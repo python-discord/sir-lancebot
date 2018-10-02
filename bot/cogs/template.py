@@ -7,7 +7,7 @@ class Template:
         
     @commands.command()
     async def template(self, ctx):
-      await ctx.send('It indeed is a template cog!')
+        await ctx.send('It indeed is a template cog!')
     
 
 def setup(bot):
