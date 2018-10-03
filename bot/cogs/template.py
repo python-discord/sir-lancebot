@@ -1,13 +1,12 @@
-from os import system
-
-
 from discord.ext import commands
 
 
-"""A template cog that contains examples of commands and command groups."""
-
-
 class Template:
+
+    """
+        A template cog that contains examples of commands and command groups.
+    """
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -15,15 +14,15 @@ class Template:
     async def repository(self, ctx):
         await ctx.send('https://github.com/discord-python/hacktoberbot')
 
-    # A command group with the name git. You can now create sub-commands such as git commit.
     @commands.group(name='git', invoke_without_command=True)
     async def github(self, ctx):
+        # A command group with the name git. You can now create sub-commands such as git commit.
         await ctx.send('Resources to learn **Git**: https://try.github.io/.')
 
-    # A command that belongs to the git command group. Invoked using git commit.
     @github.command()
     async def commit(self, ctx):
-        system('git commit -m "A huge commit adding many revolutionary features!"')
+        # A command that belongs to the git command group. Invoked using git commit.
+        await ctx.send('`git commit -m "First commit"` commits tracked changes.')
 
 
 # Required in order to load the cog, use the class name in the add_cog function.

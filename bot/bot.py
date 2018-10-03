@@ -3,9 +3,10 @@ from sys import stderr
 from traceback import print_exc
 from os import environ
 
-
 from discord.ext import commands
 
+
+HACKTOBERBOT_TOKEN = environ.get('HACKTOBERBOT_TOKEN')
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('!'))
 
 if __name__ == '__main__':
@@ -18,4 +19,4 @@ if __name__ == '__main__':
             print(f'Failed to load extension {extension}.', file=stderr)
             print_exc()
 
-bot.run(environ.get('TOKEN'))
+bot.run(HACKTOBERBOT_TOKEN)
