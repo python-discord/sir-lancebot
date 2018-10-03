@@ -9,4 +9,6 @@ This project is a community project for the Python Discord community over at htt
 * Pull requests that do not solve an open issue, for issues that have already been solved, or that are low-effort will be marked with the `invalid` label, which will ensure that they do not count towards your 5 Hacktoberfest PRs.
 * You must be a member of our Discord community in order to contribute to this project. 
 
+# Installation & Dependency Management
 
+Hacktoberbot utilizes [Pipenv](https://pipenv.readthedocs.io/en/latest/) for installation and dependency management. For users unfamiliar with the Pipenv workflow, a [Pipenv Primer](https://github.com/discord-python/hacktoberbot/wiki/Hacktoberbot-and-Pipenv) is provided in Hactoberbot's Wiki.
