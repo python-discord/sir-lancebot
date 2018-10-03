@@ -1,0 +1,21 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+"discord.py" = {ref = "rewrite", git = "https://github.com/Rapptz/discord.py"}
+
+[dev-packages]
+"flake8" = "*"
+"flake8-bugbear" = "*"
+"flake8-import-order" = "*"
+"flake8-tidy-imports" = "*"
+"flake8-todo" = "*"
+"flake8-string-format" = "*"
+
+[requires]
+python_version = "3.7"
+
+[scripts]
+start = "python -m bot"
