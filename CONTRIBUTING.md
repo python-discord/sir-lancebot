@@ -11,4 +11,4 @@ This project is a community project for the Python Discord community over at htt
 
 # Installation & Dependency Management
 
-Hacktoberbot utilizes [Pipenv](https://pipenv.readthedocs.io/en/latest/) for installation and dependency management. For users unfamiliar with the Pipenv workflow, a [Pipenv Primer](https://github.com/sdiscord-python/hacktoberbot/wiki/Hacktoberbot-and-Pipenv) is provided in Hactoberbot's Wiki.
+Hacktoberbot utilizes [Pipenv](https://pipenv.readthedocs.io/en/latest/) for installation and dependency management. For users unfamiliar with the Pipenv workflow, a [Pipenv Primer](https://github.com/discord-python/hacktoberbot/wiki/Hacktoberbot-and-Pipenv) is provided in Hactoberbot's Wiki.
