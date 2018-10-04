@@ -46,19 +46,20 @@ class Stats:
         """
         Return a stats embed built from username's PRs
         """
-        stats = self._summarizePRs(PRs)
-
-        if stats['nPRs'] >= 5:
+        PRstats = self._summarizePRs(PRs)
+        
+        n = PRstats['nPRs']
+        if n >= 5:
             shirtstr = f"**{username} has earned a tshirt!**"
-        elif stats['nPRs'] == 4:
+        elif n == 4:
             shirtstr = f"**{username} is 1 PR away from a tshirt!**"
         else:
-            shirtstr = f"**{username} is {5 - stats['nPRs']} PRs away from a tshirt!**"
+            shirtstr = f"**{username} is {5 - n} PRs away from a tshirt!**"
 
         statsembed = discord.Embed(
             title=f"{username}'s Hacktoberfest'",
             color=discord.Color(0x9c4af7),
-            description=f"{username} has made {stats['nPRs']} contributions in October\n\n{shirtstr}\n\n"
+            description=f"{username} has made {n} {Stats.contributionator(n)} in October\n\n{shirtstr}\n\n"
             )
         statsembed.set_thumbnail(url=f"https://www.github.com/{username}.png")
         statsembed.set_author(
@@ -162,13 +163,21 @@ class Stats:
         baseURL = "https://www.github.com/"
         contributionstrs = []
         for repo in stats['top5']:
-            if repo[1] == 1:
-                contributionstr = "contribution"
-            else:
-                contributionstr = "contributions"
-            contributionstrs.append(f"{repo[1]} {contributionstr} to [{repo[0]}]({baseURL}{repo[0]})")
+            n = repo[1]
+            contributionstrs.append(f"{n} {Stats.contributionator(n)} to [{repo[0]}]({baseURL}{repo[0]})")
 
         return "\n".join(contributionstrs)
+
+    @staticmethod
+    def contributionator(n: int) -> str:
+        """
+        Return "contribution" or "contributions" based on the value of n
+        """
+
+        if n == 1:
+            return "contribution"
+        else:
+            return "contributions"
 
 
 def setup(bot):
