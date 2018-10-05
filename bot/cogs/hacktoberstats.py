@@ -11,16 +11,16 @@ from discord.ext import commands
 class Stats:
     def __init__(self, bot):
         self.bot = bot
-        self.channelID = (496432022961520650)  # Hardcode #event-hacktoberfest channel ID
+        self.channel_id = (496432022961520650)  # Hardcode #event-hacktoberfest channel ID
 
     @commands.command(
         name="stats",
         aliases=["getstats", "userstats"],
         brief="Get a user's Hacktoberfest contribution stats",
     )
-    async def getstats(self, ctx, *args):
+    async def get_stats(self, ctx, username: str):
         """
-        Query GitHub's API for PRs created by a GitHub user during the month of October that 
+        Query GitHub's API for PRs created by a GitHub user during the month of October that
         do not have an 'invalid' tag
 
         For example:
@@ -32,23 +32,22 @@ class Stats:
 
         The first input argument is treated as the username, any additional inputs are discarded
         """
-        username = args[0]
-        PRs = await self.getoctoberprs(username)
+        prs = await self.get_october_prs(username)
 
-        postchannel = self.bot.get_channel(self.channelID)
-        if PRs:
-            statsembed = self.buildembed(username, PRs)
-            await postchannel.send('Here are some stats!', embed=statsembed)
+        post_channel = self.bot.get_channel(self.channel_id)
+        if prs:
+            stats_embed = self.build_embed(username, prs)
+            await post_channel.send('Here are some stats!', embed=stats_embed)
         else:
-            await postchannel.send(f"No October GitHub contributions found for '{username}'")
+            await post_channel.send(f"No October GitHub contributions found for '{username}'")
 
-    def buildembed(self, username: str, PRs: typing.List[dict]) -> discord.Embed:
+    def build_embed(self, username: str, prs: typing.List[dict]) -> discord.Embed:
         """
         Return a stats embed built from username's PRs
         """
-        PRstats = self._summarizePRs(PRs)
-        
-        n = PRstats['nPRs']
+        pr_stats = self._summarize_prs(prs)
+
+        n = pr_stats['n_prs']
         if n >= 5:
             shirtstr = f"**{username} has earned a tshirt!**"
         elif n == 4:
@@ -56,47 +55,53 @@ class Stats:
         else:
             shirtstr = f"**{username} is {5 - n} PRs away from a tshirt!**"
 
-        statsembed = discord.Embed(
-            title=f"{username}'s Hacktoberfest'",
+        stats_embed = discord.Embed(
+            title=f"{username}'s Hacktoberfest",
             color=discord.Color(0x9c4af7),
-            description=f"{username} has made {n} {Stats.contributionator(n)} in October\n\n{shirtstr}\n\n"
-            )
-        statsembed.set_thumbnail(url=f"https://www.github.com/{username}.png")
-        statsembed.set_author(
+            description=f"{username} has made {n} {Stats._contributionator(n)} in October\n\n{shirtstr}\n\n"
+        )
+
+        stats_embed.set_thumbnail(url=f"https://www.github.com/{username}.png")
+        stats_embed.set_author(
             name="Hacktoberfest",
-            url="https://hacktoberfest.digitalocean.com", 
+            url="https://hacktoberfest.digitalocean.com",
             icon_url="https://hacktoberfest.digitalocean.com/assets/logo-hacktoberfest.png"
-            )
-        statsembed.add_field(
-            name="Top 5 Repositories:", 
-            value=self._buildtop5str(stats)
-            )
-        
-        return statsembed
+        )
+        stats_embed.add_field(
+            name="Top 5 Repositories:",
+            value=self._build_top5str(pr_stats)
+        )
+
+        return stats_embed
 
     @staticmethod
-    async def getoctoberprs(username: str) -> typing.List[dict]:
+    async def get_october_prs(username: str) -> typing.List[dict]:
         """
-        Query GitHub's API for PRs created during the month of October by username that do 
+        Query GitHub's API for PRs created during the month of October by username that do
         not have an 'invalid' tag
-        
+
         If PRs are found, return a list of dicts with basic PR information
-        
+
         For each PR:
-        
             {
-            repo_url: str
-            repo_shortname: str (e.g. "discord-python/hacktoberbot")
-            created_at: datetime.datetime
+            "repo_url": str
+            "repo_shortname": str (e.g. "discord-python/hacktoberbot")
+            "created_at": datetime.datetime
             }
-        
+
         Otherwise, return None
         """
-        queryURL = f"https://api.github.com/search/issues?q=-label:invalid+type:pr+is:public+author:{username}+created:2018-10-01..2018-10-31&per_page=300"
+        base_url = "https://api.github.com/search/issues?q="
+        not_label = "invalid"
+        action_type = "pr"
+        is_query = f"public+author:{username}"
+        date_range = "2018-10-01..2018-10-31"
+        per_page = "300"
+        query_url = f"{base_url}-label:{not_label}+type:{action_type}+is:{is_query}+created:{date_range}&per_page={per_page}"
 
         headers = {"user-agent": "Discord Python Hactoberbot"}
         async with aiohttp.ClientSession() as session:
-            async with session.get(queryURL, headers=headers) as resp:
+            async with session.get(query_url, headers=headers) as resp:
                 jsonresp = await resp.json()
 
         if "message" in jsonresp.keys():
@@ -110,7 +115,7 @@ class Stats:
             else:
                 outlist = []
                 for item in jsonresp["items"]:
-                    shortname = Stats._getURL(item["repository_url"])
+                    shortname = Stats._get_shortname(item["repository_url"])
                     itemdict = {
                         "repo_url": f"https://www.github.com/{shortname}",
                         "repo_shortname": shortname,
@@ -122,58 +127,57 @@ class Stats:
                 return outlist
 
     @staticmethod
-    def _getURL(inurl: str) -> str:
+    def _get_shortname(in_url: str) -> str:
         """
-        Convert GitHub API URL to a regular permalink
-        
-        e.g. "https://api.github.com/repos/discord-python/hacktoberbot" 
-            |
-            V
-            "https://github.com/discord-python/hacktoberbot"
+        Extract shortname from https://api.github.com/repos/* URL
+
+        e.g. "https://api.github.com/repos/discord-python/hacktoberbot"
+             |
+             V
+             "discord-python/hacktoberbot"
         """
         exp = r"https?:\/\/api.github.com\/repos\/([/\-\w]+)"
-        return re.findall(exp, inurl)[0]
+        return re.findall(exp, in_url)[0]
 
     @staticmethod
-    def _summarizePRs(PRs: typing.List[dict]) -> typing.Dict:
+    def _summarize_prs(prs: typing.List[dict]) -> typing.Dict:
         """
-        Generate statistics from an input list of PR dictionaries, as output by getoctoberprs
-        
+        Generate statistics from an input list of PR dictionaries, as output by get_october_prs
+
         Return a dictionary containing:
             {
-            nPRs: int
-            top5: [(repo_shortname, ncontributions), ...]
+            "n_prs": int
+            "top5": [(repo_shortname, ncontributions), ...]
             }
         """
-        contributedrepos = [PR["repo_shortname"] for PR in PRs]
-        return {"nPRs": len(PRs), "top5": Counter(contributedrepos).most_common(5)}
+        contributed_repos = [pr["repo_shortname"] for pr in prs]
+        return {"n_prs": len(prs), "top5": Counter(contributed_repos).most_common(5)}
 
     @staticmethod
-    def _buildtop5str(stats: typing.List[tuple]) -> str:
+    def _build_top5str(stats: typing.List[tuple]) -> str:
         """
         Build a string from the Top 5 contributions that is compatible with a discord.Embed field
 
         Top 5 contributions should be a list of tuples, as output in the stats dictionary by
-        _summarizePRs
+        _summarize_prs
 
         String is of the form:
            n contribution(s) to [shortname](url)
-           ,,,
+           ...
         """
         baseURL = "https://www.github.com/"
         contributionstrs = []
         for repo in stats['top5']:
             n = repo[1]
-            contributionstrs.append(f"{n} {Stats.contributionator(n)} to [{repo[0]}]({baseURL}{repo[0]})")
+            contributionstrs.append(f"{n} {Stats._contributionator(n)} to [{repo[0]}]({baseURL}{repo[0]})")
 
         return "\n".join(contributionstrs)
 
     @staticmethod
-    def contributionator(n: int) -> str:
+    def _contributionator(n: int) -> str:
         """
         Return "contribution" or "contributions" based on the value of n
         """
-
         if n == 1:
             return "contribution"
         else:
