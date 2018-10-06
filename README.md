@@ -98,8 +98,9 @@ Now to tell other people what your PR does
 1. Title - be concise and informative
 2. Description - write what the PR changes as well as what issues it relates to
 3. Hit `Create pull request`
+![](https://i.imgur.com/OjKYdsL.png)
 
 #### 7. Wait & further reading
 At this point your PR will either be accepted or a maintainer might request some changes.
 
-So you can read up some more on (Git)[https://try.github.io], (PyCharm)[https://www.jetbrains.com/help/pycharm/quick-start-guide.html] or you might want to learn more about Python and discord: (discord.py rewrite)[https://discordpy.readthedocs.io/en/rewrite/]
+So you can read up some more on [https://try.github.io](Git), [https://www.jetbrains.com/help/pycharm/quick-start-guide.html](PyCharm) or you might want to learn more about Python and discord: [https://discordpy.readthedocs.io/en/rewrite/](discord.py rewrite)
