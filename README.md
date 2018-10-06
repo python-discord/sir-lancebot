@@ -6,20 +6,13 @@ You can find our community by going to https://discord.gg/python
 ## Motivations
 We know it can be difficult to get into the whole open source thing at first. To help out, we've decided to start a little community project during hacktober that you can all choose to contribute to if you're finding the event a little overwhelming, or if you're new to this whole thing and just want someone to hold your hand at first.
 
-*Lemon*
-
 ## Commands
 
-### repository
-Alias: project
-A command to send the hacktoberbot github project
+!repository - Links to this repository
 
-### git
-Alias: github
-A command that sends a getting started with Git page
-
-### git.commit
-Sends a sample first commit
+### Git
+!Git - Links to getting started with Git page
+!Git.commit - An example commit command
 
 ## Getting started
 
@@ -34,7 +27,7 @@ So now your going to need to download it [here](https://www.jetbrains.com/pychar
 #### 1. Fork
 Ok, now you have got PyCharm downloading you are going to want to fork this project and find its git URL. To fork scroll to the top of the page and press this button.
 ![](https://i.imgur.com/Saf9pgJ.png)
-then when you new forked repository loads you are going to want to get the Git Url by clicking the green clone or download button and then the copy link button as seen below:
+Then when you new forked repository loads you are going to want to get the Git Url by clicking the green clone or download button and then the copy link button as seen below:
 ![](https://i.imgur.com/o6kuQcZ.png)
 #### 2. Clone
 Now that you have done that you are going to want to load up Pycharm and you'll get something like this without the left sidebar:
@@ -79,12 +72,12 @@ As we work on our project we are going to want to make commits. Commits are effe
 ![](https://i.imgur.com/xA5ga4C.png)
 Now once you have made a few commits and are happy with your changes you are going to want to push them back to your fork.
 There are three ways of doing this.
-1. using the VSC Menu `VSC->Git->Push
-2. using the VSC popup <code>alt-\`->Push</code>
-3. or a shortcut: `ctrl+shift+K`
+1. Using the VSC Menu `VSC->Git->Push
+2. Using the VSC popup <code>alt-\`->Push</code>
+3. A shortcut: `ctrl+shift+K`
 
 You should get a menu like below:
-1. list of commits
+1. List of commits
 2. List of changed files
 3. Hit Push to send to fork!
 
