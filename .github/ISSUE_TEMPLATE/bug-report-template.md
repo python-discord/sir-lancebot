@@ -6,31 +6,24 @@ about: A simple bug report template.
 
 ## Description
 
-Please, provide here a simple description about the bug.
+[provide a simple description of the bug]
 
-## Steps
+## Steps to Reproduce
 
-### Step 1
-Please, provide here a detailed description about the step 1.
-
-### Step 2
-Please, provide here a detailed description about the step 2.
-
-### Step 3
-Please, provide here a detailed description about the step 3.
+- [replace with a description of a step to reproduce the issue]
+- [replace with a description of a step to reproduce the issue]
+- [replace with a description of a step to reproduce the issue]
 
 ## Expected Behavior
-The expected behaviour is <provide here detailed description and, if necessary, screenshots>.
+The expected behaviour is [provide a detailed description and, if necessary, screenshots].
 
 ## Actual Behavior
-The actual behaviour is <provide here detailed description and, if necessary, screenshots>.
+The actual behaviour is [provide a detailed description and, if necessary, screenshots].
 
 ## Environment
 - Device Type: (e.g.: Desktop or Mobile)
 - Operating System: (e.g.: Microsoft Windows or Ubuntu Linux)
   - Version: (e.g.: 10 or 18.04)
-- Browser: (e.g.: Mozilla Firefox or Google Chrome)
-  - Version: (e.g.: 1, 2, 3)
 
 ## Other
-Please, provide here additional details that can be helpful.
+[provide any additional details that can be helpful]

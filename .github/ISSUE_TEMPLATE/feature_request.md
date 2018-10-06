@@ -6,19 +6,19 @@ about: A simple feature request template.
 
 ## Description
 
-Please, provide here a simple description about the feature request.
+[provide a simple description of the feature request]
 
 ## Reason
 
-- Reason 1
-- Reason 2
-- Reason 3
+- [replace with a reason]
+- [replace with a reason]
+- [replace with a reason]
 
 ## Required Changes
 
-- Change 1
-- Change 2
-- Change 3
+- [replace with a change]
+- [replace with a change]
+- [replace with a change]
 
 ## Other
-Please, provide here additional details that can be helpful.
+[provide any additional details that can be helpful]
