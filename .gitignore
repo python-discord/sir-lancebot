@@ -1,13 +1,6 @@
 # C extensions
 *.so
 
-# Docker
-docker-compose.*.yaml
-
-# Flask
-instance/
-.webassets-cache
-
 # Log
 log/
 logs/
