@@ -7,7 +7,7 @@ from discord.ext import commands
 
 HACKTOBERBOT_TOKEN = environ.get('HACKTOBERBOT_TOKEN')
 
-ghost_unicode = u"\U0001F47B"
+ghost_unicode = "\N{GHOST}"
 bot = commands.Bot(command_prefix=commands.when_mentioned_or(".", f"{ghost_unicode} ", ghost_unicode))
 
 if __name__ == '__main__':
