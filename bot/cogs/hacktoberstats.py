@@ -11,7 +11,6 @@ from discord.ext import commands
 class Stats:
     def __init__(self, bot):
         self.bot = bot
-        self.channel_id = (496432022961520650)  # Hardcode #event-hacktoberfest channel ID
 
     @commands.command(
         name="stats",
@@ -34,12 +33,11 @@ class Stats:
         """
         prs = await self.get_october_prs(username)
 
-        post_channel = self.bot.get_channel(self.channel_id)
         if prs:
             stats_embed = self.build_embed(username, prs)
-            await post_channel.send('Here are some stats!', embed=stats_embed)
+            await ctx.send('Here are some stats!', embed=stats_embed)
         else:
-            await post_channel.send(f"No October GitHub contributions found for '{username}'")
+            await ctx.send(f"No October GitHub contributions found for '{username}'")
 
     def build_embed(self, username: str, prs: typing.List[dict]) -> discord.Embed:
         """
