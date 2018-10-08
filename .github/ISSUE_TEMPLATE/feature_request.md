@@ -4,21 +4,16 @@ about: A simple feature request template.
 
 ---
 
-## Description
+Provide a simple description of how the feature would work. This should not include technical details, but should instead be a high level description of how the user experience would be when you used this feature.
 
-[provide a simple description of the feature request]
+## Implementation details
 
-## Reason
+List the changes required for the implementation here.
 
-- [replace with a reason]
-- [replace with a reason]
-- [replace with a reason]
-
-## Required Changes
-
-- [replace with a change]
-- [replace with a change]
-- [replace with a change]
+- [ ] Write the bot command
+- [ ] Add the command to our README.md
+- [ ] etc.
 
 ## Other
-[provide any additional details that can be helpful]
+
+Provide any additional information or clarifications here.
