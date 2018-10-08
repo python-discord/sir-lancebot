@@ -14,6 +14,6 @@ List the changes required for the implementation here.
 - [ ] Add the command to our README.md
 - [ ] etc.
 
-## Other
+## Additional information
 
 Provide any additional information or clarifications here.
