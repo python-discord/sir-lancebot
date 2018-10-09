@@ -85,10 +85,10 @@ class Movie:
             description=movie.get('overview')
         )
         embed.set_image(url=poster)
-        embed.add_field(name='Staring', value=', '.join(cast))
+        embed.add_field(name='Starring', value=', '.join(cast))
         embed.add_field(name='Directed by', value=director)
         embed.add_field(name='Year', value=movie.get('release_date')[:4])
-        embed.add_field(name='Runtime', value=str(movie.get('runtime')) + 'm')
+        embed.add_field(name='Runtime', value=str(movie.get('runtime')) + ' min')
         embed.add_field(name='Spooky Rating', value=rating)
         embed.set_footer(text='powered by themoviedb.org')
 
