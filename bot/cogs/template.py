@@ -12,6 +12,9 @@ class Template:
 
     @commands.command(name='repo', aliases=['repository', 'project'], brief='A link to the repository of this bot.')
     async def repository(self, ctx):
+        """
+        A command to send the hacktoberbot github project
+        """
         await ctx.send('https://github.com/discord-python/hacktoberbot')
 
     @commands.group(name='git', invoke_without_command=True)
