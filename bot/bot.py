@@ -19,6 +19,7 @@ bot = commands.Bot(command_prefix=commands.when_mentioned_or(".", f"{ghost_unico
 
 logging.info('Start loading extensions from ./cogs/')
 
+
 if __name__ == '__main__':
     # Scan for files in the /cogs/ directory and make a list of the file names.
     cogs = [file.stem for file in Path('cogs').glob('*.py')]
