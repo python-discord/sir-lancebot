@@ -12,9 +12,9 @@
     docker push pythondiscord/hacktober-bot:latest
     
     echo "Deploying on server"
-    pepper "glimglam.gserv.me" state.apply docker/hacktoberbot \
-           --saltapi-url=${SALTAPI_URL} --auth=${SALTAPI_EAUTH} \
-           --username=${SALTAPI_USER}   --password=${SALTAPI_PASS} \
+    pepper "$SALTAPI_TARGET" state.apply docker/hacktoberbot \
+           --saltapi-url="$SALTAPI_URL" --auth="$SALTAPI_EAUTH" \
+           --username="$SALTAPI_USER"   --password="$SALTAPI_PASS" \
            &> /dev/null
 
 #    echo "Deploying container"
