@@ -37,6 +37,16 @@ HALLOWEEN_FACTS = [
      "suspected of being the familiars of witches, or actually shape-shifting witches themselves. They are, however, "
      "too cute to be evil."),
 ]
+SPOOKY_EMOJIS = [
+    "\N{BAT}",
+    "\N{DERELICT HOUSE BUILDING}",
+    "\N{EXTRATERRESTRIAL ALIEN}",
+    "\N{GHOST}",
+    "\N{JACK-O-LANTERN}",
+    "\N{SKULL}",
+    "\N{SKULL AND CROSSBONES}",
+    "\N{SPIDER WEB}",
+]
 PUMPKIN_ORANGE = discord.Color(0xFF7518)
 HACKTOBERFEST_CHANNEL_ID = 101010  # Replace with actual channel ID.
 INTERVAL = timedelta(hours=6).total_seconds()
@@ -84,7 +94,8 @@ class HalloweenFacts:
         """
         Builds a Discord embed from the given fact and its index.
         """
-        title = f"Halloween Fact #{index + 1}"
+        emoji = random.choice(SPOOKY_EMOJIS)
+        title = f"{emoji} Halloween Fact #{index + 1}"
         return discord.Embed(title=title, description=fact, color=PUMPKIN_ORANGE)
 
 
