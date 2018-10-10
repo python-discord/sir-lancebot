@@ -6,7 +6,8 @@ SPOOKY_TRIGGERS = {
     'doot': "\U0001F480",
     'pumpkin': "\U0001F383",
     'halloween': "\U0001F383",
-    'jack-o-lantern': "\U0001F383"
+    'jack-o-lantern': "\U0001F383",
+    'danger': "\U00002620"
 }
 
 
