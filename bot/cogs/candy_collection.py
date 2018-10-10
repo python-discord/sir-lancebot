@@ -138,9 +138,8 @@ class CandyCollection:
     async def send_spook_msg(self, channel, candies):
         """Send a (lame) spooky message"""
         e = discord.Embed(colour=discord.Member.colour)
-        e.set_author(name="You went to bed last night and the witch visited your grave."
-                          " She left a message that you will be cursed for as long as you live."
-                          f" You woke up this morning and found that {candies} candies had disappeared")
+        e.set_author(name="Ghosts and Ghouls and Jack o' lanterns at night; "
+                          f"I took {candies} candies and quickly took flight.")
         await channel.send(embed=e)
 
     def save_to_json(self):
@@ -176,7 +175,7 @@ class CandyCollection:
         e.add_field(name='\u200b',
                     value=f"Candies will randomly appear on messages sent. "
                           f"\nHit the candy when it appears as fast as possible to get the candy! "
-                          f"\nBut beware the witch...",
+                          f"\nBut beware the ghosts...",
                     inline=False)
         await ctx.send(embed=e)
 
