@@ -31,11 +31,11 @@ class Halloweenify:
         # Build up a Embed
         embed = discord.Embed()
         embed.colour = discord.Colour.dark_orange()
-        embed.title = 'Wow!'
+        embed.title = 'Not spooky enough?'
         embed.description = (
             f'**{ctx.author.display_name}** wasn\'t spooky enough for you? That\'s understandable, '
             f'{ctx.author.display_name} isn\'t scary at all! Let me think of something better. Hmm... I got it!\n Your '
-            f'new nickname will be: \n 👻 **{nickname}** 🎃'
+            f'new nickname will be: \n :jack_o_lantern: **{nickname}** :ghost:'
         )
         embed.set_image(url=image)
 
