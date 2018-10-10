@@ -12,11 +12,10 @@
     docker push pythondiscord/hacktober-bot:latest
     
     echo "Deploying on server"
-    pepper "glimglam.gserv.me" state.apply docker/hacktoberbot -u $SALTAPI_URL -a $SALTAPI_EAUTH --username $SALTAPI_USER --password $SALTAPI_PASS &> /dev/null
+    pepper "glimglam.gserv.me" state.apply docker/hacktoberbot -u ${SALTAPI_URL} -a ${SALTAPI_EAUTH} --username ${SALTAPI_USER} --password ${SALTAPI_PASS} &> /dev/null
 
 #    echo "Deploying container"
 #    curl -H "token: $AUTODEPLOY_TOKEN" $AUTODEPLOY_WEBHOOK
 #else
 #    echo "Skipping deploy"
 #fi
-
