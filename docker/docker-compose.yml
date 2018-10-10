@@ -1,0 +1,11 @@
+version: "3"
+services:
+  dumbo:
+    image: pythondiscord/hacktober-bot:latest
+    container_name: hacktoberbot
+
+    restart: always
+
+    environment:
+      - HACKTOBERBOT_TOKEN
+
