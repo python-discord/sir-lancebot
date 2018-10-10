@@ -12,10 +12,7 @@
     docker push pythondiscord/hacktober-bot:latest
     
     echo "Deploying on server"
-    pepper ${SALTAPI_TARGET} state.apply docker/hacktoberbot \
-           --saltapi-url=${SALTAPI_URL} --auth=${SALTAPI_EAUTH} \
-           --username=${SALTAPI_USER} --password=${SALTAPI_PASS} \
-           --out=no_out --non-interactive
+    pepper ${SALTAPI_TARGET} state.apply docker/hacktoberbot --out=no_out --non-interactive
 
 #    echo "Deploying container"
 #    curl -H "token: $AUTODEPLOY_TOKEN" $AUTODEPLOY_WEBHOOK
