@@ -15,4 +15,4 @@ install:
 script:
   - pipenv run lint
   - sh docker/build.sh
-  - pepper "glimglam.gserv.me" state.apply docker/hacktoberbot &> /dev/null
+  - echo $SALTAPI_PASS | pepper "glimglam.gserv.me" state.apply docker/hacktoberbot &> /dev/null
