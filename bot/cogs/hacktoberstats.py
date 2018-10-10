@@ -95,7 +95,9 @@ class Stats:
         is_query = f"public+author:{username}"
         date_range = "2018-10-01..2018-10-31"
         per_page = "300"
-        query_url = f"{base_url}-label:{not_label}+type:{action_type}+is:{is_query}+created:{date_range}&per_page={per_page}"
+        query_url = (
+            f"{base_url}-label:{not_label}+type:{action_type}+is:{is_query}+created:{date_range}&per_page={per_page}"
+        )
 
         headers = {"user-agent": "Discord Python Hactoberbot"}
         async with aiohttp.ClientSession() as session:
