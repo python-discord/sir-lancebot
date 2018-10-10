@@ -4,8 +4,7 @@ import aiohttp
 from discord.ext import commands
 
 
-class Gif:
-
+class SpookyGif:
     """
     A cog to fetch a random spooky gif from the web!
     """
@@ -16,6 +15,10 @@ class Gif:
 
     @commands.command()
     async def gif(self, ctx):
+        """
+        Fetches a random gif from the GIPHY API and responds with it.
+        """
+
         async with aiohttp.ClientSession() as session:
             params = {'api_key': self.GIPHY_TOKEN, 'tag': 'halloween', 'rating': 'g'}
             # Make a GET request to the Giphy API to get a random halloween gif.
@@ -26,4 +29,4 @@ class Gif:
 
 
 def setup(bot):
-    bot.add_cog(Gif(bot))
+    bot.add_cog(SpookyGif(bot))
