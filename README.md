@@ -14,8 +14,8 @@ We know it can be difficult to get into the whole open source thing at first. To
 !Git - Links to getting started with Git page
 !Git.commit - An example commit command
 
-###Halloween Facts
-Random halloween facts are posted regularly.
+### Halloween Facts
+Random halloween facts are posted regularly.  
 !hallofact - Show the last posted Halloween fact
 
 ## Getting started
