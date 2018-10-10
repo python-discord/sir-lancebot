@@ -11,5 +11,7 @@ services:
 install:
   - pip install flake8 pipenv
   - pipenv install --deploy
+
+script:
   - pipenv run lint
   - sh docker/build.sh
