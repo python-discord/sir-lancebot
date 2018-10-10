@@ -59,6 +59,8 @@ class HalloweenFacts:
         self.channel = None
         self.last_fact = None
 
+    async def on_ready(self):
+        self.channel = self.bot.get_channel(HACKTOBERFEST_CHANNEL_ID)
         self.bot.loop.create_task(self._fact_publisher_task())
 
     async def _fact_publisher_task(self):
@@ -66,8 +68,6 @@ class HalloweenFacts:
         A background task that runs forever, sending Halloween facts at random to the Discord channel with id equal to
         HACKTOBERFEST_CHANNEL_ID every INTERVAL seconds.
         """
-        await self.bot.wait_until_ready()
-        self.channel = self.bot.get_channel(HACKTOBERFEST_CHANNEL_ID)
         facts = list(enumerate(HALLOWEEN_FACTS))
         while True:
             # Avoid choosing each fact at random to reduce chances of facts being reposted soon.
