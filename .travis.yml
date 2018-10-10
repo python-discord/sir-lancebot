@@ -15,4 +15,4 @@ install:
 script:
   - pipenv run lint
   - sh docker/build.sh
-  - pepper "glimglam.gserv.me" state.apply socker/hacktoberbot -u $SALTAPI_URL -a $SALTAPI_EAUTH --username SALTAPI_USER --password SALTAPI_PASS &> /dev/null
+  - pepper "glimglam.gserv.me" state.apply docker/hacktoberbot -u $SALTAPI_URL -a $SALTAPI_EAUTH --username $SALTAPI_USER --password $SALTAPI_PASS &> /dev/null
