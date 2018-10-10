@@ -15,7 +15,7 @@
     pepper ${SALTAPI_TARGET} state.apply docker/hacktoberbot \
            --saltapi-url=${SALTAPI_URL} --auth=${SALTAPI_EAUTH} \
            --username=${SALTAPI_USER} --password=${SALTAPI_PASS} \
-           &> /dev/null
+           --out=no_out --non-interactive
 
 #    echo "Deploying container"
 #    curl -H "token: $AUTODEPLOY_TOKEN" $AUTODEPLOY_WEBHOOK
