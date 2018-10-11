@@ -18,7 +18,10 @@ class Halloweenify:
     @commands.cooldown(1, 300, BucketType.user)
     @commands.command()
     async def halloweenify(self, ctx):
-        with open(Path('../bot/resources', 'halloweenify.json'), 'r') as f:
+        """
+        Change your nickname into a much spookier one!
+        """
+        with open(Path('./bot/resources', 'halloweenify.json'), 'r') as f:
             data = load(f)
 
         # Choose a random character from our list we loaded above and set apart the nickname and image url.
