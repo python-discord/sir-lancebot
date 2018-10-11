@@ -13,9 +13,6 @@ if [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_PULL_REQUEST == 'false' ]]; then
     
     echo "Deploying on server"
     pepper ${SALTAPI_TARGET} state.apply docker/hacktoberbot --out=no_out --non-interactive &> /dev/null
-
-    echo "Deploying container"
-    curl -H "token: $AUTODEPLOY_TOKEN" $AUTODEPLOY_WEBHOOK
 else
     echo "Skipping deploy"
 fi
