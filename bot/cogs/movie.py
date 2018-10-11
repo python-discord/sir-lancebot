@@ -1,8 +1,10 @@
-import requests
 import random
 from os import environ
-from discord.ext import commands
+
+import requests
 from discord import Embed
+from discord.ext import commands
+
 
 TMDB_API_KEY = environ.get('TMDB_API_KEY')
 TMDB_TOKEN = environ.get('TMDB_TOKEN')
@@ -72,7 +74,7 @@ class Movie:
         rating_count = movie.get('vote_average') / 2
         rating = ''
 
-        for i in range(int(rating_count)):
+        for _ in range(int(rating_count)):
             rating += ':skull:'
 
         if (rating_count % 1) >= .5:

@@ -1,10 +1,10 @@
+import logging
 from os import environ
 from pathlib import Path
-from sys import stderr
-from traceback import print_exc, format_exc
+from traceback import format_exc
 
 from discord.ext import commands
-import logging
+
 
 HACKTOBERBOT_TOKEN = environ.get('HACKTOBERBOT_TOKEN')
 
@@ -18,7 +18,6 @@ ghost_unicode = "\N{GHOST}"
 bot = commands.Bot(command_prefix=commands.when_mentioned_or(".", f"{ghost_unicode} ", ghost_unicode))
 
 logging.info('Start loading extensions from ./cogs/')
-
 
 if __name__ == '__main__':
     # Scan for files in the /cogs/ directory and make a list of the file names.

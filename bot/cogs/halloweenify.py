@@ -1,5 +1,5 @@
-from pathlib import Path
 from json import load
+from pathlib import Path
 from random import choice
 
 

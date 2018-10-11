@@ -5,7 +5,6 @@ name = "pypi"
 
 [packages]
 "discord.py" = {ref = "rewrite", git = "https://github.com/Rapptz/discord.py"}
-requests = "*"
 
 [dev-packages]
 "flake8" = "*"
@@ -20,3 +19,4 @@ python_version = "3.7"
 
 [scripts]
 start = "python -m bot"
+lint = "flake8 bot"
