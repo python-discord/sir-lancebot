@@ -14,4 +14,4 @@ install:
 
 script:
   - pipenv run lint
-  - sh docker/build.sh
+  - bash docker/build.sh
