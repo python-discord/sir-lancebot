@@ -20,8 +20,6 @@ class Halloweenify:
     async def halloweenify(self, ctx):
         """
         Change your nickname into a much spookier one!
-        :param ctx:
-        :return:
         """
         with open(Path('../bot/resources', 'halloweenify.json'), 'r') as f:
             data = load(f)
