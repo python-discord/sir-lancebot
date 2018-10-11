@@ -7,7 +7,6 @@ from pathlib import Path
 import discord
 from discord.ext import commands
 
-HALLOWEEN_FACTS_JSON = "halloween_facts.json"
 SPOOKY_EMOJIS = [
     "\N{BAT}",
     "\N{DERELICT HOUSE BUILDING}",
@@ -27,7 +26,7 @@ class HalloweenFacts:
 
     def __init__(self, bot):
         self.bot = bot
-        with open(Path("resources", HALLOWEEN_FACTS_JSON), "r") as file:
+        with open(Path("resources", "halloween_facts.json"), "r") as file:
             self.halloween_facts = json.load(file)
         self.channel = None
         self.last_fact = None
