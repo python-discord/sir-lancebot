@@ -1,5 +1,3 @@
-from discord.ext import commands
-
 SPOOKY_TRIGGERS = {
     'spooky': "\U0001F47B",
     'skeleton': "\U0001F480",
