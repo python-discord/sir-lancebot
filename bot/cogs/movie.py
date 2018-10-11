@@ -18,8 +18,11 @@ class Movie:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='movie', alias=['tmdb'], brief='Pick a scary movie')
+    @commands.command(name='movie', alias=['tmdb'])
     async def random_movie(self, ctx):
+        """
+        Randomly select a scary movie and display information about it.
+        """
         selection = await self.select_movie()
         movie_details = await self.format_metadata(selection)
 
