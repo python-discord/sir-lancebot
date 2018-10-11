@@ -67,23 +67,47 @@ class Movie:
         Formats raw TMDb data to be embedded in discord chat
         """
 
-        tmdb_url = 'https://www.themoviedb.org/movie/' + str(movie.get('id'))
-        poster = 'https://image.tmdb.org/t/p/original' + movie.get('poster_path')
+        # Build the relevant URLs.
+        movie_id = movie.get("id")
+        poster_path = movie.get("poster_path")
+        tmdb_url = f'https://www.themoviedb.org/movie/{movie_id}' if movie_id else None
+        poster = f'https://image.tmdb.org/t/p/original{poster_path}' if poster_path else None
 
+        # Get cast names
         cast = []
-        for actor in movie.get('credits').get('cast')[:3]:
+        for actor in movie.get('credits', {}).get('cast', [])[:3]:
             cast.append(actor.get('name'))
 
-        director = movie.get('credits').get('crew')[0].get('name')
+        # Get director name
+        director = movie.get('credits', {}).get('crew', [])
+        if director:
+            director = director[0].get('name')
 
-        rating_count = movie.get('vote_average') / 2
+        # Determine the spookiness rating
         rating = ''
+        rating_count = movie.get('vote_average', 0)
+
+        if rating_count:
+            rating_count /= 2
 
         for _ in range(int(rating_count)):
             rating += ':skull:'
-
         if (rating_count % 1) >= .5:
             rating += ':bat:'
+
+        # Try to get year of release and runtime
+        year = movie.get('release_date', [])[:4]
+        runtime = movie.get('runtime')
+        runtime = f"{runtime} minutes" if runtime else None
+
+        # Not all these attributes will always be present
+        movie_attributes = {
+            "Directed by": director,
+            "Starring": ', '.join(cast),
+            "Running time": runtime,
+            "Release year": year,
+            "Spookiness rating": rating,
+        }
 
         embed = Embed(
             colour=0x01d277,
@@ -91,12 +115,15 @@ class Movie:
             url=tmdb_url,
             description=movie.get('overview')
         )
-        embed.set_image(url=poster)
-        embed.add_field(name='Starring', value=', '.join(cast))
-        embed.add_field(name='Directed by', value=director)
-        embed.add_field(name='Year', value=movie.get('release_date')[:4])
-        embed.add_field(name='Runtime', value=str(movie.get('runtime')) + ' min')
-        embed.add_field(name='Spooky Rating', value=rating)
+
+        if poster:
+            embed.set_image(url=poster)
+
+        # Add the attributes that we actually have data for, but not the others.
+        for name, value in movie_attributes.items():
+            if value:
+                embed.add_field(name=name, value=value)
+
         embed.set_footer(text='powered by themoviedb.org')
 
         return embed
