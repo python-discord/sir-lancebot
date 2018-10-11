@@ -3,7 +3,6 @@ import os
 
 
 # set up logging
-
 log_dir = 'log'
 log_file = log_dir + os.sep + 'hackbot.log'
 os.makedirs(log_dir, exist_ok=True)
@@ -23,9 +22,14 @@ if root.handlers:
     for handler in root.handlers:
         root.removeHandler(handler)
 
-# setup new logging configuration
-logging.basicConfig(format='%(asctime)s - %(name)s %(levelname)s: %(message)s', datefmt="%D %H:%M:%S",
-                    level=logging.DEBUG,
-                    handlers=[console_handler, file_handler])
+# Silence irrelevant loggers
+logging.getLogger("discord").setLevel(logging.ERROR)
 
-logging.info('Logging Process Started')
+# setup new logging configuration
+logging.basicConfig(
+    format='%(asctime)s - %(name)s %(levelname)s: %(message)s',
+    datefmt="%D %H:%M:%S",
+    level=logging.DEBUG,
+    handlers=[console_handler, file_handler]
+)
+logging.getLogger().info('Logging initialization complete')

@@ -2,14 +2,12 @@ from json import load
 from pathlib import Path
 from random import choice
 
-
 import discord
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
 
 
 class Halloweenify:
-
     """
     A cog to change a invokers nickname to a spooky one!
     """
