@@ -19,7 +19,7 @@ SPOOKY_EMOJIS = [
     "\N{SPIDER WEB}",
 ]
 PUMPKIN_ORANGE = discord.Color(0xFF7518)
-HACKTOBERFEST_CHANNEL_ID = 101010  # Replace with actual channel ID.
+HACKTOBERBOT_CHANNEL_ID = 498804484324196362
 INTERVAL = timedelta(hours=6).total_seconds()
 
 
@@ -33,7 +33,7 @@ class HalloweenFacts:
         self.last_fact = None
 
     async def on_ready(self):
-        self.channel = self.bot.get_channel(HACKTOBERFEST_CHANNEL_ID)
+        self.channel = self.bot.get_channel(HACKTOBERBOT_CHANNEL_ID)
         self.bot.loop.create_task(self._fact_publisher_task())
 
     async def _fact_publisher_task(self):
