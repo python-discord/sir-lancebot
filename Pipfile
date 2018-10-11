@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 "discord.py" = {ref = "rewrite", git = "https://github.com/Rapptz/discord.py"}
+requests = "*"
 
 [dev-packages]
 "flake8" = "*"
