@@ -17,7 +17,7 @@ class Template:
         """
         await ctx.send('https://github.com/discord-python/hacktoberbot')
 
-    @commands.group(name='git', invoke_without_command=True)
+    @commands.group(name='git', invoke_without_command=True, brief="A link to resources for learning Git")
     async def github(self, ctx):
         """
         A command group with the name git. You can now create sub-commands such as git commit.

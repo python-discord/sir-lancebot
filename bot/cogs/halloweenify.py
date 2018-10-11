@@ -18,6 +18,11 @@ class Halloweenify:
     @commands.cooldown(1, 300, BucketType.user)
     @commands.command()
     async def halloweenify(self, ctx):
+        """
+        Change your nickname into a much spookier one!
+        :param ctx:
+        :return:
+        """
         with open(Path('../bot/resources', 'halloweenify.json'), 'r') as f:
             data = load(f)
 
