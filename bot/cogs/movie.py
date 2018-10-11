@@ -1,8 +1,10 @@
-import requests
 import random
 from os import environ
-from discord.ext import commands
+
+import aiohttp
 from discord import Embed
+from discord.ext import commands
+
 
 TMDB_API_KEY = environ.get('TMDB_API_KEY')
 TMDB_TOKEN = environ.get('TMDB_TOKEN')
@@ -40,19 +42,24 @@ class Movie:
         }
 
         # Get total page count of horror movies
-        response = requests.get(url=url, params=params, headers=headers)
-        total_pages = response.json().get('total_pages')
+        async with aiohttp.ClientSession() as session:
+            response = await session.get(url=url, params=params, headers=headers)
+            total_pages = await response.json()
+            total_pages = total_pages.get('total_pages')
 
-        # Get movie details from one random result on a random page
-        params['page'] = random.randint(1, total_pages)
-        response = requests.get(url=url, params=params, headers=headers)
-        selection_id = random.choice(response.json().get('results')).get('id')
+            # Get movie details from one random result on a random page
+            params['page'] = random.randint(1, total_pages)
+            response = await session.get(url=url, params=params, headers=headers)
+            response = await response.json()
+            selection_id = random.choice(response.get('results')).get('id')
 
-        # Get full details and credits
-        selection = requests.get(url='https://api.themoviedb.org/3/movie/' + str(selection_id),
-                                 params={'api_key': TMDB_API_KEY, 'append_to_response': 'credits'})
+            # Get full details and credits
+            selection = await session.get(
+                url='https://api.themoviedb.org/3/movie/' + str(selection_id),
+                params={'api_key': TMDB_API_KEY, 'append_to_response': 'credits'}
+            )
 
-        return selection.json()
+            return await selection.json()
 
     @staticmethod
     async def format_metadata(movie):
@@ -72,7 +79,7 @@ class Movie:
         rating_count = movie.get('vote_average') / 2
         rating = ''
 
-        for i in range(int(rating_count)):
+        for _ in range(int(rating_count)):
             rating += ':skull:'
 
         if (rating_count % 1) >= .5:
