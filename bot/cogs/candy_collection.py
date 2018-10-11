@@ -156,7 +156,11 @@ class CandyCollection:
             pass
 
     async def send_spook_msg(self, author, channel, candies):
+<<<<<<< HEAD
         """Send a spooky message"""
+=======
+        """Send a (lame) spooky message"""
+>>>>>>> 4c29c2b470d6f27416a97c3be1e41f753e0a1ea6
         e = discord.Embed(colour=author.colour)
         e.set_author(name="Ghosts and Ghouls and Jack o' lanterns at night; "
                           f"I took {candies} candies and quickly took flight.")
@@ -200,7 +204,7 @@ class CandyCollection:
         e.add_field(name='\u200b',
                     value=f"Candies will randomly appear on messages sent. "
                           f"\nHit the candy when it appears as fast as possible to get the candy! "
-                          f"\nBut beware the witch...",
+                          f"\nBut beware the ghosts...",
                     inline=False)
         await ctx.send(embed=e)
 
