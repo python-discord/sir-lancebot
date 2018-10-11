@@ -75,7 +75,7 @@ class CandyCollection:
                         else:
                             lost = random.randint(1, 3)
                             user_records['record'] -= lost
-                        await self.send_spook_msg(message.channel, lost)
+                        await self.send_spook_msg(message.author, message.channel, lost)
 
                 except KeyError:
                     # otherwise it will raise KeyError so we need to add them
@@ -135,9 +135,9 @@ class CandyCollection:
         except discord.HTTPException:
             pass
 
-    async def send_spook_msg(self, channel, candies):
+    async def send_spook_msg(self, author, channel, candies):
         """Send a (lame) spooky message"""
-        e = discord.Embed(colour=discord.Member.colour)
+        e = discord.Embed(colour=author.colour)
         e.set_author(name="Ghosts and Ghouls and Jack o' lanterns at night; "
                           f"I took {candies} candies and quickly took flight.")
         await channel.send(embed=e)
