@@ -21,7 +21,7 @@ If you are new to this you will find it far easier using PyCharm:
 ### With PyCharm
 
 First things first, what is PyCharm?  
-PyCharm is a Python IDE(integrated development environment) that is used to make python development quicker and easier overall.  
+PyCharm is a Python IDE (integrated development environment) that is used to make python development quicker and easier overall.  
 So now your going to need to download it [here](https://www.jetbrains.com/pycharm/).
 
 #### 1. Fork
