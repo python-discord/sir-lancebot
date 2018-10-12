@@ -10,9 +10,9 @@ Provide a simple description of what the PR achieves.
 
 Please ensure you PR fulfills the following criteria:
 
-- [ ] 
-- [ ] 
-- [ ] 
+- [ ] Does your PR solve an issue created by a member of staff or event handler?
+- [ ] Have you joined the Discord community? 
+- [ ] Were you changes made in the Pipenv environment?
 
 ## Additional information
 
