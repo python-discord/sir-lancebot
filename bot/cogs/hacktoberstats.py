@@ -1,7 +1,10 @@
+import json
+import logging
 import re
 import typing
 from collections import Counter
 from datetime import datetime
+from pathlib import Path
 
 import aiohttp
 import discord
@@ -11,13 +14,129 @@ from discord.ext import commands
 class Stats:
     def __init__(self, bot):
         self.bot = bot
+        self.link_json = Path('./bot/resources', 'github_links.json')
+        self.linked_accounts = self.load_linked_users()
 
-    @commands.command(
-        name="stats",
-        aliases=["getstats", "userstats"],
-        brief="Get a user's Hacktoberfest contribution stats",
+    @commands.group(
+        name='stats',
+        aliases=('hacktoberstats', 'getstats', 'userstats'),
+        invoke_without_command=True
     )
-    async def get_stats(self, ctx, username: str):
+    async def hacktoberstats_group(self, ctx: commands.Context, github_username: str=None):
+        """
+        If invoked without a subcommand or username, get the invoking user's stats if
+        they've linked their Discord name to GitHub using .link
+
+        If invoked with a username, get that user's contributions
+        """
+        if not github_username:
+            author_id, author_mention = Stats._author_mention_from_context(ctx)
+
+            if str(author_id) in self.linked_accounts.keys():
+                github_username = self.linked_accounts[author_id]["github_username"]
+                logging.info(f"Getting stats for {author_id} linked GitHub account '{github_username}'")
+            else:
+                msg = (
+                    f"{author_mention}, you have not linked a GitHub account\n\n"
+                    f"You can link your GitHub account using:\n```{ctx.prefix}stats link github_username```\n"
+                    f"Or query GitHub stats directly using:\n```{ctx.prefix}stats github_username```"
+                )
+                await ctx.send(msg)
+                return
+
+        await self.get_stats(ctx, github_username)
+
+    @hacktoberstats_group.command(name="link")
+    async def link_user(self, ctx: commands.Context, username: str=None):
+        """
+        Link the invoking user's Github username to their Discord ID
+
+        Linked users are stored as a nested dict:
+            {
+                Discord_ID: {
+                    "github_username": str
+                    "date_added": datetime
+                }
+            }
+        """
+        author_id, author_mention = Stats._author_mention_from_context(ctx)
+        if username:
+            if str(author_id) in self.linked_accounts.keys():
+                old_username = self.linked_accounts[author_id]["github_username"]
+                logging.info(f"{author_id} has changed their github link from '{old_username}' to '{username}'")
+                await ctx.send(f"{author_mention}, your GitHub username has been updated to: '{username}'")
+            else:
+                logging.info(f"{author_id} has added a github link to '{username}'")
+                await ctx.send(f"{author_mention}, your GitHub username has been added")
+
+            self.linked_accounts[author_id] = {
+                "github_username": username,
+                "date_added": datetime.now()
+            }
+
+            self.save_linked_users()
+        else:
+            logging.info(f"{author_id} tried to link a GitHub account but didn't provide a username")
+            await ctx.send(f"{author_mention}, a GitHub username is required to link your account")
+
+    @hacktoberstats_group.command(name="unlink")
+    async def unlink_user(self, ctx: commands.Context):
+        """
+        Remove the invoking user's account link from the log
+        """
+        author_id, author_mention = Stats._author_mention_from_context(ctx)
+
+        stored_user = self.linked_accounts.pop(author_id, None)
+        if stored_user:
+            await ctx.send(f"{author_mention}, your GitHub profile has been unlinked")
+            logging.info(f"{author_id} has unlinked their GitHub account")
+        else:
+            await ctx.send(f"{author_mention}, you do not currently have a linked GitHub account")
+            logging.info(f"{author_id} tried to unlink their GitHub account but no account was linked")
+
+        self.save_linked_users()
+
+    def load_linked_users(self) -> typing.Dict:
+        """
+        Load list of linked users from local JSON file
+
+        Linked users are stored as a nested dict:
+            {
+                Discord_ID: {
+                    "github_username": str
+                    "date_added": datetime
+                }
+            }
+        """
+        if self.link_json.exists():
+            logging.info(f"Loading linked GitHub accounts from '{self.link_json}'")
+            with open(self.link_json, 'r') as fID:
+                linked_accounts = json.load(fID)
+
+            logging.info(f"Loaded {len(linked_accounts)} linked GitHub accounts from '{self.link_json}'")
+            return linked_accounts
+        else:
+            logging.info(f"Linked account log: '{self.link_json}' does not exist")
+            return {}
+
+    def save_linked_users(self):
+        """
+        Save list of linked users to local JSON file
+
+        Linked users are stored as a nested dict:
+            {
+                Discord_ID: {
+                    "github_username": str
+                    "date_added": datetime
+                }
+            }
+        """
+        logging.info(f"Saving linked_accounts to '{self.link_json}'")
+        with open(self.link_json, 'w') as fID:
+            json.dump(self.linked_accounts, fID, default=str)
+        logging.info(f"linked_accounts saved to '{self.link_json}'")
+
+    async def get_stats(self, ctx: commands.Context, username: str):
         """
         Query GitHub's API for PRs created by a GitHub user during the month of October that
         do not have an 'invalid' tag
@@ -25,11 +144,9 @@ class Stats:
         For example:
             !getstats heavysaturn
 
-        If a valid username is provided, an embed is generated and posted to the channel
+        If a valid github_username is provided, an embed is generated and posted to the channel
 
         Otherwise, post a helpful error message
-
-        The first input argument is treated as the username, any additional inputs are discarded
         """
         prs = await self.get_october_prs(username)
 
@@ -43,6 +160,7 @@ class Stats:
         """
         Return a stats embed built from username's PRs
         """
+        logging.info(f"Building Hacktoberfest embed for GitHub user: '{username}'")
         pr_stats = self._summarize_prs(prs)
 
         n = pr_stats['n_prs']
@@ -70,6 +188,7 @@ class Stats:
             value=self._build_top5str(pr_stats)
         )
 
+        logging.info(f"Hacktoberfest PR built for GitHub user '{username}'")
         return stats_embed
 
     @staticmethod
@@ -89,6 +208,7 @@ class Stats:
 
         Otherwise, return None
         """
+        logging.info(f"Generating Hacktoberfest PR query for GitHub user: '{username}'")
         base_url = "https://api.github.com/search/issues?q="
         not_label = "invalid"
         action_type = "pr"
@@ -111,13 +231,16 @@ class Stats:
 
         if "message" in jsonresp.keys():
             # One of the parameters is invalid, short circuit for now
-            # In the future, log: jsonresp["errors"][0]["message"]
+            api_message = jsonresp["errors"][0]["message"]
+            logging.error(f"GitHub API request for '{username}' failed with message: {api_message}")
             return
         else:
             if jsonresp["total_count"] == 0:
                 # Short circuit if there aren't any PRs
+                logging.info(f"No Hacktoberfest PRs found for GitHub user: '{username}'")
                 return
             else:
+                logging.info(f"Found {len(jsonresp['items'])} Hacktoberfest PRs for GitHub user: '{username}'")
                 outlist = []
                 for item in jsonresp["items"]:
                     shortname = Stats._get_shortname(item["repository_url"])
@@ -187,6 +310,16 @@ class Stats:
             return "contribution"
         else:
             return "contributions"
+
+    @staticmethod
+    def _author_mention_from_context(ctx: commands.Context) -> typing.Tuple:
+        """
+        Return stringified Message author ID and mentionable string from commands.Context
+        """
+        author_id = str(ctx.message.author.id)
+        author_mention = ctx.message.author.mention
+
+        return author_id, author_mention
 
 
 def setup(bot):
