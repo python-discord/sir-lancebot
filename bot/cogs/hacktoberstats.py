@@ -24,10 +24,10 @@ class Stats:
     )
     async def hacktoberstats_group(self, ctx: commands.Context, github_username: str=None):
         """
-        If invoked without a subcommand or username, get the invoking user's stats if
-        they've linked their Discord name to GitHub using .link
+        If invoked without a subcommand or github_username, get the invoking user's stats if
+        they've linked their Discord name to GitHub using .stats link
 
-        If invoked with a username, get that user's contributions
+        If invoked with a github_username, get that user's contributions
         """
         if not github_username:
             author_id, author_mention = Stats._author_mention_from_context(ctx)
@@ -47,9 +47,9 @@ class Stats:
         await self.get_stats(ctx, github_username)
 
     @hacktoberstats_group.command(name="link")
-    async def link_user(self, ctx: commands.Context, username: str=None):
+    async def link_user(self, ctx: commands.Context, github_username: str=None):
         """
-        Link the invoking user's Github username to their Discord ID
+        Link the invoking user's Github github_username to their Discord ID
 
         Linked users are stored as a nested dict:
             {
@@ -60,17 +60,17 @@ class Stats:
             }
         """
         author_id, author_mention = Stats._author_mention_from_context(ctx)
-        if username:
+        if github_username:
             if str(author_id) in self.linked_accounts.keys():
                 old_username = self.linked_accounts[author_id]["github_username"]
-                logging.info(f"{author_id} has changed their github link from '{old_username}' to '{username}'")
-                await ctx.send(f"{author_mention}, your GitHub username has been updated to: '{username}'")
+                logging.info(f"{author_id} has changed their github link from '{old_username}' to '{github_username}'")
+                await ctx.send(f"{author_mention}, your GitHub username has been updated to: '{github_username}'")
             else:
-                logging.info(f"{author_id} has added a github link to '{username}'")
+                logging.info(f"{author_id} has added a github link to '{github_username}'")
                 await ctx.send(f"{author_mention}, your GitHub username has been added")
 
             self.linked_accounts[author_id] = {
-                "github_username": username,
+                "github_username": github_username,
                 "date_added": datetime.now()
             }
 
@@ -136,7 +136,7 @@ class Stats:
             json.dump(self.linked_accounts, fID, default=str)
         logging.info(f"linked_accounts saved to '{self.link_json}'")
 
-    async def get_stats(self, ctx: commands.Context, username: str):
+    async def get_stats(self, ctx: commands.Context, github_username: str):
         """
         Query GitHub's API for PRs created by a GitHub user during the month of October that
         do not have an 'invalid' tag
@@ -148,36 +148,36 @@ class Stats:
 
         Otherwise, post a helpful error message
         """
-        prs = await self.get_october_prs(username)
+        prs = await self.get_october_prs(github_username)
 
         if prs:
-            stats_embed = self.build_embed(username, prs)
+            stats_embed = self.build_embed(github_username, prs)
             await ctx.send('Here are some stats!', embed=stats_embed)
         else:
-            await ctx.send(f"No October GitHub contributions found for '{username}'")
+            await ctx.send(f"No October GitHub contributions found for '{github_username}'")
 
-    def build_embed(self, username: str, prs: typing.List[dict]) -> discord.Embed:
+    def build_embed(self, github_username: str, prs: typing.List[dict]) -> discord.Embed:
         """
-        Return a stats embed built from username's PRs
+        Return a stats embed built from github_username's PRs
         """
-        logging.info(f"Building Hacktoberfest embed for GitHub user: '{username}'")
+        logging.info(f"Building Hacktoberfest embed for GitHub user: '{github_username}'")
         pr_stats = self._summarize_prs(prs)
 
         n = pr_stats['n_prs']
         if n >= 5:
-            shirtstr = f"**{username} has earned a tshirt!**"
+            shirtstr = f"**{github_username} has earned a tshirt!**"
         elif n == 4:
-            shirtstr = f"**{username} is 1 PR away from a tshirt!**"
+            shirtstr = f"**{github_username} is 1 PR away from a tshirt!**"
         else:
-            shirtstr = f"**{username} is {5 - n} PRs away from a tshirt!**"
+            shirtstr = f"**{github_username} is {5 - n} PRs away from a tshirt!**"
 
         stats_embed = discord.Embed(
-            title=f"{username}'s Hacktoberfest",
+            title=f"{github_username}'s Hacktoberfest",
             color=discord.Color(0x9c4af7),
-            description=f"{username} has made {n} {Stats._contributionator(n)} in October\n\n{shirtstr}\n\n"
+            description=f"{github_username} has made {n} {Stats._contributionator(n)} in October\n\n{shirtstr}\n\n"
         )
 
-        stats_embed.set_thumbnail(url=f"https://www.github.com/{username}.png")
+        stats_embed.set_thumbnail(url=f"https://www.github.com/{github_username}.png")
         stats_embed.set_author(
             name="Hacktoberfest",
             url="https://hacktoberfest.digitalocean.com",
@@ -188,14 +188,14 @@ class Stats:
             value=self._build_top5str(pr_stats)
         )
 
-        logging.info(f"Hacktoberfest PR built for GitHub user '{username}'")
+        logging.info(f"Hacktoberfest PR built for GitHub user '{github_username}'")
         return stats_embed
 
     @staticmethod
-    async def get_october_prs(username: str) -> typing.List[dict]:
+    async def get_october_prs(github_username: str) -> typing.List[dict]:
         """
-        Query GitHub's API for PRs created during the month of October by username that do
-        not have an 'invalid' tag
+        Query GitHub's API for PRs created during the month of October by github_username
+        that do not have an 'invalid' tag
 
         If PRs are found, return a list of dicts with basic PR information
 
@@ -208,11 +208,11 @@ class Stats:
 
         Otherwise, return None
         """
-        logging.info(f"Generating Hacktoberfest PR query for GitHub user: '{username}'")
+        logging.info(f"Generating Hacktoberfest PR query for GitHub user: '{github_username}'")
         base_url = "https://api.github.com/search/issues?q="
         not_label = "invalid"
         action_type = "pr"
-        is_query = f"public+author:{username}"
+        is_query = f"public+author:{github_username}"
         date_range = "2018-10-01..2018-10-31"
         per_page = "300"
         query_url = (
@@ -232,15 +232,15 @@ class Stats:
         if "message" in jsonresp.keys():
             # One of the parameters is invalid, short circuit for now
             api_message = jsonresp["errors"][0]["message"]
-            logging.error(f"GitHub API request for '{username}' failed with message: {api_message}")
+            logging.error(f"GitHub API request for '{github_username}' failed with message: {api_message}")
             return
         else:
             if jsonresp["total_count"] == 0:
                 # Short circuit if there aren't any PRs
-                logging.info(f"No Hacktoberfest PRs found for GitHub user: '{username}'")
+                logging.info(f"No Hacktoberfest PRs found for GitHub user: '{github_username}'")
                 return
             else:
-                logging.info(f"Found {len(jsonresp['items'])} Hacktoberfest PRs for GitHub user: '{username}'")
+                logging.info(f"Found {len(jsonresp['items'])} Hacktoberfest PRs for GitHub user: '{github_username}'")
                 outlist = []
                 for item in jsonresp["items"]:
                     shortname = Stats._get_shortname(item["repository_url"])
