@@ -1,8 +1,9 @@
 from discord.ext.commands import Bot, Context
-from typing import Optional, Tuple
+from asyncio import sleep as asleep
+from typing import Optional
 from discord.ext import commands
 from discord import Embed
-import discord, logging, json, os
+import logging, json, os
 
 log = logging.getLogger(__name__)
 
@@ -12,19 +13,33 @@ EMOJIS = {
 }
 
 
-class MonsterServey:
+class MonsterSurvey:
+    """
+    Vote for your favorite monster!
+    This command allows users to vote for their favorite listed monster.
+    Users may change their vote, but only their current vote will be counted.
+    """
 
     def __init__(self, bot: Bot):
+        """Initializes values for the bot to use within the voting commands."""
         self.bot = bot
         self.registry_location = os.path.join(os.getcwd(), 'resources', 'monstersurvey', 'monstersurvey.json')
         with open(self.registry_location, 'r') as jason:
             self.voter_registry = json.load(jason)
+
+    def json_write(self):
+        with open(self.registry_location, 'w') as jason:
+            json.dump(self.voter_registry, jason, indent=2)
 
     @commands.group(
         name='monster',
         aliases=['ms']
     )
     async def monster_group(self, ctx: Context):
+        """
+        The base voting command. If nothing is called, then it will return an embed.
+        """
+
         if ctx.invoked_subcommand is None:
             default_embed = Embed(
                 title='Monster Voting',
@@ -46,7 +61,7 @@ class MonsterServey:
                 value='Which monster has the most votes? This command will tell you.',
                 inline=False
             )
-            await ctx.send(embed=default_embed)
+            return await ctx.send(embed=default_embed)
 
     @monster_group.command(
         name='vote'
@@ -58,42 +73,78 @@ class MonsterServey:
             name='Monster Voting',
             color=0xFF6800
         )
-        if name not in self.voter_registry.keys() and name is not None:
-            vote_embed.description = f'You cannot vote for {name} because it\'s not in the running.'
+        if name is None or name.lower() not in self.voter_registry.keys():
+            if name is not None:
+                vote_embed.description = f'You cannot vote for {name} because it\'s not in the running.'
             vote_embed.add_field(
-                name='Use `.monster show {monster_name} for more information on a specific monster',
+                name='Use `.monster show {monster_name}` for more information on a specific monster',
                 value='or use `.monster vote {monster}` to cast your vote for said monster.',
                 inline=False
             )
             vote_embed.add_field(
-                name='You may vote for the following monsters:',
+                name='You may vote for or show the following monsters:',
                 value=f"{', '.join(self.voter_registry.keys())}"
             )
             return await ctx.send(embed=vote_embed)
-        if name is None:
-            pass
+        for monster in self.voter_registry.keys():
+            if ctx.author.id in self.voter_registry[monster]['votes']:
+                if name != monster:
+                    self.voter_registry[monster]['votes'].remove(ctx.author.id)
+                    break
+                else:
+                    vote_embed.add_field(
+                        name='Vote unsuccessful.',
+                        value='You already voted for this monster. '
+                              'If you want to change your vote, use another monster.',
+                        inline=False
+                    )
+                    await ctx.send(embed=vote_embed)
+                    await asleep(.5)
+                    return await ctx.invoke(self.monster_vote)
+        self.voter_registry[name]['votes'].append(ctx.author.id)
+        vote_embed.add_field(
+            name='Vote successful!',
+            value=f'You have successfully voted for {self.voter_registry[name]["full_name"]}!',
+            inline=False
+        )
+        vote_embed.set_thumbnail(url=self.voter_registry[name]['image'])
+        self.json_write()
+        return await ctx.send(embed=vote_embed)
 
-
-
-    @monster_group.command(name='show')
+    @monster_group.command(
+        name='show'
+    )
     async def monster_show(self, ctx: Context, name: str):
+        """
+        Shows the named monster. If one is not named, it sends the default voting embed instead.
+        :param ctx:
+        :param name:
+        :return:
+        """
         m = self.voter_registry.get(name)
         if not m:
-            # TODO: invoke .monster vote command to display list
-            raise commands.BadArgument("Monster does not exist.")
-
+            await ctx.send('That monster does not exist.')
+            return await ctx.invoke(self.monster_vote)
         embed = Embed(title=m['full_name'], color=0xFF6800)
         embed.add_field(name='Summary', value=m['summary'])
         embed.set_image(url=m['image'])
         embed.set_footer(text=f'To vote for this monster, type .monster vote {name}')
-        await ctx.send(embed=embed)
+        return await ctx.send(embed=embed)
 
-    @monster_group.command(name='leaderboard')
+    @monster_group.command(
+        name='leaderboard',
+        aliases=['lb']
+    )
     async def monster_leaderboard(self, ctx: Context):
+        """
+        Shows the current standings.
+        :param ctx:
+        :return:
+        """
         vr = self.voter_registry
         top = sorted(vr.values(), key=lambda k: len(k['votes']), reverse=True)
 
-        embed = Embed(title="Leader board", color=0xFF6800)
+        embed = Embed(title="Monster Survey Leader Board", color=0xFF6800)
         total_votes = sum(len(m['votes']) for m in self.voter_registry.values())
         for rank, m in enumerate(top):
             votes = len(m['votes'])
@@ -103,5 +154,6 @@ class MonsterServey:
                                   f" of total votes.", inline=False)
         await ctx.send(embed=embed)
 
+
 def setup(bot):
-    bot.add_cog(MonsterServey(bot))
+    bot.add_cog(MonsterSurvey(bot))
