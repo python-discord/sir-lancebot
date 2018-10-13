@@ -173,7 +173,7 @@ class CandyCollection:
 
         # use run_in_executor to prevent blocking
         thing = functools.partial(self.save_to_json)
-        save = await self.bot.loop.run_in_executor(None, thing)
+        await self.bot.loop.run_in_executor(None, thing)
 
         emoji = (
             '\N{FIRST PLACE MEDAL}',
