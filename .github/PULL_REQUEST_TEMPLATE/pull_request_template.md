@@ -11,7 +11,7 @@ Provide a simple description of what the PR achieves.
 
 Please ensure your PR fulfills the following criteria:
 
-- [ ] Have you joined the Discord community? 
+- [ ] Have you joined the [PythonDiscord Community](https://pythondiscord.com/invite)?
 - [ ] Were your changes made in a Pipenv environment?
 - [ ] Does flake8 pass (```pipenv run lint```)
 
