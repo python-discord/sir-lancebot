@@ -207,4 +207,3 @@ class CandyCollection:
 
 def setup(bot):
     bot.add_cog(CandyCollection(bot))
-
