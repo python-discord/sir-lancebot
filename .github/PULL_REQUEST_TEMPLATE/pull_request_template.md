@@ -1,6 +1,7 @@
 ---
 name: Pull Request
 about: A simple pull request template.
+issue: Issue # if applicable
 
 ---
 
@@ -8,12 +9,12 @@ Provide a simple description of what the PR achieves.
 
 ## Pull Request Details
 
-Please ensure you PR fulfills the following criteria:
+Please ensure your PR fulfills the following criteria:
 
-- [ ] Does your PR solve an issue created by a member of staff or event handler?
 - [ ] Have you joined the Discord community? 
-- [ ] Were your changes made in the Pipenv environment?
-- [ ] Is your commit message clear and references the issue?
+- [ ] Were your changes made in a Pipenv environment?
+- [ ] Does flake8 pass (```pipenv run lint```)
+
 
 ## Additional information
 
