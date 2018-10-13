@@ -11,7 +11,7 @@ Provide a simple description of what the PR achieves.
 Please ensure you PR fulfills the following criteria:
 
 - [ ] Does your PR solve an issue created by a member of staff or event handler?
-- [ ] Have your joined the Discord community? 
+- [ ] Have you joined the Discord community? 
 - [ ] Were your changes made in the Pipenv environment?
 - [ ] Is your commit message clear and references the issue?
 
