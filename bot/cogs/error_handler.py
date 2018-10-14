@@ -17,12 +17,12 @@ class CommandErrorHandler:
             return
         if isinstance(error, commands.UserInputError):
             return await ctx.send(
-                ":no_entry: The command you specified failed to run.",
+                ":no_entry: The command you specified failed to run." +
                 "This is because the arguments you provided were invalid."
             )
         if isinstance(error, commands.CommandOnCooldown):
             return await ctx.send(
-                "This command is on cooldown,",
+                "This command is on cooldown," +
                 "please retry in {}s.".format(math.ceil(error.retry_after))
             )
         if isinstance(error, commands.DisabledCommand):
