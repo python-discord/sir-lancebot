@@ -7,6 +7,14 @@ import os
 
 json_location = os.path.join(os.getcwd(), 'resources', 'candy_collection.json')
 
+HACKTOBER_CHANNEL_ID = 498804484324196362
+
+# chance is 1 in x range, so 1 in 20 range would give 5% chance (for add candy)
+ADD_CANDY_REACTION_CHANCE = 20  # 5%
+ADD_CANDY_EXISTING_REACTION_CHANCE = 10  # 10%
+ADD_SKULL_REACTION_CHANCE = 50  # 2%
+ADD_SKULL_EXISTING_REACTION_CHANCE = 20  # 5%
+
 
 class CandyCollection:
     def __init__(self, bot):
@@ -19,43 +27,40 @@ class CandyCollection:
             userid = userinfo['userid']
             self.get_candyinfo[userid] = userinfo
 
-    HACKTOBER_CHANNEL_ID = 498804484324196362
-    # chance is 1 in x range, so 1 in 20 range would give 5% chance (for add candy)
-    ADD_CANDY_REACTION_CHANCE = 20  # 5%
-    ADD_CANDY_EXISTING_REACTION_CHANCE = 10  # 10%
-    ADD_SKULL_REACTION_CHANCE = 50  # 2%
-    ADD_SKULL_EXISTING_REACTION_CHANCE = 20  # 5%
-
     async def on_message(self, message):
-        """Randomly adds candy or skull to certain messages"""
+        """
+        Randomly adds candy or skull to certain messages
+        """
 
         # make sure its a human message
         if message.author.bot:
             return
         # ensure it's hacktober channel
-        if message.channel.id != self.HACKTOBER_CHANNEL_ID:
+        if message.channel.id != HACKTOBER_CHANNEL_ID:
             return
 
         # do random check for skull first as it has the lower chance
-        if random.randint(1, self.ADD_SKULL_REACTION_CHANCE) == 1:
+        if random.randint(1, ADD_SKULL_REACTION_CHANCE) == 1:
             d = {"reaction": '\N{SKULL}', "msg_id": message.id, "won": False}
             self.msg_reacted.append(d)
             return await message.add_reaction('\N{SKULL}')
         # check for the candy chance next
-        if random.randint(1, self.ADD_CANDY_REACTION_CHANCE) == 1:
+        if random.randint(1, ADD_CANDY_REACTION_CHANCE) == 1:
             d = {"reaction": '\N{CANDY}', "msg_id": message.id, "won": False}
             self.msg_reacted.append(d)
             return await message.add_reaction('\N{CANDY}')
 
     async def on_reaction_add(self, reaction, user):
-        """Add/remove candies from a person if the reaction satisfies criteria"""
+        """
+        Add/remove candies from a person if the reaction satisfies criteria
+        """
 
         message = reaction.message
         # check to ensure the reactor is human
         if user.bot:
             return
         # check to ensure it is in correct channel
-        if message.channel.id != self.HACKTOBER_CHANNEL_ID:
+        if message.channel.id != HACKTOBER_CHANNEL_ID:
             return
 
         # if its not a candy or skull, and it is one of 10 most recent messages,
@@ -94,15 +99,17 @@ class CandyCollection:
                 await self.remove_reactions(reaction)
 
     async def reacted_msg_chance(self, message):
-        """Randomly add a skull or candy to a message if there is a reaction there already
-             (higher probability)"""
+        """
+        Randomly add a skull or candy to a message if there is a reaction there already
+        (higher probability)
+        """
 
-        if random.randint(1, self.ADD_SKULL_EXISTING_REACTION_CHANCE) == 1:
+        if random.randint(1, ADD_SKULL_EXISTING_REACTION_CHANCE) == 1:
             d = {"reaction": '\N{SKULL}', "msg_id": message.id, "won": False}
             self.msg_reacted.append(d)
             return await message.add_reaction('\N{SKULL}')
 
-        if random.randint(1, self.ADD_CANDY_EXISTING_REACTION_CHANCE) == 1:
+        if random.randint(1, ADD_CANDY_EXISTING_REACTION_CHANCE) == 1:
             d = {"reaction": '\N{CANDY}', "msg_id": message.id, "won": False}
             self.msg_reacted.append(d)
             return await message.add_reaction('\N{CANDY}')
@@ -125,7 +132,9 @@ class CandyCollection:
         return ten_recent
 
     async def get_message(self, msg_id):
-        """Get the message from it's ID."""
+        """
+        Get the message from it's ID.
+        """
 
         try:
             o = discord.Object(id=msg_id + 1)
@@ -142,11 +151,15 @@ class CandyCollection:
             return None
 
     async def hacktober_channel(self):
-        """Get #hacktoberbot channel from it's id"""
-        return self.bot.get_channel(id=self.HACKTOBER_CHANNEL_ID)
+        """
+        Get #hacktoberbot channel from it's id
+        """
+        return self.bot.get_channel(id=HACKTOBER_CHANNEL_ID)
 
     async def remove_reactions(self, reaction):
-        """Remove all candy/skull reactions"""
+        """
+        Remove all candy/skull reactions
+        """
 
         try:
             async for user in reaction.users():
@@ -156,20 +169,26 @@ class CandyCollection:
             pass
 
     async def send_spook_msg(self, author, channel, candies):
-        """Send a spooky message"""
+        """
+        Send a spooky message
+        """
         e = discord.Embed(colour=author.colour)
         e.set_author(name="Ghosts and Ghouls and Jack o' lanterns at night; "
                           f"I took {candies} candies and quickly took flight.")
         await channel.send(embed=e)
 
     def save_to_json(self):
-        """Save json to the file."""
+        """
+        Save json to the file.
+        """
         with open(json_location, 'w') as outfile:
             json.dump(self.candy_json, outfile)
 
     @commands.command()
     async def candy(self, ctx):
-        """Get the candy leaderboard and save to json when this is called"""
+        """
+        Get the candy leaderboard and save to json when this is called
+        """
 
         # use run_in_executor to prevent blocking
         thing = functools.partial(self.save_to_json)
