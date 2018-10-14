@@ -1,6 +1,4 @@
-import discord
 from discord.ext import commands
-import asyncio
 import sys
 import traceback
 import math
@@ -9,6 +7,7 @@ import math
 class CommandErrorHandler:
     def __init__(self, bot):
         self.bot = bot
+
     async def on_command_error(self, ctx, error):
         if hasattr(ctx.command, 'on_error'):
             return
@@ -23,19 +22,16 @@ class CommandErrorHandler:
         if isinstance(error, commands.CommandOnCooldown):
             return await ctx.send(
                 "This command is on cooldown," +
-                "please retry in {}s.".format(math.ceil(error.retry_after))
+                " please retry in {}s.".format(math.ceil(error.retry_after))
             )
         if isinstance(error, commands.DisabledCommand):
             return await ctx.send(
                 ":no_entry: This command has been disabled."
             )
         if isinstance(error, commands.NoPrivateMessage):
-            try:
-                return await ctx.author.send(
-                    ":no_entry: This command can only be used inside a server."
-                )
-            except:
-                pass
+            return await ctx.author.send(
+                ":no_entry: This command can only be used inside a server."
+            )
         if isinstance(error, commands.BadArgument):
             if ctx.command.qualified_name == 'tag list':
                 return await ctx.send(
