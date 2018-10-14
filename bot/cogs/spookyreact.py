@@ -20,7 +20,7 @@ class SpookyReact:
 
     async def on_message(self, ctx):
         """
-        A command to send the hacktoberbot github project
+        React on message if contains a spooky trigger.
         """
         for trigger in SPOOKY_TRIGGERS.keys():
             if trigger in ctx.content.lower():
