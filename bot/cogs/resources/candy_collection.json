@@ -1,25 +1,8 @@
 {
   "msg_reacted": [
-    {
-      "reaction": "\ud83c\udf6c",
-      "msg_id": 499064137188638730,
-      "won": true,
-      "user_reacted": 230214242618441728
-    },
-    {
-      "reaction": "\ud83c\udf6c",
-      "msg_id": 499064204570132500,
-      "won": false
-    }
+
    ],
   "records": [
-    {
-      "userid": 1234567890,
-      "record": 4
-    },
-    {
-      "userid": 9876543210,
-      "record": 10
-    }
+    
   ]
 }
