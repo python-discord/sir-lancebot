@@ -29,7 +29,6 @@ class SpookyReact:
 
         Lines that begin with the bot's command prefix are ignored
         """
-        await ctx.channel.send("spooky")
         # Short-circuit if bot tries to react to itself
         if ctx.author == self.bot.user:
             logging.info(f"Bot self-react short-circuited. Message ID: {ctx.id}")
