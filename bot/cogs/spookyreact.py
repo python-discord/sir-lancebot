@@ -1,11 +1,16 @@
+import logging
+import re
+
+import discord
+
 SPOOKY_TRIGGERS = {
-    'spooky': "\U0001F47B",
-    'skeleton': "\U0001F480",
-    'doot': "\U0001F480",
-    'pumpkin': "\U0001F383",
-    'halloween': "\U0001F383",
-    'jack-o-lantern': "\U0001F383",
-    'danger': "\U00002620"
+    'spooky': (r"\bspo{2,}ky\b", "\U0001F47B"),
+    'skeleton': (r"\bskeleton\b", "\U0001F480"),
+    'doot': (r"\bdo{2,}t\b", "\U0001F480"),
+    'pumpkin': (r"\bpumpkin\b", "\U0001F383"),
+    'halloween': (r"\bhalloween\b", "\U0001F383"),
+    'jack-o-lantern': (r"\bjack-o-lantern\b", "\U0001F383"),
+    'danger': (r"\bdanger\b", "\U00002620")
 }
 
 
@@ -18,13 +23,46 @@ class SpookyReact:
     def __init__(self, bot):
         self.bot = bot
 
-    async def on_message(self, ctx):
+    async def on_message(self, ctx: discord.Message):
         """
         A command to send the hacktoberbot github project
+
+        Lines that begin with the bot's command prefix are ignored
+
+        Hacktoberbot's own messages are ignored
         """
         for trigger in SPOOKY_TRIGGERS.keys():
-            if trigger in ctx.content.lower():
-                await ctx.add_reaction(SPOOKY_TRIGGERS[trigger])
+            trigger_test = re.search(SPOOKY_TRIGGERS[trigger][0], ctx.content.lower())
+            if trigger_test:
+                # Check message for bot replies and/or command invocations
+                # Short circuit if they're found, logging is handled in _short_circuit_check
+                if await self._short_circuit_check(ctx):
+                    return
+                else:
+                    await ctx.add_reaction(SPOOKY_TRIGGERS[trigger][1])
+                    logging.info(f"Added '{trigger}' reaction to message ID: {ctx.id}")
+
+    async def _short_circuit_check(self, ctx: discord.Message) -> bool:
+        """
+        Short-circuit helper check.
+
+        Return True if:
+          * author is the bot
+          * prefix is not None
+        """
+        # Check for self reaction
+        if ctx.author == self.bot.user:
+            logging.info(f"Ignoring reactions on self message. Message ID: {ctx.id}")
+            return True
+
+        # Check for command invocation
+        # Because on_message doesn't give a full Context object, generate one first
+        tmp_ctx = await self.bot.get_context(ctx)
+        if tmp_ctx.prefix:
+            logging.info(f"Ignoring reactions on command invocation. Message ID: {ctx.id}")
+            return True
+
+        return False
 
 
 def setup(bot):
