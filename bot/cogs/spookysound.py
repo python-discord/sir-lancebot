@@ -4,10 +4,13 @@ from pathlib import Path
 import discord
 from discord.ext import commands
 
-HACKTOBERBOT_VOICE_CHANNEL_ID = 101010  # Replace with actual channel ID
+HACKTOBERBOT_VOICE_CHANNEL_ID = 498804789287714816
 
 
 class SpookySound:
+    """
+    A cog that plays a spooky sound in a voice channel on command.
+    """
 
     def __init__(self, bot):
         self.bot = bot
@@ -25,14 +28,17 @@ class SpookySound:
         once in 2 minutes.
         """
         await ctx.send("Initiating spooky sound...")
-        voice = await self.channel.connect()
         file_path = random.choice(self.sound_files)
         src = discord.FFmpegPCMAudio(str(file_path.resolve()))
+        voice = await self.channel.connect()
+        voice.play(src, after=lambda e: self.bot.loop.create_task(self.disconnect(voice)))
 
-        async def disconnect():
-            await voice.disconnect()
-
-        voice.play(src, after=lambda e: self.bot.loop.create_task(disconnect()))
+    @staticmethod
+    async def disconnect(voice):
+        """
+        Helper method to disconnect a given voice client.
+        """
+        await voice.disconnect()
 
 
 def setup(bot):
