@@ -32,8 +32,8 @@ if __name__ == '__main__':
             # print(f'Failed to load extension {extension}.', file=stderr)
             # print_exc()
 
-log.info(f'Spooky Launch Sequence Initiated...')
+log.info('Spooky Launch Sequence Initiated...')
 
 bot.run(HACKTOBERBOT_TOKEN)
 
-log.info(f'HackBot has been slain!')
+log.info('HackBot has been slain!')
