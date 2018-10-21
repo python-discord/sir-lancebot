@@ -25,7 +25,8 @@ class SpookyAvatar:
             async with session.get(url) as resp:
                 return await resp.read()
 
-    @commands.command(name='savatar', aliases=['spookyavatar', 'spookify'], brief='Spookify an user\'s avatar.')
+    @commands.command(name='savatar', aliases=['spookyavatar', 'spookify'],
+                      brief='Spookify an user\'s avatar.')
     async def spookyavatar(self, ctx, user: discord.Member=None):
         """
         A command to print the user's spookified avatar.
