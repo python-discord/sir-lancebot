@@ -39,7 +39,7 @@ class SpookyAvatar:
         embed.set_author(name=str(user.name), icon_url=user.avatar_url)
         resp = await self.get(user.avatar_url)
         im = Image.open(BytesIO(resp))
-        modified_im = spookifications.inversion(im)
+        modified_im = spookifications.get_random_effect(im)
         modified_im.save(str(ctx.message.id)+'.png')
         f = discord.File(str(ctx.message.id)+'.png')
         embed.set_image(url='attachment://'+str(ctx.message.id)+'.png')
