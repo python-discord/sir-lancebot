@@ -1,3 +1,4 @@
+# Hacktoberfest 2018 - rtroshynski
 import logging.handlers
 import os
 from pathlib import Path
