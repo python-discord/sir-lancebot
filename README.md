@@ -18,6 +18,9 @@ We know it can be difficult to get into the whole open source thing at first. To
 Random halloween facts are posted regularly.  
 !hallofact - Show the last posted Halloween fact
 
+### Avatar Spookification
+!savatar - Spookifies your avatar with a few random effects.
+
 ## Getting started
 
 If you are new to this you will find it far easier using PyCharm:
