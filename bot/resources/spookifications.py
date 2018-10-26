@@ -49,5 +49,5 @@ def get_random_effect(im):
     """Randomly selects and applies an effect."""
     effects = [inversion, pentagram, bat]
     effect = choice(effects)
-    log.info("Spookyavatar's chosen effect:" + str(effect))
+    log.info("Spookyavatar's chosen effect: " + effect.__name__)
     return effect(im)

@@ -5,7 +5,7 @@ from traceback import format_exc
 
 from discord.ext import commands
 
-HACKTOBERBOT_TOKEN = environ.get('HACKTOBERBOT_TOKEN')
+HACKTOBERBOT_TOKEN = 'NDk5NjAzOTk1MzkyODY4MzU1.Dq3ITw.F0f45KYcZN1NgAyPIbrsgoz49Yo'#environ.get('HACKTOBERBOT_TOKEN')
 log = logging.getLogger()
 
 if HACKTOBERBOT_TOKEN:

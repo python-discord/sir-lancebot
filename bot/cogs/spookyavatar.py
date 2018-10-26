@@ -1,8 +1,9 @@
-import aiohttp
 from io import BytesIO
+import os
 
-from discord.ext import commands
+import aiohttp
 import discord
+from discord.ext import commands
 from PIL import Image
 
 from bot.resources import spookifications
@@ -44,6 +45,7 @@ class SpookyAvatar:
         f = discord.File(str(ctx.message.id)+'.png')
         embed.set_image(url='attachment://'+str(ctx.message.id)+'.png')
         await ctx.send(file=f, embed=embed)
+        os.remove(str(ctx.message.id)+'.png')
 
 
 def setup(bot):
