@@ -8,18 +8,18 @@ We know it can be difficult to get into the whole open source thing at first. To
 
 ## Commands
 
-!repository - Links to this repository
+.repository - Links to this repository
 
 ### Git
-!Git - Links to getting started with Git page
-!Git.commit - An example commit command
+.Git - Links to getting started with Git page
+.Git.commit - An example commit command
 
 ### Halloween Facts
 Random halloween facts are posted regularly.  
-!hallofact - Show the last posted Halloween fact
+.hallofact - Show the last posted Halloween fact
 
 ### Avatar Spookification
-!savatar - Spookifies your avatar with a few random effects.
+.savatar or .spookyavatar - Spookifies your avatar with a few random effects.
 
 ## Getting started
 
