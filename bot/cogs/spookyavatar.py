@@ -28,7 +28,7 @@ class SpookyAvatar:
 
     @commands.command(name='savatar', aliases=['spookyavatar', 'spookify'],
                       brief='Spookify an user\'s avatar.')
-    async def spookyavatar(self, ctx, user: discord.Member=None):
+    async def spookyavatar(self, ctx, user: discord.Member = None):
         """
         A command to print the user's spookified avatar.
         """
