@@ -18,6 +18,10 @@ We know it can be difficult to get into the whole open source thing at first. To
 Random halloween facts are posted regularly.  
 !hallofact - Show the last posted Halloween fact
 
+### Pull Returns Left
+Returns the number of pull requests a user has remaining in Hacktoberfest
+.prsleft - Show the number of pull returns left
+
 ## Getting started
 
 If you are new to this you will find it far easier using PyCharm:
