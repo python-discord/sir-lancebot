@@ -3,7 +3,7 @@ import logging
 import aiohttp
 import discord
 
-bot = commands.Bot(command_prefix='?', description='pr bot')
+bot = commands.Bot(command_prefix='.', description='pr bot')
 
 @bot.command()
 async def prsleft(github_username: str):
@@ -42,7 +42,7 @@ async def prsleft(github_username: str):
             tmp = tmp.pop()
             rem = 5 - tmp
             if rem<0:
-                rem=0;
+                rem=0
             message = (
                 f"The user: {github_username} has {rem} pull requests remaining for Hacktoberfest!\n" +
                 f"The {tmp} completed pull requests were:\n\n"
@@ -62,4 +62,4 @@ async def prsleft(github_username: str):
 
 
 
-bot.run('NTA1ODY3ODM2NzgzMzI5MzAw.Dre_iQ.YpwNKPKrH-TI9UMItqPpQmYMwtY')
+bot.run('token')
