@@ -1,8 +1,8 @@
-from discord.ext import commands
 import sys
 import traceback
 import math
 import logging
+from discord.ext import commands
 
 
 class CommandErrorHandler:
