@@ -20,4 +20,4 @@ async def timeleft():
     await bot.say(message)
 
 
-bot.run('NTA1ODY3ODM2NzgzMzI5MzAw.Dre_iQ.YpwNKPKrH-TI9UMItqPpQmYMwtY')
+bot.run('token')
