@@ -19,7 +19,7 @@ Random halloween facts are posted regularly.
 !hallofact - Show the last posted Halloween fact
 
 ### Pull Returns Left
-Returns the number of pull requests a user has remaining in Hacktoberfest
+Returns the number of pull requests a user has remaining in Hacktoberfest. <br>
 .prsleft - Show the number of pull returns left
 
 ## Getting started
