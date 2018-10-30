@@ -6,23 +6,25 @@ from discord.ext import commands
 
 
 class CommandErrorHandler:
+    """A error handler for the PythonDiscord server!"""
+
     def __init__(self, bot):
         self.bot = bot
 
     async def on_command_error(self, ctx, error):
+        """Activates when a command opens an error"""
+
         if hasattr(ctx.command, 'on_error'):
-            logging.debug(
+            return logging.debug(
                 "A command error occured but " +
                 "the command had it's own error handler"
             )
-            return
         error = getattr(error, 'original', error)
         if isinstance(error, commands.CommandNotFound):
-            logging.debug(
+            return logging.debug(
                 f"{ctx.author} called '{ctx.message.content}' " +
                 "but no command was found"
             )
-            return
         if isinstance(error, commands.UserInputError):
             logging.debug(
                 f"{ctx.author} called the command '{ctx.command}' " +
