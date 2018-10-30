@@ -18,6 +18,10 @@ We know it can be difficult to get into the whole open source thing at first. To
 Random halloween facts are posted regularly.  
 !hallofact - Show the last posted Halloween fact
 
+### Time Left
+Calculates the time remaining in Hacktoberfest. <br>
+.timeleft - Returns the days/hours/minutes/seconds left before Hacktoberfest ends.
+
 ## Getting started
 
 If you are new to this you will find it far easier using PyCharm:
