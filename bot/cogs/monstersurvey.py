@@ -1,11 +1,12 @@
-from discord.ext.commands import Bot, Context
-from asyncio import sleep as asleep
-from typing import Optional
-from discord.ext import commands
-from discord import Embed
-import logging
 import json
+import logging
 import os
+from asyncio import sleep as asleep
+from typing import Optional, Union
+
+from discord import Embed
+from discord.ext import commands
+from discord.ext.commands import Bot, Context
 
 log = logging.getLogger(__name__)
 
@@ -25,11 +26,12 @@ class MonsterSurvey:
     def __init__(self, bot: Bot):
         """Initializes values for the bot to use within the voting commands."""
         self.bot = bot
-        self.registry_location = os.path.join(os.getcwd(), 'resources', 'monstersurvey', 'monstersurvey.json')
+        self.registry_location = os.path.join(os.getcwd(), 'bot', 'resources', 'monstersurvey', 'monstersurvey.json')
         with open(self.registry_location, 'r') as jason:
             self.voter_registry = json.load(jason)
 
     def json_write(self):
+        log.info("Saved Monster Survey Results")
         with open(self.registry_location, 'w') as jason:
             json.dump(self.voter_registry, jason, indent=2)
 
@@ -50,12 +52,11 @@ class MonsterSurvey:
             )
             default_embed.add_field(
                 name='.monster show monster_name(optional)',
-                value='Show a specific monster. If none is listed, show a brief of all.',
+                value='Show a specific monster. If none is listed, it will give you an error with valid choices.',
                 inline=False)
             default_embed.add_field(
                 name='.monster vote monster_name',
-                value='Vote for a specific monster. You can vote more than once, but you can only vote for one monster'
-                      'at a time.',
+                value='Vote for a specific monster. You get one vote, but can change it at any time.',
                 inline=False
             )
             default_embed.add_field(
@@ -68,13 +69,16 @@ class MonsterSurvey:
     @monster_group.command(
         name='vote'
     )
-    async def monster_vote(self, ctx: Context, name: Optional[str] = None):
+    async def monster_vote(self, ctx: Context, name: Optional[Union[int, str]] = None):
         """Casts a vote for a particular monster, or displays a list of monsters that can be voted for
         if one is not given."""
         vote_embed = Embed(
             name='Monster Voting',
             color=0xFF6800
         )
+        if isinstance(name, int):
+            name = list(self.voter_registry.keys())[name]
+
         if name is None or name.lower() not in self.voter_registry.keys():
             if name is not None:
                 vote_embed.description = f'You cannot vote for {name} because it\'s not in the running.'
@@ -90,7 +94,7 @@ class MonsterSurvey:
             return await ctx.send(embed=vote_embed)
         for monster in self.voter_registry.keys():
             if ctx.author.id in self.voter_registry[monster]['votes']:
-                if name != monster:
+                if name.lower() != monster:
                     self.voter_registry[monster]['votes'].remove(ctx.author.id)
                     break
                 else:
@@ -100,6 +104,7 @@ class MonsterSurvey:
                               'If you want to change your vote, use another monster.',
                         inline=False
                     )
+                    log.info(f"{ctx.author.name} Tried to vote for the same monster.")
                     await ctx.send(embed=vote_embed)
                     await asleep(.5)
                     return await ctx.invoke(self.monster_vote)
@@ -116,14 +121,25 @@ class MonsterSurvey:
     @monster_group.command(
         name='show'
     )
-    async def monster_show(self, ctx: Context, name: str):
+    async def monster_show(self, ctx: Context, name: Optional[Union[int, str]] = None):
         """
         Shows the named monster. If one is not named, it sends the default voting embed instead.
         :param ctx:
         :param name:
         :return:
         """
-        m = self.voter_registry.get(name)
+        if name is None:
+            monster_choices = map(lambda m: f"'{m}'", self.voter_registry.keys())
+            monster_choices = ', '.join(monster_choices)
+            embed = Embed(title="Uh Oh!",
+                          description="I need you to provide a name for your"
+                                      f" monster. Choose from {monster_choices}")
+            await ctx.send(embed=embed)
+            return
+        if isinstance(name, int):
+            m = list(self.voter_registry.values())[name]
+        else:
+            m = self.voter_registry.get(name.lower())
         if not m:
             await ctx.send('That monster does not exist.')
             return await ctx.invoke(self.monster_vote)
@@ -159,3 +175,4 @@ class MonsterSurvey:
 
 def setup(bot):
     bot.add_cog(MonsterSurvey(bot))
+    log.debug("MonsterSurvey COG Loaded")
