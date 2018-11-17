@@ -1,22 +1,12 @@
-# hacktoberbot
-A community project for [Hacktoberfest 2018](https://hacktoberfest.digitalocean.com). A Discord bot primarily designed to help teach Python learners from the PythonDiscord community how to contribute to open source.
+# seasonal bot
+A community project initially started for [Hacktoberfest 2018](https://hacktoberfest.digitalocean.com). A Discord bot for the Python Discord community which changes with the seasons, and provides useful event features.
 
 You can find our community by going to https://discord.gg/python
 
 ## Motivations
 We know it can be difficult to get into the whole open source thing at first. To help out, we've decided to start a little community project during hacktober that you can all choose to contribute to if you're finding the event a little overwhelming, or if you're new to this whole thing and just want someone to hold your hand at first.
 
-## Commands
-
-!repository - Links to this repository
-
-### Git
-!Git - Links to getting started with Git page
-!Git.commit - An example commit command
-
-### Halloween Facts
-Random halloween facts are posted regularly.  
-!hallofact - Show the last posted Halloween fact
+This later evolved into a bot that will be running all through the year, providing season-appropriate functionality and issues that beginners can work on.
 
 ## Getting started
 
