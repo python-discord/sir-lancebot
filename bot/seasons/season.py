@@ -33,9 +33,8 @@ class Season:
         for cog_folder in (self.name, "evergreen"):
             if cog_folder:
                 log.info(f'Start loading extensions from bot/cogs/{cog_folder}/')
-                for file in Path('bot', 'cogs', cog_folder).glob('*.py'):
-                    if not file.name.startswith("__"):
-                        cogs.append(f"bot.cogs.{cog_folder}.{file.stem}")
+                for file in Path('bot', 'cogs', cog_folder).glob('[!__]*.py'):
+                    cogs.append(f"bot.cogs.{cog_folder}.{file.stem}")
 
         # Load the season handler
         cogs.append("bot.cogs.season")

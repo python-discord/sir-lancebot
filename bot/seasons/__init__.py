@@ -22,6 +22,7 @@ def get_season(bot, season_name: str = None, date: datetime.date = None):
     """
     Returns a Season object based on either a string or a date.
     """
+
     assert season_name or date, "This function requires either a season or a date in order to run."
 
     # If there's a season name, we can just grab the correct class.
