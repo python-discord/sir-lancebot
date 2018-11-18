@@ -13,7 +13,7 @@ class Uptime:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='uptime')
+    @commands.command(name="uptime")
     async def uptime(self, ctx):
         """
         Returns the uptime of the bot.
