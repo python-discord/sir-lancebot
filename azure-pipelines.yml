@@ -58,7 +58,7 @@ jobs:
       dockerRegistryEndpoint: 'DockerHub'
       command: 'login'
 
-  - script: sudo apt install python3-setuptools
+  - script: sudo apt-get install python3-setuptools
     displayName: 'Install setuptools'
 
   - script: sudo pip3 install salt-pepper
