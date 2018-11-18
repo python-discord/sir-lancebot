@@ -35,9 +35,6 @@ jobs:
   - script: sudo pip install pipenv
     displayName: 'Install pipenv'
 
-  - script: sudo pip install salt-pepper
-    displayName: 'Install saltstack'
-
   - script: pipenv install --dev --deploy --system
     displayName: 'Install project using pipenv'
 
@@ -56,6 +53,15 @@ jobs:
       containerregistrytype: 'Container Registry'
       dockerRegistryEndpoint: 'DockerHub'
       command: 'login'
+
+  - task: UsePythonVersion@0
+    displayName: 'Set Python version'
+    inputs:
+      versionSpec: '3.7.x'
+      addToPath: true
+
+  - script: sudo pip install salt-pepper
+    displayName: 'Install saltstack'
 
   - task: ShellScript@2
     displayName: 'Build and deploy containers'
