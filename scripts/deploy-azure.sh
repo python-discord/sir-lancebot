@@ -2,6 +2,11 @@
 
 cd ..
 
+export SALTAPI_USER=$2
+export SALTAPI_PASS=$3
+export SALTAPI_URL=$4
+export SALTAPI_EAUTH=$5
+
 # Build and deploy on master branch, only if not a pull request
 if [[ ($BUILD_SOURCEBRANCHNAME == 'master') && ($SYSTEM_PULLREQUEST_PULLREQUESTID == '') ]]; then
     echo "Building image"
