@@ -17,23 +17,19 @@ else:
 ghost_unicode = "\N{GHOST}"
 bot = commands.Bot(command_prefix=commands.when_mentioned_or(".", f"{ghost_unicode} ", ghost_unicode))
 
-log.info('Start loading extensions from ./bot/cogs/')
+log.info('Start loading extensions from ./bot/cogs/evergreen/')
 
 
 if __name__ == '__main__':
     # Scan for files in the /cogs/ directory and make a list of the file names.
-    cogs = [file.stem for file in Path('bot', 'cogs').glob('*.py')]
+    cogs = [file.stem for file in Path('bot', 'cogs', 'evergreen').glob('*.py') if not file.stem.startswith("__")]
     for extension in cogs:
         try:
-            bot.load_extension(f'bot.cogs.{extension}')
+            bot.load_extension(f'bot.cogs.evergreen.{extension}')
             log.info(f'Successfully loaded extension: {extension}')
         except Exception as e:
             log.error(f'Failed to load extension {extension}: {repr(e)} {format_exc()}')
-            # print(f'Failed to load extension {extension}.', file=stderr)
-            # print_exc()
 
-log.info(f'Spooky Launch Sequence Initiated...')
 
 bot.run(HACKTOBERBOT_TOKEN)
 
-log.info(f'HackBot has been slain!')

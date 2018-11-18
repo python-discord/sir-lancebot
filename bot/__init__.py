@@ -2,6 +2,10 @@ import logging.handlers
 import os
 from pathlib import Path
 
+import arrow
+
+# start datetime
+start_time = arrow.utcnow()
 
 # set up logging
 log_dir = Path("bot", "log")
