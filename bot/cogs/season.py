@@ -15,11 +15,25 @@ class Season:
         self.bot = bot
         self.season = get_season(self.bot, date=datetime.date.today())
 
+        # Figure out number of seconds until a minute past midnight
+        tomorrow = datetime.datetime.now() + datetime.timedelta(1)
+        midnight = datetime.datetime(
+            year=tomorrow.year,
+            month=tomorrow.month,
+            day=tomorrow.day,
+            hour=0,
+            minute=0,
+            second=0
+        )
+        self.sleep_time = (midnight - datetime.datetime.now()).seconds + 60
+
     async def on_ready(self):
         await self.season.load()
 
         while True:
-            await asyncio.sleep(86400)  # sleep for 24 hours
+            await asyncio.sleep(self.sleep_time)  # sleep until midnight
+            self.sleep_time = 86400  # next time, sleep for 24 hours.
+
             # If the season has changed, load it.
             new_season = get_season(self.bot, date=datetime.date.today())
             if new_season != self.season:
