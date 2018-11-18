@@ -16,7 +16,7 @@ if [[ ($BUILD_SOURCEBRANCHNAME == 'master') && ($SYSTEM_PULLREQUEST_PULLREQUESTI
     docker push pythondiscord/seasonalbot:latest
 
     echo "Deploying on server"
-    pepper $1 state.apply docker/hacktoberbot --out=no_out --non-interactive
+    pepper $1 state.apply docker/seasonalbot --out=no_out --non-interactive &> /dev/null
 else
     echo "Skipping deploy"
 fi
