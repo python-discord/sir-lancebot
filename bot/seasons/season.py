@@ -14,8 +14,8 @@ class Season:
     def __init__(self):
         current_year = datetime.date.today().year
         date_format = "%d/%m-%Y"
-        self.start = datetime.datetime.strptime(f"{self.start_string}-{current_year}", date_format).date()
-        self.end = datetime.datetime.strptime(f"{self.end_string}-{current_year}", date_format).date()
+        self.start = datetime.datetime.strptime(f"{self.start_date}-{current_year}", date_format).date()
+        self.end = datetime.datetime.strptime(f"{self.end_date}-{current_year}", date_format).date()
 
     async def load(self):
         """

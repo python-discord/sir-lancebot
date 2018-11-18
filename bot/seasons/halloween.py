@@ -6,8 +6,8 @@ class Halloween(Season):
 
     def __init__(self, bot):
         self.bot = bot
-        self.start_string = "01/10"
-        self.end_string = "31/10"
+        self.start_date = "01/10"
+        self.end_date = "31/10"
         self.bot_name = "Spookybot"
 
         with open("bot/resources/avatars/spooky.png", "rb") as avatar:
