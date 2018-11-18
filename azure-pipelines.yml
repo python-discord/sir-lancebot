@@ -45,6 +45,13 @@ jobs:
   displayName: 'Build Containers'
   dependsOn: 'test'
 
+  pool:
+    vmImage: 'Ubuntu 16.04'
+
+  variables:
+    PIPENV_CACHE_DIR: ".cache/pipenv"
+    PIP_CACHE_DIR: ".cache/pip"
+
   steps:
   - task: Docker@1
     displayName: 'Login: Docker Hub'
@@ -61,7 +68,7 @@ jobs:
       addToPath: true
 
   - script: sudo pip install salt-pepper
-    displayName: 'Install saltstack'
+    displayName: 'Install pepper'
 
   - task: ShellScript@2
     displayName: 'Build and deploy containers'
