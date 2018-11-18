@@ -30,6 +30,4 @@ if __name__ == '__main__':
         except Exception as e:
             log.error(f'Failed to load extension {extension}: {repr(e)} {format_exc()}')
 
-
 bot.run(HACKTOBERBOT_TOKEN)
-
