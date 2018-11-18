@@ -7,5 +7,5 @@ services:
     restart: always
 
     environment:
-      - HACKTOBERBOT_TOKEN
+      - SEASONALBOT_TOKEN
 

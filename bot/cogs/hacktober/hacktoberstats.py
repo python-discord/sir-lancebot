@@ -202,7 +202,7 @@ class Stats:
         For each PR:
             {
             "repo_url": str
-            "repo_shortname": str (e.g. "discord-python/hacktoberbot")
+            "repo_shortname": str (e.g. "python-discord/seasonalbot")
             "created_at": datetime.datetime
             }
 
@@ -259,10 +259,10 @@ class Stats:
         """
         Extract shortname from https://api.github.com/repos/* URL
 
-        e.g. "https://api.github.com/repos/discord-python/hacktoberbot"
+        e.g. "https://api.github.com/repos/python-discord/seasonalbot"
              |
              V
-             "discord-python/hacktoberbot"
+             "python-discord/seasonalbot"
         """
         exp = r"https?:\/\/api.github.com\/repos\/([/\-\_\.\w]+)"
         return re.findall(exp, in_url)[0]

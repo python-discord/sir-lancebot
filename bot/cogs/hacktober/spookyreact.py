@@ -25,11 +25,11 @@ class SpookyReact:
 
     async def on_message(self, ctx: discord.Message):
         """
-        A command to send the hacktoberbot github project
+        A command to send the seasonalbot github project
 
         Lines that begin with the bot's command prefix are ignored
 
-        Hacktoberbot's own messages are ignored
+        Seasonalbot's own messages are ignored
         """
         for trigger in SPOOKY_TRIGGERS.keys():
             trigger_test = re.search(SPOOKY_TRIGGERS[trigger][0], ctx.content.lower())

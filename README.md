@@ -1,4 +1,4 @@
-# seasonal bot
+# SeasonalBot
 A community project initially started for [Hacktoberfest 2018](https://hacktoberfest.digitalocean.com). A Discord bot for the Python Discord community which changes with the seasons, and provides useful event features.
 
 You can find our community by going to https://discord.gg/python
@@ -77,9 +77,9 @@ You should get a menu like below:
 
 ![](https://i.imgur.com/xA5ga4C.png)
 #### 6. Pull Requests (PR or PRs)
-Goto https://github.com/discord-python/hacktoberbot/pulls and the green New Pull Request button!
+Goto https://github.com/python-discord/seasonalbot/pulls and the green New Pull Request button!
 ![](https://i.imgur.com/fB4a2wQ.png)
-Now you should hit `Compare across forks` then on the third dropdown select your fork (it will be `your username/hacktoberbot`) then hit Create Pull request.
+Now you should hit `Compare across forks` then on the third dropdown select your fork (it will be `your username/seasonalbot`) then hit Create Pull request.
 1[](https://i.imgur.com/N2X9A9v.png)
 Now to tell other people what your PR does
 1. Title - be concise and informative

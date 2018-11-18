@@ -5,14 +5,14 @@ from traceback import format_exc
 
 from discord.ext import commands
 
-HACKTOBERBOT_TOKEN = environ.get('HACKTOBERBOT_TOKEN')
+SEASONALBOT_TOKEN = environ.get('SEASONALBOT_TOKEN')
 log = logging.getLogger()
 
-if HACKTOBERBOT_TOKEN:
-    token_dl = len(HACKTOBERBOT_TOKEN) // 8
-    log.info(f'Bot token loaded: {HACKTOBERBOT_TOKEN[:token_dl]}...{HACKTOBERBOT_TOKEN[-token_dl:]}')
+if SEASONALBOT_TOKEN:
+    token_dl = len(SEASONALBOT_TOKEN) // 8
+    log.info(f'Bot token loaded: {SEASONALBOT_TOKEN[:token_dl]}...{SEASONALBOT_TOKEN[-token_dl:]}')
 else:
-    log.error(f'Bot token not found: {HACKTOBERBOT_TOKEN}')
+    log.error(f'Bot token not found: {SEASONALBOT_TOKEN}')
 
 ghost_unicode = "\N{GHOST}"
 bot = commands.Bot(command_prefix=commands.when_mentioned_or(".", f"{ghost_unicode} ", ghost_unicode))
@@ -30,4 +30,4 @@ if __name__ == '__main__':
         except Exception as e:
             log.error(f'Failed to load extension {extension}: {repr(e)} {format_exc()}')
 
-bot.run(HACKTOBERBOT_TOKEN)
+bot.run(SEASONALBOT_TOKEN)
