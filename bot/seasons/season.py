@@ -1,14 +1,57 @@
+import asyncio
 import datetime
+import importlib
 import logging
+import pkgutil
 from pathlib import Path
 
+from discord.ext import commands
+
 from bot.constants import PYTHON_GUILD
-from bot.utils.cog_load import load_cogs
 
-log = logging.getLogger()
+log = logging.getLogger(__name__)
 
 
-class Season:
+def get_seasons():
+    return [i[1] for i in pkgutil.iter_modules([Path('bot', 'seasons')]) if i.ispkg]
+
+
+def get_season(bot, season_name: str = None, date: datetime.date = None):
+    """
+    Returns a Season object based on either a string or a date.
+    """
+
+    assert season_name or date, "This function requires either a season or a date in order to run."
+
+    season_name = 'halloween'
+
+    seasons = get_seasons()
+
+    # If there's a season name, we can just grab the correct class.
+    if season_name:
+        season_name = season_name.lower()
+        if season_name not in seasons:
+            season_name = 'evergreen'
+
+        season_lib = importlib.import_module(f'bot.seasons.{season_name}')
+        season_class = getattr(season_lib, season_name.capitalize())
+        return season_class(bot)
+
+    # If not, we have to figure out if the date matches any of the seasons.
+    seasons.remove('evergreen')
+
+    for season_name in seasons:
+        season_lib = importlib.import_module(f'bot.seasons.{season_name}')
+        season_class = getattr(season_lib, season_name.capitalize())
+        season_object = season_class(bot)
+        if season_object.start <= date <= season_object.end:
+            return season_object
+    else:
+        evergreen_lib = importlib.import_module(f'bot.seasons.evergreen')
+        return evergreen_lib.Evergreen(bot)
+
+
+class SeasonBase:
     name = None
 
     def __init__(self):
@@ -20,23 +63,71 @@ class Season:
     async def load(self):
         """
         Loads in the bot name, the bot avatar,
-        and the cogs that are relevant to that season.
+        and the extensions that are relevant to that season.
         """
 
         # Change the name
         bot_member = self.bot.get_guild(PYTHON_GUILD).get_member(self.bot.user.id)
         await bot_member.edit(nick=self.bot_name)
+
         await self.bot.user.edit(avatar=self.bot_avatar)
 
         # Loads all the cogs for that season, and then the evergreen ones.
-        cogs = []
-        for cog_folder in (self.name, "evergreen"):
-            if cog_folder:
-                log.info(f'Start loading extensions from bot/cogs/{cog_folder}/')
-                for file in Path('bot', 'cogs', cog_folder).glob('[!__]*.py'):
-                    cogs.append(f"bot.cogs.{cog_folder}.{file.stem}")
+        exts = []
+        for ext_folder in {self.name, "evergreen"}:
+            if ext_folder:
+                log.info(f'Start loading extensions from seasons/{ext_folder}/{ext_folder}/')
+                path = Path('bot', 'seasons', ext_folder)
+                for ext_name in [i[1] for i in pkgutil.iter_modules([path])]:
+                    exts.append(f"bot.seasons.{ext_folder}.{ext_name}")
 
-        # Load the season handler
-        cogs.append("bot.cogs.season")
+        self.bot.load_extensions(exts)
 
-        load_cogs(self.bot, cogs)
+
+class SeasonManager:
+    """
+    A cog for managing seasons.
+    """
+
+    def __init__(self, bot):
+        self.bot = bot
+        self.season = get_season(bot, date=datetime.date.today())
+        bot.loop.create_task(self.load_seasons())
+
+        if not hasattr(bot, 'loaded_seasons'):
+            bot.loaded_seasons = []
+
+        # Figure out number of seconds until a minute past midnight
+        tomorrow = datetime.datetime.now() + datetime.timedelta(1)
+        midnight = datetime.datetime(
+            year=tomorrow.year,
+            month=tomorrow.month,
+            day=tomorrow.day,
+            hour=0,
+            minute=0,
+            second=0
+        )
+        self.sleep_time = (midnight - datetime.datetime.now()).seconds + 60
+
+    async def load_seasons(self):
+        await self.bot.wait_until_ready()
+        await self.season.load()
+
+        while True:
+            await asyncio.sleep(self.sleep_time)  # sleep until midnight
+            self.sleep_time = 86400  # next time, sleep for 24 hours.
+
+            # If the season has changed, load it.
+            new_season = get_season(self.bot, date=datetime.date.today())
+            if new_season != self.season:
+                await self.season.load()
+
+    @commands.command('season')
+    async def change_season(self, ctx, new_season: str):
+        """
+        Changes the currently active season on the bot.
+        """
+
+        self.season = get_season(self.bot, season_name=new_season)
+        await self.season.load()
+        await ctx.send(f"Season changed to {new_season}.")
