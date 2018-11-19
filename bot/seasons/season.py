@@ -22,9 +22,9 @@ def get_season(bot, season_name: str = None, date: datetime.date = None):
     Returns a Season object based on either a string or a date.
     """
 
-    assert season_name or date, "This function requires either a season or a date in order to run."
-
-    season_name = 'halloween'
+    # If either both or neither are set, raise an error.
+    if not bool(season_name) ^ bool(date):
+        raise UserWarning("This function requires either a season or a date in order to run.")
 
     seasons = get_seasons()
 
