@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "ed5cef35930ac750e8cc7c6a16d23926b48e413e8a12d363203d8dc97433826c"
+            "sha256": "28b57db4238f6dced9fe49be714328f1c01d01b7b16a2cda865b17ef726e9dc3"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -31,7 +31,7 @@
             "index": "pypi",
             "version": "==0.12.1"
         },
-        "discord.py": {
+        "discord-py": {
             "git": "https://github.com/Rapptz/discord.py",
             "ref": "rewrite"
         },
