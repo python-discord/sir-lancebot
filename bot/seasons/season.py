@@ -7,7 +7,8 @@ from pathlib import Path
 
 from discord.ext import commands
 
-from bot.constants import PYTHON_GUILD
+from bot.constants import Client, Roles
+from bot.decorators import with_role
 
 log = logging.getLogger(__name__)
 
@@ -67,7 +68,7 @@ class SeasonBase:
         """
 
         # Change the name
-        bot_member = self.bot.get_guild(PYTHON_GUILD).get_member(self.bot.user.id)
+        bot_member = self.bot.get_guild(Client.guild).get_member(self.bot.user.id)
         await bot_member.edit(nick=self.bot_name)
 
         await self.bot.user.edit(avatar=self.bot_avatar)
@@ -122,6 +123,7 @@ class SeasonManager:
             if new_season != self.season:
                 await self.season.load()
 
+    @with_role(Roles.moderator, Roles.admin, Roles.owner)
     @commands.command('season')
     async def change_season(self, ctx, new_season: str):
         """
