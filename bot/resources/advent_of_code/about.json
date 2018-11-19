@@ -1,0 +1,27 @@
+[
+    {
+        "name": "What is Advent of Code?",
+        "value": "Advent of Code (AoC) is an series of small programming puzzles for a variety of skill levels, run every year during the month of December.\n\nThey are self-contained and are just as appropriate for an expert who wants to stay sharp as they are for a beginner who is just learning to code. Each puzzle calls upon different skills and has two parts that build on a theme.",
+        "inline": false
+    },
+    {
+        "name": "How do I sign up?",
+        "value": "AoC utilizes the following services' OAuth:",
+        "inline": true
+    },
+    {
+        "name": "Service",
+        "value": "GitHub\nGoogle\nTwitter\nReddit",
+        "inline": true
+    },
+    {
+        "name": "How does scoring work?",
+        "value": "Getting a star first is worth 100 points, second is 99, and so on down to 1 point at 100th place.\n\nCheck out AoC's [global leaderboard](https://adventofcode.com/2018/leaderboard) to see who's leading this year's event!",
+        "inline": false
+    },
+    {
+        "name": "Join our private leaderboard!",
+        "value": "In addition to the global leaderboard, AoC also offers private leaderboards, where you can compete against a smaller group of friends!\n\nHead over to AoC's [private leaderboard page](https://adventofcode.com/leaderboard/private) and enter code `363275-442b6939` to join the PyDis private leaderboard!",
+        "inline": false
+    }
+]
