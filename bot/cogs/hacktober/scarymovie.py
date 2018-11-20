@@ -10,7 +10,7 @@ TMDB_API_KEY = environ.get('TMDB_API_KEY')
 TMDB_TOKEN = environ.get('TMDB_TOKEN')
 
 
-class Movie:
+class ScaryMovie:
     """
     Selects a random scary movie and embeds info into discord chat
     """
@@ -133,4 +133,4 @@ class Movie:
 
 
 def setup(bot):
-    bot.add_cog(Movie(bot))
+    bot.add_cog(ScaryMovie(bot))

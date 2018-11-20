@@ -39,7 +39,7 @@ class HalloweenFacts:
     async def _fact_publisher_task(self):
         """
         A background task that runs forever, sending Halloween facts at random to the Discord channel with id equal to
-        HACKTOBERFEST_CHANNEL_ID every INTERVAL seconds.
+        HACKTOBER_CHANNEL_ID every INTERVAL seconds.
         """
         facts = list(enumerate(self.halloween_facts))
         while True:
