@@ -1,7 +1,8 @@
+import logging
+import math
 import sys
 import traceback
-import math
-import logging
+
 from discord.ext import commands
 
 
@@ -41,7 +42,7 @@ class CommandErrorHandler:
             )
             return await ctx.send(
                 "This command is on cooldown," +
-                " please retry in {}s.".format(math.ceil(error.retry_after))
+                f" please retry in {math.ceil(error.retry_after)}s."
             )
         if isinstance(error, commands.DisabledCommand):
             logging.debug(
@@ -85,7 +86,7 @@ class CommandErrorHandler:
                 ":no_entry: You are not authorized to use this command."
             )
         print(
-            "Ignoring exception in command {}:".format(ctx.command),
+            f"Ignoring exception in command {ctx.command}:",
             file=sys.stderr
         )
         logging.warning(
