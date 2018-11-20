@@ -7,7 +7,7 @@ from pathlib import Path
 
 from discord.ext import commands
 
-from bot.constants import Roles
+from bot.constants import Client, Roles
 from bot.decorators import with_role
 
 log = logging.getLogger(__name__)
@@ -38,12 +38,19 @@ def get_season(bot, season_name: str = None, date: datetime.date = None):
 
     seasons = get_seasons()
 
-    # If there's a season name, we can just grab the correct class.
+    # Use season override if season name not provided
+    if not season_name and Client.season_override:
+        log.debug(f"Season override found: {Client.season_override}")
+        season_name = Client.season_override
+
+    # Check if a valid season name was provided
     if season_name:
         season_name = season_name.lower()
         if season_name not in seasons:
             season_name = 'evergreen'
 
+    # If there's a season name, we can just grab the correct class.
+    if season_name:
         season_lib = importlib.import_module(f'bot.seasons.{season_name}')
         season_class = getattr(season_lib, season_name.capitalize())
         return season_class(bot)
@@ -80,10 +87,29 @@ class SeasonBase:
         Loads in the bot name, the bot avatar,
         and the extensions that are relevant to that season.
         """
-        # Change the name
-        if self.bot.user.name != self.bot_name:
-            await self.bot.user.edit(username=self.bot_name)
-            await self.bot.user.edit(avatar=self.bot_avatar)
+
+        guild = self.bot.get_guild(Client.guild)
+
+        # Change only nickname if in debug mode due to ratelimits for user edits
+        if Client.debug:
+            if guild.me.display_name != self.bot_name:
+                log.debug(f"Changing nickname to {self.bot_name}")
+                await guild.me.edit(nick=self.bot_name)
+        else:
+            if self.bot.user.name != self.bot_name:
+                # attempt to change user details
+                log.debug(f"Changing username to {self.bot_name}")
+                await self.bot.user.edit(name=self.bot_name, avatar=self.bot_avatar)
+
+                # fallback on nickname if failed due to ratelimit
+                if self.bot.user.name != self.bot_name:
+                    log.info(f"User details failed to change: Changing nickname to {self.bot_name}")
+                    await guild.me.edit(nick=self.bot_name)
+
+                # remove nickname if an old one exists
+                elif guild.me.nick:
+                    log.debug(f"Clearing old nickname of {guild.me.nick}")
+                    await guild.me.edit(nick=None)
 
         # Prepare all the seasonal cogs, and then the evergreen ones.
         extensions = []

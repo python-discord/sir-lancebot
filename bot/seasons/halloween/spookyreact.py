@@ -54,14 +54,14 @@ class SpookyReact:
         """
         # Check for self reaction
         if ctx.author == self.bot.user:
-            logging.info(f"Ignoring reactions on self message. Message ID: {ctx.id}")
+            logging.debug(f"Ignoring reactions on self message. Message ID: {ctx.id}")
             return True
 
         # Check for command invocation
         # Because on_message doesn't give a full Context object, generate one first
         tmp_ctx = await self.bot.get_context(ctx)
         if tmp_ctx.prefix:
-            logging.info(f"Ignoring reactions on command invocation. Message ID: {ctx.id}")
+            logging.debug(f"Ignoring reactions on command invocation. Message ID: {ctx.id}")
             return True
 
         return False
