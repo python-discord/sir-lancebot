@@ -17,36 +17,36 @@ class CommandErrorHandler:
 
         if hasattr(ctx.command, 'on_error'):
             return logging.debug(
-                "A command error occured but " +
+                "A command error occured but "
                 "the command had it's own error handler"
             )
         error = getattr(error, 'original', error)
         if isinstance(error, commands.CommandNotFound):
             return logging.debug(
-                f"{ctx.author} called '{ctx.message.content}' " +
+                f"{ctx.author} called '{ctx.message.content}' "
                 "but no command was found"
             )
         if isinstance(error, commands.UserInputError):
             logging.debug(
-                f"{ctx.author} called the command '{ctx.command}' " +
+                f"{ctx.author} called the command '{ctx.command}' "
                 "but entered invalid input!"
             )
             return await ctx.send(
-                ":no_entry: The command you specified failed to run." +
+                ":no_entry: The command you specified failed to run."
                 "This is because the arguments you provided were invalid."
             )
         if isinstance(error, commands.CommandOnCooldown):
             logging.debug(
-                f"{ctx.author} called the command '{ctx.command}' " +
+                f"{ctx.author} called the command '{ctx.command}' "
                 "but they were on cooldown!"
             )
             return await ctx.send(
-                "This command is on cooldown," +
+                "This command is on cooldown,"
                 f" please retry in {math.ceil(error.retry_after)}s."
             )
         if isinstance(error, commands.DisabledCommand):
             logging.debug(
-                f"{ctx.author} called the command '{ctx.command}' " +
+                f"{ctx.author} called the command '{ctx.command}' "
                 "but the command was disabled!"
             )
             return await ctx.send(
@@ -54,7 +54,7 @@ class CommandErrorHandler:
             )
         if isinstance(error, commands.NoPrivateMessage):
             logging.debug(
-                f"{ctx.author} called the command '{ctx.command}' " +
+                f"{ctx.author} called the command '{ctx.command}' "
                 "in a private message however the command was guild only!"
             )
             return await ctx.author.send(
@@ -63,7 +63,7 @@ class CommandErrorHandler:
         if isinstance(error, commands.BadArgument):
             if ctx.command.qualified_name == 'tag list':
                 logging.debug(
-                    f"{ctx.author} called the command '{ctx.command}' " +
+                    f"{ctx.author} called the command '{ctx.command}' "
                     "but entered an invalid user!"
                 )
                 return await ctx.send(
@@ -71,7 +71,7 @@ class CommandErrorHandler:
                 )
             else:
                 logging.debug(
-                    f"{ctx.author} called the command '{ctx.command}' " +
+                    f"{ctx.author} called the command '{ctx.command}' "
                     "but entered a bad argument!"
                 )
                 return await ctx.send(
@@ -79,7 +79,7 @@ class CommandErrorHandler:
                 )
         if isinstance(error, commands.CheckFailure):
             logging.debug(
-                f"{ctx.author} called the command '{ctx.command}' " +
+                f"{ctx.author} called the command '{ctx.command}' "
                 "but the checks failed!"
             )
             return await ctx.send(
@@ -90,8 +90,8 @@ class CommandErrorHandler:
             file=sys.stderr
         )
         logging.warning(
-            f"{ctx.author} called the command '{ctx.command}' " +
-            "however the command failed to run with the error:" +
+            f"{ctx.author} called the command '{ctx.command}' "
+            "however the command failed to run with the error:"
             f"-------------\n{error}"
         )
         traceback.print_exception(
