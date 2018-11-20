@@ -20,9 +20,9 @@ def get_seasons():
     """
     seasons = []
 
-    for object in pkgutil.iter_modules([Path('bot', 'seasons')]):
-        if object.ispkg:
-            seasons.append(object[1])
+    for module in pkgutil.iter_modules([Path('bot', 'seasons')]):
+        if module.ispkg:
+            seasons.append(module[1])
 
     return seasons
 
