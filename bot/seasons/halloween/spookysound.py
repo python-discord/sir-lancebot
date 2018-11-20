@@ -17,7 +17,7 @@ class SpookySound:
 
     def __init__(self, bot):
         self.bot = bot
-        self.sound_files = list(Path("./bot/resources/spookysounds").glob("*.mp3"))
+        self.sound_files = list(Path("bot", "resources", "halloween", "spookysounds").glob("*.mp3"))
         self.channel = None
 
     @commands.cooldown(rate=1, per=1)

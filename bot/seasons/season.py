@@ -77,7 +77,7 @@ class SeasonBase:
         and the extensions that are relevant to that season.
         """
         # Change the name
-        if "SeasonalBot" not in self.bot_name:
+        if self.bot.user.name != self.bot_name:
             await self.bot.user.edit(username=self.bot_name)
             await self.bot.user.edit(avatar=self.bot_avatar)
 
@@ -85,13 +85,10 @@ class SeasonBase:
         extensions = []
         for ext_folder in {self.name, "evergreen"}:
             if ext_folder:
-                log.info(f'Start loading extensions from seasons/{ext_folder}/{ext_folder}/')
+                log.info(f'Start loading extensions from seasons/{ext_folder}/')
                 path = Path('bot', 'seasons', ext_folder)
                 for ext_name in [i[1] for i in pkgutil.iter_modules([path])]:
                     extensions.append(f"bot.seasons.{ext_folder}.{ext_name}")
-
-        # Now add the Season cog, which should always be loaded.
-        extensions.append("bot.seasons.season")
 
         # Finally we can load all the cogs we've prepared.
         self.bot.load_extensions(extensions)
@@ -145,8 +142,3 @@ class SeasonManager:
         self.season = get_season(self.bot, season_name=new_season)
         await self.season.load()
         await ctx.send(f"Season changed to {new_season}.")
-
-
-def setup(bot):
-    bot.add_cog(SeasonManager(bot))
-    log.debug("SeasonManager cog loaded")

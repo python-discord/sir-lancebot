@@ -1,4 +1,3 @@
-import asyncio
 import json
 import logging
 import random
@@ -33,37 +32,25 @@ class HalloweenFacts:
         with open(Path("bot", "resources", "halloween", "halloween_facts.json"), "r") as file:
             self.halloween_facts = json.load(file)
         self.channel = None
-        self.last_fact = None
+        self.facts = list(enumerate(self.halloween_facts))
+        random.shuffle(self.facts)
 
     async def on_ready(self):
         self.channel = self.bot.get_channel(Hacktoberfest.channel_id)
         self.bot.loop.create_task(self._fact_publisher_task())
 
-    async def _fact_publisher_task(self):
-        """
-        A background task that runs forever, sending Halloween facts at random to the Discord channel with id equal to
-        HACKTOBER_CHANNEL_ID every INTERVAL seconds.
-        """
-        facts = list(enumerate(self.halloween_facts))
-        while True:
-            # Avoid choosing each fact at random to reduce chances of facts being reposted soon.
-            random.shuffle(facts)
-            for index, fact in facts:
-                embed = self._build_embed(index, fact)
-                await self.channel.send("Your regular serving of random Halloween facts", embed=embed)
-                self.last_fact = (index, fact)
-                await asyncio.sleep(INTERVAL)
+    @property
+    def random_fact(self):
+        return random.choice(self.facts)
 
-    @commands.command(name="hallofact", aliases=["hallofacts"], brief="Get the most recent Halloween fact")
-    async def get_last_fact(self, ctx):
+    @commands.command(name="spookyfact", aliases=["halloweenfact"], brief="Get the most recent Halloween fact")
+    async def get_random_fact(self, ctx):
         """
         Reply with the most recent Halloween fact.
         """
-        if ctx.channel != self.channel:
-            return
-        index, fact = self.last_fact
+        index, fact = self.random_fact
         embed = self._build_embed(index, fact)
-        await ctx.send("Halloween fact recap", embed=embed)
+        await ctx.send(embed=embed)
 
     @staticmethod
     def _build_embed(index, fact):

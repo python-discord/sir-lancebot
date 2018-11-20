@@ -21,7 +21,7 @@ class ScaryMovie:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='movie', alias=['tmdb'])
+    @commands.command(name='scarymovie', alias=['smovie'])
     async def random_movie(self, ctx):
         """
         Randomly select a scary movie and display information about it.
