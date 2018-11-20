@@ -5,9 +5,9 @@ import json
 import functools
 import os
 
-json_location = os.path.join(os.getcwd(), 'resources', 'candy_collection.json')
+from bot.constants import HACKTOBER_CHANNEL_ID
 
-HACKTOBER_CHANNEL_ID = 498804484324196362
+json_location = os.path.join("bot", "resources", "halloween", "candy_collection.json")
 
 # chance is 1 in x range, so 1 in 20 range would give 5% chance (for add candy)
 ADD_CANDY_REACTION_CHANCE = 20  # 5%

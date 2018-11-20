@@ -21,7 +21,7 @@ def pentagram(im):
     """Adds pentagram to image."""
     im = im.convert('RGB')
     wt, ht = im.size
-    penta = Image.open('bot/resources/bloody-pentagram.png')
+    penta = Image.open('bot/resources/halloween/bloody-pentagram.png')
     penta = penta.resize((wt, ht))
     im.paste(penta, (0, 0), penta)
     return im
@@ -34,14 +34,16 @@ def bat(im):
     image and may be rotated upto 90 degrees anti-clockwise."""
     im = im.convert('RGB')
     wt, ht = im.size
-    bat = Image.open('bot/resources/bat-clipart.png')
-    bat_size = randint(wt//5, wt)
+    bat = Image.open('bot/resources/halloween/bat-clipart.png')
+    bat_size = randint(wt//10, wt//7)
     rot = randint(0, 90)
     bat = bat.resize((bat_size, bat_size))
     bat = bat.rotate(rot)
-    x = randint(0, wt-bat_size)
-    y = randint(0, wt-bat_size)
+    x = randint(wt-(bat_size * 3), wt-bat_size)
+    y = randint(10, bat_size)
     im.paste(bat, (x, y), bat)
+    im.paste(bat, (x + bat_size, y + (bat_size // 4)), bat)
+    im.paste(bat, (x - bat_size, y - (bat_size // 2)), bat)
     return im
 
 
