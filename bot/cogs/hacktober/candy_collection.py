@@ -1,13 +1,14 @@
+import functools
+import json
+import os
+import random
+
 import discord
 from discord.ext import commands
-import random
-import json
-import functools
-import os
 
-json_location = os.path.join(os.getcwd(), 'resources', 'candy_collection.json')
+from bot.constants import HACKTOBER_CHANNEL_ID
 
-HACKTOBER_CHANNEL_ID = 498804484324196362
+json_location = os.path.join("bot", "resources", "halloween", "candy_collection.json")
 
 # chance is 1 in x range, so 1 in 20 range would give 5% chance (for add candy)
 ADD_CANDY_REACTION_CHANCE = 20  # 5%
@@ -126,7 +127,7 @@ class CandyCollection:
 
         for i in range(9):
             o = discord.Object(id=recent_msg.id + i)
-            msg = await channel.history(limit=1, before=o).next()
+            msg = await next(channel.history(limit=1, before=o))
             ten_recent.append(msg.id)
 
         return ten_recent
@@ -140,7 +141,7 @@ class CandyCollection:
             o = discord.Object(id=msg_id + 1)
             # Use history rather than get_message due to
             #         poor ratelimit (50/1s vs 1/1s)
-            msg = await self.hacktober_channel.history(limit=1, before=o).next()
+            msg = await next(self.hacktober_channel.history(limit=1, before=o))
 
             if msg.id != msg_id:
                 return None
