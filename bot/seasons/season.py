@@ -132,10 +132,7 @@ class SeasonManager:
     def __init__(self, bot):
         self.bot = bot
         self.season = get_season(bot, date=datetime.date.today())
-        bot.loop.create_task(self.load_seasons())
-
-        if not hasattr(bot, 'loaded_seasons'):
-            bot.loaded_seasons = []
+        self.season_task = bot.loop.create_task(self.load_seasons())
 
         # Figure out number of seconds until a minute past midnight
         tomorrow = datetime.datetime.now() + datetime.timedelta(1)
@@ -172,3 +169,6 @@ class SeasonManager:
         self.season = get_season(self.bot, season_name=new_season)
         await self.season.load()
         await ctx.send(f"Season changed to {new_season}.")
+
+    def __unload(self):
+        self.season_task.cancel()
