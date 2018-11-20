@@ -22,7 +22,7 @@ class Stats:
         aliases=('hacktoberstats', 'getstats', 'userstats'),
         invoke_without_command=True
     )
-    async def hacktoberstats_group(self, ctx: commands.Context, github_username: str = None):
+    async def hacktoberstats_group(self, ctx: commands.Context, github_username: str=None):
         """
         If invoked without a subcommand or github_username, get the invoking user's stats if
         they've linked their Discord name to GitHub using .stats link
@@ -47,7 +47,7 @@ class Stats:
         await self.get_stats(ctx, github_username)
 
     @hacktoberstats_group.command(name="link")
-    async def link_user(self, ctx: commands.Context, github_username: str = None):
+    async def link_user(self, ctx: commands.Context, github_username: str=None):
         """
         Link the invoking user's Github github_username to their Discord ID
 
