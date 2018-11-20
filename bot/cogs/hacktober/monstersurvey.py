@@ -25,7 +25,7 @@ class MonsterSurvey:
     def __init__(self, bot: Bot):
         """Initializes values for the bot to use within the voting commands."""
         self.bot = bot
-        self.registry_location = os.path.join(os.getcwd(), 'bot', 'resources', 'monstersurvey', 'monstersurvey.json')
+        self.registry_location = os.path.join(os.getcwd(), 'bot', 'resources', 'halloween', 'monstersurvey.json')
         with open(self.registry_location, 'r') as jason:
             self.voter_registry = json.load(jason)
 
@@ -91,7 +91,7 @@ class MonsterSurvey:
     @monster_group.command(
         name='vote'
     )
-    async def monster_vote(self, ctx: Context, name: Optional[Union[int, str]] = None):
+    async def monster_vote(self, ctx: Context, name = None):
         """Casts a vote for a particular monster, or displays a list of monsters that can be voted for
         if one is not given."""
         if name is None:
@@ -133,7 +133,7 @@ class MonsterSurvey:
     @monster_group.command(
         name='show'
     )
-    async def monster_show(self, ctx: Context, name: Optional[Union[int, str]] = None):
+    async def monster_show(self, ctx: Context, name = None):
         """
         Shows the named monster. If one is not named, it sends the default voting embed instead.
         :param ctx:
