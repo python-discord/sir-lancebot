@@ -1,7 +1,6 @@
 import json
 import logging
 import os
-from typing import Optional, Union
 
 from discord import Embed
 from discord.ext import commands
@@ -91,7 +90,7 @@ class MonsterSurvey:
     @monster_group.command(
         name='vote'
     )
-    async def monster_vote(self, ctx: Context, name = None):
+    async def monster_vote(self, ctx: Context, name=None):
         """Casts a vote for a particular monster, or displays a list of monsters that can be voted for
         if one is not given."""
         if name is None:
@@ -133,7 +132,7 @@ class MonsterSurvey:
     @monster_group.command(
         name='show'
     )
-    async def monster_show(self, ctx: Context, name = None):
+    async def monster_show(self, ctx: Context, name=None):
         """
         Shows the named monster. If one is not named, it sends the default voting embed instead.
         :param ctx:
