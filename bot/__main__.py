@@ -6,4 +6,3 @@ log = logging.getLogger(__name__)
 
 bot.load_extension("bot.seasons")
 bot.run(Client.token)
-

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import logging
 from os import environ
 from typing import NamedTuple
