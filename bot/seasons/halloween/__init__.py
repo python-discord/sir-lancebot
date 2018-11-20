@@ -14,5 +14,5 @@ class Halloween(SeasonBase):
 
     @property
     def bot_avatar(self):
-        with open("bot/resources/avatars/spooky.png", "rb") as avatar:
+        with open(self.avatar_path("spooky.png"), "rb") as avatar:
             return bytearray(avatar.read())

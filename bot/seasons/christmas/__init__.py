@@ -14,5 +14,5 @@ class Christmas(SeasonBase):
 
     @property
     def bot_avatar(self):
-        with open("bot/resources/avatars/christmas.png", "rb") as avatar:
+        with open(self.avatar_path("christmas.png"), "rb") as avatar:
             return bytearray(avatar.read())

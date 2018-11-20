@@ -71,6 +71,10 @@ class SeasonBase:
         self.start = datetime.datetime.strptime(f"{self.start_date}-{current_year}", date_format).date()
         self.end = datetime.datetime.strptime(f"{self.end_date}-{current_year}", date_format).date()
 
+    @staticmethod
+    def avatar_path(*path_segments):
+        return Path('bot', 'resources', 'avatars', *path_segments)
+
     async def load(self):
         """
         Loads in the bot name, the bot avatar,

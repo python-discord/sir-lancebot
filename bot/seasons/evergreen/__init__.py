@@ -8,5 +8,5 @@ class Evergreen(SeasonBase):
 
     @property
     def bot_avatar(self):
-        with open("bot/resources/avatars/standard.png", "rb") as avatar:
+        with open(self.avatar_path("standard.png"), "rb") as avatar:
             return bytearray(avatar.read())
