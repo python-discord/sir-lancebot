@@ -25,7 +25,7 @@ class MonsterSurvey:
     def __init__(self, bot: Bot):
         """Initializes values for the bot to use within the voting commands."""
         self.bot = bot
-        self.registry_location = os.path.join(os.getcwd(), 'bot', 'resources', 'halloween', 'monstersurvey.json')
+        self.registry_location = os.path.join(os.getcwd(), 'bot', 'resources', 'monstersurvey', 'monstersurvey.json')
         with open(self.registry_location, 'r') as jason:
             self.voter_registry = json.load(jason)
 
