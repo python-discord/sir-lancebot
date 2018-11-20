@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import logging
 from os import environ
 from typing import NamedTuple
@@ -41,6 +42,12 @@ class Client(NamedTuple):
     guild = int(environ.get('SEASONALBOT_GUILD', 267624335836053506))
     prefix = "."
     token = environ.get('SEASONALBOT_TOKEN')
+    giphy_token = environ.get("GIPHY_TOKEN")
+
+
+class Hacktoberfest(NamedTuple):
+    channel_id = 498804484324196362
+    voice_id = 514420006474219521
 
 
 class Roles(NamedTuple):
