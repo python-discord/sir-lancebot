@@ -7,14 +7,24 @@ from pathlib import Path
 
 from discord.ext import commands
 
-from bot.constants import Client, Roles
+from bot.constants import Roles
 from bot.decorators import with_role
 
 log = logging.getLogger(__name__)
 
 
 def get_seasons():
-    return [i[1] for i in pkgutil.iter_modules([Path('bot', 'seasons')]) if i.ispkg]
+    """
+    Returns all the Season objects
+    located in bot/seasons/
+    """
+    seasons = []
+
+    for object in pkgutil.iter_modules([Path('bot', 'seasons')]):
+        if object.ispkg:
+            seasons.append(object[1])
+
+    return seasons
 
 
 def get_season(bot, season_name: str = None, date: datetime.date = None):
@@ -66,23 +76,25 @@ class SeasonBase:
         Loads in the bot name, the bot avatar,
         and the extensions that are relevant to that season.
         """
-
         # Change the name
-        bot_member = self.bot.get_guild(Client.guild).get_member(self.bot.user.id)
-        await bot_member.edit(nick=self.bot_name)
+        if "SeasonalBot" not in self.bot_name:
+            await self.bot.user.edit(username=self.bot_name)
+            await self.bot.user.edit(avatar=self.bot_avatar)
 
-        await self.bot.user.edit(avatar=self.bot_avatar)
-
-        # Loads all the cogs for that season, and then the evergreen ones.
-        exts = []
+        # Prepare all the seasonal cogs, and then the evergreen ones.
+        extensions = []
         for ext_folder in {self.name, "evergreen"}:
             if ext_folder:
                 log.info(f'Start loading extensions from seasons/{ext_folder}/{ext_folder}/')
                 path = Path('bot', 'seasons', ext_folder)
                 for ext_name in [i[1] for i in pkgutil.iter_modules([path])]:
-                    exts.append(f"bot.seasons.{ext_folder}.{ext_name}")
+                    extensions.append(f"bot.seasons.{ext_folder}.{ext_name}")
 
-        self.bot.load_extensions(exts)
+        # Now add the Season cog, which should always be loaded.
+        extensions.append("bot.seasons.season")
+
+        # Finally we can load all the cogs we've prepared.
+        self.bot.load_extensions(extensions)
 
 
 class SeasonManager:
@@ -133,3 +145,8 @@ class SeasonManager:
         self.season = get_season(self.bot, season_name=new_season)
         await self.season.load()
         await ctx.send(f"Season changed to {new_season}.")
+
+
+def setup(bot):
+    bot.add_cog(SeasonManager(bot))
+    log.debug("SeasonManager cog loaded")

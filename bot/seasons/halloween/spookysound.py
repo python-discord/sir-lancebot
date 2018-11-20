@@ -1,10 +1,13 @@
+import logging
 import random
 from pathlib import Path
 
 import discord
 from discord.ext import commands
 
-from bot.constants import HACKTOBER_VOICE_CHANNEL_ID
+from bot.constants import Hacktoberfest
+
+log = logging.getLogger(__name__)
 
 
 class SpookySound:
@@ -26,7 +29,7 @@ class SpookySound:
         """
         if not self.channel:
             await self.bot.wait_until_ready()
-            self.channel = self.bot.get_channel(HACKTOBER_VOICE_CHANNEL_ID)
+            self.channel = self.bot.get_channel(Hacktoberfest.voice_id)
 
         await ctx.send("Initiating spooky sound...")
         file_path = random.choice(self.sound_files)
@@ -44,3 +47,4 @@ class SpookySound:
 
 def setup(bot):
     bot.add_cog(SpookySound(bot))
+    log.debug("SpookySound cog loaded")

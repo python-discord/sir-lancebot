@@ -1,3 +1,4 @@
+import logging
 from json import load
 from pathlib import Path
 from random import choice
@@ -5,6 +6,8 @@ from random import choice
 import discord
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
+
+log = logging.getLogger(__name__)
 
 
 class Halloweenify:
@@ -46,3 +49,4 @@ class Halloweenify:
 
 def setup(bot):
     bot.add_cog(Halloweenify(bot))
+    log.debug("Halloweenify cog loaded")

@@ -1,5 +1,6 @@
 import asyncio
 import json
+import logging
 import random
 from datetime import timedelta
 from pathlib import Path
@@ -7,7 +8,9 @@ from pathlib import Path
 import discord
 from discord.ext import commands
 
-from bot.constants import HACKTOBER_CHANNEL_ID
+from bot.constants import Hacktoberfest
+
+log = logging.getLogger(__name__)
 
 SPOOKY_EMOJIS = [
     "\N{BAT}",
@@ -33,7 +36,7 @@ class HalloweenFacts:
         self.last_fact = None
 
     async def on_ready(self):
-        self.channel = self.bot.get_channel(HACKTOBER_CHANNEL_ID)
+        self.channel = self.bot.get_channel(Hacktoberfest.channel_id)
         self.bot.loop.create_task(self._fact_publisher_task())
 
     async def _fact_publisher_task(self):
@@ -74,3 +77,4 @@ class HalloweenFacts:
 
 def setup(bot):
     bot.add_cog(HalloweenFacts(bot))
+    log.debug("HalloweenFacts cog loaded")

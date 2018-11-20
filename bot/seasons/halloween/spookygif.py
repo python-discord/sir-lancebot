@@ -1,8 +1,12 @@
+import logging
+
 import aiohttp
 import discord
 from discord.ext import commands
 
-from bot.constants import GIPHY_TOKEN
+from bot.constants import Client
+
+log = logging.getLogger(__name__)
 
 
 class SpookyGif:
@@ -20,7 +24,7 @@ class SpookyGif:
         """
 
         async with aiohttp.ClientSession() as session:
-            params = {'api_key': GIPHY_TOKEN, 'tag': 'halloween', 'rating': 'g'}
+            params = {'api_key': Client.giphy_token, 'tag': 'halloween', 'rating': 'g'}
             # Make a GET request to the Giphy API to get a random halloween gif.
             async with session.get('http://api.giphy.com/v1/gifs/random', params=params) as resp:
                 data = await resp.json()
@@ -34,3 +38,4 @@ class SpookyGif:
 
 def setup(bot):
     bot.add_cog(SpookyGif(bot))
+    log.debug("SpookyGif cog loaded")

@@ -3,6 +3,8 @@ import re
 
 import discord
 
+log = logging.getLogger(__name__)
+
 SPOOKY_TRIGGERS = {
     'spooky': (r"\bspo{2,}ky\b", "\U0001F47B"),
     'skeleton': (r"\bskeleton\b", "\U0001F480"),
@@ -67,3 +69,4 @@ class SpookyReact:
 
 def setup(bot):
     bot.add_cog(SpookyReact(bot))
+    log.debug("SpookyReact cog loaded")

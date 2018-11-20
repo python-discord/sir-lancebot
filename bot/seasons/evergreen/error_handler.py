@@ -5,6 +5,8 @@ import traceback
 
 from discord.ext import commands
 
+log = logging.getLogger(__name__)
+
 
 class CommandErrorHandler:
     """A error handler for the PythonDiscord server!"""
@@ -104,3 +106,4 @@ class CommandErrorHandler:
 
 def setup(bot):
     bot.add_cog(CommandErrorHandler(bot))
+    log.debug("CommandErrorHandler cog loaded")

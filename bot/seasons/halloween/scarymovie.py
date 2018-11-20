@@ -1,9 +1,12 @@
+import logging
 import random
 from os import environ
 
 import aiohttp
 from discord import Embed
 from discord.ext import commands
+
+log = logging.getLogger(__name__)
 
 
 TMDB_API_KEY = environ.get('TMDB_API_KEY')
@@ -134,3 +137,4 @@ class ScaryMovie:
 
 def setup(bot):
     bot.add_cog(ScaryMovie(bot))
+    log.debug("ScaryMovie cog loaded")

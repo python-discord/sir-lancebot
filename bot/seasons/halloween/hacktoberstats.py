@@ -10,8 +10,10 @@ import aiohttp
 import discord
 from discord.ext import commands
 
+log = logging.getLogger(__name__)
 
-class Stats:
+
+class HacktoberStats:
     def __init__(self, bot):
         self.bot = bot
         self.link_json = Path('./bot/resources', 'github_links.json')
@@ -30,7 +32,7 @@ class Stats:
         If invoked with a github_username, get that user's contributions
         """
         if not github_username:
-            author_id, author_mention = Stats._author_mention_from_context(ctx)
+            author_id, author_mention = HacktoberStats._author_mention_from_context(ctx)
 
             if str(author_id) in self.linked_accounts.keys():
                 github_username = self.linked_accounts[author_id]["github_username"]
@@ -59,7 +61,7 @@ class Stats:
                 }
             }
         """
-        author_id, author_mention = Stats._author_mention_from_context(ctx)
+        author_id, author_mention = HacktoberStats._author_mention_from_context(ctx)
         if github_username:
             if str(author_id) in self.linked_accounts.keys():
                 old_username = self.linked_accounts[author_id]["github_username"]
@@ -84,7 +86,7 @@ class Stats:
         """
         Remove the invoking user's account link from the log
         """
-        author_id, author_mention = Stats._author_mention_from_context(ctx)
+        author_id, author_mention = HacktoberStats._author_mention_from_context(ctx)
 
         stored_user = self.linked_accounts.pop(author_id, None)
         if stored_user:
@@ -174,7 +176,12 @@ class Stats:
         stats_embed = discord.Embed(
             title=f"{github_username}'s Hacktoberfest",
             color=discord.Color(0x9c4af7),
-            description=f"{github_username} has made {n} {Stats._contributionator(n)} in October\n\n{shirtstr}\n\n"
+            description=(
+                f"{github_username} has made {n} "
+                f"{HacktoberStats._contributionator(n)} in "
+                f"October\n\n"
+                f"{shirtstr}\n\n"
+            )
         )
 
         stats_embed.set_thumbnail(url=f"https://www.github.com/{github_username}.png")
@@ -243,7 +250,7 @@ class Stats:
                 logging.info(f"Found {len(jsonresp['items'])} Hacktoberfest PRs for GitHub user: '{github_username}'")
                 outlist = []
                 for item in jsonresp["items"]:
-                    shortname = Stats._get_shortname(item["repository_url"])
+                    shortname = HacktoberStats._get_shortname(item["repository_url"])
                     itemdict = {
                         "repo_url": f"https://www.github.com/{shortname}",
                         "repo_shortname": shortname,
@@ -297,7 +304,7 @@ class Stats:
         contributionstrs = []
         for repo in stats['top5']:
             n = repo[1]
-            contributionstrs.append(f"{n} {Stats._contributionator(n)} to [{repo[0]}]({baseURL}{repo[0]})")
+            contributionstrs.append(f"{n} {HacktoberStats._contributionator(n)} to [{repo[0]}]({baseURL}{repo[0]})")
 
         return "\n".join(contributionstrs)
 
@@ -323,4 +330,5 @@ class Stats:
 
 
 def setup(bot):
-    bot.add_cog(Stats(bot))
+    bot.add_cog(HacktoberStats(bot))
+    log.debug("HacktoberStats cog loaded")
