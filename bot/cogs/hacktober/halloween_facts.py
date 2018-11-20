@@ -7,6 +7,8 @@ from pathlib import Path
 import discord
 from discord.ext import commands
 
+from bot.constants import HACKTOBER_CHANNEL_ID
+
 SPOOKY_EMOJIS = [
     "\N{BAT}",
     "\N{DERELICT HOUSE BUILDING}",
@@ -18,7 +20,6 @@ SPOOKY_EMOJIS = [
     "\N{SPIDER WEB}",
 ]
 PUMPKIN_ORANGE = discord.Color(0xFF7518)
-HACKTOBERBOT_CHANNEL_ID = 498804484324196362
 INTERVAL = timedelta(hours=6).total_seconds()
 
 
@@ -32,7 +33,7 @@ class HalloweenFacts:
         self.last_fact = None
 
     async def on_ready(self):
-        self.channel = self.bot.get_channel(HACKTOBERBOT_CHANNEL_ID)
+        self.channel = self.bot.get_channel(HACKTOBER_CHANNEL_ID)
         self.bot.loop.create_task(self._fact_publisher_task())
 
     async def _fact_publisher_task(self):
