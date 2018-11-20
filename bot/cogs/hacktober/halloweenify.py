@@ -36,7 +36,8 @@ class Halloweenify:
             embed.title = 'Not spooky enough?'
             embed.description = (
                 f'**{ctx.author.display_name}** wasn\'t spooky enough for you? That\'s understandable, '
-                f'{ctx.author.display_name} isn\'t scary at all! Let me think of something better. Hmm... I got it!\n\n '
+                f'{ctx.author.display_name} isn\'t scary at all! '
+                'Let me think of something better. Hmm... I got it!\n\n '
                 f'Your new nickname will be: \n :ghost: **{nickname}** :jack_o_lantern:'
             )
             embed.set_image(url=image)

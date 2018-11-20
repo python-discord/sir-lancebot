@@ -45,7 +45,7 @@ class SpookyAvatar:
             modified_im.save(str(ctx.message.id)+'.png')
             f = discord.File(str(ctx.message.id)+'.png')
             embed.set_image(url='attachment://'+str(ctx.message.id)+'.png')
-        
+
         await ctx.send(file=f, embed=embed)
         os.remove(str(ctx.message.id)+'.png')
 

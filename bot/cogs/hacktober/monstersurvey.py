@@ -110,7 +110,7 @@ class MonsterSurvey:
                 name = self.get_name_by_leaderboard_index(idx)
             except ValueError:
                 name = name.lower()
-            
+
             vote_embed = Embed(
                 name='Monster Voting',
                 color=0xFF6800
@@ -164,7 +164,7 @@ class MonsterSurvey:
                 name = self.get_name_by_leaderboard_index(idx)
             except ValueError:
                 name = name.lower()
-            
+
             m = self.voter_registry.get(name)
             if not m:
                 await ctx.send('That monster does not exist.')
@@ -199,11 +199,13 @@ class MonsterSurvey:
                 votes = len(vr[m]['votes'])
                 percentage = ((votes / total_votes) * 100) if total_votes > 0 else 0
                 embed.add_field(name=f"{rank+1}. {vr[m]['full_name']}",
-                                value=f"{votes} votes. {percentage:.1f}% of total votes.\n"
+                                value=(
+                                    f"{votes} votes. {percentage:.1f}% of total votes.\n"
                                     f"Vote for this monster by typing "
                                     f"'.monster vote {m}'\n"
                                     f"Get more information on this monster by typing "
-                                    f"'.monster show {m}'",
+                                    f"'.monster show {m}'"
+                                ),
                                 inline=False)
 
             embed.set_footer(text="You can also vote by their rank number. '.monster vote {number}' ")
