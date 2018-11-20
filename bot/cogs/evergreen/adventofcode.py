@@ -27,10 +27,6 @@ class AdventOfCode:
         self.about_aoc_filepath = Path("./bot/resources/advent_of_code/about.json")
         self.cached_about_aoc = self._build_about_embed()
 
-    @commands.command(name="test")
-    async def test(self, ctx):
-        await ctx.send(u"\U0001F384")
-
     @commands.group(name="adventofcode", aliases=("aoc",), invoke_without_command=True)
     async def adventofcode_group(self, ctx: commands.Context):
         """
@@ -173,6 +169,7 @@ class AocLeaderboard:
 
         log.debug("Updating cached Advent of Code Leaderboard")
         self.members = AocLeaderboard._sorted_members(injson["members"])
+        self.last_updated = datetime.utcnow()
 
     def top_n(self, n: int = 10) -> dict:
         """
@@ -237,6 +234,10 @@ class AocLeaderboard:
         members.sort(key=lambda x: x.local_score, reverse=True)
 
         return members
+
+    @staticmethod
+    def leaderboard_embed():
+        raise NotImplementedError
 
 
 class AocMember:
