@@ -7,7 +7,7 @@ from pathlib import Path
 
 from discord.ext import commands
 
-from bot.constants import Roles
+from bot.constants import Client, Roles
 from bot.decorators import with_role
 
 log = logging.getLogger(__name__)
@@ -20,11 +20,16 @@ def get_seasons():
     """
     seasons = []
 
-    for object in pkgutil.iter_modules([Path('bot', 'seasons')]):
-        if object.ispkg:
-            seasons.append(object[1])
+    for module in pkgutil.iter_modules([Path('bot', 'seasons')]):
+        if module.ispkg:
+            seasons.append(module[1])
 
     return seasons
+
+
+def get_season_class(season_name):
+    season_lib = importlib.import_module(f'bot.seasons.{season_name}')
+    return getattr(season_lib, season_name.capitalize())
 
 
 def get_season(bot, season_name: str = None, date: datetime.date = None):
@@ -38,48 +43,79 @@ def get_season(bot, season_name: str = None, date: datetime.date = None):
 
     seasons = get_seasons()
 
-    # If there's a season name, we can just grab the correct class.
+    # Use season override if season name not provided
+    if not season_name and Client.season_override:
+        log.debug(f"Season override found: {Client.season_override}")
+        season_name = Client.season_override
+
+    # If name provided grab the specified class or fallback to evergreen.
     if season_name:
         season_name = season_name.lower()
         if season_name not in seasons:
             season_name = 'evergreen'
-
-        season_lib = importlib.import_module(f'bot.seasons.{season_name}')
-        season_class = getattr(season_lib, season_name.capitalize())
+        season_class = get_season_class(season_name)
         return season_class(bot)
 
     # If not, we have to figure out if the date matches any of the seasons.
     seasons.remove('evergreen')
-
     for season_name in seasons:
-        season_lib = importlib.import_module(f'bot.seasons.{season_name}')
-        season_class = getattr(season_lib, season_name.capitalize())
-        season_object = season_class(bot)
-        if season_object.start <= date <= season_object.end:
-            return season_object
+        season_class = get_season_class(season_name)
+        # check if date matches before returning an instance
+        if season_class.start() <= date <= season_class.end():
+            return season_class(bot)
     else:
-        evergreen_lib = importlib.import_module(f'bot.seasons.evergreen')
-        return evergreen_lib.Evergreen(bot)
+        evergreen_class = get_season_class('evergreen')
+        return evergreen_class(bot)
 
 
 class SeasonBase:
     name = None
+    date_format = "%d/%m-%Y"
 
-    def __init__(self):
-        current_year = datetime.date.today().year
-        date_format = "%d/%m-%Y"
-        self.start = datetime.datetime.strptime(f"{self.start_date}-{current_year}", date_format).date()
-        self.end = datetime.datetime.strptime(f"{self.end_date}-{current_year}", date_format).date()
+    @staticmethod
+    def current_year():
+        return datetime.date.today().year
+
+    @classmethod
+    def start(cls):
+        return datetime.datetime.strptime(f"{cls.start_date}-{cls.current_year()}", cls.date_format).date()
+
+    @classmethod
+    def end(cls):
+        return datetime.datetime.strptime(f"{cls.end_date}-{cls.current_year()}", cls.date_format).date()
+
+    @staticmethod
+    def avatar_path(*path_segments):
+        return Path('bot', 'resources', 'avatars', *path_segments)
 
     async def load(self):
         """
         Loads in the bot name, the bot avatar,
         and the extensions that are relevant to that season.
         """
-        # Change the name
-        if self.bot.user.name != self.bot_name:
-            await self.bot.user.edit(username=self.bot_name)
-            await self.bot.user.edit(avatar=self.bot_avatar)
+
+        guild = self.bot.get_guild(Client.guild)
+
+        # Change only nickname if in debug mode due to ratelimits for user edits
+        if Client.debug:
+            if guild.me.display_name != self.bot_name:
+                log.debug(f"Changing nickname to {self.bot_name}")
+                await guild.me.edit(nick=self.bot_name)
+        else:
+            if self.bot.user.name != self.bot_name:
+                # attempt to change user details
+                log.debug(f"Changing username to {self.bot_name}")
+                await self.bot.user.edit(name=self.bot_name, avatar=self.bot_avatar)
+
+                # fallback on nickname if failed due to ratelimit
+                if self.bot.user.name != self.bot_name:
+                    log.info(f"User details failed to change: Changing nickname to {self.bot_name}")
+                    await guild.me.edit(nick=self.bot_name)
+
+            # remove nickname if an old one exists
+            if guild.me.nick and guild.me.nick != self.bot_name:
+                log.debug(f"Clearing old nickname of {guild.me.nick}")
+                await guild.me.edit(nick=None)
 
         # Prepare all the seasonal cogs, and then the evergreen ones.
         extensions = []
@@ -102,10 +138,7 @@ class SeasonManager:
     def __init__(self, bot):
         self.bot = bot
         self.season = get_season(bot, date=datetime.date.today())
-        bot.loop.create_task(self.load_seasons())
-
-        if not hasattr(bot, 'loaded_seasons'):
-            bot.loaded_seasons = []
+        self.season_task = bot.loop.create_task(self.load_seasons())
 
         # Figure out number of seconds until a minute past midnight
         tomorrow = datetime.datetime.now() + datetime.timedelta(1)
@@ -142,3 +175,6 @@ class SeasonManager:
         self.season = get_season(self.bot, season_name=new_season)
         await self.season.load()
         await ctx.send(f"Season changed to {new_season}.")
+
+    def __unload(self):
+        self.season_task.cancel()

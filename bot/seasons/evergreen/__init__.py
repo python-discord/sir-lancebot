@@ -2,11 +2,12 @@ from bot.seasons import SeasonBase
 
 
 class Evergreen(SeasonBase):
+    bot_name = "SeasonalBot"
+
     def __init__(self, bot):
         self.bot = bot
-        self.bot_name = "SeasonalBot"
 
     @property
     def bot_avatar(self):
-        with open("bot/resources/avatars/standard.png", "rb") as avatar:
+        with open(self.avatar_path("standard.png"), "rb") as avatar:
             return bytearray(avatar.read())

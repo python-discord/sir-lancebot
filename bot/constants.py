@@ -42,6 +42,8 @@ class Client(NamedTuple):
     prefix = "."
     token = environ.get('SEASONALBOT_TOKEN')
     giphy_token = environ.get("GIPHY_TOKEN")
+    debug = environ.get('SEASONALBOT_DEBUG', '').lower() == 'true'
+    season_override = environ.get('SEASON_OVERRIDE')
 
 
 class Hacktoberfest(NamedTuple):
