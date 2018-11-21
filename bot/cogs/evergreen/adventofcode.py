@@ -20,13 +20,14 @@ class AdventOfCode:
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-        self.leaderboard_link = (
-            f"https://adventofcode.com/{AocConfig.year}/leaderboard/private/view/{AocConfig.leaderboard_id}"
-        )
-        self.cached_leaderboard = None
-
         self.about_aoc_filepath = Path("./bot/resources/advent_of_code/about.json")
         self.cached_about_aoc = self._build_about_embed()
+
+        self._base_url = f"https://adventofcode.com/{AocConfig.year}"
+        self.private_leaderboard_link = f"{self._base_url}/leaderboard/private/view/{AocConfig.leaderboard_id}"
+
+        self.cached_global_leaderboard = None
+        self.cached_private_leaderboard = None
 
     @commands.group(name="adventofcode", aliases=("aoc",), invoke_without_command=True)
     async def adventofcode_group(self, ctx: commands.Context):
@@ -69,7 +70,7 @@ class AdventOfCode:
         async with ctx.typing():
             await self._check_leaderboard_cache(ctx)
 
-            if not self.cached_leaderboard:
+            if not self.cached_private_leaderboard:
                 # Feedback on issues with leaderboard caching are sent by _check_leaderboard_cache()
                 # Short circuit here if there's an issue
                 return
@@ -77,12 +78,12 @@ class AdventOfCode:
             n_disp = await self._check_n_entries(ctx, n_disp)
 
             # Generate leaderboard table for embed
-            members_to_print = self.cached_leaderboard.top_n(n_disp)
+            members_to_print = self.cached_private_leaderboard.top_n(n_disp)
             table = AocLeaderboard.build_leaderboard_embed(members_to_print)
 
             # Build embed
-            aoc_embed = discord.Embed(colour=Colours.soft_green, timestamp=self.cached_leaderboard.last_updated)
-            aoc_embed.set_author(name="Advent of Code", url=self.leaderboard_link)
+            aoc_embed = discord.Embed(colour=Colours.soft_green, timestamp=self.cached_private_leaderboard.last_updated)
+            aoc_embed.set_author(name="Advent of Code", url=self.private_leaderboard_link)
             aoc_embed.set_footer(text="Last Updated")
 
         await ctx.send(
@@ -99,30 +100,66 @@ class AdventOfCode:
         limit will default to this maximum and provide feedback to the user.
         """
 
-        raise NotImplementedError
+        async with ctx.typing():
+            await self._check_leaderboard_cache(ctx, global_board=True)
 
-    async def _check_leaderboard_cache(self, ctx):
+            if not self.cached_global_leaderboard:
+                # Feedback on issues with leaderboard caching are sent by _check_leaderboard_cache()
+                # Short circuit here if there's an issue
+                return
+
+            n_disp = await self._check_n_entries(ctx, n_disp)
+
+            # Generate leaderboard table for embed
+            members_to_print = self.cached_global_leaderboard.top_n(n_disp)
+            table = AocLeaderboard.build_leaderboard_embed(members_to_print)
+
+            # Build embed
+            aoc_embed = discord.Embed(colour=Colours.soft_green, timestamp=self.cached_global_leaderboard.last_updated)
+            aoc_embed.set_author(name="Advent of Code", url=self._base_url)
+            aoc_embed.set_footer(text="Last Updated")
+
+        await ctx.send(
+            content=f"Here's the current global Top {n_disp}! {Emojis.christmas_tree*3}\n\n{table}", embed=aoc_embed
+        )
+
+    async def _check_leaderboard_cache(self, ctx, global_board: bool = False):
         """
         Check age of current leaderboard & pull a new one if the board is too old
+
+        global_board is a boolean to toggle between the global board and the Pydis private board
         """
 
-        if not self.cached_leaderboard:
-            log.debug("No cached leaderboard found")
-            self.cached_leaderboard = await AocLeaderboard.from_url()
+        # Toggle between global & private leaderboards
+        if global_board:
+            log.debug("Checking global leaderboard cache")
+            leaderboard_str = "cached_global_leaderboard"
+            _shortstr = "global"
         else:
-            leaderboard_age = datetime.utcnow() - self.cached_leaderboard.last_updated
+            log.debug("Checking private leaderboard cache")
+            leaderboard_str = "cached_private_leaderboard"
+            _shortstr = "private"
+
+        leaderboard = getattr(self, leaderboard_str)
+        if not leaderboard:
+            log.debug(f"No cached {_shortstr} leaderboard found")
+            await self._boardgetter(global_board)
+        else:
+            leaderboard_age = datetime.utcnow() - self.cached_private_leaderboard.last_updated
             age_seconds = leaderboard_age.total_seconds()
             if age_seconds < AocConfig.leaderboard_cache_age_threshold_seconds:
-                log.debug(f"Cached leaderboard age less than threshold ({age_seconds} seconds old)")
+                log.debug(f"Cached {_shortstr} leaderboard age less than threshold ({age_seconds} seconds old)")
             else:
-                log.debug(f"Cached leaderboard age greater than threshold ({age_seconds} seconds old)")
-                self.cached_leaderboard.update()
+                log.debug(f"Cached {_shortstr} leaderboard age greater than threshold ({age_seconds} seconds old)")
 
-        if not self.cached_leaderboard:
+            await self._boardgetter(global_board)
+
+        leaderboard = getattr(self, leaderboard_str)
+        if not leaderboard:
             await ctx.send(
                 "",
                 _error_embed_helper(
-                    title="Something's gone wrong and there's no cached leaderboard!",
+                    title=f"Something's gone wrong and there's no cached {_shortstr} leaderboard!",
                     description="Please check in with a staff member.",
                 ),
             )
@@ -139,7 +176,7 @@ class AdventOfCode:
             await ctx.send(
                 f":x: {author.mention}, number of entries to display must be a positive "
                 f"integer less than or equal to {max_entries}\n\n"
-                f"Head to {self.leaderboard_link} to view the entire leaderboard"
+                f"Head to {self.private_leaderboard_link} to view the entire leaderboard"
             )
             n_disp = max_entries
 
@@ -163,6 +200,15 @@ class AdventOfCode:
         about_embed.set_footer(text=f"Last Updated (UTC): {datetime.utcnow()}")
 
         return about_embed
+
+    async def _boardgetter(self, global_board: bool):
+        """
+        Invoke the proper leaderboard getter based on the global_board boolean
+        """
+        if global_board:
+            self.cached_global_leaderboard = await AocLeaderboard.get_global_leaderboard()
+        else:
+            self.cached_private_leaderboard = await AocLeaderboard.from_url()
 
 
 class AocMember:
