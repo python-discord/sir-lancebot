@@ -67,32 +67,14 @@ class AdventOfCode:
         """
 
         async with ctx.typing():
-            await self._check_leaderboard_cache()
+            await self._check_leaderboard_cache(ctx)
 
             if not self.cached_leaderboard:
-                await ctx.send(
-                    "",
-                    _error_embed_helper(
-                        title="Something's gone wrong and there's no cached leaderboard!",
-                        description="Please check in with a staff member.",
-                    ),
-                )
+                # Feedback on issues with leaderboard caching are sent by _check_leaderboard_cache()
+                # Short circuit here if there's an issue
                 return
 
-            # Check for n > max_entries and n <= 0
-            max_entries = AocConfig.leaderboard_max_displayed_members
-            _author = ctx.message.author
-            if not 0 <= n_disp <= max_entries:
-                log.debug(
-                    f"{_author.name} ({_author.id}) attempted to fetch an invalid number "
-                    f" of entries from the AoC leaderboard ({n_disp})"
-                )
-                await ctx.send(
-                    f":x: {_author.mention}, number of entries to display must be a positive "
-                    f"integer less than or equal to {max_entries}\n\n"
-                    f"Head to {self.leaderboard_link} to view the entire leaderboard"
-                )
-                n_disp = max_entries
+            n_disp = await self._check_n_entries(ctx, n_disp)
 
             # Generate leaderboard table for embed
             members_to_print = self.cached_leaderboard.top_n(n_disp)
@@ -119,7 +101,7 @@ class AdventOfCode:
 
         raise NotImplementedError
 
-    async def _check_leaderboard_cache(self):
+    async def _check_leaderboard_cache(self, ctx):
         """
         Check age of current leaderboard & pull a new one if the board is too old
         """
@@ -135,6 +117,33 @@ class AdventOfCode:
             else:
                 log.debug(f"Cached leaderboard age greater than threshold ({age_seconds} seconds old)")
                 self.cached_leaderboard.update()
+
+        if not self.cached_leaderboard:
+            await ctx.send(
+                "",
+                _error_embed_helper(
+                    title="Something's gone wrong and there's no cached leaderboard!",
+                    description="Please check in with a staff member.",
+                ),
+            )
+
+    async def _check_n_entries(self, ctx: commands.Context, n_disp: int) -> int:
+        # Check for n > max_entries and n <= 0
+        max_entries = AocConfig.leaderboard_max_displayed_members
+        author = ctx.message.author
+        if not 0 <= n_disp <= max_entries:
+            log.debug(
+                f"{author.name} ({author.id}) attempted to fetch an invalid number "
+                f" of entries from the AoC leaderboard ({n_disp})"
+            )
+            await ctx.send(
+                f":x: {author.mention}, number of entries to display must be a positive "
+                f"integer less than or equal to {max_entries}\n\n"
+                f"Head to {self.leaderboard_link} to view the entire leaderboard"
+            )
+            n_disp = max_entries
+
+        return n_disp
 
     def _build_about_embed(self) -> discord.Embed:
         """
