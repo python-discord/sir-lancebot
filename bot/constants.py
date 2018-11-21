@@ -52,7 +52,7 @@ class Hacktoberfest(NamedTuple):
 
 
 class Roles(NamedTuple):
-    admin = 351758043643510788
+    admin = 267628507062992896
     announcements = 463658397560995840
     champion = 430492892331769857
     contributor = 295488872404484098

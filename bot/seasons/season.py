@@ -27,6 +27,11 @@ def get_seasons():
     return seasons
 
 
+def get_season_class(season_name):
+    season_lib = importlib.import_module(f'bot.seasons.{season_name}')
+    return getattr(season_lib, season_name.capitalize())
+
+
 def get_season(bot, season_name: str = None, date: datetime.date = None):
     """
     Returns a Season object based on either a string or a date.
@@ -43,40 +48,41 @@ def get_season(bot, season_name: str = None, date: datetime.date = None):
         log.debug(f"Season override found: {Client.season_override}")
         season_name = Client.season_override
 
-    # Check if a valid season name was provided
+    # If name provided grab the specified class or fallback to evergreen.
     if season_name:
         season_name = season_name.lower()
         if season_name not in seasons:
             season_name = 'evergreen'
-
-    # If there's a season name, we can just grab the correct class.
-    if season_name:
-        season_lib = importlib.import_module(f'bot.seasons.{season_name}')
-        season_class = getattr(season_lib, season_name.capitalize())
+        season_class = get_season_class(season_name)
         return season_class(bot)
 
     # If not, we have to figure out if the date matches any of the seasons.
     seasons.remove('evergreen')
-
     for season_name in seasons:
-        season_lib = importlib.import_module(f'bot.seasons.{season_name}')
-        season_class = getattr(season_lib, season_name.capitalize())
-        season_object = season_class(bot)
-        if season_object.start <= date <= season_object.end:
-            return season_object
+        season_class = get_season_class(season_name)
+        # check if date matches before returning an instance
+        if season_class.start() <= date <= season_class.end():
+            return season_class(bot)
     else:
-        evergreen_lib = importlib.import_module(f'bot.seasons.evergreen')
-        return evergreen_lib.Evergreen(bot)
+        evergreen_class = get_season_class('evergreen')
+        return evergreen_class(bot)
 
 
 class SeasonBase:
     name = None
+    date_format = "%d/%m-%Y"
 
-    def __init__(self):
-        current_year = datetime.date.today().year
-        date_format = "%d/%m-%Y"
-        self.start = datetime.datetime.strptime(f"{self.start_date}-{current_year}", date_format).date()
-        self.end = datetime.datetime.strptime(f"{self.end_date}-{current_year}", date_format).date()
+    @staticmethod
+    def current_year():
+        return datetime.date.today().year
+
+    @classmethod
+    def start(cls):
+        return datetime.datetime.strptime(f"{cls.start_date}-{cls.current_year()}", cls.date_format).date()
+
+    @classmethod
+    def end(cls):
+        return datetime.datetime.strptime(f"{cls.end_date}-{cls.current_year()}", cls.date_format).date()
 
     @staticmethod
     def avatar_path(*path_segments):
@@ -106,10 +112,10 @@ class SeasonBase:
                     log.info(f"User details failed to change: Changing nickname to {self.bot_name}")
                     await guild.me.edit(nick=self.bot_name)
 
-                # remove nickname if an old one exists
-                elif guild.me.nick:
-                    log.debug(f"Clearing old nickname of {guild.me.nick}")
-                    await guild.me.edit(nick=None)
+            # remove nickname if an old one exists
+            if guild.me.nick and guild.me.nick != self.bot_name:
+                log.debug(f"Clearing old nickname of {guild.me.nick}")
+                await guild.me.edit(nick=None)
 
         # Prepare all the seasonal cogs, and then the evergreen ones.
         extensions = []
