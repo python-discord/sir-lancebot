@@ -23,12 +23,12 @@ class AdventOfCode:
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
+        self._base_url = f"https://adventofcode.com/{AocConfig.year}"
+        self.global_leaderboard_url = f"https://adventofcode.com/{AocConfig.year}/leaderboard"
+        self.private_leaderboard_url = f"{self._base_url}/leaderboard/private/view/{AocConfig.leaderboard_id}"
+
         self.about_aoc_filepath = Path("./bot/resources/advent_of_code/about.json")
         self.cached_about_aoc = self._build_about_embed()
-
-        self._base_url = f"https://adventofcode.com/{AocConfig.year}"
-        self.global_leaderboard_url = f"{self._base_url}/leaderboard"
-        self.private_leaderboard_url = f"{self._base_url}/leaderboard/private/view/{AocConfig.leaderboard_id}"
 
         self.cached_global_leaderboard = None
         self.cached_private_leaderboard = None
@@ -87,7 +87,7 @@ class AdventOfCode:
 
             # Generate leaderboard table for embed
             members_to_print = self.cached_private_leaderboard.top_n(n_disp)
-            table = AocLeaderboard.build_private_leaderboard_embed(members_to_print)
+            table = AocPrivateLeaderboard.build_leaderboard_embed(members_to_print)
 
             # Build embed
             aoc_embed = discord.Embed(colour=Colours.soft_green, timestamp=self.cached_private_leaderboard.last_updated)
@@ -102,8 +102,6 @@ class AdventOfCode:
         name="global",
         aliases=("globalstats", "globalboard", "gb"),
         brief="Get a snapshot of the global AoC leaderboard",
-        hidden=True,
-        enabled=False,
     )
     async def global_leaderboard(self, ctx: commands.Context, n_disp: int = 10):
         """
@@ -126,7 +124,7 @@ class AdventOfCode:
 
             # Generate leaderboard table for embed
             members_to_print = self.cached_global_leaderboard.top_n(n_disp)
-            table = AocLeaderboard.build_private_leaderboard_embed(members_to_print)
+            table = AocGlobalLeaderboard.build_leaderboard_embed(members_to_print)
 
             # Build embed
             aoc_embed = discord.Embed(colour=Colours.soft_green, timestamp=self.cached_global_leaderboard.last_updated)
@@ -159,7 +157,7 @@ class AdventOfCode:
             log.debug(f"No cached {_shortstr} leaderboard found")
             await self._boardgetter(global_board)
         else:
-            leaderboard_age = datetime.utcnow() - self.cached_private_leaderboard.last_updated
+            leaderboard_age = datetime.utcnow() - leaderboard.last_updated
             age_seconds = leaderboard_age.total_seconds()
             if age_seconds < AocConfig.leaderboard_cache_age_threshold_seconds:
                 log.debug(f"Cached {_shortstr} leaderboard age less than threshold ({age_seconds} seconds old)")
@@ -171,7 +169,7 @@ class AdventOfCode:
         if not leaderboard:
             await ctx.send(
                 "",
-                _error_embed_helper(
+                embed=_error_embed_helper(
                     title=f"Something's gone wrong and there's no cached {_shortstr} leaderboard!",
                     description="Please check in with a staff member.",
                 ),
@@ -217,9 +215,9 @@ class AdventOfCode:
         Invoke the proper leaderboard getter based on the global_board boolean
         """
         if global_board:
-            self.cached_global_leaderboard = await AocLeaderboard.get_global_leaderboard()
+            self.cached_global_leaderboard = await AocGlobalLeaderboard.from_url()
         else:
-            self.cached_private_leaderboard = await AocLeaderboard.from_url()
+            self.cached_private_leaderboard = await AocPrivateLeaderboard.from_url()
 
 
 class AocMember:
@@ -306,7 +304,7 @@ class AocMember:
         return tuple(completions)
 
 
-class AocLeaderboard:
+class AocPrivateLeaderboard:
     def __init__(self, members: list, owner_id: int, event_year: int):
         self.members = members
         self._owner_id = owner_id
@@ -325,7 +323,7 @@ class AocLeaderboard:
     @staticmethod
     async def json_from_url(
         leaderboard_id: int = AocConfig.leaderboard_id, year: int = AocConfig.year
-    ) -> "AocLeaderboard":
+    ) -> "AocPrivateLeaderboard":
         """
         Request the API JSON from Advent of Code for leaderboard_id for the specified year's event
 
@@ -346,9 +344,9 @@ class AocLeaderboard:
         return raw_dict
 
     @classmethod
-    def from_json(cls, injson: dict) -> "AocLeaderboard":
+    def from_json(cls, injson: dict) -> "AocPrivateLeaderboard":
         """
-        Generate an AocLeaderboard object from AoC's private leaderboard API JSON
+        Generate an AocPrivateLeaderboard object from AoC's private leaderboard API JSON
         """
 
         return cls(
@@ -356,9 +354,9 @@ class AocLeaderboard:
         )
 
     @classmethod
-    async def from_url(cls) -> "AocLeaderboard":
+    async def from_url(cls) -> "AocPrivateLeaderboard":
         """
-        Helper wrapping of AocLeaderboard.json_from_url and AocLeaderboard.from_json
+        Helper wrapping of AocPrivateLeaderboard.json_from_url and AocPrivateLeaderboard.from_json
         """
 
         api_json = await cls.json_from_url()
@@ -378,7 +376,7 @@ class AocLeaderboard:
         return members
 
     @staticmethod
-    def build_private_leaderboard_embed(members_to_print: List[AocMember]) -> str:
+    def build_leaderboard_embed(members_to_print: List[AocMember]) -> str:
         """
         Build a text table from members_to_print, a list of AocMember objects
 
@@ -403,17 +401,35 @@ class AocLeaderboard:
 
         return table
 
-    @staticmethod
-    async def get_global_leaderboard(aoc_url: str) -> List[tuple]:
+
+class AocGlobalLeaderboard:
+    def __init__(self, members: List[tuple]):
+        self.members = members
+        self.last_updated = datetime.utcnow()
+
+    def top_n(self, n: int = 10) -> dict:
+        """
+        Return the top n participants on the leaderboard.
+
+        If n is not specified, default to the top 10
+        """
+
+        return self.members[:n]
+
+    @classmethod
+    async def from_url(cls) -> "AocGlobalLeaderboard":
         """
         Generate an list of tuples for the entries on AoC's global leaderboard
 
         Because there is no API for this, web scraping needs to be used
         """
+
+        aoc_url = f"https://adventofcode.com/{AocConfig.year}/leaderboard"
+
         async with aiohttp.ClientSession(cookies=AOC_SESSION_COOKIE, headers=AOC_REQUEST_HEADER) as session:
             async with session.get(aoc_url) as resp:
                 if resp.status == 200:
-                    raw_html = await resp.text
+                    raw_html = await resp.text()
                 else:
                     log.warning(f"Bad response received from AoC ({resp.status}), check session cookie")
                     resp.raise_for_status()
@@ -444,13 +460,24 @@ class AocLeaderboard:
 
             lb_list.append((rank, global_score, member))
 
-        return lb_list
+        return cls(lb_list)
 
     @staticmethod
-    def build_global_leaderboard_embed(members_to_print: List[tuple]) -> str:
+    def build_leaderboard_embed(members_to_print: List[tuple]) -> str:
         """
+        Build a text table from members_to_print, a list of tuples
+
+        Returns a string to be used as the content of the bot's leaderboard response
         """
-        raise NotImplementedError
+
+        header = f"{' '*4}{'Score'} {'Name':^25}"
+        table = ""
+        for member in members_to_print:
+            table += f"{member[0]:3}) {member[1]:4} {member[2]:25.25}\n"
+        else:
+            table = f"```{header}\n{table}```"
+
+        return table
 
 
 def _error_embed_helper(title: str, description: str) -> discord.Embed:
