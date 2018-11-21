@@ -23,6 +23,7 @@ class MonsterSurvey:
 
     def __init__(self, bot: Bot):
         """Initializes values for the bot to use within the voting commands."""
+
         self.bot = bot
         self.registry_location = os.path.join(os.getcwd(), 'bot', 'resources', 'halloween', 'monstersurvey.json')
         with open(self.registry_location, 'r') as jason:
@@ -35,11 +36,11 @@ class MonsterSurvey:
 
     def cast_vote(self, id: int, monster: str):
         """
-
         :param id: The id of the person voting
         :param monster: the string key of the json that represents a monster
         :return: None
         """
+
         vr = self.voter_registry
         for m in vr.keys():
             if id not in vr[m]['votes'] and m == monster:
@@ -65,69 +66,80 @@ class MonsterSurvey:
         """
 
         if ctx.invoked_subcommand is None:
-            default_embed = Embed(
-                title='Monster Voting',
-                color=0xFF6800,
-                description='Vote for your favorite monster!'
-            )
-            default_embed.add_field(
-                name='.monster show monster_name(optional)',
-                value='Show a specific monster. If none is listed, it will give you an error with valid choices.',
-                inline=False)
-            default_embed.add_field(
-                name='.monster vote monster_name',
-                value='Vote for a specific monster. You get one vote, but can change it at any time.',
-                inline=False
-            )
-            default_embed.add_field(
-                name='.monster leaderboard',
-                value='Which monster has the most votes? This command will tell you.',
-                inline=False
-            )
-            default_embed.set_footer(text=f"Monsters choices are: {', '.join(self.voter_registry.keys())}")
-            return await ctx.send(embed=default_embed)
+            async with ctx.typing():
+                default_embed = Embed(
+                    title='Monster Voting',
+                    color=0xFF6800,
+                    description='Vote for your favorite monster!'
+                )
+                default_embed.add_field(
+                    name='.monster show monster_name(optional)',
+                    value='Show a specific monster. If none is listed, it will give you an error with valid choices.',
+                    inline=False)
+                default_embed.add_field(
+                    name='.monster vote monster_name',
+                    value='Vote for a specific monster. You get one vote, but can change it at any time.',
+                    inline=False
+                )
+                default_embed.add_field(
+                    name='.monster leaderboard',
+                    value='Which monster has the most votes? This command will tell you.',
+                    inline=False
+                )
+                default_embed.set_footer(text=f"Monsters choices are: {', '.join(self.voter_registry.keys())}")
+
+            await ctx.send(embed=default_embed)
 
     @monster_group.command(
         name='vote'
     )
     async def monster_vote(self, ctx: Context, name=None):
-        """Casts a vote for a particular monster, or displays a list of monsters that can be voted for
-        if one is not given."""
+        """
+        Casts a vote for a particular monster, or displays a list of monsters that can be voted for
+        if one is not given.
+        """
+
         if name is None:
             await ctx.invoke(self.monster_leaderboard)
             return
-        vote_embed = Embed(
-            name='Monster Voting',
-            color=0xFF6800
-        )
-        if isinstance(name, int):
-            name = self.get_name_by_leaderboard_index(name)
-        else:
-            name = name.lower()
-        m = self.voter_registry.get(name)
-        if m is None:
 
-            vote_embed.description = f'You cannot vote for {name} because it\'s not in the running.'
-            vote_embed.add_field(
-                name='Use `.monster show {monster_name}` for more information on a specific monster',
-                value='or use `.monster vote {monster}` to cast your vote for said monster.',
-                inline=False
+        async with ctx.typing():
+            # Check to see if user used a numeric (leaderboard) index to vote
+            try:
+                idx = int(name)
+                name = self.get_name_by_leaderboard_index(idx)
+            except ValueError:
+                name = name.lower()
+
+            vote_embed = Embed(
+                name='Monster Voting',
+                color=0xFF6800
             )
-            vote_embed.add_field(
-                name='You may vote for or show the following monsters:',
-                value=f"{', '.join(self.voter_registry.keys())}"
-            )
-            return await ctx.send(embed=vote_embed)
-        self.cast_vote(ctx.author.id, name)
-        vote_embed.add_field(
-            name='Vote successful!',
-            value=f'You have successfully voted for {m["full_name"]}!',
-            inline=False
-        )
-        vote_embed.set_thumbnail(url=m['image'])
-        vote_embed.set_footer(text="Please note that any previous votes have been removed.")
-        self.json_write()
-        return await ctx.send(embed=vote_embed)
+
+            m = self.voter_registry.get(name)
+            if m is None:
+                vote_embed.description = f'You cannot vote for {name} because it\'s not in the running.'
+                vote_embed.add_field(
+                    name='Use `.monster show {monster_name}` for more information on a specific monster',
+                    value='or use `.monster vote {monster}` to cast your vote for said monster.',
+                    inline=False
+                )
+                vote_embed.add_field(
+                    name='You may vote for or show the following monsters:',
+                    value=f"{', '.join(self.voter_registry.keys())}"
+                )
+            else:
+                self.cast_vote(ctx.author.id, name)
+                vote_embed.add_field(
+                    name='Vote successful!',
+                    value=f'You have successfully voted for {m["full_name"]}!',
+                    inline=False
+                )
+                vote_embed.set_thumbnail(url=m['image'])
+                vote_embed.set_footer(text="Please note that any previous votes have been removed.")
+                self.json_write()
+
+        await ctx.send(embed=vote_embed)
 
     @monster_group.command(
         name='show'
@@ -135,26 +147,36 @@ class MonsterSurvey:
     async def monster_show(self, ctx: Context, name=None):
         """
         Shows the named monster. If one is not named, it sends the default voting embed instead.
+
         :param ctx:
         :param name:
         :return:
         """
+
         if name is None:
             await ctx.invoke(self.monster_leaderboard)
             return
-        if isinstance(name, int):
-            m = self.voter_registry.get(self.get_name_by_leaderboard_index(name))
-        else:
-            name = name.lower()
+
+        async with ctx.typing():
+            # Check to see if user used a numeric (leaderboard) index to vote
+            try:
+                idx = int(name)
+                name = self.get_name_by_leaderboard_index(idx)
+            except ValueError:
+                name = name.lower()
+
             m = self.voter_registry.get(name)
-        if not m:
-            await ctx.send('That monster does not exist.')
-            return await ctx.invoke(self.monster_vote)
-        embed = Embed(title=m['full_name'], color=0xFF6800)
-        embed.add_field(name='Summary', value=m['summary'])
-        embed.set_image(url=m['image'])
-        embed.set_footer(text=f'To vote for this monster, type .monster vote {name}')
-        return await ctx.send(embed=embed)
+            if not m:
+                await ctx.send('That monster does not exist.')
+                await ctx.invoke(self.monster_vote)
+                return
+
+            embed = Embed(title=m['full_name'], color=0xFF6800)
+            embed.add_field(name='Summary', value=m['summary'])
+            embed.set_image(url=m['image'])
+            embed.set_footer(text=f'To vote for this monster, type .monster vote {name}')
+
+        await ctx.send(embed=embed)
 
     @monster_group.command(
         name='leaderboard',
@@ -166,23 +188,28 @@ class MonsterSurvey:
         :param ctx:
         :return:
         """
-        vr = self.voter_registry
-        top = sorted(vr, key=lambda k: len(vr[k]['votes']), reverse=True)
 
-        embed = Embed(title="Monster Survey Leader Board", color=0xFF6800)
-        total_votes = sum(len(m['votes']) for m in self.voter_registry.values())
-        for rank, m in enumerate(top):
-            votes = len(vr[m]['votes'])
-            percentage = ((votes / total_votes) * 100) if total_votes > 0 else 0
-            embed.add_field(name=f"{rank+1}. {vr[m]['full_name']}",
-                            value=f"{votes} votes. {percentage:.1f}% of total votes.\n"
-                                  f"Vote for this monster by typing "
-                                  f"'.monster vote {m}'\n"
-                                  f"Get more information on this monster by typing "
-                                  f"'.monster show {m}'",
-                            inline=False)
+        async with ctx.typing():
+            vr = self.voter_registry
+            top = sorted(vr, key=lambda k: len(vr[k]['votes']), reverse=True)
+            total_votes = sum(len(m['votes']) for m in self.voter_registry.values())
 
-        embed.set_footer(text="You can also vote by their rank number. '.monster vote {number}' ")
+            embed = Embed(title="Monster Survey Leader Board", color=0xFF6800)
+            for rank, m in enumerate(top):
+                votes = len(vr[m]['votes'])
+                percentage = ((votes / total_votes) * 100) if total_votes > 0 else 0
+                embed.add_field(name=f"{rank+1}. {vr[m]['full_name']}",
+                                value=(
+                                    f"{votes} votes. {percentage:.1f}% of total votes.\n"
+                                    f"Vote for this monster by typing "
+                                    f"'.monster vote {m}'\n"
+                                    f"Get more information on this monster by typing "
+                                    f"'.monster show {m}'"
+                                ),
+                                inline=False)
+
+            embed.set_footer(text="You can also vote by their rank number. '.monster vote {number}' ")
+
         await ctx.send(embed=embed)
 
 

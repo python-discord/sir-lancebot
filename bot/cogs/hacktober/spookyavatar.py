@@ -35,15 +35,17 @@ class SpookyAvatar:
         if user is None:
             user = ctx.message.author
 
-        embed = discord.Embed(colour=0xFF0000)
-        embed.title = "Is this you or am I just really paranoid?"
-        embed.set_author(name=str(user.name), icon_url=user.avatar_url)
-        resp = await self.get(user.avatar_url)
-        im = Image.open(BytesIO(resp))
-        modified_im = spookifications.get_random_effect(im)
-        modified_im.save(str(ctx.message.id)+'.png')
-        f = discord.File(str(ctx.message.id)+'.png')
-        embed.set_image(url='attachment://'+str(ctx.message.id)+'.png')
+        async with ctx.typing():
+            embed = discord.Embed(colour=0xFF0000)
+            embed.title = "Is this you or am I just really paranoid?"
+            embed.set_author(name=str(user.name), icon_url=user.avatar_url)
+            resp = await self.get(user.avatar_url)
+            im = Image.open(BytesIO(resp))
+            modified_im = spookifications.get_random_effect(im)
+            modified_im.save(str(ctx.message.id)+'.png')
+            f = discord.File(str(ctx.message.id)+'.png')
+            embed.set_image(url='attachment://'+str(ctx.message.id)+'.png')
+
         await ctx.send(file=f, embed=embed)
         os.remove(str(ctx.message.id)+'.png')
 
