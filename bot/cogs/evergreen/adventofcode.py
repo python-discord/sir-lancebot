@@ -1,11 +1,13 @@
 import json
 import logging
+import re
 from datetime import datetime
 from pathlib import Path
 from typing import List
 
 import aiohttp
 import discord
+from bs4 import BeautifulSoup
 from discord.ext import commands
 
 from bot.constants import AdventOfCode as AocConfig
@@ -13,6 +15,7 @@ from bot.constants import Colours, Emojis
 
 log = logging.getLogger(__name__)
 
+AOC_REQUEST_HEADER = {"user-agent": "PythonDiscord AoC Event Bot"}
 AOC_SESSION_COOKIE = {"session": AocConfig.session_cookie}
 
 
@@ -24,7 +27,8 @@ class AdventOfCode:
         self.cached_about_aoc = self._build_about_embed()
 
         self._base_url = f"https://adventofcode.com/{AocConfig.year}"
-        self.private_leaderboard_link = f"{self._base_url}/leaderboard/private/view/{AocConfig.leaderboard_id}"
+        self.global_leaderboard_url = f"{self._base_url}/leaderboard"
+        self.private_leaderboard_url = f"{self._base_url}/leaderboard/private/view/{AocConfig.leaderboard_id}"
 
         self.cached_global_leaderboard = None
         self.cached_private_leaderboard = None
@@ -87,7 +91,7 @@ class AdventOfCode:
 
             # Build embed
             aoc_embed = discord.Embed(colour=Colours.soft_green, timestamp=self.cached_private_leaderboard.last_updated)
-            aoc_embed.set_author(name="Advent of Code", url=self.private_leaderboard_link)
+            aoc_embed.set_author(name="Advent of Code", url=self.private_leaderboard_url)
             aoc_embed.set_footer(text="Last Updated")
 
         await ctx.send(
@@ -99,7 +103,7 @@ class AdventOfCode:
         aliases=("globalstats", "globalboard", "gb"),
         brief="Get a snapshot of the global AoC leaderboard",
         hidden=True,
-        enabled=False
+        enabled=False,
     )
     async def global_leaderboard(self, ctx: commands.Context, n_disp: int = 10):
         """
@@ -185,7 +189,7 @@ class AdventOfCode:
             await ctx.send(
                 f":x: {author.mention}, number of entries to display must be a positive "
                 f"integer less than or equal to {max_entries}\n\n"
-                f"Head to {self.private_leaderboard_link} to view the entire leaderboard"
+                f"Head to {self.private_leaderboard_url} to view the entire leaderboard"
             )
             n_disp = max_entries
 
@@ -199,10 +203,8 @@ class AdventOfCode:
         with self.about_aoc_filepath.open("r") as f:
             embed_fields = json.load(f)
 
-        about_embed = discord.Embed(
-            title="https://adventofcode.com/", colour=Colours.soft_green, url="https://adventofcode.com/"
-        )
-        about_embed.set_author(name="Advent of Code", url="https://discordapp.com")
+        about_embed = discord.Embed(title=self._base_url, colour=Colours.soft_green, url=self._base_url)
+        about_embed.set_author(name="Advent of Code", url=self._base_url)
         for field in embed_fields:
             about_embed.add_field(**field)
 
@@ -333,8 +335,7 @@ class AocLeaderboard:
         api_url = f"https://adventofcode.com/{year}/leaderboard/private/view/{leaderboard_id}.json"
 
         log.debug("Querying Advent of Code Private Leaderboard API")
-        headers = {"user-agent": "PythonDiscord AoC Event Bot"}
-        async with aiohttp.ClientSession(cookies=AOC_SESSION_COOKIE, headers=headers) as session:
+        async with aiohttp.ClientSession(cookies=AOC_SESSION_COOKIE, headers=AOC_REQUEST_HEADER) as session:
             async with session.get(api_url) as resp:
                 if resp.status == 200:
                     raw_dict = await resp.json()
@@ -362,15 +363,6 @@ class AocLeaderboard:
 
         api_json = await cls.json_from_url()
         return cls.from_json(api_json)
-
-    @classmethod
-    async def get_global_leaderboard(cls) -> "AocLeaderboard":
-        """
-        Generate an AocLeaderboard from AoC's global leaderboard
-
-        Because there is no API for this, web scraping needs to be used
-        """
-        raise NotImplementedError
 
     @staticmethod
     def _sorted_members(injson: dict) -> list:
@@ -410,6 +402,49 @@ class AocLeaderboard:
             table = f"```{header}\n{table}```"
 
         return table
+
+    @staticmethod
+    async def get_global_leaderboard(aoc_url: str) -> List[tuple]:
+        """
+        Generate an list of tuples for the entries on AoC's global leaderboard
+
+        Because there is no API for this, web scraping needs to be used
+        """
+        async with aiohttp.ClientSession(cookies=AOC_SESSION_COOKIE, headers=AOC_REQUEST_HEADER) as session:
+            async with session.get(aoc_url) as resp:
+                if resp.status == 200:
+                    raw_html = await resp.text
+                else:
+                    log.warning(f"Bad response received from AoC ({resp.status}), check session cookie")
+                    resp.raise_for_status()
+
+        soup = BeautifulSoup(raw_html, "html.parser")
+        ele = soup.find_all("div", class_="leaderboard-entry")
+
+        exp = r"([ ]{,2}(\d+)\))?[ ]+(\d+)\s+([\w\(\)#\d ]+)"
+
+        lb_list = []
+        for entry in ele:
+            # Strip off the AoC++ decorator
+            raw_str = entry.text.replace("(AoC++)", "").rstrip()
+
+            # Use a regex to extract the info from the string to unify formatting
+            # Group 2: Rank
+            # Group 3: Global Score
+            # Group 4: Member string
+            r = re.match(exp, raw_str)
+
+            rank = int(r.group(2)) if r.group(2) else None
+            global_score = int(r.group(3))
+
+            member = r.group(4)
+            if member.lower().startswith("(anonymous"):
+                # Normalize anonymous user string by stripping () and title casing
+                member = re.sub(r"[\(\)]", "", member).title()
+
+            lb_list.append((rank, global_score, member))
+
+        return lb_list
 
 
 def _error_embed_helper(title: str, description: str) -> discord.Embed:
