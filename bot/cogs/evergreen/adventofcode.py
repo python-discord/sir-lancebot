@@ -470,7 +470,7 @@ class AocGlobalLeaderboard:
         Returns a string to be used as the content of the bot's leaderboard response
         """
 
-        header = f"{' '*4}{'Score'} {'Name':^25}"
+        header = f"{' '*4}{'Score'} {'Name':^25}\n{'-'*36}"
         table = ""
         for member in members_to_print:
             table += f"{member[0]:3}) {member[1]:4} {member[2]:25.25}\n"
