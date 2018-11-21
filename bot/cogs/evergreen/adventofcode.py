@@ -90,7 +90,7 @@ class AdventOfCode:
             content=f"Here's the current Top {n_disp}! {Emojis.christmas_tree*3}\n\n{table}", embed=aoc_embed
         )
 
-    @adventofcode_group.command(name="global", aliases=("globalstats", "globalboard", "gb"))
+    @adventofcode_group.command(name="global", aliases=("globalstats", "globalboard", "gb"), hidden=True)
     async def global_leaderboard(self, ctx: commands.Context, n_disp: int = 10):
         """
         Pull the top n_disp members from the global AoC leaderboard and post an embed
@@ -99,7 +99,7 @@ class AdventOfCode:
         Advent of Code section of the bot constants. n_disp values greater than this
         limit will default to this maximum and provide feedback to the user.
         """
-
+        raise NotImplementedError
         async with ctx.typing():
             await self._check_leaderboard_cache(ctx, global_board=True)
 
@@ -151,8 +151,7 @@ class AdventOfCode:
                 log.debug(f"Cached {_shortstr} leaderboard age less than threshold ({age_seconds} seconds old)")
             else:
                 log.debug(f"Cached {_shortstr} leaderboard age greater than threshold ({age_seconds} seconds old)")
-
-            await self._boardgetter(global_board)
+                await self._boardgetter(global_board)
 
         leaderboard = getattr(self, leaderboard_str)
         if not leaderboard:
@@ -302,15 +301,6 @@ class AocLeaderboard:
         self._event_year = event_year
         self.last_updated = datetime.utcnow()
 
-    def update(self, injson: dict):
-        """
-        From AoC's private leaderboard API JSON, update members & resort
-        """
-
-        log.debug("Updating cached Advent of Code Leaderboard")
-        self.members = AocLeaderboard._sorted_members(injson["members"])
-        self.last_updated = datetime.utcnow()
-
     def top_n(self, n: int = 10) -> dict:
         """
         Return the top n participants on the leaderboard.
@@ -365,6 +355,11 @@ class AocLeaderboard:
 
     @classmethod
     async def get_global_leaderboard(cls) -> "AocLeaderboard":
+        """
+        Generate an AocLeaderboard from AoC's global leaderboard
+
+        Because there is no API for this, web scraping needs to be used
+        """
         raise NotImplementedError
 
     @staticmethod
