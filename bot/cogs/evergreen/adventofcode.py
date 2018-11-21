@@ -37,7 +37,7 @@ class AdventOfCode:
 
         await ctx.invoke(self.bot.get_command("help"), "adventofcode")
 
-    @adventofcode_group.command(name="about", aliases=("ab", "info"))
+    @adventofcode_group.command(name="about", aliases=("ab", "info"), brief="Learn about Advent of Code")
     async def about_aoc(self, ctx: commands.Context):
         """
         Respond with an explanation all things Advent of Code
@@ -45,7 +45,7 @@ class AdventOfCode:
 
         await ctx.send("", embed=self.cached_about_aoc)
 
-    @adventofcode_group.command(name="join", aliases=("j",))
+    @adventofcode_group.command(name="join", aliases=("j",), brief="Learn how to join PyDis' private AoC leaderboard")
     async def join_leaderboard(self, ctx: commands.Context):
         """
         Reply with the link to join the PyDis AoC private leaderboard
@@ -57,7 +57,11 @@ class AdventOfCode:
         )
         await ctx.send(info_str)
 
-    @adventofcode_group.command(name="leaderboard", aliases=("board", "stats", "lb"))
+    @adventofcode_group.command(
+        name="leaderboard",
+        aliases=("board", "stats", "lb"),
+        brief="Get a snapshot of the PyDis private AoC leaderboard",
+    )
     async def aoc_leaderboard(self, ctx: commands.Context, n_disp: int = 10):
         """
         Pull the top n_disp members from the PyDis leaderboard and post an embed
@@ -90,7 +94,12 @@ class AdventOfCode:
             content=f"Here's the current Top {n_disp}! {Emojis.christmas_tree*3}\n\n{table}", embed=aoc_embed
         )
 
-    @adventofcode_group.command(name="global", aliases=("globalstats", "globalboard", "gb"), hidden=True)
+    @adventofcode_group.command(
+        name="global",
+        aliases=("globalstats", "globalboard", "gb"),
+        brief="Get a snapshot of the global AoC leaderboard",
+        hidden=True,
+    )
     async def global_leaderboard(self, ctx: commands.Context, n_disp: int = 10):
         """
         Pull the top n_disp members from the global AoC leaderboard and post an embed
