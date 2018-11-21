@@ -99,6 +99,7 @@ class AdventOfCode:
         aliases=("globalstats", "globalboard", "gb"),
         brief="Get a snapshot of the global AoC leaderboard",
         hidden=True,
+        enabled=False
     )
     async def global_leaderboard(self, ctx: commands.Context, n_disp: int = 10):
         """
@@ -108,7 +109,7 @@ class AdventOfCode:
         Advent of Code section of the bot constants. n_disp values greater than this
         limit will default to this maximum and provide feedback to the user.
         """
-        raise NotImplementedError
+
         async with ctx.typing():
             await self._check_leaderboard_cache(ctx, global_board=True)
 
