@@ -2,6 +2,7 @@ import json
 import logging
 from datetime import datetime
 from pathlib import Path
+from typing import List
 
 import aiohttp
 import discord
@@ -64,55 +65,43 @@ class AdventOfCode:
         Advent of Code section of the bot constants. n_disp values greater than this
         limit will default to this maximum and provide feedback to the user.
         """
-        await self._check_leaderboard_cache()
 
-        if not self.cached_leaderboard:
-            await ctx.send(
-                "",
-                _error_embed_helper(
-                    title="Something's gone wrong and there's no cached leaderboard!",
-                    description="Please check in with a staff member.",
-                ),
-            )
-            return
+        async with ctx.typing():
+            await self._check_leaderboard_cache()
 
-        # Check for n > max_entries and n <= 0
-        max_entries = AocConfig.leaderboard_max_displayed_members
-        _author = ctx.message.author
-        if not 0 <= n_disp <= max_entries:
-            log.debug(
-                f"{_author.name} ({_author.id}) attempted to fetch an invalid number "
-                f" of entries from the AoC leaderboard ({n_disp})"
-            )
-            await ctx.send(
-                f":x: {_author.mention}, number of entries to display must be a positive "
-                f"integer less than or equal to {max_entries}\n\n"
-                f"Head to {self.leaderboard_link} to view the entire leaderboard"
-            )
-            n_disp = max_entries
+            if not self.cached_leaderboard:
+                await ctx.send(
+                    "",
+                    _error_embed_helper(
+                        title="Something's gone wrong and there's no cached leaderboard!",
+                        description="Please check in with a staff member.",
+                    ),
+                )
+                return
 
-        # Generate leaderboard table for embed
-        members_to_print = self.cached_leaderboard.top_n(n_disp)
-        stargroup = f"{Emojis.star}, {Emojis.star*2}"
-        header = f"{' '*3}{'Score'} {'Name':^25} {stargroup:^7}\n{'-'*44}"
-        table = ""
-        for i, member in enumerate(members_to_print):
-            if member.name == "Anonymous User":
-                name = f"{member.name} #{member.aoc_id}"
-            else:
-                name = member.name
+            # Check for n > max_entries and n <= 0
+            max_entries = AocConfig.leaderboard_max_displayed_members
+            _author = ctx.message.author
+            if not 0 <= n_disp <= max_entries:
+                log.debug(
+                    f"{_author.name} ({_author.id}) attempted to fetch an invalid number "
+                    f" of entries from the AoC leaderboard ({n_disp})"
+                )
+                await ctx.send(
+                    f":x: {_author.mention}, number of entries to display must be a positive "
+                    f"integer less than or equal to {max_entries}\n\n"
+                    f"Head to {self.leaderboard_link} to view the entire leaderboard"
+                )
+                n_disp = max_entries
 
-            table += (
-                f"{i+1:2}) {member.local_score:4} {name:25.25} "
-                f"({member.completions[0]:2}, {member.completions[1]:2})\n"
-            )
-        else:
-            table = f"```{header}\n{table}```"
+            # Generate leaderboard table for embed
+            members_to_print = self.cached_leaderboard.top_n(n_disp)
+            table = AocLeaderboard.build_leaderboard_embed(members_to_print)
 
-        # Build embed
-        aoc_embed = discord.Embed(colour=Colours.soft_green, timestamp=self.cached_leaderboard.last_updated)
-        aoc_embed.set_author(name="Advent of Code", url=self.leaderboard_link)
-        aoc_embed.set_footer(text="Last Updated")
+            # Build embed
+            aoc_embed = discord.Embed(colour=Colours.soft_green, timestamp=self.cached_leaderboard.last_updated)
+            aoc_embed.set_author(name="Advent of Code", url=self.leaderboard_link)
+            aoc_embed.set_footer(text="Last Updated")
 
         await ctx.send(
             content=f"Here's the current Top {n_disp}! {Emojis.christmas_tree*3}\n\n{table}", embed=aoc_embed
@@ -153,91 +142,6 @@ class AdventOfCode:
         about_embed.set_footer(text=f"Last Updated (UTC): {datetime.utcnow()}")
 
         return about_embed
-
-
-class AocLeaderboard:
-    def __init__(self, members: list, owner_id: int, event_year: int):
-        self.members = members
-        self._owner_id = owner_id
-        self._event_year = event_year
-        self.last_updated = datetime.utcnow()
-
-    def update(self, injson: dict):
-        """
-        From AoC's private leaderboard API JSON, update members & resort
-        """
-
-        log.debug("Updating cached Advent of Code Leaderboard")
-        self.members = AocLeaderboard._sorted_members(injson["members"])
-        self.last_updated = datetime.utcnow()
-
-    def top_n(self, n: int = 10) -> dict:
-        """
-        Return the top n participants on the leaderboard.
-
-        If n is not specified, default to the top 10
-        """
-
-        return self.members[:n]
-
-    @staticmethod
-    async def json_from_url(
-        leaderboard_id: int = AocConfig.leaderboard_id, year: int = AocConfig.year
-    ) -> "AocLeaderboard":
-        """
-        Request the API JSON from Advent of Code for leaderboard_id for the specified year's event
-
-        If no year is input, year defaults to the current year
-        """
-
-        api_url = f"https://adventofcode.com/{year}/leaderboard/private/view/{leaderboard_id}.json"
-
-        log.debug("Querying Advent of Code Private Leaderboard API")
-        headers = {"user-agent": "PythonDiscord AoC Event Bot"}
-        async with aiohttp.ClientSession(cookies=AOC_SESSION_COOKIE, headers=headers) as session:
-            async with session.get(api_url) as resp:
-                if resp.status == 200:
-                    raw_dict = await resp.json()
-                else:
-                    log.warning(f"Bad response received from AoC ({resp.status}), check session cookie")
-                    resp.raise_for_status()
-
-        return raw_dict
-
-    @classmethod
-    def from_json(cls, injson: dict) -> "AocLeaderboard":
-        """
-        Generate an AocLeaderboard object from AoC's private leaderboard API JSON
-        """
-
-        return cls(
-            members=cls._sorted_members(injson["members"]), owner_id=injson["owner_id"], event_year=injson["event"]
-        )
-
-    @classmethod
-    async def from_url(cls) -> "AocLeaderboard":
-        """
-        Helper wrapping of AocLeaderboard.json_from_url and AocLeaderboard.from_json
-        """
-        api_json = await cls.json_from_url()
-        return cls.from_json(api_json)
-
-    @staticmethod
-    def _sorted_members(injson: dict) -> list:
-        """
-        Generate a sorted list of AocMember objects from AoC's private leaderboard API JSON
-
-        Output list is sorted based on the AocMember.local_score
-        """
-
-        members = [AocMember.member_from_json(injson[member]) for member in injson]
-        members.sort(key=lambda x: x.local_score, reverse=True)
-
-        return members
-
-    @staticmethod
-    def leaderboard_embed():
-        raise NotImplementedError
 
 
 class AocMember:
@@ -322,6 +226,111 @@ class AocMember:
                 completions[1] += 1
 
         return tuple(completions)
+
+
+class AocLeaderboard:
+    def __init__(self, members: list, owner_id: int, event_year: int):
+        self.members = members
+        self._owner_id = owner_id
+        self._event_year = event_year
+        self.last_updated = datetime.utcnow()
+
+    def update(self, injson: dict):
+        """
+        From AoC's private leaderboard API JSON, update members & resort
+        """
+
+        log.debug("Updating cached Advent of Code Leaderboard")
+        self.members = AocLeaderboard._sorted_members(injson["members"])
+        self.last_updated = datetime.utcnow()
+
+    def top_n(self, n: int = 10) -> dict:
+        """
+        Return the top n participants on the leaderboard.
+
+        If n is not specified, default to the top 10
+        """
+
+        return self.members[:n]
+
+    @staticmethod
+    async def json_from_url(
+        leaderboard_id: int = AocConfig.leaderboard_id, year: int = AocConfig.year
+    ) -> "AocLeaderboard":
+        """
+        Request the API JSON from Advent of Code for leaderboard_id for the specified year's event
+
+        If no year is input, year defaults to the current year
+        """
+
+        api_url = f"https://adventofcode.com/{year}/leaderboard/private/view/{leaderboard_id}.json"
+
+        log.debug("Querying Advent of Code Private Leaderboard API")
+        headers = {"user-agent": "PythonDiscord AoC Event Bot"}
+        async with aiohttp.ClientSession(cookies=AOC_SESSION_COOKIE, headers=headers) as session:
+            async with session.get(api_url) as resp:
+                if resp.status == 200:
+                    raw_dict = await resp.json()
+                else:
+                    log.warning(f"Bad response received from AoC ({resp.status}), check session cookie")
+                    resp.raise_for_status()
+
+        return raw_dict
+
+    @classmethod
+    def from_json(cls, injson: dict) -> "AocLeaderboard":
+        """
+        Generate an AocLeaderboard object from AoC's private leaderboard API JSON
+        """
+
+        return cls(
+            members=cls._sorted_members(injson["members"]), owner_id=injson["owner_id"], event_year=injson["event"]
+        )
+
+    @classmethod
+    async def from_url(cls) -> "AocLeaderboard":
+        """
+        Helper wrapping of AocLeaderboard.json_from_url and AocLeaderboard.from_json
+        """
+        api_json = await cls.json_from_url()
+        return cls.from_json(api_json)
+
+    @classmethod
+    async def get_global_leaderboard(cls) -> "AocLeaderboard":
+        raise NotImplementedError
+
+    @staticmethod
+    def _sorted_members(injson: dict) -> list:
+        """
+        Generate a sorted list of AocMember objects from AoC's private leaderboard API JSON
+
+        Output list is sorted based on the AocMember.local_score
+        """
+
+        members = [AocMember.member_from_json(injson[member]) for member in injson]
+        members.sort(key=lambda x: x.local_score, reverse=True)
+
+        return members
+
+    @staticmethod
+    def build_leaderboard_embed(members_to_print: List[AocMember]) -> str:
+        stargroup = f"{Emojis.star}, {Emojis.star*2}"
+        header = f"{' '*3}{'Score'} {'Name':^25} {stargroup:^7}\n{'-'*44}"
+        table = ""
+        for i, member in enumerate(members_to_print):
+            if member.name == "Anonymous User":
+                name = f"{member.name} #{member.aoc_id}"
+            else:
+                name = member.name
+
+            table += (
+                f"{i+1:2}) {member.local_score:4} {name:25.25} "
+                f"({member.completions[0]:2}, {member.completions[1]:2})\n"
+            )
+        else:
+            table = f"```{header}\n{table}```"
+
+        return table
 
 
 def _error_embed_helper(title: str, description: str) -> discord.Embed:
