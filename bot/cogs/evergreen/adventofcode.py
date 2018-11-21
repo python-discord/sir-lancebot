@@ -107,6 +107,18 @@ class AdventOfCode:
             content=f"Here's the current Top {n_disp}! {Emojis.christmas_tree*3}\n\n{table}", embed=aoc_embed
         )
 
+    @adventofcode_group.command(name="global", aliases=("globalstats", "globalboard", "gb"))
+    async def global_leaderboard(self, ctx: commands.Context, n_disp: int = 10):
+        """
+        Pull the top n_disp members from the global AoC leaderboard and post an embed
+
+        For readability, n_disp defaults to 10. A maximum value is configured in the
+        Advent of Code section of the bot constants. n_disp values greater than this
+        limit will default to this maximum and provide feedback to the user.
+        """
+
+        raise NotImplementedError
+
     async def _check_leaderboard_cache(self):
         """
         Check age of current leaderboard & pull a new one if the board is too old
@@ -292,6 +304,7 @@ class AocLeaderboard:
         """
         Helper wrapping of AocLeaderboard.json_from_url and AocLeaderboard.from_json
         """
+
         api_json = await cls.json_from_url()
         return cls.from_json(api_json)
 
@@ -314,6 +327,12 @@ class AocLeaderboard:
 
     @staticmethod
     def build_leaderboard_embed(members_to_print: List[AocMember]) -> str:
+        """
+        Build a text table from members_to_print, a list of AocMember objects
+
+        Returns a string to be used as the content of the bot's leaderboard response
+        """
+
         stargroup = f"{Emojis.star}, {Emojis.star*2}"
         header = f"{' '*3}{'Score'} {'Name':^25} {stargroup:^7}\n{'-'*44}"
         table = ""
@@ -337,6 +356,7 @@ def _error_embed_helper(title: str, description: str) -> discord.Embed:
     """
     Return a red-colored Embed with the given title and description
     """
+
     return discord.Embed(title=title, description=description, colour=discord.Colour.red())
 
 
