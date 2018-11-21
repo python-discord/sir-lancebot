@@ -150,13 +150,14 @@ class HacktoberStats:
 
         Otherwise, post a helpful error message
         """
-        prs = await self.get_october_prs(github_username)
+        async with ctx.typing():
+            prs = await self.get_october_prs(github_username)
 
-        if prs:
-            stats_embed = self.build_embed(github_username, prs)
-            await ctx.send('Here are some stats!', embed=stats_embed)
-        else:
-            await ctx.send(f"No October GitHub contributions found for '{github_username}'")
+            if prs:
+                stats_embed = self.build_embed(github_username, prs)
+                await ctx.send('Here are some stats!', embed=stats_embed)
+            else:
+                await ctx.send(f"No October GitHub contributions found for '{github_username}'")
 
     def build_embed(self, github_username: str, prs: typing.List[dict]) -> discord.Embed:
         """

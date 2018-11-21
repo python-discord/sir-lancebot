@@ -23,17 +23,19 @@ class SpookyGif:
         Fetches a random gif from the GIPHY API and responds with it.
         """
 
-        async with aiohttp.ClientSession() as session:
-            params = {'api_key': Client.giphy_token, 'tag': 'halloween', 'rating': 'g'}
-            # Make a GET request to the Giphy API to get a random halloween gif.
-            async with session.get('http://api.giphy.com/v1/gifs/random', params=params) as resp:
-                data = await resp.json()
-            url = data['data']['image_url']
+        async with ctx.typing():
+            async with aiohttp.ClientSession() as session:
+                params = {'api_key': Client.giphy_token, 'tag': 'halloween', 'rating': 'g'}
+                # Make a GET request to the Giphy API to get a random halloween gif.
+                async with session.get('http://api.giphy.com/v1/gifs/random', params=params) as resp:
+                    data = await resp.json()
+                url = data['data']['image_url']
 
-            embed = discord.Embed(colour=0x9b59b6)
-            embed.title = "A spooooky gif!"
-            embed.set_image(url=url)
-            await ctx.send(embed=embed)
+                embed = discord.Embed(colour=0x9b59b6)
+                embed.title = "A spooooky gif!"
+                embed.set_image(url=url)
+
+        await ctx.send(embed=embed)
 
 
 def setup(bot):
