@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "9d82195bc8a856a7c9f00057caf3af26c64d3d1daf09f63c6de55ad63f47f470"
+            "sha256": "a5d864a4579e3ed7985b708a1974ae36c6aa30b5ced913b4db12ab00a8e1775f"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -23,9 +23,18 @@
             "index": "pypi",
             "version": "==0.12.1"
         },
-        "discord.py": {
+        "beautifulsoup4": {
+            "hashes": [
+                "sha256:194ec62a25438adcb3fdb06378b26559eda1ea8a747367d34c33cef9c7f48d57",
+                "sha256:90f8e61121d6ae58362ce3bed8cd997efb00c914eae0ff3d363c32f9a9822d10",
+                "sha256:f0abd31228055d698bb392a826528ea08ebb9959e6bea17c606fd9c9009db938"
+            ],
+            "index": "pypi",
+            "version": "==4.6.3"
+        },
+        "discord-py": {
             "git": "https://github.com/Rapptz/discord.py",
-            "ref": "rewrite"
+            "ref": "860d6a9ace8248dfeec18b8b159e7b757d9f56bb"
         },
         "python-dateutil": {
             "hashes": [
@@ -106,7 +115,6 @@
         },
         "pycodestyle": {
             "hashes": [
-                "sha256:74abc4e221d393ea5ce1f129ea6903209940c1ecd29e002e8c6933c2b21026e0",
                 "sha256:cbc619d09254895b0d12c2c691e237b2e91e9b2ecf5e84c26b35400f93dcfb83",
                 "sha256:cbfca99bd594a10f674d0cd97a3d802a1fdef635d4361e1a2658de47ed261e3a"
             ],

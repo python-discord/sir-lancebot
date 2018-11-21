@@ -87,7 +87,7 @@ class AdventOfCode:
 
             # Generate leaderboard table for embed
             members_to_print = self.cached_private_leaderboard.top_n(n_disp)
-            table = AocLeaderboard.build_leaderboard_embed(members_to_print)
+            table = AocLeaderboard.build_private_leaderboard_embed(members_to_print)
 
             # Build embed
             aoc_embed = discord.Embed(colour=Colours.soft_green, timestamp=self.cached_private_leaderboard.last_updated)
@@ -126,7 +126,7 @@ class AdventOfCode:
 
             # Generate leaderboard table for embed
             members_to_print = self.cached_global_leaderboard.top_n(n_disp)
-            table = AocLeaderboard.build_leaderboard_embed(members_to_print)
+            table = AocLeaderboard.build_private_leaderboard_embed(members_to_print)
 
             # Build embed
             aoc_embed = discord.Embed(colour=Colours.soft_green, timestamp=self.cached_global_leaderboard.last_updated)
@@ -378,7 +378,7 @@ class AocLeaderboard:
         return members
 
     @staticmethod
-    def build_leaderboard_embed(members_to_print: List[AocMember]) -> str:
+    def build_private_leaderboard_embed(members_to_print: List[AocMember]) -> str:
         """
         Build a text table from members_to_print, a list of AocMember objects
 
@@ -421,7 +421,7 @@ class AocLeaderboard:
         soup = BeautifulSoup(raw_html, "html.parser")
         ele = soup.find_all("div", class_="leaderboard-entry")
 
-        exp = r"([ ]{,2}(\d+)\))?[ ]+(\d+)\s+([\w\(\)#\d ]+)"
+        exp = r"(?:[ ]{,2}(\d+)\))?[ ]+(\d+)\s+([\w\(\)#\d ]+)"
 
         lb_list = []
         for entry in ele:
@@ -429,15 +429,15 @@ class AocLeaderboard:
             raw_str = entry.text.replace("(AoC++)", "").rstrip()
 
             # Use a regex to extract the info from the string to unify formatting
-            # Group 2: Rank
-            # Group 3: Global Score
-            # Group 4: Member string
+            # Group 1: Rank
+            # Group 2: Global Score
+            # Group 3: Member string
             r = re.match(exp, raw_str)
 
-            rank = int(r.group(2)) if r.group(2) else None
-            global_score = int(r.group(3))
+            rank = int(r.group(1)) if r.group(1) else None
+            global_score = int(r.group(2))
 
-            member = r.group(4)
+            member = r.group(3)
             if member.lower().startswith("(anonymous"):
                 # Normalize anonymous user string by stripping () and title casing
                 member = re.sub(r"[\(\)]", "", member).title()
@@ -445,6 +445,12 @@ class AocLeaderboard:
             lb_list.append((rank, global_score, member))
 
         return lb_list
+
+    @staticmethod
+    def build_global_leaderboard_embed(members_to_print: List[tuple]) -> str:
+        """
+        """
+        raise NotImplementedError
 
 
 def _error_embed_helper(title: str, description: str) -> discord.Embed:
