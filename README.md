@@ -94,7 +94,8 @@ Now to tell other people what your PR does
 #### 7. Wait & further reading
 At this point your PR will either be accepted or a maintainer might request some changes.
 
-So you can read up some more on [https://try.github.io](Git), [https://www.jetbrains.com/help/pycharm/quick-start-guide.html](PyCharm) or you might want to learn more about Python and discord: [https://discordpy.readthedocs.io/en/rewrite/](discord.py rewrite)
+You can now read up some more on [Git](https://try.github.io), [PyCharm](https://www.jetbrains.com/help/pycharm/quick-start-guide.html),
+or learn more about Python and Discord: [discord.py rewrite](https://discordpy.readthedocs.io/en/rewrite)
 
 
 ### Without PyCharm
