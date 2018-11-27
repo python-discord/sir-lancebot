@@ -6,7 +6,9 @@ name = "pypi"
 [packages]
 "discord-py" = {ref = "rewrite", git = "https://github.com/Rapptz/discord.py"}
 arrow = "*"
-beautifulsoup4 = ">=4.6.0"
+beautifulsoup4 = "*"
+aiodns = "*"
+pillow = "*"
 
 [dev-packages]
 "flake8" = "*"

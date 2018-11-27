@@ -1,0 +1,28 @@
+{
+  "frankenstein": {
+    "full_name": "Frankenstein's Monster",
+    "summary": "His limbs were in proportion, and I had selected his features as beautiful. Beautiful! Great God! His yellow skin scarcely covered the work of muscles and arteries beneath; his hair was of a lustrous black, and flowing; his teeth of a pearly whiteness; but these luxuriances only formed a more horrid contrast with his watery eyes, that seemed almost of the same colour as the dun-white sockets in which they were set, his shrivelled complexion and straight black lips.",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Frankenstein%27s_monster_%28Boris_Karloff%29.jpg",
+    "votes": []
+  },
+  "dracula": {
+    "full_name": "Count Dracula",
+    "summary": "Count Dracula is an undead, centuries-old vampire, and a Transylvanian nobleman who claims to be a Sz\u00c3\u00a9kely descended from Attila the Hun. He inhabits a decaying castle in the Carpathian Mountains near the Borgo Pass. Unlike the vampires of Eastern European folklore, which are portrayed as repulsive, corpse-like creatures, Dracula wears a veneer of aristocratic charm. In his conversations with Jonathan Harker, he reveals himself as deeply proud of his boyar heritage and nostalgic for the past, which he admits have become only a memory of heroism, honour and valour in modern times.",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Bela_Lugosi_as_Dracula%2C_anonymous_photograph_from_1931%2C_Universal_Studios.jpg/250px-Bela_Lugosi_as_Dracula%2C_anonymous_photograph_from_1931%2C_Universal_Studios.jpg",
+    "votes": [
+    ]
+  },
+  "goofy": {
+    "full_name": "Goofy in the Monster's INC World",
+    "summary": "Pure nightmare fuel.\nThis monster is nothing like its original counterpart. With two different eyes, a pointed nose, fins growing out of its blue skin, and dark spots covering his body, he's a true nightmare come to life.",
+    "image": "https://www.dailydot.com/wp-content/uploads/3a2/a8/bf38aedbef9f795f.png",
+    "votes": []
+  },
+  "refisio": {
+    "full_name": "Refisio",
+    "summary": "Who let this guy write this? That's who the real monster is.",
+    "image": "https://avatars0.githubusercontent.com/u/24819750?s=460&v=4",
+    "votes": [
+    ]
+  }
+}
