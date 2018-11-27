@@ -39,7 +39,6 @@ class HalloweenFacts:
         self.channel = self.bot.get_channel(Hacktoberfest.channel_id)
         self.bot.loop.create_task(self._fact_publisher_task())
 
-    @property
     def random_fact(self):
         return random.choice(self.facts)
 
@@ -48,7 +47,7 @@ class HalloweenFacts:
         """
         Reply with the most recent Halloween fact.
         """
-        index, fact = self.random_fact
+        index, fact = self.random_fact()
         embed = self._build_embed(index, fact)
         await ctx.send(embed=embed)
 
