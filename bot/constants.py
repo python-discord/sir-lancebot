@@ -41,7 +41,6 @@ class Client(NamedTuple):
     guild = int(environ.get('SEASONALBOT_GUILD', 267624335836053506))
     prefix = "."
     token = environ.get('SEASONALBOT_TOKEN')
-    giphy_token = environ.get("GIPHY_TOKEN")
     debug = environ.get('SEASONALBOT_DEBUG', '').lower() == 'true'
     season_override = environ.get('SEASON_OVERRIDE')
 
@@ -65,6 +64,10 @@ class Roles(NamedTuple):
     verified = 352427296948486144
     helpers = 267630620367257601
     rockstars = 458226413825294336
+
+
+class Tokens(NamedTuple):
+    giphy = environ.get("GIPHY_TOKEN")
 
 
 bot = SeasonalBot(command_prefix=Client.prefix)
