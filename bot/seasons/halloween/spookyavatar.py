@@ -1,3 +1,4 @@
+import logging
 import os
 from io import BytesIO
 
@@ -6,7 +7,9 @@ import discord
 from discord.ext import commands
 from PIL import Image
 
-from bot.utils import spookifications
+from bot.utils.halloween import spookifications
+
+log = logging.getLogger(__name__)
 
 
 class SpookyAvatar:
@@ -26,7 +29,7 @@ class SpookyAvatar:
             async with session.get(url) as resp:
                 return await resp.read()
 
-    @commands.command(name='savatar', aliases=['spookyavatar', 'spookify'],
+    @commands.command(name='savatar', aliases=('spookyavatar', 'spookify'),
                       brief='Spookify an user\'s avatar.')
     async def spooky_avatar(self, ctx, user: discord.Member = None):
         """
@@ -52,3 +55,4 @@ class SpookyAvatar:
 
 def setup(bot):
     bot.add_cog(SpookyAvatar(bot))
+    log.debug("SpookyAvatar cog loaded")

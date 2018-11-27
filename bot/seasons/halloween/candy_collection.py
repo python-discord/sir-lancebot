@@ -1,12 +1,15 @@
 import functools
 import json
+import logging
 import os
 import random
 
 import discord
 from discord.ext import commands
 
-from bot.constants import HACKTOBER_CHANNEL_ID
+from bot.constants import Hacktoberfest
+
+log = logging.getLogger(__name__)
 
 json_location = os.path.join("bot", "resources", "halloween", "candy_collection.json")
 
@@ -37,7 +40,7 @@ class CandyCollection:
         if message.author.bot:
             return
         # ensure it's hacktober channel
-        if message.channel.id != HACKTOBER_CHANNEL_ID:
+        if message.channel.id != Hacktoberfest.channel_id:
             return
 
         # do random check for skull first as it has the lower chance
@@ -60,8 +63,9 @@ class CandyCollection:
         # check to ensure the reactor is human
         if user.bot:
             return
+
         # check to ensure it is in correct channel
-        if message.channel.id != HACKTOBER_CHANNEL_ID:
+        if message.channel.id != Hacktoberfest.channel_id:
             return
 
         # if its not a candy or skull, and it is one of 10 most recent messages,
@@ -120,7 +124,7 @@ class CandyCollection:
         ten_recent = []
         recent_msg = max(message.id for message
                          in self.bot._connection._messages
-                         if message.channel.id == self.HACKTOBER_CHANNEL_ID)
+                         if message.channel.id == Hacktoberfest.channel_id)
 
         channel = await self.hacktober_channel()
         ten_recent.append(recent_msg.id)
@@ -155,7 +159,7 @@ class CandyCollection:
         """
         Get #hacktoberbot channel from it's id
         """
-        return self.bot.get_channel(id=HACKTOBER_CHANNEL_ID)
+        return self.bot.get_channel(id=Hacktoberfest.channel_id)
 
     async def remove_reactions(self, reaction):
         """
@@ -227,3 +231,4 @@ class CandyCollection:
 
 def setup(bot):
     bot.add_cog(CandyCollection(bot))
+    log.debug("CandyCollection cog loaded")
