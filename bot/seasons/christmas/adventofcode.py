@@ -44,7 +44,7 @@ class AdventOfCode:
     @adventofcode_group.command(name="about", aliases=("ab", "info"), brief="Learn about Advent of Code")
     async def about_aoc(self, ctx: commands.Context):
         """
-        Respond with an explanation all things Advent of Code
+        Respond with an explanation of all things Advent of Code
         """
 
         await ctx.send("", embed=self.cached_about_aoc)
@@ -52,7 +52,7 @@ class AdventOfCode:
     @adventofcode_group.command(name="join", aliases=("j",), brief="Learn how to join PyDis' private AoC leaderboard")
     async def join_leaderboard(self, ctx: commands.Context):
         """
-        Reply with the link to join the PyDis AoC private leaderboard
+        Retrieve the link to join the PyDis AoC private leaderboard
         """
 
         info_str = (
