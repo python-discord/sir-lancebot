@@ -58,7 +58,7 @@ class MonsterSurvey:
 
     @commands.group(
         name='monster',
-        aliases=['ms']
+        aliases=('ms',)
     )
     async def monster_group(self, ctx: Context):
         """
@@ -180,7 +180,7 @@ class MonsterSurvey:
 
     @monster_group.command(
         name='leaderboard',
-        aliases=['lb']
+        aliases=('lb',)
     )
     async def monster_leaderboard(self, ctx: Context):
         """

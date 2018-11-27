@@ -17,7 +17,7 @@ class SpookyGif:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="spookygif", aliases=["sgif", "scarygif"])
+    @commands.command(name="spookygif", aliases=("sgif", "scarygif"))
     async def spookygif(self, ctx):
         """
         Fetches a random gif from the GIPHY API and responds with it.
