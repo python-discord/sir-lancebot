@@ -66,8 +66,27 @@ class Roles(NamedTuple):
     rockstars = 458226413825294336
 
 
+class Colours:
+    soft_red = 0xcd6d6d
+    soft_green = 0x68c290
+
+
+class Emojis:
+    star = "\u2B50"
+    christmas_tree = u"\U0001F384"
+
+
 class Tokens(NamedTuple):
     giphy = environ.get("GIPHY_TOKEN")
+    aoc_session_cookie = environ.get("AOC_SESSION_COOKIE")
+
+
+class AdventOfCode:
+    leaderboard_cache_age_threshold_seconds = 3600
+    leaderboard_id = 363275
+    leaderboard_join_code = "363275-442b6939"
+    leaderboard_max_displayed_members = 10
+    year = 2018
 
 
 bot = SeasonalBot(command_prefix=Client.prefix)
