@@ -78,6 +78,7 @@ class Emojis:
 
 class Tokens(NamedTuple):
     giphy = environ.get("GIPHY_TOKEN")
+    aoc_session_cookie = environ.get("AOC_SESSION_COOKIE")
 
 
 class AdventOfCode:
@@ -85,7 +86,6 @@ class AdventOfCode:
     leaderboard_id = 363275
     leaderboard_join_code = "363275-442b6939"
     leaderboard_max_displayed_members = 10
-    session_cookie = environ.get("AOC_SESSION_COOKIE")
     year = 2018
 
 

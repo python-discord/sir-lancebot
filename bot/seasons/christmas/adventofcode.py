@@ -11,12 +11,12 @@ from bs4 import BeautifulSoup
 from discord.ext import commands
 
 from bot.constants import AdventOfCode as AocConfig
-from bot.constants import Colours, Emojis
+from bot.constants import Colours, Emojis, Tokens
 
 log = logging.getLogger(__name__)
 
 AOC_REQUEST_HEADER = {"user-agent": "PythonDiscord AoC Event Bot"}
-AOC_SESSION_COOKIE = {"session": AocConfig.session_cookie}
+AOC_SESSION_COOKIE = {"session": Tokens.aoc_session_cookie}
 
 
 class AdventOfCode:
