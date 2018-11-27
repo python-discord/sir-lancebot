@@ -66,12 +66,12 @@ class AdventOfCode:
         aliases=("board", "stats", "lb"),
         brief="Get a snapshot of the PyDis private AoC leaderboard",
     )
-    async def aoc_leaderboard(self, ctx: commands.Context, n_disp: int = 10):
+    async def aoc_leaderboard(self, ctx: commands.Context, number_of_people_to_display: int = 10):
         """
-        Pull the top n_disp members from the PyDis leaderboard and post an embed
+        Pull the top number_of_people_to_display members from the PyDis leaderboard and post an embed
 
-        For readability, n_disp defaults to 10. A maximum value is configured in the
-        Advent of Code section of the bot constants. n_disp values greater than this
+        For readability, number_of_people_to_display defaults to 10. A maximum value is configured in the
+        Advent of Code section of the bot constants. number_of_people_to_display values greater than this
         limit will default to this maximum and provide feedback to the user.
         """
 
@@ -83,10 +83,10 @@ class AdventOfCode:
                 # Short circuit here if there's an issue
                 return
 
-            n_disp = await self._check_n_entries(ctx, n_disp)
+            number_of_people_to_display = await self._check_n_entries(ctx, number_of_people_to_display)
 
             # Generate leaderboard table for embed
-            members_to_print = self.cached_private_leaderboard.top_n(n_disp)
+            members_to_print = self.cached_private_leaderboard.top_n(number_of_people_to_display)
             table = AocPrivateLeaderboard.build_leaderboard_embed(members_to_print)
 
             # Build embed
@@ -95,7 +95,8 @@ class AdventOfCode:
             aoc_embed.set_footer(text="Last Updated")
 
         await ctx.send(
-            content=f"Here's the current Top {n_disp}! {Emojis.christmas_tree*3}\n\n{table}", embed=aoc_embed
+            content=f"Here's the current Top {number_of_people_to_display}! {Emojis.christmas_tree*3}\n\n{table}",
+            embed=aoc_embed,
         )
 
     @adventofcode_group.command(
@@ -103,12 +104,12 @@ class AdventOfCode:
         aliases=("globalstats", "globalboard", "gb"),
         brief="Get a snapshot of the global AoC leaderboard",
     )
-    async def global_leaderboard(self, ctx: commands.Context, n_disp: int = 10):
+    async def global_leaderboard(self, ctx: commands.Context, number_of_people_to_display: int = 10):
         """
-        Pull the top n_disp members from the global AoC leaderboard and post an embed
+        Pull the top number_of_people_to_display members from the global AoC leaderboard and post an embed
 
-        For readability, n_disp defaults to 10. A maximum value is configured in the
-        Advent of Code section of the bot constants. n_disp values greater than this
+        For readability, number_of_people_to_display defaults to 10. A maximum value is configured in the
+        Advent of Code section of the bot constants. number_of_people_to_display values greater than this
         limit will default to this maximum and provide feedback to the user.
         """
 
@@ -120,10 +121,10 @@ class AdventOfCode:
                 # Short circuit here if there's an issue
                 return
 
-            n_disp = await self._check_n_entries(ctx, n_disp)
+            number_of_people_to_display = await self._check_n_entries(ctx, number_of_people_to_display)
 
             # Generate leaderboard table for embed
-            members_to_print = self.cached_global_leaderboard.top_n(n_disp)
+            members_to_print = self.cached_global_leaderboard.top_n(number_of_people_to_display)
             table = AocGlobalLeaderboard.build_leaderboard_embed(members_to_print)
 
             # Build embed
@@ -132,7 +133,8 @@ class AdventOfCode:
             aoc_embed.set_footer(text="Last Updated")
 
         await ctx.send(
-            content=f"Here's the current global Top {n_disp}! {Emojis.christmas_tree*3}\n\n{table}", embed=aoc_embed
+            content=f"Here's the current global Top {number_of_people_to_display}! {Emojis.christmas_tree*3}\n\n{table}",  # noqa
+            embed=aoc_embed,
         )
 
     async def _check_leaderboard_cache(self, ctx, global_board: bool = False):
@@ -175,23 +177,23 @@ class AdventOfCode:
                 ),
             )
 
-    async def _check_n_entries(self, ctx: commands.Context, n_disp: int) -> int:
+    async def _check_n_entries(self, ctx: commands.Context, number_of_people_to_display: int) -> int:
         # Check for n > max_entries and n <= 0
         max_entries = AocConfig.leaderboard_max_displayed_members
         author = ctx.message.author
-        if not 0 <= n_disp <= max_entries:
+        if not 0 <= number_of_people_to_display <= max_entries:
             log.debug(
                 f"{author.name} ({author.id}) attempted to fetch an invalid number "
-                f" of entries from the AoC leaderboard ({n_disp})"
+                f" of entries from the AoC leaderboard ({number_of_people_to_display})"
             )
             await ctx.send(
                 f":x: {author.mention}, number of entries to display must be a positive "
                 f"integer less than or equal to {max_entries}\n\n"
                 f"Head to {self.private_leaderboard_url} to view the entire leaderboard"
             )
-            n_disp = max_entries
+            number_of_people_to_display = max_entries
 
-        return n_disp
+        return number_of_people_to_display
 
     def _build_about_embed(self) -> discord.Embed:
         """
