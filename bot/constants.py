@@ -4,14 +4,14 @@ from typing import NamedTuple
 
 from bot.bot import SeasonalBot
 
-__all__ = ('Client', 'Roles', 'bot')
+__all__ = ("Channels", "Client", "Roles", "bot")
 
 log = logging.getLogger(__name__)
 
 
 class Channels(NamedTuple):
     admins = 365960823622991872
-    announcements = 354619224620138496
+    announcements = int(environ.get('CHANNEL_ANNOUNCEMENTS', 354619224620138496))
     big_brother_logs = 468507907357409333
     bot = 267659945086812160
     checkpoint_test = 422077681434099723

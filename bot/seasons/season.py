@@ -1,14 +1,16 @@
 import asyncio
 import datetime
 import importlib
+import inspect
 import logging
 import pkgutil
+import typing
 from pathlib import Path
 
 import discord
 from discord.ext import commands
 
-from bot.constants import Client, Roles, bot
+from bot.constants import Channels, Client, Roles, bot
 from bot.decorators import with_role
 
 log = logging.getLogger(__name__)
@@ -69,10 +71,11 @@ def get_season(season_name: str = None, date: datetime.datetime = None):
 
 
 class SeasonBase:
-    name = None
+    name: typing.Optional[str] = "evergreen"
+    start_date: typing.Optional[str] = None
+    end_date: typing.Optional[str] = None
+    colour: typing.Optional[int] = None
     date_format = "%d/%m/%Y"
-    start_date = None
-    end_date = None
     bot_name: str = "SeasonalBot"
     icon: str = "/logos/logo_full/logo_full.png"
 
@@ -95,6 +98,11 @@ class SeasonBase:
     @classmethod
     def is_between_dates(cls, date):
         return cls.start() <= date <= cls.end()
+
+    @property
+    def greeting(self):
+        season_name = " ".join(self.name.split("_")).title()
+        return f"New Season, {season_name}!"
 
     async def get_icon(self):
         base_url = "https://raw.githubusercontent.com/python-discord/branding/master"
@@ -180,16 +188,57 @@ class SeasonBase:
             log.debug(f"Changing server icon failed: {self.icon}")
             return False
 
+    async def announce_season(self):
+        # don't actually announce if reverting to normal season
+        if self.name == "evergreen":
+            log.debug(f"Season Changed: {self.icon}")
+            return
+
+        guild = bot.get_guild(Client.guild)
+
+        channel = guild.get_channel(Channels.announcements)
+        mention = f"<@&{Roles.announcements}>"
+
+        # collect seasonal cogs
+        cogs = []
+        for cog in bot.cogs.values():
+            if "evergreen" in cog.__module__:
+                continue
+            cog_name = type(cog).__name__
+            if cog_name != "SeasonManager":
+                cogs.append(cog_name)
+
+        # no cogs, so no seasonal commands
+        if not cogs:
+            return
+
+        # build cog info output
+        doc = inspect.getdoc(self)
+        announce_text = doc + "\n\n" if doc else ""
+
+        def cog_name(cog):
+            return type(cog).__name__
+
+        cog_info = []
+        for cog in sorted(cogs, key=cog_name):
+            doc = inspect.getdoc(bot.get_cog(cog))
+            if doc:
+                cog_info.append(f"**{cog}**\n*{doc}*")
+            else:
+                cog_info.append(f"**{cog}**")
+
+        embed = discord.Embed(description=announce_text, colour=self.colour or guild.me.colour)
+        embed.set_author(name=self.greeting)
+        cogs_text = "\n".join(cog_info)
+        embed.add_field(name="New Command Categories", value=cogs_text)
+        embed.set_footer(text="To see the new commands, use .help Category")
+
+        await channel.send(mention, embed=embed)
+
     async def load(self):
         """
-        Loads in the bot name, the bot avatar, and the extensions that are relevant to that season.
+        Loads extensions, bot name and avatar, server icon and announces new season.
         """
-
-        await self.apply_username(debug=Client.debug)
-        await self.apply_avatar()
-
-        if not Client.debug:
-            await self.apply_server_icon()
 
         # Prepare all the seasonal cogs, and then the evergreen ones.
         extensions = []
@@ -202,6 +251,15 @@ class SeasonBase:
 
         # Finally we can load all the cogs we've prepared.
         bot.load_extensions(extensions)
+
+        # Apply seasonal elements after extensions successfully load
+        await self.apply_username(debug=Client.debug)
+
+        # Avoid heavy API ratelimited elements when debugging
+        if not Client.debug:
+            await self.apply_avatar()
+            await self.apply_server_icon()
+            await self.announce_season()
 
 
 class SeasonManager:
@@ -240,7 +298,7 @@ class SeasonManager:
                 await self.season.load()
 
     @with_role(Roles.moderator, Roles.admin, Roles.owner)
-    @commands.command(name='season')
+    @commands.command(name="season")
     async def change_season(self, ctx, new_season: str):
         """
         Changes the currently active season on the bot.
@@ -262,6 +320,8 @@ class SeasonManager:
             return season.start(), season.end() - datetime.datetime.max
 
         current_season = self.season.name
+
+        forced_space = "\u200b "
 
         entries = []
         seasons = [get_season_class(s) for s in get_seasons()]
@@ -285,7 +345,6 @@ class SeasonManager:
             is_active = current_season == season.name
             sdec = "__" if is_active else ""
 
-            forced_space = "\u200b "
             entries.append(
                 f"**{sdec}{season.__name__}:{sdec}**\n"
                 f"{forced_space*3}{pdec}{period}{pdec}"
@@ -353,7 +412,7 @@ class SeasonManager:
             colour=colour
         )
         embed.set_author(name=title)
-        embed.set_thumbnail(url=bot.get_guild(Client.guild).icon_url_as(format='png'))
+        embed.set_thumbnail(url=bot.get_guild(Client.guild).icon_url_as(format="png"))
         await ctx.send(embed=embed)
 
     @refresh.command(name="username", aliases=("name",))
@@ -396,6 +455,14 @@ class SeasonManager:
         )
         embed.set_author(name=title)
         await ctx.send(embed=embed)
+
+    @with_role(Roles.moderator, Roles.admin, Roles.owner)
+    @commands.command()
+    async def announce(self, ctx):
+        """
+        Announces the currently loaded season.
+        """
+        await self.season.announce_season()
 
     def __unload(self):
         self.season_task.cancel()
