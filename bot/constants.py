@@ -74,6 +74,7 @@ class Colours:
 class Emojis:
     star = "\u2B50"
     christmas_tree = u"\U0001F384"
+    check = "\u2611"
 
 
 class Tokens(NamedTuple):
