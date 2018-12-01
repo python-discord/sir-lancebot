@@ -74,7 +74,7 @@ class SeasonBase:
     start_date = None
     end_date = None
     bot_name: str = "SeasonalBot"
-    bot_avatar: str = "standard.png"
+    icon: str = "/logos/logo_full/logo_full.png"
 
     @staticmethod
     def current_year():
@@ -96,38 +96,100 @@ class SeasonBase:
     def is_between_dates(cls, date):
         return cls.start() <= date <= cls.end()
 
-    def get_avatar(self):
-        avatar_path = Path("bot", "resources", "avatars", self.bot_avatar)
-        with open(avatar_path, "rb") as avatar_file:
-            return bytearray(avatar_file.read())
+    async def get_icon(self):
+        base_url = "https://raw.githubusercontent.com/python-discord/branding/master"
+        async with bot.http_session.get(base_url + self.icon) as resp:
+            avatar = await resp.read()
+            return bytearray(avatar)
+
+    async def apply_username(self, *, debug: bool = False):
+        """
+        Applies the username for the current season. Returns if it was successful.
+        """
+
+        guild = bot.get_guild(Client.guild)
+        result = None
+
+        # Change only nickname if in debug mode due to ratelimits for user edits
+        if debug:
+            if guild.me.display_name != self.bot_name:
+                log.debug(f"Changing nickname to {self.bot_name}")
+                await guild.me.edit(nick=self.bot_name)
+
+        else:
+            if bot.user.name != self.bot_name:
+                # attempt to change user details
+                log.debug(f"Changing username to {self.bot_name}")
+                await bot.user.edit(username=self.bot_name)
+
+                # fallback on nickname if failed due to ratelimit
+                if bot.user.name != self.bot_name:
+                    log.info(f"Username failed to change: Changing nickname to {self.bot_name}")
+                    await guild.me.edit(nick=self.bot_name)
+                    result = False
+                else:
+                    result = True
+
+            # remove nickname if an old one exists
+            if guild.me.nick and guild.me.nick != self.bot_name:
+                log.debug(f"Clearing old nickname of {guild.me.nick}")
+                await guild.me.edit(nick=None)
+
+            return result
+
+    async def apply_avatar(self):
+        """
+        Applies the avatar for the current season. Returns if it was successful.
+        """
+
+        # track old avatar hash for later comparison
+        old_avatar = bot.user.avatar
+
+        # attempt the change
+        log.debug(f"Changing avatar to {self.icon}")
+        avatar = await self.get_icon()
+        await bot.user.edit(avatar=avatar)
+
+        if bot.user.avatar != old_avatar:
+            log.debug(f"Avatar changed to {self.icon}")
+            return True
+        else:
+            log.debug(f"Changing avatar failed: {self.icon}")
+            return False
+
+    async def apply_server_icon(self):
+        """
+        Applies the server icon for the current season. Returns if it was successful.
+        """
+
+        guild = bot.get_guild(Client.guild)
+
+        # track old icon hash for later comparison
+        old_icon = guild.icon
+
+        # attempt the change
+        log.debug(f"Changing server icon to {self.icon}")
+        avatar = await self.get_icon()
+        await guild.edit(icon=avatar, reason=f"Seasonbot Season Change: {self.__name__}")
+
+        new_icon = bot.get_guild(Client.guild).icon
+        if new_icon != old_icon:
+            log.debug(f"Server icon changed to {self.icon}")
+            return True
+        else:
+            log.debug(f"Changing server icon failed: {self.icon}")
+            return False
 
     async def load(self):
         """
         Loads in the bot name, the bot avatar, and the extensions that are relevant to that season.
         """
 
-        guild = bot.get_guild(Client.guild)
+        await self.apply_username(debug=Client.debug)
+        await self.apply_avatar()
 
-        # Change only nickname if in debug mode due to ratelimits for user edits
-        if Client.debug:
-            if guild.me.display_name != self.bot_name:
-                log.debug(f"Changing nickname to {self.bot_name}")
-                await guild.me.edit(nick=self.bot_name)
-        else:
-            if bot.user.name != self.bot_name:
-                # attempt to change user details
-                log.debug(f"Changing username to {self.bot_name}")
-                await bot.user.edit(username=self.bot_name, avatar=self.get_avatar())
-
-                # fallback on nickname if failed due to ratelimit
-                if bot.user.name != self.bot_name:
-                    log.info(f"User details failed to change: Changing nickname to {self.bot_name}")
-                    await guild.me.edit(nick=self.bot_name)
-
-            # remove nickname if an old one exists
-            if guild.me.nick and guild.me.nick != self.bot_name:
-                log.debug(f"Clearing old nickname of {guild.me.nick}")
-                await guild.me.edit(nick=None)
+        if not Client.debug:
+            await self.apply_server_icon()
 
         # Prepare all the seasonal cogs, and then the evergreen ones.
         extensions = []
@@ -248,29 +310,50 @@ class SeasonManager:
         Re-applies the bot avatar for the currently loaded season.
         """
 
-        # track old avatar hash for later comparison
-        old_avatar = bot.user.avatar
-
         # attempt the change
-        await bot.user.edit(avatar=self.season.get_avatar())
+        is_changed = await self.season.apply_avatar()
 
-        if bot.user.avatar != old_avatar:
-            log.debug(f"Avatar changed to {self.season.bot_avatar}")
+        if is_changed:
             colour = ctx.guild.me.colour
             title = "Avatar Refreshed"
         else:
-            log.debug(f"Changing avatar failed: {self.season.bot_avatar}")
             colour = discord.Colour.red()
             title = "Avatar Failed to Refresh"
 
         # report back details
         season_name = type(self.season).__name__
         embed = discord.Embed(
-            description=f"**Season:** {season_name}\n**Avatar:** {self.season.bot_avatar}",
+            description=f"**Season:** {season_name}\n**Avatar:** {self.season.icon}",
             colour=colour
         )
         embed.set_author(name=title)
         embed.set_thumbnail(url=bot.user.avatar_url_as(format="png"))
+        await ctx.send(embed=embed)
+
+    @refresh.command(name="icon")
+    async def refresh_server_icon(self, ctx):
+        """
+        Re-applies the server icon for the currently loaded season.
+        """
+
+        # attempt the change
+        is_changed = await self.season.apply_server_icon()
+
+        if is_changed:
+            colour = ctx.guild.me.colour
+            title = "Server Icon Refreshed"
+        else:
+            colour = discord.Colour.red()
+            title = "Server Icon Failed to Refresh"
+
+        # report back details
+        season_name = type(self.season).__name__
+        embed = discord.Embed(
+            description=f"**Season:** {season_name}\n**Icon:** {self.season.icon}",
+            colour=colour
+        )
+        embed.set_author(name=title)
+        embed.set_thumbnail(url=bot.get_guild(Client.guild).icon_url_as(format='png'))
         await ctx.send(embed=embed)
 
     @refresh.command(name="username", aliases=("name",))
@@ -279,31 +362,35 @@ class SeasonManager:
         Re-applies the bot username for the currently loaded season.
         """
 
-        # track old username for later comparison
         old_username = str(bot.user)
+        old_display_name = ctx.guild.me.display_name
 
         # attempt the change
-        await bot.user.edit(username=self.season.bot_name)
+        is_changed = await self.season.apply_username()
 
-        if str(bot.user) != old_username:
-            log.debug(f"Username changed to {self.season.bot_name}")
+        if is_changed:
             colour = ctx.guild.me.colour
             title = "Username Refreshed"
             changed_element = "Username"
+            old_name = old_username
             new_name = str(bot.user)
         else:
-            log.debug(f"Changing username failed: Changing nickname to {self.season.bot_name}")
-            new_name = self.season.bot_name
-            await ctx.guild.me.edit(nick=new_name)
             colour = discord.Colour.red()
-            title = "Username Failed to Refresh"
+
+            # if None, it's because it wasn't meant to change username
+            if is_changed is None:
+                title = "Nickname Refreshed"
+            else:
+                title = "Username Failed to Refresh"
             changed_element = "Nickname"
+            old_name = old_display_name
+            new_name = self.season.bot_name
 
         # report back details
         season_name = type(self.season).__name__
         embed = discord.Embed(
             description=f"**Season:** {season_name}\n"
-                        f"**Old Username:** {old_username}\n"
+                        f"**Old {changed_element}:** {old_name}\n"
                         f"**New {changed_element}:** {new_name}",
             colour=colour
         )
