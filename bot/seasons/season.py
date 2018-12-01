@@ -166,7 +166,7 @@ class SeasonManager:
                 await self.season.load()
 
     @with_role(Roles.moderator, Roles.admin, Roles.owner)
-    @commands.command('season')
+    @commands.command(name='season')
     async def change_season(self, ctx, new_season: str):
         """
         Changes the currently active season on the bot.
