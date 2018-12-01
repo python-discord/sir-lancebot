@@ -1,5 +1,5 @@
 FROM python:3.6-alpine3.7
-RUN apk add --update tini git jpeg-dev zlib zlib-dev
+RUN apk add --update tini build-base git jpeg-dev zlib zlib-dev
 
 RUN mkdir /bot
 COPY . /bot
