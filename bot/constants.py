@@ -51,7 +51,7 @@ class Hacktoberfest(NamedTuple):
 
 
 class Roles(NamedTuple):
-    admin = 267628507062992896
+    admin = int(environ.get('SEASONALBOT_DEBUG', 267628507062992896))
     announcements = 463658397560995840
     champion = 430492892331769857
     contributor = 295488872404484098
