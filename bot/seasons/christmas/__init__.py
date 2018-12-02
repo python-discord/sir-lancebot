@@ -1,3 +1,4 @@
+from bot.constants import Colours
 from bot.seasons import SeasonBase
 
 
@@ -10,9 +11,11 @@ class Christmas(SeasonBase):
     we hope every one of you enjoy this festive season!
     """
     name = "christmas"
+    bot_name = "Merrybot"
     greeting = "Happy Holidays!"
-    colour = 0x1f8b4c
+
     start_date = "01/12"
     end_date = "31/12"
-    bot_name = "Merrybot"
+
+    colour = Colours.dark_green
     icon = "/logos/logo_seasonal/christmas/festive.png"

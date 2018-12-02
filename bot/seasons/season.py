@@ -4,9 +4,10 @@ import importlib
 import inspect
 import logging
 import pkgutil
-import typing
 from pathlib import Path
+from typing import List, Optional, Type, Union
 
+import async_timeout
 import discord
 from discord.ext import commands
 
@@ -16,25 +17,29 @@ from bot.decorators import with_role
 log = logging.getLogger(__name__)
 
 
-def get_seasons():
+def get_seasons() -> List[str]:
     """
     Returns all the Season objects located in bot/seasons/
     """
+
     seasons = []
 
     for module in pkgutil.iter_modules([Path("bot", "seasons")]):
         if module.ispkg:
             seasons.append(module.name)
-
     return seasons
 
 
-def get_season_class(season_name):
+def get_season_class(season_name: str) -> Type["SeasonBase"]:
+    """
+    Get's the season class of the season module.
+    """
+
     season_lib = importlib.import_module(f"bot.seasons.{season_name}")
     return getattr(season_lib, season_name.capitalize())
 
 
-def get_season(season_name: str = None, date: datetime.datetime = None):
+def get_season(season_name: str = None, date: datetime.datetime = None) -> "SeasonBase":
     """
     Returns a Season object based on either a string or a date.
     """
@@ -71,48 +76,100 @@ def get_season(season_name: str = None, date: datetime.datetime = None):
 
 
 class SeasonBase:
-    name: typing.Optional[str] = "evergreen"
-    start_date: typing.Optional[str] = None
-    end_date: typing.Optional[str] = None
-    colour: typing.Optional[int] = None
-    date_format = "%d/%m/%Y"
+    """
+    Base class for Seasonal classes.
+    """
+
+    name: Optional[str] = "evergreen"
     bot_name: str = "SeasonalBot"
+
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+
+    colour: Optional[int] = None
     icon: str = "/logos/logo_full/logo_full.png"
 
+    date_format: str = "%d/%m/%Y"
+
     @staticmethod
-    def current_year():
+    def current_year() -> int:
+        """
+        Returns the current year.
+        """
+
         return datetime.date.today().year
 
     @classmethod
-    def start(cls):
+    def start(cls) -> datetime.datetime:
+        """
+        Returns the start date using current year and start_date attribute.
+
+        If no start_date was defined, returns the minimum datetime to ensure
+        it's always below checked dates.
+        """
+
         if not cls.start_date:
             return datetime.datetime.min
         return datetime.datetime.strptime(f"{cls.start_date}/{cls.current_year()}", cls.date_format)
 
     @classmethod
-    def end(cls):
+    def end(cls) -> datetime.datetime:
+        """
+        Returns the start date using current year and end_date attribute.
+
+        If no end_date was defined, returns the minimum datetime to ensure
+        it's always above checked dates.
+        """
+
         if not cls.end_date:
             return datetime.datetime.max
         return datetime.datetime.strptime(f"{cls.end_date}/{cls.current_year()}", cls.date_format)
 
     @classmethod
-    def is_between_dates(cls, date):
+    def is_between_dates(cls, date: datetime.datetime) -> bool:
+        """
+        Determines if the given date falls between the season's date range.
+        """
+
         return cls.start() <= date <= cls.end()
 
     @property
-    def greeting(self):
+    def greeting(self) -> str:
+        """
+        Provides a default greeting based on the season name if one wasn't
+        defined in the season class.
+
+        It's recommended to define one in most cases by overwriting this as a
+        normal attribute in the inhertiting class.
+        """
+
         season_name = " ".join(self.name.split("_")).title()
         return f"New Season, {season_name}!"
 
-    async def get_icon(self):
-        base_url = "https://raw.githubusercontent.com/python-discord/branding/master"
-        async with bot.http_session.get(base_url + self.icon) as resp:
-            avatar = await resp.read()
-            return bytearray(avatar)
-
-    async def apply_username(self, *, debug: bool = False):
+    async def get_icon(self) -> bytes:
         """
-        Applies the username for the current season. Returns if it was successful.
+        Retrieves the icon image from the branding repository, using the
+        defined icon attribute for the season.
+
+        The icon attribute must provide the url path, starting from the master
+        branch base url, including the starting slash:
+        `https://raw.githubusercontent.com/python-discord/branding/master`
+        """
+
+        base_url = "https://raw.githubusercontent.com/python-discord/branding/master"
+        full_url = base_url + self.icon
+        log.debug(f"Getting icon from: {full_url}")
+        async with bot.http_session.get(full_url) as resp:
+            return await resp.read()
+
+    async def apply_username(self, *, debug: bool = False) -> Union[bool, None]:
+        """
+        Applies the username for the current season. Only changes nickname if
+        `bool` is False, otherwise only changes the nickname.
+
+        Returns True if it successfully changed the username.
+        Returns False if it failed to change the username, falling back to nick.
+        Returns None if `debug` was True and username change wasn't attempted.
         """
 
         guild = bot.get_guild(Client.guild)
@@ -128,11 +185,14 @@ class SeasonBase:
             if bot.user.name != self.bot_name:
                 # attempt to change user details
                 log.debug(f"Changing username to {self.bot_name}")
-                await bot.user.edit(username=self.bot_name)
+                try:
+                    await bot.user.edit(username=self.bot_name)
+                except discord.HTTPException:
+                    pass
 
                 # fallback on nickname if failed due to ratelimit
                 if bot.user.name != self.bot_name:
-                    log.info(f"Username failed to change: Changing nickname to {self.bot_name}")
+                    log.warning(f"Username failed to change: Changing nickname to {self.bot_name}")
                     await guild.me.edit(nick=self.bot_name)
                     result = False
                 else:
@@ -145,7 +205,7 @@ class SeasonBase:
 
             return result
 
-    async def apply_avatar(self):
+    async def apply_avatar(self) -> bool:
         """
         Applies the avatar for the current season. Returns if it was successful.
         """
@@ -155,17 +215,21 @@ class SeasonBase:
 
         # attempt the change
         log.debug(f"Changing avatar to {self.icon}")
-        avatar = await self.get_icon()
-        await bot.user.edit(avatar=avatar)
+        icon = await self.get_icon()
+        try:
+            async with async_timeout.timeout(5):
+                await bot.user.edit(avatar=icon)
+        except (discord.HTTPException, asyncio.TimeoutError):
+            pass
 
         if bot.user.avatar != old_avatar:
             log.debug(f"Avatar changed to {self.icon}")
             return True
-        else:
-            log.debug(f"Changing avatar failed: {self.icon}")
-            return False
 
-    async def apply_server_icon(self):
+        log.warning(f"Changing avatar failed: {self.icon}")
+        return False
+
+    async def apply_server_icon(self) -> bool:
         """
         Applies the server icon for the current season. Returns if it was successful.
         """
@@ -177,25 +241,35 @@ class SeasonBase:
 
         # attempt the change
         log.debug(f"Changing server icon to {self.icon}")
-        avatar = await self.get_icon()
-        await guild.edit(icon=avatar, reason=f"Seasonbot Season Change: {self.__name__}")
+        icon = await self.get_icon()
+        try:
+            async with async_timeout.timeout(5):
+                await guild.edit(icon=icon, reason=f"Seasonbot Season Change: {self.name}")
+        except (discord.HTTPException, asyncio.TimeoutError):
+            pass
 
         new_icon = bot.get_guild(Client.guild).icon
         if new_icon != old_icon:
             log.debug(f"Server icon changed to {self.icon}")
             return True
-        else:
-            log.debug(f"Changing server icon failed: {self.icon}")
-            return False
+
+        log.warning(f"Changing server icon failed: {self.icon}")
+        return False
 
     async def announce_season(self):
+        """
+        Announces a change in season in the announcement channel.
+
+        It will skip the announcement if the current active season is the
+        "evergreen" default season.
+        """
+
         # don't actually announce if reverting to normal season
         if self.name == "evergreen":
-            log.debug(f"Season Changed: {self.icon}")
+            log.debug(f"Season Changed: {self.name}")
             return
 
         guild = bot.get_guild(Client.guild)
-
         channel = guild.get_channel(Channels.announcements)
         mention = f"<@&{Roles.announcements}>"
 
@@ -238,6 +312,8 @@ class SeasonBase:
     async def load(self):
         """
         Loads extensions, bot name and avatar, server icon and announces new season.
+
+        If in debug mode, the avatar, server icon, and announcement will be skipped.
         """
 
         # Prepare all the seasonal cogs, and then the evergreen ones.
@@ -253,13 +329,19 @@ class SeasonBase:
         bot.load_extensions(extensions)
 
         # Apply seasonal elements after extensions successfully load
-        await self.apply_username(debug=Client.debug)
+        username_changed = await self.apply_username(debug=Client.debug)
 
         # Avoid heavy API ratelimited elements when debugging
         if not Client.debug:
+            log.info("Applying avatar.")
             await self.apply_avatar()
+            log.info("Applying server icon.")
             await self.apply_server_icon()
-            await self.announce_season()
+            if username_changed:
+                log.info(f"Announcing season {self.name}.")
+                await self.announce_season()
+            else:
+                log.info(f"Skipping season announcement due to username not being changed.")
 
 
 class SeasonManager:
@@ -347,7 +429,7 @@ class SeasonManager:
 
             entries.append(
                 f"**{sdec}{season.__name__}:{sdec}**\n"
-                f"{forced_space*3}{pdec}{period}{pdec}"
+                f"{forced_space*3}{pdec}{period}{pdec}\n"
             )
 
         embed = discord.Embed(description="\n".join(entries), colour=ctx.guild.me.colour)
