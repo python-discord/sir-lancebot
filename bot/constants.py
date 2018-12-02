@@ -87,6 +87,8 @@ class AdventOfCode:
     leaderboard_join_code = "363275-442b6939"
     leaderboard_max_displayed_members = 10
     year = 2018
+    channel_id = int(environ.get("AOC_CHANNEL_ID", 517745814039166986))
+    role_id = int(environ.get("AOC_ROLE_ID", 518565788744024082))
 
 
 bot = SeasonalBot(command_prefix=Client.prefix)

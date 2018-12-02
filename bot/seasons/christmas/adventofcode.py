@@ -1,12 +1,14 @@
+import asyncio
 import json
 import logging
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import List
 
 import aiohttp
 import discord
+from pytz import timezone
 from bs4 import BeautifulSoup
 from discord.ext import commands
 
@@ -17,6 +19,95 @@ log = logging.getLogger(__name__)
 
 AOC_REQUEST_HEADER = {"user-agent": "PythonDiscord AoC Event Bot"}
 AOC_SESSION_COOKIE = {"session": Tokens.aoc_session_cookie}
+
+EST = timezone("EST")
+
+def is_in_advent() -> bool:
+    """
+    Utility function to check if we are between December 1st
+    and December 25th.
+    """
+    return datetime.now(EST).day in range(1, 26) and datetime.now(EST).month == 12
+
+
+def time_left_to_aoc_midnight() -> timedelta:
+    """
+    This calculates the amount of time left until midnight in
+    UTC-5 (Advent of Code maintainer timezone).
+    """
+    # Change all time properties back to 00:00
+    todays_midnight = datetime.now(EST).replace(microsecond=0,
+                                                second=0,
+                                                minute=0,
+                                                hour=0)
+
+    # We want tomorrow so add a day on
+    tomorrow = todays_midnight + timedelta(days=1)
+
+    # Calculate the timedelta between the current time and midnight
+    return tomorrow, tomorrow - datetime.now(EST)
+
+
+async def countdown_status(bot: commands.Bot):
+    """
+    Every 2 minutes set the playing status of the bot to
+    the number of minutes & hours left until the next day
+    release.
+    """
+
+    # If we are not in the advent of code anymore
+    if not is_in_advent():
+        return
+
+    while True:
+        _, time_left = time_left_to_aoc_midnight()
+
+        hours, minutes = time_left.seconds // 3600, time_left.seconds // 60 % 60
+
+        if hours == 0:
+            game = discord.Game(f"in {minutes} minutes")
+        else:
+            game = discord.Game(f"in {hours} hours and {minutes} minutes")
+
+        # Status will look like "Playing in 5 hours and 30 minutes"
+        await bot.change_presence(activity=game)
+
+        # Sleep 2 minutes
+        await asyncio.sleep(2 * 60)
+
+
+async def day_countdown(bot: commands.Bot):
+    """
+    Calculate the number of seconds left until the next day of advent. Once
+    we have calculated this we should then sleep that number and when the time
+    is reached ping the advent of code role notifying them that the new task is
+    ready.
+    """
+
+    # If we are not in the advent of code anymore
+    if not is_in_advent():
+        return
+
+    while True:
+        tomorrow, time_left = time_left_to_aoc_midnight()
+
+        await asyncio.sleep(time_left.seconds)
+
+        channel = bot.get_channel(AocConfig.channel_id)
+        print(channel)
+
+        if not channel:
+            log.error("Could not find the AoC channel to send notification in")
+            break
+
+
+        await channel.send(f"<@&{AocConfig.role_id}> Good morning! Day {tomorrow.day} is ready to be attempted. "
+                           f"View it online now at https://adventofcode.com/{AocConfig.year}/day/{tomorrow.day}"
+                           f" (this link could take a few minutes to start working). Good luck!")
+
+        # Wait a couple minutes so that if our sleep didn't sleep enough
+        # time we don't end up announcing twice.
+        await asyncio.sleep(120)
 
 
 class AdventOfCode:
@@ -33,6 +124,15 @@ class AdventOfCode:
         self.cached_global_leaderboard = None
         self.cached_private_leaderboard = None
 
+        self.countdown_task = None
+        self.status_task = None
+
+        countdown_coro = day_countdown(self.bot)
+        self.countdown_task = asyncio.ensure_future(self.bot.loop.create_task(countdown_coro))
+
+        status_coro = countdown_status(self.bot)
+        self.status_task = asyncio.ensure_future(self.bot.loop.create_task(status_coro))
+
     @commands.group(name="adventofcode", aliases=("aoc",), invoke_without_command=True)
     async def adventofcode_group(self, ctx: commands.Context):
         """
@@ -40,6 +140,35 @@ class AdventOfCode:
         """
 
         await ctx.invoke(self.bot.get_command("help"), "adventofcode")
+        
+    @adventofcode_group.command(name="notifications", aliases=("notify", "notifs"), brief="Notifications for new days")
+    async def aoc_notifications(self, ctx: commands.Context):
+        """
+        Assign the role for notifications about new days being ready.
+
+        Call the same command again to end notifications and remove the role.
+        """
+        role = ctx.guild.get_role(AocConfig.role_id)
+        
+        if role in ctx.author.roles:
+            await ctx.author.remove_roles(role)
+            await ctx.send("Okay! You have been unsubscribed from notifications. If in future you want to"
+                           " resubscribe just run this command again.")
+        else:
+            await ctx.author.add_roles(role)
+            await ctx.send("Okay! You have been subscribed to notifications about new Advent of Code tasks."
+                           " To unsubscribe in future run the same command again.")
+            
+    @adventofcode_group.command(name="countdown", aliases=("count", "c"), brief="Return time left until next day")
+    async def aoc_countdown(self, ctx: commands.Context):
+        """
+        Return time left until next day
+        """
+        tomorrow, time_left = time_left_to_aoc_midnight()
+        
+        hours, minutes = time_left.seconds // 3600, time_left.seconds // 60 % 60
+        
+        await ctx.send(f"There are {hours} hours and {minutes} minutes left until day {tomorrow.day}.")
 
     @adventofcode_group.command(name="about", aliases=("ab", "info"), brief="Learn about Advent of Code")
     async def about_aoc(self, ctx: commands.Context):

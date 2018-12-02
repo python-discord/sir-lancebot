@@ -9,6 +9,7 @@ arrow = "*"
 beautifulsoup4 = "*"
 aiodns = "*"
 pillow = "*"
+pytz = "*"
 
 [dev-packages]
 "flake8" = "*"
