@@ -212,7 +212,7 @@ class AdventOfCode:
                 description=f"Total members: {len(self.cached_private_leaderboard.members)}",
                 colour=Colours.soft_green,
                 timestamp=self.cached_private_leaderboard.last_updated
-                )
+            )
             aoc_embed.set_author(name="Advent of Code", url=self.private_leaderboard_url)
             aoc_embed.set_footer(text="Last Updated")
 
