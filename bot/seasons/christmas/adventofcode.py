@@ -22,6 +22,7 @@ AOC_SESSION_COOKIE = {"session": Tokens.aoc_session_cookie}
 
 EST = timezone("EST")
 
+
 def is_in_advent() -> bool:
     """
     Utility function to check if we are between December 1st
@@ -138,7 +139,7 @@ class AdventOfCode:
         """
 
         await ctx.invoke(self.bot.get_command("help"), "adventofcode")
-        
+
     @adventofcode_group.command(name="notifications", aliases=("notify", "notifs"), brief="Notifications for new days")
     async def aoc_notifications(self, ctx: commands.Context):
         """
@@ -147,7 +148,7 @@ class AdventOfCode:
         Call the same command again to end notifications and remove the role.
         """
         role = ctx.guild.get_role(AocConfig.role_id)
-        
+
         if role in ctx.author.roles:
             await ctx.author.remove_roles(role)
             await ctx.send("Okay! You have been unsubscribed from notifications. If in future you want to"
@@ -156,16 +157,16 @@ class AdventOfCode:
             await ctx.author.add_roles(role)
             await ctx.send("Okay! You have been subscribed to notifications about new Advent of Code tasks."
                            " To unsubscribe in future run the same command again.")
-            
+
     @adventofcode_group.command(name="countdown", aliases=("count", "c"), brief="Return time left until next day")
     async def aoc_countdown(self, ctx: commands.Context):
         """
         Return time left until next day
         """
         tomorrow, time_left = time_left_to_aoc_midnight()
-        
+
         hours, minutes = time_left.seconds // 3600, time_left.seconds // 60 % 60
-        
+
         await ctx.send(f"There are {hours} hours and {minutes} minutes left until day {tomorrow.day}.")
 
     @adventofcode_group.command(name="about", aliases=("ab", "info"), brief="Learn about Advent of Code")
