@@ -79,12 +79,7 @@ async def day_countdown(bot: commands.Bot):
     is reached ping the advent of code role notifying them that the new task is
     ready.
     """
-
-    # If we are not in the advent of code anymore
-    if not is_in_advent():
-        return
-
-    while True:
+    while is_in_advent():
         tomorrow, time_left = time_left_to_aoc_midnight()
 
         await asyncio.sleep(time_left.seconds)
