@@ -8,9 +8,9 @@ from typing import List
 
 import aiohttp
 import discord
-from pytz import timezone
 from bs4 import BeautifulSoup
 from discord.ext import commands
+from pytz import timezone
 
 from bot.constants import AdventOfCode as AocConfig
 from bot.constants import Colours, Emojis, Tokens
