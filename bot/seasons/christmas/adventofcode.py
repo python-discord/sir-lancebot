@@ -69,7 +69,7 @@ async def countdown_status(bot: commands.Bot):
         await bot.change_presence(activity=game)
 
         # Sleep 2 minutes
-        await asyncio.sleep(2 * 60)
+        await asyncio.sleep(120)
 
 
 async def day_countdown(bot: commands.Bot):
