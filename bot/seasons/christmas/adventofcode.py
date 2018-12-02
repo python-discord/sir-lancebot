@@ -55,12 +55,7 @@ async def countdown_status(bot: commands.Bot):
     the number of minutes & hours left until the next day
     release.
     """
-
-    # If we are not in the advent of code anymore
-    if not is_in_advent():
-        return
-
-    while True:
+    while is_in_advent():
         _, time_left = time_left_to_aoc_midnight()
 
         hours, minutes = time_left.seconds // 3600, time_left.seconds // 60 % 60
