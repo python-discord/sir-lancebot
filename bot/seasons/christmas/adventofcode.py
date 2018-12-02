@@ -94,12 +94,10 @@ async def day_countdown(bot: commands.Bot):
         await asyncio.sleep(time_left.seconds)
 
         channel = bot.get_channel(AocConfig.channel_id)
-        print(channel)
 
         if not channel:
             log.error("Could not find the AoC channel to send notification in")
             break
-
 
         await channel.send(f"<@&{AocConfig.role_id}> Good morning! Day {tomorrow.day} is ready to be attempted. "
                            f"View it online now at https://adventofcode.com/{AocConfig.year}/day/{tomorrow.day}"
