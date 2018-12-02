@@ -208,7 +208,11 @@ class AdventOfCode:
             table = AocPrivateLeaderboard.build_leaderboard_embed(members_to_print)
 
             # Build embed
-            aoc_embed = discord.Embed(colour=Colours.soft_green, timestamp=self.cached_private_leaderboard.last_updated)
+            aoc_embed = discord.Embed(
+                description=f"Total members: {len(self.cached_private_leaderboard.members)}",
+                colour=Colours.soft_green,
+                timestamp=self.cached_private_leaderboard.last_updated
+            )
             aoc_embed.set_author(name="Advent of Code", url=self.private_leaderboard_url)
             aoc_embed.set_footer(text="Last Updated")
 
