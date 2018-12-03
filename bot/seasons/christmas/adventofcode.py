@@ -130,9 +130,11 @@ class AdventOfCode:
 
         await ctx.invoke(self.bot.get_command("help"), "adventofcode")
 
-    @adventofcode_group.command(name="subscribe",
-                                aliases=("sub", "notifications", "notify", "notifs"),
-                                brief="Notifications for new days")
+    @adventofcode_group.command(
+        name="subscribe",
+        aliases=("sub", "notifications", "notify", "notifs"),
+        brief="Notifications for new days"
+    )
     async def aoc_subscribe(self, ctx: commands.Context):
         """
         Assign the role for notifications about new days being ready.
