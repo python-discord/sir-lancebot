@@ -1,10 +1,11 @@
 import asyncio
 import json
 import logging
+import math
 import re
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 
 import aiohttp
 import discord
@@ -12,8 +13,7 @@ from bs4 import BeautifulSoup
 from discord.ext import commands
 from pytz import timezone
 
-from bot.constants import AdventOfCode as AocConfig
-from bot.constants import Colours, Emojis, Tokens
+from bot.constants import AdventOfCode as AocConfig, Colours, Emojis, Tokens
 
 log = logging.getLogger(__name__)
 
@@ -21,6 +21,7 @@ AOC_REQUEST_HEADER = {"user-agent": "PythonDiscord AoC Event Bot"}
 AOC_SESSION_COOKIE = {"session": Tokens.aoc_session_cookie}
 
 EST = timezone("EST")
+COUNTDOWN_STEP = 60 * 5
 
 
 def is_in_advent() -> bool:
@@ -31,7 +32,7 @@ def is_in_advent() -> bool:
     return datetime.now(EST).day in range(1, 26) and datetime.now(EST).month == 12
 
 
-def time_left_to_aoc_midnight() -> timedelta:
+def time_left_to_aoc_midnight() -> Tuple[datetime, timedelta]:
     """
     This calculates the amount of time left until midnight in
     UTC-5 (Advent of Code maintainer timezone).
@@ -51,25 +52,32 @@ def time_left_to_aoc_midnight() -> timedelta:
 
 async def countdown_status(bot: commands.Bot):
     """
-    Every 2 minutes set the playing status of the bot to
-    the number of minutes & hours left until the next day
-    release.
+    Every `COUNTDOWN_STEP` seconds set the playing status of the bot to
+    the number of minutes & hours left until the next day's release.
     """
     while is_in_advent():
         _, time_left = time_left_to_aoc_midnight()
 
-        hours, minutes = time_left.seconds // 3600, time_left.seconds // 60 % 60
+        aligned_seconds = int(math.ceil(time_left.seconds / COUNTDOWN_STEP)) * COUNTDOWN_STEP
+        hours, minutes = aligned_seconds // 3600, aligned_seconds // 60 % 60
 
-        if hours == 0:
-            game = discord.Game(f"in {minutes} minutes")
+        if aligned_seconds == 0:
+            playing = f"right now!"
+        elif aligned_seconds == COUNTDOWN_STEP:
+            playing = f"in less than {minutes} minutes"
+        elif hours == 0:
+            playing = f"in {minutes} minutes"
+        elif hours == 23:
+            playing = f"since {60 - minutes} minutes ago"
         else:
-            game = discord.Game(f"in {hours} hours and {minutes} minutes")
+            playing = f"in {hours} hours and {minutes} minutes"
 
         # Status will look like "Playing in 5 hours and 30 minutes"
-        await bot.change_presence(activity=game)
+        await bot.change_presence(activity=discord.Game(playing))
 
-        # Sleep 2 minutes
-        await asyncio.sleep(120)
+        # Sleep until next aligned time or a full step if already aligned
+        delay = time_left.seconds % COUNTDOWN_STEP or COUNTDOWN_STEP
+        await asyncio.sleep(delay)
 
 
 async def day_countdown(bot: commands.Bot):
