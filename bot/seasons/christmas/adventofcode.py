@@ -130,23 +130,35 @@ class AdventOfCode:
 
         await ctx.invoke(self.bot.get_command("help"), "adventofcode")
 
-    @adventofcode_group.command(name="notifications", aliases=("notify", "notifs"), brief="Notifications for new days")
-    async def aoc_notifications(self, ctx: commands.Context):
+    @adventofcode_group.command(name="subscribe",
+                                aliases=("sub", "notifications", "notify", "notifs"),
+                                brief="Notifications for new days")
+    async def aoc_subscribe(self, ctx: commands.Context):
         """
         Assign the role for notifications about new days being ready.
+        """
+        role = ctx.guild.get_role(AocConfig.role_id)
 
-        Call the same command again to end notifications and remove the role.
+        if role not in ctx.author.roles:
+            await ctx.author.add_roles(role)
+            await ctx.send("Okay! You have been __subscribed__ to notifications about new Advent of Code tasks. "
+                           f"You can run `{ctx.prefix}unsubscribe` to disable them again for you.")
+        else:
+            await ctx.send("Hey, you already are receiving notifications about new Advent of Code tasks. "
+                           f"If you don't want them any more, run `{ctx.prefix}unsubscribe` instead.")
+
+    @adventofcode_group.command(name="unsubscribe", aliases=("unsub"), brief="Notifications for new days")
+    async def aoc_unsubscribe(self, ctx: commands.Context):
+        """
+        Remove the role for notifications about new days being ready.
         """
         role = ctx.guild.get_role(AocConfig.role_id)
 
         if role in ctx.author.roles:
             await ctx.author.remove_roles(role)
-            await ctx.send("Okay! You have been unsubscribed from notifications. If in future you want to"
-                           " resubscribe just run this command again.")
+            await ctx.send("Okay! You have been __unsubscribed__ from notifications about new Advent of Code tasks.")
         else:
-            await ctx.author.add_roles(role)
-            await ctx.send("Okay! You have been subscribed to notifications about new Advent of Code tasks."
-                           " To unsubscribe in future run the same command again.")
+            await ctx.send("Hey, you don't even get any notifications about new Advent of Code tasks currently anyway.")
 
     @adventofcode_group.command(name="countdown", aliases=("count", "c"), brief="Return time left until next day")
     async def aoc_countdown(self, ctx: commands.Context):
