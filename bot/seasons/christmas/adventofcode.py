@@ -138,16 +138,17 @@ class AdventOfCode:
         Assign the role for notifications about new days being ready.
         """
         role = ctx.guild.get_role(AocConfig.role_id)
+        unsubscribe_command = f"{ctx.prefix}{ctx.command.root_parent} unsubscribe"
 
         if role not in ctx.author.roles:
             await ctx.author.add_roles(role)
             await ctx.send("Okay! You have been __subscribed__ to notifications about new Advent of Code tasks. "
-                           f"You can run `{ctx.prefix}unsubscribe` to disable them again for you.")
+                           f"You can run `{unsubscribe_command}` to disable them again for you.")
         else:
             await ctx.send("Hey, you already are receiving notifications about new Advent of Code tasks. "
-                           f"If you don't want them any more, run `{ctx.prefix}unsubscribe` instead.")
+                           f"If you don't want them any more, run `{unsubscribe_command}` instead.")
 
-    @adventofcode_group.command(name="unsubscribe", aliases=("unsub"), brief="Notifications for new days")
+    @adventofcode_group.command(name="unsubscribe", aliases=("unsub",), brief="Notifications for new days")
     async def aoc_unsubscribe(self, ctx: commands.Context):
         """
         Remove the role for notifications about new days being ready.
