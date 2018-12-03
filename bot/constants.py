@@ -67,7 +67,7 @@ class Colours:
 
 class Emojis:
     star = "\u2B50"
-    christmas_tree = u"\U0001F384"
+    christmas_tree = "\U0001F384"
     check = "\u2611"
 
 
@@ -77,7 +77,7 @@ class Hacktoberfest(NamedTuple):
 
 
 class Roles(NamedTuple):
-    admin = int(environ.get('SEASONALBOT_ADMIN', 267628507062992896))
+    admin = int(environ.get('SEASONALBOT_ADMIN_ROLE_ID', 267628507062992896))
     announcements = 463658397560995840
     champion = 430492892331769857
     contributor = 295488872404484098

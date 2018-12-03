@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 import datetime
 import importlib
 import inspect
@@ -185,10 +186,8 @@ class SeasonBase:
             if bot.user.name != self.bot_name:
                 # attempt to change user details
                 log.debug(f"Changing username to {self.bot_name}")
-                try:
+                with contextlib.suppress(discord.HTTPException):
                     await bot.user.edit(username=self.bot_name)
-                except discord.HTTPException:
-                    pass
 
                 # fallback on nickname if failed due to ratelimit
                 if bot.user.name != self.bot_name:
@@ -216,11 +215,9 @@ class SeasonBase:
         # attempt the change
         log.debug(f"Changing avatar to {self.icon}")
         icon = await self.get_icon()
-        try:
+        with contextlib.suppress(discord.HTTPException, asyncio.TimeoutError):
             async with async_timeout.timeout(5):
                 await bot.user.edit(avatar=icon)
-        except (discord.HTTPException, asyncio.TimeoutError):
-            pass
 
         if bot.user.avatar != old_avatar:
             log.debug(f"Avatar changed to {self.icon}")
@@ -242,11 +239,9 @@ class SeasonBase:
         # attempt the change
         log.debug(f"Changing server icon to {self.icon}")
         icon = await self.get_icon()
-        try:
+        with contextlib.suppress(discord.HTTPException, asyncio.TimeoutError):
             async with async_timeout.timeout(5):
                 await guild.edit(icon=icon, reason=f"Seasonbot Season Change: {self.name}")
-        except (discord.HTTPException, asyncio.TimeoutError):
-            pass
 
         new_icon = bot.get_guild(Client.guild).icon
         if new_icon != old_icon:
