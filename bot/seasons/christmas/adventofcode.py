@@ -108,6 +108,9 @@ async def day_countdown(bot: commands.Bot):
 
 
 class AdventOfCode:
+    """
+    Advent of Code festivities! Ho Ho Ho!
+    """
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
@@ -133,7 +136,7 @@ class AdventOfCode:
     @commands.group(name="adventofcode", aliases=("aoc",), invoke_without_command=True)
     async def adventofcode_group(self, ctx: commands.Context):
         """
-        Advent of Code festivities! Ho Ho Ho!
+        All of the Advent of Code commands
         """
 
         await ctx.invoke(self.bot.get_command("help"), "adventofcode")
