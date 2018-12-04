@@ -37,7 +37,8 @@ def get_season_class(season_name: str) -> Type["SeasonBase"]:
     """
 
     season_lib = importlib.import_module(f"bot.seasons.{season_name}")
-    return getattr(season_lib, season_name.capitalize())
+    class_name = season_name.replace("_", " ").title().replace(" ", "")
+    return getattr(season_lib, class_name)
 
 
 def get_season(season_name: str = None, date: datetime.datetime = None) -> "SeasonBase":
@@ -135,6 +136,10 @@ class SeasonBase:
         return cls.start() <= date <= cls.end()
 
     @property
+    def name_clean(self) -> str:
+        return self.name.replace("_", " ").title()
+
+    @property
     def greeting(self) -> str:
         """
         Provides a default greeting based on the season name if one wasn't
@@ -144,8 +149,7 @@ class SeasonBase:
         normal attribute in the inhertiting class.
         """
 
-        season_name = " ".join(self.name.split("_")).title()
-        return f"New Season, {season_name}!"
+        return f"New Season, {self.name_clean}!"
 
     async def get_icon(self) -> bytes:
         """
@@ -326,7 +330,7 @@ class SeasonBase:
         # Apply seasonal elements after extensions successfully load
         username_changed = await self.apply_username(debug=Client.debug)
 
-        # Avoid heavy API ratelimited elements when debugging
+        # Avoid major changes and annoucements if debug mode
         if not Client.debug:
             log.info("Applying avatar.")
             await self.apply_avatar()
@@ -337,6 +341,8 @@ class SeasonBase:
                 await self.announce_season()
             else:
                 log.info(f"Skipping season announcement due to username not being changed.")
+
+        await bot.send_log("SeasonalBot Loaded!", f"Active Season: **{self.name_clean}**")
 
 
 class SeasonManager:
@@ -371,7 +377,7 @@ class SeasonManager:
 
             # If the season has changed, load it.
             new_season = get_season(date=datetime.datetime.utcnow())
-            if new_season != self.season:
+            if new_season.name != self.season.name:
                 await self.season.load()
 
     @with_role(Roles.moderator, Roles.admin, Roles.owner)
@@ -393,8 +399,8 @@ class SeasonManager:
         """
 
         # sort by start order, followed by lower duration
-        def season_key(season: SeasonBase):
-            return season.start(), season.end() - datetime.datetime.max
+        def season_key(season_class: Type[SeasonBase]):
+            return season_class.start(), season_class.end() - datetime.datetime.max
 
         current_season = self.season.name
 
