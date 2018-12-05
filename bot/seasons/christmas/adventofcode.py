@@ -249,16 +249,47 @@ class AdventOfCode:
 
     @adventofcode_group.command(
         name="stats",
-        aliases=('lbs', "privatestats"),
-        brief=("Get summary statistics for the PyDis private leaderboard")
+        aliases=("dailystats", "ds"),
+        brief=("Get daily statistics for the PyDis private leaderboard")
     )
-    async def private_leaderboard_stats(self, ctx: commands.Context):
+    async def private_leaderboard_daily_stats(self, ctx: commands.Context):
         """
-        Return an embed with the summary statistics for the PyDis private leaderboard
+        Respond with a table of the daily completion statistics for the PyDis private leaderboard
 
-        Embed will display the total members, and the number of users who have completed each day's puzzle
+        Embed will display the total members and the number of users who have completed each day's puzzle
         """
-        raise NotImplementedError
+
+        async with ctx.typing():
+            await self._check_leaderboard_cache(ctx)
+
+            if not self.cached_private_leaderboard:
+                # Feedback on issues with leaderboard caching are sent by _check_leaderboard_cache()
+                # Short circuit here if there's an issue
+                return
+
+            # Build ASCII table
+            total_members = len(self.cached_private_leaderboard.members)
+            _star = Emojis.star
+            header = f"{'Day':4}{_star:^8}{_star*2:^4}{'% ' + _star:^8}{'% ' + _star*2:^4}\n{'='*35}"
+            table = ""
+            for day, completions in enumerate(self.cached_private_leaderboard.daily_completion_summary):
+                per_one_star = f"{(completions[0]/total_members)*100:.2f}"
+                per_two_star = f"{(completions[1]/total_members)*100:.2f}"
+
+                table += f"{day+1:3}){completions[0]:^8}{completions[1]:^6}{per_one_star:^10}{per_two_star:^6}\n"
+
+            table = f"```\n{header}\n{table}```"
+
+            # Build embed
+            daily_stats_embed = discord.Embed(
+                colour=Colours.soft_green, timestamp=self.cached_private_leaderboard.last_updated
+            )
+            daily_stats_embed.set_author(name="Advent of Code", url=self._base_url)
+            daily_stats_embed.set_footer(text="Last Updated")
+
+            await ctx.send(
+                content=f"Here's the current daily statistics!\n\n{table}", embed=daily_stats_embed
+            )
 
     @adventofcode_group.command(
         name="global",
