@@ -207,7 +207,7 @@ class AdventOfCode:
 
     @adventofcode_group.command(
         name="leaderboard",
-        aliases=("board", "stats", "lb"),
+        aliases=("board", "lb"),
         brief="Get a snapshot of the PyDis private AoC leaderboard",
     )
     async def aoc_leaderboard(self, ctx: commands.Context, number_of_people_to_display: int = 10):
@@ -248,8 +248,21 @@ class AdventOfCode:
         )
 
     @adventofcode_group.command(
+        name="stats",
+        aliases=('lbs', "privatestats"),
+        brief=("Get summary statistics for the PyDis private leaderboard")
+    )
+    async def private_leaderboard_stats(self, ctx: commands.Context):
+        """
+        Return an embed with the summary statistics for the PyDis private leaderboard
+
+        Embed will display the total members, and the number of users who have completed each day's puzzle
+        """
+        raise NotImplementedError
+
+    @adventofcode_group.command(
         name="global",
-        aliases=("globalstats", "globalboard", "gb"),
+        aliases=("globalboard", "gb"),
         brief="Get a snapshot of the global AoC leaderboard",
     )
     async def global_leaderboard(self, ctx: commands.Context, number_of_people_to_display: int = 10):
@@ -461,6 +474,8 @@ class AocPrivateLeaderboard:
         self._event_year = event_year
         self.last_updated = datetime.utcnow()
 
+        self.daily_completion_summary = self.calculate_daily_completion()
+
     def top_n(self, n: int = 10) -> dict:
         """
         Return the top n participants on the leaderboard.
@@ -469,6 +484,29 @@ class AocPrivateLeaderboard:
         """
 
         return self.members[:n]
+
+    def calculate_daily_completion(self) -> List[tuple]:
+        """
+        Calculate member completion rates by day
+
+        Return a list of tuples for each day containing the number of users who completed each part
+        of the challenge
+        """
+
+        daily_member_completions = []
+        for day in range(25):
+            one_star_count = 0
+            two_star_count = 0
+            for member in self.members:
+                if member.starboard[day][1]:
+                    one_star_count += 1
+                    two_star_count += 1
+                elif member.starboard[day][0]:
+                    one_star_count += 1
+            else:
+                daily_member_completions.append((one_star_count, two_star_count))
+
+        return(daily_member_completions)
 
     @staticmethod
     async def json_from_url(
