@@ -656,7 +656,7 @@ class AocGlobalLeaderboard:
         soup = BeautifulSoup(raw_html, "html.parser")
         ele = soup.find_all("div", class_="leaderboard-entry")
 
-        exp = r"(?:[ ]{,2}(\d+)\))?[ ]+(\d+)\s+([\w\(\)#\-\d ]+)"
+        exp = r"(?:[ ]{,2}(\d+)\))?[ ]+(\d+)\s+([\w\(\)\#\@\-\d ]+)"
 
         lb_list = []
         for entry in ele:
