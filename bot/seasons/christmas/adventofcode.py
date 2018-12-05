@@ -250,7 +250,7 @@ class AdventOfCode:
     @adventofcode_group.command(
         name="stats",
         aliases=("dailystats", "ds"),
-        brief=("Get daily statistics for the PyDis private leaderboard")
+        brief="Get daily statistics for the PyDis private leaderboard"
     )
     async def private_leaderboard_daily_stats(self, ctx: commands.Context):
         """
