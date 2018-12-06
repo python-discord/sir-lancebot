@@ -207,7 +207,7 @@ class AdventOfCode:
 
     @adventofcode_group.command(
         name="leaderboard",
-        aliases=("board", "stats", "lb"),
+        aliases=("board", "lb"),
         brief="Get a snapshot of the PyDis private AoC leaderboard",
     )
     async def aoc_leaderboard(self, ctx: commands.Context, number_of_people_to_display: int = 10):
@@ -248,8 +248,52 @@ class AdventOfCode:
         )
 
     @adventofcode_group.command(
+        name="stats",
+        aliases=("dailystats", "ds"),
+        brief="Get daily statistics for the PyDis private leaderboard"
+    )
+    async def private_leaderboard_daily_stats(self, ctx: commands.Context):
+        """
+        Respond with a table of the daily completion statistics for the PyDis private leaderboard
+
+        Embed will display the total members and the number of users who have completed each day's puzzle
+        """
+
+        async with ctx.typing():
+            await self._check_leaderboard_cache(ctx)
+
+            if not self.cached_private_leaderboard:
+                # Feedback on issues with leaderboard caching are sent by _check_leaderboard_cache()
+                # Short circuit here if there's an issue
+                return
+
+            # Build ASCII table
+            total_members = len(self.cached_private_leaderboard.members)
+            _star = Emojis.star
+            header = f"{'Day':4}{_star:^8}{_star*2:^4}{'% ' + _star:^8}{'% ' + _star*2:^4}\n{'='*35}"
+            table = ""
+            for day, completions in enumerate(self.cached_private_leaderboard.daily_completion_summary):
+                per_one_star = f"{(completions[0]/total_members)*100:.2f}"
+                per_two_star = f"{(completions[1]/total_members)*100:.2f}"
+
+                table += f"{day+1:3}){completions[0]:^8}{completions[1]:^6}{per_one_star:^10}{per_two_star:^6}\n"
+
+            table = f"```\n{header}\n{table}```"
+
+            # Build embed
+            daily_stats_embed = discord.Embed(
+                colour=Colours.soft_green, timestamp=self.cached_private_leaderboard.last_updated
+            )
+            daily_stats_embed.set_author(name="Advent of Code", url=self._base_url)
+            daily_stats_embed.set_footer(text="Last Updated")
+
+            await ctx.send(
+                content=f"Here's the current daily statistics!\n\n{table}", embed=daily_stats_embed
+            )
+
+    @adventofcode_group.command(
         name="global",
-        aliases=("globalstats", "globalboard", "gb"),
+        aliases=("globalboard", "gb"),
         brief="Get a snapshot of the global AoC leaderboard",
     )
     async def global_leaderboard(self, ctx: commands.Context, number_of_people_to_display: int = 10):
@@ -461,6 +505,8 @@ class AocPrivateLeaderboard:
         self._event_year = event_year
         self.last_updated = datetime.utcnow()
 
+        self.daily_completion_summary = self.calculate_daily_completion()
+
     def top_n(self, n: int = 10) -> dict:
         """
         Return the top n participants on the leaderboard.
@@ -469,6 +515,29 @@ class AocPrivateLeaderboard:
         """
 
         return self.members[:n]
+
+    def calculate_daily_completion(self) -> List[tuple]:
+        """
+        Calculate member completion rates by day
+
+        Return a list of tuples for each day containing the number of users who completed each part
+        of the challenge
+        """
+
+        daily_member_completions = []
+        for day in range(25):
+            one_star_count = 0
+            two_star_count = 0
+            for member in self.members:
+                if member.starboard[day][1]:
+                    one_star_count += 1
+                    two_star_count += 1
+                elif member.starboard[day][0]:
+                    one_star_count += 1
+            else:
+                daily_member_completions.append((one_star_count, two_star_count))
+
+        return(daily_member_completions)
 
     @staticmethod
     async def json_from_url(
@@ -587,7 +656,7 @@ class AocGlobalLeaderboard:
         soup = BeautifulSoup(raw_html, "html.parser")
         ele = soup.find_all("div", class_="leaderboard-entry")
 
-        exp = r"(?:[ ]{,2}(\d+)\))?[ ]+(\d+)\s+([\w\(\)#\-\d ]+)"
+        exp = r"(?:[ ]{,2}(\d+)\))?[ ]+(\d+)\s+([\w\(\)\#\@\-\d ]+)"
 
         lb_list = []
         for entry in ele:
