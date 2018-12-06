@@ -29,7 +29,7 @@ class Channels(NamedTuple):
     bot = 267659945086812160
     checkpoint_test = 422077681434099723
     devalerts = 460181980097675264
-    devlog = 409308876241108992
+    devlog = int(environ.get('CHANNEL_DEVLOG', 409308876241108992))
     devtest = 414574275865870337
     help_0 = 303906576991780866
     help_1 = 303906556754395136
