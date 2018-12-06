@@ -330,7 +330,7 @@ class SeasonBase:
         # Apply seasonal elements after extensions successfully load
         username_changed = await self.apply_username(debug=Client.debug)
 
-        # Avoid major changes and annoucements if debug mode
+        # Avoid major changes and announcements if debug mode
         if not Client.debug:
             log.info("Applying avatar.")
             await self.apply_avatar()
