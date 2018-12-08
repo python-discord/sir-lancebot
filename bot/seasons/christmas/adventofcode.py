@@ -121,6 +121,9 @@ class AdventOfCode:
         self.about_aoc_filepath = Path("./bot/resources/advent_of_code/about.json")
         self.cached_about_aoc = self._build_about_embed()
 
+        self.aoc_stats_filepath = Path("./bot/resources/advent_of_code/names.json")
+        self.names_dict = self._get_names_json()
+
         self.cached_global_leaderboard = None
         self.cached_private_leaderboard = None
 
@@ -205,6 +208,46 @@ class AdventOfCode:
         )
         await ctx.send(info_str)
 
+
+    @adventofcode_group.command(name="register", brief="Link your AoC user to your Discord Account to view your stats!")
+    async def aoc_register(self, ctx, name=None):
+        if not name:
+            return await ctx.send("Please enter your Advent of Code name to link your AoC account to your Discord Account")
+        if self.cached_private_leaderboard.check_name(name):
+            self._add_json(ctx.author.id, name)
+            return await ctx.send("Your AoC account has been linked to your Discord Account.")
+        else:
+            return await ctx.send("That username does not exist or is not in PyDis' private AoC Leaderboard.")
+
+    @adventofcode_group.command(
+        name="stats",
+        brief="Get yours or another member's stats"
+    )
+    async def aoc_stats(self, ctx: commands.Context, user: discord.Member=None):
+        if not user:
+            user = ctx.author
+        if user == ctx.author: 
+            _pronoun = "your"
+            _command = "Use"
+        else: 
+            _pronoun = "their"
+            _command = "Tell them to use"
+        async with ctx.typing():
+            name = self.names_dict.get(user.id)
+            if not name:
+                return await ctx.send(f"{_pronoun.title()} name has not been registered. {_command} `.aoc register` to link {_pronoun} name to {_pronoun} Discord Account.")
+            await self._check_leaderboard_cache(ctx)
+
+            if not self.cached_private_leaderboard: return
+            
+            member = self.cached_private_leaderboard.get_member(name)
+            if not member:
+                return await ctx.send("{_pronoun} user can no longer be found in the Private Leaderboard.")
+            position = self.cached_private_leaderboard.get_position(member)
+            embed = member.build_stats_embed(position)
+
+            await ctx.send(embed=embed)            
+                    
     @adventofcode_group.command(
         name="leaderboard",
         aliases=("board", "lb"),
@@ -248,7 +291,7 @@ class AdventOfCode:
         )
 
     @adventofcode_group.command(
-        name="stats",
+        name="daily",
         aliases=("dailystats", "ds"),
         brief="Get daily statistics for the PyDis private leaderboard"
     )
@@ -387,6 +430,11 @@ class AdventOfCode:
 
         return number_of_people_to_display
 
+    def _get_names_json(self):
+        with self.aoc_stats_filepath.open("r") as f:
+            names = json.load(f)
+        return names
+
     def _build_about_embed(self) -> discord.Embed:
         """
         Build and return the informational "About AoC" embed from the resources file
@@ -413,9 +461,13 @@ class AdventOfCode:
         else:
             self.cached_private_leaderboard = await AocPrivateLeaderboard.from_url()
 
+    def _add_json(self, user, name):
+        self.names_dict[user] = name
+        with self.aoc_stats_filepath.open("w") as f:
+            json.dump(self.names_dict, f)
 
 class AocMember:
-    def __init__(self, name: str, aoc_id: int, stars: int, starboard: list, local_score: int, global_score: int):
+    def __init__(self, name: str, aoc_id: int, stars: int, starboard: list, local_score: int, global_score: int, full_dict: dict):
         self.name = name
         self.aoc_id = aoc_id
         self.stars = stars
@@ -423,9 +475,53 @@ class AocMember:
         self.local_score = local_score
         self.global_score = global_score
         self.completions = self._completions_from_starboard(self.starboard)
+        self.full_dict = full_dict
 
     def __repr__(self):
         return f"<{self.name} ({self.aoc_id}): {self.local_score}>"
+
+    def build_stats_embed(self, pos):
+        embed = discord.Embed(
+            name = self.name,
+            description=f"POSITION: {pos}\nSTARS: {self.stars}\nSCORE: {self.local_score}",
+            colour = Colours.soft_green
+        )
+        days = []
+        for day in self.full_dict["completion_day_level"]:
+            parts = []
+            for part in "12":
+                if part in self.full_dict["completion_day_level"][day]:
+                    unix = int(self.full_dict["completion_day_level"][day][part])
+                    timestamp = self._ts_from_int(unix)
+                else:
+                    timestamp = None
+                parts.append(timestamp)
+            days.append([int(day),parts])
+        days.sort(key=lambda x: x[0])
+        for day in days:
+            name = f"Day {day[0]}"
+            if days[1][1]:
+                value = (
+                    "1st Star was acquired at {days[1][0]} EST"
+                    "\n"
+                    "2nd Star was acquired at {days[1][0]} EST"
+                )
+            else:
+                value = (
+                    "1st Star was acquired at {days[1][0]} EST"
+                    "\n"
+                    "2nd Star has not been acquired yet"
+                )
+            embed.add_field(
+                name=name,
+                value=value,
+                inline=False
+            )
+        return embed
+
+
+            
+
 
     @classmethod
     def member_from_json(cls, injson: dict) -> "AocMember":
@@ -446,7 +542,17 @@ class AocMember:
             starboard=cls._starboard_from_json(injson["completion_day_level"]),
             local_score=injson["local_score"],
             global_score=injson["global_score"],
+            full_dict = injson
         )
+
+    @staticmethod
+    def _ts_from_int(unix: int) -> str:
+        """
+        Generates a String of the timestamp from a given Unix time
+        (Subtracts 18000 due to EST being UTC-5)
+        """
+        date = datetime.fromtimestamp(unix-18000)
+        return date.strftime("%d/%m/%Y %H:%M:%S")
 
     @staticmethod
     def _starboard_from_json(injson: dict) -> list:
@@ -506,6 +612,19 @@ class AocPrivateLeaderboard:
         self.last_updated = datetime.utcnow()
 
         self.daily_completion_summary = self.calculate_daily_completion()
+
+    def get_position(self, member):
+        sorted_list = sorted(self.members, key = lambda x: x.local_score)
+        return sorted_list.index(member) + 1
+
+    def check_name(self, name):
+        return name in [member.name for member in self.members]
+
+    def get_member(self, name):
+        matches = [member for member in self.members if member.name == name][0]
+        if matches:
+            return matches[0]
+        return None
 
     def top_n(self, n: int = 10) -> dict:
         """
