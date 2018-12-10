@@ -223,7 +223,7 @@ class AdventOfCode:
         Staff command to update the AoC join code constant locally to allow for the code to be updated
         on regeneration without having to redeploy the bot
         """
-        
+
         author = ctx.message.author
         log.info(f"{author.name} ({author.id}) has changed the PyDis AoC leaderboard code")
 
