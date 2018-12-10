@@ -13,7 +13,8 @@ from bs4 import BeautifulSoup
 from discord.ext import commands
 from pytz import timezone
 
-from bot.constants import AdventOfCode as AocConfig, Colours, Emojis, Tokens
+from bot.constants import AdventOfCode as AocConfig, Colours, Emojis, Roles, Tokens
+from bot.decorators import with_role
 
 log = logging.getLogger(__name__)
 
@@ -214,6 +215,20 @@ class AdventOfCode:
             await ctx.send(
                 f':x: {author.mention}, please (temporarily) enable DMs to receive the join code'
             )
+
+    @with_role(Roles.admin, Roles.owner)
+    @adventofcode_group.command(name="changecode", hidden=True)
+    async def update_aoc_join_code(self, ctx: commands.Context, new_code: str):
+        """
+        Staff command to update the AoC join code constant locally to allow for the code to be updated
+        on regeneration without having to redeploy the bot
+        """
+        
+        author = ctx.message.author
+        log.info(f"{author.name} ({author.id}) has changed the PyDis AoC leaderboard code")
+
+        global AOC_JOIN_CODE  # Necessary (probably?) evil to update the code without redeploying
+        AOC_JOIN_CODE = new_code
 
     @adventofcode_group.command(
         name="leaderboard",
