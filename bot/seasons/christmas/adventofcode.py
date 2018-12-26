@@ -29,7 +29,8 @@ def is_in_advent() -> bool:
     Utility function to check if we are between December 1st
     and December 25th.
     """
-    return datetime.now(EST).day in range(1, 26) and datetime.now(EST).month == 12
+    # Run the code from the 1st to the 24th
+    return datetime.now(EST).day in range(1, 25) and datetime.now(EST).month == 12
 
 
 def time_left_to_aoc_midnight() -> Tuple[datetime, timedelta]:
@@ -179,6 +180,14 @@ class AdventOfCode:
         """
         Return time left until next day
         """
+        if not is_in_advent():
+            datetime_now = datetime.datetime.now(EST)
+            december_first = datetime.datetime(datetime_now.year + 1, 12, 1, tzinfo=EST)
+            delta = december_first - datetime_now
+            await ctx.send(f"The Advent of Code event is not currently running. "
+                           f"The next event will start in {delta.days} days.")
+            return
+
         tomorrow, time_left = time_left_to_aoc_midnight()
 
         hours, minutes = time_left.seconds // 3600, time_left.seconds // 60 % 60
