@@ -29,7 +29,8 @@ def is_in_advent() -> bool:
     Utility function to check if we are between December 1st
     and December 25th.
     """
-    return datetime.now(EST).day in range(1, 26) and datetime.now(EST).month == 12
+    # Run the code from the 1st to the 24th
+    return datetime.now(EST).day in range(1, 25) and datetime.now(EST).month == 12
 
 
 def time_left_to_aoc_midnight() -> Tuple[datetime, timedelta]:
