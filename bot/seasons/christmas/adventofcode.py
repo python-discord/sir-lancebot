@@ -180,6 +180,10 @@ class AdventOfCode:
         """
         Return time left until next day
         """
+        if not is_in_advent():
+            await ctx.send(f"Advent of Code is no longer running this year! Come back next year for more puzzles!")
+            return
+
         tomorrow, time_left = time_left_to_aoc_midnight()
 
         hours, minutes = time_left.seconds // 3600, time_left.seconds // 60 % 60
