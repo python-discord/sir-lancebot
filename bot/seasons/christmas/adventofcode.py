@@ -181,8 +181,8 @@ class AdventOfCode:
         Return time left until next day
         """
         if not is_in_advent():
-            datetime_now = datetime.datetime.now(EST)
-            december_first = datetime.datetime(datetime_now.year + 1, 12, 1, tzinfo=EST)
+            datetime_now = datetime.now(EST)
+            december_first = datetime(datetime_now.year + 1, 12, 1, tzinfo=EST)
             delta = december_first - datetime_now
             await ctx.send(f"The Advent of Code event is not currently running. "
                            f"The next event will start in {delta.days} days.")
