@@ -20,7 +20,6 @@ log = logging.getLogger(__name__)
 
 AOC_REQUEST_HEADER = {"user-agent": "PythonDiscord AoC Event Bot"}
 AOC_SESSION_COOKIE = {"session": Tokens.aoc_session_cookie}
-AOC_JOIN_CODE = AocConfig.leaderboard_join_code  # Constant so staff can update without redeploying
 
 EST = timezone("EST")
 COUNTDOWN_STEP = 60 * 5
@@ -206,7 +205,7 @@ class AdventOfCode:
 
         info_str = (
             "Head over to https://adventofcode.com/leaderboard/private "
-            f"with code `{AOC_JOIN_CODE}` to join the PyDis private leaderboard!"
+            f"with code `{AocConfig.leaderboard_join_code}` to join the PyDis private leaderboard!"
         )
         try:
             await author.send(info_str)
@@ -215,20 +214,6 @@ class AdventOfCode:
             await ctx.send(
                 f':x: {author.mention}, please (temporarily) enable DMs to receive the join code'
             )
-
-    @with_role(Roles.admin, Roles.owner)
-    @adventofcode_group.command(name="changecode", hidden=True)
-    async def update_aoc_join_code(self, ctx: commands.Context, new_code: str):
-        """
-        Staff command to update the AoC join code constant locally to allow for the code to be updated
-        on regeneration without having to redeploy the bot
-        """
-
-        author = ctx.message.author
-        log.info(f"{author.name} ({author.id}) has changed the PyDis AoC leaderboard code")
-
-        global AOC_JOIN_CODE  # Necessary (probably?) evil to update the code without redeploying
-        AOC_JOIN_CODE = new_code
 
     @adventofcode_group.command(
         name="leaderboard",
