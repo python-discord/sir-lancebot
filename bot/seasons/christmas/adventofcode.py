@@ -184,7 +184,7 @@ class AdventOfCode:
             datetime_now = datetime.datetime.now(EST)
             december_first = datetime.datetime(datetime_now.year + 1, 12, 1, tzinfo=EST)
             delta = december_first - datetime_now
-            await ctx.send(f"Advent of Code event is not currently running. The next event will start in {delta.days} days.")
+            await ctx.send(f"The Advent of Code event is not currently running. The next event will start in {delta.days} days.")
             return
 
         tomorrow, time_left = time_left_to_aoc_midnight()
