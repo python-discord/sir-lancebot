@@ -65,4 +65,3 @@ jobs:
 
     inputs:
       scriptPath: scripts/deploy-azure.sh
-      args: '$(SALTAPI_TARGET) $(SALTAPI_USER) $(SALTAPI_PASS) $(SALTAPI_URL)'
