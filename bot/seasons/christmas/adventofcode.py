@@ -210,9 +210,7 @@ class AdventOfCode:
             await author.send(info_str)
         except discord.errors.Forbidden:
             log.debug(f"{author.name} ({author.id}) has disabled DMs from server members")
-            await ctx.send(
-                f':x: {author.mention}, please (temporarily) enable DMs to receive the join code'
-            )
+            await ctx.send(f":x: {author.mention}, please (temporarily) enable DMs to receive the join code")
 
     @adventofcode_group.command(
         name="leaderboard",
