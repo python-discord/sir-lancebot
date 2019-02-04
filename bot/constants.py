@@ -63,6 +63,7 @@ class Colours:
     soft_green = 0x68c290
     dark_green = 0x1f8b4c
     orange = 0xe67e22
+    pink = 0xcf84e0
 
 
 class Emojis:
