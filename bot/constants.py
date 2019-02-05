@@ -72,6 +72,11 @@ class Emojis:
     check = "\u2611"
 
 
+class Lovefest:
+    channel_id = int(environ.get("LOVEFEST_CHANNEL_ID", 542272993192050698))
+    role_id = int(environ.get("LOVEFEST_ROLE_ID", 542313670223331329))
+
+
 class Hacktoberfest(NamedTuple):
     channel_id = 498804484324196362
     voice_id = 514420006474219521

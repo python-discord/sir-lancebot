@@ -56,7 +56,7 @@ We are going to want to choose a python config as below:
 The first setting we need to change is script path as below (the start script may have changed from bot.py so be sure to click the right one
 ![](https://i.imgur.com/napKLar.png)
 Now we need to add an enviroment variable - what this will do is allow us to set a value without it affact the main repository.
-To do this click the folder icon to the right of the text, then on the new window the plus icon. Now name the var `HACKTOBERBOT_TOKEN` and give the value the token we kept for safe keeping earilier.
+To do this click the folder icon to the right of the text, then on the new window the plus icon. Now name the var `SEASONALBOT_TOKEN` and give the value the token we kept for safe keeping earilier.
 ![](https://i.imgur.com/nZFWNaQ.png)
 Now hit apply on that window and your ready to get going!
 #### 5. Git in PyCharm
