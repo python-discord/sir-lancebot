@@ -74,7 +74,7 @@ class Emojis:
 
 class Lovefest:
     channel_id = int(environ.get("LOVEFEST_CHANNEL_ID", 542272993192050698))
-    role_id = int(environ.get("LOVEFEST_ROLE_ID", 542313670223331329))
+    role_id = int(environ.get("LOVEFEST_ROLE_ID", 542431903886606399))
 
 
 class Hacktoberfest(NamedTuple):
