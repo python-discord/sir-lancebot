@@ -61,7 +61,7 @@ class LoveCalculator:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=['love_calculator', 'love_calc'])
+    @commands.command(aliases=('love_calculator', 'love_calc',))
     async def love(self, ctx, name_one: discord.Member, name_two: discord.Member):
         love_meter = (name_one.id + name_two.id) % 100
         if love_meter >= 95:
