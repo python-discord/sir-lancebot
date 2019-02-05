@@ -184,6 +184,16 @@ Once you finish a push request, you can delete your branch, and pull the changes
 
 Note: You should never commit directly to the original repository's `master` branch. All additions to the `master` branch of the original repository **must** be put through a PR first.
 
+#### Precommit Hook
+
+Projects need to pass linting checks to be able to successfully build and pass as in push requests.  
+Read [CONTRIBUTING.md](https://github.com/python-discord/seasonalbot/blob/master/CONTRIBUTING.md) for more details.
+
+To install the precommit hook, which checks your code before commits are submitted, do the following:
+```bash
+pipenv run precommit
+```
+
 #### In PyCharm
 
 The PyCharm interface has a set of Git actions on the top right section of your workspace:
