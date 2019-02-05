@@ -108,10 +108,10 @@ class LoveCalculator:
     @love.error
     async def love_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            logger.info(f"Wrong usage by {ctx.message.author}: MissingRequiredArgument")
+            logger.info(f"{ctx.message.author}, /love: MissingRequiredArgument")
 
         if isinstance(error, commands.BadArgument):
-            logger.info(f"Username for /love, invoked by {ctx.message.author}, not found: BadArgument")
+            logger.info(f"{ctx.message.author} invoked /love with a non-existent username: BadArgument")
 
 
 def setup(bot):
