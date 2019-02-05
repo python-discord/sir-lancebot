@@ -1,8 +1,9 @@
+import logging
+from random import randint
+
 import discord
 from discord.ext import commands
 
-from random import randint
-import logging
 
 logger = logging.getLogger(__name__)
 
