@@ -1,7 +1,10 @@
+import aiohttp
 import logging
+from typing import List, Dict
 
 from discord.ext import commands
 import markovify
+
 
 log = logging.getLogger(__name__)
 
@@ -19,13 +22,45 @@ class PoemGenerator:
                 full_corpus += f.read()  # Make sure all files end with a blank newline!
 
         self.model = markovify.Text(full_corpus)  # Create a markov model
+        self.rhymes: Dict[str, List[str]] = {}
 
-    def generate_poem(self):
+    async def get_rhyming_words(self, word: str) -> List[str]:
+        word = word.replace("'", "e")  # Sometimes e is replaced with '
+
+        if word in self.rhymes:
+            return self.rhymes[word]
+
+        async with aiohttp.ClientSession() as client:
+            async with client.get("https://api.datamuse.com/words?rel_rhy=" + word) as response:  # Exact rhymes
+                exact = [x["word"] for x in await response.json()]
+                if not exact:
+                    print(word)
+            async with client.get("https://api.datamuse.com/words?rel_nry=" + word) as response:  # Close rhymes
+                close = [x["word"] for x in await response.json() if x.get("score", 0) > 2000]
+
+        words = exact + close
+
+        self.rhymes[word] = words
+        return words
+
+    @staticmethod
+    def last_word(line: str) -> str:
+        return line.strip("?.,!").split()[-1]
+
+    async def generate_poem(self) -> str:
         lines = []
-        for _ in range(14):  # A sonnet has 14 lines, so generate 14
+        for i in range(1, 15):  # A sonnet has 14 lines, so generate 14
             line = None
             while line is None:  # Line can be None if it fails to be under 50, so keep looping
                 line = self.model.make_short_sentence(50)
+                if line is not None and i in (3, 4, 7, 8, 11, 12, 13, 14):
+                    previous = lines[i-3]
+                    last_word = self.last_word(previous)
+                    words = await self.get_rhyming_words(last_word)
+                    current_last_word = self.last_word(line)
+
+                    if current_last_word not in [*words, last_word]:
+                        line = None
             lines.append(line)
 
         return "\n\n".join([  # Section dividers
@@ -37,7 +72,7 @@ class PoemGenerator:
 
     @commands.command()
     async def poem(self, ctx):
-        await ctx.send(self.generate_poem())
+        await ctx.send(await self.generate_poem())
 
 
 def setup(bot):
