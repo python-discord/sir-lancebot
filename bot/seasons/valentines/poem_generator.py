@@ -1,3 +1,5 @@
+import random
+
 import aiohttp
 import logging
 from typing import List, Dict
@@ -21,7 +23,7 @@ class PoemGenerator:
             with open(f"bot/resources/valentines/{file}") as f:
                 full_corpus += f.read()  # Make sure all files end with a blank newline!
 
-        self.model = markovify.Text(full_corpus)  # Create a markov model
+        self.model = markovify.Text(full_corpus, state_size=1)  # Create a markov model
         self.rhymes: Dict[str, List[str]] = {}
 
     async def get_rhyming_words(self, word: str) -> List[str]:
@@ -52,14 +54,14 @@ class PoemGenerator:
         for i in range(1, 15):  # A sonnet has 14 lines, so generate 14
             line = None
             while line is None:  # Line can be None if it fails to be under 50, so keep looping
-                line = self.model.make_short_sentence(50)
+                line = self.model.make_short_sentence(random.randint(50, 120))
                 if line is not None and i in (3, 4, 7, 8, 11, 12, 13, 14):
                     previous = lines[i-3]
                     last_word = self.last_word(previous)
                     words = await self.get_rhyming_words(last_word)
                     current_last_word = self.last_word(line)
 
-                    if current_last_word not in [*words, last_word]:
+                    if words and current_last_word not in [*words, last_word]:
                         line = None
             lines.append(line)
 
@@ -78,3 +80,8 @@ class PoemGenerator:
 def setup(bot):
     bot.add_cog(PoemGenerator())
     log.debug("PoemGenerator cog loaded")
+
+
+if __name__ == "__main__":
+    import asyncio
+    print(asyncio.get_event_loop().run_until_complete(PoemGenerator().generate_poem()))
