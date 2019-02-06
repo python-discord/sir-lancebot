@@ -1,0 +1,67 @@
+# https://aka.ms/yaml
+
+variables:
+  LIBRARY_PATH: /lib:/usr/lib
+  PIPENV_HIDE_EMOJIS: 1
+  PIPENV_IGNORE_VIRTUALENVS: 1
+  PIPENV_NOSPIN: 1
+  PIPENV_VENV_IN_PROJECT: 1
+
+jobs:
+- job: test
+  displayName: 'Lint & Test'
+
+  pool:
+    vmImage: 'Ubuntu 16.04'
+
+  variables:
+    PIPENV_CACHE_DIR: ".cache/pipenv"
+    PIP_CACHE_DIR: ".cache/pip"
+
+  steps:
+  - script: sudo apt-get install build-essential curl docker libffi-dev libfreetype6-dev libxml2 libxml2-dev libxslt1-dev zlib1g zlib1g-dev
+    displayName: 'Install base dependencies'
+
+  - task: UsePythonVersion@0
+    displayName: 'Set Python version'
+    inputs:
+      versionSpec: '3.7.x'
+      addToPath: true
+
+  - script: sudo pip install pipenv
+    displayName: 'Install pipenv'
+
+  - script: pipenv install --dev --deploy --system
+    displayName: 'Install project using pipenv'
+
+  - script: python -m flake8
+    displayName: 'Run linter'
+
+- job: build
+  displayName: 'Build Containers'
+  dependsOn: 'test'
+
+  variables:
+    PIPENV_CACHE_DIR: ".cache/pipenv"
+    PIP_CACHE_DIR: ".cache/pip"
+
+  steps:
+  - task: Docker@1
+    displayName: 'Login: Docker Hub'
+
+    inputs:
+      containerregistrytype: 'Container Registry'
+      dockerRegistryEndpoint: 'DockerHub'
+      command: 'login'
+
+  - script: sudo apt-get install python3-setuptools
+    displayName: 'Install setuptools'
+
+  - script: sudo pip3 install salt-pepper
+    displayName: 'Install pepper'
+
+  - task: ShellScript@2
+    displayName: 'Build and deploy containers'
+
+    inputs:
+      scriptPath: scripts/deploy-azure.sh

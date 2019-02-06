@@ -2,6 +2,12 @@ import logging.handlers
 import os
 from pathlib import Path
 
+import arrow
+
+from bot.constants import Client
+
+# start datetime
+start_time = arrow.utcnow()
 
 # set up logging
 log_dir = Path("bot", "log")
@@ -15,7 +21,8 @@ file_handler.setLevel(logging.DEBUG)
 
 # console handler prints to terminal
 console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.INFO)
+level = logging.DEBUG if Client.debug else logging.INFO
+console_handler.setLevel(level)
 
 # remove old loggers if any
 root = logging.getLogger()

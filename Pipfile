@@ -4,7 +4,12 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-"discord.py" = {ref = "rewrite", git = "https://github.com/Rapptz/discord.py"}
+discord-py = {ref = "rewrite",git = "https://github.com/Rapptz/discord.py"}
+arrow = "*"
+beautifulsoup4 = "*"
+aiodns = "*"
+pillow = "*"
+pytz = "*"
 
 [dev-packages]
 "flake8" = "*"
@@ -13,6 +18,7 @@ name = "pypi"
 "flake8-tidy-imports" = "*"
 "flake8-todo" = "*"
 "flake8-string-format" = "*"
+pre-commit = "*"
 
 [requires]
 python_version = "3.7"
@@ -20,3 +26,4 @@ python_version = "3.7"
 [scripts]
 start = "python -m bot"
 lint = "flake8 bot"
+precommit = "pre-commit install"

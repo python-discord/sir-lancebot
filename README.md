@@ -1,22 +1,16 @@
-# hacktoberbot
-A community project for [Hacktoberfest 2018](https://hacktoberfest.digitalocean.com). A Discord bot primarily designed to help teach Python learners from the PythonDiscord community how to contribute to open source.
+# SeasonalBot 
+
+[![Build Status](https://dev.azure.com/python-discord/Python%20Discord/_apis/build/status/Seasonal%20Bot%20(Mainline))](https://dev.azure.com/python-discord/Python%20Discord/_build/latest?definitionId=3)
+[![Discord](https://discordapp.com/api/guilds/267624335836053506/embed.png)](https://discord.gg/2B963hn)
+
+A community project initially started for [Hacktoberfest 2018](https://hacktoberfest.digitalocean.com). A Discord bot for the Python Discord community which changes with the seasons, and provides useful event features.
 
 You can find our community by going to https://discord.gg/python
 
 ## Motivations
 We know it can be difficult to get into the whole open source thing at first. To help out, we've decided to start a little community project during hacktober that you can all choose to contribute to if you're finding the event a little overwhelming, or if you're new to this whole thing and just want someone to hold your hand at first.
 
-## Commands
-
-!repository - Links to this repository
-
-### Git
-!Git - Links to getting started with Git page
-!Git.commit - An example commit command
-
-### Halloween Facts
-Random halloween facts are posted regularly.  
-!hallofact - Show the last posted Halloween fact
+This later evolved into a bot that will be running all through the year, providing season-appropriate functionality and issues that beginners can work on.
 
 ## Getting started
 
@@ -87,9 +81,9 @@ You should get a menu like below:
 
 ![](https://i.imgur.com/xA5ga4C.png)
 #### 6. Pull Requests (PR or PRs)
-Goto https://github.com/discord-python/hacktoberbot/pulls and the green New Pull Request button!
+Goto https://github.com/python-discord/seasonalbot/pulls and the green New Pull Request button!
 ![](https://i.imgur.com/fB4a2wQ.png)
-Now you should hit `Compare across forks` then on the third dropdown select your fork (it will be `your username/hacktoberbot`) then hit Create Pull request.
+Now you should hit `Compare across forks` then on the third dropdown select your fork (it will be `your username/seasonalbot`) then hit Create Pull request.
 1[](https://i.imgur.com/N2X9A9v.png)
 Now to tell other people what your PR does
 1. Title - be concise and informative
@@ -100,7 +94,8 @@ Now to tell other people what your PR does
 #### 7. Wait & further reading
 At this point your PR will either be accepted or a maintainer might request some changes.
 
-So you can read up some more on [https://try.github.io](Git), [https://www.jetbrains.com/help/pycharm/quick-start-guide.html](PyCharm) or you might want to learn more about Python and discord: [https://discordpy.readthedocs.io/en/rewrite/](discord.py rewrite)
+You can now read up some more on [Git](https://try.github.io), [PyCharm](https://www.jetbrains.com/help/pycharm/quick-start-guide.html),
+or learn more about Python and Discord: [discord.py rewrite](https://discordpy.readthedocs.io/en/rewrite)
 
 
 ### Without PyCharm

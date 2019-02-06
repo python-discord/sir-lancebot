@@ -1,11 +1,11 @@
 version: "3"
 services:
   dumbo:
-    image: pythondiscord/hacktober-bot:latest
-    container_name: hacktoberbot
+    image: pythondiscord/seasonalbot:latest
+    container_name: seasonalbot
 
     restart: always
 
     environment:
-      - HACKTOBERBOT_TOKEN
+      - SEASONALBOT_TOKEN
 

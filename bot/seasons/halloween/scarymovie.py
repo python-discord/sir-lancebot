@@ -1,3 +1,4 @@
+import logging
 import random
 from os import environ
 
@@ -5,12 +6,14 @@ import aiohttp
 from discord import Embed
 from discord.ext import commands
 
+log = logging.getLogger(__name__)
+
 
 TMDB_API_KEY = environ.get('TMDB_API_KEY')
 TMDB_TOKEN = environ.get('TMDB_TOKEN')
 
 
-class Movie:
+class ScaryMovie:
     """
     Selects a random scary movie and embeds info into discord chat
     """
@@ -18,13 +21,14 @@ class Movie:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='movie', alias=['tmdb'])
+    @commands.command(name='scarymovie', alias=['smovie'])
     async def random_movie(self, ctx):
         """
         Randomly select a scary movie and display information about it.
         """
-        selection = await self.select_movie()
-        movie_details = await self.format_metadata(selection)
+        async with ctx.typing():
+            selection = await self.select_movie()
+            movie_details = await self.format_metadata(selection)
 
         await ctx.send(embed=movie_details)
 
@@ -133,4 +137,5 @@ class Movie:
 
 
 def setup(bot):
-    bot.add_cog(Movie(bot))
+    bot.add_cog(ScaryMovie(bot))
+    log.debug("ScaryMovie cog loaded")
