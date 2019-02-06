@@ -80,8 +80,3 @@ class PoemGenerator:
 def setup(bot):
     bot.add_cog(PoemGenerator())
     log.debug("PoemGenerator cog loaded")
-
-
-if __name__ == "__main__":
-    import asyncio
-    print(asyncio.get_event_loop().run_until_complete(PoemGenerator().generate_poem()))
