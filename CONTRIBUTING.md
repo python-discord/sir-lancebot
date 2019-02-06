@@ -34,7 +34,7 @@ All projects evolve over time, and this contribution guide is no different. This
 
 ##  Supplemental Information
 ### Developer Environment
-Seasonalbot utilizes [Pipenv](https://pipenv.readthedocs.io/en/latest/) for installation and dependency management. For users unfamiliar with the Pipenv workflow, a [Pipenv Primer](https://github.com/python-discord/seasonalbot/wiki/Hacktoberbot-and-Pipenv) is provided in Seasonalbot's Wiki.
+Seasonalbot utilizes [Pipenv](https://pipenv.readthedocs.io/en/latest/) for installation and dependency management. For users unfamiliar with the Pipenv workflow, Pipenv's documentation provides a [Basic Usage](https://pipenv.readthedocs.io/en/latest/basics/) tutorial, along with some of the more advanced workflows.
 
 ### Logging levels
 The project currently defines [`logging`](https://docs.python.org/3/library/logging.html) levels as follows:
