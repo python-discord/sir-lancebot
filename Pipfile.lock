@@ -21,12 +21,14 @@
                 "sha256:970688599fcb7d65334ec490a94a51afd634ae2de8a2138d21e2ffbbddc12718",
                 "sha256:d67e14b32176bcf3ff79b5d47c466011ce4adeadfa264f7949da1377332a0449"
             ],
+            "index": "pypi",
             "version": "==1.2.0"
         },
         "arrow": {
             "hashes": [
                 "sha256:9cb4a910256ed536751cd5728673bfb53e6f0026e240466f90c2a92c0b79c895"
             ],
+            "index": "pypi",
             "version": "==0.13.0"
         },
         "beautifulsoup4": {
@@ -35,16 +37,18 @@
                 "sha256:945065979fb8529dd2f37dbb58f00b661bdbcbebf954f93b32fdf5263ef35348",
                 "sha256:ba6d5c59906a85ac23dadfe5c88deaf3e179ef565f4898671253e50a78680718"
             ],
+            "index": "pypi",
             "version": "==4.7.1"
         },
         "discord-py": {
             "git": "https://github.com/Rapptz/discord.py",
-            "ref": "1222bce271cf736b4db8c1eecb2823edd22f85dc"
+            "ref": "700dbb5555f7edd5a1fa8915d606495439b24ee3"
         },
         "markovify": {
             "hashes": [
                 "sha256:f016ef58f60a8afb925aa16803538561c4b00375bf0b7f84952c29993805b9a7"
             ],
+            "index": "pypi",
             "version": "==0.7.1"
         },
         "pillow": {
@@ -80,6 +84,7 @@
                 "sha256:f227d7e574d050ff3996049e086e1f18c7bd2d067ef24131e50a1d3fe5831fbc",
                 "sha256:fc9a12aad714af36cf3ad0275a96a733526571e52710319855628f476dcb144e"
             ],
+            "index": "pypi",
             "version": "==5.4.1"
         },
         "pycares": {
@@ -122,6 +127,7 @@
                 "sha256:32b0891edff07e28efe91284ed9c31e123d84bea3fd98e1f72be2508f43ef8d9",
                 "sha256:d5f05e487007e29e03409f9398d074e158d920d36eb82eaf66fb1136b0c5374c"
             ],
+            "index": "pypi",
             "version": "==2018.9"
         },
         "six": {
@@ -188,6 +194,7 @@
                 "sha256:c3ba1e130c813191db95c431a18cb4d20a468e98af7a77e2181b68574481ad36",
                 "sha256:fd9ddf503110bf3d8b1d270e8c673aab29ccb3dd6abf29bae1f54e5116ab4a91"
             ],
+            "index": "pypi",
             "version": "==3.7.5"
         },
         "flake8-bugbear": {
@@ -195,6 +202,7 @@
                 "sha256:07b6e769d7f4e168d590f7088eae40f6ddd9fa4952bed31602def65842682c83",
                 "sha256:0ccf56975f4db1d69dc1cf3598c99d768ebf95d0cad27d76087954aa399b515a"
             ],
+            "index": "pypi",
             "version": "==18.8.0"
         },
         "flake8-import-order": {
@@ -202,6 +210,7 @@
                 "sha256:9be5ca10d791d458eaa833dd6890ab2db37be80384707b0f76286ddd13c16cbf",
                 "sha256:feca2fd0a17611b33b7fa84449939196c2c82764e262486d5c3e143ed77d387b"
             ],
+            "index": "pypi",
             "version": "==0.18"
         },
         "flake8-string-format": {
@@ -209,6 +218,7 @@
                 "sha256:68ea72a1a5b75e7018cae44d14f32473c798cf73d75cbaed86c6a9a907b770b2",
                 "sha256:774d56103d9242ed968897455ef49b7d6de272000cfa83de5814273a868832f1"
             ],
+            "index": "pypi",
             "version": "==0.2.3"
         },
         "flake8-tidy-imports": {
@@ -216,12 +226,14 @@
                 "sha256:1c476aabc6e8db26dc75278464a3a392dba0ea80562777c5f13fd5cdf2646154",
                 "sha256:b3f5b96affd0f57cacb6621ed28286ce67edaca807757b51227043ebf7b136a1"
             ],
+            "index": "pypi",
             "version": "==2.0.0"
         },
         "flake8-todo": {
             "hashes": [
                 "sha256:6e4c5491ff838c06fe5a771b0e95ee15fc005ca57196011011280fc834a85915"
             ],
+            "index": "pypi",
             "version": "==0.7"
         },
         "identify": {
@@ -256,6 +268,7 @@
                 "sha256:40bc3f3a56402d73c54db2dc855fccfb2e7b1b8136da29c61470c1d999614060",
                 "sha256:dfca349528e1b1272bc35511e4375d8bb01d4b0dec5eb632e0cf2d7e7458fecc"
             ],
+            "index": "pypi",
             "version": "==1.14.3"
         },
         "pycodestyle": {
