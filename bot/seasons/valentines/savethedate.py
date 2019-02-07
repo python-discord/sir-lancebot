@@ -6,15 +6,16 @@ from pathlib import Path
 import discord
 from discord.ext import commands
 
+from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
-emoji = [":heart:", ":couple_with_heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_heart:", ":two_hearts:"]
+HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_heart:", ":two_hearts:"]
 
 
 class SaveTheDate:
     """
-    A cog to change a invokers nickname to a spooky one!
+    A cog that gives random suggestion, for a valentines date !
     """
 
     def __init__(self, bot):
@@ -23,13 +24,13 @@ class SaveTheDate:
     @commands.command()
     async def savethedate(self, ctx):
         with open(Path('bot', 'resources', 'valentines', 'date_ideas.json'), 'r', encoding="utf8") as f:
-            data = load(f)
-            date_idea = random.choice(data['ideas'])
-            emoji_1 = random.choice(emoji)
-            emoji_2 = random.choice(emoji)
-            embed = discord.Embed(title=date_idea['name'],
-                                  description=f"{emoji_1}{date_idea['description']}{emoji_2}",
-                                  colour=0x01d277)
+            valentine_dates = load(f)
+            random_date = random.choice(valentine_dates['ideas'])
+            emoji_1 = random.choice(HEART_EMOJIS)
+            emoji_2 = random.choice(HEART_EMOJIS)
+            embed = discord.Embed(title=f"{emoji_1}{random_date['name']}{emoji_2}",
+                                  description=f"{random_date['description']}",
+                                  colour=Colours.bright_green)
             await ctx.send(embed=embed)
 
 

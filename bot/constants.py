@@ -61,6 +61,7 @@ class Client(NamedTuple):
 class Colours:
     soft_red = 0xcd6d6d
     soft_green = 0x68c290
+    bright_green = 0x01d277
     dark_green = 0x1f8b4c
     orange = 0xe67e22
     pink = 0xcf84e0
