@@ -1,7 +1,7 @@
 import logging
 from json import load
-from pathlib import Path
 import random
+from pathlib import Path
 
 import discord
 from discord.ext import commands
@@ -9,7 +9,8 @@ from discord.ext import commands
 
 log = logging.getLogger(__name__)
 
-emoji = [":heart:", ":couple_with_heart:", ":gift_heart: :revolving_hearts:", ":sparkling_heart:", ":two_hearts:" ]
+emoji = [":heart:", ":couple_with_heart:", ":gift_heart: :revolving_hearts:", ":sparkling_heart:", ":two_hearts:"]
+
 
 class SaveTheDate:
     """
