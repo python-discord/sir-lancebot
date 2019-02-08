@@ -28,9 +28,11 @@ class SaveTheDate:
             random_date = random.choice(valentine_dates['ideas'])
             emoji_1 = random.choice(HEART_EMOJIS)
             emoji_2 = random.choice(HEART_EMOJIS)
-            embed = discord.Embed(title=f"{emoji_1}{random_date['name']}{emoji_2}",
-                                  description=f"{random_date['description']}",
-                                  colour=Colours.bright_green)
+            embed = discord.Embed(
+                title=f"{emoji_1}{random_date['name']}{emoji_2}",
+                description=f"{random_date['description']}",
+                colour=Colours.pink
+            )
             await ctx.send(embed=embed)
 
 
