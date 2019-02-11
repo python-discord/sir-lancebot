@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 
 class LoveCalc:
     """
-    A cog that gives random percentage love values, for 2 input names
+    A cog that gives random percentage love values, for 2 input names,
     """
 
     def __init__(self, bot):
