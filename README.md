@@ -15,6 +15,8 @@ This later evolved into a bot that runs all year, providing season-appropriate f
 
 ## Getting started
 
+Please ensure you read the [contributing guidelines](CONTRIBUTING.md) in full.
+
 If you are new to this you may find it easier to use PyCharm. [What is PyCharm?](#what-is-pycharm)
 
 1. [Fork the Project](#fork-the-project)
@@ -187,7 +189,7 @@ Note: You should never commit directly to the original repository's `master` bra
 #### Precommit Hook
 
 Projects need to pass linting checks to be able to successfully build and pass as in push requests.  
-Read [CONTRIBUTING.md](https://github.com/python-discord/seasonalbot/blob/master/CONTRIBUTING.md) for more details.
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
 
 To install the precommit hook, which checks your code before commits are submitted, do the following:
 ```bash
@@ -208,7 +210,9 @@ In order from left to right these are:
 
 As we work on our project we are going to want to make commits. Commits are effectively a log of changes you made over time.
 
-Before making any commits, you should make the branch for the PR you're about to work on. At the bottom of the PyCharm workspace, you'll see 
+Before making any commits, you should make the branch for the PR you're about to work on. At the bottom of the PyCharm workspace, you'll see the current git branch, which you can click to show a menu of actions. You can click `New Branch` to create a new one, and name it something short that references what the PR is to accomplish. Before making new branches, be sure you change to `master` and ensure it's up to date before creating a new branch.
+
+![](https://i.imgur.com/A9zV4lF.png)
 
 After making changes to the project files, you can commit by clicking the `Commit` button that's part of the git actions available on the top right of your workspace.
 
