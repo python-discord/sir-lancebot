@@ -1,0 +1,15 @@
+{
+  "neg":[
+    {
+      "message": "The relationship might work out but the chance is very small. A successful relationship is possible, but you both have to work on it. Do not sit back and think that it will all work out fine, because it might not be working out the way you wanted it to. Spend as much time with each other as possible. Again, the chance of this relationship working out is very small, so even when you do work hard on it, it still might not work out. "
+    }
+
+  ],
+
+  "pos":[
+    {
+      "message":"The relationship has a reasonable chance of working out, but on the other hand, it might not. Your relationship may suffer good and bad times. If things might not be working out as you would like them to, do not hesitate to talk about it with the person involved. Spend time together, talk with each other."
+    }
+  ]
+
+}
