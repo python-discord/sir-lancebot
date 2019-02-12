@@ -10,6 +10,10 @@ from bot.constants import Roles
 
 log = logging.getLogger(__name__)
 
+with open(Path("bot", "resources", "valentines", "love_matches.json"), "r") as file:
+    LOVE_DATA = json.load(file)
+LOVE_LEVELS = [int(x) for x in LOVE_DATA]
+
 
 class LoveCalculator:
     """
@@ -20,7 +24,7 @@ class LoveCalculator:
 
     @commands.command(aliases=('love_calculator', 'love_calc'))
     @commands.cooldown(rate=1, per=5.0, type=commands.BucketType.user)
-    async def love(self, ctx, name_one: discord.Member, name_two=None):
+    async def love(self, ctx, name_one: discord.Member, name_two: discord.Member = None):
         """
         Calculates the love between two given names
 
@@ -40,15 +44,8 @@ class LoveCalculator:
         """
 
         if name_two is None:
-            staff = ctx.guild.get_role(Roles().helpers).members
+            staff = ctx.guild.get_role(Roles.helpers).members
             name_two = choice(staff)
-        else:
-            name_two = await commands.MemberConverter().convert(ctx, name_two)
-            print(name_two)
-
-        with open(Path("bot", "resources", "valentines", "love_matches.json"), "r") as file:
-            LOVE_DATA = json.load(file)
-        LOVE_LEVELS = [int(x) for x in LOVE_DATA]
 
         love_meter = (name_one.id + name_two.id) % 100
         love_idx = str(sorted(x for x in LOVE_LEVELS if x <= love_meter)[-1])
@@ -56,7 +53,10 @@ class LoveCalculator:
 
         embed = discord.Embed(
             title=love_status,
-            description=f'{name_one.display_name} \u2764 {name_two.display_name} scored {love_meter}%!\n\u200b',
+            description=(
+                f'{name_one.display_name} \u2764 {name_two.display_name}'
+                f' scored {love_meter}%!\n\u200b'
+            ),
             color=discord.Color.dark_magenta()
         )
         embed.add_field(
