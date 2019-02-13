@@ -1,8 +1,7 @@
 import logging
 from random import choice, randint
 
-from PIL import Image
-from PIL import ImageOps
+from PIL import Image, ImageOps
 
 log = logging.getLogger()
 

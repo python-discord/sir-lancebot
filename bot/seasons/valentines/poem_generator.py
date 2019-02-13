@@ -1,12 +1,10 @@
+import logging
 import random
+from typing import Dict, List
 
 import aiohttp
-import logging
-from typing import List, Dict
-
 from discord.ext import commands
 import markovify
-
 
 log = logging.getLogger(__name__)
 
@@ -56,7 +54,7 @@ class PoemGenerator:
             while line is None:  # Line can be None if it fails to be under 50, so keep looping
                 line = self.model.make_short_sentence(random.randint(50, 120))
                 if line is not None and i in (3, 4, 7, 8, 11, 12, 13, 14):
-                    previous = lines[i-3]
+                    previous = lines[i - 3]
                     last_word = self.last_word(previous)
                     words = await self.get_rhyming_words(last_word)
                     current_last_word = self.last_word(line)

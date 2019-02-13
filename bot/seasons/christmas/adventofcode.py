@@ -13,7 +13,8 @@ from bs4 import BeautifulSoup
 from discord.ext import commands
 from pytz import timezone
 
-from bot.constants import AdventOfCode as AocConfig, Colours, Emojis, Tokens
+from bot.constants import AdventOfCode as AocConfig
+from bot.constants import Colours, Emojis, Tokens
 
 log = logging.getLogger(__name__)
 
