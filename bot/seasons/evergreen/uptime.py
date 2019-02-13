@@ -1,9 +1,9 @@
 import logging
 
+import arrow
 from dateutil.relativedelta import relativedelta
 from discord.ext import commands
 
-import arrow
 from bot import start_time
 
 log = logging.getLogger(__name__)
