@@ -16,6 +16,7 @@ log = logging.getLogger(__name__)
 HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_heart:", ":two_hearts:"]
 EMOJI_1 = random.choice(HEART_EMOJIS)
 EMOJI_2 = random.choice(HEART_EMOJIS)
+USER_LOVEFEST = []
 
 
 class BeMyValentine:
@@ -35,10 +36,29 @@ class BeMyValentine:
         user = ctx.author
         role = discord.utils.get(ctx.guild.roles, id=Lovefest.role_id)
         if id not in [role.id for role in ctx.message.author.roles]:
+            USER_LOVEFEST.append(ctx.author)
             await user.add_roles(role)
             await ctx.send("The Lovefest role has been added !")
         else:
             await ctx.send("You already have the role !")
+
+    @commands.command(name='refreshlovefest')
+    async def refresh_user_lovefestlist(self, ctx):
+        """
+        Use this command to refresh the USER_VALENTINE list when the bot goes offline and then comes back online
+        """
+        USER_LOVEFEST.clear()
+        for member in ctx.guild.members:
+            for role in member.roles:
+                if role.id == Lovefest.role_id:
+                    USER_LOVEFEST.append(member)
+        embed = discord.Embed(
+            title="USER_LOVEFEST list updated!",
+            description=f'''The USER_LOVEFEST has been refreshed,`bemyvalentine` and `bemyvalentine dm` commands can now
+                            be used and there are {USER_LOVEFEST.__len__()} members having the lovefest role.''',
+            color=Colours.pink
+        )
+        await ctx.send(embed=embed)
 
     @commands.cooldown(1, 1800, BucketType.user)
     @commands.group(
@@ -59,18 +79,22 @@ class BeMyValentine:
 
         example: .bemyvalentine @Iceman#6508 Hey I love you, wanna hang around ? (sends the custom message to Iceman)
         """
+        if ctx.guild is None:
+            # This command should only be used in the server
+            msg = "You are supposed to use this command in the server."
+            return await ctx.send(msg)
+
         channel = self.bot.get_channel(Lovefest.channel_id)
-        random_user = []
 
         if user == ctx.author:
+            # Well a user cant valentine himself/herself.
             await ctx.send('Come on dude, you cant send a valentine to yourself :expressionless:')
 
         elif user is None:
-            for member in ctx.guild.members:
-                for role in member.roles:
-                    if role.id == Lovefest.role_id:
-                        random_user.append(member)
-                        user = random.choice(random_user)
+            # just making sure that the random does not pick up the same user(ctx.author)
+            USER_LOVEFEST.remove(ctx.author)
+            user = random.choice(USER_LOVEFEST)
+            USER_LOVEFEST.append(ctx.author)
 
             if valentine_type is None:
                 # grabs a random valentine -can be a poem or a good message
@@ -124,17 +148,20 @@ class BeMyValentine:
     example : .bemyvalentine dm Iceman#6508 Hey I love you, wanna hang around ? (sends the custom message to Iceman in
     DM making you anonymous)
         """
-        random_user = []
+        if ctx.guild is not None:
+            # This command is only DM specific
+            msg = "You are not supposed to use this command in the server, DM the command to the bot."
+            return await ctx.send(msg)
 
         if user == ctx.author:
+            # Well a user cant valentine himself/herself.
             await ctx.send('Come on dude, you cant send a valentine to yourself :expressionless:')
 
         elif user is None:
-            for member in ctx.guild.members:
-                for role in member.roles:
-                    if role.id == Lovefest.role_id:
-                        random_user.append(member)
-                        user = random.choice(random_user)
+            # just making sure that the random dosent pick up the same user(ctx.author)
+            USER_LOVEFEST.remove(ctx.author)
+            user = random.choice(USER_LOVEFEST)
+            USER_LOVEFEST.append(ctx.author)
 
             if valentine_type is None:
                 valentine, title = self.random_valentine()
@@ -165,6 +192,7 @@ class BeMyValentine:
                 )
 
             embed.description = f'{valentine} \n **{EMOJI_2}From anonymous{EMOJI_1}**'
+            await ctx.author.send(f"Your message has been sent to {user}")
             await user.send(embed=embed)
 
     @staticmethod
