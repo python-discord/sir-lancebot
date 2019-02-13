@@ -3,8 +3,8 @@ import random
 from typing import Dict, List
 
 import aiohttp
-from discord.ext import commands
 import markovify
+from discord.ext import commands
 
 log = logging.getLogger(__name__)
 
