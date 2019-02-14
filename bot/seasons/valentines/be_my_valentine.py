@@ -8,7 +8,8 @@ import discord
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
 
-from bot.constants import Colours, Lovefest
+from bot.constants import Colours, Lovefest, Roles
+from bot.decorators import with_role
 
 log = logging.getLogger(__name__)
 
@@ -43,6 +44,7 @@ class BeMyValentine:
         else:
             await ctx.send("You already have the role !")
 
+    @with_role(Roles.moderator)
     @commands.command(name='refreshlovefest')
     async def refresh_user_lovefestlist(self, ctx):
         """
