@@ -42,7 +42,6 @@ class MovieGenerator:
         request_url = "https://api.themoviedb.org/3/discover/movie?" + parse.urlencode(params)
         async with aiohttp.ClientSession() as session:
             async with session.get(request_url) as resp:
-                print(await resp.json())
                 # loading the json file returned from the api
                 data = await resp.json()
                 # selecting random result from results object in the json file
