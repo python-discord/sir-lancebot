@@ -36,12 +36,16 @@ class HacktoberStats:
 
             if str(author_id) in self.linked_accounts.keys():
                 github_username = self.linked_accounts[author_id]["github_username"]
-                logging.info(f"Getting stats for {author_id} linked GitHub account '{github_username}'")
+                logging.info(
+                    f"Getting stats for {author_id} linked GitHub account '{github_username}'"
+                )
             else:
                 msg = (
                     f"{author_mention}, you have not linked a GitHub account\n\n"
-                    f"You can link your GitHub account using:\n```{ctx.prefix}stats link github_username```\n"
-                    f"Or query GitHub stats directly using:\n```{ctx.prefix}stats github_username```"
+                    f"You can link your GitHub account using:\n"
+                    f"```{ctx.prefix}stats link github_username```\n"
+                    f"Or query GitHub stats directly using:\n"
+                    f"```{ctx.prefix}stats github_username```"
                 )
                 await ctx.send(msg)
                 return
@@ -65,8 +69,14 @@ class HacktoberStats:
         if github_username:
             if str(author_id) in self.linked_accounts.keys():
                 old_username = self.linked_accounts[author_id]["github_username"]
-                logging.info(f"{author_id} has changed their github link from '{old_username}' to '{github_username}'")
-                await ctx.send(f"{author_mention}, your GitHub username has been updated to: '{github_username}'")
+                logging.info(
+                    f"{author_id} has changed their github link from "
+                    f"'{old_username}' to '{github_username}'"
+                )
+                await ctx.send(
+                    f"{author_mention}, your GitHub username has been updated to: "
+                    f"'{github_username}'"
+                )
             else:
                 logging.info(f"{author_id} has added a github link to '{github_username}'")
                 await ctx.send(f"{author_mention}, your GitHub username has been added")
@@ -78,7 +88,9 @@ class HacktoberStats:
 
             self.save_linked_users()
         else:
-            logging.info(f"{author_id} tried to link a GitHub account but didn't provide a username")
+            logging.info(
+                f"{author_id} tried to link a GitHub account but didn't provide a username"
+            )
             await ctx.send(f"{author_mention}, a GitHub username is required to link your account")
 
     @hacktoberstats_group.command(name="unlink")
@@ -94,7 +106,9 @@ class HacktoberStats:
             logging.info(f"{author_id} has unlinked their GitHub account")
         else:
             await ctx.send(f"{author_mention}, you do not currently have a linked GitHub account")
-            logging.info(f"{author_id} tried to unlink their GitHub account but no account was linked")
+            logging.info(
+                f"{author_id} tried to unlink their GitHub account but no account was linked"
+            )
 
         self.save_linked_users()
 
@@ -115,7 +129,9 @@ class HacktoberStats:
             with open(self.link_json, 'r') as fID:
                 linked_accounts = json.load(fID)
 
-            logging.info(f"Loaded {len(linked_accounts)} linked GitHub accounts from '{self.link_json}'")
+            logging.info(
+                f"Loaded {len(linked_accounts)} linked GitHub accounts from '{self.link_json}'"
+            )
             return linked_accounts
         else:
             logging.info(f"Linked account log: '{self.link_json}' does not exist")
@@ -240,7 +256,9 @@ class HacktoberStats:
         if "message" in jsonresp.keys():
             # One of the parameters is invalid, short circuit for now
             api_message = jsonresp["errors"][0]["message"]
-            logging.error(f"GitHub API request for '{github_username}' failed with message: {api_message}")
+            logging.error(
+                f"GitHub API request for '{github_username}' failed with message: {api_message}"
+            )
             return
         else:
             if jsonresp["total_count"] == 0:
@@ -248,7 +266,10 @@ class HacktoberStats:
                 logging.info(f"No Hacktoberfest PRs found for GitHub user: '{github_username}'")
                 return
             else:
-                logging.info(f"Found {len(jsonresp['items'])} Hacktoberfest PRs for GitHub user: '{github_username}'")
+                logging.info(
+                    f"Found {len(jsonresp['items'])} Hacktoberfest "
+                    f"PRs for GitHub user: '{github_username}'"
+                )
                 outlist = []
                 for item in jsonresp["items"]:
                     shortname = HacktoberStats._get_shortname(item["repository_url"])
@@ -278,7 +299,8 @@ class HacktoberStats:
     @staticmethod
     def _summarize_prs(prs: typing.List[dict]) -> typing.Dict:
         """
-        Generate statistics from an input list of PR dictionaries, as output by get_october_prs
+        Generate statistics from an input list of PR dictionaries,
+        as output by get_october_prs
 
         Return a dictionary containing:
             {
@@ -305,7 +327,9 @@ class HacktoberStats:
         contributionstrs = []
         for repo in stats['top5']:
             n = repo[1]
-            contributionstrs.append(f"{n} {HacktoberStats._contributionator(n)} to [{repo[0]}]({baseURL}{repo[0]})")
+            contributionstrs.append(
+                f"{n} {HacktoberStats._contributionator(n)} to [{repo[0]}]({baseURL}{repo[0]})"
+            )
 
         return "\n".join(contributionstrs)
 

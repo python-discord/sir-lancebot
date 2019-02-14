@@ -42,7 +42,9 @@ class HalloweenFacts:
     def random_fact(self):
         return random.choice(self.facts)
 
-    @commands.command(name="spookyfact", aliases=("halloweenfact",), brief="Get the most recent Halloween fact")
+    @commands.command(
+        name="spookyfact", aliases=("halloweenfact",), brief="Get the most recent Halloween fact"
+    )
     async def get_random_fact(self, ctx):
         """
         Reply with the most recent Halloween fact.

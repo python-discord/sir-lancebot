@@ -27,7 +27,8 @@ class SpookyGif:
             async with aiohttp.ClientSession() as session:
                 params = {'api_key': Tokens.giphy, 'tag': 'halloween', 'rating': 'g'}
                 # Make a GET request to the Giphy API to get a random halloween gif.
-                async with session.get('http://api.giphy.com/v1/gifs/random', params=params) as resp:
+                async with session.get(
+                        'http://api.giphy.com/v1/gifs/random', params=params) as resp:
                     data = await resp.json()
                 url = data['data']['image_url']
 

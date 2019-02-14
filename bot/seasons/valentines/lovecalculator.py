@@ -35,7 +35,8 @@ class LoveCalculator:
         4. Nickname (1)
         5. @mention
 
-        Using method 1-4 is highly encouraged, as nobody likes unwanted pings + they'll count as spam.
+        Using method 1-4 is highly encouraged,
+        as nobody likes unwanted pings + they'll count as spam.
         Skipping the second name will lead to something awesome.
 
         *(1): If the name has any form of spacing, the name must be wrapped inside quotes. Example:

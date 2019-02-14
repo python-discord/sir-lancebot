@@ -25,7 +25,9 @@ class MonsterSurvey:
         """Initializes values for the bot to use within the voting commands."""
 
         self.bot = bot
-        self.registry_location = os.path.join(os.getcwd(), 'bot', 'resources', 'halloween', 'monstersurvey.json')
+        self.registry_location = os.path.join(
+            os.getcwd(), 'bot', 'resources', 'halloween', 'monstersurvey.json'
+        )
         with open(self.registry_location, 'r') as jason:
             self.voter_registry = json.load(jason)
 
@@ -74,11 +76,17 @@ class MonsterSurvey:
                 )
                 default_embed.add_field(
                     name='.monster show monster_name(optional)',
-                    value='Show a specific monster. If none is listed, it will give you an error with valid choices.',
+                    value=(
+                        'Show a specific monster. If none is listed, '
+                        'it will give you an error with valid choices.'
+                    ),
                     inline=False)
                 default_embed.add_field(
                     name='.monster vote monster_name',
-                    value='Vote for a specific monster. You get one vote, but can change it at any time.',
+                    value=(
+                        'Vote for a specific monster. You get one vote, '
+                        'but can change it at any time.'
+                    ),
                     inline=False
                 )
                 default_embed.add_field(
@@ -86,7 +94,9 @@ class MonsterSurvey:
                     value='Which monster has the most votes? This command will tell you.',
                     inline=False
                 )
-                default_embed.set_footer(text=f"Monsters choices are: {', '.join(self.voter_registry.keys())}")
+                default_embed.set_footer(
+                    text=f"Monsters choices are: {', '.join(self.voter_registry.keys())}"
+                )
 
             await ctx.send(embed=default_embed)
 
@@ -95,7 +105,8 @@ class MonsterSurvey:
     )
     async def monster_vote(self, ctx: Context, name=None):
         """
-        Casts a vote for a particular monster, or displays a list of monsters that can be voted for
+        Casts a vote for a particular monster, \
+        or displays a list of monsters that can be voted for
         if one is not given.
         """
 
@@ -118,9 +129,14 @@ class MonsterSurvey:
 
             m = self.voter_registry.get(name)
             if m is None:
-                vote_embed.description = f'You cannot vote for {name} because it\'s not in the running.'
+                vote_embed.description = (
+                    f'You cannot vote for {name} because it\'s not in the running.'
+                )
                 vote_embed.add_field(
-                    name='Use `.monster show {monster_name}` for more information on a specific monster',
+                    name=(
+                        'Use `.monster show {monster_name}` for more '
+                        'information on a specific monster'
+                    ),
                     value='or use `.monster vote {monster}` to cast your vote for said monster.',
                     inline=False
                 )
@@ -136,7 +152,9 @@ class MonsterSurvey:
                     inline=False
                 )
                 vote_embed.set_thumbnail(url=m['image'])
-                vote_embed.set_footer(text="Please note that any previous votes have been removed.")
+                vote_embed.set_footer(
+                    text="Please note that any previous votes have been removed."
+                )
                 self.json_write()
 
         await ctx.send(embed=vote_embed)
@@ -208,7 +226,9 @@ class MonsterSurvey:
                                 ),
                                 inline=False)
 
-            embed.set_footer(text="You can also vote by their rank number. '.monster vote {number}' ")
+            embed.set_footer(
+                text="You can also vote by their rank number. '.monster vote {number}' "
+            )
 
         await ctx.send(embed=embed)
 

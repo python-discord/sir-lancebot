@@ -10,7 +10,9 @@ from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
-HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_heart:", ":two_hearts:"]
+HEART_EMOJIS = [
+    ":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_heart:", ":two_hearts:"
+]
 
 
 class SaveTheDate:
@@ -23,7 +25,8 @@ class SaveTheDate:
 
     @commands.command()
     async def savethedate(self, ctx):
-        with open(Path('bot', 'resources', 'valentines', 'date_ideas.json'), 'r', encoding="utf8") as f:
+        with open(Path('bot', 'resources', 'valentines', 'date_ideas.json'),
+                  'r', encoding="utf8") as f:
             valentine_dates = load(f)
             random_date = random.choice(valentine_dates['ideas'])
             emoji_1 = random.choice(HEART_EMOJIS)

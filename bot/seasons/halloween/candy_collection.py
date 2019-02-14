@@ -207,7 +207,11 @@ class CandyCollection:
             '\N{SPORTS MEDAL}'
         )
 
-        top_sorted = sorted(self.candy_json['records'], key=lambda k: k.get('record', 0), reverse=True)
+        top_sorted = sorted(
+            self.candy_json['records'],
+            key=lambda k: k.get('record', 0),
+            reverse=True
+        )
         top_five = top_sorted[:5]
 
         usersid = []

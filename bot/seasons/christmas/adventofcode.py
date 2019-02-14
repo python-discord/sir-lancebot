@@ -99,9 +99,11 @@ async def day_countdown(bot: commands.Bot):
             log.error("Could not find the AoC channel to send notification in")
             break
 
-        await channel.send(f"<@&{AocConfig.role_id}> Good morning! Day {tomorrow.day} is ready to be attempted. "
-                           f"View it online now at https://adventofcode.com/{AocConfig.year}/day/{tomorrow.day}"
-                           f" (this link could take a few minutes to start working). Good luck!")
+        await channel.send(
+            f"<@&{AocConfig.role_id}> Good morning! Day {tomorrow.day} is ready to be attempted. "
+            f"View it online now at https://adventofcode.com/{AocConfig.year}/day/{tomorrow.day}"
+            f" (this link could take a few minutes to start working). Good luck!"
+        )
 
         # Wait a couple minutes so that if our sleep didn't sleep enough
         # time we don't end up announcing twice.
@@ -117,7 +119,9 @@ class AdventOfCode:
 
         self._base_url = f"https://adventofcode.com/{AocConfig.year}"
         self.global_leaderboard_url = f"https://adventofcode.com/{AocConfig.year}/leaderboard"
-        self.private_leaderboard_url = f"{self._base_url}/leaderboard/private/view/{AocConfig.leaderboard_id}"
+        self.private_leaderboard_url = (
+            f"{self._base_url}/leaderboard/private/view/{AocConfig.leaderboard_id}"
+        )
 
         self.about_aoc_filepath = Path("./bot/resources/advent_of_code/about.json")
         self.cached_about_aoc = self._build_about_embed()
@@ -156,13 +160,19 @@ class AdventOfCode:
 
         if role not in ctx.author.roles:
             await ctx.author.add_roles(role)
-            await ctx.send("Okay! You have been __subscribed__ to notifications about new Advent of Code tasks. "
-                           f"You can run `{unsubscribe_command}` to disable them again for you.")
+            await ctx.send(
+                "Okay! You have been __subscribed__ to notifications "
+                "about new Advent of Code tasks. "
+                f"You can run `{unsubscribe_command}` to disable them again for you.")
         else:
-            await ctx.send("Hey, you already are receiving notifications about new Advent of Code tasks. "
-                           f"If you don't want them any more, run `{unsubscribe_command}` instead.")
+            await ctx.send(
+                "Hey, you already are receiving notifications about new Advent of Code tasks. "
+                f"If you don't want them any more, run `{unsubscribe_command}` instead."
+            )
 
-    @adventofcode_group.command(name="unsubscribe", aliases=("unsub",), brief="Notifications for new days")
+    @adventofcode_group.command(
+        name="unsubscribe", aliases=("unsub",), brief="Notifications for new days"
+    )
     async def aoc_unsubscribe(self, ctx: commands.Context):
         """
         Remove the role for notifications about new days being ready.
@@ -171,11 +181,19 @@ class AdventOfCode:
 
         if role in ctx.author.roles:
             await ctx.author.remove_roles(role)
-            await ctx.send("Okay! You have been __unsubscribed__ from notifications about new Advent of Code tasks.")
+            await ctx.send(
+                "Okay! You have been __unsubscribed__ from notifications about "
+                "new Advent of Code tasks."
+            )
         else:
-            await ctx.send("Hey, you don't even get any notifications about new Advent of Code tasks currently anyway.")
+            await ctx.send(
+                "Hey, you don't even get any notifications "
+                "about new Advent of Code tasks currently anyway."
+            )
 
-    @adventofcode_group.command(name="countdown", aliases=("count", "c"), brief="Return time left until next day")
+    @adventofcode_group.command(
+        name="countdown", aliases=("count", "c"), brief="Return time left until next day"
+    )
     async def aoc_countdown(self, ctx: commands.Context):
         """
         Return time left until next day
@@ -192,9 +210,13 @@ class AdventOfCode:
 
         hours, minutes = time_left.seconds // 3600, time_left.seconds // 60 % 60
 
-        await ctx.send(f"There are {hours} hours and {minutes} minutes left until day {tomorrow.day}.")
+        await ctx.send(
+            f"There are {hours} hours and {minutes} minutes left until day {tomorrow.day}."
+        )
 
-    @adventofcode_group.command(name="about", aliases=("ab", "info"), brief="Learn about Advent of Code")
+    @adventofcode_group.command(
+        name="about", aliases=("ab", "info"), brief="Learn about Advent of Code"
+    )
     async def about_aoc(self, ctx: commands.Context):
         """
         Respond with an explanation of all things Advent of Code
@@ -202,7 +224,9 @@ class AdventOfCode:
 
         await ctx.send("", embed=self.cached_about_aoc)
 
-    @adventofcode_group.command(name="join", aliases=("j",), brief="Learn how to join PyDis' private AoC leaderboard")
+    @adventofcode_group.command(
+        name="join", aliases=("j",), brief="Learn how to join PyDis' private AoC leaderboard"
+    )
     async def join_leaderboard(self, ctx: commands.Context):
         """
         Retrieve the link to join the PyDis AoC private leaderboard
@@ -221,10 +245,13 @@ class AdventOfCode:
     )
     async def aoc_leaderboard(self, ctx: commands.Context, number_of_people_to_display: int = 10):
         """
-        Pull the top number_of_people_to_display members from the PyDis leaderboard and post an embed
+        Pull the top number_of_people_to_display members from the \
+        PyDis leaderboard and post an embed
 
-        For readability, number_of_people_to_display defaults to 10. A maximum value is configured in the
-        Advent of Code section of the bot constants. number_of_people_to_display values greater than this
+        For readability, number_of_people_to_display defaults to 10.
+        A maximum value is configured in the
+        Advent of Code section of the bot constants.
+        number_of_people_to_display values greater than this
         limit will default to this maximum and provide feedback to the user.
         """
 
@@ -232,11 +259,14 @@ class AdventOfCode:
             await self._check_leaderboard_cache(ctx)
 
             if not self.cached_private_leaderboard:
-                # Feedback on issues with leaderboard caching are sent by _check_leaderboard_cache()
+                # Feedback on issues with leaderboard caching
+                # are sent by _check_leaderboard_cache()
                 # Short circuit here if there's an issue
                 return
 
-            number_of_people_to_display = await self._check_n_entries(ctx, number_of_people_to_display)
+            number_of_people_to_display = await self._check_n_entries(
+                ctx, number_of_people_to_display
+            )
 
             # Generate leaderboard table for embed
             members_to_print = self.cached_private_leaderboard.top_n(number_of_people_to_display)
@@ -252,7 +282,10 @@ class AdventOfCode:
             aoc_embed.set_footer(text="Last Updated")
 
         await ctx.send(
-            content=f"Here's the current Top {number_of_people_to_display}! {Emojis.christmas_tree*3}\n\n{table}",
+            content=(
+                f"Here's the current Top {number_of_people_to_display}! "
+                f"{Emojis.christmas_tree*3}\n\n{table}"
+            ),
             embed=aoc_embed,
         )
 
@@ -265,27 +298,35 @@ class AdventOfCode:
         """
         Respond with a table of the daily completion statistics for the PyDis private leaderboard
 
-        Embed will display the total members and the number of users who have completed each day's puzzle
+        Embed will display the total members and the number
+        of users who have completed each day's puzzle
         """
 
         async with ctx.typing():
             await self._check_leaderboard_cache(ctx)
 
             if not self.cached_private_leaderboard:
-                # Feedback on issues with leaderboard caching are sent by _check_leaderboard_cache()
+                # Feedback on issues with leaderboard caching
+                # are sent by _check_leaderboard_cache()
                 # Short circuit here if there's an issue
                 return
 
             # Build ASCII table
             total_members = len(self.cached_private_leaderboard.members)
             _star = Emojis.star
-            header = f"{'Day':4}{_star:^8}{_star*2:^4}{'% ' + _star:^8}{'% ' + _star*2:^4}\n{'='*35}"
+            header = (
+                f"{'Day':4}{_star:^8}{_star*2:^4}{'% ' + _star:^8}{'% ' + _star*2:^4}\n{'='*35}"
+            )
             table = ""
-            for day, completions in enumerate(self.cached_private_leaderboard.daily_completion_summary):
+            for day, completions in enumerate(
+                    self.cached_private_leaderboard.daily_completion_summary):
                 per_one_star = f"{(completions[0]/total_members)*100:.2f}"
                 per_two_star = f"{(completions[1]/total_members)*100:.2f}"
 
-                table += f"{day+1:3}){completions[0]:^8}{completions[1]:^6}{per_one_star:^10}{per_two_star:^6}\n"
+                table += (
+                    f"{day+1:3}){completions[0]:^8}{completions[1]:^6}"
+                    f"{per_one_star:^10}{per_two_star:^6}\n"
+                )
 
             table = f"```\n{header}\n{table}```"
 
@@ -305,12 +346,16 @@ class AdventOfCode:
         aliases=("globalboard", "gb"),
         brief="Get a snapshot of the global AoC leaderboard",
     )
-    async def global_leaderboard(self, ctx: commands.Context, number_of_people_to_display: int = 10):
+    async def global_leaderboard(
+            self, ctx: commands.Context, number_of_people_to_display: int = 10):
         """
-        Pull the top number_of_people_to_display members from the global AoC leaderboard and post an embed
+        Pull the top number_of_people_to_display members \
+        from the global AoC leaderboard and post an embed
 
-        For readability, number_of_people_to_display defaults to 10. A maximum value is configured in the
-        Advent of Code section of the bot constants. number_of_people_to_display values greater than this
+        For readability, number_of_people_to_display defaults to 10.
+        A maximum value is configured in the
+        Advent of Code section of the bot constants.
+        number_of_people_to_display values greater than this
         limit will default to this maximum and provide feedback to the user.
         """
 
@@ -318,23 +363,32 @@ class AdventOfCode:
             await self._check_leaderboard_cache(ctx, global_board=True)
 
             if not self.cached_global_leaderboard:
-                # Feedback on issues with leaderboard caching are sent by _check_leaderboard_cache()
+                # Feedback on issues with leaderboard caching
+                # are sent by _check_leaderboard_cache()
                 # Short circuit here if there's an issue
                 return
 
-            number_of_people_to_display = await self._check_n_entries(ctx, number_of_people_to_display)
+            number_of_people_to_display = await self._check_n_entries(
+                ctx, number_of_people_to_display
+            )
 
             # Generate leaderboard table for embed
             members_to_print = self.cached_global_leaderboard.top_n(number_of_people_to_display)
             table = AocGlobalLeaderboard.build_leaderboard_embed(members_to_print)
 
             # Build embed
-            aoc_embed = discord.Embed(colour=Colours.soft_green, timestamp=self.cached_global_leaderboard.last_updated)
+            aoc_embed = discord.Embed(
+                colour=Colours.soft_green,
+                timestamp=self.cached_global_leaderboard.last_updated
+            )
             aoc_embed.set_author(name="Advent of Code", url=self._base_url)
             aoc_embed.set_footer(text="Last Updated")
 
         await ctx.send(
-            content=f"Here's the current global Top {number_of_people_to_display}! {Emojis.christmas_tree*3}\n\n{table}",  # noqa
+            content=(
+                f"Here's the current global Top {number_of_people_to_display}! "
+                f"{Emojis.christmas_tree*3}\n\n{table}"
+            ),  # noqa
             embed=aoc_embed,
         )
 
@@ -363,9 +417,15 @@ class AdventOfCode:
             leaderboard_age = datetime.utcnow() - leaderboard.last_updated
             age_seconds = leaderboard_age.total_seconds()
             if age_seconds < AocConfig.leaderboard_cache_age_threshold_seconds:
-                log.debug(f"Cached {_shortstr} leaderboard age less than threshold ({age_seconds} seconds old)")
+                log.debug(
+                    f"Cached {_shortstr} leaderboard age less than threshold "
+                    f"({age_seconds} seconds old)"
+                )
             else:
-                log.debug(f"Cached {_shortstr} leaderboard age greater than threshold ({age_seconds} seconds old)")
+                log.debug(
+                    f"Cached {_shortstr} leaderboard age greater than threshold "
+                    f"({age_seconds} seconds old)"
+                )
                 await self._boardgetter(global_board)
 
         leaderboard = getattr(self, leaderboard_str)
@@ -378,7 +438,8 @@ class AdventOfCode:
                 ),
             )
 
-    async def _check_n_entries(self, ctx: commands.Context, number_of_people_to_display: int) -> int:
+    async def _check_n_entries(
+            self, ctx: commands.Context, number_of_people_to_display: int) -> int:
         # Check for n > max_entries and n <= 0
         max_entries = AocConfig.leaderboard_max_displayed_members
         author = ctx.message.author
@@ -404,7 +465,11 @@ class AdventOfCode:
         with self.about_aoc_filepath.open("r") as f:
             embed_fields = json.load(f)
 
-        about_embed = discord.Embed(title=self._base_url, colour=Colours.soft_green, url=self._base_url)
+        about_embed = discord.Embed(
+            title=self._base_url,
+            colour=Colours.soft_green,
+            url=self._base_url
+        )
         about_embed.set_author(name="Advent of Code", url=self._base_url)
         for field in embed_fields:
             about_embed.add_field(**field)
@@ -424,7 +489,15 @@ class AdventOfCode:
 
 
 class AocMember:
-    def __init__(self, name: str, aoc_id: int, stars: int, starboard: list, local_score: int, global_score: int):
+    def __init__(
+            self,
+            name: str,
+            aoc_id: int,
+            stars: int,
+            starboard: list,
+            local_score: int,
+            global_score: int
+    ):
         self.name = name
         self.aoc_id = aoc_id
         self.stars = stars
@@ -466,7 +539,8 @@ class AocMember:
 
             AoC_APIjson['members'][<member id>:str]['completion_day_level']
 
-        Returns a list of 25 lists, where each nested list contains a pair of booleans representing
+        Returns a list of 25 lists, where each nested list contains
+        a pair of booleans representing
         the code challenge completion status for that day
         """
 
@@ -529,7 +603,8 @@ class AocPrivateLeaderboard:
         """
         Calculate member completion rates by day
 
-        Return a list of tuples for each day containing the number of users who completed each part
+        Return a list of tuples for each day containing the
+        number of users who completed each part
         of the challenge
         """
 
@@ -553,20 +628,26 @@ class AocPrivateLeaderboard:
         leaderboard_id: int = AocConfig.leaderboard_id, year: int = AocConfig.year
     ) -> "AocPrivateLeaderboard":
         """
-        Request the API JSON from Advent of Code for leaderboard_id for the specified year's event
+        Request the API JSON from Advent of Code for leaderboard_id
+        for the specified year's event
 
         If no year is input, year defaults to the current year
         """
 
-        api_url = f"https://adventofcode.com/{year}/leaderboard/private/view/{leaderboard_id}.json"
+        api_url = (
+            f"https://adventofcode.com/{year}/leaderboard/private/view/{leaderboard_id}.json"
+        )
 
         log.debug("Querying Advent of Code Private Leaderboard API")
-        async with aiohttp.ClientSession(cookies=AOC_SESSION_COOKIE, headers=AOC_REQUEST_HEADER) as session:
+        async with aiohttp.ClientSession(
+                cookies=AOC_SESSION_COOKIE, headers=AOC_REQUEST_HEADER) as session:
             async with session.get(api_url) as resp:
                 if resp.status == 200:
                     raw_dict = await resp.json()
                 else:
-                    log.warning(f"Bad response received from AoC ({resp.status}), check session cookie")
+                    log.warning(
+                        f"Bad response received from AoC ({resp.status}), check session cookie"
+                    )
                     resp.raise_for_status()
 
         return raw_dict
@@ -578,13 +659,15 @@ class AocPrivateLeaderboard:
         """
 
         return cls(
-            members=cls._sorted_members(injson["members"]), owner_id=injson["owner_id"], event_year=injson["event"]
+            members=cls._sorted_members(
+                injson["members"]), owner_id=injson["owner_id"], event_year=injson["event"]
         )
 
     @classmethod
     async def from_url(cls) -> "AocPrivateLeaderboard":
         """
-        Helper wrapping of AocPrivateLeaderboard.json_from_url and AocPrivateLeaderboard.from_json
+        Helper wrapping of AocPrivateLeaderboard.json_from_url
+        and AocPrivateLeaderboard.from_json
         """
 
         api_json = await cls.json_from_url()
@@ -659,7 +742,9 @@ class AocGlobalLeaderboard:
                 if resp.status == 200:
                     raw_html = await resp.text()
                 else:
-                    log.warning(f"Bad response received from AoC ({resp.status}), check session cookie")
+                    log.warning(
+                        f"Bad response received from AoC ({resp.status}), check session cookie"
+                    )
                     resp.raise_for_status()
 
         soup = BeautifulSoup(raw_html, "html.parser")

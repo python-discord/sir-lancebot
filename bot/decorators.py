@@ -27,8 +27,10 @@ def with_role(*role_ids: int):
 def without_role(*role_ids: int):
     async def predicate(ctx: Context):
         if not ctx.guild:  # Return False in a DM
-            log.debug(f"{ctx.author} tried to use the '{ctx.command.name}' command from a DM. "
-                      "This command is restricted by the without_role decorator. Rejecting request.")
+            log.debug(
+                f"{ctx.author} tried to use the '{ctx.command.name}' command from a DM. "
+                "This command is restricted by the without_role decorator. Rejecting request."
+            )
             return False
 
         author_roles = [role.id for role in ctx.author.roles]
