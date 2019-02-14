@@ -4,7 +4,6 @@ import typing
 from json import load
 from pathlib import Path
 
-
 import discord
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
@@ -17,11 +16,13 @@ HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_hea
 EMOJI_1 = random.choice(HEART_EMOJIS)
 EMOJI_2 = random.choice(HEART_EMOJIS)
 USER_LOVEFEST = []
+JSON_FILE = open(Path('bot', 'resources', 'VALENTINES', 'bemyvalentine_valentines.json'), 'r', encoding="utf8")
+VALENTINES = load(JSON_FILE)
 
 
 class BeMyValentine:
     """
-    A cog that sends valentines to other users !
+    A cog that sends VALENTINES to other users !
     """
     id = Lovefest.role_id
 
@@ -31,7 +32,7 @@ class BeMyValentine:
     @commands.command(name="lovefest")
     async def add_role(self, ctx):
         """
-            This command adds people to the lovefest role
+        This command adds people to the lovefest role.
         """
         user = ctx.author
         role = discord.utils.get(ctx.guild.roles, id=Lovefest.role_id)
@@ -61,22 +62,16 @@ class BeMyValentine:
         await ctx.send(embed=embed)
 
     @commands.cooldown(1, 1800, BucketType.user)
-    @commands.group(
-        name='bemyvalentine',
-        invoke_without_command=True
-    )
+    @commands.group(name='bemyvalentine', invoke_without_command=True)
     async def send_valentine(self, ctx, user: typing.Optional[discord.Member] = None, *, valentine_type=None):
         """
         This command sends valentine to user if specified or a random user having lovefest role.
-
 
         syntax: .bemyvalentine [user](optional) [p/poem/c/compliment/or you can type your own valentine message]
         (optional)
 
         example: .bemyvalentine (sends valentine as a poem or a compliment to a random user)
-
         example: .bemyvalentine @Iceman#6508 p (sends a poem to Iceman)
-
         example: .bemyvalentine @Iceman#6508 Hey I love you, wanna hang around ? (sends the custom message to Iceman)
         """
         if ctx.guild is None:
@@ -132,21 +127,18 @@ class BeMyValentine:
     @send_valentine.command(name='dm')
     async def anonymous(self, ctx, user: typing.Optional[discord.Member] = None, *, valentine_type=None):
         """
-    - This command DMs a valentine to be given anonymous to a user if specified or a random user having lovefest role.
+        This command DMs a valentine to be given anonymous to a user if specified or a random user having lovefest role.
 
+        **This command should be DMed to the bot.**
 
-    **This command should be DMed to the bot.**
+        syntax : .bemyvalentine dm [user](optional) [p/poem/c/compliment/or you can type your own valentine message]
+        (optional)
 
-
-    syntax : .bemyvalentine dm [user](optional) [p/poem/c/compliment/or you can type your own valentine message]
-    (optional)
-
-    example : .bemyvalentine dm (sends valentine as a poem or a compliment to a random user in DM making you anonymous)
-
-    example : .bemyvalentine dm Iceman#6508 p (sends a poem to Iceman in DM making you anonymous)
-
-    example : .bemyvalentine dm Iceman#6508 Hey I love you, wanna hang around ? (sends the custom message to Iceman in
-    DM making you anonymous)
+        example : .bemyvalentine dm (sends valentine as a poem or a compliment to a random user in DM making you
+        anonymous)
+        example : .bemyvalentine dm Iceman#6508 p (sends a poem to Iceman in DM making you anonymous)
+        example : .bemyvalentine dm Iceman#6508 Hey I love you, wanna hang around ? (sends the custom message to Iceman
+        in DM making you anonymous)
         """
         if ctx.guild is not None:
             # This command is only DM specific
@@ -198,38 +190,35 @@ class BeMyValentine:
     @staticmethod
     def random_valentine():
         """
-            grabs a random poem or a compliment (any message)
+        Grabs a random poem or a compliment (any message).
         """
-        with open(Path('bot', 'resources', 'valentines', 'bemyvalentine_valentines.json'), 'r', encoding="utf8") as f:
-            valentines = load(f)
-            valentine_poem = random.choice(valentines['valentine_poems'])
-            valentine_compliment = random.choice(valentines['valentine_compliments'])
-            random_valentine = random.choice([valentine_compliment, valentine_poem])
-            if random_valentine == valentine_poem:
-                message_type = 'A poem dedicated to'
-            else:
-                message_type = 'A compliment for '
-            return random_valentine['message'], message_type
+        valentine_poem = random.choice(VALENTINES['valentine_poems'])
+        valentine_compliment = random.choice(VALENTINES['valentine_compliments'])
+        JSON_FILE.close()
+        random_valentine = random.choice([valentine_compliment, valentine_poem])
+        if random_valentine == valentine_poem:
+            message_type = 'A poem dedicated to'
+        else:
+            message_type = 'A compliment for '
+        return random_valentine['message'], message_type
 
     @staticmethod
     def valentine_poem():
         """
-            grabs a random poem
+        Grabs a random poem.
         """
-        with open(Path('bot', 'resources', 'valentines', 'bemyvalentine_valentines.json'), 'r', encoding="utf8") as f:
-            valentines = load(f)
-            valentine_poem = random.choice(valentines['valentine_poems'])
-            return valentine_poem['message']
+        valentine_poem = random.choice(VALENTINES['valentine_poems'])
+        JSON_FILE.close()
+        return valentine_poem['message']
 
     @staticmethod
     def valentine_compliment():
         """
-            grabs a random compliment
+        Grabs a random compliment.
         """
-        with open(Path('bot', 'resources', 'valentines', 'bemyvalentine_valentines.json'), 'r', encoding="utf8") as f:
-            valentines = load(f)
-            valentine_compliment = random.choice(valentines['valentine_compliments'])
-            return valentine_compliment['message']
+        valentine_compliment = random.choice(VALENTINES['valentine_compliments'])
+        JSON_FILE.close()
+        return valentine_compliment['message']
 
 
 def setup(bot):
