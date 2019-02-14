@@ -4,6 +4,7 @@ from discord.ext import commands
 import random
 import json
 from urllib import parse, request
+from os import environ
 log = logging.getLogger(__name__)
 
 
@@ -18,10 +19,11 @@ class MovieGenerator:
 
     @commands.command()
     async def movie(self, ctx):
+        TMDB_API_KEY = environ.get('TMDB_API_KEY')
         # selecting a random int to parse it to the page parameter
         random_page = random.randint(0, 20)
         # TMDB api params
-        params = {'api_key': 'Api key here.',
+        params = {'api_key': TMDB_API_KEY,
                   'language': 'en-US',
                   'sort_by': 'popularity.desc',
                   'include_adult': 'false',
