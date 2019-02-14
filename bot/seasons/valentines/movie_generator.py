@@ -1,10 +1,12 @@
-import discord
 import logging
-from discord.ext import commands
 import random
-import json
-from urllib import parse, request
+from urllib import parse
 from os import environ
+
+import aiohttp
+import discord
+from discord.ext import commands
+
 log = logging.getLogger(__name__)
 
 
@@ -14,12 +16,17 @@ class MovieGenerator:
 
     """
 
-    def __init__(self,bot):
+    def __init__(self, bot):
         self.bot = bot
 
     @commands.command()
-    async def movie(self, ctx):
-        TMDB_API_KEY = environ.get('TMDB_API_KEY')
+    async def romancemovie(self, ctx):
+        """
+
+        randomly selects romance movie and displays info about it
+        """
+
+        TMDB_API_KEY = environ.get("TMDB_API_KEY")
         # selecting a random int to parse it to the page parameter
         random_page = random.randint(0, 20)
         # TMDB api params
@@ -33,29 +40,24 @@ class MovieGenerator:
                   }
         # the api request url
         request_url = "https://api.themoviedb.org/3/discover/movie?" + parse.urlencode(params)
-        with request.urlopen(request_url) as url:
-            # loading the json file returned from the api
-            data = json.loads(url.read().decode())
-            # selecting random result from results object in the json file
-            selected_movie = random.choice(data['results'])
+        async with aiohttp.ClientSession() as session:
+            async with session.get(request_url) as resp:
+                print(await resp.json())
+                # loading the json file returned from the api
+                data = await resp.json()
+                # selecting random result from results object in the json file
+                selected_movie = random.choice(data['results'])
 
         embed = discord.Embed(
-            title=selected_movie['title'],
+            title=":sparkling_heart: " + selected_movie['title'] + ":sparkling_heart: ",
             description=selected_movie['overview'],
         )
         embed.set_image(url='http://image.tmdb.org/t/p/w200/' + selected_movie['poster_path'])
-        embed.add_field(name='release_date', value=selected_movie['release_date'])
-        embed.add_field(name='rating', value=selected_movie['vote_average'])
+        embed.add_field(name='release date :clock1:', value=selected_movie['release_date'])
+        embed.add_field(name='rating :star2: ', value=selected_movie['vote_average'])
         await ctx.send(embed=embed)
 
 
 def setup(bot):
     bot.add_cog(MovieGenerator(bot))
     log.debug("Random movie generator cog loaded!")
-
-
-
-
-
-
-
