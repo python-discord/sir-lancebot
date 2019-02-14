@@ -1,7 +1,7 @@
 import logging
 import random
-from urllib import parse
 from os import environ
+from urllib import parse
 
 import aiohttp
 import discord
