@@ -25,6 +25,7 @@ class SpookyAvatar:
         """
         Returns the contents of the supplied url.
         """
+
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 return await resp.read()
@@ -35,6 +36,7 @@ class SpookyAvatar:
         """
         A command to print the user's spookified avatar.
         """
+
         if user is None:
             user = ctx.message.author
 
@@ -42,6 +44,7 @@ class SpookyAvatar:
             embed = discord.Embed(colour=0xFF0000)
             embed.title = "Is this you or am I just really paranoid?"
             embed.set_author(name=str(user.name), icon_url=user.avatar_url)
+
             resp = await self.get(user.avatar_url)
             im = Image.open(BytesIO(resp))
             modified_im = spookifications.get_random_effect(im)

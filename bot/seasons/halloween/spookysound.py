@@ -24,9 +24,10 @@ class SpookySound:
     @commands.command(brief="Play a spooky sound, restricted to once per 2 mins")
     async def spookysound(self, ctx):
         """
-        Connect to the Hacktoberbot voice channel, play a random spooky sound, then disconnect. \
+        Connect to the Hacktoberbot voice channel, play a random spooky sound, then disconnect.
         Cannot be used more than once in 2 minutes.
         """
+
         if not self.channel:
             await self.bot.wait_until_ready()
             self.channel = self.bot.get_channel(Hacktoberfest.voice_id)

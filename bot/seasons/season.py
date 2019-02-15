@@ -106,8 +106,8 @@ class SeasonBase:
         """
         Returns the start date using current year and start_date attribute.
 
-        If no start_date was defined, returns the minimum datetime to ensure
-        it's always below checked dates.
+        If no start_date was defined, returns the minimum datetime to ensure it's always below
+        checked dates.
         """
 
         if not cls.start_date:
@@ -119,8 +119,8 @@ class SeasonBase:
         """
         Returns the start date using current year and end_date attribute.
 
-        If no end_date was defined, returns the minimum datetime to ensure
-        it's always above checked dates.
+        If no end_date was defined, returns the minimum datetime to ensure it's always above checked
+        dates.
         """
 
         if not cls.end_date:
@@ -142,22 +142,22 @@ class SeasonBase:
     @property
     def greeting(self) -> str:
         """
-        Provides a default greeting based on the season name if one wasn't
-        defined in the season class.
+        Provides a default greeting based on the season name if one wasn't defined in the season
+        class.
 
-        It's recommended to define one in most cases by overwriting this as a
-        normal attribute in the inhertiting class.
+        It's recommended to define one in most cases by overwriting this as a normal attribute in
+        the inhertiting class.
         """
 
         return f"New Season, {self.name_clean}!"
 
     async def get_icon(self) -> bytes:
         """
-        Retrieves the icon image from the branding repository, using the
-        defined icon attribute for the season.
+        Retrieves the icon image from the branding repository, using the defined icon attribute for
+        the season.
 
-        The icon attribute must provide the url path, starting from the master
-        branch base url, including the starting slash:
+        The icon attribute must provide the url path, starting from the master branch base url,
+        including the starting slash:
         `https://raw.githubusercontent.com/python-discord/branding/master`
         """
 
@@ -169,8 +169,8 @@ class SeasonBase:
 
     async def apply_username(self, *, debug: bool = False) -> Union[bool, None]:
         """
-        Applies the username for the current season. Only changes nickname if
-        `bool` is False, otherwise only changes the nickname.
+        Applies the username for the current season. Only changes nickname if `bool` is False,
+        otherwise only changes the nickname.
 
         Returns True if it successfully changed the username.
         Returns False if it failed to change the username, falling back to nick.
@@ -259,8 +259,7 @@ class SeasonBase:
         """
         Announces a change in season in the announcement channel.
 
-        It will skip the announcement if the current active season is the
-        "evergreen" default season.
+        It will skip the announcement if the current active season is the "evergreen" default season
         """
 
         # don't actually announce if reverting to normal season
@@ -443,6 +442,7 @@ class SeasonManager:
         """
         Refreshes certain seasonal elements without reloading seasons.
         """
+
         if not ctx.invoked_subcommand:
             await ctx.invoke(bot.get_command("help"), "refresh")
 
@@ -545,6 +545,7 @@ class SeasonManager:
         """
         Announces the currently loaded season.
         """
+
         await self.season.announce_season()
 
     def __unload(self):

@@ -26,11 +26,12 @@ class HacktoberStats:
     )
     async def hacktoberstats_group(self, ctx: commands.Context, github_username: str = None):
         """
-        If invoked without a subcommand or github_username, get the invoking user's stats if
-        they've linked their Discord name to GitHub using .stats link
+        If invoked without a subcommand or github_username, get the invoking user's stats if they've
+        linked their Discord name to GitHub using .stats link
 
         If invoked with a github_username, get that user's contributions
         """
+
         if not github_username:
             author_id, author_mention = HacktoberStats._author_mention_from_context(ctx)
 
@@ -65,6 +66,7 @@ class HacktoberStats:
                 }
             }
         """
+
         author_id, author_mention = HacktoberStats._author_mention_from_context(ctx)
         if github_username:
             if str(author_id) in self.linked_accounts.keys():
@@ -98,6 +100,7 @@ class HacktoberStats:
         """
         Remove the invoking user's account link from the log
         """
+
         author_id, author_mention = HacktoberStats._author_mention_from_context(ctx)
 
         stored_user = self.linked_accounts.pop(author_id, None)
@@ -124,6 +127,7 @@ class HacktoberStats:
                 }
             }
         """
+
         if self.link_json.exists():
             logging.info(f"Loading linked GitHub accounts from '{self.link_json}'")
             with open(self.link_json, 'r') as fID:
@@ -149,6 +153,7 @@ class HacktoberStats:
                 }
             }
         """
+
         logging.info(f"Saving linked_accounts to '{self.link_json}'")
         with open(self.link_json, 'w') as fID:
             json.dump(self.linked_accounts, fID, default=str)
@@ -156,8 +161,8 @@ class HacktoberStats:
 
     async def get_stats(self, ctx: commands.Context, github_username: str):
         """
-        Query GitHub's API for PRs created by a GitHub user during the month of October that
-        do not have an 'invalid' tag
+        Query GitHub's API for PRs created by a GitHub user during the month of October that do not
+        have an 'invalid' tag
 
         For example:
             !getstats heavysaturn
@@ -166,6 +171,7 @@ class HacktoberStats:
 
         Otherwise, post a helpful error message
         """
+
         async with ctx.typing():
             prs = await self.get_october_prs(github_username)
 
@@ -179,6 +185,7 @@ class HacktoberStats:
         """
         Return a stats embed built from github_username's PRs
         """
+
         logging.info(f"Building Hacktoberfest embed for GitHub user: '{github_username}'")
         pr_stats = self._summarize_prs(prs)
 
@@ -218,8 +225,8 @@ class HacktoberStats:
     @staticmethod
     async def get_october_prs(github_username: str) -> typing.List[dict]:
         """
-        Query GitHub's API for PRs created during the month of October by github_username
-        that do not have an 'invalid' tag
+        Query GitHub's API for PRs created during the month of October by github_username that do
+        not have an 'invalid' tag
 
         If PRs are found, return a list of dicts with basic PR information
 
@@ -232,6 +239,7 @@ class HacktoberStats:
 
         Otherwise, return None
         """
+
         logging.info(f"Generating Hacktoberfest PR query for GitHub user: '{github_username}'")
         base_url = "https://api.github.com/search/issues?q="
         not_label = "invalid"
@@ -293,14 +301,14 @@ class HacktoberStats:
              V
              "python-discord/seasonalbot"
         """
+
         exp = r"https?:\/\/api.github.com\/repos\/([/\-\_\.\w]+)"
         return re.findall(exp, in_url)[0]
 
     @staticmethod
     def _summarize_prs(prs: typing.List[dict]) -> typing.Dict:
         """
-        Generate statistics from an input list of PR dictionaries,
-        as output by get_october_prs
+        Generate statistics from an input list of PR dictionaries, as output by get_october_prs
 
         Return a dictionary containing:
             {
@@ -308,6 +316,7 @@ class HacktoberStats:
             "top5": [(repo_shortname, ncontributions), ...]
             }
         """
+
         contributed_repos = [pr["repo_shortname"] for pr in prs]
         return {"n_prs": len(prs), "top5": Counter(contributed_repos).most_common(5)}
 
@@ -323,6 +332,7 @@ class HacktoberStats:
            n contribution(s) to [shortname](url)
            ...
         """
+
         baseURL = "https://www.github.com/"
         contributionstrs = []
         for repo in stats['top5']:
@@ -338,6 +348,7 @@ class HacktoberStats:
         """
         Return "contribution" or "contributions" based on the value of n
         """
+
         if n == 1:
             return "contribution"
         else:
@@ -348,6 +359,7 @@ class HacktoberStats:
         """
         Return stringified Message author ID and mentionable string from commands.Context
         """
+
         author_id = str(ctx.message.author.id)
         author_mention = ctx.message.author.mention
 

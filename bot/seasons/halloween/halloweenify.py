@@ -24,6 +24,7 @@ class Halloweenify:
         """
         Change your nickname into a much spookier one!
         """
+
         async with ctx.typing():
             with open(Path('bot', 'resources', 'halloween', 'halloweenify.json'), 'r') as f:
                 data = load(f)

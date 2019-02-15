@@ -26,18 +26,19 @@ COUNTDOWN_STEP = 60 * 5
 
 def is_in_advent() -> bool:
     """
-    Utility function to check if we are between December 1st
-    and December 25th.
+    Utility function to check if we are between December 1st and December 25th.
     """
+
     # Run the code from the 1st to the 24th
     return datetime.now(EST).day in range(1, 25) and datetime.now(EST).month == 12
 
 
 def time_left_to_aoc_midnight() -> Tuple[datetime, timedelta]:
     """
-    This calculates the amount of time left until midnight in
-    UTC-5 (Advent of Code maintainer timezone).
+    This calculates the amount of time left until midnight in UTC-5, the Advent of Code maintainer
+    timezone.
     """
+
     # Change all time properties back to 00:00
     todays_midnight = datetime.now(EST).replace(microsecond=0,
                                                 second=0,
@@ -53,9 +54,10 @@ def time_left_to_aoc_midnight() -> Tuple[datetime, timedelta]:
 
 async def countdown_status(bot: commands.Bot):
     """
-    Every `COUNTDOWN_STEP` seconds set the playing status of the bot to
-    the number of minutes & hours left until the next day's release.
+    Every `COUNTDOWN_STEP` seconds set the playing status of the bot to the number of minutes and
+    hours left until the next day's release.
     """
+
     while is_in_advent():
         _, time_left = time_left_to_aoc_midnight()
 
@@ -83,11 +85,11 @@ async def countdown_status(bot: commands.Bot):
 
 async def day_countdown(bot: commands.Bot):
     """
-    Calculate the number of seconds left until the next day of advent. Once
-    we have calculated this we should then sleep that number and when the time
-    is reached ping the advent of code role notifying them that the new task is
-    ready.
+    Calculate the number of seconds left until the next day of advent. Once we have calculated this
+    we should then sleep that number and when the time is reached ping the advent of code role
+    notifying them that the new task is ready.
     """
+
     while is_in_advent():
         tomorrow, time_left = time_left_to_aoc_midnight()
 
@@ -114,6 +116,7 @@ class AdventOfCode:
     """
     Advent of Code festivities! Ho Ho Ho!
     """
+
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
@@ -155,6 +158,7 @@ class AdventOfCode:
         """
         Assign the role for notifications about new days being ready.
         """
+
         role = ctx.guild.get_role(AocConfig.role_id)
         unsubscribe_command = f"{ctx.prefix}{ctx.command.root_parent} unsubscribe"
 
@@ -177,6 +181,7 @@ class AdventOfCode:
         """
         Remove the role for notifications about new days being ready.
         """
+
         role = ctx.guild.get_role(AocConfig.role_id)
 
         if role in ctx.author.roles:
@@ -198,6 +203,7 @@ class AdventOfCode:
         """
         Return time left until next day
         """
+
         if not is_in_advent():
             datetime_now = datetime.now(EST)
             december_first = datetime(datetime_now.year + 1, 12, 1, tzinfo=EST)
@@ -248,19 +254,16 @@ class AdventOfCode:
         Pull the top number_of_people_to_display members from the \
         PyDis leaderboard and post an embed
 
-        For readability, number_of_people_to_display defaults to 10.
-        A maximum value is configured in the
-        Advent of Code section of the bot constants.
-        number_of_people_to_display values greater than this
-        limit will default to this maximum and provide feedback to the user.
+        For readability, number_of_people_to_display defaults to 10. A maximum value is configured
+        in the Advent of Code section of the bot constants. Values greater than this limit will
+        default to this maximum and provide feedback to the user.
         """
 
         async with ctx.typing():
             await self._check_leaderboard_cache(ctx)
 
             if not self.cached_private_leaderboard:
-                # Feedback on issues with leaderboard caching
-                # are sent by _check_leaderboard_cache()
+                # Feedback on issues with leaderboard caching are sent by _check_leaderboard_cache()
                 # Short circuit here if there's an issue
                 return
 
@@ -298,8 +301,8 @@ class AdventOfCode:
         """
         Respond with a table of the daily completion statistics for the PyDis private leaderboard
 
-        Embed will display the total members and the number
-        of users who have completed each day's puzzle
+        Embed will display the total members and the number of users who have completed each day's
+        puzzle
         """
 
         async with ctx.typing():
@@ -349,22 +352,19 @@ class AdventOfCode:
     async def global_leaderboard(
             self, ctx: commands.Context, number_of_people_to_display: int = 10):
         """
-        Pull the top number_of_people_to_display members \
-        from the global AoC leaderboard and post an embed
+        Pull the top number_of_people_to_display members from the global AoC leaderboard and post an
+        embed
 
-        For readability, number_of_people_to_display defaults to 10.
-        A maximum value is configured in the
-        Advent of Code section of the bot constants.
-        number_of_people_to_display values greater than this
-        limit will default to this maximum and provide feedback to the user.
+        For readability, number_of_people_to_display defaults to 10. A maximum value is configured
+        in the Advent of Code section of the bot constants. Values greater than this limit will
+        default to this maximum and provide feedback to the user.
         """
 
         async with ctx.typing():
             await self._check_leaderboard_cache(ctx, global_board=True)
 
             if not self.cached_global_leaderboard:
-                # Feedback on issues with leaderboard caching
-                # are sent by _check_leaderboard_cache()
+                # Feedback on issues with leaderboard caching are sent by _check_leaderboard_cache()
                 # Short circuit here if there's an issue
                 return
 
@@ -388,7 +388,7 @@ class AdventOfCode:
             content=(
                 f"Here's the current global Top {number_of_people_to_display}! "
                 f"{Emojis.christmas_tree*3}\n\n{table}"
-            ),  # noqa
+            ),
             embed=aoc_embed,
         )
 
@@ -539,8 +539,7 @@ class AocMember:
 
             AoC_APIjson['members'][<member id>:str]['completion_day_level']
 
-        Returns a list of 25 lists, where each nested list contains
-        a pair of booleans representing
+        Returns a list of 25 lists, where each nested list contains a pair of booleans representing
         the code challenge completion status for that day
         """
 
@@ -603,8 +602,7 @@ class AocPrivateLeaderboard:
         """
         Calculate member completion rates by day
 
-        Return a list of tuples for each day containing the
-        number of users who completed each part
+        Return a list of tuples for each day containing the number of users who completed each part
         of the challenge
         """
 
@@ -666,8 +664,7 @@ class AocPrivateLeaderboard:
     @classmethod
     async def from_url(cls) -> "AocPrivateLeaderboard":
         """
-        Helper wrapping of AocPrivateLeaderboard.json_from_url
-        and AocPrivateLeaderboard.from_json
+        Helper wrapping of AocPrivateLeaderboard.json_from_url and AocPrivateLeaderboard.from_json
         """
 
         api_json = await cls.json_from_url()

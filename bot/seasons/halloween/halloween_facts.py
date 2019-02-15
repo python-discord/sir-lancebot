@@ -26,7 +26,6 @@ INTERVAL = timedelta(hours=6).total_seconds()
 
 
 class HalloweenFacts:
-
     def __init__(self, bot):
         self.bot = bot
         with open(Path("bot", "resources", "halloween", "halloween_facts.json"), "r") as file:
@@ -49,6 +48,7 @@ class HalloweenFacts:
         """
         Reply with the most recent Halloween fact.
         """
+
         index, fact = self.random_fact()
         embed = self._build_embed(index, fact)
         await ctx.send(embed=embed)
@@ -58,6 +58,7 @@ class HalloweenFacts:
         """
         Builds a Discord embed from the given fact and its index.
         """
+
         emoji = random.choice(SPOOKY_EMOJIS)
         title = f"{emoji} Halloween Fact #{index + 1}"
         return discord.Embed(title=title, description=fact, color=PUMPKIN_ORANGE)

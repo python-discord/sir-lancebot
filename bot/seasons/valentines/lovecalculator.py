@@ -19,6 +19,7 @@ class LoveCalculator:
     """
     A cog for calculating the love between two people
     """
+
     def __init__(self, bot):
         self.bot = bot
 

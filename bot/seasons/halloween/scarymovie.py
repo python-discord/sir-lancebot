@@ -26,6 +26,7 @@ class ScaryMovie:
         """
         Randomly select a scary movie and display information about it.
         """
+
         async with ctx.typing():
             selection = await self.select_movie()
             movie_details = await self.format_metadata(selection)

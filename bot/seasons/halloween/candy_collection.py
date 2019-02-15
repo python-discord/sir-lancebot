@@ -121,6 +121,7 @@ class CandyCollection:
 
     async def ten_recent_msg(self):
         """Get the last 10 messages sent in the channel"""
+
         ten_recent = []
         recent_msg = max(message.id for message
                          in self.bot._connection._messages
@@ -159,6 +160,7 @@ class CandyCollection:
         """
         Get #hacktoberbot channel from it's id
         """
+
         return self.bot.get_channel(id=Hacktoberfest.channel_id)
 
     async def remove_reactions(self, reaction):
@@ -177,6 +179,7 @@ class CandyCollection:
         """
         Send a spooky message
         """
+
         e = discord.Embed(colour=author.colour)
         e.set_author(name="Ghosts and Ghouls and Jack o' lanterns at night; "
                           f"I took {candies} candies and quickly took flight.")
@@ -186,6 +189,7 @@ class CandyCollection:
         """
         Save json to the file.
         """
+
         with open(json_location, 'w') as outfile:
             json.dump(self.candy_json, outfile)
 
@@ -226,8 +230,8 @@ class CandyCollection:
         e = discord.Embed(colour=discord.Colour.blurple())
         e.add_field(name="Top Candy Records", value=value, inline=False)
         e.add_field(name='\u200b',
-                    value=f"Candies will randomly appear on messages sent. "
-                          f"\nHit the candy when it appears as fast as possible to get the candy! "
+                    value=f"Candies will randomly appear on messages sent."
+                          f"\nHit the candy when it appears as fast as possible to get the candy!"
                           f"\nBut beware the ghosts...",
                     inline=False)
         await ctx.send(embed=e)
