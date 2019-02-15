@@ -57,4 +57,4 @@ class RomanceMovieFinder:
 
 def setup(bot):
     bot.add_cog(RomanceMovieFinder(bot))
-    log.debug("Random romance movie generator cog loaded!")
+    log.debug("Random romance movie cog loaded!")
