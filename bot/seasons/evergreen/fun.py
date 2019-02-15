@@ -15,22 +15,14 @@ class Fun:
         self.bot = bot
 
     @commands.command()
-    async def roll(self, ctx, str_input: str = None):
+    async def roll(self, ctx, num_rolls: int):
         output = ""
-
-        if not str_input:
-            output = "To use .roll, format it as such: .roll (number)"
-        else:
-            try:
-                num_rolls = int(str_input)
-                if num_rolls > 6:
-                    num_rolls = 6
-                elif num_rolls < 1:
-                    return
-                for i in range(num_rolls):
-                    output += ":terning%d: " % random.randint(1, 6)
-            except ValueError:
-                return
+        if num_rolls > 6:
+            num_rolls = 6
+        elif num_rolls < 0:
+            output = ":no_entry: You must roll at least once."
+        for _ in range(num_rolls):
+            output += ":terning%d: " % random.randint(1, 6)
         await ctx.send(output)
 
 
