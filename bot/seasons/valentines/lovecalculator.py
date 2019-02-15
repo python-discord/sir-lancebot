@@ -47,7 +47,7 @@ class LoveCalculator:
             staff = ctx.guild.get_role(Roles.helpers).members
             name_two = choice(staff)
 
-        love_meter = (name_one.id + name_two.id) % 100
+        love_meter = (name_one.id + name_two.id) % 101
         love_idx = str(sorted(x for x in LOVE_LEVELS if x <= love_meter)[-1])
         love_status = choice(LOVE_DATA[love_idx]["titles"])
 
