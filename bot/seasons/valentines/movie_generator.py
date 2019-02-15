@@ -3,11 +3,10 @@ import random
 from os import environ
 from urllib import parse
 
-import aiohttp
 import discord
 from discord.ext import commands
 
-TMDB_API_KEY = environ.get("TMDB_API_KEY")
+TMDB_API_KEY = environ.get('TMDB_API_KEY')
 
 log = logging.getLogger(__name__)
 
@@ -38,21 +37,25 @@ class RomanceMovieFinder:
                   }
         # the api request url
         request_url = "https://api.themoviedb.org/3/discover/movie?" + parse.urlencode(params)
-        async with aiohttp.ClientSession() as session:
+        async with self.bot.http_session as session:
             async with session.get(request_url) as resp:
-                # loading the json file returned from the api
-                data = await resp.json()
-                # selecting random result from results object in the json file
-                selected_movie = random.choice(data["results"])
+                # trying to load the json file returned from the api
+                try:
+                    data = await resp.json()
+                    # selecting random result from results object in the json file
+                    selected_movie = random.choice(data["results"])
 
-        embed = discord.Embed(
-            title=f":sparkling_heart: {selected_movie['title']} :sparkling_heart:",
-            description=selected_movie["overview"],
-        )
-        embed.set_image(url=f"http://image.tmdb.org/t/p/w200/{selected_movie['poster_path']}")
-        embed.add_field(name="Release date :clock1:", value=selected_movie["release_date"])
-        embed.add_field(name="Rating :star2:", value=selected_movie["vote_average"])
-        await ctx.send(embed=embed)
+                    embed = discord.Embed(
+                        title=f":sparkling_heart: {selected_movie['title']} :sparkling_heart:",
+                        description=selected_movie["overview"],
+                    )
+                    embed.set_image(url=f"http://image.tmdb.org/t/p/w200/{selected_movie['poster_path']}")
+                    embed.add_field(name="Release date :clock1:", value=selected_movie["release_date"])
+                    embed.add_field(name="Rating :star2:", value=selected_movie["vote_average"])
+                    await ctx.send(embed=embed)
+                except KeyError:
+                    embed = discord.Embed(title='Something went wrong')
+                    await ctx.send(embed=embed)
 
 
 def setup(bot):
