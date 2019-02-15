@@ -5,6 +5,7 @@ from typing import List
 
 from aiohttp import AsyncResolver, ClientSession, TCPConnector
 from discord import Embed
+from discord.ext import commands
 from discord.ext.commands import Bot
 
 from bot import constants
@@ -61,3 +62,10 @@ class SeasonalBot(Bot):
         embed.set_author(name=title, icon_url=icon)
 
         await devlog.send(embed=embed)
+
+    async def on_command_error(self, context, exception):
+        # Don't punish the user for getting the arguments wrong
+        if isinstance(exception, commands.UserInputError):
+            context.command.reset_cooldown(context)
+        else:
+            super().on_command_error(context, exception)
