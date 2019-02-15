@@ -7,26 +7,25 @@ import aiohttp
 import discord
 from discord.ext import commands
 
+TMDB_API_KEY = environ.get('TMDB_API_KEY')
+
 log = logging.getLogger(__name__)
 
 
-class MovieGenerator:
+class RomanceMovieFinder:
     """
-    a cog that gives random romance movie suggestion to a user
+    A cog that returns a random romance movie suggestion to a user
 
     """
 
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
-    async def romancemovie(self, ctx):
+    @commands.command(name='romancemovie')
+    async def romance_movie(self, ctx):
         """
-
-        randomly selects romance movie and displays info about it
+        Randomly selects a romance movie and displays information about it
         """
-
-        TMDB_API_KEY = environ.get("TMDB_API_KEY")
         # selecting a random int to parse it to the page parameter
         random_page = random.randint(0, 20)
         # TMDB api params
@@ -48,15 +47,15 @@ class MovieGenerator:
                 selected_movie = random.choice(data['results'])
 
         embed = discord.Embed(
-            title=":sparkling_heart: " + selected_movie['title'] + ":sparkling_heart: ",
+            title=f":sparkling_heart: {selected_movie['title']} :sparkling_heart:",
             description=selected_movie['overview'],
         )
-        embed.set_image(url='http://image.tmdb.org/t/p/w200/' + selected_movie['poster_path'])
-        embed.add_field(name='release date :clock1:', value=selected_movie['release_date'])
-        embed.add_field(name='rating :star2: ', value=selected_movie['vote_average'])
+        embed.set_image(url=f"http://image.tmdb.org/t/p/w200/{selected_movie['poster_path']}")
+        embed.add_field(name='Release date :clock1:', value=selected_movie['release_date'])
+        embed.add_field(name='Rating :star2:', value=selected_movie['vote_average'])
         await ctx.send(embed=embed)
 
 
 def setup(bot):
-    bot.add_cog(MovieGenerator(bot))
-    log.debug("Random movie generator cog loaded!")
+    bot.add_cog(RomanceMovieFinder(bot))
+    log.debug("Random romance movie generator cog loaded!")
