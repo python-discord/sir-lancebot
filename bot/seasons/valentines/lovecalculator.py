@@ -33,14 +33,24 @@ class LoveCalculator:
     async def love(self, ctx, who: Union[Member, str], whom: Union[Member, str] = None):
         """
         Tells you how much the two love each other.
+
+        This command accepts users or arbitrary strings as arguments.
+        Users are converted from:
+          - User ID
+          - Mention
+          - name#discrim
+          - name
+          - nickname
+
+        Any two arguments will always yield the same result, though the order of arguments matters:
+          Running .love joseph erlang will always yield the same result.
+          Running .love erlang joseph won't yield the same result as .love joseph erlang
+
+        If you want to use multiple words for one argument, you must include quotes.
+          .love "Zes Vappa" "morning coffee"
+
+        If only one argument is provided, the subject will become one of the helpers at random.
         """
-        # TODO better docstring
-        # figure out how to cram info about the intricacies of the command somehow
-        # - member conversion
-        # - asymmetry
-        # - consistency (from hashing)
-        # - need for quotes
-        # - I'm probably forgetting something
 
         if whom is None:
             staff = ctx.guild.get_role(Roles.helpers).members
@@ -55,7 +65,6 @@ class LoveCalculator:
         #
         # hashlib is used over the builtin hash() function
         # to guarantee same result over multiple runtimes
-        # TODO: make it so `a ab` and `aa b` yield different results?
         m = hashlib.sha256(who.encode() + whom.encode())
         # mod 101 for [0, 100]
         love_percent = sum(m.digest()) % 101
