@@ -38,7 +38,7 @@ class RomanceMovieFinder:
         # the api request url
         request_url = "https://api.themoviedb.org/3/discover/movie?" + parse.urlencode(params)
         async with self.bot.http_session.get(request_url) as resp:
-                # trying to load the json file returned from the api
+            # trying to load the json file returned from the api
             try:
                 data = await resp.json()
                 # selecting random result from results object in the json file
