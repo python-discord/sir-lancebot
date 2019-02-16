@@ -57,7 +57,7 @@ class RomanceMovieFinder:
                     warning_message = 'Got KeyError in the data dictionary, API service might not be available' \
                                       'or wrong API key'
                     embed = discord.Embed(title=warning_message)
-                    log.warning('Got KeyError in the data dictionary')
+                    log.warning(warning_message)
                     await ctx.send(embed=embed)
 
 
