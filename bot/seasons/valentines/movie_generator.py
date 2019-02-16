@@ -55,6 +55,8 @@ class RomanceMovieFinder:
                     await ctx.send(embed=embed)
                 except KeyError:
                     embed = discord.Embed(title='Something went wrong')
+                    log.setLevel(logging.WARNING)
+                    log.debug('Got KeyError at romance movie cog')
                     await ctx.send(embed=embed)
 
 
