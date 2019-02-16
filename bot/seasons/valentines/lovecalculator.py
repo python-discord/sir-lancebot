@@ -9,7 +9,7 @@ from typing import Union
 import discord
 from discord import Member
 from discord.ext import commands
-from discord.ext.commands import clean_content
+from discord.ext.commands import clean_content, BadArgument
 
 from bot.constants import Roles
 
@@ -30,7 +30,11 @@ class LoveCalculator:
 
     @commands.command(aliases=('love_calculator', 'love_calc'))
     @commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
-    async def love(self, ctx, who: Union[Member, str], whom: Union[Member, str] = None):
+    async def love(
+            self, ctx,
+            who: Union[Member, clean_content],
+            whom: Union[Member, clean_content] = None
+    ):
         """
         Tells you how much the two love each other.
 
@@ -57,9 +61,12 @@ class LoveCalculator:
             whom = random.choice(staff)
 
         # if inputs were members, make sure to show name#discrim
-        # also make sure to escape all discord markdown to prevent mischief
-        cleaner = clean_content(escape_markdown=True, use_nicknames=False)
-        who, whom = [await cleaner.convert(ctx, str(arg)) for arg in (who, whom)]
+        # normalize case and remove any leading/trailing whitespace
+        who, whom = [str(arg).strip().title() for arg in (who, whom)]
+
+        # make sure user didn't provide something silly such as 10 spaces
+        if not (who and whom):
+            raise BadArgument('Arguments be non-empty strings.')
 
         # hash inputs to guarantee consistent results (hashing algorithm choice arbitrary)
         #
