@@ -6,7 +6,7 @@ from urllib import parse
 import discord
 from discord.ext import commands
 
-TMDB_API_KEY = environ.get('TMDB_API_KEY')
+TMDB_API_KEY = environ.get("TMDB_API_KEY")
 
 log = logging.getLogger(__name__)
 
@@ -27,14 +27,15 @@ class RomanceMovieFinder:
         # selecting a random int to parse it to the page parameter
         random_page = random.randint(0, 20)
         # TMDB api params
-        params = {"api_key": TMDB_API_KEY,
-                  "language": "en-US",
-                  "sort_by": "popularity.desc",
-                  "include_adult": "false",
-                  "include_video": "false",
-                  "page": random_page,
-                  "with_genres": "10749"
-                  }
+        params = {
+            "api_key": TMDB_API_KEY,
+            "language": "en-US",
+            "sort_by": "popularity.desc",
+            "include_adult": "false",
+            "include_video": "false",
+            "page": random_page,
+            "with_genres": "10749"
+        }
         # the api request url
         request_url = "https://api.themoviedb.org/3/discover/movie?" + parse.urlencode(params)
         async with self.bot.http_session.get(request_url) as resp:
@@ -53,8 +54,8 @@ class RomanceMovieFinder:
                 embed.add_field(name="Rating :star2:", value=selected_movie["vote_average"])
                 await ctx.send(embed=embed)
             except KeyError:
-                warning_message = 'Got KeyError in the data dictionary, API service might not be available' \
-                                    'or wrong API key'
+                warning_message = "A KeyError was raised while fetching information on the movie. The API service" \
+                                  " could be unavailable or the API key could be set incorrectly."
                 embed = discord.Embed(title=warning_message)
                 log.warning(warning_message)
                 await ctx.send(embed=embed)
