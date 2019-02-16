@@ -16,6 +16,9 @@ class Fun:
 
     @commands.command()
     async def roll(self, ctx, num_rolls: int = 1):
+        """
+            Outputs a number of random dice emotes (up to 6)
+        """
         output = ""
         if num_rolls > 6:
             num_rolls = 6
