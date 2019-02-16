@@ -4,12 +4,12 @@ import json
 import logging
 import random
 from pathlib import Path
+from typing import Union
 
 import discord
 from discord import Member
 from discord.ext import commands
 from discord.ext.commands import clean_content
-from typing import Union
 
 from bot.constants import Roles
 
