@@ -54,9 +54,10 @@ class RomanceMovieFinder:
                     embed.add_field(name="Rating :star2:", value=selected_movie["vote_average"])
                     await ctx.send(embed=embed)
                 except KeyError:
-                    embed = discord.Embed(title='Something went wrong')
-                    log.setLevel(logging.WARNING)
-                    log.debug('Got KeyError at romance movie cog')
+                    warning_message = 'Got KeyError in the data dictionary, API service might not be available' \
+                                      'or wrong API key'
+                    embed = discord.Embed(title=warning_message)
+                    log.warning('Got KeyError in the data dictionary')
                     await ctx.send(embed=embed)
 
 
