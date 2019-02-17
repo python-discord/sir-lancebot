@@ -8,8 +8,7 @@ import discord
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
 
-from bot.constants import Colours, Lovefest, Roles
-from bot.decorators import with_role
+from bot.constants import Colours, Lovefest
 
 log = logging.getLogger(__name__)
 
@@ -72,25 +71,6 @@ You can have the lovefest role or get rid of it by using one of the commands sho
             await user.remove_roles(role)
             await ctx.send("The lovefest role has been successfully removed !")
 
-    """@with_role(Roles.moderator)
-    @commands.command(name='refreshlovefest')
-    async def refresh_user_lovefestlist(self, ctx):
-        
-        Use this command to refresh the USER_VALENTINE list when the bot goes offline and then comes back online
-        
-        USER_LOVEFEST.clear()
-        for member in ctx.guild.members:
-            for role in member.roles:
-                if role.id == Lovefest.role_id:
-                    USER_LOVEFEST.append(member)
-        embed = discord.Embed(
-            title="USER_LOVEFEST list updated!",
-            description=f'''The USER_LOVEFEST has been refreshed,`bemyvalentine` and `bemyvalentine dm` commands can now
-                            be used and there are {USER_LOVEFEST.__len__()} members having the lovefest role.''',
-            color=Colours.pink
-        )
-        await ctx.send(embed=embed)
-    """
     @commands.cooldown(1, 1800, BucketType.user)
     @commands.group(name='bemyvalentine', invoke_without_command=True)
     async def send_valentine(self, ctx, user: typing.Optional[discord.Member] = None, *, valentine_type=None):
@@ -161,8 +141,8 @@ You can have the lovefest role or get rid of it by using one of the commands sho
         example : .bemyvalentine secret (sends valentine as a poem or a compliment to a random user in DM making you
         anonymous)
         example : .bemyvalentine secret Iceman#6508 p (sends a poem to Iceman in DM making you anonymous)
-        example : .bemyvalentine secret Iceman#6508 Hey I love you, wanna hang around ? (sends the custom message to Iceman
-        in DM making you anonymous)
+        example : .bemyvalentine secret Iceman#6508 Hey I love you, wanna hang around ? (sends the custom message to
+        Iceman in DM making you anonymous)
         """
         emoji_1, emoji_2 = self.random_emoji()
         if ctx.guild is not None:
