@@ -74,8 +74,10 @@ class Emojis:
 
 
 class Lovefest:
-    channel_id = int(environ.get("LOVEFEST_CHANNEL_ID", 542272993192050698))
-    role_id = int(environ.get("LOVEFEST_ROLE_ID", 542431903886606399))
+    # channel_id = int(environ.get("LOVEFEST_CHANNEL_ID", 542272993192050698))
+    channel_id = int(environ.get("LOVEFEST_CHANNEL_ID", 426566445124812815))
+    # role_id = int(environ.get("LOVEFEST_ROLE_ID", 542431903886606399))
+    role_id = int(environ.get("LOVEFEST_ROLE_ID", 507601744411230208))
 
 
 class Hacktoberfest(NamedTuple):
@@ -91,7 +93,8 @@ class Roles(NamedTuple):
     developer = 352427296948486144
     devops = 409416496733880320
     jammer = 423054537079783434
-    moderator = 267629731250176001
+    # moderator = 267629731250176001
+    moderator = 507601744411230208  # for my local server, never add this file
     muted = 277914926603829249
     owner = 267627879762755584
     verified = 352427296948486144

@@ -24,7 +24,7 @@ class SaveTheDate:
     @commands.command()
     async def savethedate(self, ctx):
         """
-        This command gives you ideas for a date with your valentine.
+        Gives you ideas for what to do on a date with your valentine.
         """
         with open(Path('bot', 'resources', 'valentines', 'date_ideas.json'), 'r', encoding="utf8") as f:
             valentine_dates = load(f)
