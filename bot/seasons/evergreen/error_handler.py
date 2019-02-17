@@ -44,10 +44,10 @@ class CommandErrorHandler:
             )
             seconds = error.retry_after
             remaining_minutes, remaining_seconds = divmod(seconds, 60)
-            message = f'{int(remaining_minutes)} minutes {math.ceil(remaining_seconds)} seconds'
+            time_remaining = f'{int(remaining_minutes)} minutes {math.ceil(remaining_seconds)} seconds'
             return await ctx.send(
                 "This command is on cooldown,"
-                f" please retry in {message}."
+                f" please retry in {time_remaining}."
             )
         if isinstance(error, commands.DisabledCommand):
             logging.debug(
