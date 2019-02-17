@@ -42,9 +42,13 @@ class CommandErrorHandler:
                 f"{ctx.author} called the command '{ctx.command}' "
                 "but they were on cooldown!"
             )
+            seconds = error.retry_after
+            minutes, seconds = divmod(seconds, 60)
+            # hours, minutes = divmod(minutes, 60) uncomment if needed
+            message = f'{int(minutes)} minutes {math.ceil(seconds)} seconds'
             return await ctx.send(
                 "This command is on cooldown,"
-                f" please retry in {math.ceil(error.retry_after)}s."
+                f" please retry in {message}."
             )
         if isinstance(error, commands.DisabledCommand):
             logging.debug(
