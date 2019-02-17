@@ -3,6 +3,8 @@ import random
 
 from discord.ext import commands
 
+from bot.constants import Emojis
+
 log = logging.getLogger(__name__)
 
 
@@ -25,7 +27,8 @@ class Fun:
         elif num_rolls < 1:
             output = ":no_entry: You must roll at least once."
         for _ in range(num_rolls):
-            output += ":terning%d: " % random.randint(1, 6)
+            terning = f"terning{random.randint(1, 6)}"
+            output += getattr(Emojis, terning, '')
         await ctx.send(output)
 
 
