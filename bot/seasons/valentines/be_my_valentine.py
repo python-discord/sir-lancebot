@@ -8,7 +8,7 @@ import discord
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
 
-from bot.constants import Colours, Lovefest, Client
+from bot.constants import Client, Colours, Lovefest
 
 log = logging.getLogger(__name__)
 
