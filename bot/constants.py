@@ -72,6 +72,13 @@ class Emojis:
     christmas_tree = "\U0001F384"
     check = "\u2611"
 
+    terning1 = "<:terning1:431249668983488527>"
+    terning2 = "<:terning2:462339216987127808>"
+    terning3 = "<:terning3:431249694467948544>"
+    terning4 = "<:terning4:431249704769290241>"
+    terning5 = "<:terning5:431249716328792064>"
+    terning6 = "<:terning6:431249726705369098>"
+
 
 class Lovefest:
     channel_id = int(environ.get("LOVEFEST_CHANNEL_ID", 542272993192050698))
