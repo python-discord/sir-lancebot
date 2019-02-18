@@ -8,7 +8,7 @@ import discord
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
 
-from bot.constants import Colours, Lovefest
+from bot.constants import Colours, Lovefest, Client
 
 log = logging.getLogger(__name__)
 
@@ -19,7 +19,6 @@ class BeMyValentine:
     """
     A cog that sends valentines to other users !
     """
-    id = Lovefest.role_id
 
     def __init__(self, bot):
         self.bot = bot
@@ -35,15 +34,13 @@ class BeMyValentine:
     @commands.group(name="lovefest", invoke_without_command=True)
     async def lovefest_role(self, ctx):
         """
-        By using this command, you can have yourself the lovefest role or remove it.
+        You can have yourself the lovefest role or remove it.
         The lovefest role makes you eligible to receive anonymous valentines from other users.
-        """
-        message = """```
-You can have the lovefest role or get rid of it by using one of the commands shown below:
-1) use the command \".lovefest sub\" to get the lovefest role.
-2) use the command \".lovefest unsub\" to get rid of the lovefest role.
-            ```"""
-        await ctx.send(message)
+
+        1) use the command \".lovefest sub\" to get the lovefest role.
+        2) use the command \".lovefest unsub\" to get rid of the lovefest role.
+            """
+        await ctx.invoke(self.bot.get_command("help"), "lovefest")
 
     @lovefest_role.command(name="sub")
     async def add_role(self, ctx):
@@ -81,26 +78,35 @@ You can have the lovefest role or get rid of it by using one of the commands sho
         (optional)
 
         example: .bemyvalentine (sends valentine as a poem or a compliment to a random user)
-        example: .bemyvalentine @Iceman#6508 p (sends a poem to Iceman)
-        example: .bemyvalentine @Iceman#6508 Hey I love you, wanna hang around ? (sends the custom message to Iceman)
+        example: .bemyvalentine Iceman#6508 p (sends a poem to Iceman)
+        example: .bemyvalentine Iceman Hey I love you, wanna hang around ? (sends the custom message to Iceman)
+        NOTE : AVOID TAGGING THE USER MOST OF THE TIMES.JUST TRIM THE '@' when using this command.
         """
-        emoji_1, emoji_2 = self.random_emoji()
-
         if ctx.guild is None:
             # This command should only be used in the server
             msg = "You are supposed to use this command in the server."
             return await ctx.send(msg)
 
-        channel = self.bot.get_channel(Lovefest.channel_id)
+        if user:
+            if Lovefest.role_id not in [role.id for role in user.roles]:
+                message = f"You cannot send a valentine to {user} as he/she does not have the lovefest role!"
+                return await ctx.send(message)
 
         if user == ctx.author:
             # Well a user cant valentine himself/herself.
-            await ctx.send('Come on dude, you cant send a valentine to yourself :expressionless:')
+            return await ctx.send('Come on dude, you cant send a valentine to yourself :expressionless:')
 
-        elif user is None:
+        emoji_1, emoji_2 = self.random_emoji()
+        Role = discord.utils.get(ctx.guild.roles, id=Lovefest.role_id)
+        channel = self.bot.get_channel(Lovefest.channel_id)
+
+        if user is None:
             author = ctx.author
-            members = ctx.guild.members
-            user = self.random_user(author, members)
+            user = self.random_user(author, Role.members)
+            if user is None:
+                return await ctx.send("There are no users avilable to whome your valentine can be sent.")
+            else:
+                pass
             # just making sure that the random does not pick up the same user(ctx.author)
 
         if valentine_type is None:
@@ -144,20 +150,32 @@ You can have the lovefest role or get rid of it by using one of the commands sho
         example : .bemyvalentine secret Iceman#6508 Hey I love you, wanna hang around ? (sends the custom message to
         Iceman in DM making you anonymous)
         """
-        emoji_1, emoji_2 = self.random_emoji()
         if ctx.guild is not None:
             # This command is only DM specific
             msg = "You are not supposed to use this command in the server, DM the command to the bot."
             return await ctx.send(msg)
 
+        if user:
+            if Lovefest.role_id not in [role.id for role in user.roles]:
+                message = f"You cannot send a valentine to {user} as he/she does not have the lovefest role!"
+                return await ctx.send(message)
+
         if user == ctx.author:
             # Well a user cant valentine himself/herself.
-            await ctx.send('Come on dude, you cant send a valentine to yourself :expressionless:')
+            return await ctx.send('Come on dude, you cant send a valentine to yourself :expressionless:')
+
+        guild = self.bot.get_guild(id=Client.guild)
+        emoji_1, emoji_2 = self.random_emoji()
+        Role = discord.utils.get(guild.roles, id=Lovefest.role_id)
+        print(Role)
 
         if user is None:
             author = ctx.author
-            members = ctx.guild.members
-            user = self.random_user(author, members)
+            user = self.random_user(author, Role.members)
+            if user is None:
+                return await ctx.send("There are no users avilable to whome your valentine can be sent.")
+            else:
+                pass
             # just making sure that the random does not pick up the same user(ctx.author)
 
         if valentine_type is None:
@@ -186,15 +204,11 @@ You can have the lovefest role or get rid of it by using one of the commands sho
 
     @staticmethod
     def random_user(author, members):
-        USER_LOVEFEST = []
-        for member in members:
-            for role in member.roles:
-                if role.id == Lovefest.role_id:
-                    USER_LOVEFEST.append(member)
-
-        USER_LOVEFEST.remove(author)
-        user = random.choice(USER_LOVEFEST)
-        USER_LOVEFEST.append(author)
+        members.remove(author)
+        if members.__len__() == 0:
+            user = None
+        else:
+            user = random.choice(members)
         return user
 
     @staticmethod
