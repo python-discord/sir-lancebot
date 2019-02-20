@@ -39,7 +39,7 @@ class BeMyValentine:
 
         1) use the command \".lovefest sub\" to get the lovefest role.
         2) use the command \".lovefest unsub\" to get rid of the lovefest role.
-            """
+        """
         await ctx.invoke(self.bot.get_command("help"), "lovefest")
 
     @lovefest_role.command(name="sub")
@@ -97,17 +97,16 @@ class BeMyValentine:
             return await ctx.send('Come on dude, you cant send a valentine to yourself :expressionless:')
 
         emoji_1, emoji_2 = self.random_emoji()
-        Role = discord.utils.get(ctx.guild.roles, id=Lovefest.role_id)
+        lovefest_role = discord.utils.get(ctx.guild.roles, id=Lovefest.role_id)
         channel = self.bot.get_channel(Lovefest.channel_id)
 
         if user is None:
             author = ctx.author
-            user = self.random_user(author, Role.members)
+            user = self.random_user(author, lovefest_role.members)
             if user is None:
                 return await ctx.send("There are no users avilable to whome your valentine can be sent.")
             else:
                 pass
-            # just making sure that the random does not pick up the same user(ctx.author)
 
         if valentine_type is None:
             # grabs a random valentine -can be a poem or a good message
@@ -115,16 +114,16 @@ class BeMyValentine:
 
         elif valentine_type.lower() in ['p', 'poem']:
             valentine = self.valentine_poem()
-            title = f'A poem dedicated to'
+            title = 'A poem dedicated to'
 
         elif valentine_type.lower() in ['c', 'compliment']:
             valentine = self.valentine_compliment()
-            title = f'A compliment for'
+            title = 'A compliment for'
 
         else:
             # in this case, the user decides to type his own valentine.
             valentine = valentine_type
-            title = f'A message for'
+            title = 'A message for'
 
         embed = discord.Embed(
             title=f'{emoji_1} {title} {user.display_name} {emoji_2}',
@@ -166,33 +165,31 @@ class BeMyValentine:
 
         guild = self.bot.get_guild(id=Client.guild)
         emoji_1, emoji_2 = self.random_emoji()
-        Role = discord.utils.get(guild.roles, id=Lovefest.role_id)
-        print(Role)
+        lovefest_role = discord.utils.get(guild.roles, id=Lovefest.role_id)
 
         if user is None:
             author = ctx.author
-            user = self.random_user(author, Role.members)
+            user = self.random_user(author, lovefest_role.members)
             if user is None:
                 return await ctx.send("There are no users avilable to whome your valentine can be sent.")
             else:
                 pass
-            # just making sure that the random does not pick up the same user(ctx.author)
 
         if valentine_type is None:
             valentine, title = self.random_valentine()
 
         elif valentine_type.lower() in ['p', 'poem']:
             valentine = self.valentine_poem()
-            title = f'A poem dedicated to'
+            title = 'A poem dedicated to'
 
         elif valentine_type.lower() in ['c', 'compliment']:
             valentine = self.valentine_compliment()
-            title = f'A compliment for'
+            title = 'A compliment for'
 
         else:
             # in this case, the user decides to type his own valentine.
             valentine = valentine_type
-            title = f'A message for'
+            title = 'A message for'
 
         embed = discord.Embed(
             title=f'{emoji_1}{title} {user.display_name}{emoji_2}',
@@ -204,11 +201,14 @@ class BeMyValentine:
 
     @staticmethod
     def random_user(author, members):
-        members.remove(author)
-        if members.__len__() == 0:
-            user = None
-        else:
+        # just making sure that the random does not pick up the same user(ctx.author)
+
+        if members.__len__() != 0:
+            if author in members:
+                members.remove(author)
             user = random.choice(members)
+        else:
+            user = None
         return user
 
     @staticmethod
