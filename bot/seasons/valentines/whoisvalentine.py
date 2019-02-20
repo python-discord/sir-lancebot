@@ -6,6 +6,8 @@ from random import choice
 import discord
 from discord.ext import commands
 
+from bot.constants import Colours
+
 log = logging.getLogger(__name__)
 
 with open(Path("bot", "resources", "valentines", "valentine_facts.json"), "r") as file:
@@ -24,7 +26,7 @@ class ValentineFacts:
         embed = discord.Embed(
             title="Who is Saint Valentine?",
             description=FACTS['whois'],
-            color=discord.Color.dark_magenta()
+            color=Colours.pink
         )
         embed.set_thumbnail(
             url='https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Saint_Valentine_-_'
@@ -34,14 +36,14 @@ class ValentineFacts:
         await ctx.channel.send(embed=embed)
 
     @commands.command()
-    async def valentine_facts(self, ctx):
+    async def valentine_fact(self, ctx):
         """
         Shows a random fact about Valentine's Day.
         """
         embed = discord.Embed(
             title=choice(FACTS['titles']),
             description=choice(FACTS['text']),
-            color=discord.Color.dark_magenta()
+            color=Colours.pink
         )
 
         await ctx.channel.send(embed=embed)
