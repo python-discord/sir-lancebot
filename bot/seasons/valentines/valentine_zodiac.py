@@ -26,28 +26,28 @@ class ValentineZodiac:
         """
         Provides a counter compatible zodiac sign to the given user's zodiac sign.
         """
-        try:
-            with open(Path('bot', 'resources', 'valentines', 'zodiac_compatibility.json'), 'r', encoding="utf8") as f:
-                zodiacs = load(f)
+
+        with open(Path('bot', 'resources', 'valentines', 'zodiac_compatibility.json'), 'r', encoding="utf8") as f:
+            zodiacs = load(f)
+
+            try:
                 compatible_zodiac = random.choice(zodiacs[zodiac_sign.lower()])
-                emoji1 = random.choice(HEART_EMOJIS)
-                emoji2 = random.choice(HEART_EMOJIS)
-                embed = discord.Embed(
-                    title="Zodic Compatibility",
-                    description=f'{zodiac_sign.capitalize()}{emoji1}{compatible_zodiac["Zodiac"]}\n'
-                                f'{emoji2}Compatibility meter : {compatible_zodiac["compatibility_score"]}{emoji2}',
-                    color=Colours.pink
-                )
-                embed.add_field(
-                    name=f'A letter from Dr.Zodiac {LETTER_EMOJI}',
-                    value=compatible_zodiac['description']
-                )
-                await ctx.send(embed=embed)
-        except Exception as e:
-            if isinstance(e, KeyError):
-                await ctx.send(zodiac_sign.capitalize() + " zodiac sign does not exist.")
-            else:
-                raise e
+            except KeyError:
+                return await ctx.send(zodiac_sign.capitalize() + " zodiac sign does not exist.")
+
+            emoji1 = random.choice(HEART_EMOJIS)
+            emoji2 = random.choice(HEART_EMOJIS)
+            embed = discord.Embed(
+                title="Zodic Compatibility",
+                description=f'{zodiac_sign.capitalize()}{emoji1}{compatible_zodiac["Zodiac"]}\n'
+                            f'{emoji2}Compatibility meter : {compatible_zodiac["compatibility_score"]}{emoji2}',
+                color=Colours.pink
+            )
+            embed.add_field(
+                name=f'A letter from Dr.Zodiac {LETTER_EMOJI}',
+                value=compatible_zodiac['description']
+            )
+            await ctx.send(embed=embed)
 
 
 def setup(bot):
