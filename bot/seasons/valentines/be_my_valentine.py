@@ -82,6 +82,7 @@ class BeMyValentine:
         example: .bemyvalentine Iceman Hey I love you, wanna hang around ? (sends the custom message to Iceman)
         NOTE : AVOID TAGGING THE USER MOST OF THE TIMES.JUST TRIM THE '@' when using this command.
         """
+
         if ctx.guild is None:
             # This command should only be used in the server
             msg = "You are supposed to use this command in the server."
@@ -99,31 +100,13 @@ class BeMyValentine:
         emoji_1, emoji_2 = self.random_emoji()
         lovefest_role = discord.utils.get(ctx.guild.roles, id=Lovefest.role_id)
         channel = self.bot.get_channel(Lovefest.channel_id)
+        valentine, title = self.valentine_check(valentine_type)
 
         if user is None:
             author = ctx.author
             user = self.random_user(author, lovefest_role.members)
             if user is None:
                 return await ctx.send("There are no users avilable to whome your valentine can be sent.")
-            else:
-                pass
-
-        if valentine_type is None:
-            # grabs a random valentine -can be a poem or a good message
-            valentine, title = self.random_valentine()
-
-        elif valentine_type.lower() in ['p', 'poem']:
-            valentine = self.valentine_poem()
-            title = 'A poem dedicated to'
-
-        elif valentine_type.lower() in ['c', 'compliment']:
-            valentine = self.valentine_compliment()
-            title = 'A compliment for'
-
-        else:
-            # in this case, the user decides to type his own valentine.
-            valentine = valentine_type
-            title = 'A message for'
 
         embed = discord.Embed(
             title=f'{emoji_1} {title} {user.display_name} {emoji_2}',
@@ -149,6 +132,7 @@ class BeMyValentine:
         example : .bemyvalentine secret Iceman#6508 Hey I love you, wanna hang around ? (sends the custom message to
         Iceman in DM making you anonymous)
         """
+
         if ctx.guild is not None:
             # This command is only DM specific
             msg = "You are not supposed to use this command in the server, DM the command to the bot."
@@ -166,15 +150,23 @@ class BeMyValentine:
         guild = self.bot.get_guild(id=Client.guild)
         emoji_1, emoji_2 = self.random_emoji()
         lovefest_role = discord.utils.get(guild.roles, id=Lovefest.role_id)
+        valentine, title = self.valentine_check(valentine_type)
 
         if user is None:
             author = ctx.author
             user = self.random_user(author, lovefest_role.members)
             if user is None:
                 return await ctx.send("There are no users avilable to whome your valentine can be sent.")
-            else:
-                pass
 
+        embed = discord.Embed(
+            title=f'{emoji_1}{title} {user.display_name}{emoji_2}',
+            description=f'{valentine} \n **{emoji_2}From anonymous{emoji_1}**',
+            color=Colours.pink
+        )
+        await ctx.author.send(f"Your message has been sent to {user}")
+        await user.send(embed=embed)
+
+    def valentine_check(self, valentine_type):
         if valentine_type is None:
             valentine, title = self.random_valentine()
 
@@ -190,14 +182,7 @@ class BeMyValentine:
             # in this case, the user decides to type his own valentine.
             valentine = valentine_type
             title = 'A message for'
-
-        embed = discord.Embed(
-            title=f'{emoji_1}{title} {user.display_name}{emoji_2}',
-            description=f'{valentine} \n **{emoji_2}From anonymous{emoji_1}**',
-            color=Colours.pink
-        )
-        await ctx.author.send(f"Your message has been sent to {user}")
-        await user.send(embed=embed)
+        return valentine, title
 
     @staticmethod
     def random_user(author, members):
