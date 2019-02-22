@@ -220,14 +220,14 @@ class BeMyValentine:
         Grabs a random poem.
         """
         valentine_poem = random.choice(self.valentines['valentine_poems'])
-        return valentine_poem['message']
+        return valentine_poem
 
     def valentine_compliment(self):
         """
         Grabs a random compliment.
         """
         valentine_compliment = random.choice(self.valentines['valentine_compliments'])
-        return valentine_compliment['message']
+        return valentine_compliment
 
 
 def setup(bot):
