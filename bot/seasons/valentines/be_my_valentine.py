@@ -163,8 +163,12 @@ class BeMyValentine:
             description=f'{valentine} \n **{emoji_2}From anonymous{emoji_1}**',
             color=Colours.pink
         )
-        await ctx.author.send(f"Your message has been sent to {user}")
-        await user.send(embed=embed)
+        try:
+            await user.send(embed=embed)
+        except discord.Forbidden:
+            await ctx.author.send(f"{user} has DMs disabled, so I couldn't send the message. Sorry!")
+        else:
+            await ctx.author.send(f"Your message has been sent to {user}")
 
     def valentine_check(self, valentine_type):
         if valentine_type is None:
@@ -186,11 +190,16 @@ class BeMyValentine:
 
     @staticmethod
     def random_user(author, members):
-        # just making sure that the random does not pick up the same user(ctx.author)
+        """
+        Picks a random member from the list provided in `members`, ensuring
+        the author is not one of the options.
 
-        if members.__len__() != 0:
-            if author in members:
-                members.remove(author)
+        :param author: member who invoked the command
+        :param members: list of discord.Member objects
+        """
+        if author in members:
+            members.remove(author)
+        if len(members) != 0:
             user = random.choice(members)
         else:
             user = None
@@ -213,7 +222,7 @@ class BeMyValentine:
             title = 'A poem dedicated to'
         else:
             title = 'A compliment for '
-        return random_valentine['message'], title
+        return random_valentine, title
 
     def valentine_poem(self):
         """
