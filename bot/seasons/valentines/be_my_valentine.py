@@ -94,8 +94,8 @@ class BeMyValentine:
                 return await ctx.send(message)
 
         if user == ctx.author:
-            # Well a user cant valentine himself/herself.
-            return await ctx.send('Come on dude, you cant send a valentine to yourself :expressionless:')
+            # Well a user can't valentine himself/herself.
+            return await ctx.send("Come on dude, you can't send a valentine to yourself :expressionless:")
 
         emoji_1, emoji_2 = self.random_emoji()
         lovefest_role = discord.utils.get(ctx.guild.roles, id=Lovefest.role_id)
@@ -199,11 +199,8 @@ class BeMyValentine:
         """
         if author in members:
             members.remove(author)
-        if len(members) != 0:
-            user = random.choice(members)
-        else:
-            user = None
-        return user
+
+        return random.choice(members) if members else None
 
     @staticmethod
     def random_emoji():
