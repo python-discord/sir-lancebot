@@ -345,7 +345,7 @@ class SeasonBase:
         await bot.send_log("SeasonalBot Loaded!", f"Active Season: **{self.name_clean}**")
 
 
-class SeasonManager:
+class SeasonManager(commands.Cog):
     """
     A cog for managing seasons.
     """
