@@ -61,6 +61,7 @@ class Client(NamedTuple):
 class Colours:
     soft_red = 0xcd6d6d
     soft_green = 0x68c290
+    bright_green = 0x01d277
     dark_green = 0x1f8b4c
     orange = 0xe67e22
     pink = 0xcf84e0
@@ -70,6 +71,18 @@ class Emojis:
     star = "\u2B50"
     christmas_tree = "\U0001F384"
     check = "\u2611"
+
+    terning1 = "<:terning1:431249668983488527>"
+    terning2 = "<:terning2:462339216987127808>"
+    terning3 = "<:terning3:431249694467948544>"
+    terning4 = "<:terning4:431249704769290241>"
+    terning5 = "<:terning5:431249716328792064>"
+    terning6 = "<:terning6:431249726705369098>"
+
+
+class Lovefest:
+    channel_id = int(environ.get("LOVEFEST_CHANNEL_ID", 542272993192050698))
+    role_id = int(environ.get("LOVEFEST_ROLE_ID", 542431903886606399))
 
 
 class Hacktoberfest(NamedTuple):
