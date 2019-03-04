@@ -4,7 +4,7 @@ import os
 
 from discord import Embed
 from discord.ext import commands
-from discord.ext.commands import Bot, Context
+from discord.ext.commands import Bot, Cog, Context
 
 log = logging.getLogger(__name__)
 
@@ -14,7 +14,7 @@ EMOJIS = {
 }
 
 
-class MonsterSurvey:
+class MonsterSurvey(Cog):
     """
     Vote for your favorite monster!
     This command allows users to vote for their favorite listed monster.

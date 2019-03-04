@@ -108,7 +108,7 @@ async def day_countdown(bot: commands.Bot):
         await asyncio.sleep(120)
 
 
-class AdventOfCode:
+class AdventOfCode(commands.Cog):
     """
     Advent of Code festivities! Ho Ho Ho!
     """

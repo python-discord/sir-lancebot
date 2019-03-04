@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_heart:", ":two_hearts:"]
 
 
-class SaveTheDate:
+class SaveTheDate(commands.Cog):
     """
     A cog that gives random suggestion, for a valentines date !
     """

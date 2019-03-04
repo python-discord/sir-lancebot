@@ -13,7 +13,7 @@ from discord.ext import commands
 log = logging.getLogger(__name__)
 
 
-class HacktoberStats:
+class HacktoberStats(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.link_json = Path("bot", "resources", "github_links.json")

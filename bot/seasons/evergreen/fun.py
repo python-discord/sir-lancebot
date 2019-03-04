@@ -8,7 +8,7 @@ from bot.constants import Emojis
 log = logging.getLogger(__name__)
 
 
-class Fun:
+class Fun(commands.Cog):
     """
     A collection of general commands for fun.
     """

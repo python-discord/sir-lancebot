@@ -14,7 +14,7 @@ LETTER_EMOJI = ':love_letter:'
 HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_heart:", ":two_hearts:"]
 
 
-class ValentineZodiac:
+class ValentineZodiac(commands.Cog):
     """
     A cog that returns a counter compatible zodiac sign to the given user's zodiac sign.
     """
