@@ -13,7 +13,6 @@ log = logging.getLogger(__name__)
 
 with open(Path('bot', 'resources', 'valentines', 'valenstates.json'), 'r') as file:
     STATES = json.load(file)
-    # STATES.sort()
 
 
 class MyValenstate:
@@ -78,3 +77,4 @@ class MyValenstate:
 
 def setup(bot):
     bot.add_cog(MyValenstate(bot))
+    log.debug("MyValenstate cog loaded")
