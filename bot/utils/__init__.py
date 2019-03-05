@@ -25,7 +25,6 @@ async def disambiguate(
     :param embed: The embed that the paginator will use.
     :return: Users choice for correct entry.
     """
-
     if len(entries) == 0:
         raise BadArgument('No matches found.')
 

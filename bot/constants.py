@@ -128,6 +128,3 @@ ERROR_REPLIES = [
 
 
 bot = SeasonalBot(command_prefix=Client.prefix)
-
-
-

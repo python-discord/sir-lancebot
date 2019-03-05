@@ -16,7 +16,7 @@ from typing import List, Tuple
 import aiohttp
 from PIL import Image
 from PIL.ImageDraw import ImageDraw
-from discord import Reaction, Member, File
+from discord import File, Member, Reaction
 from discord.ext.commands import Context
 
 SNAKE_RESOURCES = Path('bot', 'resources', 'snakes').absolute()
@@ -65,7 +65,9 @@ snakes = {
 BOARD_TILE_SIZE = 56         # the size of each board tile
 BOARD_PLAYER_SIZE = 20       # the size of each player icon
 BOARD_MARGIN = (10, 0)       # margins, in pixels (for player icons)
-PLAYER_ICON_IMAGE_SIZE = 32  # the size of the image to download, should a power of 2 and higher than BOARD_PLAYER_SIZE
+# The size of the image to download
+# Should a power of 2 and higher than BOARD_PLAYER_SIZE
+PLAYER_ICON_IMAGE_SIZE = 32
 MAX_PLAYERS = 4              # depends on the board size/quality, 4 is for the default board
 
 # board definition (from, to)
@@ -391,7 +393,6 @@ class SnakeAndLaddersGame:
         Listen for reactions until players have joined,
         and the game has been started.
         """
-
         def startup_event_check(reaction_: Reaction, user_: Member):
             """
             Make sure that this reaction is what we want to operate on
@@ -539,7 +540,6 @@ class SnakeAndLaddersGame:
         await self.start_round()
 
     async def start_round(self):
-
         def game_event_check(reaction_: Reaction, user_: Member):
             """
             Make sure that this reaction is what we want to operate on
@@ -665,7 +665,6 @@ class SnakeAndLaddersGame:
         self.round_has_rolled[user.id] = True
 
     async def _complete_round(self):
-
         self.state = 'post_round'
 
         # check for winner

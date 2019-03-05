@@ -159,7 +159,6 @@ class Snakes:
         """
         Returns random bright pastels.
         """
-
         light = random.uniform(0.7, 0.85)
         saturation = 1
 
@@ -179,7 +178,6 @@ class Snakes:
 
         Written by juan and Someone during the first code jam.
         """
-
         snake = Image.open(buffer)
 
         # Get the size of the snake icon, configure the height of the image box (yes, it changes)
@@ -259,7 +257,6 @@ class Snakes:
         """
         Sssnakifffiesss a sstring.
         """
-
         # Replace fricatives with exaggerated snake fricatives.
         simple_fricatives = [
             "f", "s", "z", "h",
@@ -284,7 +281,6 @@ class Snakes:
         """
         Asyncronous web request helper method.
         """
-
         if params is None:
             params = {}
 
@@ -299,7 +295,6 @@ class Snakes:
         attempts. Else, just return whatever the last
         message is.
         """
-
         long_message = random.choice(messages)
         if len(long_message.split()) < 3 and retries > 0:
             return self._get_random_long_message(
@@ -319,7 +314,6 @@ class Snakes:
         :param name: The name of the snake to get information for - omit for a random snake
         :return: A dict containing information on a snake
         """
-
         snake_info = {}
 
         async with aiohttp.ClientSession() as session:
@@ -492,10 +486,14 @@ class Snakes:
 
             return (
                 all((
-                    reaction_.message.id == board_id.id,  # Reaction is on this message
-                    reaction_.emoji in ANTIDOTE_EMOJI,    # Reaction is one of the pagination emotes
-                    user_.id != self.bot.user.id,         # Reaction was not made by the Bot
-                    user_.id == ctx.author.id             # Reaction was made by author
+                    # Reaction is on this message
+                    reaction_.message.id == board_id.id,
+                    # Reaction is one of the pagination emotes
+                    reaction_.emoji in ANTIDOTE_EMOJI,
+                    # Reaction was not made by the Bot
+                    user_.id != self.bot.user.id,
+                    # Reaction was made by author
+                    user_.id == ctx.author.id
                 ))
             )
 
@@ -535,7 +533,8 @@ class Snakes:
         # Begin main game loop
         while not win and antidote_tries < 10:
             try:
-                reaction, user = await ctx.bot.wait_for("reaction_add", timeout=300, check=predicate)
+                reaction, user = await ctx.bot.wait_for(
+                    "reaction_add", timeout=300, check=predicate)
             except asyncio.TimeoutError:
                 log.debug("Antidote timed out waiting for a reaction")
                 break  # We're done, no reactions for the last 5 minutes
@@ -654,11 +653,11 @@ class Snakes:
         """
         Fetches information about a snake from Wikipedia.
         :param ctx: Context object passed from discord.py
-        :param name: Optional, the name of the snake to get information for - omit for a random snake
+        :param name: Optional, the name of the snake to get information
+                     for - omit for a random snake
 
         Created by Ava and eivl.
         """
-
         with ctx.typing():
             if name is None:
                 name = await Snake.random()
@@ -693,7 +692,8 @@ class Snakes:
             )
 
             emoji = 'https://emojipedia-us.s3.amazonaws.com/thumbs/60/google/3/snake_1f40d.png'
-            image = next((url for url in data['image_list'] if url.endswith(self.valid_image_extensions)), emoji)
+            image = next((url for url in data['image_list']
+                          if url.endswith(self.valid_image_extensions)), emoji)
             embed.set_image(url=image)
 
             await ctx.send(embed=embed)
@@ -707,7 +707,6 @@ class Snakes:
         Made by Ava and eivl.
         Modified by lemon.
         """
-
         with ctx.typing():
 
             image = None
@@ -719,11 +718,13 @@ class Snakes:
 
                 data = await self._get_snek(snake)
 
-                image = next((url for url in data['image_list'] if url.endswith(self.valid_image_extensions)), None)
+                image = next((url for url in data['image_list']
+                              if url.endswith(self.valid_image_extensions)), None)
 
             embed = Embed(
                 title='Which of the following is the snake in the image?',
-                description="\n".join(f"{'ABCD'[snakes.index(snake)]}: {snake}" for snake in snakes),
+                description="\n".join(
+                    f"{'ABCD'[snakes.index(snake)]}: {snake}" for snake in snakes),
                 colour=SNAKE_COLOR
             )
             embed.set_image(url=image)
@@ -739,7 +740,6 @@ class Snakes:
 
         Written by Momo and kel.
         """
-
         # Pick a random snake to hatch.
         snake_name = random.choice(list(utils.snakes.keys()))
         snake_image = utils.snakes[snake_name]
@@ -772,7 +772,6 @@ class Snakes:
         Written by Samuel.
         Modified by gdude.
         """
-
         url = "http://www.omdbapi.com/"
         page = random.randint(1, 27)
 
@@ -843,7 +842,6 @@ class Snakes:
         This was created by Mushy and Cardium,
         and modified by Urthas and lemon.
         """
-
         # Prepare a question.
         question = random.choice(self.snake_quizzes)
         answer = question["answerkey"]
@@ -882,7 +880,6 @@ class Snakes:
 
         This was written by Iceman, and modified for inclusion into the bot by lemon.
         """
-
         snake_name = await self._get_snake_name()
         snake_name = snake_name['name']
         snake_prefix = ""
@@ -940,7 +937,6 @@ class Snakes:
         Written by Momo and kel.
         Modified by lemon.
         """
-
         # check if there is already a game in this channel
         if ctx.channel in self.active_sal:
             await ctx.send(f"{ctx.author.mention} A game is already in progress in this channel.")
@@ -957,7 +953,6 @@ class Snakes:
         A command that shows an embed with information about the event,
         it's participants, and its winners.
         """
-
         contributors = [
             "<@!245270749919576066>",
             "<@!396290259907903491>",
@@ -1005,7 +1000,6 @@ class Snakes:
 
         Created by juan and Someone during the first code jam.
         """
-
         # Get the snake data we need
         if not name:
             name_obj = await self._get_snake_name()
@@ -1045,7 +1039,6 @@ class Snakes:
         Written by Andrew and Prithaj.
         Modified by lemon.
         """
-
         question = random.choice(self.snake_facts)["fact"]
         embed = Embed(
             title="Snake fact",
@@ -1059,7 +1052,6 @@ class Snakes:
         """
         This just invokes the help command on this cog.
         """
-
         log.debug(f"{ctx.author} requested info about the snakes cog")
         return await ctx.invoke(self.bot.get_command("help"), "Snakes")
 
@@ -1075,7 +1067,6 @@ class Snakes:
         Written by Momo and kel.
         Modified by lemon.
         """
-
         with ctx.typing():
             embed = Embed()
             user = ctx.message.author
@@ -1110,12 +1101,12 @@ class Snakes:
     async def video_command(self, ctx: Context, *, search: str = None):
         """
         Gets a YouTube video about snakes
-        :param name: Optional, a name of a snake. Used to search for videos with that name
+
         :param ctx: Context object passed from discord.py
+        :param search: Optional, a name of a snake. Used to search for videos with that name
 
         Written by Andrew and Prithaj.
         """
-
         # Are we searching for anything specific?
         if search:
             query = search + ' snake'
@@ -1156,7 +1147,6 @@ class Snakes:
         Written by Prithaj and Andrew.
         Modified by lemon.
         """
-
         embed = Embed(
             title="Zzzen of Pythhon",
             color=SNAKE_COLOR

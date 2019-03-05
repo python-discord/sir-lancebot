@@ -1,6 +1,6 @@
+import json
 import logging
 import random
-import json
 
 import discord
 from discord.ext.commands import Converter
