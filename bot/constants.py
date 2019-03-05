@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 class AdventOfCode:
     leaderboard_cache_age_threshold_seconds = 3600
     leaderboard_id = 363275
-    leaderboard_join_code = "363275-442b6939"
+    leaderboard_join_code = str(environ.get("AOC_JOIN_CODE", None))
     leaderboard_max_displayed_members = 10
     year = 2018
     channel_id = int(environ.get("AOC_CHANNEL_ID", 517745814039166986))
