@@ -56,22 +56,27 @@ class MyValenstate:
         matches = [x for x, y in eq_chars.items() if y == min(eq_chars.values())]
         valenstate = choice(matches)
         matches.remove(valenstate)
-        leftovers = f"{', '.join(matches[:len(matches)-2])}, and {matches[len(matches)-1]}"
+
+        embed_title = "But there are more!"
+        if len(matches) > 1:
+            leftovers = f"{', '.join(matches[:len(matches)-2])}, and {matches[len(matches)-1]}"
+            embed_text = f"You have {len(matches)} more matches, these being {leftovers}."
+        elif len(matches) == 1:
+            embed_title = "But there's another one!"
+            leftovers = str(matches)
+            embed_text = f"You have another match, this being {leftovers}."
+        else:
+            embed_title = "You have a true match!"
+            embed_text = "This state is your true Valenstate! There are no states that would suit" \
+                         " you better"
 
         embed = discord.Embed(
             title=f'Your Valenstate is {valenstate} \u2764',
             description=f'{STATES[valenstate]["text"]}',
             colour=Colours.pink
         )
-
-        if len(matches) > 1:
-            embed.add_field(
-                name="But there are more!",
-                value=f"You have {len(matches)} more matches, these being {leftovers}."
-            )
-        embed.set_image(
-            url=STATES[valenstate]["flag"]
-        )
+        embed.add_field(name=embed_title, value=embed_text)
+        embed.set_image(url=STATES[valenstate]["flag"])
         await ctx.channel.send(embed=embed)
 
 
