@@ -11,7 +11,7 @@ import math
 import random
 from itertools import product
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import List, Tuple
 
 import aiohttp
 from PIL import Image
@@ -114,7 +114,7 @@ Y = 1
 ANGLE_RANGE = math.pi * 2
 
 
-async def get_resource(file: str) -> Dict[str, str]:
+def get_resource(file: str) -> List[dict]:
     with (SNAKE_RESOURCES / f"{file}.json").open() as snakefile:
         return json.load(snakefile)
 

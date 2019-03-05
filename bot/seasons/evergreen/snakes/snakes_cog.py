@@ -148,7 +148,10 @@ class Snakes:
     def __init__(self, bot: Bot):
         self.active_sal = {}
         self.bot = bot
-        # self.headers = {"X-API-KEY": Keys.site_api}
+        self.snake_names = utils.get_resource("snake_names")
+        self.snake_idioms = utils.get_resource("snake_idioms")
+        self.snake_quizzes = utils.get_resource("snake_quiz")
+        self.snake_facts = utils.get_resource("snake_facts")
 
     # region: Helper methods
     @staticmethod
@@ -417,7 +420,7 @@ class Snakes:
         Gets a random snake name.
         :return: A random snake name, as a string.
         """
-        return await utils.get_resource("snake_names")
+        return random.choice(self.snake_names)
 
     async def _validate_answer(self, ctx: Context, message: Message, answer: str, options: list):
         """
@@ -628,21 +631,15 @@ class Snakes:
                 random.randint(50, 70),
             )
 
-            # Get a snake idiom from the API
-            # response = await self.bot.http_session.get(URLs.site_idioms_api, headers=self.headers)
-            # text = await response.json()
-            # TODO: did the API return a random name or something??
-            #    why was text being passed as-is without str conversion?
-            text = await utils.get_resource("snake_idioms")
-
             # Build and send the snek
+            text = random.choice(self.snake_idioms)["idiom"]
             factory = utils.PerlinNoiseFactory(dimension=1, octaves=2)
             image_frame = utils.create_snek_frame(
                 factory,
                 snake_width=width,
                 snake_length=length,
                 snake_color=snek_color,
-                text=str(text),
+                text=text,
                 text_color=text_color,
                 bg_color=bg_color
             )
@@ -848,10 +845,7 @@ class Snakes:
         """
 
         # Prepare a question.
-        # response = await self.bot.http_session.get(URLs.site_quiz_api, headers=self.headers)
-        # question = await response.json()
-        question = await utils.get_resource("snake_quiz")
-
+        question = random.choice(self.snake_quizzes)
         answer = question["answerkey"]
         options = {key: question["options"][key] for key in ANSWERS_EMOJI.keys()}
 
@@ -1052,12 +1046,7 @@ class Snakes:
         Modified by lemon.
         """
 
-        # Get a fact from the API.
-        # response = await self.bot.http_session.get(URLs.site_facts_api, headers=self.headers)
-        # question = await response.json()
-        question = await utils.get_resource("snake_facts")
-
-        # Build and send the embed.
+        question = random.choice(self.snake_facts)["fact"]
         embed = Embed(
             title="Snake fact",
             color=SNAKE_COLOR,
