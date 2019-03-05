@@ -215,4 +215,4 @@ class MonsterSurvey(Cog):
 
 def setup(bot):
     bot.add_cog(MonsterSurvey(bot))
-    log.debug("MonsterSurvey cog loaded")
+    log.info("Monster survey cog loaded")

@@ -233,4 +233,4 @@ class CandyCollection(commands.Cog):
 
 def setup(bot):
     bot.add_cog(CandyCollection(bot))
-    log.debug("CandyCollection cog loaded")
+    log.info("Candy collection cog loaded")

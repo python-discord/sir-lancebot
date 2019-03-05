@@ -35,4 +35,4 @@ class Fun(commands.Cog):
 # Required in order to load the cog, use the class name in the add_cog function.
 def setup(bot):
     bot.add_cog(Fun(bot))
-    log.debug("Fun cog loaded")
+    log.info("Fun cog loaded")

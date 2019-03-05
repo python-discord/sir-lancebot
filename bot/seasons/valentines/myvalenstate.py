@@ -82,4 +82,4 @@ class MyValenstate:
 
 def setup(bot):
     bot.add_cog(MyValenstate(bot))
-    log.debug("MyValenstate cog loaded")
+    log.info("My Valenstate cog loaded")

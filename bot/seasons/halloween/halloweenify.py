@@ -52,4 +52,4 @@ class Halloweenify(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Halloweenify(bot))
-    log.debug("Halloweenify cog loaded")
+    log.info("Halloweenify cog loaded")

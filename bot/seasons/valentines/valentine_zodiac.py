@@ -56,4 +56,4 @@ class ValentineZodiac(commands.Cog):
 
 def setup(bot):
     bot.add_cog(ValentineZodiac(bot))
-    log.debug("Valentine Zodiac cog loaded")
+    log.info("Valentine Zodiac cog loaded")

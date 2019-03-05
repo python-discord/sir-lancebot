@@ -9,4 +9,4 @@ log = logging.getLogger(__name__)
 
 def setup(bot):
     bot.add_cog(SeasonManager(bot))
-    log.debug("SeasonManager cog loaded")
+    log.info("Season manager cog loaded")

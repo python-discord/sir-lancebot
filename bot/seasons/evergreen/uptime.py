@@ -35,4 +35,4 @@ class Uptime(commands.Cog):
 # Required in order to load the cog, use the class name in the add_cog function.
 def setup(bot):
     bot.add_cog(Uptime(bot))
-    log.debug("Uptime cog loaded")
+    log.info("Uptime cog loaded")
