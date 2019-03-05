@@ -51,6 +51,7 @@ def get_season(season_name: str = None, date: datetime.datetime = None) -> "Seas
         raise UserWarning("This function requires either a season or a date in order to run.")
 
     seasons = get_seasons()
+    print(seasons)
 
     # Use season override if season name not provided
     if not season_name and Client.season_override:

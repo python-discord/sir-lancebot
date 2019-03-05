@@ -6,7 +6,7 @@ from bot.bot import SeasonalBot
 
 __all__ = (
     "AdventOfCode", "Channels", "Client", "Colours", "Emojis", "Hacktoberfest", "Roles",
-    "Tokens", "bot"
+    "Tokens", "ERROR_REPLIES", "bot"
 )
 
 log = logging.getLogger(__name__)
@@ -109,6 +109,25 @@ class Roles(NamedTuple):
 class Tokens(NamedTuple):
     giphy = environ.get("GIPHY_TOKEN")
     aoc_session_cookie = environ.get("AOC_SESSION_COOKIE")
+    omdb = environ.get("OMDB_API_KEY")
+    youtube = environ.get("YOUTUBE_API_KEY")
+
+
+ERROR_REPLIES = [
+    "Please don't do that.",
+    "You have to stop.",
+    "Do you mind?",
+    "In the future, don't do that.",
+    "That was a mistake.",
+    "You blew it.",
+    "You're bad at computers.",
+    "Are you trying to kill me?",
+    "Noooooo!!",
+    "I can't believe you've done this",
+]
 
 
 bot = SeasonalBot(command_prefix=Client.prefix)
+
+
+
