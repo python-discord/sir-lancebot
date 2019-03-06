@@ -89,7 +89,7 @@ class SeasonBase:
     end_date: Optional[str] = None
 
     colour: Optional[int] = None
-    icon: str = "/logos/logo_full/logo_full.png"
+    icon: str = "/logos/logo_seasonal/evergreen/logo_evergreen.png"
 
     date_format: str = "%d/%m/%Y"
 
