@@ -334,8 +334,11 @@ class SeasonBase:
         if not Client.debug:
             log.info("Applying avatar.")
             await self.apply_avatar()
-            log.info("Applying server icon.")
-            await self.apply_server_icon()
+            if self.name != "evergreen":
+                log.info("Applying server icon.")
+                await self.apply_server_icon()
+            else:
+                log.info(f"Skipping server icon change due to current season being evergreen.")
             if username_changed:
                 log.info(f"Announcing season {self.name}.")
                 await self.announce_season()
