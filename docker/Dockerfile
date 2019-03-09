@@ -1,5 +1,5 @@
-FROM python:3.6-alpine3.7
-RUN apk add --update tini build-base git jpeg-dev zlib zlib-dev
+FROM python:3.7-alpine3.7
+RUN apk add --update libffi-dev tini build-base git jpeg-dev zlib zlib-dev
 
 RUN mkdir /bot
 COPY . /bot
@@ -12,4 +12,3 @@ RUN pipenv install --deploy --system
 
 ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["python", "-m", "bot"]
-
