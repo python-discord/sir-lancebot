@@ -1164,6 +1164,7 @@ class Snakes(Cog):
     # endregion
 
     # region: Error handlers
+    @Cog.listener()
     @get_command.error
     @card_command.error
     @video_command.error
