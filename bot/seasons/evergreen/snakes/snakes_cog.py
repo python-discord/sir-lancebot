@@ -1065,7 +1065,7 @@ class Snakes:
     @snakes_group.command(name='snakify')
     async def snakify_command(self, ctx: Context, *, message: str = None):
         """
-        How would I talk if I were a snake.
+        Shows the given message in snake-speak.
 
         :param ctx: context
         :param message: If this is passed, it will snakify the message.
