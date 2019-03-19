@@ -16,6 +16,8 @@ __all__ = ('SeasonalBot',)
 
 
 class SeasonalBot(Bot):
+    """Base bot instance."""
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.http_session = ClientSession(
@@ -26,9 +28,7 @@ class SeasonalBot(Bot):
         )
 
     def load_extensions(self, exts: List[str]):
-        """
-        Unload all current cogs, then load in the ones passed into `cogs`
-        """
+        """Unload all current cogs, then load in the ones passed into `cogs`."""
 
         # Unload all cogs
         extensions = list(self.extensions.keys())
@@ -46,9 +46,8 @@ class SeasonalBot(Bot):
                 log.error(f'Failed to load extension {cog}: {repr(e)} {format_exc()}')
 
     async def send_log(self, title: str, details: str = None, *, icon: str = None):
-        """
-        Send an embed message to the devlog channel
-        """
+        """Send an embed message to the devlog channel."""
+
         devlog = self.get_channel(constants.Channels.devlog)
 
         if not devlog:
@@ -64,7 +63,8 @@ class SeasonalBot(Bot):
         await devlog.send(embed=embed)
 
     async def on_command_error(self, context, exception):
-        # Don't punish the user for getting the arguments wrong
+        """Check command errors for UserInputError and reset the cooldown if thrown."""
+
         if isinstance(exception, commands.UserInputError):
             context.command.reset_cooldown(context)
         else:
