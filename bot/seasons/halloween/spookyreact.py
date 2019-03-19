@@ -17,22 +17,20 @@ SPOOKY_TRIGGERS = {
 
 
 class SpookyReact:
-
-    """
-    A cog that makes the bot react to message triggers.
-    """
+    """A cog that makes the bot react to message triggers."""
 
     def __init__(self, bot):
         self.bot = bot
 
     async def on_message(self, ctx: discord.Message):
         """
-        A command to send the seasonalbot github project
+        A command to send the seasonalbot github project.
 
         Lines that begin with the bot's command prefix are ignored
 
         Seasonalbot's own messages are ignored
         """
+
         for trigger in SPOOKY_TRIGGERS.keys():
             trigger_test = re.search(SPOOKY_TRIGGERS[trigger][0], ctx.content.lower())
             if trigger_test:
@@ -52,6 +50,7 @@ class SpookyReact:
           * author is the bot
           * prefix is not None
         """
+
         # Check for self reaction
         if ctx.author == self.bot.user:
             logging.debug(f"Ignoring reactions on self message. Message ID: {ctx.id}")
@@ -68,5 +67,7 @@ class SpookyReact:
 
 
 def setup(bot):
+    """Spooky reaction Cog load."""
+
     bot.add_cog(SpookyReact(bot))
     log.debug("SpookyReact cog loaded")

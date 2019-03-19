@@ -21,6 +21,8 @@ ADD_SKULL_EXISTING_REACTION_CHANCE = 20  # 5%
 
 
 class CandyCollection:
+    """Candy collection game Cog."""
+
     def __init__(self, bot):
         self.bot = bot
         with open(json_location) as candy:
@@ -32,9 +34,7 @@ class CandyCollection:
             self.get_candyinfo[userid] = userinfo
 
     async def on_message(self, message):
-        """
-        Randomly adds candy or skull to certain messages
-        """
+        """Randomly adds candy or skull reaction to non-bot messages in the Event channel."""
 
         # make sure its a human message
         if message.author.bot:
@@ -55,9 +55,7 @@ class CandyCollection:
             return await message.add_reaction('\N{CANDY}')
 
     async def on_reaction_add(self, reaction, user):
-        """
-        Add/remove candies from a person if the reaction satisfies criteria
-        """
+        """Add/remove candies from a person if the reaction satisfies criteria."""
 
         message = reaction.message
         # check to ensure the reactor is human
@@ -105,8 +103,10 @@ class CandyCollection:
 
     async def reacted_msg_chance(self, message):
         """
-        Randomly add a skull or candy to a message if there is a reaction there already
-        (higher probability)
+        Randomly add a skull or candy reaction to a message if there is a reaction there already.
+
+        This event has a higher probability of occurring than a reaction add to a message without an
+        existing reaction.
         """
 
         if random.randint(1, ADD_SKULL_EXISTING_REACTION_CHANCE) == 1:
@@ -120,7 +120,8 @@ class CandyCollection:
             return await message.add_reaction('\N{CANDY}')
 
     async def ten_recent_msg(self):
-        """Get the last 10 messages sent in the channel"""
+        """Get the last 10 messages sent in the channel."""
+
         ten_recent = []
         recent_msg = max(message.id for message
                          in self.bot._connection._messages
@@ -137,9 +138,7 @@ class CandyCollection:
         return ten_recent
 
     async def get_message(self, msg_id):
-        """
-        Get the message from it's ID.
-        """
+        """Get the message from its ID."""
 
         try:
             o = discord.Object(id=msg_id + 1)
@@ -156,15 +155,12 @@ class CandyCollection:
             return None
 
     async def hacktober_channel(self):
-        """
-        Get #hacktoberbot channel from it's id
-        """
+        """Get #hacktoberbot channel from its ID."""
+
         return self.bot.get_channel(id=Hacktoberfest.channel_id)
 
     async def remove_reactions(self, reaction):
-        """
-        Remove all candy/skull reactions
-        """
+        """Remove all candy/skull reactions."""
 
         try:
             async for user in reaction.users():
@@ -174,26 +170,22 @@ class CandyCollection:
             pass
 
     async def send_spook_msg(self, author, channel, candies):
-        """
-        Send a spooky message
-        """
+        """Send a spooky message."""
+
         e = discord.Embed(colour=author.colour)
         e.set_author(name="Ghosts and Ghouls and Jack o' lanterns at night; "
                           f"I took {candies} candies and quickly took flight.")
         await channel.send(embed=e)
 
     def save_to_json(self):
-        """
-        Save json to the file.
-        """
+        """Save JSON to a local file."""
+
         with open(json_location, 'w') as outfile:
             json.dump(self.candy_json, outfile)
 
     @commands.command()
     async def candy(self, ctx):
-        """
-        Get the candy leaderboard and save to json when this is called
-        """
+        """Get the candy leaderboard and save to JSON."""
 
         # use run_in_executor to prevent blocking
         thing = functools.partial(self.save_to_json)
@@ -230,5 +222,7 @@ class CandyCollection:
 
 
 def setup(bot):
+    """Candy Collection game Cog load."""
+
     bot.add_cog(CandyCollection(bot))
     log.debug("CandyCollection cog loaded")

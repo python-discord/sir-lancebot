@@ -3,6 +3,8 @@ from bot.seasons import SeasonBase
 
 
 class Halloween(SeasonBase):
+    """Halloween Seasonal event attributes."""
+
     name = "halloween"
     bot_name = "Spookybot"
     greeting = "Happy Halloween!"

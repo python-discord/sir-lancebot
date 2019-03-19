@@ -14,18 +14,15 @@ TMDB_TOKEN = environ.get('TMDB_TOKEN')
 
 
 class ScaryMovie:
-    """
-    Selects a random scary movie and embeds info into discord chat
-    """
+    """Selects a random scary movie and embeds info into Discord chat."""
 
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(name='scarymovie', alias=['smovie'])
     async def random_movie(self, ctx):
-        """
-        Randomly select a scary movie and display information about it.
-        """
+        """Randomly select a scary movie and display information about it."""
+
         async with ctx.typing():
             selection = await self.select_movie()
             movie_details = await self.format_metadata(selection)
@@ -34,9 +31,7 @@ class ScaryMovie:
 
     @staticmethod
     async def select_movie():
-        """
-        Selects a random movie and returns a json of movie details from TMDb
-        """
+        """Selects a random movie and returns a json of movie details from TMDb."""
 
         url = 'https://api.themoviedb.org/4/discover/movie'
         params = {
@@ -70,9 +65,7 @@ class ScaryMovie:
 
     @staticmethod
     async def format_metadata(movie):
-        """
-        Formats raw TMDb data to be embedded in discord chat
-        """
+        """Formats raw TMDb data to be embedded in discord chat."""
 
         # Build the relevant URLs.
         movie_id = movie.get("id")
@@ -137,5 +130,7 @@ class ScaryMovie:
 
 
 def setup(bot):
+    """Scary movie Cog load."""
+
     bot.add_cog(ScaryMovie(bot))
     log.debug("ScaryMovie cog loaded")
