@@ -21,9 +21,7 @@ with Path('bot', 'resources', 'valentines', 'love_matches.json').open() as file:
 
 
 class LoveCalculator:
-    """
-    A cog for calculating the love between two people
-    """
+    """A cog for calculating the love between two people."""
 
     def __init__(self, bot):
         self.bot = bot
@@ -103,4 +101,6 @@ class LoveCalculator:
 
 
 def setup(bot):
+    """Love calculator Cog load."""
+
     bot.add_cog(LoveCalculator(bot))

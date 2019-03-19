@@ -14,18 +14,15 @@ HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_hea
 
 
 class SaveTheDate:
-    """
-    A cog that gives random suggestion, for a valentines date !
-    """
+    """A cog that gives random suggestion for a Valentine's date."""
 
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command()
     async def savethedate(self, ctx):
-        """
-        Gives you ideas for what to do on a date with your valentine.
-        """
+        """Gives you ideas for what to do on a date with your valentine."""
+
         with open(Path('bot', 'resources', 'valentines', 'date_ideas.json'), 'r', encoding="utf8") as f:
             valentine_dates = load(f)
             random_date = random.choice(valentine_dates['ideas'])
@@ -40,5 +37,7 @@ class SaveTheDate:
 
 
 def setup(bot):
+    """Save the date Cog Load."""
+
     bot.add_cog(SaveTheDate(bot))
     log.debug("Save the date cog loaded")
