@@ -1,8 +1,3 @@
-"""
-Perlin noise implementation.
-Taken from: https://gist.github.com/eevee/26f547457522755cb1fb8739d0ea89a1
-Licensed under ISC
-"""
 import asyncio
 import io
 import json
@@ -117,43 +112,54 @@ ANGLE_RANGE = math.pi * 2
 
 
 def get_resource(file: str) -> List[dict]:
+    """Load Snake resources JSON."""
+
     with (SNAKE_RESOURCES / f"{file}.json").open() as snakefile:
         return json.load(snakefile)
 
 
 def smoothstep(t):
-    """Smooth curve with a zero derivative at 0 and 1, making it useful for
-    interpolating.
-    """
+    """Smooth curve with a zero derivative at 0 and 1, making it useful for interpolating."""
+
     return t * t * (3. - 2. * t)
 
 
 def lerp(t, a, b):
     """Linear interpolation between a and b, given a fraction t."""
+
     return a + t * (b - a)
 
 
 class PerlinNoiseFactory(object):
-    """Callable that produces Perlin noise for an arbitrary point in an
-    arbitrary number of dimensions.  The underlying grid is aligned with the
-    integers.
-    There is no limit to the coordinates used; new gradients are generated on
-    the fly as necessary.
+    """
+    Callable that produces Perlin noise for an arbitrary point in an arbitrary number of dimensions.
+
+    The underlying grid is aligned with the integers.
+
+    There is no limit to the coordinates used; new gradients are generated on the fly as necessary.
+
+    Taken from: https://gist.github.com/eevee/26f547457522755cb1fb8739d0ea89a1
+    Licensed under ISC
     """
 
     def __init__(self, dimension, octaves=1, tile=(), unbias=False):
-        """Create a new Perlin noise factory in the given number of dimensions,
-        which should be an integer and at least 1.
-        More octaves create a foggier and more-detailed noise pattern.  More
-        than 4 octaves is rather excessive.
-        ``tile`` can be used to make a seamlessly tiling pattern.  For example:
-            pnf = PerlinNoiseFactory(2, tile=(0, 3))
-        This will produce noise that tiles every 3 units vertically, but never
-        tiles horizontally.
-        If ``unbias`` is true, the smoothstep function will be applied to the
-        output before returning it, to counteract some of Perlin noise's
-        significant bias towards the center of its output range.
         """
+        Create a new Perlin noise factory in the given number of dimensions.
+
+        dimension should be an integer and at least 1.
+
+        More octaves create a foggier and more-detailed noise pattern.  More than 4 octaves is rather excessive.
+
+        ``tile`` can be used to make a seamlessly tiling pattern.
+        For example:
+            pnf = PerlinNoiseFactory(2, tile=(0, 3))
+
+        This will produce noise that tiles every 3 units vertically, but never tiles horizontally.
+
+        If ``unbias`` is true, the smoothstep function will be applied to the output before returning
+        it, to counteract some of Perlin noise's significant bias towards the center of its output range.
+        """
+
         self.dimension = dimension
         self.octaves = octaves
         self.tile = tile + (0,) * dimension
@@ -166,8 +172,11 @@ class PerlinNoiseFactory(object):
         self.gradient = {}
 
     def _generate_gradient(self):
-        # Generate a random unit vector at each grid point -- this is the
-        # "gradient" vector, in that the grid tile slopes towards it
+        """
+        Generate a random unit vector at each grid point.
+
+        This is the "gradient" vector, in that the grid tile slopes towards it
+        """
 
         # 1 dimension is special, since the only unit vector is trivial;
         # instead, use a slope between -1 and 1
@@ -184,9 +193,8 @@ class PerlinNoiseFactory(object):
         return tuple(coord * scale for coord in random_point)
 
     def get_plain_noise(self, *point):
-        """Get plain noise for a single point, without taking into account
-        either octaves or tiling.
-        """
+        """Get plain noise for a single point, without taking into account either octaves or tiling."""
+
         if len(point) != self.dimension:
             raise ValueError("Expected {0} values, got {1}".format(
                 self.dimension, len(point)))
@@ -234,9 +242,12 @@ class PerlinNoiseFactory(object):
         return dots[0] * self.scale_factor
 
     def __call__(self, *point):
-        """Get the value of this Perlin noise function at the given point.  The
-        number of values given should match the number of dimensions.
         """
+        Get the value of this Perlin noise function at the given point.
+
+        The number of values given should match the number of dimensions.
+        """
+
         ret = 0
         for o in range(self.octaves):
             o2 = 1 << o
@@ -281,6 +292,7 @@ def create_snek_frame(
 ) -> Image:
     """
     Creates a single random snek frame using Perlin noise.
+
     :param perlin_factory: the perlin noise factory used. Required.
     :param perlin_lookup_vertical_shift: the Perlin noise shift in the Y-dimension for this frame
     :param image_dimensions: the size of the output image.
@@ -288,14 +300,15 @@ def create_snek_frame(
     :param snake_length: the length of the snake, in segments.
     :param snake_color: the color of the snake.
     :param bg_color: the background color.
-    :param segment_length_range: the range of the segment length. Values will be generated inside this range, including
-                                 the bounds.
+    :param segment_length_range: the range of the segment length. Values will be generated inside
+                                 this range, including the bounds.
     :param snake_width: the width of the snek, in pixels.
     :param text: the text to display with the snek. Set to None for no text.
     :param text_position: the position of the text.
     :param text_color: the color of the text.
     :return: a PIL image, representing a single frame.
     """
+
     start_x = random.randint(image_margins[X], image_dimensions[X] - image_margins[X])
     start_y = random.randint(image_margins[Y], image_dimensions[Y] - image_margins[Y])
     points = [(start_x, start_y)]
@@ -349,6 +362,8 @@ def create_snek_frame(
 
 
 def frame_to_png_bytes(image: Image):
+    """Convert image to byte stream."""
+
     stream = io.BytesIO()
     image.save(stream, format='PNG')
     return stream.getvalue()
@@ -371,6 +386,8 @@ GAME_SCREEN_EMOJI = [
 
 
 class SnakeAndLaddersGame:
+    """Snakes and Ladders game Cog."""
+
     def __init__(self, snakes, context: Context):
         self.snakes = snakes
         self.ctx = context
@@ -393,10 +410,10 @@ class SnakeAndLaddersGame:
         Listen for reactions until players have joined,
         and the game has been started.
         """
+
         def startup_event_check(reaction_: Reaction, user_: Member):
-            """
-            Make sure that this reaction is what we want to operate on
-            """
+            """Make sure that this reaction is what we want to operate on."""
+
             return (
                 all((
                     reaction_.message.id == startup.id,       # Reaction is on startup message
@@ -471,6 +488,13 @@ class SnakeAndLaddersGame:
                 self.avatar_images[user.id] = im
 
     async def player_join(self, user: Member):
+        """
+        Handle players joining the game.
+
+        Prevent player joining if they have already joined, if the game is full, or if the game is
+        in a waiting state.
+        """
+
         for p in self.players:
             if user == p:
                 await self.channel.send(user.mention + " You are already in the game.", delete_after=10)
@@ -491,6 +515,13 @@ class SnakeAndLaddersGame:
         )
 
     async def player_leave(self, user: Member):
+        """
+        Handle players leaving the game.
+
+        Leaving is prevented if the user initiated the game or if they weren't part of it in the
+        first place.
+        """
+
         if user == self.author:
             await self.channel.send(
                 user.mention + " You are the author, and cannot leave the game. Execute "
@@ -515,6 +546,8 @@ class SnakeAndLaddersGame:
         await self.channel.send(user.mention + " You are not in the match.", delete_after=10)
 
     async def cancel_game(self, user: Member):
+        """Allow the game author to cancel the running game."""
+
         if not user == self.author:
             await self.channel.send(user.mention + " Only the author of the game can cancel it.", delete_after=10)
             return
@@ -522,6 +555,13 @@ class SnakeAndLaddersGame:
         self._destruct()
 
     async def start_game(self, user: Member):
+        """
+        Allow the game author to begin the game.
+
+        The game cannot be started if there aren't enough players joined or if the game is in a
+        waiting state.
+        """
+
         if not user == self.author:
             await self.channel.send(user.mention + " Only the author of the game can start it.", delete_after=10)
             return
@@ -540,10 +580,11 @@ class SnakeAndLaddersGame:
         await self.start_round()
 
     async def start_round(self):
+        """Begin the round."""
+
         def game_event_check(reaction_: Reaction, user_: Member):
-            """
-            Make sure that this reaction is what we want to operate on
-            """
+            """Make sure that this reaction is what we want to operate on."""
+
             return (
                 all((
                     reaction_.message.id == self.positions.id,  # Reaction is on positions message
@@ -634,6 +675,8 @@ class SnakeAndLaddersGame:
         await self._complete_round()
 
     async def player_roll(self, user: Member):
+        """Handle the player's roll."""
+
         if user.id not in self.player_tiles:
             await self.channel.send(user.mention + " You are not in the match.", delete_after=10)
             return

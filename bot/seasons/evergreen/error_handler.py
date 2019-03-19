@@ -9,13 +9,13 @@ log = logging.getLogger(__name__)
 
 
 class CommandErrorHandler:
-    """A error handler for the PythonDiscord server!"""
+    """A error handler for the PythonDiscord server."""
 
     def __init__(self, bot):
         self.bot = bot
 
     async def on_command_error(self, ctx, error):
-        """Activates when a command opens an error"""
+        """Activates when a command opens an error."""
 
         if hasattr(ctx.command, 'on_error'):
             return logging.debug(
@@ -108,5 +108,7 @@ class CommandErrorHandler:
 
 
 def setup(bot):
+    """Error handler Cog load."""
+
     bot.add_cog(CommandErrorHandler(bot))
     log.debug("CommandErrorHandler cog loaded")
