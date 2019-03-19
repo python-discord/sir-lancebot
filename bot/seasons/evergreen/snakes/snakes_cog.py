@@ -465,7 +465,7 @@ class Snakes:
     @locked()
     async def antidote_command(self, ctx: Context):
         """
-        Antidote - Can you create the antivenom before the patient dies.
+        A game where you race to create an antivenom before the patient dies.
 
         Rules:  You have 4 ingredients for each antidote, you only have 10 attempts
                 Once you synthesize the antidote, you will be presented with 4 markers
