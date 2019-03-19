@@ -114,7 +114,7 @@ ANGLE_RANGE = math.pi * 2
 def get_resource(file: str) -> List[dict]:
     """Load Snake resources JSON."""
 
-    with (SNAKE_RESOURCES / f"{file}.json").open() as snakefile:
+    with (SNAKE_RESOURCES / f"{file}.json").open(encoding="utf-8") as snakefile:
         return json.load(snakefile)
 
 
