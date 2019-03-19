@@ -23,20 +23,13 @@ class SpookyRating:
 
     def __init__(self, bot):
         self.bot = bot
+        self.local_random = random.Random()
 
     @commands.command()
     @commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
     async def spookyrating(self, ctx, who: discord.Member = None):
         """
         Calculates the spooky rating of someone.
-
-        This command accepts an optional user as an argument, defaulting to the command executor.
-        Users are converted from:
-          - User ID
-          - Mention
-          - name#discrim
-          - name
-          - nickname
 
         Any user will always yield the same result, no matter who calls the command
         """
@@ -45,9 +38,8 @@ class SpookyRating:
             who = ctx.author
 
         # This ensures that the same result over multiple runtimes
-        random.seed(who.id)
-
-        spooky_percent = random.randint(1, 100)
+        self.local_random.seed(who.id)
+        spooky_percent = self.local_random.randint(1, 101)
 
         # We need the -1 due to how bisect returns the point
         # see the documentation for further detail
