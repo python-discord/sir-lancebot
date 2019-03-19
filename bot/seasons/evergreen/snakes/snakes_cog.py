@@ -276,7 +276,7 @@ class Snakes:
         return message
 
     async def _fetch(self, session, url, params=None):
-        """Asyncronous web request helper method."""
+        """Asynchronous web request helper method."""
 
         if params is None:
             params = {}
