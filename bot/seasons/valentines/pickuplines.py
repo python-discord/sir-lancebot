@@ -14,7 +14,7 @@ with open(Path('bot', 'resources', 'valentines', 'pickup_lines.json'), 'r', enco
     pickup_lines = load(f)
 
 
-class PickupLine:
+class PickupLine(commands.Cog):
     """
     A cog that gives random cheesy pickup lines.
     """
