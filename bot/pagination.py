@@ -20,8 +20,6 @@ log = logging.getLogger(__name__)
 class EmptyPaginatorEmbed(Exception):
     """Base Exception class for an empty paginator embed."""
 
-    pass
-
 
 class LinePaginator(Paginator):
     """
