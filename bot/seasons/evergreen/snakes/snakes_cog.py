@@ -465,7 +465,7 @@ class Snakes:
     @locked()
     async def antidote_command(self, ctx: Context):
         """
-        A game where you race to create an antivenom before the patient dies.
+        Antidote! Can you create the antivenom before the patient dies?
 
         Rules:  You have 4 ingredients for each antidote, you only have 10 attempts
                 Once you synthesize the antidote, you will be presented with 4 markers
@@ -1065,7 +1065,7 @@ class Snakes:
     @snakes_group.command(name='snakify')
     async def snakify_command(self, ctx: Context, *, message: str = None):
         """
-        Shows the given message in snake-speak.
+        How would I talk if I were a snake?
 
         :param ctx: context
         :param message: If this is passed, it will snakify the message.
