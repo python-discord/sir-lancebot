@@ -28,7 +28,7 @@ class SeasonalBot(Bot):
         )
 
     def load_extensions(self, exts: List[str]):
-        """Unload all current cogs, then load in the ones passed into `cogs`."""
+        """Unload all current extensions, then load the given extensions."""
 
         # Unload all cogs
         extensions = list(self.extensions.keys())
