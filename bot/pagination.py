@@ -57,7 +57,7 @@ class LinePaginator(Paginator):
         """
         Adds a line to the current page.
 
-        If the line exceeds the :attr:`max_size` then an exception is raised.
+        If the line exceeds the `max_size` then an exception is raised.
 
         Overrides the Paginator.add_line from inside discord.ext.commands in order to allow
         configuration of the maximum number of lines per page.
@@ -72,7 +72,7 @@ class LinePaginator(Paginator):
         Raises
         ------
         RuntimeError
-            The line was too big for the current :attr:`max_size`.
+            The line was too big for the current `max_size`.
         """
 
         if len(line) > self.max_size - len(self.prefix) - 2:
