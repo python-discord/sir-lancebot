@@ -24,18 +24,7 @@ jobs:
       versionSpec: '3.7.x'
       addToPath: true
 
-  - script: |
-      which python
-      which python3
-      python -V
-      python3 -V
-      pip -V
-      pip3 -V
-      pip list
-      pip3 list
-    displayName: 'Gather intel'
-
-  - script: sudo python -m pip install poetry
+  - script: pip3 install poetry
     displayName: 'Install poetry'
 
   - script: |
@@ -43,7 +32,7 @@ jobs:
       poetry install
     displayName: 'Install project using poetry'
 
-  - script: python -m flake8
+  - script: python3 -m flake8
     displayName: 'Run linter'
 
 - job: build
