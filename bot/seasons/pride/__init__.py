@@ -2,8 +2,8 @@ from bot.seasons import SeasonBase
 
 class Pride(SeasonBase):
     """
-    In support of all cultures and communities, and in hopes of providing global cultural knowledge,
-    this event provides information about the LGBTQ community.
+    No matter your origins, identity or sexuality, we hope we can come together to celebrate each and every person's individuality this Pride Month.
+    Features of ProudBot will be encouraged to be contributed during this event which appropriately commemorate the history and challenges of the LGBTQ+ community.
     """
 
     name = "pride"
