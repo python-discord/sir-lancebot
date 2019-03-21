@@ -9,7 +9,7 @@ ENV LIBRARY_PATH=/lib:/usr/lib
 
 RUN pip install poetry
 RUN poetry config settings.virtualenvs.create false
-RUN poetry install
+RUN poetry install --no-dev
 
 ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["python", "-m", "bot"]
