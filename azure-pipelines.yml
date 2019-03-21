@@ -27,7 +27,7 @@ jobs:
   - script: sudo apt-get install python3-setuptools
     displayName: 'Install setuptools'
 
-  - script: sudo pip3 install poetry
+  - script: sudo pip install poetry
     displayName: 'Install poetry'
 
   - script: |
