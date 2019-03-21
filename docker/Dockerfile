@@ -1,5 +1,5 @@
 FROM python:3.7-alpine3.7
-RUN apk add --update libffi-dev tini build-base git jpeg-dev zlib zlib-dev
+RUN apk add --update libffi-dev tini build-base git jpeg-dev zlib zlib-dev freetype-dev
 
 RUN mkdir /bot
 COPY . /bot
