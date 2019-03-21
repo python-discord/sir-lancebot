@@ -8,7 +8,7 @@ class Pride(SeasonBase):
     """
 
     name = "pride"
-    bot_name = "Spookybot"
+    bot_name = "ProudBot"
     greeting = "Happy Pride Month!"
 
     # Duration of season
