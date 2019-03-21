@@ -68,4 +68,4 @@ class SeasonalBot(Bot):
         if isinstance(exception, commands.UserInputError):
             context.command.reset_cooldown(context)
         else:
-            super().on_command_error(context, exception)
+            await super().on_command_error(context, exception)
