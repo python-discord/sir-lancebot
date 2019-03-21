@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "seasonalbot"
+name = "bot"
 version = "0.1.0"
 description = "A Discord bot that changes with the seasons."
 authors = ["The Python Discord community"]
@@ -12,7 +12,8 @@ beautifulsoup4 = "^4.7"
 aiodns = "^1.2"
 pillow = "^5.4"
 pytz = "^2018.9"
-"discord.py" = {git = "https://github.com/Rapptz/discord.py", branch = "rewrite"}
+"discord.py" = {git = "https://github.com/Rapptz/discord.py", branch = "3f06f24"}
+fuzzywuzzy = "^0.17.0"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^3.7"
