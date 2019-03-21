@@ -24,10 +24,7 @@ jobs:
       versionSpec: '3.7.x'
       addToPath: true
 
-  - script: sudo apt-get install python3-setuptools
-    displayName: 'Install setuptools'
-
-  - script: sudo pip install poetry
+  - script: sudo python3.7 -m pip install poetry
     displayName: 'Install poetry'
 
   - script: |
@@ -35,7 +32,7 @@ jobs:
       poetry install
     displayName: 'Install project using poetry'
 
-  - script: python -m flake8
+  - script: python3.7 -m flake8
     displayName: 'Run linter'
 
 - job: build
@@ -53,6 +50,9 @@ jobs:
       containerregistrytype: 'Container Registry'
       dockerRegistryEndpoint: 'DockerHub'
       command: 'login'
+
+  - script: sudo apt-get install python3-setuptools
+    displayName: 'Install setuptools'
 
   - script: sudo pip3 install salt-pepper
     displayName: 'Install pepper'
