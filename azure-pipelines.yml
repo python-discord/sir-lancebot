@@ -24,7 +24,7 @@ jobs:
       versionSpec: '3.7.x'
       addToPath: true
 
-  - script: sudo pip install poetry
+  - script: sudo pip3 install poetry
     displayName: 'Install poetry'
 
   - script: poetry config settings.virtualenvs.create false && poetry install
