@@ -2,10 +2,6 @@
 
 variables:
   LIBRARY_PATH: /lib:/usr/lib
-  PIPENV_HIDE_EMOJIS: 1
-  PIPENV_IGNORE_VIRTUALENVS: 1
-  PIPENV_NOSPIN: 1
-  PIPENV_VENV_IN_PROJECT: 1
 
 jobs:
 - job: test
@@ -15,7 +11,6 @@ jobs:
     vmImage: 'Ubuntu 16.04'
 
   variables:
-    PIPENV_CACHE_DIR: ".cache/pipenv"
     PIP_CACHE_DIR: ".cache/pip"
     PIP_SRC: ".cache/src"
 
@@ -29,11 +24,11 @@ jobs:
       versionSpec: '3.7.x'
       addToPath: true
 
-  - script: sudo pip install pipenv
-    displayName: 'Install pipenv'
+  - script: sudo pip install poetry
+    displayName: 'Install poetry'
 
-  - script: pipenv install --dev --deploy --system
-    displayName: 'Install project using pipenv'
+  - script: poetry config settings.virtualenvs.create false && poetry install
+    displayName: 'Install project using poetry'
 
   - script: python -m flake8
     displayName: 'Run linter'
@@ -43,7 +38,6 @@ jobs:
   dependsOn: 'test'
 
   variables:
-    PIPENV_CACHE_DIR: ".cache/pipenv"
     PIP_CACHE_DIR: ".cache/pip"
 
   steps:

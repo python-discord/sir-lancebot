@@ -5,11 +5,11 @@ RUN mkdir /bot
 COPY . /bot
 WORKDIR /bot
 
-ENV LIBRARY_PATH=/lib:/usr/lib \
-    PIPENV_VENV_IN_PROJECT=1
+ENV LIBRARY_PATH=/lib:/usr/lib
 
-RUN pip install pipenv
-RUN pipenv install --deploy --system
+RUN pip install poetry
+RUN poetry config settings.virtualenvs.create false
+RUN poetry install
 
 ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["python", "-m", "bot"]
