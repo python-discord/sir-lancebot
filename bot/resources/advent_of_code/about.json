@@ -21,7 +21,7 @@
     },
     {
         "name": "Join our private leaderboard!",
-        "value": "In addition to the global leaderboard, AoC also offers private leaderboards, where you can compete against a smaller group of friends!\n\nHead over to AoC's [private leaderboard page](https://adventofcode.com/leaderboard/private) and enter code `363275-442b6939` to join the PyDis private leaderboard!",
+        "value": "In addition to the global leaderboard, AoC also offers private leaderboards, where you can compete against a smaller group of friends!\n\nGet the join code using `.aoc join` and head over to AoC's [private leaderboard page](https://adventofcode.com/leaderboard/private) to join the PyDis private leaderboard!",
         "inline": false
     }
 ]

@@ -6,7 +6,7 @@ from bot.bot import SeasonalBot
 
 __all__ = (
     "AdventOfCode", "Channels", "Client", "Colours", "Emojis", "Hacktoberfest", "Roles",
-    "Tokens", "bot"
+    "Tokens", "ERROR_REPLIES", "bot"
 )
 
 log = logging.getLogger(__name__)
@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 class AdventOfCode:
     leaderboard_cache_age_threshold_seconds = 3600
     leaderboard_id = 363275
-    leaderboard_join_code = "363275-442b6939"
+    leaderboard_join_code = str(environ.get("AOC_JOIN_CODE", None))
     leaderboard_max_displayed_members = 10
     year = 2018
     channel_id = int(environ.get("AOC_CHANNEL_ID", 517745814039166986))
@@ -72,6 +72,13 @@ class Emojis:
     christmas_tree = "\U0001F384"
     check = "\u2611"
 
+    terning1 = "<:terning1:431249668983488527>"
+    terning2 = "<:terning2:462339216987127808>"
+    terning3 = "<:terning3:431249694467948544>"
+    terning4 = "<:terning4:431249704769290241>"
+    terning5 = "<:terning5:431249716328792064>"
+    terning6 = "<:terning6:431249726705369098>"
+
 
 class Lovefest:
     channel_id = int(environ.get("LOVEFEST_CHANNEL_ID", 542272993192050698))
@@ -102,6 +109,22 @@ class Roles(NamedTuple):
 class Tokens(NamedTuple):
     giphy = environ.get("GIPHY_TOKEN")
     aoc_session_cookie = environ.get("AOC_SESSION_COOKIE")
+    omdb = environ.get("OMDB_API_KEY")
+    youtube = environ.get("YOUTUBE_API_KEY")
+
+
+ERROR_REPLIES = [
+    "Please don't do that.",
+    "You have to stop.",
+    "Do you mind?",
+    "In the future, don't do that.",
+    "That was a mistake.",
+    "You blew it.",
+    "You're bad at computers.",
+    "Are you trying to kill me?",
+    "Noooooo!!",
+    "I can't believe you've done this",
+]
 
 
 bot = SeasonalBot(command_prefix=Client.prefix)

@@ -1,0 +1,262 @@
+{
+  "aries":[
+    {
+      "Zodiac" : "Sagittarius",
+      "description" : "The Archer is one of the most compatible signs Aries should consider when searching out relationships that will bear fruit. Sagittarians share a certain love of freedom with Aries that will help the two of them conquer new territory together.",
+      "compatibility_score" : "87%"
+    },
+    {
+      "Zodiac" : "Leo",
+      "description" : "Leo is the center of attention and typically the life of the party, but can also be courageous, bold, and powerful. These two signs share a gregarious nature that helps them walk life's path in sync. They may vie occasionally to see which one leads the way, but all things considered, they share a great capacity for compatibility.",
+      "compatibility_score" : "83%"
+    },
+    {
+      "Zodiac" : "Aquarius",
+      "description" : "Aquarius' need for personal space dovetails nicely with Aries' love of freedom. This doesn't mean that the Ram and the Water Bearer can't forge a deep bond; in fact, quite the opposite. Their mutual respect for one another's needs and space leaves room for both to grow on their own and together.",
+      "compatibility_score" : "68%"
+    },
+    {
+      "Zodiac" : "Gemini",
+      "description" : "The Twins are known for their adaptability, a trait that easily follows Aries' need to lead their closest companions down new paths. Geminis are also celebrated for their personal charm and intellect, traits the discerning Ram is also capable of fully appreciating.",
+      "compatibility_score" : "74%"
+    }
+  ],
+  "taurus":[
+    {
+      "Zodiac" : "Virgo",
+      "description" : "Although these signs have their set of differences, the Virgo Taurus compatibility is usually pretty strong. This is because both the signs want the same thing ultimately and have generally synchronous ways of reaching those points. This helps them complement each other and create a healthy relationship between them.",
+      "compatibility_score" : "73%"
+    },
+    {
+      "Zodiac" : "Capricorn",
+      "description" : "A great compatibility is seen in this match as far as the philosophical and spiritual aspects of life are concerned. Taurus and Capricorn have a practical approach towards life. The ambitions and calmness of the Goat will attract the Bull, who will attract the former with his strong determination.The compatibility between these two zodiac signs is at the greatest height due to their mutual understanding, faith and consonance.",
+      "compatibility_score" : "89%"
+    },
+    {
+      "Zodiac" : "Pisces",
+      "description" : "This relationship will survive the test of time if both parties involved have unbreakable trust in each other and nurture that connection they have painstakingly built over the years. They must remember to be honest and committed to their partner through all times.If natural communication flows between them like clockwork, this will be a beautiful love story with a prominent tag of 'happily-ever-after' pinned right to it!",
+      "compatibility_score" : "88%"
+    },
+    {
+      "Zodiac" : "Cancer",
+      "description" : "This is a peaceful union of two reliable and kind souls. It is one of the strong zodiac pairings in terms of compatibility, and certainly has a real chance of lasting a lifetime in astrological charts. If Taurus man and Cancer woman and vice-versa are mature enough to handle the occasional friction, which they usually are, their bond will transcend all boundaries and is likely to grow in strength through the years.",
+      "compatibility_score" : "91%"
+    }
+  ],
+  "gemini":[
+    {
+      "Zodiac" : "Aries",
+      "description" : "The theorem of astrology says that Aries and Gemini have a zero tolerance for boredom and will at once get rid of anything dull. An Arian will let a Geminian enjoy his personal freedom and the Gemini will respect his individuality.",
+      "compatibility_score" : "74%"
+    },
+    {
+      "Zodiac" : "Leo",
+      "description" : "Gemini and Leo love match that can go through extravagant heights and crushing lows, but one is sure to leave both of them breathless. This is a pair that forms one of the most exciting relationships of the zodiac chart, but the converse is equally true; they are vulnerable to experiencing terrible lows.",
+      "compatibility_score" : "82%"
+    },
+    {
+      "Zodiac" : "Libra",
+      "description" : "It is relatively easier for them to adjust to each other as while they might have different outlooks to some things in life, they rarely collide or crash against one another. Hence, it is easy for them to go forward in harmony, forming a formidable bond in the process.",
+      "compatibility_score" : "78%"
+    },
+    {
+      "Zodiac" : "Aquarius",
+      "description" : "This is one of the most successful pairs of the zodiac chart.If they manage to smooth this solitary wrinkle, this will be a beautiful union for both the parties involved. It will turn into a gift that will keep giving happiness, contentment and encouragement to the air signs.",
+      "compatibility_score" : "91%"
+    }
+  ],
+  "cancer":[
+    {
+      "Zodiac" : "Taurus",
+      "description" : "The Cancer Taurus zodiac relationship compatibility is strong because of their mutual love for safety, stability, and comfort. Their mutual understanding will always be powerful, which will be the pillar of strength of their relationship.",
+      "compatibility_score" : "91%"
+    },
+    {
+      "Zodiac" : "Scorpio",
+      "description" : "The Cancer man and Scorpio woman and vice-versa connect on an intuitive level and will find refuge in each other from the outset of the relationship.",
+      "compatibility_score" : "79%"
+    },
+    {
+      "Zodiac" : "Virgo",
+      "description" : "This is a match made in heaven! Very few zodiac combinations work as well as Cancer and Virgo. Their blissful union is one which is generally filled with memories of happiness, contentment, loyalty, and harmony. They will build an extremely strong bond with each other that can pass all the tests of time and emerge stronger after every challenge that is thrown in its way!",
+      "compatibility_score" : "77%"
+    }
+  ],
+  "leo":[
+    {
+      "Zodiac" : "Aries",
+      "description" : "A Leo is generous and an Arian is open to life. Sharing the same likes and dislikes, they both crave for fun, romance and excitement. A Leo respects an Arian's need for freedom because an Arian does not interfere much in the life of a Leo. Aries will love the charisma and ideas of the Leo.",
+      "compatibility_score" : "83%"
+    },
+    {
+      "Zodiac" : "Gemini",
+      "description" : "This is one of the most compatible pairings in the zodiac chart and if the minor friction is handled with maturity by both the parties, the Leo and Gemini compatibility relationship can last a lifetime. A lifetime, which will be filled with love, happiness, and success.",
+      "compatibility_score" : "82%"
+    },
+    {
+      "Zodiac" : "Libra",
+      "description" : "he thing that attributes for the greater compatibility of this love match is that both the signs like to complement each other. Leo and Libra love to attend social gatherings. They like to engage themselves in romance and act as lovers. This love match is strong enough to face adverse situations due to their opposite individual characters. This pair likes to enjoy candlelit dinners, long drives, dancing",
+      "compatibility_score" : "75%"
+    },
+    {
+      "Zodiac" : "Sagittarius",
+      "description" : "The key for this relationship to work is that both Leo star sign and Sagittarius star sign natives should know where they want it to go in the long run. If they are ready for a long-time commitment and are mutually aware of the same, they will form a brilliant and buoyant bond together. It can last for a lifetime and will be characterized by the excitement, love, happiness, and unending loyalty that Leo and Sagittarius will bring to each other’s life.",
+      "compatibility_score" : "75%"
+    }
+  ],
+  "virgo":[
+    {
+      "Zodiac" : "Taurus",
+      "description" : "Although these signs have their set of differences, the Virgo Taurus compatibility is usually pretty strong. This is because both the signs want the same thing ultimately and have generally synchronous ways of reaching those points. This helps them complement each other and create a healthy relationship between them.",
+      "compatibility_score" : "73%"
+    },
+    {
+      "Zodiac" : "Cancer",
+      "description" : "This is one of the few zodiac compatibilities that look great not only on paper, but also in reality. The shared outlook that Cancer and Virgo have towards life makes their relationship a positive, reliable, and beautiful entity for both the sides.",
+      "compatibility_score" : "77%"
+    },
+    {
+      "Zodiac" : "Scorpio",
+      "description" : "The Virgo Scorpio love match definitely has something unique to offer to the zodiac world, and to both the parties involved in this pair. If they manage to control their negative traits, this relationship truly has the chance to survive everything life throws at it.",
+      "compatibility_score" : "76%"
+    },
+    {
+      "Zodiac" : "Capricorn",
+      "description" : "The compatibility of this match is quite well as both rely on each other and possess the maturity to understand their individual outlook. Capricorn plans in advance and steadily reaches his goal and a Virgo has faith in his abilities and skills.",
+      "compatibility_score" : "77%"
+    }
+  ],
+  "libra":[
+    {
+      "Zodiac" : "Leo",
+      "description" : "Libra and Leo love match can work well for both the partners and truly help them learn from each other and grow individually, as well as together. Libra and Leo, when in the right frame of mind, form a formidable couple that attracts admiration and respect everywhere it goes.",
+      "compatibility_score" : "75%"
+    },
+    {
+      "Zodiac" : "Aquarius",
+      "description" : "Libra Aquarius Relationship has a good chance of working because of the immense understanding that both the zodiac signs have for each other. They are likely to fight less as Libra believes in avoiding conflict and Aquarius usually is an extremely open-minded and non-judgmental sign.",
+      "compatibility_score" : "68%"
+    },
+    {
+      "Zodiac" : "Gemini",
+      "description" : "It is relatively easier for them to adjust to each other as while they might have different outlooks to some things in life, they rarely collide or crash against one another. Hence, it is easy for them to go forward in harmony, forming a formidable bond in the process.",
+      "compatibility_score" : "78%"
+    },
+    {
+      "Zodiac" : "sagittarius",
+      "description" : "If Sagittarius and Libra want to make it with each other, they must give themselves the time to understand each other fully. Rushing through the relationship will only need to problems in the future and that can be avoided if both the parties are careful not to get too ahead of themselves at any point.",
+      "compatibility_score" : "71%"
+    }
+  ],
+  "scorpio":[
+    {
+      "Zodiac" : "Cancer",
+      "description" : "This union is not unusual, but will take a fair share of work in the start. A strong foundation of clear cut communication is mandatory to make this a loving and stress free relationship!",
+      "compatibility_score" : "79%"
+    },
+    {
+      "Zodiac" : "Virgo",
+      "description" : "Very rarely does it so happen that a pairing can be so perfect and perfectly horrid at the same time. As such, it is imperative that the individuals involved take time before they jump into a serious commitment. Knowing these two zodiacs, commitments last for a lifetime.",
+      "compatibility_score" : "76%"
+    },
+    {
+      "Zodiac" : "Capricorn",
+      "description" : "The relationship of Scorpio and Capricorn can be inspiring for both partners to search for the truth, dig up under their family tree and deal with any unresolved karma and debt. They are both deep and don’t take things lightly, and this will help them build a strong foundation for a relationship that can last for a long time.",
+      "compatibility_score" : "72%"
+    },
+    {
+      "Zodiac" : "Pisces",
+      "description" : "Scorpio-Pisces is one of the most compatible signs of the zodiac calendar. They have a gamut of intense emotions that are consistently in sync with each other. Only if the Scorpion learns to let it go once in a while and the Pisces develops a sense of self-assurance, it will be a successful partnership that will meet its short-term as well as long-term goals.",
+      "compatibility_score" : "81%"
+    }
+  ],
+  "sagittarius":[
+    {
+      "Zodiac" : "Aries",
+      "description" : "Sagittarius and Aries can make a very compatible pair. Their relationship will have a lot of passion, enthusiasm, and energy. These are very good traits to make their relationship deeper and stronger. Both Aries and Sagittarius will enjoy each other's company and their energy level rises as the relationship grows. Both will support and help in fighting hardships and failures.",
+      "compatibility_score" : "87%"
+    },
+    {
+      "Zodiac" : "Leo",
+      "description" : "While there might be a few blips in the Sagittarius Leo relationship, they are certainly one of the most compatible couples when it comes to astrological studies. They can bring the best out of each other and shine in the light of their positive all exciting relationship.",
+      "compatibility_score" : "75%"
+    },
+    {
+      "Zodiac" : "Libra",
+      "description" : "The connectivity between Sagittarians and Librans is amazing. Librans are inclined towards maintaining balance and harmony. Sagittarians are intelligent and fun loving. But, Librans have a strange trait of transiting from one phase of emotion to other.",
+      "compatibility_score" : "71%"
+    },
+    {
+      "Zodiac" : "Aquarius",
+      "description" : "This is a combination where the positives outweigh the negatives by a considerable margin. As long as this pair builds and retains their passion for each other in the relationship, it will be a hit that can pass every test that is thrown at it.The Sagittarius Aquarius compatibility is one of a kind and can go the distance in most cases.",
+      "compatibility_score" : "83%"
+    }
+  ],
+  "capricorn":[
+    {
+      "Zodiac" : "Taurus",
+      "description" : "This is one of the most grounded and reliable bonds of the zodiac chart. If Capricorn and Taurus do find a way to handle their minor issues, they have a good chance of making it together and that too, in a happy, peaceful, and healthy relationship.",
+      "compatibility_score" : "89%"
+    },
+    {
+      "Zodiac" : "Virgo",
+      "description" : "Virgo and Capricorn will connect to each other on a visceral level and will find enduring stability in their relationship. Since this bond is something they can rely on, they tend to ease up individually and thus, are likely to be more relaxed and happier in life.",
+      "compatibility_score" : "77%"
+    },
+    {
+      "Zodiac" : "Scorpio",
+      "description" : "Though they have a couple of blips in the relationship, the combination of Scorpion and Capricorn is a match with powerful compatibility. They will shine with each other, develop each other, and build a beautiful bond with each other. If and when the two decide to commit to each other, their relationship is one that is likely to go the distance nine times out of ten!",
+      "compatibility_score" : "70%"
+    },
+    {
+      "Zodiac" : "Pisces",
+      "description" : "Pisces and Capricorn signs have primary difference of qualities, but their union is aided seamlessly due to that very discrepancy of their personas. It is a highly compatible relationship that can go a long way with mutual respect, amicable understanding and immense trust between the concerned parties.",
+      "compatibility_score" : "76%"
+    }
+  ],
+  "aquarius":[
+    {
+      "Zodiac" : "Aries",
+      "description" : "The relationship of Aries and Aquarius is very exciting, adventurous and interesting. They will enjoy each other's company as both of them love fun and freedom.This is a couple that lacks tenderness. They are not two brutes who let their relationship fade as soon as their passion does.",
+      "compatibility_score" : "72%"
+    },
+    {
+      "Zodiac" : "Gemini",
+      "description" : "If you want to see a relationship that is full of conversation, ideas and \"eureka moments\", you observe the Aquarius Gemini relationship. They will enjoy a camaraderie that you won't find in most zodiac relationships.",
+      "compatibility_score" : "85%"
+    },
+    {
+      "Zodiac" : "Libra",
+      "description" : "The couple will share a lot of similar qualities and will enjoy the relationship. Both of them love to socialize with people and to make new friends.",
+      "compatibility_score" : "68%"
+    },
+    {
+      "Zodiac" : "Sagittarius",
+      "description" : "These two will get together when it is time for both of them to go through a change in their lives or leave a partner they feel restricted with. Their relationship is often a shiny beacon to everyone around them because it gives priority to the future and brings hope of a better time.",
+      "compatibility_score" : "83%"
+    }
+  ],
+  "pisces":[
+    {
+      "Zodiac" : "Taurus",
+      "description" : "This relationship will survive the test of time if both parties involved have unbreakable trust in each other and nurture that connection they have painstakingly built over the years. They must remember to be honest and committed to their partner through all times.If natural communication flows between them like clockwork, this will be a beautiful love story with a prominent tag of ‘happily-ever-after’ pinned right to it!",
+      "compatibility_score" : "88%"
+    },
+    {
+      "Zodiac" : "Cancer",
+      "description" : "The Pisces Cancer union is a beautiful one. Both zodiacs are normally blessed with appealing looks and attractive minds. They are both prone to be drawn to each other. Mostly, for very valid reasons. However, both the zodiac star signs need to make sure that they do not let their love overpower them.",
+      "compatibility_score" : "72%"
+    },
+    {
+      "Zodiac" : "Scorpio",
+      "description" : "Though there are a few problems that might test this relationship, these star sign compatibility of two water signs has many features that can help it survive. Pisces and Scorpio are both passionate in their own ways and thus, end up striking the perfect rhythm with each other.If and when they decide to commit to the relationship, they can script a special story of camaraderie and bliss with each other.",
+      "compatibility_score" : "81%"
+    },
+    {
+      "Zodiac" : "Capricorn",
+      "description" : "A relationship between Capricorn and Pisces tells a story about possibilities of inspiration. If someone like Capricorn can be pulled into a crazy love story, exciting and unpredictable, this must be done by Pisces. In return, Capricorn will offer their Pisces partner stability, peace and some rest from their usual emotional tornadoes. There is a fine way in which Capricorn can help Pisces be more realistic and practical, while feeling more cheerful and optimistic themselves.",
+      "compatibility_score" : "76%"
+    }
+  ]
+
+}
