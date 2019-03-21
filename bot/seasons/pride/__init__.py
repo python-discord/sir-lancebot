@@ -1,9 +1,8 @@
 from bot.seasons import SeasonBase
 
-
 class Pride(SeasonBase):
     """
-    In support of our pride community, and in hopes of providing global cultural knowledge,
+    In support of all cultures and communities, and in hopes of providing global cultural knowledge,
     this event provides information about the LGBTQ community.
     """
 
