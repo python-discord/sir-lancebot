@@ -2,8 +2,9 @@ import json
 import logging
 import random
 
-from discord.ext import commands
 from pathlib import Path
+
+from discord.ext import commands
 
 log = logging.getLogger(__name__)
 
