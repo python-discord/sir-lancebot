@@ -45,9 +45,6 @@ jobs:
       dockerRegistryEndpoint: 'DockerHub'
       command: 'login'
 
-  - script: docker --version
-    displayName: 'Check Dgitocker version'
-
   - task: ShellScript@2
     displayName: 'Build and deploy containers'
 
