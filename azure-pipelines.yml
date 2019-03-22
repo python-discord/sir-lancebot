@@ -15,7 +15,7 @@ jobs:
     PIP_SRC: ".cache/src"
 
   steps:
-  - script: sudo apt-get install build-essential docker libffi-dev zlib1g zlib1g-dev
+  - script: sudo apt-get install docker
     displayName: 'Install base dependencies'
 
   - task: UsePythonVersion@0
