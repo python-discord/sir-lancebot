@@ -14,10 +14,6 @@ jobs:
     PIP_CACHE_DIR: ".cache/pip"
     PIP_SRC: ".cache/src"
 
-  steps:
-  - script: sudo apt-get install docker
-    displayName: 'Install base dependencies'
-
   - task: UsePythonVersion@0
     displayName: 'Set Python version'
     inputs:
@@ -47,6 +43,9 @@ jobs:
       containerregistrytype: 'Container Registry'
       dockerRegistryEndpoint: 'DockerHub'
       command: 'login'
+
+  - script: docker --version
+    displayName: 'Check Docker version'
 
   - task: ShellScript@2
     displayName: 'Build and deploy containers'
