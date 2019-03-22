@@ -2,15 +2,10 @@ import json
 import logging
 from pathlib import Path
 from datetime import datetime
-
-# import discord
 from discord.ext import commands
 
 
 log = logging.getLogger(__name__)
-
-with open(Path("bot", "resources", "evergreen", "global_birth.json"), "r") as indep_file:
-    indep_info = json.load(indep_file)
 
 
 class CountriesBirth:
@@ -20,34 +15,55 @@ class CountriesBirth:
 
     def __init__(self, bot):
         self.bot = bot
+        self.indep_info = self.load_data()
+
+    def load_data(self):
+        """
+        Loading the json data to be used for the rest of the class
+        :return: loaded json data as dictionary
+        """
+        indep_file = open(Path("bot", "resources", "evergreen", "global_birth.json"), "r")
+        return json.load(indep_file)
+
+    async def get_info(self, ctx, country_name: str):
+        """
+        Processes the country name against the `countries` dictionary in
+        :param ctx: takes in ctx to send data to discord channel
+        :param country_name: takes in the name of a country to get it's info
+        """
+        countries = self.indep_info["countries"]
+        for info in countries[country_name]:
+            # needs to be changed into embed
+            counter = []
+            counter.append(info["name"])
+            counter.append(info["independence"])
+            counter.append(info["description"])
+            counter.append(info["holiday"])
+            # print(counter)
+            await ctx.send(counter)
 
     @commands.command()
-    async def inform(self, ctx, country_name: str = ""):
+    async def inform(self, ctx, country_name: str = None):
         """
         @returns output the name and info on the country(ies) who's birthday is today.
         @returns output the independence information about the country provided
         """
-        dates = indep_info["dates"]
-        countries = indep_info["countries"]
+        dates = self.indep_info["dates"]
 
-        output = " The country is who knows"
         if country_name:
-            output = f" The country is who knows {country_name}, {len(countries)}"
-            if str(country_name) in countries:
-                name = countries[country_name][0]["name"]
-                # info = countries[country_name][0]["info"]
-                output = f" The country is {name}"
+            await self.get_info(ctx, country_name)
         else:
             today = datetime.now()
             month = today.strftime("%B")
             day = str(today.strftime("%d"))
 
             if day in dates[month]:
-                output = []
-                for item in dates[month][day]:
-                    output.append(item)
-
-        await ctx.send(output)
+                for country_name in dates[month][day]:
+                    await self.get_info(ctx, country_name)
+            else:
+                output = "Today is one of the lovely days where no country saw their independence, or at least," \
+                         "it is not yet documented"
+                await ctx.send(output)
 
 
 def setup(bot):
