@@ -1,7 +1,6 @@
 import json
 import logging
 import random
-
 from pathlib import Path
 
 from discord.ext import commands
