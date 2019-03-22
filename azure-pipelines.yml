@@ -14,6 +14,7 @@ jobs:
     PIP_CACHE_DIR: ".cache/pip"
     PIP_SRC: ".cache/src"
 
+  steps:
   - task: UsePythonVersion@0
     displayName: 'Set Python version'
     inputs:
@@ -45,7 +46,7 @@ jobs:
       command: 'login'
 
   - script: docker --version
-    displayName: 'Check Docker version'
+    displayName: 'Check Dgitocker version'
 
   - task: ShellScript@2
     displayName: 'Build and deploy containers'
