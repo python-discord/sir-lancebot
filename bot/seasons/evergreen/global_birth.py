@@ -33,7 +33,7 @@ class CountriesBirth:
         """
         countries = self.indep_info["countries"]
         for info in countries[country_name]:
-            # needs to be changed into embed
+            # TODO needs to be changed into embed
             counter = []
             counter.append(info["name"])
             counter.append(info["independence"])
@@ -45,12 +45,15 @@ class CountriesBirth:
     @commands.command()
     async def inform(self, ctx, country_name: str = None):
         """
-        @returns output the name and info on the country(ies) who's birthday is today.
-        @returns output the independence information about the country provided
+        Provides the name and info on the country(ies) who's birthday is today, if no country name is provided.
+        Provides the independence information about the country provided
+        :param ctx: takes in ctx to send data to discord channel
+        :param country_name: takes in optional name of a country to provide info on that country
         """
         dates = self.indep_info["dates"]
 
         if country_name:
+            # TODO needs to be able to take a space separated string as argument for country name
             await self.get_info(ctx, country_name)
         else:
             today = datetime.now()
