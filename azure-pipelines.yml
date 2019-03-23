@@ -1,6 +1,6 @@
 # https://aka.ms/yaml
 
-variables:
+env:
   LIBRARY_PATH: /lib:/usr/lib
 
 jobs:
@@ -10,7 +10,7 @@ jobs:
   pool:
     vmImage: 'Ubuntu 16.04'
 
-  variables:
+  env:
     PIP_CACHE_DIR: ".cache/pip"
     PIP_SRC: ".cache/src"
 
@@ -21,12 +21,14 @@ jobs:
       versionSpec: '3.7.x'
       addToPath: true
 
-  - script: pip3 install poetry
+  - script: |
+      set -o pipefail
+      curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python3 - -y
     displayName: 'Install Poetry'
 
   - script: |
-      poetry config settings.virtualenvs.create false
-      poetry install
+      ~/.poetry/bin/poetry config settings.virtualenvs.create false
+      ~/.poetry/bin/poetry install
     displayName: 'Install project using Poetry'
 
   - script: python3 -m flake8
