@@ -13,7 +13,6 @@ RUN set -euxo pipefail \
         git \
         libffi-dev \
     && apk add --no-cache --update \
-        tini \
         # Pillow dependencies
         freetype-dev \
         libjpeg-turbo-dev \
@@ -26,5 +25,5 @@ RUN set -euxo pipefail \
     && rm -rf ~/.poetry \
     && apk del .build-deps
 
-ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["python", "-m", "bot"]
+ENTRYPOINT ["python"]
+CMD ["-m", "bot"]
