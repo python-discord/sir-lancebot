@@ -1,4 +1,4 @@
-FROM python:3.7-alpine3.7
+FROM python:3.7.2-alpine3.9
 
 COPY . /bot
 WORKDIR /bot
@@ -19,8 +19,6 @@ RUN set -euxo pipefail \
         libjpeg-turbo-dev \
         zlib-dev \
     \
-    # Upgrade pip to get fix pypa/pip#6219
-    && pip install -U pip \
     && wget -O- $POETRY_INSTALLER | python - -y \
     && ~/.poetry/bin/poetry config settings.virtualenvs.create false \
     && ~/.poetry/bin/poetry install --no-dev \
