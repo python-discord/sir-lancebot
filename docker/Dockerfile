@@ -5,6 +5,7 @@ WORKDIR /bot
 
 ENV LIBRARY_PATH="/lib:/usr/lib" \
     PIP_NO_CACHE_DIR="false" \
+    POETRY_INSTALLER="https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py"
 
 RUN set -euxo pipefail \
     && apk add --no-cache --update --virtual .build-deps \
@@ -20,10 +21,11 @@ RUN set -euxo pipefail \
     \
     # Upgrade pip to get fix pypa/pip#6219
     && pip install -U pip \
-    && pip install poetry \
-    && poetry config settings.virtualenvs.create false \
-    && poetry install --no-dev \
+    && wget -O- $POETRY_INSTALLER | python - -y \
+    && ~/.poetry/bin/poetry config settings.virtualenvs.create false \
+    && ~/.poetry/bin/poetry install --no-dev \
     \
+    && rm -rf ~/.poetry \
     && apk del .build-deps
 
 ENTRYPOINT ["/sbin/tini", "--"]
