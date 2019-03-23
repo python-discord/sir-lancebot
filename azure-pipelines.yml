@@ -1,18 +1,11 @@
 # https://aka.ms/yaml
 
-env:
-  LIBRARY_PATH: /lib:/usr/lib
-
 jobs:
 - job: test
   displayName: 'Lint & Test'
 
   pool:
     vmImage: 'Ubuntu 16.04'
-
-  env:
-    PIP_CACHE_DIR: ".cache/pip"
-    PIP_SRC: ".cache/src"
 
   steps:
   - task: UsePythonVersion@0
