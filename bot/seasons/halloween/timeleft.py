@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import logging
 
 from discord.ext import commands
@@ -16,16 +16,23 @@ class TimeLeft:
 
     @staticmethod
     def in_october():
-        return datetime.datetime.now().month == 10
+        """
+        checks that the current month is October
+        """
+        return datetime.now().month == 10
 
     @staticmethod
     def load_date():
-        now = datetime.datetime.now()
+        """
+        Grabs the current time in additon to the first and last day of the following October
+        """
+        now = datetime.now()
         year = now.year
         if now.month > 10:
             year += 1
-        end = datetime.datetime(year, 10, 31, 11, 59, 59)
-        return now, end
+        end = datetime(year, 10, 31, 11, 59, 59)
+        start = datetime(year, 10, 1)
+        return now, end, start
 
     @commands.command()
     async def timeleft(self, ctx):
@@ -33,10 +40,10 @@ class TimeLeft:
         Calculates the time left until the end of Hacktober
 
         Whilst in October, displays the days, hours and minutes left.
-        Only displays the days left whilst in a different month
+        Only displays the days left until the beginning and end whilst in a different month
         """
 
-        now, end = self.load_date()
+        now, end, start = self.load_date()
         diff = end - now
         days, seconds = diff.days, diff.seconds
         if self.in_october():
@@ -45,7 +52,12 @@ class TimeLeft:
             await ctx.send(f"There is currently only {days} days, {hours} hours and {minutes}"
                            "minutes left until the end of Hacktober.")
         else:
-            await ctx.send(f"It is not currently Hacktober. However, the next one will finish in {days} days.")
+            start_diff = start - now
+            start_days = start_diff.days
+            await ctx.send(
+                f"It is not currently Hacktober. However, the next one will start in {start_days} days "
+                f"and will finish in {days} days."
+            )
 
 
 def setup(bot):
