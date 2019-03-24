@@ -19,13 +19,15 @@ class Magic8ball:
             self.answers = json.load(file)
 
     @commands.command(name="8ball")
-    async def output_answer(self, ctx, question: list):
+    async def output_answer(self, ctx, *, question):
         """
         Return a magic 8 ball answer from answers list.
         """
-        if len(question) >= 3:
+        if len(question.split()) >= 3:
             answer = random.choice(self.answers)
             await ctx.send(answer)
+        else:
+            await ctx.send("Usage: .8ball <question> (minimum length of 3 eg: `will I win?`)")
 
 
 # Required in order to load the cog, use the class name in the add_cog function.
