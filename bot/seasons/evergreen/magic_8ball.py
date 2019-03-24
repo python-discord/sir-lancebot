@@ -31,4 +31,4 @@ class Magic8ball:
 # Required in order to load the cog, use the class name in the add_cog function.
 def setup(bot):
     bot.add_cog(Magic8ball(bot))
-    log.debug("Magic 8ball cog loaded")
+    log.info("Magic 8ball cog loaded")
