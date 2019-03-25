@@ -1,4 +1,4 @@
-FROM python:3.7-alpine3.7
+FROM python:3.7.2-alpine3.9
 
 ENV LIBRARY_PATH="/lib:/usr/lib" \
     PIP_NO_CACHE_DIR="false" \
@@ -15,12 +15,11 @@ RUN apk add --no-cache --update \
         freetype-dev \
         libjpeg-turbo-dev \
         zlib-dev
+RUN pip install pipenv
 
-RUN mkdir /bot
 COPY . /bot
 WORKDIR /bot
 
-RUN pip install pipenv
 RUN pipenv install --deploy --system
 
 ENTRYPOINT ["python"]
