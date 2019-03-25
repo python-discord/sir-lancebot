@@ -1,12 +1,5 @@
 # https://aka.ms/yaml
 
-variables:
-  LIBRARY_PATH: /lib:/usr/lib
-  PIPENV_HIDE_EMOJIS: 1
-  PIPENV_IGNORE_VIRTUALENVS: 1
-  PIPENV_NOSPIN: 1
-  PIPENV_VENV_IN_PROJECT: 1
-
 jobs:
 - job: test
   displayName: 'Lint & Test'
@@ -15,9 +8,13 @@ jobs:
     vmImage: 'Ubuntu 16.04'
 
   variables:
-    PIPENV_CACHE_DIR: ".cache/pipenv"
     PIP_CACHE_DIR: ".cache/pip"
     PIP_SRC: ".cache/src"
+    PIPENV_CACHE_DIR: ".cache/pipenv"
+    PIPENV_DONT_USE_PYENV: 1
+    PIPENV_HIDE_EMOJIS: 1
+    PIPENV_IGNORE_VIRTUALENVS: 1
+    PIPENV_NOSPIN: 1
 
   - task: UsePythonVersion@0
     displayName: 'Set Python version'
@@ -37,10 +34,6 @@ jobs:
 - job: build
   displayName: 'Build Containers'
   dependsOn: 'test'
-
-  variables:
-    PIPENV_CACHE_DIR: ".cache/pipenv"
-    PIP_CACHE_DIR: ".cache/pip"
 
   steps:
   - task: Docker@1
