@@ -1,9 +1,4 @@
 FROM python:3.7-alpine3.7
-RUN apk add --update libffi-dev build-base git jpeg-dev zlib zlib-dev
-
-RUN mkdir /bot
-COPY . /bot
-WORKDIR /bot
 
 ENV LIBRARY_PATH="/lib:/usr/lib" \
     PIP_NO_CACHE_DIR="false" \
@@ -11,6 +6,19 @@ ENV LIBRARY_PATH="/lib:/usr/lib" \
     PIPENV_HIDE_EMOJIS="1" \
     PIPENV_IGNORE_VIRTUALENVS="1" \
     PIPENV_NOSPIN="1"
+
+RUN apk add --no-cache --update \
+        build-base \
+        git \
+        libffi-dev \
+        # Pillow dependencies
+        jpeg-dev \
+        zlib \
+        zlib-dev
+
+RUN mkdir /bot
+COPY . /bot
+WORKDIR /bot
 
 RUN pip install pipenv
 RUN pipenv install --deploy --system
