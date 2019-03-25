@@ -19,7 +19,7 @@ class TimeLeft:
         """
         checks that the current month is October
         """
-        return datetime.now().month == 10
+        return datetime.utcnow().month == 10
 
     @staticmethod
     def load_date():
