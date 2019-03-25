@@ -26,7 +26,7 @@ class TimeLeft:
         """
         Grabs the current time in additon to the first and last day of the following October
         """
-        now = datetime.now()
+        now = datetime.utcnow()
         year = now.year
         if now.month > 10:
             year += 1
