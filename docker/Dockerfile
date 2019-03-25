@@ -1,5 +1,5 @@
 FROM python:3.7-alpine3.7
-RUN apk add --update libffi-dev tini build-base git jpeg-dev zlib zlib-dev
+RUN apk add --update libffi-dev build-base git jpeg-dev zlib zlib-dev
 
 RUN mkdir /bot
 COPY . /bot
@@ -11,5 +11,5 @@ ENV LIBRARY_PATH=/lib:/usr/lib \
 RUN pip install pipenv
 RUN pipenv install --deploy --system
 
-ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["python", "-m", "bot"]
+ENTRYPOINT ["python"]
+CMD ["-m", "bot"]
