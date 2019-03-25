@@ -16,19 +16,20 @@ jobs:
     PIPENV_IGNORE_VIRTUALENVS: 1
     PIPENV_NOSPIN: 1
 
+  steps:
   - task: UsePythonVersion@0
     displayName: 'Set Python version'
     inputs:
       versionSpec: '3.7.x'
       addToPath: true
 
-  - script: sudo pip install pipenv
+  - script: pip3 install pipenv
     displayName: 'Install pipenv'
 
   - script: pipenv install --dev --deploy --system
     displayName: 'Install project using pipenv'
 
-  - script: python -m flake8
+  - script: python3 -m flake8
     displayName: 'Run linter'
 
 - job: build
