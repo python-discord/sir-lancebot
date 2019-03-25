@@ -1,7 +1,9 @@
 FROM python:3.7.2-alpine3.9
 
-ENV LIBRARY_PATH="/lib:/usr/lib" \
-    PIP_NO_CACHE_DIR="false" \
+ENTRYPOINT ["python"]
+CMD ["-m", "bot"]
+
+ENV PIP_NO_CACHE_DIR="false" \
     PIPENV_DONT_USE_PYENV="1" \
     PIPENV_HIDE_EMOJIS="1" \
     PIPENV_IGNORE_VIRTUALENVS="1" \
@@ -21,6 +23,3 @@ COPY . /bot
 WORKDIR /bot
 
 RUN pipenv install --deploy --system
-
-ENTRYPOINT ["python"]
-CMD ["-m", "bot"]
