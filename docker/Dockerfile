@@ -12,8 +12,8 @@ RUN apk add --no-cache --update \
         git \
         libffi-dev \
         # Pillow dependencies
-        jpeg-dev \
-        zlib \
+        freetype-dev \
+        libjpeg-turbo-dev \
         zlib-dev
 
 RUN mkdir /bot
