@@ -47,4 +47,4 @@ def setup(bot):
     """Spooky sound Cog load."""
 
     bot.add_cog(SpookySound(bot))
-    log.debug("SpookySound cog loaded")
+    log.info("SpookySound cog loaded")

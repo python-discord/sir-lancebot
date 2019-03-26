@@ -2,6 +2,7 @@ import logging
 import re
 
 import discord
+from discord.ext.commands import Cog
 
 log = logging.getLogger(__name__)
 
@@ -22,6 +23,7 @@ class SpookyReact:
     def __init__(self, bot):
         self.bot = bot
 
+    @Cog.listener()
     async def on_message(self, ctx: discord.Message):
         """
         A command to send the seasonalbot github project.
@@ -70,4 +72,4 @@ def setup(bot):
     """Spooky reaction Cog load."""
 
     bot.add_cog(SpookyReact(bot))
-    log.debug("SpookyReact cog loaded")
+    log.info("SpookyReact cog loaded")

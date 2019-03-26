@@ -133,4 +133,4 @@ def setup(bot):
     """Scary movie Cog load."""
 
     bot.add_cog(ScaryMovie(bot))
-    log.debug("ScaryMovie cog loaded")
+    log.info("ScaryMovie cog loaded")

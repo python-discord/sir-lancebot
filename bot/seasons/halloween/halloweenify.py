@@ -11,7 +11,7 @@ log = logging.getLogger(__name__)
 
 
 class Halloweenify:
-    """A cog to change a invokers nickname to a spooky one."""
+    """A cog to change a invokers nickname to a spooky one!"""
 
     def __init__(self, bot):
         self.bot = bot
@@ -51,4 +51,4 @@ def setup(bot):
     """Halloweenify Cog load."""
 
     bot.add_cog(Halloweenify(bot))
-    log.debug("Halloweenify cog loaded")
+    log.info("Halloweenify cog loaded")

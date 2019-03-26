@@ -58,4 +58,4 @@ def setup(bot):
     """Valentine Zodiac Cog load."""
 
     bot.add_cog(ValentineZodiac(bot))
-    log.debug("Valentine Zodiac cog loaded")
+    log.info("ValentineZodiac cog loaded")

@@ -33,4 +33,4 @@ def setup(bot):
     """Fun Cog load."""
 
     bot.add_cog(Fun(bot))
-    log.debug("Fun cog loaded")
+    log.info("Fun cog loaded")

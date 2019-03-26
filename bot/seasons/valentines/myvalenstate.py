@@ -87,4 +87,4 @@ def setup(bot):
     """Valenstate Cog load."""
 
     bot.add_cog(MyValenstate(bot))
-    log.debug("MyValenstate cog loaded")
+    log.info("MyValenstate cog loaded")

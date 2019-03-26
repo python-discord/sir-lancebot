@@ -36,6 +36,7 @@ class HalloweenFacts:
         self.facts = list(enumerate(self.halloween_facts))
         random.shuffle(self.facts)
 
+    @commands.Cog.listener()
     async def on_ready(self):
         """Get event Channel object and initialize fact task loop."""
 
@@ -68,4 +69,4 @@ def setup(bot):
     """Halloween facts Cog load."""
 
     bot.add_cog(HalloweenFacts(bot))
-    log.debug("HalloweenFacts cog loaded")
+    log.info("HalloweenFacts cog loaded")

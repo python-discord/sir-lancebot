@@ -62,4 +62,4 @@ def setup(bot):
     """Romance movie Cog load."""
 
     bot.add_cog(RomanceMovieFinder(bot))
-    log.debug("Random romance movie cog loaded!")
+    log.info("RomanceMovieFinder cog loaded")

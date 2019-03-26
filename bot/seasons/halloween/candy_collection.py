@@ -33,6 +33,7 @@ class CandyCollection:
             userid = userinfo['userid']
             self.get_candyinfo[userid] = userinfo
 
+    @commands.Cog.listener()
     async def on_message(self, message):
         """Randomly adds candy or skull reaction to non-bot messages in the Event channel."""
 
@@ -54,6 +55,7 @@ class CandyCollection:
             self.msg_reacted.append(d)
             return await message.add_reaction('\N{CANDY}')
 
+    @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
         """Add/remove candies from a person if the reaction satisfies criteria."""
 
@@ -225,4 +227,4 @@ def setup(bot):
     """Candy Collection game Cog load."""
 
     bot.add_cog(CandyCollection(bot))
-    log.debug("CandyCollection cog loaded")
+    log.info("CandyCollection cog loaded")

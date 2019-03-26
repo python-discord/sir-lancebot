@@ -714,4 +714,4 @@ def setup(bot: commands.Bot) -> None:
     """Advent of Code Cog load."""
 
     bot.add_cog(AdventOfCode(bot))
-    log.info("Cog loaded: adventofcode")
+    log.info("AdventOfCode cog loaded")

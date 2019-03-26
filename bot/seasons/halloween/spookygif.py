@@ -10,7 +10,7 @@ log = logging.getLogger(__name__)
 
 
 class SpookyGif:
-    """A cog to fetch a random spooky gif from the web."""
+    """A cog to fetch a random spooky gif from the web!"""
 
     def __init__(self, bot):
         self.bot = bot
@@ -38,4 +38,4 @@ def setup(bot):
     """Spooky GIF Cog load."""
 
     bot.add_cog(SpookyGif(bot))
-    log.debug("SpookyGif cog loaded")
+    log.info("SpookyGif cog loaded")

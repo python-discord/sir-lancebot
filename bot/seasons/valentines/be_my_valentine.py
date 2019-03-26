@@ -16,7 +16,7 @@ HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_hea
 
 
 class BeMyValentine:
-    """A cog that sends Valentines to other users."""
+    """A cog that sends Valentines to other users!"""
 
     def __init__(self, bot):
         self.bot = bot
@@ -243,4 +243,4 @@ def setup(bot):
     """Be my Valentine Cog load."""
 
     bot.add_cog(BeMyValentine(bot))
-    log.debug("Be My Valentine cog loaded")
+    log.info("BeMyValentine cog loaded")

@@ -6,7 +6,6 @@ from typing import List
 from aiohttp import AsyncResolver, ClientSession, TCPConnector
 from discord import Embed
 from discord.ext import commands
-from discord.ext.commands import Bot
 
 from bot import constants
 
@@ -15,16 +14,13 @@ log = logging.getLogger(__name__)
 __all__ = ('SeasonalBot',)
 
 
-class SeasonalBot(Bot):
+class SeasonalBot(commands.Bot):
     """Base bot instance."""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.http_session = ClientSession(
-            connector=TCPConnector(
-                resolver=AsyncResolver(),
-                family=socket.AF_INET,
-            )
+            connector=TCPConnector(resolver=AsyncResolver(), family=socket.AF_INET)
         )
 
     def load_extensions(self, exts: List[str]):

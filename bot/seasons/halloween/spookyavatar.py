@@ -52,4 +52,4 @@ def setup(bot):
     """Spooky avatar Cog load."""
 
     bot.add_cog(SpookyAvatar(bot))
-    log.debug("SpookyAvatar cog loaded")
+    log.info("SpookyAvatar cog loaded")

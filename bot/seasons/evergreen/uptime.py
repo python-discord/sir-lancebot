@@ -33,4 +33,4 @@ def setup(bot):
     """Uptime Cog load."""
 
     bot.add_cog(Uptime(bot))
-    log.debug("Uptime cog loaded")
+    log.info("Uptime cog loaded")

@@ -341,4 +341,4 @@ def setup(bot):
     """Hacktoberstats Cog load."""
 
     bot.add_cog(HacktoberStats(bot))
-    log.debug("HacktoberStats cog loaded")
+    log.info("HacktoberStats cog loaded")

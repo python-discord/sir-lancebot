@@ -41,4 +41,4 @@ def setup(bot):
     """Save the date Cog Load."""
 
     bot.add_cog(SaveTheDate(bot))
-    log.debug("Save the date cog loaded")
+    log.info("SaveTheDate cog loaded")
