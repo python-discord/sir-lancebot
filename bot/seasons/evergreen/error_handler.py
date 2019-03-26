@@ -59,7 +59,7 @@ class CommandErrorHandler(commands.Cog):
             remaining_minutes, remaining_seconds = divmod(error.retry_after, 60)
 
             return await ctx.send(
-                f"This command is on cooldown, please retry in "
+                "This command is on cooldown, please retry in "
                 f"{int(remaining_minutes)} minutes {math.ceil(remaining_seconds)} seconds."
             )
 
