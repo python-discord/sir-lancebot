@@ -7,4 +7,4 @@ log = logging.getLogger(__name__)
 
 def setup(bot):
     bot.add_cog(Snakes(bot))
-    log.info("Cog loaded: Snakes")
+    log.info("Snakes cog loaded")

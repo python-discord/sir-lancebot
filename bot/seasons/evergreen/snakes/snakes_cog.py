@@ -1187,8 +1187,3 @@ class Snakes(Cog):
 
         await ctx.send(embed=embed)
     # endregion
-
-
-def setup(bot):
-    bot.add_cog(Snakes(bot))
-    log.info("Cog loaded: Snakes")

@@ -41,4 +41,4 @@ class PickupLine(commands.Cog):
 
 def setup(bot):
     bot.add_cog(PickupLine(bot))
-    log.info('Pickup line cog loaded')
+    log.info('PickupLine cog loaded')
