@@ -9,7 +9,7 @@ from bot import start_time
 log = logging.getLogger(__name__)
 
 
-class Uptime:
+class Uptime(commands.Cog):
     """
     A cog for posting the bots uptime.
     """
@@ -35,4 +35,4 @@ class Uptime:
 # Required in order to load the cog, use the class name in the add_cog function.
 def setup(bot):
     bot.add_cog(Uptime(bot))
-    log.debug("Uptime cog loaded")
+    log.info("Uptime cog loaded")

@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-discord-py = {ref = "3f06f24",git = "https://github.com/Rapptz/discord.py",editable = true}
+discord-py = {ref = "42a7c4f",git = "https://github.com/Rapptz/discord.py",editable = true}
 arrow = "*"
 beautifulsoup4 = "*"
 aiodns = "*"

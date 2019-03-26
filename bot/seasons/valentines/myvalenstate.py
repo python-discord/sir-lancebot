@@ -15,7 +15,7 @@ with open(Path('bot', 'resources', 'valentines', 'valenstates.json'), 'r') as fi
     STATES = json.load(file)
 
 
-class MyValenstate:
+class MyValenstate(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -82,4 +82,4 @@ class MyValenstate:
 
 def setup(bot):
     bot.add_cog(MyValenstate(bot))
-    log.debug("MyValenstate cog loaded")
+    log.info("MyValenstate cog loaded")
