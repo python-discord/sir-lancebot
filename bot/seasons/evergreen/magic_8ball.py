@@ -8,7 +8,7 @@ from discord.ext import commands
 log = logging.getLogger(__name__)
 
 
-class Magic8ball:
+class Magic8ball(commands.Cog):
     """
     A Magic 8ball command to respond to a users question.
     """
