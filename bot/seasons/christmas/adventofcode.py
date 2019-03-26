@@ -730,4 +730,4 @@ def _error_embed_helper(title: str, description: str) -> discord.Embed:
 
 def setup(bot: commands.Bot) -> None:
     bot.add_cog(AdventOfCode(bot))
-    log.info("Advent of Code cog loaded")
+    log.info("AdventOfCode cog loaded")

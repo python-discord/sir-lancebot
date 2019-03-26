@@ -104,4 +104,4 @@ class LoveCalculator(Cog):
 
 def setup(bot):
     bot.add_cog(LoveCalculator(bot))
-    log.info("Love calculator cog loaded")
+    log.info("LoveCalculator cog loaded")

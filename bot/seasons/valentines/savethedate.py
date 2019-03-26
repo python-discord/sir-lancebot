@@ -41,4 +41,4 @@ class SaveTheDate(commands.Cog):
 
 def setup(bot):
     bot.add_cog(SaveTheDate(bot))
-    log.info("Save the date cog loaded")
+    log.info("SaveTheDate cog loaded")
