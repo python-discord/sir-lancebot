@@ -17,15 +17,17 @@ class TimeLeft:
     @staticmethod
     def in_october():
         """
-        checks that the current month is October
+        Return True if the current month is October.
         """
+
         return datetime.utcnow().month == 10
 
     @staticmethod
     def load_date():
         """
-        Grabs the current time in additon to the first and last day of the following October
+        Return of a tuple of the current time and the end and start times of the following October.
         """
+
         now = datetime.utcnow()
         year = now.year
         if now.month > 10:
@@ -37,7 +39,7 @@ class TimeLeft:
     @commands.command()
     async def timeleft(self, ctx):
         """
-        Calculates the time left until the end of Hacktober
+        Calculates the time left until the end of Hacktober.
 
         Whilst in October, displays the days, hours and minutes left.
         Only displays the days left until the beginning and end whilst in a different month
