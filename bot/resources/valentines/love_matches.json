@@ -1,0 +1,58 @@
+{
+    "0": {
+        "titles": [
+            "\ud83d\udc94 There's no real connection between you two \ud83d\udc94"
+        ],
+        "text": "The chance of this relationship working out is really low. You can get it to work, but with high costs and no guarantee of working out. Do not sit back, spend as much time together as possible, talk a lot with each other to increase the chances of this relationship's survival."
+    },
+    "5": {
+        "titles": [
+            "\ud83d\udc99 A small acquaintance \ud83d\udc99"
+        ],
+        "text": "There might be a chance of this relationship working out somewhat well, but it is not very high. With a lot of time and effort you'll get it to work eventually, however don't count on it. It might fall apart quicker than you'd expect."
+    },
+    "20": {
+        "titles": [
+            "\ud83d\udc9c You two seem like casual friends \ud83d\udc9c"
+        ],
+        "text": "The chance of this relationship working is not very high. You both need to put time and effort into this relationship, if you want it to work out well for both of you. Talk with each other about everything and don't lock yourself up. Spend time together. This will improve the chances of this relationship's survival by a lot."
+    },
+    "30": {
+        "titles": [
+            "\ud83d\udc97 You seem like you are good friends \ud83d\udc97"
+        ],
+        "text": "The chance of this relationship working is not very high, but its not that low either. If you both want this relationship to work, and put time and effort into it, meaning spending time together, talking to each other etc., than nothing shall stand in your way."
+    },
+    "45": {
+        "titles": [
+            "\ud83d\udc98 You two are really close aren't you? \ud83d\udc98"
+        ],
+        "text": "Your relationship has a reasonable amount of working out. But do not overestimate yourself there. Your relationship will suffer good and bad times. Make sure to not let the bad times destroy your relationship, so do not hesitate to talk to each other, figure problems out together etc."
+    },
+    "60": {
+        "titles": [
+            "\u2764 So when will you two go on a date? \u2764"
+        ],
+        "text": "Your relationship will most likely work out. It won't be perfect and you two need to spend a lot of time together, but if you keep on having contact, the good times in your relationship will outweigh the bad ones."
+    },
+    "80": {
+        "titles": [
+            "\ud83d\udc95 Aww look you two fit so well together \ud83d\udc95"
+        ],
+        "text": "Your relationship will most likely work out well. Don't hesitate on making contact with each other though, as your relationship might suffer from a lack of time spent together. Talking with each other and spending time together is key."
+    },
+    "95": {
+        "titles": [
+            "\ud83d\udc96 Love is in the air \ud83d\udc96",
+            "\ud83d\udc96 Planned your future yet? \ud83d\udc96"
+        ],
+        "text": "Your relationship will most likely work out perfect. This doesn't mean thought that you don't need to put effort into it. Talk to each other, spend time together, and you two won't have a hard time."
+    },
+    "100": {
+        "titles": [
+            "\ud83d\udc9b When will you two marry? \ud83d\udc9b",
+            "\ud83d\udc9b Now kiss already \ud83d\udc9b"
+        ],
+        "text": "You two will most likely have the perfect relationship. But don't think that this means you don't have to do anything for it to work. Talking to each other and spending time together is key, even in a seemingly perfect relationship."
+    }
+}

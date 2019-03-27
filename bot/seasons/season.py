@@ -90,6 +90,7 @@ class SeasonBase:
 
     colour: Optional[int] = None
     icon: str = "/logos/logo_full/logo_full.png"
+    bot_icon: Optional[str] = None
 
     date_format: str = "%d/%m/%Y"
 
@@ -151,10 +152,11 @@ class SeasonBase:
 
         return f"New Season, {self.name_clean}!"
 
-    async def get_icon(self) -> bytes:
+    async def get_icon(self, avatar: bool = False) -> bytes:
         """
         Retrieves the icon image from the branding repository, using the
-        defined icon attribute for the season.
+        defined icon attribute for the season. If `avatar` is True, uses
+        optional bot-only avatar icon if present.
 
         The icon attribute must provide the url path, starting from the master
         branch base url, including the starting slash:
@@ -162,7 +164,11 @@ class SeasonBase:
         """
 
         base_url = "https://raw.githubusercontent.com/python-discord/branding/master"
-        full_url = base_url + self.icon
+        if avatar:
+            icon = self.bot_icon or self.icon
+        else:
+            icon = self.icon
+        full_url = base_url + icon
         log.debug(f"Getting icon from: {full_url}")
         async with bot.http_session.get(full_url) as resp:
             return await resp.read()
@@ -217,17 +223,17 @@ class SeasonBase:
         old_avatar = bot.user.avatar
 
         # attempt the change
-        log.debug(f"Changing avatar to {self.icon}")
-        icon = await self.get_icon()
+        log.debug(f"Changing avatar to {self.bot_icon or self.icon}")
+        icon = await self.get_icon(avatar=True)
         with contextlib.suppress(discord.HTTPException, asyncio.TimeoutError):
             async with async_timeout.timeout(5):
                 await bot.user.edit(avatar=icon)
 
         if bot.user.avatar != old_avatar:
-            log.debug(f"Avatar changed to {self.icon}")
+            log.debug(f"Avatar changed to {self.bot_icon or self.icon}")
             return True
 
-        log.warning(f"Changing avatar failed: {self.icon}")
+        log.warning(f"Changing avatar failed: {self.bot_icon or self.icon}")
         return False
 
     async def apply_server_icon(self) -> bool:
@@ -334,18 +340,19 @@ class SeasonBase:
         if not Client.debug:
             log.info("Applying avatar.")
             await self.apply_avatar()
-            log.info("Applying server icon.")
-            await self.apply_server_icon()
             if username_changed:
+                log.info("Applying server icon.")
+                await self.apply_server_icon()
                 log.info(f"Announcing season {self.name}.")
                 await self.announce_season()
             else:
+                log.info(f"Skipping server icon change due to username not being changed.")
                 log.info(f"Skipping season announcement due to username not being changed.")
 
         await bot.send_log("SeasonalBot Loaded!", f"Active Season: **{self.name_clean}**")
 
 
-class SeasonManager:
+class SeasonManager(commands.Cog):
     """
     A cog for managing seasons.
     """
@@ -465,7 +472,7 @@ class SeasonManager:
         # report back details
         season_name = type(self.season).__name__
         embed = discord.Embed(
-            description=f"**Season:** {season_name}\n**Avatar:** {self.season.icon}",
+            description=f"**Season:** {season_name}\n**Avatar:** {self.season.bot_icon or self.season.icon}",
             colour=colour
         )
         embed.set_author(name=title)

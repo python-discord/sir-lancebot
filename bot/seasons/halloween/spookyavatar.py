@@ -4,15 +4,15 @@ from io import BytesIO
 
 import aiohttp
 import discord
-from discord.ext import commands
 from PIL import Image
+from discord.ext import commands
 
 from bot.utils.halloween import spookifications
 
 log = logging.getLogger(__name__)
 
 
-class SpookyAvatar:
+class SpookyAvatar(commands.Cog):
 
     """
     A cog that spookifies an avatar.
@@ -55,4 +55,4 @@ class SpookyAvatar:
 
 def setup(bot):
     bot.add_cog(SpookyAvatar(bot))
-    log.debug("SpookyAvatar cog loaded")
+    log.info("SpookyAvatar cog loaded")

@@ -108,7 +108,7 @@ async def day_countdown(bot: commands.Bot):
         await asyncio.sleep(120)
 
 
-class AdventOfCode:
+class AdventOfCode(commands.Cog):
     """
     Advent of Code festivities! Ho Ho Ho!
     """
@@ -205,14 +205,21 @@ class AdventOfCode:
     @adventofcode_group.command(name="join", aliases=("j",), brief="Learn how to join PyDis' private AoC leaderboard")
     async def join_leaderboard(self, ctx: commands.Context):
         """
-        Retrieve the link to join the PyDis AoC private leaderboard
+        DM the user the information for joining the PyDis AoC private leaderboard
         """
+
+        author = ctx.message.author
+        log.info(f"{author.name} ({author.id}) has requested the PyDis AoC leaderboard code")
 
         info_str = (
             "Head over to https://adventofcode.com/leaderboard/private "
             f"with code `{AocConfig.leaderboard_join_code}` to join the PyDis private leaderboard!"
         )
-        await ctx.send(info_str)
+        try:
+            await author.send(info_str)
+        except discord.errors.Forbidden:
+            log.debug(f"{author.name} ({author.id}) has disabled DMs from server members")
+            await ctx.send(f":x: {author.mention}, please (temporarily) enable DMs to receive the join code")
 
     @adventofcode_group.command(
         name="leaderboard",
@@ -723,4 +730,4 @@ def _error_embed_helper(title: str, description: str) -> discord.Embed:
 
 def setup(bot: commands.Bot) -> None:
     bot.add_cog(AdventOfCode(bot))
-    log.info("Cog loaded: adventofcode")
+    log.info("AdventOfCode cog loaded")

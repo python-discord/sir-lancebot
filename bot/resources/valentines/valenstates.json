@@ -1,0 +1,122 @@
+{
+  "Australia": {
+    "text": "Australia is the oldest, flattest and driest inhabited continent on earth. It is one of the 18 megadiverse countries, featuring a wide variety of plants and animals, the most iconic ones being the koalas and kangaroos, as well as its deadly wildlife and trees falling under the Eucalyptus genus.",
+    "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Flag_of_Australia_%28converted%29.svg/1920px-Flag_of_Australia_%28converted%29.svg.png"
+  },
+  "Austria": {
+    "text": "Austria is part of the european continent, lying in the alps. Due to its location, Austria possesses a variety of very tall mountains like the Großglockner (3798 m) or the Wildspitze (3772 m).",
+    "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Flag_of_Austria.svg/1920px-Flag_of_Austria.svg.png"
+  },
+  "Brazil": {
+    "text": "Being the largest and most populated country in South and Latin America, Brazil, as one of the 18 megadiverse countries, features a wide variety of plants and animals, especially in the Amazon rainforest, the most biodiverse rainforest in the world.",
+    "flag": "https://upload.wikimedia.org/wikipedia/en/thumb/0/05/Flag_of_Brazil.svg/1280px-Flag_of_Brazil.svg.png"
+  },
+  "Canada": {
+    "text": "Canada is the second-largest country in the world measured by total area, only surpassed by Russia. It's widely known for its astonishing national parks.",
+    "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Flag_of_Canada_%28Pantone%29.svg/1920px-Flag_of_Canada_%28Pantone%29.svg.png"
+  },
+  "Croatia": {
+    "text": "Croatia is a country at the crossroads of Central and Southeast Europe, mostly known for its beautiful beaches and waters.",
+    "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Flag_of_Croatia.svg/1920px-Flag_of_Croatia.svg.png"
+  },
+  "England": {
+    "text": "",
+    "flag": "https://upload.wikimedia.org/wikipedia/en/thumb/b/be/Flag_of_England.svg/1920px-Flag_of_England.svg.png"
+  },
+  "Finland": {
+    "text": "",
+    "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Flag_of_Finland.svg/1920px-Flag_of_Finland.svg.png"
+  },
+  "France": {
+    "text": "",
+    "flag": "https://upload.wikimedia.org/wikipedia/en/thumb/c/c3/Flag_of_France.svg/1920px-Flag_of_France.svg.png"
+  },
+  "Germany": {
+    "text": "",
+    "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Flag_of_Germany.svg/1920px-Flag_of_Germany.svg.png"
+  },
+  "Greece": {
+    "text": "",
+    "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Flag_of_Greece.svg/1920px-Flag_of_Greece.svg.png"
+  },
+  "Iceland": {
+    "text": "",
+    "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Flag_of_Iceland.svg/1280px-Flag_of_Iceland.svg.png"
+  },
+  "India": {
+    "text": "",
+    "flag": "https://upload.wikimedia.org/wikipedia/en/thumb/4/41/Flag_of_India.svg/1920px-Flag_of_India.svg.png"
+  },
+  "Indonesia": {
+    "text": "",
+    "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Flag_of_Indonesia.svg/1920px-Flag_of_Indonesia.svg.png"
+  },
+  "Ireland": {
+    "text": "",
+    "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Flag_of_Ireland.svg/1920px-Flag_of_Ireland.svg.png"
+  },
+  "Italy": {
+    "text": "",
+    "flag": "https://upload.wikimedia.org/wikipedia/en/thumb/0/03/Flag_of_Italy.svg/1920px-Flag_of_Italy.svg.png"
+  },
+  "Mexico": {
+    "text": "",
+    "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Flag_of_Mexico.svg/1920px-Flag_of_Mexico.svg.png"
+  },
+  "New Zealand": {
+    "text": "",
+    "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Flag_of_New_Zealand.svg/1920px-Flag_of_New_Zealand.svg.png"
+  },
+  "Norway": {
+    "text": "",
+    "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Flag_of_Norway.svg/1280px-Flag_of_Norway.svg.png"
+  },
+  "Peru": {
+    "text": "",
+    "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Flag_of_Peru.svg/1920px-Flag_of_Peru.svg.png"
+  },
+  "Portugal": {
+    "text": "",
+    "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Flag_of_Portugal.svg/1920px-Flag_of_Portugal.svg.png"
+  },
+  "Scotland": {
+    "text": "",
+    "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Flag_of_Scotland.svg/1920px-Flag_of_Scotland.svg.png"
+  },
+  "Slovenia": {
+    "text": "",
+    "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Flag_of_Slovenia.svg/1920px-Flag_of_Slovenia.svg.png"
+  },
+  "South Africa": {
+    "text": "",
+    "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Flag_of_South_Africa.svg/1920px-Flag_of_South_Africa.svg.png"
+  },
+  "Spain": {
+    "text": "",
+    "flag": "https://upload.wikimedia.org/wikipedia/en/thumb/9/9a/Flag_of_Spain.svg/1920px-Flag_of_Spain.svg.png"
+  },
+  "Sweden": {
+    "text": "",
+    "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Flag_of_Sweden.svg/1920px-Flag_of_Sweden.svg.png"
+  },
+  "Switzerland": {
+    "text": "",
+    "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Flag_of_Switzerland_%28Pantone%29.svg/1024px-Flag_of_Switzerland_%28Pantone%29.svg.png"
+  },
+  "Turkey": {
+    "text": "",
+    "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Flag_of_Turkey.svg/1920px-Flag_of_Turkey.svg.png"
+  },
+  "United States": {
+    "text": "",
+    "flag": "https://upload.wikimedia.org/wikipedia/en/thumb/a/a4/Flag_of_the_United_States.svg/1920px-Flag_of_the_United_States.svg.png"
+  },
+  "Vietnam": {
+    "text": "",
+    "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Flag_of_Vietnam.svg/1920px-Flag_of_Vietnam.svg.png"
+  },
+  "Wales": {
+    "text": "",
+    "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Flag_of_Wales_%281959%E2%80%93present%29.svg/1920px-Flag_of_Wales_%281959%E2%80%93present%29.svg.png"
+  }
+}

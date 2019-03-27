@@ -18,10 +18,7 @@ class SeasonalBot(Bot):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.http_session = ClientSession(
-            connector=TCPConnector(
-                resolver=AsyncResolver(),
-                family=socket.AF_INET,
-            )
+            connector=TCPConnector(resolver=AsyncResolver(), family=socket.AF_INET)
         )
 
     def load_extensions(self, exts: List[str]):
@@ -48,6 +45,7 @@ class SeasonalBot(Bot):
         """
         Send an embed message to the devlog channel
         """
+
         devlog = self.get_channel(constants.Channels.devlog)
 
         if not devlog:
