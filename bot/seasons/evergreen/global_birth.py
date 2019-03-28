@@ -72,7 +72,7 @@ class CountriesBirth:
                     await self.produce_info(ctx, country_name)
             else:
                 output = "Today is one of the lovely days where no country saw their independence, or at least," \
-                         "it is not yet documented"
+                         " not yet documented"
                 await ctx.send(output)
 
 
