@@ -15,7 +15,7 @@ import aiohttp
 import async_timeout
 from PIL import Image, ImageDraw, ImageFont
 from discord import Colour, Embed, File, Member, Message, Reaction
-from discord.ext.commands import BadArgument, Bot, Context, bot_has_permissions, group
+from discord.ext.commands import BadArgument, Bot, Cog, Context, bot_has_permissions, group
 
 from bot.constants import ERROR_REPLIES, Tokens
 from bot.decorators import locked
@@ -132,7 +132,7 @@ CARD = {
 # endregion
 
 
-class Snakes:
+class Snakes(Cog):
     """
     Commands related to snakes. These were created by our
     community during the first code jam.
@@ -1187,8 +1187,3 @@ class Snakes:
 
         await ctx.send(embed=embed)
     # endregion
-
-
-def setup(bot):
-    bot.add_cog(Snakes(bot))
-    log.info("Cog loaded: Snakes")

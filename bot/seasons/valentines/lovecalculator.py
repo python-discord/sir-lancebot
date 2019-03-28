@@ -9,7 +9,7 @@ from typing import Union
 import discord
 from discord import Member
 from discord.ext import commands
-from discord.ext.commands import BadArgument, clean_content
+from discord.ext.commands import BadArgument, Cog, clean_content
 
 from bot.constants import Roles
 
@@ -20,7 +20,7 @@ with Path('bot', 'resources', 'valentines', 'love_matches.json').open() as file:
     LOVE_DATA = sorted((int(key), value) for key, value in LOVE_DATA.items())
 
 
-class LoveCalculator:
+class LoveCalculator(Cog):
     """
     A cog for calculating the love between two people
     """
@@ -104,3 +104,4 @@ class LoveCalculator:
 
 def setup(bot):
     bot.add_cog(LoveCalculator(bot))
+    log.info("LoveCalculator cog loaded")

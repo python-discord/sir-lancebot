@@ -5,7 +5,6 @@ from typing import List
 
 from aiohttp import AsyncResolver, ClientSession, TCPConnector
 from discord import Embed
-from discord.ext import commands
 from discord.ext.commands import Bot
 
 from bot import constants
@@ -19,10 +18,7 @@ class SeasonalBot(Bot):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.http_session = ClientSession(
-            connector=TCPConnector(
-                resolver=AsyncResolver(),
-                family=socket.AF_INET,
-            )
+            connector=TCPConnector(resolver=AsyncResolver(), family=socket.AF_INET)
         )
 
     def load_extensions(self, exts: List[str]):
@@ -49,6 +45,7 @@ class SeasonalBot(Bot):
         """
         Send an embed message to the devlog channel
         """
+
         devlog = self.get_channel(constants.Channels.devlog)
 
         if not devlog:
@@ -62,10 +59,3 @@ class SeasonalBot(Bot):
         embed.set_author(name=title, icon_url=icon)
 
         await devlog.send(embed=embed)
-
-    async def on_command_error(self, context, exception):
-        # Don't punish the user for getting the arguments wrong
-        if isinstance(exception, commands.UserInputError):
-            context.command.reset_cooldown(context)
-        else:
-            await super().on_command_error(context, exception)

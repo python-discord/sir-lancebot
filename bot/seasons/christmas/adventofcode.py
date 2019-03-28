@@ -108,7 +108,7 @@ async def day_countdown(bot: commands.Bot):
         await asyncio.sleep(120)
 
 
-class AdventOfCode:
+class AdventOfCode(commands.Cog):
     """
     Advent of Code festivities! Ho Ho Ho!
     """
@@ -730,4 +730,4 @@ def _error_embed_helper(title: str, description: str) -> discord.Embed:
 
 def setup(bot: commands.Bot) -> None:
     bot.add_cog(AdventOfCode(bot))
-    log.info("Cog loaded: adventofcode")
+    log.info("AdventOfCode cog loaded")

@@ -14,7 +14,7 @@ LETTER_EMOJI = ':love_letter:'
 HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_heart:", ":two_hearts:"]
 
 
-class ValentineZodiac:
+class ValentineZodiac(commands.Cog):
     """
     A cog that returns a counter compatible zodiac sign to the given user's zodiac sign.
     """
@@ -56,4 +56,4 @@ class ValentineZodiac:
 
 def setup(bot):
     bot.add_cog(ValentineZodiac(bot))
-    log.debug("Valentine Zodiac cog loaded")
+    log.info("ValentineZodiac cog loaded")

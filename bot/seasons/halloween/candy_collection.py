@@ -20,7 +20,7 @@ ADD_SKULL_REACTION_CHANCE = 50  # 2%
 ADD_SKULL_EXISTING_REACTION_CHANCE = 20  # 5%
 
 
-class CandyCollection:
+class CandyCollection(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         with open(json_location) as candy:
@@ -31,6 +31,7 @@ class CandyCollection:
             userid = userinfo['userid']
             self.get_candyinfo[userid] = userinfo
 
+    @commands.Cog.listener()
     async def on_message(self, message):
         """
         Randomly adds candy or skull to certain messages
@@ -54,6 +55,7 @@ class CandyCollection:
             self.msg_reacted.append(d)
             return await message.add_reaction('\N{CANDY}')
 
+    @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
         """
         Add/remove candies from a person if the reaction satisfies criteria
@@ -231,4 +233,4 @@ class CandyCollection:
 
 def setup(bot):
     bot.add_cog(CandyCollection(bot))
-    log.debug("CandyCollection cog loaded")
+    log.info("CandyCollection cog loaded")
