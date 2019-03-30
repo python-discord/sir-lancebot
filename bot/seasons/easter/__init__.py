@@ -1,3 +1,4 @@
+from bot.constants import Colours
 from bot.seasons import SeasonBase
 
 
@@ -15,3 +16,6 @@ class Easter(SeasonBase):
     # Duration of season
     start_date = "01/04"
     end_date = "30/04"
+
+    colour = Colours.pink
+    icon = "/logos/logo_seasonal/easter/easter.png"
