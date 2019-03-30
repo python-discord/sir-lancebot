@@ -11,19 +11,16 @@ TMDB_API_KEY = environ.get("TMDB_API_KEY")
 log = logging.getLogger(__name__)
 
 
-class RomanceMovieFinder(commands.Cog):
-    """
-    A cog that returns a random romance movie suggestion to a user
-    """
+class RomanceMovieFinder:
+    """A cog that returns a random romance movie suggestion to a user."""
 
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(name="romancemovie")
     async def romance_movie(self, ctx):
-        """
-        Randomly selects a romance movie and displays information about it
-        """
+        """Randomly selects a romance movie and displays information about it."""
+
         # selecting a random int to parse it to the page parameter
         random_page = random.randint(0, 20)
         # TMDB api params
@@ -62,5 +59,7 @@ class RomanceMovieFinder(commands.Cog):
 
 
 def setup(bot):
+    """Romance movie Cog load."""
+
     bot.add_cog(RomanceMovieFinder(bot))
     log.info("RomanceMovieFinder cog loaded")

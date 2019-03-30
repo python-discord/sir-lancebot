@@ -20,6 +20,7 @@ fuzzywuzzy = "*"
 "flake8-todo" = "*"
 "flake8-string-format" = "*"
 pre-commit = "*"
+flake8-docstrings = "*"
 
 [requires]
 python_version = "3.7"

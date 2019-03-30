@@ -9,9 +9,7 @@ log = logging.getLogger(__name__)
 
 
 class Magic8ball:
-    """
-    A Magic 8ball command to respond to a users question.
-    """
+    """A Magic 8ball command to respond to a users question."""
 
     def __init__(self, bot):
         self.bot = bot
@@ -20,9 +18,7 @@ class Magic8ball:
 
     @commands.command(name="8ball")
     async def output_answer(self, ctx, *, question):
-        """
-        Return a magic 8 ball answer from answers list.
-        """
+        """Return a magic 8 ball answer from answers list."""
         if len(question.split()) >= 3:
             answer = random.choice(self.answers)
             await ctx.send(answer)
@@ -30,7 +26,8 @@ class Magic8ball:
             await ctx.send("Usage: .8ball <question> (minimum length of 3 eg: `will I win?`)")
 
 
-# Required in order to load the cog, use the class name in the add_cog function.
 def setup(bot):
+    """Magic 8ball cog load."""
+
     bot.add_cog(Magic8ball(bot))
-    log.info("Magic 8ball cog loaded")
+    log.info("Magic8ball cog loaded")
