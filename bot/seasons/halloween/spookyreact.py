@@ -17,7 +17,7 @@ SPOOKY_TRIGGERS = {
 }
 
 
-class SpookyReact:
+class SpookyReact(Cog):
     """A cog that makes the bot react to message triggers."""
 
     def __init__(self, bot):

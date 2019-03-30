@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_heart:", ":two_hearts:"]
 
 
-class BeMyValentine:
+class BeMyValentine(commands.Cog):
     """A cog that sends Valentines to other users!"""
 
     def __init__(self, bot):

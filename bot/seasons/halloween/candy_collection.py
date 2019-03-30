@@ -20,7 +20,7 @@ ADD_SKULL_REACTION_CHANCE = 50  # 2%
 ADD_SKULL_EXISTING_REACTION_CHANCE = 20  # 5%
 
 
-class CandyCollection:
+class CandyCollection(commands.Cog):
     """Candy collection game Cog."""
 
     def __init__(self, bot):

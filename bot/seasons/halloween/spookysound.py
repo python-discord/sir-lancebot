@@ -10,7 +10,7 @@ from bot.constants import Hacktoberfest
 log = logging.getLogger(__name__)
 
 
-class SpookySound:
+class SpookySound(commands.Cog):
     """A cog that plays a spooky sound in a voice channel on command."""
 
     def __init__(self, bot):

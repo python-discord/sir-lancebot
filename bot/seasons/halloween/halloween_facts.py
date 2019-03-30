@@ -25,7 +25,7 @@ PUMPKIN_ORANGE = discord.Color(0xFF7518)
 INTERVAL = timedelta(hours=6).total_seconds()
 
 
-class HalloweenFacts:
+class HalloweenFacts(commands.Cog):
     """A Cog for displaying interesting facts about Halloween."""
 
     def __init__(self, bot):

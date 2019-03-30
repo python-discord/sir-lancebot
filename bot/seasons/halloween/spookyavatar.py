@@ -12,7 +12,7 @@ from bot.utils.halloween import spookifications
 log = logging.getLogger(__name__)
 
 
-class SpookyAvatar:
+class SpookyAvatar(commands.Cog):
     """A cog that spookifies an avatar."""
 
     def __init__(self, bot):

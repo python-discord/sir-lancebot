@@ -9,7 +9,7 @@ from bot.constants import Tokens
 log = logging.getLogger(__name__)
 
 
-class SpookyGif:
+class SpookyGif(commands.Cog):
     """A cog to fetch a random spooky gif from the web!"""
 
     def __init__(self, bot):

@@ -15,7 +15,7 @@ with open(Path('bot', 'resources', 'valentines', 'valenstates.json'), 'r') as fi
     STATES = json.load(file)
 
 
-class MyValenstate:
+class MyValenstate(commands.Cog):
     """A Cog to find your most likely Valentine's vacation destination."""
 
     def __init__(self, bot):
