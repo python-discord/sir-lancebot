@@ -3,9 +3,8 @@ from bot.seasons import SeasonBase
 
 class Easter(SeasonBase):
     """
-    Easter is a beautiful time of the year often celebrated after the first full moon of the
-    Northern Hemisphere's new spring season, making it a beautiful time of the year with colorful
-    flowers coming out to greet us.
+    Often celebrated after the first full moon of the Northern Hemisphere's new spring season,
+    Easter is a beautiful time of the year with colorful flowers coming out to greet us.
 
     To celebrate, we have a lovely new colourful server icon. Thanks to <@140605665772175361> for
     the design.
