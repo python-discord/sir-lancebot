@@ -278,7 +278,18 @@ class SeasonBase:
         channel = guild.get_channel(Channels.announcements)
         mention = f"<@&{Roles.announcements}>"
 
-        # collect seasonal cogs
+        # build cog info output
+        doc = inspect.getdoc(self)
+        announce = "\n\n".join(l.replace("\n", " ") for l in doc.split("\n\n"))
+
+        # no announcement message found
+        if not doc:
+            return
+
+        embed = discord.Embed(description=f"{announce}\n\n", colour=self.colour or guild.me.colour)
+        embed.set_author(name=self.greeting)
+
+        # find any seasonal commands
         cogs = []
         for cog in bot.cogs.values():
             if "evergreen" in cog.__module__:
@@ -287,30 +298,21 @@ class SeasonBase:
             if cog_name != "SeasonManager":
                 cogs.append(cog_name)
 
-        # no cogs, so no seasonal commands
-        if not cogs:
-            return
+        if cogs:
+            def cog_name(cog):
+                return type(cog).__name__
 
-        # build cog info output
-        doc = inspect.getdoc(self)
-        announce_text = doc + "\n\n" if doc else ""
+            cog_info = []
+            for cog in sorted(cogs, key=cog_name):
+                doc = inspect.getdoc(bot.get_cog(cog))
+                if doc:
+                    cog_info.append(f"**{cog}**\n*{doc}*")
+                else:
+                    cog_info.append(f"**{cog}**")
 
-        def cog_name(cog):
-            return type(cog).__name__
-
-        cog_info = []
-        for cog in sorted(cogs, key=cog_name):
-            doc = inspect.getdoc(bot.get_cog(cog))
-            if doc:
-                cog_info.append(f"**{cog}**\n*{doc}*")
-            else:
-                cog_info.append(f"**{cog}**")
-
-        embed = discord.Embed(description=announce_text, colour=self.colour or guild.me.colour)
-        embed.set_author(name=self.greeting)
-        cogs_text = "\n".join(cog_info)
-        embed.add_field(name="New Command Categories", value=cogs_text)
-        embed.set_footer(text="To see the new commands, use .help Category")
+            cogs_text = "\n".join(cog_info)
+            embed.add_field(name="New Command Categories", value=cogs_text)
+            embed.set_footer(text="To see the new commands, use .help Category")
 
         await channel.send(mention, embed=embed)
 
