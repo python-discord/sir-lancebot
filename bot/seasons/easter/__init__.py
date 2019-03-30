@@ -3,17 +3,20 @@ from bot.seasons import SeasonBase
 
 class Easter(SeasonBase):
     """
-    Often celebrated after the first full moon of the Northern Hemisphere's new spring season,
-    Easter is a beautiful time of the year with colorful flowers coming out to greet us.
+    Here at Python Discord, we celebrate our version of Easter during the entire month of April.
+    While this celebration takes place, you'll notice a few changes:
 
-    To celebrate, we have a lovely new colourful server icon. Thanks to <@140605665772175361> for
-    the design.
+     • The server icon has changed to our Easter icon. Thanks to <@140605665772175361> for the
+    design!
 
-    We hope you can join us in the spring and Easter celebrations by heading over to the
-    [SeasonalBot GitHub repo](https://git.io/fjkvQ) and either submit some issues with ideas for
-    commands for this season, or to pick out an issue that you think looks fun to work on yourself.
+     • [Easter issues now available for SeasonalBot on the repo](https://git.io/fjkvQ).
 
-    Come over to <#542272993192050698> if you're interested or have any questions!
+     • You may see stuff like an Easter themed esoteric challenge, a celebration of Earth Day, or
+    Easter-related micro-events for you to join. Stay tuned!
+
+    If you'd like to contribute, head on over to <#542272993192050698> and we will help you get
+    started. It doesn't matter if you're new to open source or Python, if you'd like to help, we
+    will find you a task and teach you what you need to know.
     """
 
     name = "easter"
