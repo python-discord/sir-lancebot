@@ -17,6 +17,8 @@ from bot.decorators import with_role
 
 log = logging.getLogger(__name__)
 
+ICON_BASE_URL = "https://raw.githubusercontent.com/python-discord/branding/master"
+
 
 def get_seasons() -> List[str]:
     """
@@ -163,12 +165,11 @@ class SeasonBase:
         `https://raw.githubusercontent.com/python-discord/branding/master`
         """
 
-        base_url = "https://raw.githubusercontent.com/python-discord/branding/master"
         if avatar:
             icon = self.bot_icon or self.icon
         else:
             icon = self.icon
-        full_url = base_url + icon
+        full_url = ICON_BASE_URL + icon
         log.debug(f"Getting icon from: {full_url}")
         async with bot.http_session.get(full_url) as resp:
             return await resp.read()
@@ -288,6 +289,9 @@ class SeasonBase:
 
         embed = discord.Embed(description=f"{announce}\n\n", colour=self.colour or guild.me.colour)
         embed.set_author(name=self.greeting)
+
+        if self.icon:
+            embed.set_image(url=ICON_BASE_URL+self.icon)
 
         # find any seasonal commands
         cogs = []
