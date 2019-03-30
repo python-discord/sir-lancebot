@@ -5,6 +5,7 @@ from bot.seasons import SeasonBase
 class Easter(SeasonBase):
     """
     Here at Python Discord, we celebrate our version of Easter during the entire month of April.
+
     While this celebration takes place, you'll notice a few changes:
 
      • The server icon has changed to our Easter icon. Thanks to <@140605665772175361> for the
