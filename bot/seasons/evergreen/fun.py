@@ -8,19 +8,16 @@ from bot.constants import Emojis
 log = logging.getLogger(__name__)
 
 
-class Fun(commands.Cog):
-    """
-    A collection of general commands for fun.
-    """
+class Fun:
+    """A collection of general commands for fun."""
 
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command()
     async def roll(self, ctx, num_rolls: int = 1):
-        """
-            Outputs a number of random dice emotes (up to 6)
-        """
+        """Outputs a number of random dice emotes (up to 6)."""
+
         output = ""
         if num_rolls > 6:
             num_rolls = 6
@@ -32,7 +29,8 @@ class Fun(commands.Cog):
         await ctx.send(output)
 
 
-# Required in order to load the cog, use the class name in the add_cog function.
 def setup(bot):
+    """Fun Cog load."""
+
     bot.add_cog(Fun(bot))
     log.info("Fun cog loaded")

@@ -9,19 +9,16 @@ from bot import start_time
 log = logging.getLogger(__name__)
 
 
-class Uptime(commands.Cog):
-    """
-    A cog for posting the bots uptime.
-    """
+class Uptime:
+    """A cog for posting the bot's uptime."""
 
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(name="uptime")
     async def uptime(self, ctx):
-        """
-        Returns the uptime of the bot.
-        """
+        """Responds with the uptime of the bot."""
+
         difference = relativedelta(start_time - arrow.utcnow())
         uptime_string = start_time.shift(
             seconds=-difference.seconds,
@@ -32,7 +29,8 @@ class Uptime(commands.Cog):
         await ctx.send(f"I started up {uptime_string}.")
 
 
-# Required in order to load the cog, use the class name in the add_cog function.
 def setup(bot):
+    """Uptime Cog load."""
+
     bot.add_cog(Uptime(bot))
     log.info("Uptime cog loaded")

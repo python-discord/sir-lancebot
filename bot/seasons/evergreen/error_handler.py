@@ -8,8 +8,8 @@ from discord.ext import commands
 log = logging.getLogger(__name__)
 
 
-class CommandErrorHandler(commands.Cog):
-    """A error handler for the PythonDiscord server!"""
+class CommandErrorHandler:
+    """A error handler for the PythonDiscord server."""
 
     def __init__(self, bot):
         self.bot = bot
@@ -26,7 +26,7 @@ class CommandErrorHandler(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-        """Activates when a command opens an error"""
+        """Activates when a command opens an error."""
 
         if hasattr(ctx.command, 'on_error'):
             return logging.debug(
@@ -100,5 +100,7 @@ class CommandErrorHandler(commands.Cog):
 
 
 def setup(bot):
+    """Error handler Cog load."""
+
     bot.add_cog(CommandErrorHandler(bot))
     log.info("CommandErrorHandler cog loaded")

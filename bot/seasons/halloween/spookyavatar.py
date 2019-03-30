@@ -12,19 +12,15 @@ from bot.utils.halloween import spookifications
 log = logging.getLogger(__name__)
 
 
-class SpookyAvatar(commands.Cog):
-
-    """
-    A cog that spookifies an avatar.
-    """
+class SpookyAvatar:
+    """A cog that spookifies an avatar."""
 
     def __init__(self, bot):
         self.bot = bot
 
     async def get(self, url):
-        """
-        Returns the contents of the supplied url.
-        """
+        """Returns the contents of the supplied url."""
+
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 return await resp.read()
@@ -32,9 +28,8 @@ class SpookyAvatar(commands.Cog):
     @commands.command(name='savatar', aliases=('spookyavatar', 'spookify'),
                       brief='Spookify an user\'s avatar.')
     async def spooky_avatar(self, ctx, user: discord.Member = None):
-        """
-        A command to print the user's spookified avatar.
-        """
+        """A command to print the user's spookified avatar."""
+
         if user is None:
             user = ctx.message.author
 
@@ -54,5 +49,7 @@ class SpookyAvatar(commands.Cog):
 
 
 def setup(bot):
+    """Spooky avatar Cog load."""
+
     bot.add_cog(SpookyAvatar(bot))
     log.info("SpookyAvatar cog loaded")

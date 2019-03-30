@@ -7,26 +7,20 @@ log = logging.getLogger(__name__)
 
 
 class TimeLeft:
-    """
-    A Cog that tells you how long left until Hacktober is over!
-    """
+    """A Cog that tells you how long left until Hacktober is over!"""
 
     def __init__(self, bot):
         self.bot = bot
 
     @staticmethod
     def in_october():
-        """
-        Return True if the current month is October.
-        """
+        """Return True if the current month is October."""
 
         return datetime.utcnow().month == 10
 
     @staticmethod
     def load_date():
-        """
-        Return of a tuple of the current time and the end and start times of the following October.
-        """
+        """Return of a tuple of the current time and the end and start times of the next October."""
 
         now = datetime.utcnow()
         year = now.year
@@ -63,5 +57,7 @@ class TimeLeft:
 
 
 def setup(bot):
+    """Cog load."""
+
     bot.add_cog(TimeLeft(bot))
     log.info("TimeLeft cog loaded")
