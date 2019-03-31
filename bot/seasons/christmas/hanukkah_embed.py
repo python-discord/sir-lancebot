@@ -108,5 +108,6 @@ class HanukkahEmbed(commands.Cog):
 
 
 def setup(bot):
+    """A function to add the cog."""
     bot.add_cog(HanukkahEmbed(bot))
     log.info("Hanukkah embed cog loaded")
