@@ -1,8 +1,9 @@
-from discord.ext import commands
-from discord import Embed
-import requests
 import datetime
 import logging
+
+import requests
+from discord import Embed
+from discord.ext import commands
 
 
 log = logging.getLogger(__name__)
@@ -13,7 +14,9 @@ HANUKKAH_YEARS = []
 
 
 class HanukkahEmbed(commands.Cog):
-
+    """
+    A cog that returns information about Hanukkah festival.
+    """
     def __init__(self, bot):
         self.bot = bot
         self.url = """https://www.hebcal.com/hebcal/?v=1&cfg=json&maj=on&min=on&mod=on&nx=on&year=now&month=x&ss=on&
@@ -21,6 +24,9 @@ class HanukkahEmbed(commands.Cog):
         self.hanukkah_dates = self.get_hanukkah_dates()
 
     def get_hanukkah_dates(self):
+        """
+        Gets the dates for hanukkah festival.
+        """
         hanukkah_dates = []
         r = requests.get(self.url)
         json_data = r.json()
@@ -34,7 +40,8 @@ class HanukkahEmbed(commands.Cog):
     @commands.command(name='hanukkah', aliases=['chanukah'])
     async def hanukkah_festival(self, ctx):
         """
-        Hanukkah embed
+        Tells you about the Hanukkah Festival
+        (time of festival, festival day, etc)
         """
         self.hanukkah_dates_split()
 
@@ -99,6 +106,9 @@ class HanukkahEmbed(commands.Cog):
             await ctx.send(embed=embed)
 
     def hanukkah_dates_split(self):
+        """
+        We are splitting the dates for hanukkah into days, months and years.
+        """
         for date in self.hanukkah_dates:
             HANUKKAH_DAYS.append(date[8:10])
             HANUKKAH_MONTHS.append(date[5:7])
