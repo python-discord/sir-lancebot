@@ -3,23 +3,36 @@ import logging
 from pathlib import Path
 from datetime import datetime
 
+
 import discord
 from discord.ext import commands
 
 from bot.constants import Colours
 
 
+
 log = logging.getLogger(__name__)
+
+
+def get_flag_url(country, size=512):
+    """Fetch flag by country name and size using defined base URL."""
+    flag = "https://raw.githubusercontent.com/jodth07/seasonalbot/global-birth/bot/resources/flags/"
+    return f"{flag}{size}/{country}.png"
+
+
+# FLAG_URL = "https://raw.githubusercontent.com/python-discord/seasonalbot/master/bot/resources/flags/"  <-- use this for live
+# FLAG = "https://raw.githubusercontent.com/jodth07/seasonalbot/global-birth/bot/resources/flags/"
+
 
 
 class CountriesBirth:
     """
     Compilation of countries independence days, as well as some information about them
     """
-
     def __init__(self, bot):
         self.bot = bot
         self.indep_info = self.load_data()
+
 
     def load_data(self):
         """
@@ -39,13 +52,14 @@ class CountriesBirth:
         for info in countries[country_name]:
             # TODO complete and test embed
             embed = discord.Embed(
-                title=f' {info["name"]} \u2764',
+                title=f'{info["name"]} \u2764',
                 description=f'{info["description"]}',
                 colour=Colours.pink
             )
+
             embed.add_field(name="independence", value=info["independence"])
             embed.add_field(name="holiday", value=info["holiday"])
-            # embed.set_image(url=STATES[valenstate]["flag"])
+            embed.set_image(url=get_flag_url(country_name))
 
             # print(counter)
             await ctx.channel.send(embed=embed)
@@ -59,6 +73,19 @@ class CountriesBirth:
         :param country_name: takes in optional name of a country to provide info on that country
         """
         dates = self.indep_info["dates"]
+        countries = self.indep_info["countries"]
+
+
+
+        if country_name not in countries:
+            for country_name in countries:
+                b = difflib.get_close_matches(country_name, countries)
+            message = f'country name does not exsists {b}'
+            await ctx.send(message)
+
+
+        # if country_name:
+        #     await self.produce_info(ctx, country_name.lower().strip().replace(" ", "_"))
 
         if country_name:
             await self.produce_info(ctx, country_name.lower())
