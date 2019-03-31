@@ -539,4 +539,6 @@ class SeasonManager(commands.Cog):
         await self.season.announce_season()
 
     def cog_unload(self):
+        """Cancel season-related tasks on cog unload."""
+
         self.season_task.cancel()
