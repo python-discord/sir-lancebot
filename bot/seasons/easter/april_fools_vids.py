@@ -20,6 +20,7 @@ class AprilFoolVideos(commands.Cog):
 
     @staticmethod
     def load_json():
+        """A function to load json data."""
         p = Path('bot/resources/april_fools_vids.json')
         with p.open() as json_file:
             all_vids = load(json_file)
