@@ -16,7 +16,7 @@ with Path('bot', 'resources', 'halloween', 'spooky_rating.json').open() as file:
     SPOOKY_DATA = sorted((int(key), value) for key, value in SPOOKY_DATA.items())
 
 
-class SpookyRating:
+class SpookyRating(commands.Cog):
     """A cog for calculating one's spooky rating"""
 
     def __init__(self, bot):
