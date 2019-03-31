@@ -4,6 +4,7 @@ import logging
 import requests
 from discord import Embed
 from discord.ext import commands
+
 from bot.constants import Colours
 
 
