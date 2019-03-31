@@ -8,10 +8,6 @@ from discord.ext import commands
 
 log = logging.getLogger(__name__)
 
-HANUKKAH_DAYS = []
-HANUKKAH_MONTHS = []
-HANUKKAH_YEARS = []
-
 
 class HanukkahEmbed(commands.Cog):
     """
@@ -22,6 +18,9 @@ class HanukkahEmbed(commands.Cog):
         self.url = """https://www.hebcal.com/hebcal/?v=1&cfg=json&maj=on&min=on&mod=on&nx=on&year=now&month=x&ss=on&
                       mf=on&c=on&geo=geoname&geonameid=3448439&m=50&s=on"""
         self.hanukkah_dates = self.get_hanukkah_dates()
+        self.hanukkah_days = []
+        self.hanukkah_months = []
+        self.hanukkah_years = []
 
     def get_hanukkah_dates(self):
         """
@@ -41,28 +40,28 @@ class HanukkahEmbed(commands.Cog):
     async def hanukkah_festival(self, ctx):
         """
         Tells you about the Hanukkah Festival
-        (time of festival, festival day, etc)
+        (time of festival, festival day, etc).
         """
         self.hanukkah_dates_split()
 
-        hanukkah_start_day = int(HANUKKAH_DAYS[0])
-        hanukkah_start_month = int(HANUKKAH_MONTHS[0])
-        hanukkah_start_year = int(HANUKKAH_YEARS[0])
-        hanukkah_end_day = int(HANUKKAH_DAYS[8])
-        hanukkah_end_month = int(HANUKKAH_MONTHS[8])
-        hanukkah_end_year = int(HANUKKAH_YEARS[8])
+        hanukkah_start_day = int(self.hanukkah_days[0])
+        hanukkah_start_month = int(self.hanukkah_months[0])
+        hanukkah_start_year = int(self.hanukkah_years[0])
+        hanukkah_end_day = int(self.hanukkah_days[8])
+        hanukkah_end_month = int(self.hanukkah_months[8])
+        hanukkah_end_year = int(self.hanukkah_years[8])
 
         hanukkah_start = datetime.date(hanukkah_start_year, hanukkah_start_month, hanukkah_start_day)
         hanukkah_end = datetime.date(hanukkah_end_year, hanukkah_end_month, hanukkah_end_day)
-        # today = datetime.date.today()
-        today = datetime.date(2019, 12, 24)
+        today = datetime.date.today()
+        # today = datetime.date(2019, 12, 24) (for testing)
         day = str(today.day)
         month = str(today.month)
         year = str(today.year)
         embed = Embed()
         embed.title = 'Hanukkah Embed'
         embed.colour = 0x68c290
-        if day in HANUKKAH_DAYS and month in HANUKKAH_MONTHS and year in HANUKKAH_YEARS:
+        if day in self.hanukkah_days and month in self.hanukkah_months and year in self.hanukkah_years:
             if int(day) == hanukkah_start_day:
                 now = datetime.datetime.utcnow()
                 now = str(now)
@@ -76,7 +75,7 @@ class HanukkahEmbed(commands.Cog):
                     embed.description = (f'It is the starting day of Hanukkah ! '
                                          f'Its been {hours-hanukkah_start_hour} hours hanukkah started !')
                     return await ctx.send(embed=embed)
-            festival_day = HANUKKAH_DAYS.index(day)
+            festival_day = self.hanukkah_days.index(day)
             number_suffixes = ['st', 'nd', 'rd', 'th']
             suffix = ''
             if int(festival_day) == 1:
@@ -88,7 +87,7 @@ class HanukkahEmbed(commands.Cog):
             if int(festival_day) > 3:
                 suffix = number_suffixes[3]
             message = ''
-            for i in range(1, festival_day + 1):
+            for _ in range(1, festival_day + 1):
                 message += ':menorah:'
             embed.description = f'It is the {festival_day}{suffix} day of Hanukkah ! \n {message}'
             await ctx.send(embed=embed)
@@ -107,14 +106,15 @@ class HanukkahEmbed(commands.Cog):
 
     def hanukkah_dates_split(self):
         """
-        We are splitting the dates for hanukkah into days, months and years.
+        We are splitting the dates for hanukkah
+        into days, months and years.
         """
         for date in self.hanukkah_dates:
-            HANUKKAH_DAYS.append(date[8:10])
-            HANUKKAH_MONTHS.append(date[5:7])
-            HANUKKAH_YEARS.append(date[0:4])
+            self.hanukkah_days.append(date[8:10])
+            self.hanukkah_months.append(date[5:7])
+            self.hanukkah_years.append(date[0:4])
 
 
 def setup(bot):
     bot.add_cog(HanukkahEmbed(bot))
-    log.info("AdventOfCode cog loaded")
+    log.info("Hanukkah embed cog loaded")
