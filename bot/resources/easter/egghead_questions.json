@@ -7,7 +7,7 @@
             "The UK",
             "Germany"
         ],
-        "correct_answer": 4
+        "correct_answer": 3
     },
     {
         "question": "The Easter Bunny was originally going to be a...",
@@ -17,7 +17,7 @@
             "cat",
             "dove"
         ],
-        "correct_answer": 1
+        "correct_answer": 0
     },
     {
         "question": "Which of the following is NOT a movie about Easter?",
@@ -27,7 +27,7 @@
             "The Passion of the Christ",
             "Here Comes Peter Cottontail"
         ],
-        "correct_answer": 2
+        "correct_answer": 1
     },
     {
         "question": "In Australia, what animal is used instead of the Easter Bunny?",
@@ -37,7 +37,7 @@
             "koala",
             "bilby"
         ],
-        "correct_answer": 4
+        "correct_answer": 3
     },
     {
         "question": "When was the first Earth Day?",
@@ -47,7 +47,7 @@
             "1999",
             "1970"
         ],
-        "correct_answer": 3
+        "correct_answer": 2
     },
     {
         "question": "Who is considered to be the founder of Earth Day?",
@@ -57,7 +57,7 @@
             "Vice President Al Gore",
             "Sentator Gaylord Nelson"
         ],
-        "correct_answer": 4
+        "correct_answer": 3
     },
     {
         "question": "Approximately how many countries participated in Earth Day 2000?",
@@ -67,7 +67,7 @@
             "180",
             "240"
         ],
-        "correct_answer": 3
+        "correct_answer": 2
     },
     {
         "question": "As Earth Day is this month, how old is the Earth?",
@@ -77,7 +77,7 @@
             "10 billion years old",
             "6.7 billion years old"
         ],
-        "correct_answer": 1
+        "correct_answer": 0
     },
     {
         "question": "As a celebration of Earth Day, what is the percentage of Oxygen in the Earth's atmosphere?",
@@ -87,7 +87,7 @@
             "25%",
             "31%"
         ],
-        "correct_answer": 2
+        "correct_answer": 1
     },
     {
         "question": "In what year did Google begin its tradition of April Fools Jokes?",
@@ -97,7 +97,7 @@
             "2003",
             "2007"
         ],
-        "correct_answer": 2
+        "correct_answer": 1
     },
     {
         "question": "Which type of chocolate is the most healthy?",
@@ -106,7 +106,7 @@
             "White",
             "Milk"
         ],
-        "correct_answer": 1
+        "correct_answer": 0
     },
     {
         "question": "How many bars of milk chocolate would you have to eat to get the same amount of caffeine as in one cup of coffee?",
@@ -116,7 +116,7 @@
             "14",
             "20"
         ],
-        "correct_answer": 3
+        "correct_answer": 2
     },
     {
         "question": "Aztecs used to use one of the ingedients of chocolate, cocoa beans, as...",
@@ -126,7 +126,7 @@
             "dye",
             "fertilizer"
         ],
-        "correct_answer": 1
+        "correct_answer": 0
     },
     {
         "question": "Which European country was the first to enjoy chocolate?",
@@ -136,7 +136,7 @@
             "England",
             "Switxherland"
         ],
-        "correct_answer": 2
+        "correct_answer": 1
     },
     {
         "question": "The first European Chocolate Shop opened in what city in 1657?",
@@ -146,7 +146,7 @@
             "Zürich, Switzerland",
             "London, England"
         ],
-        "correct_answer": 4
+        "correct_answer": 3
     },
     {
         "question": "On average, how many eggs does a hen lay in a year?",
@@ -156,7 +156,7 @@
             "Between 300-330",
             "Between 370-400"
         ],
-        "correct_answer": 2
+        "correct_answer": 1
     },
     {
         "question": "What determines the colour of an egg yolk?",
@@ -166,7 +166,7 @@
             "The diet of a hen",
             "The colour of a hen's feathers"
         ],
-        "correct_answer": 3
+        "correct_answer": 2
     },
     {
         "question": "What country produces the most eggs in a year?",
@@ -176,6 +176,6 @@
             "The United States",
             "Japan"
         ],
-        "correct_answer": 1
+        "correct_answer": 0
     }
 ]

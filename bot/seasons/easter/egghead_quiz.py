@@ -22,7 +22,9 @@ EMOJIS = [
     '\U0001f1f5', '\U0001f1f6', '\U0001f1f7', '\U0001f1f8', '\U0001f1f9',
     '\U0001f1fa', '\U0001f1fb', '\U0001f1fc', '\U0001f1fd', '\U0001f1fe',
     '\U0001f1ff'
-]
+]  # Regional Indicators A-Z (used for voting)
+
+TIMELIMIT = 30
 
 
 class EggheadQuiz(commands.Cog):
@@ -43,11 +45,12 @@ class EggheadQuiz(commands.Cog):
         random_question = random.choice(EGGHEAD_QUESTIONS)
         question, answers = random_question["question"], random_question["answers"]
         answers = [(EMOJIS[i], a) for i, a in enumerate(answers)]
-        correct = EMOJIS[random_question["correct_answer"]-1]
+        correct = EMOJIS[random_question["correct_answer"]]
 
         valid_emojis = [emoji for emoji, _ in answers]
 
-        description = "\n".join([f"{emoji} -> **{answer}**" for emoji, answer in answers])
+        description = f"You have {TIMELIMIT} seconds to vote.\n\n"
+        description += "\n".join([f"{emoji} -> **{answer}**" for emoji, answer in answers])
 
         q_embed = discord.Embed(title=question, description=description, colour=Colours.pink)
 
@@ -57,11 +60,11 @@ class EggheadQuiz(commands.Cog):
 
         self.quiz_messages[msg.id] = valid_emojis
 
-        await asyncio.sleep(30)
+        await asyncio.sleep(TIMELIMIT)
 
         del self.quiz_messages[msg.id]
 
-        msg = await ctx.channel.get_message(msg.id)  # Refreshes message
+        msg = await ctx.channel.fetch_message(msg.id)  # Refreshes message
 
         total_no = sum([len(await r.users().flatten()) for r in msg.reactions]) - len(valid_emojis)  # - bot's reactions
 
