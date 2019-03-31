@@ -12,7 +12,6 @@ log = logging.getLogger(__name__)
 
 
 class HanukkahEmbed(commands.Cog):
-
     """A cog that returns information about Hanukkah festival."""
     def __init__(self, bot):
         self.bot = bot
