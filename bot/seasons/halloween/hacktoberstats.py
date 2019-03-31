@@ -13,7 +13,7 @@ from discord.ext import commands
 log = logging.getLogger(__name__)
 
 
-class HacktoberStats:
+class HacktoberStats(commands.Cog):
     """Hacktoberfest statistics Cog."""
 
     def __init__(self, bot):

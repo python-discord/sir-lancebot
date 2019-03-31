@@ -349,7 +349,7 @@ class SeasonBase:
         await bot.send_log("SeasonalBot Loaded!", f"Active Season: **{self.name_clean}**")
 
 
-class SeasonManager:
+class SeasonManager(commands.Cog):
     """A cog for managing seasons."""
 
     def __init__(self, bot):
@@ -538,5 +538,7 @@ class SeasonManager:
 
         await self.season.announce_season()
 
-    def __unload(self):
+    def cog_unload(self):
+        """Cancel season-related tasks on cog unload."""
+
         self.season_task.cancel()

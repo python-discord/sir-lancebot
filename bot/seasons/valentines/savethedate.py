@@ -16,7 +16,7 @@ with open(Path('bot', 'resources', 'valentines', 'date_ideas.json'), 'r', encodi
     VALENTINES_DATES = load(f)
 
 
-class SaveTheDate:
+class SaveTheDate(commands.Cog):
     """A cog that gives random suggestion for a Valentine's date."""
 
     def __init__(self, bot):

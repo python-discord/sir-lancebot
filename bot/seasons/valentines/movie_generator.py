@@ -11,7 +11,7 @@ TMDB_API_KEY = environ.get("TMDB_API_KEY")
 log = logging.getLogger(__name__)
 
 
-class RomanceMovieFinder:
+class RomanceMovieFinder(commands.Cog):
     """A cog that returns a random romance movie suggestion to a user."""
 
     def __init__(self, bot):

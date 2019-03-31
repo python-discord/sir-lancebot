@@ -26,7 +26,7 @@ class Easter(SeasonBase):
     greeting = "Happy Easter!"
 
     # Duration of season
-    start_date = "01/04"
+    start_date = "02/04"
     end_date = "30/04"
 
     colour = Colours.pink

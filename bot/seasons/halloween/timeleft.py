@@ -6,7 +6,7 @@ from discord.ext import commands
 log = logging.getLogger(__name__)
 
 
-class TimeLeft:
+class TimeLeft(commands.Cog):
     """A Cog that tells you how long left until Hacktober is over!"""
 
     def __init__(self, bot):

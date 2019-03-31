@@ -14,7 +14,7 @@ with open(Path("bot", "resources", "valentines", "valentine_facts.json"), "r") a
     FACTS = json.load(file)
 
 
-class ValentineFacts:
+class ValentineFacts(commands.Cog):
     """A Cog for displaying facts about Saint Valentine."""
 
     def __init__(self, bot):

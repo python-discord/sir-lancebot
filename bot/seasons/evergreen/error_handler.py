@@ -8,7 +8,7 @@ from discord.ext import commands
 log = logging.getLogger(__name__)
 
 
-class CommandErrorHandler:
+class CommandErrorHandler(commands.Cog):
     """A error handler for the PythonDiscord server."""
 
     def __init__(self, bot):
