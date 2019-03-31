@@ -11,6 +11,7 @@ aiodns = "*"
 pillow = "*"
 pytz = "*"
 fuzzywuzzy = "*"
+requests = "*"
 
 [dev-packages]
 "flake8" = "*"
