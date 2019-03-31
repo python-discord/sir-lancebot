@@ -29,11 +29,7 @@ class AprilFoolVideos(commands.Cog):
     @commands.command(name='fool')
     async def aprial_fools(self, ctx):
         """Gets a random april fools video from youtube."""
-        random_youtuber = 'google'
-
-        # Change the above line of code to "random_youtuber = random.choice(self.youtubers)".
-        # I will add more youtubers and their vids in the future, for now only google, Around 30 vids.
-
+        random_youtuber = random.choice(self.youtubers)
         category = self.yt_vids[random_youtuber]
         random_vid = random.choice(category)
         embed = discord.Embed()
