@@ -43,12 +43,16 @@ class CountriesBirth:
                 description=f'{info["description"]}',
                 colour=Colours.pink
             )
-            embed.add_field(name="independence", value=info["independence"])
-            embed.add_field(name="holiday", value=info["holiday"])
-            # embed.set_image(url=STATES[valenstate]["flag"])
+            cdir = Path("/bot/resources/flags/512/afghanistan.png")
+            f = discord.File(cdir, filename="image.png")
+
+            embed.set_image(url="attachment://image.png")
+            # await messagable.send(file=f, embed=e)
+
+            # embed.set_image(url=open(, "rb").read())
 
             # print(counter)
-            await ctx.channel.send(embed=embed)
+            await ctx.channel.send(file=f, embed=embed)
 
     @commands.command()
     async def inform(self, ctx, *, country_name: str = None):
@@ -78,3 +82,9 @@ class CountriesBirth:
 
 def setup(bot):
     bot.add_cog(CountriesBirth(bot))
+
+# TODO handle naming conventions between files
+# TODO handle partial namings of countries
+# TODO handle countries not in our list
+# TODO test dates make sure country is pulled via dates
+# TODO test multiple countries based on dates
