@@ -25,7 +25,7 @@ PUMPKIN_ORANGE = discord.Color(0xFF7518)
 INTERVAL = timedelta(hours=6).total_seconds()
 
 
-class HalloweenFacts:
+class HalloweenFacts(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
@@ -35,6 +35,7 @@ class HalloweenFacts:
         self.facts = list(enumerate(self.halloween_facts))
         random.shuffle(self.facts)
 
+    @commands.Cog.listener()
     async def on_ready(self):
         self.channel = self.bot.get_channel(Hacktoberfest.channel_id)
         self.bot.loop.create_task(self._fact_publisher_task())
@@ -63,4 +64,4 @@ class HalloweenFacts:
 
 def setup(bot):
     bot.add_cog(HalloweenFacts(bot))
-    log.debug("HalloweenFacts cog loaded")
+    log.info("HalloweenFacts cog loaded")

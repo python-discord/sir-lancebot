@@ -112,4 +112,8 @@ venv.bak/
 
 # jetbrains
 .idea/
+<<<<<<< HEAD
 *.DS_Store
+=======
+.DS_Store
+>>>>>>> master

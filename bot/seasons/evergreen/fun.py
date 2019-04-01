@@ -8,7 +8,7 @@ from bot.constants import Emojis
 log = logging.getLogger(__name__)
 
 
-class Fun:
+class Fun(commands.Cog):
     """
     A collection of general commands for fun.
     """
@@ -35,4 +35,4 @@ class Fun:
 # Required in order to load the cog, use the class name in the add_cog function.
 def setup(bot):
     bot.add_cog(Fun(bot))
-    log.debug("Fun cog loaded")
+    log.info("Fun cog loaded")

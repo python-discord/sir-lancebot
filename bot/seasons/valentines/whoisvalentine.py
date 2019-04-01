@@ -14,7 +14,7 @@ with open(Path("bot", "resources", "valentines", "valentine_facts.json"), "r") a
     FACTS = json.load(file)
 
 
-class ValentineFacts:
+class ValentineFacts(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -51,3 +51,4 @@ class ValentineFacts:
 
 def setup(bot):
     bot.add_cog(ValentineFacts(bot))
+    log.info("ValentineFacts cog loaded")
