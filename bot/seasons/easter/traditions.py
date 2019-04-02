@@ -17,7 +17,7 @@ class Traditions(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(alias='eastercustoms')
+    @commands.command(aliases=('eastercustoms',))
     async def easter_tradition(self, ctx):
         """Responds with a random tradition or custom"""
 
