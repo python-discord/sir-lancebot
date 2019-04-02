@@ -21,7 +21,7 @@ class AprilFoolVideos(commands.Cog):
     @staticmethod
     def load_json():
         """A function to load json data."""
-        p = Path('bot/resources/april_fools_vids.json')
+        p = Path('bot', 'resources', 'easter', 'april_fools_vids.json')
         with p.open() as json_file:
             all_vids = load(json_file)
         return all_vids
@@ -37,8 +37,7 @@ class AprilFoolVideos(commands.Cog):
         embed.colour = Colours.yellow
         embed.description = f'Checkout this april fools video by {random_youtuber}'
         embed.url = random_vid['link']
-        await ctx.send(embed=embed)
-        await ctx.send(random_vid["link"])
+        await ctx.send(f"Check out this April Fools' video by {random_youtuber}.\n\n{random_vid['link']}")
 
 
 def setup(bot):
