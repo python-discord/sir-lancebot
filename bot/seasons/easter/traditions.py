@@ -19,7 +19,7 @@ class Traditions(commands.Cog):
 
     @commands.command(alias='eastercustoms')
     async def easter_tradition(self, ctx):
-    """Responds with a random tradition or custom"""
+        """Responds with a random tradition or custom"""
 
         random_country = random.choice(list(traditions))
 
