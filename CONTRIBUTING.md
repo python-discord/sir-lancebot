@@ -9,7 +9,7 @@ Note that contributions may be rejected on the basis of a contributor failing to
 ## Rules
 
 1. You must be a member of [our Discord community](https://discord.gg/python) in order to contribute to this project.
-2. Your pull request must solve an issue created by or approved a staff member or event handler. These will be labeled with the `approved` label. Feel free to suggest issues of your own, which staff can review for approval.
+2. Your pull request must solve an issue created or approved by a staff member. These will be labeled with the `approved` label. Feel free to suggest issues of your own, which staff can review for approval.
 3. **No force-pushes** or modifying the Git history in any way.
 4. If you have direct access to the repository, **create a branch for your changes** and create a pull request for that branch. If not, create a branch on a fork of the repository and create a pull request from there.
     * It's common practice for a repository to reject direct pushes to `master`, so make branching a habit!
