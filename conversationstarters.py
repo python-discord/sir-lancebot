@@ -1,6 +1,5 @@
 import logging
 import random
-from pathlib import Path
 
 from discord.ext import commands
 
@@ -44,7 +43,7 @@ class ConvoStarters(commands.Cog):
 
 
 def setup(bot):
-    """ConversationStarters Cog load."""
+    """Conversation starters Cog load."""
 
     bot.add_cog(ConvoStarters(bot))
-    log.info("ConversationStarters cog loaded")
+    log.info("Conversation starters cog loaded")
