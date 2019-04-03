@@ -56,14 +56,15 @@ class EggDecorating(commands.Cog):
             return await ctx.send("You must include at least 2 colours!")
 
         invalid = []
-        converted = []
-        for c in colours:
-            try:
-                colour = await commands.ColourConverter().convert(ctx, c)
-                # Attempts to convert the arguments into discord.Colour
-                converted.append(colour)
-            except commands.BadArgument:
-                invalid.append(c)
+        colours = list(colours)
+        for idx, colour in enumerate(colours):
+            if isinstance(colour, discord.Colour):
+                continue
+            value = self.replace_invalid(colour)
+            if value:
+                colours[idx] = discord.Colour(value)
+            else:
+                invalid.append(colour)
 
         if len(invalid) > 1:
             return await ctx.send(f"Sorry, I don't know these colours: {' '.join(invalid)}")
