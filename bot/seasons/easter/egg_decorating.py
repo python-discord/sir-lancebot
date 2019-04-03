@@ -1,14 +1,22 @@
+import json
 import logging
 import random
+from contextlib import suppress
 from io import BytesIO
 from pathlib import Path
-
+from typing import Union
 
 import discord
 from PIL import Image
 from discord.ext import commands
 
 log = logging.getLogger(__name__)
+
+with open(Path("bot", "resources", "evergreen", "html_colours.json")) as f:
+    HTML_COLOURS = json.load(f)
+
+with open(Path("bot", "resources", "evergreen", "xkcd_colours.json")) as f:
+    XKCD_COLOURS = json.load(f)
 
 COLOURS = [
     (255, 0, 0, 255), (255, 128, 0, 255), (255, 255, 0, 255), (0, 255, 0, 255),
@@ -21,17 +29,27 @@ IRREPLACEABLE = [
 
 
 class EggDecorating(commands.Cog):
-    """A Command that lets you decorate some easter eggs!"""
+    """Decorate some easter eggs!"""
 
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=["decorateegg"])
-    async def eggdecorate(self, ctx, *colours):
-        """
-        This 'paints' a beautiful egg using inputted colours
+    @staticmethod
+    def replace_invalid(colour: str):
+        """Attempts to match with HTML or XKCD colour names, returning the int value."""
+        with suppress(KeyError):
+            return int(HTML_COLOURS[colour], 16)
+        with suppress(KeyError):
+            return int(XKCD_COLOURS[colour], 16)
+        return None
 
-        It picks from a random set of designs and alters the colours to the user's liking
+    @commands.command(aliases=["decorateegg"])
+    async def eggdecorate(self, ctx, *colours: Union[discord.Colour, str]):
+        """
+        Picks a random egg design and decorates it using the given colours.
+
+        Colours are split by spaces, unless you wrap the colour name in double quotes.
+        Discord colour names, HTML colour names, XKCD colour names and hex values are accepted.
         """
 
         if len(colours) < 2:
@@ -48,21 +66,22 @@ class EggDecorating(commands.Cog):
                 invalid.append(c)
 
         if len(invalid) > 1:
-            return await ctx.send(f"The following colours are invalid: {' '.join(invalid)}")
+            return await ctx.send(f"Sorry, I don't know these colours: {' '.join(invalid)}")
         elif len(invalid) == 1:
-            return await ctx.send(f"{invalid[0]} is an invalid colour!")
-
-        colours = converted
+            return await ctx.send(f"Sorry, I don't know the colour {invalid[0]}!")
 
         async with ctx.typing():
-            colours *= 4
-            # This is to ensure that no IndexErrors are raised since the most amount of colours on an egg is 8
+            # expand list to 8 colours
+            colours_n = len(colours)
+            if colours_n < 8:
+                q, r = divmod(8, colours_n)
+                colours = colours * q + colours[:r]
             num = random.randint(1, 6)
             im = Image.open(Path("bot", "resources", "easter", "easter_eggs", f"design{num}.png"))
             data = list(im.getdata())
 
-            replaceable = {x for x in data if x not in IRREPLACEABLE}  # Turns it into a set to avoid duplicates
-            replaceable = sorted(replaceable, key=COLOURS.index)  # Sorts it by colour order
+            replaceable = {x for x in data if x not in IRREPLACEABLE}
+            replaceable = sorted(replaceable, key=COLOURS.index)
 
             replacing_colours = {colour: colours[i] for i, colour in enumerate(replaceable)}
             new_data = []
@@ -81,11 +100,14 @@ class EggDecorating(commands.Cog):
             bufferedio.seek(0)
 
             file = discord.File(bufferedio, filename="egg.png")  # Creates file to be used in embed
-            embed = discord.Embed(title="Your egg", description="Here is your pretty little egg. Hope you like it!")
+            embed = discord.Embed(
+                title="Your Colourful Easter Egg",
+                description="Here is your pretty little egg. Hope you like it!"
+            )
             embed.set_image(url="attachment://egg.png")
-            embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
+            embed.set_footer(text=f"Made by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
 
-            await ctx.send(file=file, embed=embed)
+        await ctx.send(file=file, embed=embed)
 
 
 def setup(bot):
