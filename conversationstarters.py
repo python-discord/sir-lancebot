@@ -19,7 +19,7 @@ class ConvoStarters(commands.Cog):
 
     @commands.command(aliases=('conversation_starters', 'convo_starters'))
     async def convo_starter(self, ctx):
-        """Responds with a random conversation starter"""
+        """Responds with a random topic to start a conversation."""
 
         await ctx.send(f"{random.choice(starters['starters'])}")
 
