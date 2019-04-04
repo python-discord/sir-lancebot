@@ -32,11 +32,6 @@ class AprilFoolVideos(commands.Cog):
         random_youtuber = random.choice(self.youtubers)
         category = self.yt_vids[random_youtuber]
         random_vid = random.choice(category)
-        embed = discord.Embed()
-        embed.title = random_vid['title']
-        embed.colour = Colours.yellow
-        embed.description = f'Checkout this april fools video by {random_youtuber}'
-        embed.url = random_vid['link']
         await ctx.send(f"Check out this April Fools' video by {random_youtuber}.\n\n{random_vid['link']}")
 
 
