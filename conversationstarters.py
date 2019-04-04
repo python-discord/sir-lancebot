@@ -18,7 +18,7 @@ class ConvoStarters(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def convo_starter(self, ctx):
+    async def topic(self, ctx):
         """Responds with a random topic to start a conversation."""
 
         await ctx.send(random.choice(starters['starters']))
