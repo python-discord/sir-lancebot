@@ -12,7 +12,7 @@ with open(Path('bot', 'resources', 'easter', 'starter.json'), 'r', encoding="utf
 
 
 class ConvoStarters(commands.Cog):
-    """A cog which posts easter conversation starters"""
+    """Easter conversation topics."""
 
     def __init__(self, bot):
         self.bot = bot
