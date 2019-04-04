@@ -28,4 +28,4 @@ def setup(bot):
     """Conversation starters Cog load."""
 
     bot.add_cog(ConvoStarters(bot))
-    log.info("Conversation starters cog loaded")
+    log.info("ConvoStarters cog loaded")
