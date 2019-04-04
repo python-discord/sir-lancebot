@@ -17,7 +17,7 @@ class ConvoStarters(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=('conversation_starters', 'convo_starters'))
+    @commands.command()
     async def convo_starter(self, ctx):
         """Responds with a random topic to start a conversation."""
 
