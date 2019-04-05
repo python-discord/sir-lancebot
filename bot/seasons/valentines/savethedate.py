@@ -17,18 +17,15 @@ with open(Path('bot', 'resources', 'valentines', 'date_ideas.json'), 'r', encodi
 
 
 class SaveTheDate(commands.Cog):
-    """
-    A cog that gives random suggestion, for a valentines date !
-    """
+    """A cog that gives random suggestion for a Valentine's date."""
 
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command()
     async def savethedate(self, ctx):
-        """
-        Gives you ideas for what to do on a date with your valentine.
-        """
+        """Gives you ideas for what to do on a date with your valentine."""
+
         random_date = random.choice(VALENTINES_DATES['ideas'])
         emoji_1 = random.choice(HEART_EMOJIS)
         emoji_2 = random.choice(HEART_EMOJIS)
@@ -41,5 +38,7 @@ class SaveTheDate(commands.Cog):
 
 
 def setup(bot):
+    """Save the date Cog Load."""
+
     bot.add_cog(SaveTheDate(bot))
     log.info("SaveTheDate cog loaded")

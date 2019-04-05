@@ -4,8 +4,8 @@ from bot.seasons import SeasonBase
 class Pride(SeasonBase):
     """
     No matter your origin, identity or sexuality, we come together to celebrate each and everyone's individuality.
+
     Feature contributions to ProudBot is encouraged to commemorate the history and challenges of the LGBTQ+ community.
-    Happy Pride Month
     """
 
     name = "pride"
