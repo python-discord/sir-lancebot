@@ -3,10 +3,7 @@ import random
 from json import load
 from pathlib import Path
 
-import discord
 from discord.ext import commands
-
-from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
