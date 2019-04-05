@@ -4,7 +4,6 @@ from io import BytesIO
 from pathlib import Path
 from typing import Union
 
-import aiohttp
 import discord
 from PIL import Image
 from PIL.ImageOps import posterize
@@ -24,7 +23,6 @@ class AvatarEasterifier(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.session = aiohttp.ClientSession()
 
     @staticmethod
     def closest(x):
@@ -73,7 +71,7 @@ class AvatarEasterifier(commands.Cog):
         async with ctx.typing():
 
             # Grabs image of avatar
-            async with self.session.get(ctx.author.avatar_url_as(size=256)) as resp:
+            async with self.bot.http_session.get(ctx.author.avatar_url_as(size=256)) as resp:
                 image_bytes = await resp.read()
 
             old = Image.open(BytesIO(image_bytes))
