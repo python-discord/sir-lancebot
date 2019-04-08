@@ -2,6 +2,7 @@ import json
 import logging
 from pathlib import Path
 from datetime import datetime
+from fuzzywuzzy import process
 
 
 import discord
@@ -18,11 +19,8 @@ def get_flag_url(country, size=512):
     """Fetch flag by country name and size using defined base URL."""
     flag = "https://raw.githubusercontent.com/jodth07/seasonalbot/global-birth/bot/resources/flags/"
     return f"{flag}{size}/{country}.png"
-
-
 # FLAG_URL = "https://raw.githubusercontent.com/python-discord/seasonalbot/master/bot/resources/flags/"  <-- use this for live
 # FLAG = "https://raw.githubusercontent.com/jodth07/seasonalbot/global-birth/bot/resources/flags/"
-
 
 
 class CountriesBirth:
@@ -32,7 +30,6 @@ class CountriesBirth:
     def __init__(self, bot):
         self.bot = bot
         self.indep_info = self.load_data()
-
 
     def load_data(self):
         """
@@ -73,22 +70,19 @@ class CountriesBirth:
         :param country_name: takes in optional name of a country to provide info on that country
         """
         dates = self.indep_info["dates"]
-        countries = self.indep_info["countries"]
+        countries = self.indep_info["countries"].keys()
+        # country_name = country_name.lower().strip().replace(" ", "_")     this stuff is breaks everything so it is commented out
 
-
-
-        if country_name not in countries:
-            for country_name in countries:
-                b = difflib.get_close_matches(country_name, countries)
-            message = f'country name does not exsists {b}'
-            await ctx.send(message)
-
-
-        # if country_name:
-        #     await self.produce_info(ctx, country_name.lower().strip().replace(" ", "_"))
+        #
+        # if country_name not in countries:
+        #     a = process.extract(country_name, countries, limit=3)
+        #     b = [i[0:1] for i in a]
+        #     c = " , ".join(b[0] + b[1] + b[2])
+        #     message = f'country name does not exists did you mean? \n{c}'
+        #     await ctx.send(message)
 
         if country_name:
-            await self.produce_info(ctx, country_name.lower())
+                await self.produce_info(ctx, country_name)
         else:
             today = datetime.now()
             month = today.strftime("%B")
