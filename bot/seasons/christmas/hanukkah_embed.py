@@ -1,7 +1,7 @@
 import datetime
 import logging
 
-import requests
+import aiohttp
 from discord import Embed
 from discord.ext import commands
 
@@ -13,20 +13,20 @@ log = logging.getLogger(__name__)
 
 class HanukkahEmbed(commands.Cog):
     """A cog that returns information about Hanukkah festival."""
+
     def __init__(self, bot):
         self.bot = bot
         self.url = ("https://www.hebcal.com/hebcal/?v=1&cfg=json&maj=on&min=on&mod=on&nx=on&"
                     "year=now&month=x&ss=on&mf=on&c=on&geo=geoname&geonameid=3448439&m=50&s=on")
-        self.hanukkah_dates = self.get_hanukkah_dates()
         self.hanukkah_days = []
         self.hanukkah_months = []
         self.hanukkah_years = []
 
-    def get_hanukkah_dates(self):
+    async def get_hanukkah_dates(self):
         """Gets the dates for hanukkah festival."""
         hanukkah_dates = []
-        r = requests.get(self.url)
-        json_data = r.json()
+        async with self.bot.http_session.get(self.url) as response:
+            json_data = await response.json()
         festivals = json_data['items']
         for festival in festivals:
             if festival['title'].startswith('Chanukah'):
@@ -37,8 +37,8 @@ class HanukkahEmbed(commands.Cog):
     @commands.command(name='hanukkah', aliases=['chanukah'])
     async def hanukkah_festival(self, ctx):
         """Tells you about the Hanukkah Festivaltime of festival, festival day, etc)."""
-        self.hanukkah_dates_split()
-
+        hanukkah_dates = await self.get_hanukkah_dates()
+        self.hanukkah_dates_split(hanukkah_dates)
         hanukkah_start_day = int(self.hanukkah_days[0])
         hanukkah_start_month = int(self.hanukkah_months[0])
         hanukkah_start_year = int(self.hanukkah_years[0])
@@ -54,7 +54,7 @@ class HanukkahEmbed(commands.Cog):
         month = str(today.month)
         year = str(today.year)
         embed = Embed()
-        embed.title = 'Hanukkah Embed'
+        embed.title = 'Hanukkah'
         embed.colour = Colours.blue
         if day in self.hanukkah_days and month in self.hanukkah_months and year in self.hanukkah_years:
             if int(day) == hanukkah_start_day:
@@ -99,15 +99,19 @@ class HanukkahEmbed(commands.Cog):
 
             await ctx.send(embed=embed)
 
-    def hanukkah_dates_split(self):
+    def hanukkah_dates_split(self, hanukkah_dates):
         """We are splitting the dates for hanukkah into days, months and years."""
-        for date in self.hanukkah_dates:
+        for date in hanukkah_dates:
             self.hanukkah_days.append(date[8:10])
             self.hanukkah_months.append(date[5:7])
             self.hanukkah_years.append(date[0:4])
 
+    async def on_ready(self):
+        """A function that runs when ready."""
+        self.bot.http_session = aiohttp.ClientSession()
+
 
 def setup(bot):
-    """A function to add the cog."""
+    """Cog load."""
     bot.add_cog(HanukkahEmbed(bot))
     log.info("Hanukkah embed cog loaded")
