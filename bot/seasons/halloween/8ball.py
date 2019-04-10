@@ -18,7 +18,7 @@ class EightBall(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=('spooky8ball'))
+    @commands.command(aliases=('spooky8ball',))
     async def spookyeightball(self, ctx, question: str):
         """Responds with a random response to a question."""
 
