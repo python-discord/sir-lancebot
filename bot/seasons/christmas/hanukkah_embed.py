@@ -106,10 +106,6 @@ class HanukkahEmbed(commands.Cog):
             self.hanukkah_months.append(date[5:7])
             self.hanukkah_years.append(date[0:4])
 
-    async def on_ready(self):
-        """A function that runs when ready."""
-        self.bot.http_session = aiohttp.ClientSession()
-
 
 def setup(bot):
     """Cog load."""
