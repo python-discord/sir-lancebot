@@ -385,7 +385,7 @@ class EggHunt(commands.Cog):
         For 48 hours, hunt down as many eggs randomly appearing as possible.
 
         Standard Eggs
-        ==============
+        --------------
         Egg React: +1pt
         Team Bonus for Claimed Egg: +1pt
         First React on Other Team Egg: +1pt
@@ -396,7 +396,7 @@ class EggHunt(commands.Cog):
         disappear after 5 seconds of the first react.
 
         Super Eggs
-        ===========
+        -----------
         Gold Egg: 50 team pts, 5pts to first react
         Diamond Egg: 100 team pts, 10pts to first react
 
