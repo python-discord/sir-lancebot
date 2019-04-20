@@ -21,8 +21,8 @@ class EggHuntSettings:
 
 
 class Roles:
-    white = GUILD.get_role(569123918795898921)
-    blurple = GUILD.get_role(569124011406000139)
+    white = GUILD.get_role(569304397054607363)
+    blurple = GUILD.get_role(569304472820514816)
 
 
 class Emoji:
