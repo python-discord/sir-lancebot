@@ -26,10 +26,10 @@ class Roles:
 
 
 class Emoji:
-    egg_white = bot.get_emoji(569006388437844023)
-    egg_blurple = bot.get_emoji(569006905972752384)
-    egg_gold = bot.get_emoji(569079769736675328)
-    egg_diamond = bot.get_emoji(569109259288182784)
+    egg_white = bot.get_emoji(569266762428841989)
+    egg_blurple = bot.get_emoji(569266666094067819)
+    egg_gold = bot.get_emoji(569266900106739712)
+    egg_diamond = bot.get_emoji(569266839738384384)
 
 
 class Colours:

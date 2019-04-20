@@ -178,7 +178,8 @@ class EggMessage:
 
         log.debug(f"EggHunt session started for message {self.message.id}.")
         bot.add_listener(self.collect_reacts, name="on_reaction_add")
-        await self.message.add_reaction(self.egg)
+        with contextlib.suppress(discord.Forbidden):
+            await self.message.add_reaction(self.egg)
         self.timeout_task = asyncio.create_task(self.start_timeout(300))
 
 
@@ -191,8 +192,10 @@ class SuperEggMessage(EggMessage):
 
     async def finalise_score(self):
         """Sums and actions scoring for this super egg session."""
-
-        message = await self.message.channel.get_message(self.message.id)
+        try:
+            message = await self.message.channel.get_message(self.message.id)
+        except discord.NotFound:
+            return
 
         count = 0
         white = 0
@@ -257,7 +260,8 @@ class SuperEggMessage(EggMessage):
         db.close()
 
         embed.set_footer(text=f"Finished with {count} total reacts.")
-        await self.message.edit(embed=embed)
+        with contextlib.suppress(discord.HTTPException):
+            await self.message.edit(embed=embed)
 
     async def start_timeout(self, seconds=None):
         """Starts the super egg session."""
@@ -269,7 +273,10 @@ class SuperEggMessage(EggMessage):
             await asyncio.sleep(1)
             embed = self.message.embeds[0]
             embed.set_footer(text=f"Finishing in {count} minutes.")
-            await self.message.edit(embed=embed)
+            try:
+                await self.message.edit(embed=embed)
+            except discord.HTTPException:
+                break
             count -= 1
         bot.remove_listener(self.collect_reacts, name="on_reaction_add")
         await self.finalise_score()
@@ -376,7 +383,7 @@ class EggHunt(commands.Cog):
         if message.author.bot:
             return
 
-        if random.randrange(100) <= 40:
+        if random.randrange(100) <= 5:
             await EggMessage(message, random.choice([Emoji.egg_white, Emoji.egg_blurple])).start()
 
     @commands.group(invoke_without_command=True)
