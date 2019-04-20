@@ -46,8 +46,10 @@ class Channels(NamedTuple):
     off_topic_2 = 463035268514185226
     python = 267624335836053506
     reddit = 458224812528238616
+    seasonalbot_chat = int(environ.get('CHANNEL_SEASONALBOT_CHAT', 542272993192050698))
     staff_lounge = 464905259261755392
     verification = 352442727016693763
+    python_discussion = 267624335836053506
 
 
 class Client(NamedTuple):
