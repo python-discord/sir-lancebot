@@ -54,7 +54,7 @@ class Channels(NamedTuple):
 
 class Client(NamedTuple):
     guild = int(environ.get('SEASONALBOT_GUILD', 267624335836053506))
-    prefix = "."
+    prefix = environ.get("PREFIX", ".")
     token = environ.get('SEASONALBOT_TOKEN')
     debug = environ.get('SEASONALBOT_DEBUG', '').lower() == 'true'
     season_override = environ.get('SEASON_OVERRIDE')
