@@ -347,6 +347,8 @@ class EggHunt(commands.Cog):
         self.task.add_done_callback(self.task_cleanup)
 
     def prepare_db(self):
+        """Ensures database tables all exist and if not, creates them."""
+
         db = sqlite3.connect(DB_PATH)
         c = db.cursor()
 
