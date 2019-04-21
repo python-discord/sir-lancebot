@@ -482,8 +482,9 @@ class EggHunt(commands.Cog):
         db = sqlite3.connect(DB_PATH)
         c = db.cursor()
         c.execute(
-            f"SELECT RANK() OVER(ORDER BY score DESC) AS rank FROM user_scores "
-            f"WHERE user_id={member.id}"
+            "SELECT rank FROM "
+            "(SELECT RANK() OVER(ORDER BY score DESC) AS rank, user_id FROM user_scores)"
+            f"WHERE user_id = {member.id};"
         )
         result = c.fetchone()
         db.close()
