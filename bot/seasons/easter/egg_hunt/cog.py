@@ -313,8 +313,58 @@ class EggHunt(commands.Cog):
     def __init__(self):
         self.event_channel = GUILD.get_channel(Channels.seasonalbot_chat)
         self.super_egg_buffer = 60*60
+        self.tables = {
+            "super_eggs": (
+                "CREATE TABLE super_eggs ("
+                "message_id INTEGER NOT NULL "
+                "  CONSTRAINT super_eggs_pk PRIMARY KEY, "
+                "egg_type   TEXT    NOT NULL, "
+                "team       TEXT    NOT NULL, "
+                "window     INTEGER);"
+            ),
+            "team_scores": (
+                "CREATE TABLE team_scores ("
+                "team_id TEXT, "
+                "team_score INTEGER DEFAULT 0);"
+            ),
+            "user_scores": (
+                "CREATE TABLE user_scores("
+                "user_id INTEGER NOT NULL "
+                "  CONSTRAINT user_scores_pk PRIMARY KEY, "
+                "team TEXT NOT NULL, "
+                "score INTEGER DEFAULT 0 NOT NULL);"
+            ),
+            "react_logs": (
+                "CREATE TABLE react_logs("
+                "member_id INTEGER NOT NULL, "
+                "message_id INTEGER NOT NULL, "
+                "reaction_id TEXT NOT NULL, "
+                "react_timestamp REAL NOT NULL);"
+            )
+        }
+        self.prepare_db()
         self.task = asyncio.create_task(self.super_egg())
         self.task.add_done_callback(self.task_cleanup)
+
+    def prepare_db(self):
+        db = sqlite3.connect(DB_PATH)
+        c = db.cursor()
+
+        exists_sql = "SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}';"
+
+        missing_tables = []
+        for table in self.tables:
+            c.execute(exists_sql.format(table_name=table))
+            result = c.fetchone()
+            if not result:
+                missing_tables.append(table)
+
+        for table in missing_tables:
+            log.info(f"Table {table} is missing, building new one.")
+            c.execute(self.tables[table])
+
+        db.commit()
+        db.close()
 
     def task_cleanup(self, task):
         """Returns task result and restarts. Used as a done callback to show raised exceptions."""
@@ -323,16 +373,16 @@ class EggHunt(commands.Cog):
         self.task = asyncio.create_task(self.super_egg())
 
     @staticmethod
-    def current_timestamp() -> int:
+    def current_timestamp() -> float:
         """Returns a timestamp of the current UTC time."""
 
-        return int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp())
+        return datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
 
     async def super_egg(self):
         """Manages the timing of super egg drops."""
 
         while True:
-            now = self.current_timestamp()
+            now = int(self.current_timestamp())
 
             if now > EggHuntSettings.end_time:
                 log.debug("Hunt ended. Ending task.")
@@ -363,7 +413,7 @@ class EggHunt(commands.Cog):
                 if now < window:
                     log.debug("Drop windows up to date, sleeping until next one.")
                     await asyncio.sleep(window-now)
-                    now = self.current_timestamp()
+                    now = int(self.current_timestamp())
 
                 current_window = window
                 next_window = windows[i+1]
@@ -412,8 +462,25 @@ class EggHunt(commands.Cog):
                 await SuperEggMessage(msg, egg, current_window).start()
 
             log.debug("Sleeping until next window.")
-            next_loop = max(next_window - self.current_timestamp(), self.super_egg_buffer)
+            next_loop = max(next_window - int(self.current_timestamp()), self.super_egg_buffer)
             await asyncio.sleep(next_loop)
+
+    @commands.Cog.listener()
+    async def on_raw_reaction_add(self, payload):
+        """Reaction event listener for reaction logging for later anti-cheat analysis."""
+
+        if payload.channel_id not in EggHuntSettings.allowed_channels:
+            return
+
+        now = self.current_timestamp()
+        db = sqlite3.connect(DB_PATH)
+        c = db.cursor()
+        c.execute(
+            "INSERT INTO react_logs(member_id, message_id, reaction_id, react_timestamp) "
+            f"VALUES({payload.user_id}, {payload.message_id}, '{payload.emoji}', {now})"
+        )
+        db.commit()
+        db.close()
 
     @commands.Cog.listener()
     async def on_message(self, message):
