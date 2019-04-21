@@ -11,7 +11,7 @@ GUILD = bot.get_guild(Client.guild)
 class EggHuntSettings:
     start_time = int(os.environ["HUNT_START"])
     end_time = start_time + 172800  # 48 hrs later
-    windows = os.environ.get("HUNT_WINDOWS").split(',') or []
+    windows = [int(w) for w in os.environ.get("HUNT_WINDOWS").split(',')] or []
     allowed_channels = [
         Channels.seasonalbot_chat,
         Channels.off_topic_0,

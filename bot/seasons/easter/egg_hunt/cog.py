@@ -295,11 +295,11 @@ class EggHunt(commands.Cog):
         self.task = asyncio.create_task(self.super_egg())
         self.task.add_done_callback(self.task_cleanup)
 
-    @staticmethod
-    def task_cleanup(task):
-        """Returns a task result. Used as a done callback to show raised exceptions."""
+    def task_cleanup(self, task):
+        """Returns task result and restarts. Used as a done callback to show raised exceptions."""
 
         task.result()
+        self.task = asyncio.create_task(self.super_egg())
 
     @staticmethod
     def current_timestamp() -> int:
@@ -323,25 +323,32 @@ class EggHunt(commands.Cog):
                 await asyncio.sleep(remaining)
 
             log.debug(f"Hunt started.")
-            current_window = EggHuntSettings.start_time
-            next_window = 0
-            for window in EggHuntSettings.windows:
-                window = int(window)
-                if window < now:
-                    current_window = window
-                    continue
-                if not next_window:
-                    next_window = window
-                else:
-                    break
-
-            log.debug(f"Current Window: {current_window}. Next Window {next_window}")
 
             db = sqlite3.connect(DB_PATH)
             c = db.cursor()
-            c.execute(f"SELECT COUNT(*) FROM super_eggs WHERE window={current_window}")
+
+            current_window = None
+            next_window = None
+            windows = EggHuntSettings.windows.copy()
+            windows.insert(0, EggHuntSettings.start_time)
+            for i, window in enumerate(windows):
+                c.execute(f"SELECT COUNT(*) FROM super_eggs WHERE window={window}")
+                alread_dropped = c.fetchone()[0]
+                if alread_dropped:
+                    continue
+                else:
+                    current_window = window
+                    next_window = window[i+1]
+                    break
+
             count = c.fetchone()[0]
             db.close()
+
+            if not current_window:
+                log.debug(f"Suitable window not found.")
+                break
+
+            log.debug(f"Current Window: {current_window}. Next Window {next_window}")
 
             if not count:
                 next_drop = random.randrange(now, next_window)
@@ -370,7 +377,7 @@ class EggHunt(commands.Cog):
                 await SuperEggMessage(msg, egg, current_window).start()
 
             log.debug("Sleeping until next window.")
-            next_loop = max(next_window - self.current_timestamp(), 0)
+            next_loop = max(next_window - self.current_timestamp(), 60*60)
             await asyncio.sleep(next_loop)
 
     @commands.Cog.listener()
