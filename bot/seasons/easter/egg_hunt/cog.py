@@ -458,20 +458,26 @@ class EggHunt(commands.Cog):
         team_result = c.fetchall()
         db.close()
         output = []
-        scr_len = max(len(str(r[2])) for r in user_result)
-        for user_id, team, score, rank in user_result:
-            user = GUILD.get_member(user_id) or user_id
-            team = team.capitalize()
-            score = f"{score}pts"
-            output.append(f"{rank:>2}. {score:>{scr_len+3}} - {user} ({team})")
-        user_board = "\n".join(output)
-        output = []
-        for team, score in team_result:
-            output.append(f"{team:<7}: {score}")
-        team_board = "\n".join(output)
+        if user_result:
+            scr_len = max(len(str(r[2])) for r in user_result)
+            for user_id, team, score, rank in user_result:
+                user = GUILD.get_member(user_id) or user_id
+                team = team.capitalize()
+                score = f"{score}pts"
+                output.append(f"{rank:>2}. {score:>{scr_len+3}} - {user} ({team})")
+            user_board = "\n".join(output)
+        else:
+            user_board = "No entries."
+        if team_result:
+            output = []
+            for team, score in team_result:
+                output.append(f"{team:<7}: {score}")
+            team_board = "\n".join(output)
+        else:
+            team_board = "No entries."
         embed = discord.Embed(
             title="Egg Hunt Leaderboards",
-            description=f"**Teams**\n```\n{team_board}\n```\n"
+            description=f"**Team Scores**\n```\n{team_board}\n```\n"
                         f"**Top 10 Members**\n```\n{user_board}\n```"
         )
         await ctx.send(embed=embed)
