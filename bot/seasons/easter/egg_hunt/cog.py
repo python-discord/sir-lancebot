@@ -218,7 +218,7 @@ class SuperEggMessage(EggMessage):
         if white == blurple:
             log.debug("Tied SuperEgg Result.")
             team = None
-            score = score / 2
+            score /= 2
         elif white > blurple:
             team = Roles.white
         else:
@@ -235,7 +235,7 @@ class SuperEggMessage(EggMessage):
                 continue
             role = get_team_role(user)
             if not role:
-                print('issue')
+                print("issue")
             user_score = 1 if user != self.first else user_bonus
             c.execute(self.add_user_score_sql(user.id, self.teams[role], user_score))
 
@@ -284,7 +284,7 @@ class SuperEggMessage(EggMessage):
 
 
 class EggHunt(commands.Cog):
-    """Easter Egg Hunt Event"""
+    """Easter Egg Hunt Event."""
 
     def __init__(self):
         self.event_channel = GUILD.get_channel(Channels.seasonalbot_chat)
@@ -310,7 +310,7 @@ class EggHunt(commands.Cog):
             now = self.current_timestamp()
 
             if now > EggHuntSettings.end_time:
-                log.debug(f"Hunt ended. Ending task.")
+                log.debug("Hunt ended. Ending task.")
                 break
 
             if now < EggHuntSettings.start_time:
@@ -340,7 +340,6 @@ class EggHunt(commands.Cog):
             db.close()
 
             if not count:
-                log.debug(f"test")
                 next_drop = random.randrange(now, next_window)
                 log.debug(f"Sleeping until next super egg drop: {next_drop}.")
                 await asyncio.sleep(next_drop)
@@ -362,11 +361,11 @@ class EggHunt(commands.Cog):
                     colour=colour
                 )
                 embed.set_thumbnail(url=egg.url)
-                embed.set_footer(text=f"Finishing in 5 minutes.")
+                embed.set_footer(text="Finishing in 5 minutes.")
                 msg = await self.event_channel.send(embed=embed)
                 await SuperEggMessage(msg, egg, current_window).start()
 
-            log.debug(f"Sleeping until next window.")
+            log.debug("Sleeping until next window.")
             next_loop = max(next_window - self.current_timestamp(), 0)
             await asyncio.sleep(next_loop)
 
@@ -452,11 +451,11 @@ class EggHunt(commands.Cog):
             team = team.capitalize()
             score = f"{score}pts"
             output.append(f"{rank:>2}. {score:>{scr_len+3}} - {user} ({team})")
-        user_board = '\n'.join(output)
+        user_board = "\n".join(output)
         output = []
         for team, score in team_result:
             output.append(f"{team:<7}: {score}")
-        team_board = '\n'.join(output)
+        team_board = "\n".join(output)
         embed = discord.Embed(
             title="Egg Hunt Leaderboards",
             description=f"**Teams**\n```\n{team_board}\n```\n"
@@ -505,7 +504,7 @@ class EggHunt(commands.Cog):
         c = db.cursor()
         c.execute("DELETE FROM super_eggs;")
         c.execute("DELETE FROM user_scores;")
-        c.execute(f"UPDATE team_scores SET team_score=0")
+        c.execute("UPDATE team_scores SET team_score=0")
         db.commit()
         db.close()
         await ctx.send("Database successfully cleared.")
