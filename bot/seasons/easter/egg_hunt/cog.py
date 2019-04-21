@@ -50,7 +50,8 @@ async def assign_team(user: discord.Member) -> discord.Member:
             "SELECT team, COUNT(*) AS count FROM user_scores "
             "GROUP BY team ORDER BY count ASC LIMIT 1;"
         )
-        result = c.fetchone()[0]
+        result = c.fetchone()
+        result = result[0] if result else "WHITE"
 
     if result[0] == "WHITE":
         new_team = Roles.white
@@ -195,6 +196,15 @@ class EggMessage:
         with contextlib.suppress(discord.Forbidden):
             await self.message.add_reaction(self.egg)
         self.timeout_task = asyncio.create_task(self.start_timeout(300))
+        while True:
+            if not self.timeout_task:
+                break
+            if not self.timeout_task.done():
+                await self.timeout_task
+            else:
+                # make sure any exceptions raise if necessary
+                self.timeout_task.result()
+                break
 
 
 class SuperEggMessage(EggMessage):
@@ -207,7 +217,7 @@ class SuperEggMessage(EggMessage):
     async def finalise_score(self):
         """Sums and actions scoring for this super egg session."""
         try:
-            message = await self.message.channel.get_message(self.message.id)
+            message = await self.message.channel.fetch_message(self.message.id)
         except discord.NotFound:
             return
 
@@ -301,6 +311,7 @@ class EggHunt(commands.Cog):
 
     def __init__(self):
         self.event_channel = GUILD.get_channel(Channels.seasonalbot_chat)
+        self.super_egg_buffer = 60*60
         self.task = asyncio.create_task(self.super_egg())
         self.task.add_done_callback(self.task_cleanup)
 
@@ -343,26 +354,40 @@ class EggHunt(commands.Cog):
             for i, window in enumerate(windows):
                 c.execute(f"SELECT COUNT(*) FROM super_eggs WHERE window={window}")
                 already_dropped = c.fetchone()[0]
-                if already_dropped:
-                    continue
-                else:
-                    current_window = window
-                    next_window = window[i+1]
-                    break
 
-            count = c.fetchone()[0]
+                if already_dropped:
+                    log.debug(f"Window {window} already dropped, checking next one.")
+                    continue
+
+                if now < window:
+                    log.debug("Drop windows up to date, sleeping until next one.")
+                    await asyncio.sleep(window-now)
+                    now = self.current_timestamp()
+
+                current_window = window
+                next_window = windows[i+1]
+                break
+
+            count = c.fetchone()
             db.close()
 
             if not current_window:
-                log.debug(f"Suitable window not found.")
+                log.debug("No drop windows left, ending task.")
                 break
 
             log.debug(f"Current Window: {current_window}. Next Window {next_window}")
 
             if not count:
-                next_drop = random.randrange(now, next_window)
-                log.debug(f"Sleeping until next super egg drop: {next_drop}.")
-                await asyncio.sleep(next_drop)
+                if next_window < now:
+                    log.debug("An Egg Drop Window was missed, dropping one now.")
+                    next_drop = 0
+                else:
+                    next_drop = random.randrange(now, next_window)
+
+                if next_drop:
+                    log.debug(f"Sleeping until next super egg drop: {next_drop}.")
+                    await asyncio.sleep(next_drop)
+
                 if random.randrange(10) <= 2:
                     egg = Emoji.egg_diamond
                     egg_type = "Diamond"
@@ -386,7 +411,7 @@ class EggHunt(commands.Cog):
                 await SuperEggMessage(msg, egg, current_window).start()
 
             log.debug("Sleeping until next window.")
-            next_loop = max(next_window - self.current_timestamp(), 60*60)
+            next_loop = max(next_window - self.current_timestamp(), self.super_egg_buffer)
             await asyncio.sleep(next_loop)
 
     @commands.Cog.listener()
@@ -432,7 +457,7 @@ class EggHunt(commands.Cog):
         wins the points.
         """
 
-        await ctx.invoke(bot.get_command("help"), "hunt")
+        await ctx.invoke(bot.get_command("help"), command="hunt")
 
     @hunt.command()
     async def countdown(self, ctx):
