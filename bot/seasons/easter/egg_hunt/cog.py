@@ -342,8 +342,8 @@ class EggHunt(commands.Cog):
             windows.insert(0, EggHuntSettings.start_time)
             for i, window in enumerate(windows):
                 c.execute(f"SELECT COUNT(*) FROM super_eggs WHERE window={window}")
-                alread_dropped = c.fetchone()[0]
-                if alread_dropped:
+                already_dropped = c.fetchone()[0]
+                if already_dropped:
                     continue
                 else:
                     current_window = window
