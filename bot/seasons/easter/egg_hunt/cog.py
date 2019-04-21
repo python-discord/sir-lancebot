@@ -26,6 +26,8 @@ TEAM_MAP = {
 
 GUILD = bot.get_guild(Client.guild)
 
+MUTED = GUILD.get_role(MainRoles.muted)
+
 
 def get_team_role(user: discord.Member) -> discord.Role:
     """Helper function to get the team role for a member."""
@@ -44,14 +46,21 @@ async def assign_team(user: discord.Member) -> discord.Member:
     c.execute(f"SELECT team FROM user_scores WHERE user_id = {user.id}")
     result = c.fetchone()
     if not result:
-        new_team = random.choice([Roles.white, Roles.blurple])
-        log.debug(f"Assigned role {new_team} to {user}.")
+        c.execute(
+            "SELECT team, COUNT(*) AS count FROM user_scores "
+            "GROUP BY team ORDER BY count ASC LIMIT 1;"
+        )
+        result = c.fetchone()
+        result = result[0] if result else "WHITE"
+
+    if result[0] == "WHITE":
+        new_team = Roles.white
     else:
-        if result[0] == "WHITE":
-            new_team = Roles.white
-        else:
-            new_team = Roles.blurple
-        log.debug(f"Restored role {new_team} to {user}.")
+        new_team = Roles.blurple
+
+    db.close()
+
+    log.debug(f"Assigned role {new_team} to {user}.")
 
     await user.add_roles(new_team)
     return GUILD.get_member(user.id)
@@ -64,7 +73,7 @@ class EggMessage:
         self.message = message
         self.egg = egg
         self.first = None
-        self.users = []
+        self.users = set()
         self.teams = {Roles.white: "WHITE", Roles.blurple: "BLURPLE"}
         self.new_team_assignments = {}
         self.timeout_task = None
@@ -154,6 +163,11 @@ class EggMessage:
             return False
         if reaction.emoji != self.egg:
             return False
+
+        # ignore the pushished
+        if MUTED in user.roles:
+            return False
+
         return True
 
     async def collect_reacts(self, reaction: discord.Reaction, user: discord.Member):
@@ -172,7 +186,8 @@ class EggMessage:
             self.first = user
             await self.start_timeout()
         else:
-            self.users.append(user)
+            if user != self.first:
+                self.users.add(user)
 
     async def start(self):
         """Starts the egg drop session."""
@@ -182,6 +197,15 @@ class EggMessage:
         with contextlib.suppress(discord.Forbidden):
             await self.message.add_reaction(self.egg)
         self.timeout_task = asyncio.create_task(self.start_timeout(300))
+        while True:
+            if not self.timeout_task:
+                break
+            if not self.timeout_task.done():
+                await self.timeout_task
+            else:
+                # make sure any exceptions raise if necessary
+                self.timeout_task.result()
+                break
 
 
 class SuperEggMessage(EggMessage):
@@ -194,7 +218,7 @@ class SuperEggMessage(EggMessage):
     async def finalise_score(self):
         """Sums and actions scoring for this super egg session."""
         try:
-            message = await self.message.channel.get_message(self.message.id)
+            message = await self.message.channel.fetch_message(self.message.id)
         except discord.NotFound:
             return
 
@@ -271,7 +295,7 @@ class SuperEggMessage(EggMessage):
             return
         count = 4
         for _ in range(count):
-            await asyncio.sleep(1)
+            await asyncio.sleep(60)
             embed = self.message.embeds[0]
             embed.set_footer(text=f"Finishing in {count} minutes.")
             try:
@@ -288,26 +312,79 @@ class EggHunt(commands.Cog):
 
     def __init__(self):
         self.event_channel = GUILD.get_channel(Channels.seasonalbot_chat)
+        self.super_egg_buffer = 60*60
+        self.tables = {
+            "super_eggs": (
+                "CREATE TABLE super_eggs ("
+                "message_id INTEGER NOT NULL "
+                "  CONSTRAINT super_eggs_pk PRIMARY KEY, "
+                "egg_type   TEXT    NOT NULL, "
+                "team       TEXT    NOT NULL, "
+                "window     INTEGER);"
+            ),
+            "team_scores": (
+                "CREATE TABLE team_scores ("
+                "team_id TEXT, "
+                "team_score INTEGER DEFAULT 0);"
+            ),
+            "user_scores": (
+                "CREATE TABLE user_scores("
+                "user_id INTEGER NOT NULL "
+                "  CONSTRAINT user_scores_pk PRIMARY KEY, "
+                "team TEXT NOT NULL, "
+                "score INTEGER DEFAULT 0 NOT NULL);"
+            ),
+            "react_logs": (
+                "CREATE TABLE react_logs("
+                "member_id INTEGER NOT NULL, "
+                "message_id INTEGER NOT NULL, "
+                "reaction_id TEXT NOT NULL, "
+                "react_timestamp REAL NOT NULL);"
+            )
+        }
+        self.prepare_db()
         self.task = asyncio.create_task(self.super_egg())
         self.task.add_done_callback(self.task_cleanup)
 
-    @staticmethod
-    def task_cleanup(task):
-        """Returns a task result. Used as a done callback to show raised exceptions."""
+    def prepare_db(self):
+        """Ensures database tables all exist and if not, creates them."""
+
+        db = sqlite3.connect(DB_PATH)
+        c = db.cursor()
+
+        exists_sql = "SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}';"
+
+        missing_tables = []
+        for table in self.tables:
+            c.execute(exists_sql.format(table_name=table))
+            result = c.fetchone()
+            if not result:
+                missing_tables.append(table)
+
+        for table in missing_tables:
+            log.info(f"Table {table} is missing, building new one.")
+            c.execute(self.tables[table])
+
+        db.commit()
+        db.close()
+
+    def task_cleanup(self, task):
+        """Returns task result and restarts. Used as a done callback to show raised exceptions."""
 
         task.result()
+        self.task = asyncio.create_task(self.super_egg())
 
     @staticmethod
-    def current_timestamp() -> int:
+    def current_timestamp() -> float:
         """Returns a timestamp of the current UTC time."""
 
-        return int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp())
+        return datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
 
     async def super_egg(self):
         """Manages the timing of super egg drops."""
 
         while True:
-            now = self.current_timestamp()
+            now = int(self.current_timestamp())
 
             if now > EggHuntSettings.end_time:
                 log.debug("Hunt ended. Ending task.")
@@ -319,30 +396,51 @@ class EggHunt(commands.Cog):
                 await asyncio.sleep(remaining)
 
             log.debug(f"Hunt started.")
-            current_window = EggHuntSettings.start_time
-            next_window = 0
-            for window in EggHuntSettings.windows:
-                window = int(window)
-                if window < now:
-                    current_window = window
-                    continue
-                if not next_window:
-                    next_window = window
-                else:
-                    break
-
-            log.debug(f"Current Window: {current_window}. Next Window {next_window}")
 
             db = sqlite3.connect(DB_PATH)
             c = db.cursor()
-            c.execute(f"SELECT COUNT(*) FROM super_eggs WHERE window={current_window}")
-            count = c.fetchone()[0]
+
+            current_window = None
+            next_window = None
+            windows = EggHuntSettings.windows.copy()
+            windows.insert(0, EggHuntSettings.start_time)
+            for i, window in enumerate(windows):
+                c.execute(f"SELECT COUNT(*) FROM super_eggs WHERE window={window}")
+                already_dropped = c.fetchone()[0]
+
+                if already_dropped:
+                    log.debug(f"Window {window} already dropped, checking next one.")
+                    continue
+
+                if now < window:
+                    log.debug("Drop windows up to date, sleeping until next one.")
+                    await asyncio.sleep(window-now)
+                    now = int(self.current_timestamp())
+
+                current_window = window
+                next_window = windows[i+1]
+                break
+
+            count = c.fetchone()
             db.close()
 
+            if not current_window:
+                log.debug("No drop windows left, ending task.")
+                break
+
+            log.debug(f"Current Window: {current_window}. Next Window {next_window}")
+
             if not count:
-                next_drop = random.randrange(now, next_window)
-                log.debug(f"Sleeping until next super egg drop: {next_drop}.")
-                await asyncio.sleep(next_drop)
+                if next_window < now:
+                    log.debug("An Egg Drop Window was missed, dropping one now.")
+                    next_drop = 0
+                else:
+                    next_drop = random.randrange(now, next_window)
+
+                if next_drop:
+                    log.debug(f"Sleeping until next super egg drop: {next_drop}.")
+                    await asyncio.sleep(next_drop)
+
                 if random.randrange(10) <= 2:
                     egg = Emoji.egg_diamond
                     egg_type = "Diamond"
@@ -366,8 +464,25 @@ class EggHunt(commands.Cog):
                 await SuperEggMessage(msg, egg, current_window).start()
 
             log.debug("Sleeping until next window.")
-            next_loop = max(next_window - self.current_timestamp(), 0)
+            next_loop = max(next_window - int(self.current_timestamp()), self.super_egg_buffer)
             await asyncio.sleep(next_loop)
+
+    @commands.Cog.listener()
+    async def on_raw_reaction_add(self, payload):
+        """Reaction event listener for reaction logging for later anti-cheat analysis."""
+
+        if payload.channel_id not in EggHuntSettings.allowed_channels:
+            return
+
+        now = self.current_timestamp()
+        db = sqlite3.connect(DB_PATH)
+        c = db.cursor()
+        c.execute(
+            "INSERT INTO react_logs(member_id, message_id, reaction_id, react_timestamp) "
+            f"VALUES({payload.user_id}, {payload.message_id}, '{payload.emoji}', {now})"
+        )
+        db.commit()
+        db.close()
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -412,7 +527,7 @@ class EggHunt(commands.Cog):
         wins the points.
         """
 
-        await ctx.invoke(bot.get_command("help"), "hunt")
+        await ctx.invoke(bot.get_command("help"), command="hunt")
 
     @hunt.command()
     async def countdown(self, ctx):
@@ -445,20 +560,32 @@ class EggHunt(commands.Cog):
         team_result = c.fetchall()
         db.close()
         output = []
-        scr_len = max(len(str(r[2])) for r in user_result)
-        for user_id, team, score, rank in user_result:
-            user = GUILD.get_member(user_id) or user_id
-            team = team.capitalize()
-            score = f"{score}pts"
-            output.append(f"{rank:>2}. {score:>{scr_len+3}} - {user} ({team})")
-        user_board = "\n".join(output)
-        output = []
-        for team, score in team_result:
-            output.append(f"{team:<7}: {score}")
-        team_board = "\n".join(output)
+        if user_result:
+            # Get the alignment needed for the score
+            score_lengths = []
+            for result in user_result:
+                length = len(str(result[2]))
+                score_lengths.append(length)
+
+            score_length = max(score_lengths)
+            for user_id, team, score, rank in user_result:
+                user = GUILD.get_member(user_id) or user_id
+                team = team.capitalize()
+                score = f"{score}pts"
+                output.append(f"{rank:>2}. {score:>{score_length+3}} - {user} ({team})")
+            user_board = "\n".join(output)
+        else:
+            user_board = "No entries."
+        if team_result:
+            output = []
+            for team, score in team_result:
+                output.append(f"{team:<7}: {score}")
+            team_board = "\n".join(output)
+        else:
+            team_board = "No entries."
         embed = discord.Embed(
             title="Egg Hunt Leaderboards",
-            description=f"**Teams**\n```\n{team_board}\n```\n"
+            description=f"**Team Scores**\n```\n{team_board}\n```\n"
                         f"**Top 10 Members**\n```\n{user_board}\n```"
         )
         await ctx.send(embed=embed)
@@ -471,8 +598,9 @@ class EggHunt(commands.Cog):
         db = sqlite3.connect(DB_PATH)
         c = db.cursor()
         c.execute(
-            f"SELECT RANK() OVER(ORDER BY score DESC) AS rank FROM user_scores "
-            f"WHERE user_id={member.id}"
+            "SELECT rank FROM "
+            "(SELECT RANK() OVER(ORDER BY score DESC) AS rank, user_id FROM user_scores)"
+            f"WHERE user_id = {member.id};"
         )
         result = c.fetchone()
         db.close()
