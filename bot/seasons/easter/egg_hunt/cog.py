@@ -27,7 +27,7 @@ TEAM_MAP = {
 GUILD = bot.get_guild(Client.guild)
 
 
-def get_team_role(user: discord.Member):
+def get_team_role(user: discord.Member) -> discord.Role:
     """Helper function to get the team role for a member."""
 
     if Roles.white in user.roles:
@@ -36,7 +36,7 @@ def get_team_role(user: discord.Member):
         return Roles.blurple
 
 
-async def assign_team(user: discord.Member):
+async def assign_team(user: discord.Member) -> discord.Member:
     """Helper function to assign a new team role for a member."""
 
     db = sqlite3.connect(DB_PATH)
@@ -70,7 +70,7 @@ class EggMessage:
         self.timeout_task = None
 
     @staticmethod
-    def add_user_score_sql(user_id: int, team: str, score: int):
+    def add_user_score_sql(user_id: int, team: str, score: int) -> str:
         """Builds the SQL for adding a score to a user in the database."""
 
         return (
@@ -80,7 +80,7 @@ class EggMessage:
         )
 
     @staticmethod
-    def add_team_score_sql(team_name: str, score: int):
+    def add_team_score_sql(team_name: str, score: int) -> str:
         """Builds the SQL for adding a score to a team in the database."""
 
         return f"UPDATE team_scores SET team_score=team_score+{score} WHERE team_id='{team_name}'"
@@ -145,7 +145,7 @@ class EggMessage:
         if self.first:
             self.finalise_score()
 
-    def is_valid_react(self, reaction: discord.Reaction, user: discord.Member):
+    def is_valid_react(self, reaction: discord.Reaction, user: discord.Member) -> bool:
         """Validates a reaction event was meant for this session."""
 
         if user.bot:
@@ -298,7 +298,7 @@ class EggHunt(commands.Cog):
         task.result()
 
     @staticmethod
-    def current_timestamp():
+    def current_timestamp() -> int:
         """Returns a timestamp of the current UTC time."""
 
         return int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp())
