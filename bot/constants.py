@@ -29,7 +29,7 @@ class Channels(NamedTuple):
     bot = 267659945086812160
     checkpoint_test = 422077681434099723
     devalerts = 460181980097675264
-    devlog = int(environ.get('CHANNEL_DEVLOG', 409308876241108992))
+    devlog = int(environ.get('CHANNEL_DEVLOG', 548438471685963776))
     devtest = 414574275865870337
     help_0 = 303906576991780866
     help_1 = 303906556754395136
@@ -46,13 +46,15 @@ class Channels(NamedTuple):
     off_topic_2 = 463035268514185226
     python = 267624335836053506
     reddit = 458224812528238616
+    seasonalbot_chat = int(environ.get('CHANNEL_SEASONALBOT_CHAT', 542272993192050698))
     staff_lounge = 464905259261755392
     verification = 352442727016693763
+    python_discussion = 267624335836053506
 
 
 class Client(NamedTuple):
     guild = int(environ.get('SEASONALBOT_GUILD', 267624335836053506))
-    prefix = "."
+    prefix = environ.get("PREFIX", ".")
     token = environ.get('SEASONALBOT_TOKEN')
     debug = environ.get('SEASONALBOT_DEBUG', '').lower() == 'true'
     season_override = environ.get('SEASON_OVERRIDE')
