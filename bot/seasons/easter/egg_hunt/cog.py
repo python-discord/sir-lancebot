@@ -44,14 +44,18 @@ async def assign_team(user: discord.Member) -> discord.Member:
     c.execute(f"SELECT team FROM user_scores WHERE user_id = {user.id}")
     result = c.fetchone()
     if not result:
-        new_team = random.choice([Roles.white, Roles.blurple])
-        log.debug(f"Assigned role {new_team} to {user}.")
+        c.execute(
+            "SELECT team, COUNT(*) AS count FROM user_scores "
+            "GROUP BY team ORDER BY count ASC LIMIT 1;"
+        )
+        result = c.fetchone()[0]
+
+    if result[0] == "WHITE":
+        new_team = Roles.white
     else:
-        if result[0] == "WHITE":
-            new_team = Roles.white
-        else:
-            new_team = Roles.blurple
-        log.debug(f"Restored role {new_team} to {user}.")
+        new_team = Roles.blurple
+
+    log.debug(f"Assigned role {new_team} to {user}.")
 
     await user.add_roles(new_team)
     return GUILD.get_member(user.id)
