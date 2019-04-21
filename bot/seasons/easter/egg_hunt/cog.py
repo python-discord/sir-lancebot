@@ -295,7 +295,7 @@ class SuperEggMessage(EggMessage):
             return
         count = 4
         for _ in range(count):
-            await asyncio.sleep(1)
+            await asyncio.sleep(60)
             embed = self.message.embeds[0]
             embed.set_footer(text=f"Finishing in {count} minutes.")
             try:
