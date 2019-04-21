@@ -55,6 +55,8 @@ async def assign_team(user: discord.Member) -> discord.Member:
     else:
         new_team = Roles.blurple
 
+    db.close()
+
     log.debug(f"Assigned role {new_team} to {user}.")
 
     await user.add_roles(new_team)
