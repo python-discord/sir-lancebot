@@ -26,6 +26,8 @@ TEAM_MAP = {
 
 GUILD = bot.get_guild(Client.guild)
 
+MUTED = GUILD.get_role(MainRoles.muted)
+
 
 def get_team_role(user: discord.Member) -> discord.Role:
     """Helper function to get the team role for a member."""
@@ -160,6 +162,11 @@ class EggMessage:
             return False
         if reaction.emoji != self.egg:
             return False
+
+        # ignore the pushished
+        if MUTED in user.roles:
+            return False
+
         return True
 
     async def collect_reacts(self, reaction: discord.Reaction, user: discord.Member):
