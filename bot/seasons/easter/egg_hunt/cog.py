@@ -38,6 +38,7 @@ def get_team_role(user: discord.Member):
 
 async def assign_team(user: discord.Member):
     """Helper function to assign a new team role for a member."""
+
     db = sqlite3.connect(DB_PATH)
     c = db.cursor()
     c.execute(f"SELECT team FROM user_scores WHERE user_id = {user.id}")
@@ -69,7 +70,7 @@ class EggMessage:
         self.timeout_task = None
 
     @staticmethod
-    def add_user_score(user_id: int, team: str, score: int):
+    def add_user_score_sql(user_id: int, team: str, score: int):
         """Builds the SQL for adding a score to a user in the database."""
 
         return (
@@ -79,7 +80,7 @@ class EggMessage:
         )
 
     @staticmethod
-    def add_team_score(team_name: str, score: int):
+    def add_team_score_sql(team_name: str, score: int):
         """Builds the SQL for adding a score to a team in the database."""
 
         return f"UPDATE team_scores SET team_score=team_score+{score} WHERE team_id='{team_name}'"
@@ -100,7 +101,7 @@ class EggMessage:
 
         score = 3 if first_team == TEAM_MAP[first_team] else 2
 
-        c.execute(self.add_user_score(self.first.id, self.teams[first_team], score))
+        c.execute(self.add_user_score_sql(self.first.id, self.teams[first_team], score))
         team_scores[self.teams[first_team]] += score
 
         for user in self.users:
@@ -112,12 +113,12 @@ class EggMessage:
             team_name = self.teams[team]
             team_scores[team_name] += 1
             score = 2 if team == first_team else 1
-            c.execute(self.add_user_score(user.id, team_name, score))
+            c.execute(self.add_user_score_sql(user.id, team_name, score))
 
         for team_name, score in team_scores.items():
             if not score:
                 continue
-            c.execute(self.add_team_score(team_name, score))
+            c.execute(self.add_team_score_sql(team_name, score))
 
         db.commit()
         db.close()
@@ -236,19 +237,19 @@ class SuperEggMessage(EggMessage):
             if not role:
                 print('issue')
             user_score = 1 if user != self.first else user_bonus
-            c.execute(self.add_user_score(user.id, self.teams[role], user_score))
+            c.execute(self.add_user_score_sql(user.id, self.teams[role], user_score))
 
         if not team:
             embed.description = f"{embed.description}\n\nA Tie!\nBoth got {score} points!"
-            c.execute(self.add_team_score(self.teams[Roles.white], score))
-            c.execute(self.add_team_score(self.teams[Roles.blurple], score))
+            c.execute(self.add_team_score_sql(self.teams[Roles.white], score))
+            c.execute(self.add_team_score_sql(self.teams[Roles.blurple], score))
             team_name = "TIE"
         else:
             team_name = self.teams[team]
             embed.description = (
                 f"{embed.description}\n\nTeam {team_name.capitalize()} won the points!"
             )
-            c.execute(self.add_team_score(team_name, score))
+            c.execute(self.add_team_score_sql(team_name, score))
 
         c.execute(
             "INSERT INTO super_eggs (message_id, egg_type, team, window) "
@@ -411,6 +412,7 @@ class EggHunt(commands.Cog):
         out. They stay around for 5 minutes and the team with the most reacts
         wins the points.
         """
+
         await ctx.invoke(bot.get_command("help"), "hunt")
 
     @hunt.command()
