@@ -73,7 +73,7 @@ class EggMessage:
         self.message = message
         self.egg = egg
         self.first = None
-        self.users = []
+        self.users = set()
         self.teams = {Roles.white: "WHITE", Roles.blurple: "BLURPLE"}
         self.new_team_assignments = {}
         self.timeout_task = None
@@ -186,7 +186,8 @@ class EggMessage:
             self.first = user
             await self.start_timeout()
         else:
-            self.users.append(user)
+            if user != self.first:
+                self.users.add(user)
 
     async def start(self):
         """Starts the egg drop session."""
