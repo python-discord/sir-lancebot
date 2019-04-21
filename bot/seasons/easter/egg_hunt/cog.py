@@ -466,12 +466,18 @@ class EggHunt(commands.Cog):
         db.close()
         output = []
         if user_result:
-            scr_len = max(len(str(r[2])) for r in user_result)
+            # Get the alignment needed for the score
+            score_lengths = []
+            for result in user_result:
+                length = len(str(result[2]))
+                score_lengths.append(length)
+
+            score_length = max(score_lengths)
             for user_id, team, score, rank in user_result:
                 user = GUILD.get_member(user_id) or user_id
                 team = team.capitalize()
                 score = f"{score}pts"
-                output.append(f"{rank:>2}. {score:>{scr_len+3}} - {user} ({team})")
+                output.append(f"{rank:>2}. {score:>{score_length+3}} - {user} ({team})")
             user_board = "\n".join(output)
         else:
             user_board = "No entries."
