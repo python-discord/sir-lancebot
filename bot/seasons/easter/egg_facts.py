@@ -42,7 +42,7 @@ class EasterFacts(commands.Cog):
         embed = discord.Embed()
         embed.colour = Colours.soft_red
         embed.title = 'Easter Egg Fact'
-        random_fact = random.choice(self.facts['facts'])
+        random_fact = random.choice(self.facts)
         embed.description = random_fact
         return embed
 
