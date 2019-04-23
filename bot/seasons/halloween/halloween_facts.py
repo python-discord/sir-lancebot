@@ -7,7 +7,7 @@ from pathlib import Path
 import discord
 from discord.ext import commands
 
-from bot.constants import Hacktoberfest
+from bot.constants import Channels
 
 log = logging.getLogger(__name__)
 
@@ -40,7 +40,7 @@ class HalloweenFacts(commands.Cog):
     async def on_ready(self):
         """Get event Channel object and initialize fact task loop."""
 
-        self.channel = self.bot.get_channel(Hacktoberfest.channel_id)
+        self.channel = self.bot.get_channel(Channels.seasonalbot_chat)
         self.bot.loop.create_task(self._fact_publisher_task())
 
     def random_fact(self):

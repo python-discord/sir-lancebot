@@ -18,7 +18,6 @@ class AdventOfCode:
     leaderboard_join_code = str(environ.get("AOC_JOIN_CODE", None))
     leaderboard_max_displayed_members = 10
     year = 2018
-    channel_id = int(environ.get("AOC_CHANNEL_ID", 517745814039166986))
     role_id = int(environ.get("AOC_ROLE_ID", 518565788744024082))
 
 
@@ -84,12 +83,10 @@ class Emojis:
 
 
 class Lovefest:
-    channel_id = int(environ.get("LOVEFEST_CHANNEL_ID", 542272993192050698))
     role_id = int(environ.get("LOVEFEST_ROLE_ID", 542431903886606399))
 
 
 class Hacktoberfest(NamedTuple):
-    channel_id = 498804484324196362
     voice_id = 514420006474219521
 
 
