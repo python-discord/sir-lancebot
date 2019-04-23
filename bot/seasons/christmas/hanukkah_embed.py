@@ -1,7 +1,6 @@
 import datetime
 import logging
 
-import aiohttp
 from discord import Embed
 from discord.ext import commands
 
