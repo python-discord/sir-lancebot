@@ -36,7 +36,6 @@ class CandyCollection(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         """Randomly adds candy or skull reaction to non-bot messages in the Event channel."""
-
         # make sure its a human message
         if message.author.bot:
             return
@@ -58,7 +57,6 @@ class CandyCollection(commands.Cog):
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
         """Add/remove candies from a person if the reaction satisfies criteria."""
-
         message = reaction.message
         # check to ensure the reactor is human
         if user.bot:
@@ -110,7 +108,6 @@ class CandyCollection(commands.Cog):
         This event has a higher probability of occurring than a reaction add to a message without an
         existing reaction.
         """
-
         if random.randint(1, ADD_SKULL_EXISTING_REACTION_CHANCE) == 1:
             d = {"reaction": '\N{SKULL}', "msg_id": message.id, "won": False}
             self.msg_reacted.append(d)
@@ -123,7 +120,6 @@ class CandyCollection(commands.Cog):
 
     async def ten_recent_msg(self):
         """Get the last 10 messages sent in the channel."""
-
         ten_recent = []
         recent_msg = max(message.id for message
                          in self.bot._connection._messages
@@ -141,7 +137,6 @@ class CandyCollection(commands.Cog):
 
     async def get_message(self, msg_id):
         """Get the message from its ID."""
-
         try:
             o = discord.Object(id=msg_id + 1)
             # Use history rather than get_message due to
@@ -158,12 +153,10 @@ class CandyCollection(commands.Cog):
 
     async def hacktober_channel(self):
         """Get #hacktoberbot channel from its ID."""
-
         return self.bot.get_channel(id=Hacktoberfest.channel_id)
 
     async def remove_reactions(self, reaction):
         """Remove all candy/skull reactions."""
-
         try:
             async for user in reaction.users():
                 await reaction.message.remove_reaction(reaction.emoji, user)
@@ -173,7 +166,6 @@ class CandyCollection(commands.Cog):
 
     async def send_spook_msg(self, author, channel, candies):
         """Send a spooky message."""
-
         e = discord.Embed(colour=author.colour)
         e.set_author(name="Ghosts and Ghouls and Jack o' lanterns at night; "
                           f"I took {candies} candies and quickly took flight.")
@@ -181,15 +173,13 @@ class CandyCollection(commands.Cog):
 
     def save_to_json(self):
         """Save JSON to a local file."""
-
         with open(json_location, 'w') as outfile:
             json.dump(self.candy_json, outfile)
 
     @commands.command()
     async def candy(self, ctx):
         """Get the candy leaderboard and save to JSON."""
-
-        # use run_in_executor to prevent blocking
+        # Use run_in_executor to prevent blocking
         thing = functools.partial(self.save_to_json)
         await self.bot.loop.run_in_executor(None, thing)
 
@@ -225,6 +215,5 @@ class CandyCollection(commands.Cog):
 
 def setup(bot):
     """Candy Collection game Cog load."""
-
     bot.add_cog(CandyCollection(bot))
     log.info("CandyCollection cog loaded")

@@ -27,7 +27,6 @@ class CommandErrorHandler(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         """Activates when a command opens an error."""
-
         if hasattr(ctx.command, 'on_error'):
             return logging.debug(
                 "A command error occured but the command had it's own error handler."
@@ -101,6 +100,5 @@ class CommandErrorHandler(commands.Cog):
 
 def setup(bot):
     """Error handler Cog load."""
-
     bot.add_cog(CommandErrorHandler(bot))
     log.info("CommandErrorHandler cog loaded")

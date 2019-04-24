@@ -41,7 +41,6 @@ class EggheadQuiz(commands.Cog):
 
         Also informs of the percentages and votes of each option
         """
-
         random_question = random.choice(EGGHEAD_QUESTIONS)
         question, answers = random_question["question"], random_question["answers"]
         answers = [(EMOJIS[i], a) for i, a in enumerate(answers)]
@@ -69,7 +68,7 @@ class EggheadQuiz(commands.Cog):
         total_no = sum([len(await r.users().flatten()) for r in msg.reactions]) - len(valid_emojis)  # - bot's reactions
 
         if total_no == 0:
-            return await msg.delete()  # to avoid ZeroDivisionError if nobody reacts
+            return await msg.delete()  # To avoid ZeroDivisionError if nobody reacts
 
         results = ["**VOTES:**"]
         for emoji, _ in answers:
@@ -115,7 +114,6 @@ class EggheadQuiz(commands.Cog):
 
 
 def setup(bot):
-    """Cog load."""
-
+    """Egghead Quiz Cog load."""
     bot.add_cog(EggheadQuiz(bot))
     log.info("EggheadQuiz bot loaded")
