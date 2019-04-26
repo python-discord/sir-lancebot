@@ -55,7 +55,7 @@ class EasterRiddle(commands.Cog):
             title=f"Here's a hint: {hints[1]}!",
             colour=Colours.pink
         )
-        
+
         await ctx.send(embed=h_embed)
         await asyncio.sleep(TIMELIMIT)
 
@@ -77,12 +77,10 @@ class EasterRiddle(commands.Cog):
     async def on_message(self, message):
         if self.bot.user != message.author:
             if message.content.lower() == self.correct.lower():
-                self.winner = self.winner +  message.author.mention + " "
-
+                self.winner = self.winner + message.author.mention + " "
 
 
 def setup(bot):
     """Cog load."""
-
     bot.add_cog(EasterRiddle(bot))
     log.info("Easter Riddle bot loaded")
