@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 with open(Path('bot', 'resources', 'easter', 'easter_riddle.json'), 'r', encoding="utf8") as f:
     RIDDLE_QUESTIONS = load(f)
 
-TIMELIMIT = 10
+TIMELIMIT = 20
 
 
 class EasterRiddle(commands.Cog):
@@ -24,6 +24,7 @@ class EasterRiddle(commands.Cog):
         self.bot = bot
         self.quiz_messages = {}
         self.mention = " "
+        self.correct = ""
 
     @commands.command(aliases=["riddlemethis", "riddleme"])
     async def riddle(self, ctx):
@@ -60,7 +61,7 @@ class EasterRiddle(commands.Cog):
         await asyncio.sleep(TIMELIMIT)
         """
 
-        content = f"Well done {mention} for getting it correct!" if mention else "Nobody got it right..."
+        content = f"Well done {self.mention} for getting it correct!" if self.mention else "Nobody got it right..."
 
         a_embed = discord.Embed(
             title=f"The answer is: {correct}!",
@@ -71,7 +72,7 @@ class EasterRiddle(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.lower() == self.correct.lower():
+        if message.content.lower() == self.correct.lower():
             self.mention = message.author
 
 
