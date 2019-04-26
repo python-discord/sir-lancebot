@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 with open(Path('bot', 'resources', 'easter', 'easter_riddle.json'), 'r', encoding="utf8") as f:
     RIDDLE_QUESTIONS = load(f)
 
-TIMELIMIT = 20
+TIMELIMIT = 10
 
 
 class EasterRiddle(commands.Cog):
@@ -23,7 +23,7 @@ class EasterRiddle(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.quiz_messages = {}
-        self.mention = " "
+        self.winner = " "
         self.correct = ""
 
     @commands.command(aliases=["riddlemethis", "riddleme"])
@@ -34,7 +34,7 @@ class EasterRiddle(commands.Cog):
         """
         random_question = random.choice(RIDDLE_QUESTIONS)
         question, hints = random_question["question"], random_question["riddles"]
-        correct = random_question["correct_answer"]
+        self.correct = random_question["correct_answer"]
 
         description = f"You have {TIMELIMIT} seconds before the first hint.\n\n"
 
@@ -43,7 +43,6 @@ class EasterRiddle(commands.Cog):
         await ctx.send(embed=q_embed)
         await asyncio.sleep(TIMELIMIT)
 
-        """
         h_embed = discord.Embed(
             title=f"Here's a hint: {hints[0]}!",
             colour=Colours.pink
@@ -59,21 +58,25 @@ class EasterRiddle(commands.Cog):
         
         await ctx.send(embed=h_embed)
         await asyncio.sleep(TIMELIMIT)
-        """
 
-        content = f"Well done {self.mention} for getting it correct!" if self.mention else "Nobody got it right..."
+        if self.winner != " ":
+            content = "Well done " + self.winner + " for getting it correct!"
+        else:
+            content = "Nobody got it right..."
 
         a_embed = discord.Embed(
-            title=f"The answer is: {correct}!",
+            title=f"The answer is: {self.correct}!",
             colour=Colours.pink
         )
 
         await ctx.send(content, embed=a_embed)
 
+        self.winner = " "
+
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.content.lower() == self.correct.lower():
-            self.mention = message.author
+            self.winner = message.author.mention
 
 
 
