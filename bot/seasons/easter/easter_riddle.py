@@ -60,7 +60,7 @@ class EasterRiddle(commands.Cog):
         await asyncio.sleep(TIMELIMIT)
 
         if self.winner != " ":
-            content = "Well done " + self.winner + " for getting it correct!"
+            content = "Well done " + self.winner + "for getting it correct!"
         else:
             content = "Nobody got it right..."
 
@@ -75,8 +75,9 @@ class EasterRiddle(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.content.lower() == self.correct.lower():
-            self.winner = message.author.mention
+        if self.bot.user != message.author:
+            if message.content.lower() == self.correct.lower():
+                self.winner = self.winner +  message.author.mention + " "
 
 
 

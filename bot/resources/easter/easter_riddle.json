@@ -2,15 +2,15 @@
   {
       "question": "What kind of music do bunnies like?",
       "riddles": [
-            "two words",
-            "jump to the beat"
+            "Two words",
+            "Jump to the beat"
         ],
       "correct_answer": "Hip hop"
   },
   {
       "question": "What kind of jewelry do rabbits wear?",
       "riddles": [
-            "they can eat it too",
+            "They can eat it too",
             "14 ___ gold"
         ],
       "correct_answer": "14 carrot gold"
@@ -59,7 +59,7 @@
       "question": "What kind of bunny can't hop?",
       "riddles": [
             "Might melt in the sun",
-            "Fragile and Yummy"
+            "Fragile and yummy"
         ],
       "correct_answer": "A chocolate one"
   },
@@ -74,8 +74,8 @@
   {
       "question": "Why did the Easter Bunny have to fire the duck?",
       "riddles": [
-            "quack",
-            "MY EGGS!!!"
+            "Quack",
+            "MY EGGS!!"
         ],
       "correct_answer": "He kept quacking the eggs"
   }
