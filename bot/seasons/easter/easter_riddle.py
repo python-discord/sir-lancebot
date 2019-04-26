@@ -23,6 +23,7 @@ class EasterRiddle(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.quiz_messages = {}
+        self.mention = " "
 
     @commands.command(aliases=["riddlemethis", "riddleme"])
     async def riddle(self, ctx):
@@ -38,30 +39,41 @@ class EasterRiddle(commands.Cog):
 
         q_embed = discord.Embed(title=question, description=description, colour=Colours.pink)
 
-        msg = await ctx.send(embed=q_embed)
+        await ctx.send(embed=q_embed)
         await asyncio.sleep(TIMELIMIT)
 
         """
-        a_embed = discord.Embed(
+        h_embed = discord.Embed(
             title=f"Here's a hint: {hints[0]}!",
             colour=Colours.pink
         )
 
-        msg = await ctx.send(embed=q_embed)
+        await ctx.send(embed=h_embed)
         await asyncio.sleep(TIMELIMIT)
 
-        a_embed = discord.Embed(
-            title=f"Here's a hint: {hints[0]}!",
+        h_embed = discord.Embed(
+            title=f"Here's a hint: {hints[1]}!",
             colour=Colours.pink
         )
+        
+        await ctx.send(embed=h_embed)
+        await asyncio.sleep(TIMELIMIT)
         """
+
+        content = f"Well done {mention} for getting it correct!" if mention else "Nobody got it right..."
 
         a_embed = discord.Embed(
             title=f"The answer is: {correct}!",
             colour=Colours.pink
         )
 
-        await ctx.send(embed=a_embed)
+        await ctx.send(content, embed=a_embed)
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.lower() == self.correct.lower():
+            self.mention = message.author
+
 
 
 def setup(bot):
