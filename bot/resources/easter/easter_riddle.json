@@ -21,7 +21,7 @@
             "KOBE!",
             "1+1 = ?"
         ],
-      "correct_answer": "2 points!"
+      "correct_answer": "2 points"
   },
   {
       "question": "Where does the easter bunny eat breakfast?",
@@ -45,7 +45,7 @@
             "2nd place?",
             "Who beat her?"
         ],
-      "correct_answer": "Because an egg beater!"
+      "correct_answer": "Because an egg beater"
   },
   {
       "question": "What happened to the Easter Bunny when he misbehaved at school?",
@@ -53,7 +53,7 @@
             "Won't be back anymore",
             "Worse than suspension"
         ],
-      "correct_answer": "He was eggspelled."
+      "correct_answer": "He was eggspelled"
   },
   {
       "question": "What kind of bunny can't hop?",
@@ -61,7 +61,7 @@
             "Might melt in the sun",
             "Fragile and Yummy"
         ],
-      "correct_answer": "A chocolate one!"
+      "correct_answer": "A chocolate one"
   },
   {
       "question": "Where does the Easter Bunny get his eggs?",
@@ -77,6 +77,6 @@
             "quack",
             "MY EGGS!!!"
         ],
-      "correct_answer": "He kept quacking the eggs!"
+      "correct_answer": "He kept quacking the eggs"
   }
 ]
