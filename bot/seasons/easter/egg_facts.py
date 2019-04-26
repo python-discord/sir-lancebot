@@ -57,7 +57,7 @@ class EasterFacts(commands.Cog):
 
 
 def setup(bot):
-    """EasterEgg facts loaded."""
+    """Easter Egg facts loaded."""
 
     bot.loop.create_task(EasterFacts(bot).send_egg_fact_daily())
     bot.add_cog(EasterFacts(bot))
