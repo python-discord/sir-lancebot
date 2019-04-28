@@ -1,11 +1,10 @@
-import random
 import json
 import logging
+import random
 import re
-
-from discord.ext import commands
 from pathlib import Path
 
+from discord.ext import commands
 
 log = logging.getLogger(__name__)
 
@@ -41,8 +40,8 @@ class BunnyNameGenerator(commands.Cog):
 
         def find_spaces(displayname):
             """
-            Check if Discord name contains spaces so we can bunnify
-            an individual word in the name.
+            Check if Discord name contains spaces so we can bunnify an individual word in the name.
+
             Spaces should not be bunnified so we remove them from
             the list that is returned from the pattern matching.
             """
@@ -55,6 +54,8 @@ class BunnyNameGenerator(commands.Cog):
 
         def find_vowels(displayname):
             """
+            Finds vowels in the user's display name.
+
             If the Discord name contains a vowel and the letter y,
             it will match one or more of these patterns.
             Only the most recently matched pattern will apply the changes.
