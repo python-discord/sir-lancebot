@@ -79,8 +79,6 @@ class BunnyNameGenerator(commands.Cog):
             if option5 != displayname:
                 new_name = option5
 
-            print(new_name)
-
             return new_name
 
         def append_name(displayname):
