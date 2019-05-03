@@ -19,9 +19,7 @@ class BunnyNameGenerator(commands.Cog):
         self.bot = bot
 
     def find_separators(self, displayname):
-        """
-        Check if Discord name contains spaces so we can bunnify an individual word in the name.
-        """
+        """Check if Discord name contains spaces so we can bunnify an individual word in the name."""
 
         new_name = re.split(r'[_.\s]', str(displayname))
         if displayname not in new_name:
