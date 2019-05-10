@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-discord-py = {ref = "42a7c4f",git = "https://github.com/Rapptz/discord.py",editable = true}
+discord-py = {ref = "43b4475",git = "https://github.com/Rapptz/discord.py",editable = true}
 arrow = "*"
 beautifulsoup4 = "*"
 aiodns = "*"
@@ -20,6 +20,7 @@ fuzzywuzzy = "*"
 "flake8-todo" = "*"
 "flake8-string-format" = "*"
 pre-commit = "*"
+flake8-docstrings = "*"
 
 [requires]
 python_version = "3.7"

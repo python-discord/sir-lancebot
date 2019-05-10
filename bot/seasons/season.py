@@ -17,11 +17,11 @@ from bot.decorators import with_role
 
 log = logging.getLogger(__name__)
 
+ICON_BASE_URL = "https://raw.githubusercontent.com/python-discord/branding/master"
+
 
 def get_seasons() -> List[str]:
-    """
-    Returns all the Season objects located in bot/seasons/
-    """
+    """Returns all the Season objects located in /bot/seasons/."""
 
     seasons = []
 
@@ -32,9 +32,7 @@ def get_seasons() -> List[str]:
 
 
 def get_season_class(season_name: str) -> Type["SeasonBase"]:
-    """
-    Get's the season class of the season module.
-    """
+    """Gets the season class of the season module."""
 
     season_lib = importlib.import_module(f"bot.seasons.{season_name}")
     class_name = season_name.replace("_", " ").title().replace(" ", "")
@@ -42,9 +40,7 @@ def get_season_class(season_name: str) -> Type["SeasonBase"]:
 
 
 def get_season(season_name: str = None, date: datetime.datetime = None) -> "SeasonBase":
-    """
-    Returns a Season object based on either a string or a date.
-    """
+    """Returns a Season object based on either a string or a date."""
 
     # If either both or neither are set, raise an error.
     if not bool(season_name) ^ bool(date):
@@ -78,9 +74,7 @@ def get_season(season_name: str = None, date: datetime.datetime = None) -> "Seas
 
 
 class SeasonBase:
-    """
-    Base class for Seasonal classes.
-    """
+    """Base class for Seasonal classes."""
 
     name: Optional[str] = "evergreen"
     bot_name: str = "SeasonalBot"
@@ -96,9 +90,7 @@ class SeasonBase:
 
     @staticmethod
     def current_year() -> int:
-        """
-        Returns the current year.
-        """
+        """Returns the current year."""
 
         return datetime.date.today().year
 
@@ -107,8 +99,7 @@ class SeasonBase:
         """
         Returns the start date using current year and start_date attribute.
 
-        If no start_date was defined, returns the minimum datetime to ensure
-        it's always below checked dates.
+        If no start_date was defined, returns the minimum datetime to ensure it's always below checked dates.
         """
 
         if not cls.start_date:
@@ -120,8 +111,7 @@ class SeasonBase:
         """
         Returns the start date using current year and end_date attribute.
 
-        If no end_date was defined, returns the minimum datetime to ensure
-        it's always above checked dates.
+        If no end_date was defined, returns the minimum datetime to ensure it's always above checked dates.
         """
 
         if not cls.end_date:
@@ -130,53 +120,52 @@ class SeasonBase:
 
     @classmethod
     def is_between_dates(cls, date: datetime.datetime) -> bool:
-        """
-        Determines if the given date falls between the season's date range.
-        """
+        """Determines if the given date falls between the season's date range."""
 
         return cls.start() <= date <= cls.end()
 
     @property
     def name_clean(self) -> str:
+        """Return the Season's name with underscores replaced by whitespace."""
+
         return self.name.replace("_", " ").title()
 
     @property
     def greeting(self) -> str:
         """
-        Provides a default greeting based on the season name if one wasn't
-        defined in the season class.
+        Provides a default greeting based on the season name if one wasn't defined in the season class.
 
-        It's recommended to define one in most cases by overwriting this as a
-        normal attribute in the inhertiting class.
+        It's recommended to define one in most cases by overwriting this as a normal attribute in the
+        inheriting class.
         """
 
         return f"New Season, {self.name_clean}!"
 
     async def get_icon(self, avatar: bool = False) -> bytes:
         """
-        Retrieves the icon image from the branding repository, using the
-        defined icon attribute for the season. If `avatar` is True, uses
-        optional bot-only avatar icon if present.
+        Retrieve the season's icon from the branding repository using the Season's icon attribute.
 
-        The icon attribute must provide the url path, starting from the master
-        branch base url, including the starting slash:
-        `https://raw.githubusercontent.com/python-discord/branding/master`
+        If `avatar` is True, uses optional bot-only avatar icon if present.
+
+        The icon attribute must provide the url path, starting from the master branch base url,
+        including the starting slash.
+        e.g. `/logos/logo_seasonal/valentines/loved_up.png`
         """
 
-        base_url = "https://raw.githubusercontent.com/python-discord/branding/master"
         if avatar:
             icon = self.bot_icon or self.icon
         else:
             icon = self.icon
-        full_url = base_url + icon
+        full_url = ICON_BASE_URL + icon
         log.debug(f"Getting icon from: {full_url}")
         async with bot.http_session.get(full_url) as resp:
             return await resp.read()
 
     async def apply_username(self, *, debug: bool = False) -> Union[bool, None]:
         """
-        Applies the username for the current season. Only changes nickname if
-        `bool` is False, otherwise only changes the nickname.
+        Applies the username for the current season.
+
+        Only changes nickname if `bool` is False, otherwise only changes the nickname.
 
         Returns True if it successfully changed the username.
         Returns False if it failed to change the username, falling back to nick.
@@ -216,7 +205,9 @@ class SeasonBase:
 
     async def apply_avatar(self) -> bool:
         """
-        Applies the avatar for the current season. Returns if it was successful.
+        Applies the avatar for the current season.
+
+        Returns True if successful.
         """
 
         # track old avatar hash for later comparison
@@ -238,7 +229,9 @@ class SeasonBase:
 
     async def apply_server_icon(self) -> bool:
         """
-        Applies the server icon for the current season. Returns if it was successful.
+        Applies the server icon for the current season.
+
+        Returns True if was successful.
         """
 
         guild = bot.get_guild(Client.guild)
@@ -265,8 +258,7 @@ class SeasonBase:
         """
         Announces a change in season in the announcement channel.
 
-        It will skip the announcement if the current active season is the
-        "evergreen" default season.
+        It will skip the announcement if the current active season is the "evergreen" default season.
         """
 
         # don't actually announce if reverting to normal season
@@ -278,7 +270,21 @@ class SeasonBase:
         channel = guild.get_channel(Channels.announcements)
         mention = f"<@&{Roles.announcements}>"
 
-        # collect seasonal cogs
+        # build cog info output
+        doc = inspect.getdoc(self)
+        announce = "\n\n".join(l.replace("\n", " ") for l in doc.split("\n\n"))
+
+        # no announcement message found
+        if not doc:
+            return
+
+        embed = discord.Embed(description=f"{announce}\n\n", colour=self.colour or guild.me.colour)
+        embed.set_author(name=self.greeting)
+
+        if self.icon:
+            embed.set_image(url=ICON_BASE_URL+self.icon)
+
+        # find any seasonal commands
         cogs = []
         for cog in bot.cogs.values():
             if "evergreen" in cog.__module__:
@@ -287,30 +293,21 @@ class SeasonBase:
             if cog_name != "SeasonManager":
                 cogs.append(cog_name)
 
-        # no cogs, so no seasonal commands
-        if not cogs:
-            return
+        if cogs:
+            def cog_name(cog):
+                return type(cog).__name__
 
-        # build cog info output
-        doc = inspect.getdoc(self)
-        announce_text = doc + "\n\n" if doc else ""
+            cog_info = []
+            for cog in sorted(cogs, key=cog_name):
+                doc = inspect.getdoc(bot.get_cog(cog))
+                if doc:
+                    cog_info.append(f"**{cog}**\n*{doc}*")
+                else:
+                    cog_info.append(f"**{cog}**")
 
-        def cog_name(cog):
-            return type(cog).__name__
-
-        cog_info = []
-        for cog in sorted(cogs, key=cog_name):
-            doc = inspect.getdoc(bot.get_cog(cog))
-            if doc:
-                cog_info.append(f"**{cog}**\n*{doc}*")
-            else:
-                cog_info.append(f"**{cog}**")
-
-        embed = discord.Embed(description=announce_text, colour=self.colour or guild.me.colour)
-        embed.set_author(name=self.greeting)
-        cogs_text = "\n".join(cog_info)
-        embed.add_field(name="New Command Categories", value=cogs_text)
-        embed.set_footer(text="To see the new commands, use .help Category")
+            cogs_text = "\n".join(cog_info)
+            embed.add_field(name="New Command Categories", value=cogs_text)
+            embed.set_footer(text="To see the new commands, use .help Category")
 
         await channel.send(mention, embed=embed)
 
@@ -353,9 +350,7 @@ class SeasonBase:
 
 
 class SeasonManager(commands.Cog):
-    """
-    A cog for managing seasons.
-    """
+    """A cog for managing seasons."""
 
     def __init__(self, bot):
         self.bot = bot
@@ -375,6 +370,8 @@ class SeasonManager(commands.Cog):
         self.sleep_time = (midnight - datetime.datetime.now()).seconds + 60
 
     async def load_seasons(self):
+        """Asynchronous timer loop to check for a new season every midnight."""
+
         await self.bot.wait_until_ready()
         await self.season.load()
 
@@ -390,9 +387,7 @@ class SeasonManager(commands.Cog):
     @with_role(Roles.moderator, Roles.admin, Roles.owner)
     @commands.command(name="season")
     async def change_season(self, ctx, new_season: str):
-        """
-        Changes the currently active season on the bot.
-        """
+        """Changes the currently active season on the bot."""
 
         self.season = get_season(season_name=new_season)
         await self.season.load()
@@ -401,9 +396,7 @@ class SeasonManager(commands.Cog):
     @with_role(Roles.moderator, Roles.admin, Roles.owner)
     @commands.command(name="seasons")
     async def show_seasons(self, ctx):
-        """
-        Shows the available seasons and their dates.
-        """
+        """Shows the available seasons and their dates."""
 
         # sort by start order, followed by lower duration
         def season_key(season_class: Type[SeasonBase]):
@@ -447,17 +440,13 @@ class SeasonManager(commands.Cog):
     @with_role(Roles.moderator, Roles.admin, Roles.owner)
     @commands.group()
     async def refresh(self, ctx):
-        """
-        Refreshes certain seasonal elements without reloading seasons.
-        """
+        """Refreshes certain seasonal elements without reloading seasons."""
         if not ctx.invoked_subcommand:
             await ctx.invoke(bot.get_command("help"), "refresh")
 
     @refresh.command(name="avatar")
     async def refresh_avatar(self, ctx):
-        """
-        Re-applies the bot avatar for the currently loaded season.
-        """
+        """Re-applies the bot avatar for the currently loaded season."""
 
         # attempt the change
         is_changed = await self.season.apply_avatar()
@@ -481,9 +470,7 @@ class SeasonManager(commands.Cog):
 
     @refresh.command(name="icon")
     async def refresh_server_icon(self, ctx):
-        """
-        Re-applies the server icon for the currently loaded season.
-        """
+        """Re-applies the server icon for the currently loaded season."""
 
         # attempt the change
         is_changed = await self.season.apply_server_icon()
@@ -507,9 +494,7 @@ class SeasonManager(commands.Cog):
 
     @refresh.command(name="username", aliases=("name",))
     async def refresh_username(self, ctx):
-        """
-        Re-applies the bot username for the currently loaded season.
-        """
+        """Re-applies the bot username for the currently loaded season."""
 
         old_username = str(bot.user)
         old_display_name = ctx.guild.me.display_name
@@ -549,10 +534,11 @@ class SeasonManager(commands.Cog):
     @with_role(Roles.moderator, Roles.admin, Roles.owner)
     @commands.command()
     async def announce(self, ctx):
-        """
-        Announces the currently loaded season.
-        """
+        """Announces the currently loaded season."""
+
         await self.season.announce_season()
 
-    def __unload(self):
+    def cog_unload(self):
+        """Cancel season-related tasks on cog unload."""
+
         self.season_task.cancel()
