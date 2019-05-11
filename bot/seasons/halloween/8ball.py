@@ -1,4 +1,5 @@
 import asyncio
+import discord
 import json
 import logging
 import random
@@ -13,27 +14,29 @@ with open(Path('bot', 'resources', 'halloween', 'responses.json'), 'r', encoding
 
 
 class EightBall(commands.Cog):
-    """Spooky Eightball - upon use of the command the user receives a randomised response to their question!"""
+    """Spooky Eightball answers."""
 
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(aliases=('spooky8ball',))
-    async def spookyeightball(self, ctx, question: str):
+    async def spookyeightball(self, ctx, *, question: str):
         """Responds with a random response to a question."""
-
-        choice = random.choice(responses)
+        choice = random.choice(responses['responses'])
         if len(choice) == 1:
             await ctx.send(choice[0])
         else:
-            for x in choice:
-                await ctx.send(x)
-                asyncio.sleep(random.randint(2, 5))
-                await ctx.send(x)
+            emb = discord.Embed(colour=0x00f2ff)
+            emb.add_field(name=f'Question from {ctx.author.name}', value=question)
+            emb.add_field(name='Answer', value=choice[0])
+            msg = await ctx.send(embed=emb)
+            await asyncio.sleep(random.randint(2, 5))
+            emb.set_field_at(1, name='Answer', value=f'{choice[0]} \n {choice[1]}')
+            await msg.edit(embed=emb)
 
 
 def setup(bot):
-    """Conversation starters Cog load."""
+    """Spooky Eight Ball Cog Load."""
 
     bot.add_cog(EightBall(bot))
     log.info("8Ball cog loaded")
