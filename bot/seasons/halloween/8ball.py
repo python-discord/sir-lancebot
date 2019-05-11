@@ -13,7 +13,7 @@ with open(Path('bot', 'resources', 'halloween', 'responses.json'), 'r', encoding
     responses = json.load(f)
 
 
-class EightBall(commands.Cog):
+class SpookyEightBall(commands.Cog):
     """Spooky Eightball answers."""
 
     def __init__(self, bot):
