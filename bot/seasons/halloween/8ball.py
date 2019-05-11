@@ -39,4 +39,4 @@ def setup(bot):
     """Spooky Eight Ball Cog Load."""
 
     bot.add_cog(SpookyEightBall(bot))
-    log.info("8Ball cog loaded")
+    log.info("SpookyEightBall cog loaded")
