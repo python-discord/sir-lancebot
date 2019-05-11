@@ -1,10 +1,10 @@
 import asyncio
-import discord
 import json
 import logging
 import random
 from pathlib import Path
 
+import discord
 from discord.ext import commands
 
 log = logging.getLogger(__name__)
