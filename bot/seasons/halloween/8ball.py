@@ -23,16 +23,10 @@ class SpookyEightBall(commands.Cog):
     async def spookyeightball(self, ctx, *, question: str):
         """Responds with a random response to a question."""
         choice = random.choice(responses['responses'])
-        if len(choice) == 1:
-            await ctx.send(choice[0])
-        else:
-            emb = discord.Embed(colour=0x00f2ff)
-            emb.add_field(name=f'Question from {ctx.author.name}', value=question)
-            emb.add_field(name='Answer', value=choice[0])
-            msg = await ctx.send(embed=emb)
+        msg = await ctx.send(choice[0])
+        if len(choice) > 1:
             await asyncio.sleep(random.randint(2, 5))
-            emb.set_field_at(1, name='Answer', value=f'{choice[0]} \n {choice[1]}')
-            await msg.edit(embed=emb)
+            await msg.edit(content=f"{choice[0]} \n{choice[1]}")
 
 
 def setup(bot):
