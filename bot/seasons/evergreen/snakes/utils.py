@@ -488,8 +488,7 @@ class SnakeAndLaddersGame:
         """
         Handle players joining the game.
 
-        Prevent player joining if they have already cccccckgctrfebkrntucrvrktivvefvdjvnnniiehbde
-        joined, if the game is full, or if the game is
+        Prevent player joining if they have already joined, if the game is full, or if the game is
         in a waiting state.
         """
 
