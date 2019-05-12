@@ -8,7 +8,6 @@ from itertools import product
 from pathlib import Path
 from typing import List, Tuple
 
-import aiohttp
 from PIL import Image
 from PIL.ImageDraw import ImageDraw
 from discord import File, Member, Reaction
@@ -480,18 +479,17 @@ class SnakeAndLaddersGame:
     async def _add_player(self, user: Member):
         self.players.append(user)
         self.player_tiles[user.id] = 1
-        avatar_url = user.avatar_url_as(format='jpeg', size=PLAYER_ICON_IMAGE_SIZE)
-        async with aiohttp.ClientSession() as session:
-            async with session.get(avatar_url) as res:
-                avatar_bytes = await res.read()
-                im = Image.open(io.BytesIO(avatar_bytes)).resize((BOARD_PLAYER_SIZE, BOARD_PLAYER_SIZE))
-                self.avatar_images[user.id] = im
+
+        avatar_bytes = await user.avatar_url_as(format='jpeg', size=PLAYER_ICON_IMAGE_SIZE).read()
+        im = Image.open(io.BytesIO(avatar_bytes)).resize((BOARD_PLAYER_SIZE, BOARD_PLAYER_SIZE))
+        self.avatar_images[user.id] = im
 
     async def player_join(self, user: Member):
         """
         Handle players joining the game.
 
-        Prevent player joining if they have already joined, if the game is full, or if the game is
+        Prevent player joining if they have already cccccckgctrfebkrntucrvrktivvefvdjvnnniiehbde
+        joined, if the game is full, or if the game is
         in a waiting state.
         """
 
