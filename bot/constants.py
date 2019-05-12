@@ -18,7 +18,6 @@ class AdventOfCode:
     leaderboard_join_code = str(environ.get("AOC_JOIN_CODE", None))
     leaderboard_max_displayed_members = 10
     year = 2018
-    channel_id = int(environ.get("AOC_CHANNEL_ID", 517745814039166986))
     role_id = int(environ.get("AOC_ROLE_ID", 518565788744024082))
 
 
@@ -61,13 +60,14 @@ class Client(NamedTuple):
 
 
 class Colours:
-    yellow = 0xf9f586
-    soft_red = 0xcd6d6d
-    soft_green = 0x68c290
+    blue = 0x0279fd
     bright_green = 0x01d277
     dark_green = 0x1f8b4c
     orange = 0xe67e22
     pink = 0xcf84e0
+    soft_green = 0x68c290
+    soft_red = 0xcd6d6d
+    yellow = 0xf9f586
 
 
 class Emojis:
@@ -84,12 +84,10 @@ class Emojis:
 
 
 class Lovefest:
-    channel_id = int(environ.get("LOVEFEST_CHANNEL_ID", 542272993192050698))
     role_id = int(environ.get("LOVEFEST_ROLE_ID", 542431903886606399))
 
 
 class Hacktoberfest(NamedTuple):
-    channel_id = 498804484324196362
     voice_id = 514420006474219521
 
 
