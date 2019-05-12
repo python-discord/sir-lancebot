@@ -132,7 +132,7 @@ class AdventOfCode(commands.Cog):
     async def adventofcode_group(self, ctx: commands.Context):
         """All of the Advent of Code commands."""
 
-        await ctx.invoke(self.bot.get_command("help"), "adventofcode")
+        await ctx.send_help(ctx.command)
 
     @adventofcode_group.command(
         name="subscribe",

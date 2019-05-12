@@ -10,7 +10,7 @@ aiodns = "*"
 pillow = "*"
 pytz = "*"
 fuzzywuzzy = "*"
-discord-py = "==1.1"
+discord-py = "~=1.1"
 
 [dev-packages]
 "flake8" = "*"
