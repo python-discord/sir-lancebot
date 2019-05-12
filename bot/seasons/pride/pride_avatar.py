@@ -105,13 +105,11 @@ class PrideAvatar(commands.Cog):
             avatar = Image.open(BytesIO(image_bytes))
             avatar = avatar.convert("RGBA").resize((1024, 1024))
 
-            print(avatar.size)
-
             avatar = self.crop_avatar(avatar)
 
             ring = Image.open(Path("bot", "resources", "pride", "flags", f"{flag}.png")).resize((1024, 1024))
             ring = self.crop_ring(ring, pixels)
-            print(ring.size)
+
             avatar.alpha_composite(ring, (0, 0))
             bufferedio = BytesIO()
             avatar.save(bufferedio, format="PNG")
