@@ -18,6 +18,7 @@ class AdventOfCode:
     leaderboard_join_code = str(environ.get("AOC_JOIN_CODE", None))
     leaderboard_max_displayed_members = 10
     year = 2018
+    channel_id = int(environ.get("AOC_CHANNEL_ID", 517745814039166986))
     role_id = int(environ.get("AOC_ROLE_ID", 518565788744024082))
 
 
@@ -28,7 +29,7 @@ class Channels(NamedTuple):
     bot = 267659945086812160
     checkpoint_test = 422077681434099723
     devalerts = 460181980097675264
-    devlog = int(environ.get('CHANNEL_DEVLOG', 548438471685963776))
+    devlog = int(environ.get('CHANNEL_DEVLOG', 409308876241108992))
     devtest = 414574275865870337
     help_0 = 303906576991780866
     help_1 = 303906556754395136
@@ -45,29 +46,27 @@ class Channels(NamedTuple):
     off_topic_2 = 463035268514185226
     python = 267624335836053506
     reddit = 458224812528238616
-    seasonalbot_chat = int(environ.get('CHANNEL_SEASONALBOT_CHAT', 542272993192050698))
     staff_lounge = 464905259261755392
     verification = 352442727016693763
-    python_discussion = 267624335836053506
+    show_your_projects = 303934982764625920
+    show_your_projects_discussion = 360148304664723466
 
 
 class Client(NamedTuple):
     guild = int(environ.get('SEASONALBOT_GUILD', 267624335836053506))
-    prefix = environ.get("PREFIX", ".")
+    prefix = "."
     token = environ.get('SEASONALBOT_TOKEN')
     debug = environ.get('SEASONALBOT_DEBUG', '').lower() == 'true'
     season_override = environ.get('SEASON_OVERRIDE')
 
 
 class Colours:
-    blue = 0x0279fd
+    soft_red = 0xcd6d6d
+    soft_green = 0x68c290
     bright_green = 0x01d277
     dark_green = 0x1f8b4c
     orange = 0xe67e22
     pink = 0xcf84e0
-    soft_green = 0x68c290
-    soft_red = 0xcd6d6d
-    yellow = 0xf9f586
 
 
 class Emojis:
@@ -84,10 +83,12 @@ class Emojis:
 
 
 class Lovefest:
+    channel_id = int(environ.get("LOVEFEST_CHANNEL_ID", 542272993192050698))
     role_id = int(environ.get("LOVEFEST_ROLE_ID", 542431903886606399))
 
 
 class Hacktoberfest(NamedTuple):
+    channel_id = 498804484324196362
     voice_id = 514420006474219521
 
 
