@@ -54,6 +54,7 @@ if root.handlers:
 # Silence irrelevant loggers
 logging.getLogger("discord").setLevel(logging.ERROR)
 logging.getLogger("websockets").setLevel(logging.ERROR)
+logging.getLogger("PIL").setLevel(logging.ERROR)
 
 # Setup new logging configuration
 logging.basicConfig(
