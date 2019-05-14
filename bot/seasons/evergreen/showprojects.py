@@ -19,12 +19,17 @@ class ShowProjects(commands.Cog):
         """Adds reactions to posts in #show-your-projects"""
 
         reactions = ["\U0001f44d", "\U00002764", "\U0001f440", "\U0001f389", "\U0001f680", "\U00002b50", "\U0001f6a9"]
-        if message.channel.id == Channels.show_your_projects and message.author.id != 528937022996611082 \
-                and message.author.id != self.lastPoster:
+        if (message.channel.id == Channels.show_your_projects
+                and message.author.bot is False
+                and message.author.id != self.lastPoster):
             for reaction in reactions:
                 await message.add_reaction(reaction)
 
         self.lastPoster = message.author.id
+
+    @commands.command()
+    async def testcomm(self, ctx):
+        await ctx.send("test")
 
 
 def setup(bot):
