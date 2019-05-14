@@ -27,10 +27,6 @@ class ShowProjects(commands.Cog):
 
         self.lastPoster = message.author.id
 
-    @commands.command()
-    async def testcomm(self, ctx):
-        await ctx.send("test")
-
 
 def setup(bot):
     """Show Projects Reaction Cog"""
