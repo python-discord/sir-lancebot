@@ -34,6 +34,7 @@ class Issues(commands.Cog):
             valid.add_field(name="Description", value=json_data.get("body"), inline=False)
         await ctx.send(embed=valid)
 
+
 def setup(bot):
     """Cog Retrieves Issues From Github"""
 
