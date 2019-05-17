@@ -101,7 +101,7 @@ class PrideAvatar(commands.Cog):
         async with ctx.typing():
 
             # Get avatar bytes
-            image_bytes = ctx.author.avatar_url.read()
+            image_bytes = await ctx.author.avatar_url.read()
             avatar = Image.open(BytesIO(image_bytes))
             avatar = avatar.convert("RGBA").resize((1024, 1024))
 
