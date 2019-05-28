@@ -30,6 +30,5 @@ class SpookyEightBall(commands.Cog):
 
 def setup(bot):
     """Spooky Eight Ball Cog Load."""
-
     bot.add_cog(SpookyEightBall(bot))
     log.info("SpookyEightBall cog loaded")

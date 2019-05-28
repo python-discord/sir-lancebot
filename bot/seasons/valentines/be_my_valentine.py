@@ -40,7 +40,6 @@ class BeMyValentine(commands.Cog):
         1) use the command \".lovefest sub\" to get the lovefest role.
         2) use the command \".lovefest unsub\" to get rid of the lovefest role.
         """
-
         await ctx.send_help(ctx.command)
 
     @lovefest_role.command(name="sub")
