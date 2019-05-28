@@ -69,8 +69,7 @@ class AvatarEasterifier(commands.Cog):
         async with ctx.typing():
 
             # Grabs image of avatar
-            async with self.bot.http_session.get(ctx.author.avatar_url_as(size=256)) as resp:
-                image_bytes = await resp.read()
+            image_bytes = await ctx.author.avatar_url_as(size=256).read()
 
             old = Image.open(BytesIO(image_bytes))
             old = old.convert("RGBA")

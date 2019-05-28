@@ -13,7 +13,7 @@ from bs4 import BeautifulSoup
 from discord.ext import commands
 from pytz import timezone
 
-from bot.constants import AdventOfCode as AocConfig, Colours, Emojis, Tokens
+from bot.constants import AdventOfCode as AocConfig, Channels, Colours, Emojis, Tokens
 
 log = logging.getLogger(__name__)
 
@@ -84,7 +84,7 @@ async def day_countdown(bot: commands.Bot):
 
         await asyncio.sleep(time_left.seconds)
 
-        channel = bot.get_channel(AocConfig.channel_id)
+        channel = bot.get_channel(Channels.seasonalbot_chat)
 
         if not channel:
             log.error("Could not find the AoC channel to send notification in")
@@ -127,7 +127,7 @@ class AdventOfCode(commands.Cog):
     @commands.group(name="adventofcode", aliases=("aoc",), invoke_without_command=True)
     async def adventofcode_group(self, ctx: commands.Context):
         """All of the Advent of Code commands."""
-        await ctx.invoke(self.bot.get_command("help"), "adventofcode")
+        await ctx.send_help(ctx.command)
 
     @adventofcode_group.command(
         name="subscribe",

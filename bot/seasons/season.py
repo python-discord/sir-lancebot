@@ -424,7 +424,7 @@ class SeasonManager(commands.Cog):
     async def refresh(self, ctx):
         """Refreshes certain seasonal elements without reloading seasons."""
         if not ctx.invoked_subcommand:
-            await ctx.invoke(bot.get_command("help"), "refresh")
+            await ctx.send_help(ctx.command)
 
     @refresh.command(name="avatar")
     async def refresh_avatar(self, ctx):

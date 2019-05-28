@@ -8,7 +8,7 @@ import discord
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
 
-from bot.constants import Client, Colours, Lovefest
+from bot.constants import Channels, Client, Colours, Lovefest
 
 log = logging.getLogger(__name__)
 
@@ -40,7 +40,8 @@ class BeMyValentine(commands.Cog):
         1) use the command \".lovefest sub\" to get the lovefest role.
         2) use the command \".lovefest unsub\" to get rid of the lovefest role.
         """
-        await ctx.invoke(self.bot.get_command("help"), "lovefest")
+
+        await ctx.send_help(ctx.command)
 
     @lovefest_role.command(name="sub")
     async def add_role(self, ctx):
@@ -94,7 +95,7 @@ class BeMyValentine(commands.Cog):
 
         emoji_1, emoji_2 = self.random_emoji()
         lovefest_role = discord.utils.get(ctx.guild.roles, id=Lovefest.role_id)
-        channel = self.bot.get_channel(Lovefest.channel_id)
+        channel = self.bot.get_channel(Channels.seasonalbot_chat)
         valentine, title = self.valentine_check(valentine_type)
 
         if user is None:

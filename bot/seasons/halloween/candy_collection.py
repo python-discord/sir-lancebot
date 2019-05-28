@@ -7,7 +7,7 @@ import random
 import discord
 from discord.ext import commands
 
-from bot.constants import Hacktoberfest
+from bot.constants import Channels
 
 log = logging.getLogger(__name__)
 
@@ -40,7 +40,7 @@ class CandyCollection(commands.Cog):
         if message.author.bot:
             return
         # ensure it's hacktober channel
-        if message.channel.id != Hacktoberfest.channel_id:
+        if message.channel.id != Channels.seasonalbot_chat:
             return
 
         # do random check for skull first as it has the lower chance
@@ -63,7 +63,7 @@ class CandyCollection(commands.Cog):
             return
 
         # check to ensure it is in correct channel
-        if message.channel.id != Hacktoberfest.channel_id:
+        if message.channel.id != Channels.seasonalbot_chat:
             return
 
         # if its not a candy or skull, and it is one of 10 most recent messages,
@@ -123,7 +123,7 @@ class CandyCollection(commands.Cog):
         ten_recent = []
         recent_msg = max(message.id for message
                          in self.bot._connection._messages
-                         if message.channel.id == Hacktoberfest.channel_id)
+                         if message.channel.id == Channels.seasonalbot_chat)
 
         channel = await self.hacktober_channel()
         ten_recent.append(recent_msg.id)
@@ -153,7 +153,7 @@ class CandyCollection(commands.Cog):
 
     async def hacktober_channel(self):
         """Get #hacktoberbot channel from its ID."""
-        return self.bot.get_channel(id=Hacktoberfest.channel_id)
+        return self.bot.get_channel(id=Channels.seasonalbot_chat)
 
     async def remove_reactions(self, reaction):
         """Remove all candy/skull reactions."""
