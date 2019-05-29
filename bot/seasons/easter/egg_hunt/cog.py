@@ -157,7 +157,7 @@ class EggMessage:
         if reaction.emoji != self.egg:
             return False
 
-        # Ignore the pushished
+        # Ignore the punished
         if MUTED in user.roles:
             return False
 
