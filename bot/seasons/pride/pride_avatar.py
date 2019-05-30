@@ -108,6 +108,7 @@ class PrideAvatar(commands.Cog):
             avatar = self.crop_avatar(avatar)
 
             ring = Image.open(Path("bot", "resources", "pride", "flags", f"{flag}.png")).resize((1024, 1024))
+            ring = ring.convert("RGBA")
             ring = self.crop_ring(ring, pixels)
 
             avatar.alpha_composite(ring, (0, 0))
