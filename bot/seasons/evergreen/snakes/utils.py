@@ -352,11 +352,12 @@ def create_snek_frame(
     return image
 
 
-def frame_to_png_bytes(image: Image):
+def frame_to_png_bytes(image: Image) -> io.BytesIO:
     """Convert image to byte stream."""
     stream = io.BytesIO()
     image.save(stream, format='PNG')
-    return stream.getvalue()
+    stream.seek(0)
+    return stream
 
 
 log = logging.getLogger(__name__)
