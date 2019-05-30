@@ -458,7 +458,7 @@ class Snakes(Cog):
     async def snakes_group(self, ctx: Context):
         """Commands from our first code jam."""
 
-        await ctx.invoke(self.bot.get_command("help"), "snake")
+        await ctx.send_help(ctx.command)
 
     @bot_has_permissions(manage_messages=True)
     @snakes_group.command(name='antidote')
@@ -1054,13 +1054,6 @@ class Snakes(Cog):
             description=question
         )
         await ctx.channel.send(embed=embed)
-
-    @snakes_group.command(name='help')
-    async def help_command(self, ctx: Context):
-        """Invokes the help command for the Snakes Cog."""
-
-        log.debug(f"{ctx.author} requested info about the snakes cog")
-        return await ctx.invoke(self.bot.get_command("help"), "Snakes")
 
     @snakes_group.command(name='snakify')
     async def snakify_command(self, ctx: Context, *, message: str = None):

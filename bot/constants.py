@@ -49,6 +49,8 @@ class Channels(NamedTuple):
     staff_lounge = 464905259261755392
     verification = 352442727016693763
     python_discussion = 267624335836053506
+    show_your_projects = 303934982764625920
+    show_your_projects_discussion = 360148304664723466
 
 
 class Client(NamedTuple):
