@@ -4,7 +4,7 @@ from bot.seasons import SeasonBase
 class Pride(SeasonBase):
     """
     The month of June is a special month for us at Python Discord.
-    
+
     It is very important to us that everyone feels welcome here, no matter their origin,
     identity or sexuality. During the month of June, while some of you are participating in Pride
     festivals across the world, we will be celebrating individuality and commemorating the history
