@@ -22,7 +22,6 @@ class ScaryMovie(commands.Cog):
     @commands.command(name='scarymovie', alias=['smovie'])
     async def random_movie(self, ctx):
         """Randomly select a scary movie and display information about it."""
-
         async with ctx.typing():
             selection = await self.select_movie()
             movie_details = await self.format_metadata(selection)
@@ -31,8 +30,7 @@ class ScaryMovie(commands.Cog):
 
     @staticmethod
     async def select_movie():
-        """Selects a random movie and returns a json of movie details from TMDb."""
-
+        """Selects a random movie and returns a JSON of movie details from TMDb."""
         url = 'https://api.themoviedb.org/4/discover/movie'
         params = {
             'with_genres': '27',
@@ -65,8 +63,7 @@ class ScaryMovie(commands.Cog):
 
     @staticmethod
     async def format_metadata(movie):
-        """Formats raw TMDb data to be embedded in discord chat."""
-
+        """Formats raw TMDb data to be embedded in Discord chat."""
         # Build the relevant URLs.
         movie_id = movie.get("id")
         poster_path = movie.get("poster_path")
@@ -131,6 +128,5 @@ class ScaryMovie(commands.Cog):
 
 def setup(bot):
     """Scary movie Cog load."""
-
     bot.add_cog(ScaryMovie(bot))
     log.info("ScaryMovie cog loaded")

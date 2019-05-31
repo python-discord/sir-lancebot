@@ -31,12 +31,10 @@ class AvatarEasterifier(commands.Cog):
 
         Returns a merge between the original colour and the closest colour
         """
-
         r1, g1, b1 = x
 
         def distance(point):
             """Finds the difference between a pastel colour and the original pixel colour"""
-
             r2, g2, b2 = point
             return ((r1 - r2)**2 + (g1 - g2)**2 + (b1 - b2)**2)
 
@@ -45,6 +43,7 @@ class AvatarEasterifier(commands.Cog):
         r = (r1 + r2) // 2
         g = (g1 + g2) // 2
         b = (b1 + b2) // 2
+
         return (r, g, b)
 
     @commands.command(pass_context=True, aliases=["easterify"])
@@ -57,7 +56,6 @@ class AvatarEasterifier(commands.Cog):
         Colours are split by spaces, unless you wrap the colour name in double quotes.
         Discord colour names, HTML colour names, XKCD colour names and hex values are accepted.
         """
-
         async def send(*args, **kwargs):
             """
             This replaces the original ctx.send.
@@ -126,7 +124,6 @@ class AvatarEasterifier(commands.Cog):
 
 
 def setup(bot):
-    """Cog load."""
-
+    """Avatar Easterifier Cog load."""
     bot.add_cog(AvatarEasterifier(bot))
     log.info("AvatarEasterifier cog loaded")

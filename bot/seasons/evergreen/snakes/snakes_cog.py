@@ -156,7 +156,6 @@ class Snakes(Cog):
     @staticmethod
     def _beautiful_pastel(hue):
         """Returns random bright pastels."""
-
         light = random.uniform(0.7, 0.85)
         saturation = 1
 
@@ -176,7 +175,6 @@ class Snakes(Cog):
 
         Written by juan and Someone during the first code jam.
         """
-
         snake = Image.open(buffer)
 
         # Get the size of the snake icon, configure the height of the image box (yes, it changes)
@@ -254,7 +252,6 @@ class Snakes(Cog):
     @staticmethod
     def _snakify(message):
         """Sssnakifffiesss a sstring."""
-
         # Replace fricatives with exaggerated snake fricatives.
         simple_fricatives = [
             "f", "s", "z", "h",
@@ -277,7 +274,6 @@ class Snakes(Cog):
 
     async def _fetch(self, session, url, params=None):
         """Asynchronous web request helper method."""
-
         if params is None:
             params = {}
 
@@ -291,7 +287,6 @@ class Snakes(Cog):
 
         Else, just return whatever the last message is.
         """
-
         long_message = random.choice(messages)
         if len(long_message.split()) < 3 and retries > 0:
             return self._get_random_long_message(
@@ -312,7 +307,6 @@ class Snakes(Cog):
         :param name: The name of the snake to get information for - omit for a random snake
         :return: A dict containing information on a snake
         """
-
         snake_info = {}
 
         async with aiohttp.ClientSession() as session:
@@ -327,7 +321,7 @@ class Snakes(Cog):
 
             json = await self._fetch(session, URL, params=params)
 
-            # wikipedia does have a error page
+            # Wikipedia does have a error page
             try:
                 pageid = json["query"]["search"][0]["pageid"]
             except KeyError:
@@ -348,7 +342,7 @@ class Snakes(Cog):
 
             json = await self._fetch(session, URL, params=params)
 
-            # constructing dict - handle exceptions later
+            # Constructing dict - handle exceptions later
             try:
                 snake_info["title"] = json["query"]["pages"][f"{pageid}"]["title"]
                 snake_info["extract"] = json["query"]["pages"][f"{pageid}"]["extract"]
@@ -380,7 +374,7 @@ class Snakes(Cog):
                 ]
 
                 for image in snake_info["images"]:
-                    # images come in the format of `File:filename.extension`
+                    # Images come in the format of `File:filename.extension`
                     file, sep, filename = image["title"].partition(':')
                     filename = filename.replace(" ", "%20")  # Wikipedia returns good data!
 
@@ -417,15 +411,9 @@ class Snakes(Cog):
         return random.choice(self.snake_names)
 
     async def _validate_answer(self, ctx: Context, message: Message, answer: str, options: list):
-        """
-        Validate the answer using a reaction event loop.
-
-        :return:
-        """
-
+        """Validate the answer using a reaction event loop."""
         def predicate(reaction, user):
             """Test if the the answer is valid and can be evaluated."""
-
             return (
                 reaction.message.id == message.id                  # The reaction is attached to the question we asked.
                 and user == ctx.author                             # It's the user who triggered the quiz.
@@ -457,7 +445,6 @@ class Snakes(Cog):
     @group(name='snakes', aliases=('snake',), invoke_without_command=True)
     async def snakes_group(self, ctx: Context):
         """Commands from our first code jam."""
-
         await ctx.send_help(ctx.command)
 
     @bot_has_permissions(manage_messages=True)
@@ -478,10 +465,8 @@ class Snakes(Cog):
 
         This game was created by Lord Bisk and Runew0lf.
         """
-
         def predicate(reaction_: Reaction, user_: Member):
             """Make sure that this reaction is what we want to operate on."""
-
             return (
                 all((
                     # Reaction is on this message
@@ -613,7 +598,6 @@ class Snakes(Cog):
         Written by Momo and kel.
         Modified by juan and lemon.
         """
-
         with ctx.typing():
 
             # Generate random snake attributes
@@ -640,8 +624,8 @@ class Snakes(Cog):
                 text_color=text_color,
                 bg_color=bg_color
             )
-            png_bytes = utils.frame_to_png_bytes(image_frame)
-            file = File(png_bytes, filename='snek.png')
+            png_bytesIO = utils.frame_to_png_bytes(image_frame)
+            file = File(png_bytesIO, filename='snek.png')
             await ctx.send(file=file)
 
     @snakes_group.command(name='get')
@@ -657,7 +641,6 @@ class Snakes(Cog):
 
         Created by Ava and eivl.
         """
-
         with ctx.typing():
             if name is None:
                 name = await Snake.random()
@@ -707,7 +690,6 @@ class Snakes(Cog):
         Made by Ava and eivl.
         Modified by lemon.
         """
-
         with ctx.typing():
 
             image = None
@@ -741,7 +723,6 @@ class Snakes(Cog):
 
         Written by Momo and kel.
         """
-
         # Pick a random snake to hatch.
         snake_name = random.choice(list(utils.snakes.keys()))
         snake_image = utils.snakes[snake_name]
@@ -774,7 +755,6 @@ class Snakes(Cog):
         Written by Samuel.
         Modified by gdude.
         """
-
         url = "http://www.omdbapi.com/"
         page = random.randint(1, 27)
 
@@ -845,7 +825,6 @@ class Snakes(Cog):
         This was created by Mushy and Cardium,
         and modified by Urthas and lemon.
         """
-
         # Prepare a question.
         question = random.choice(self.snake_quizzes)
         answer = question["answerkey"]
@@ -886,7 +865,6 @@ class Snakes(Cog):
 
         This was written by Iceman, and modified for inclusion into the bot by lemon.
         """
-
         snake_name = await self._get_snake_name()
         snake_name = snake_name['name']
         snake_prefix = ""
@@ -944,8 +922,7 @@ class Snakes(Cog):
         Written by Momo and kel.
         Modified by lemon.
         """
-
-        # check if there is already a game in this channel
+        # Check if there is already a game in this channel
         if ctx.channel in self.active_sal:
             await ctx.send(f"{ctx.author.mention} A game is already in progress in this channel.")
             return
@@ -958,7 +935,6 @@ class Snakes(Cog):
     @snakes_group.command(name='about')
     async def about_command(self, ctx: Context):
         """Show an embed with information about the event, its participants, and its winners."""
-
         contributors = [
             "<@!245270749919576066>",
             "<@!396290259907903491>",
@@ -1006,7 +982,6 @@ class Snakes(Cog):
 
         Created by juan and Someone during the first code jam.
         """
-
         # Get the snake data we need
         if not name:
             name_obj = await self._get_snake_name()
@@ -1046,7 +1021,6 @@ class Snakes(Cog):
         Written by Andrew and Prithaj.
         Modified by lemon.
         """
-
         question = random.choice(self.snake_facts)["fact"]
         embed = Embed(
             title="Snake fact",
@@ -1068,7 +1042,6 @@ class Snakes(Cog):
         Written by Momo and kel.
         Modified by lemon.
         """
-
         with ctx.typing():
             embed = Embed()
             user = ctx.message.author
@@ -1109,7 +1082,6 @@ class Snakes(Cog):
 
         Written by Andrew and Prithaj.
         """
-
         # Are we searching for anything specific?
         if search:
             query = search + ' snake'
@@ -1149,7 +1121,6 @@ class Snakes(Cog):
         Written by Prithaj and Andrew.
         Modified by lemon.
         """
-
         embed = Embed(
             title="Zzzen of Pythhon",
             color=SNAKE_COLOR
@@ -1172,7 +1143,6 @@ class Snakes(Cog):
     @video_command.error
     async def command_error(self, ctx, error):
         """Local error handler for the Snake Cog."""
-
         embed = Embed()
         embed.colour = Colour.red()
 

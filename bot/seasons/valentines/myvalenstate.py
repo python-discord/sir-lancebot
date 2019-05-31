@@ -23,7 +23,6 @@ class MyValenstate(commands.Cog):
 
     def levenshtein(self, source, goal):
         """Calculates the Levenshtein Distance between source and goal."""
-
         if len(source) < len(goal):
             return self.levenshtein(goal, source)
         if len(source) == 0:
@@ -45,7 +44,6 @@ class MyValenstate(commands.Cog):
     @commands.command()
     async def myvalenstate(self, ctx, *, name=None):
         """Find the vacation spot(s) with the most matching characters to the invoking user."""
-
         eq_chars = collections.defaultdict(int)
         if name is None:
             author = ctx.message.author.name.lower().replace(' ', '')
@@ -85,6 +83,5 @@ class MyValenstate(commands.Cog):
 
 def setup(bot):
     """Valenstate Cog load."""
-
     bot.add_cog(MyValenstate(bot))
     log.info("MyValenstate cog loaded")

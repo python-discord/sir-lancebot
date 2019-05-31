@@ -19,8 +19,7 @@ class SpookyAvatar(commands.Cog):
         self.bot = bot
 
     async def get(self, url):
-        """Returns the contents of the supplied url."""
-
+        """Returns the contents of the supplied URL."""
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 return await resp.read()
@@ -29,7 +28,6 @@ class SpookyAvatar(commands.Cog):
                       brief='Spookify an user\'s avatar.')
     async def spooky_avatar(self, ctx, user: discord.Member = None):
         """A command to print the user's spookified avatar."""
-
         if user is None:
             user = ctx.message.author
 
@@ -51,6 +49,5 @@ class SpookyAvatar(commands.Cog):
 
 def setup(bot):
     """Spooky avatar Cog load."""
-
     bot.add_cog(SpookyAvatar(bot))
     log.info("SpookyAvatar cog loaded")

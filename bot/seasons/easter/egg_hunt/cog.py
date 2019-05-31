@@ -31,7 +31,6 @@ MUTED = GUILD.get_role(MainRoles.muted)
 
 def get_team_role(user: discord.Member) -> discord.Role:
     """Helper function to get the team role for a member."""
-
     if Roles.white in user.roles:
         return Roles.white
     if Roles.blurple in user.roles:
@@ -40,7 +39,6 @@ def get_team_role(user: discord.Member) -> discord.Role:
 
 async def assign_team(user: discord.Member) -> discord.Member:
     """Helper function to assign a new team role for a member."""
-
     db = sqlite3.connect(DB_PATH)
     c = db.cursor()
     c.execute(f"SELECT team FROM user_scores WHERE user_id = {user.id}")
@@ -81,7 +79,6 @@ class EggMessage:
     @staticmethod
     def add_user_score_sql(user_id: int, team: str, score: int) -> str:
         """Builds the SQL for adding a score to a user in the database."""
-
         return (
             "INSERT INTO user_scores(user_id, team, score)"
             f"VALUES({user_id}, '{team}', {score})"
@@ -91,12 +88,10 @@ class EggMessage:
     @staticmethod
     def add_team_score_sql(team_name: str, score: int) -> str:
         """Builds the SQL for adding a score to a team in the database."""
-
         return f"UPDATE team_scores SET team_score=team_score+{score} WHERE team_id='{team_name}'"
 
     def finalise_score(self):
         """Sums and actions scoring for this egg drop session."""
-
         db = sqlite3.connect(DB_PATH)
         c = db.cursor()
 
@@ -139,7 +134,6 @@ class EggMessage:
 
     async def start_timeout(self, seconds: int = 5):
         """Begins a task that will sleep until the given seconds before finalizing the session."""
-
         if self.timeout_task:
             self.timeout_task.cancel()
             self.timeout_task = None
@@ -156,7 +150,6 @@ class EggMessage:
 
     def is_valid_react(self, reaction: discord.Reaction, user: discord.Member) -> bool:
         """Validates a reaction event was meant for this session."""
-
         if user.bot:
             return False
         if reaction.message.id != self.message.id:
@@ -164,7 +157,7 @@ class EggMessage:
         if reaction.emoji != self.egg:
             return False
 
-        # ignore the pushished
+        # Ignore the punished
         if MUTED in user.roles:
             return False
 
@@ -172,7 +165,6 @@ class EggMessage:
 
     async def collect_reacts(self, reaction: discord.Reaction, user: discord.Member):
         """Handles emitted reaction_add events via listener."""
-
         if not self.is_valid_react(reaction, user):
             return
 
@@ -191,7 +183,6 @@ class EggMessage:
 
     async def start(self):
         """Starts the egg drop session."""
-
         log.debug(f"EggHunt session started for message {self.message.id}.")
         bot.add_listener(self.collect_reacts, name="on_reaction_add")
         with contextlib.suppress(discord.Forbidden):
@@ -290,7 +281,6 @@ class SuperEggMessage(EggMessage):
 
     async def start_timeout(self, seconds=None):
         """Starts the super egg session."""
-
         if not seconds:
             return
         count = 4
@@ -348,7 +338,6 @@ class EggHunt(commands.Cog):
 
     def prepare_db(self):
         """Ensures database tables all exist and if not, creates them."""
-
         db = sqlite3.connect(DB_PATH)
         c = db.cursor()
 
@@ -370,19 +359,16 @@ class EggHunt(commands.Cog):
 
     def task_cleanup(self, task):
         """Returns task result and restarts. Used as a done callback to show raised exceptions."""
-
         task.result()
         self.task = asyncio.create_task(self.super_egg())
 
     @staticmethod
     def current_timestamp() -> float:
         """Returns a timestamp of the current UTC time."""
-
         return datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
 
     async def super_egg(self):
         """Manages the timing of super egg drops."""
-
         while True:
             now = int(self.current_timestamp())
 
@@ -470,7 +456,6 @@ class EggHunt(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         """Reaction event listener for reaction logging for later anti-cheat analysis."""
-
         if payload.channel_id not in EggHuntSettings.allowed_channels:
             return
 
@@ -487,7 +472,6 @@ class EggHunt(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         """Message event listener for random egg drops."""
-
         if self.current_timestamp() < EggHuntSettings.start_time:
             return
 
@@ -526,13 +510,11 @@ class EggHunt(commands.Cog):
         out. They stay around for 5 minutes and the team with the most reacts
         wins the points.
         """
-
         await ctx.invoke(bot.get_command("help"), command="hunt")
 
     @hunt.command()
     async def countdown(self, ctx):
         """Show the time status of the Egg Hunt event."""
-
         now = self.current_timestamp()
         if now > EggHuntSettings.end_time:
             return await ctx.send("The Hunt has ended.")
@@ -551,7 +533,6 @@ class EggHunt(commands.Cog):
     @hunt.command()
     async def leaderboard(self, ctx):
         """Show the Egg Hunt Leaderboards."""
-
         db = sqlite3.connect(DB_PATH)
         c = db.cursor()
         c.execute(f"SELECT *, RANK() OVER(ORDER BY score DESC) AS rank FROM user_scores LIMIT 10")
@@ -593,7 +574,6 @@ class EggHunt(commands.Cog):
     @hunt.command()
     async def rank(self, ctx, *, member: discord.Member = None):
         """Get your ranking in the Egg Hunt Leaderboard."""
-
         member = member or ctx.author
         db = sqlite3.connect(DB_PATH)
         c = db.cursor()
@@ -614,7 +594,6 @@ class EggHunt(commands.Cog):
     @hunt.command()
     async def clear_db(self, ctx):
         """Resets the database to it's initial state."""
-
         def check(msg):
             if msg.author != ctx.author:
                 return False

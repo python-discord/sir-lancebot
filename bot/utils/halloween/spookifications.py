@@ -13,7 +13,6 @@ def inversion(im):
 
     Returns an inverted image when supplied with an Image object.
     """
-
     im = im.convert('RGB')
     inv = ImageOps.invert(im)
     return inv
@@ -21,7 +20,6 @@ def inversion(im):
 
 def pentagram(im):
     """Adds pentagram to the image."""
-
     im = im.convert('RGB')
     wt, ht = im.size
     penta = Image.open('bot/resources/halloween/bloody-pentagram.png')
@@ -37,7 +35,6 @@ def bat(im):
     The bat silhoutte is of a size at least one-fifths that of the original image and may be rotated
     up to 90 degrees anti-clockwise.
     """
-
     im = im.convert('RGB')
     wt, ht = im.size
     bat = Image.open('bot/resources/halloween/bat-clipart.png')
@@ -55,7 +52,6 @@ def bat(im):
 
 def get_random_effect(im):
     """Randomly selects and applies an effect."""
-
     effects = [inversion, pentagram, bat]
     effect = choice(effects)
     log.info("Spookyavatar's chosen effect: " + effect.__name__)

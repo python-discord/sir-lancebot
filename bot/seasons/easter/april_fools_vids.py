@@ -9,7 +9,8 @@ log = logging.getLogger(__name__)
 
 
 class AprilFoolVideos(commands.Cog):
-    """A cog for april fools that gets a random april fools video from youtube."""
+    """A cog for April Fools' that gets a random April Fools' video from Youtube."""
+
     def __init__(self, bot):
         self.bot = bot
         self.yt_vids = self.load_json()
@@ -17,7 +18,7 @@ class AprilFoolVideos(commands.Cog):
 
     @staticmethod
     def load_json():
-        """A function to load json data."""
+        """A function to load JSON data."""
         p = Path('bot', 'resources', 'easter', 'april_fools_vids.json')
         with p.open() as json_file:
             all_vids = load(json_file)
@@ -25,7 +26,7 @@ class AprilFoolVideos(commands.Cog):
 
     @commands.command(name='fool')
     async def aprial_fools(self, ctx):
-        """Gets a random april fools video from youtube."""
+        """Get a random April Fools' video from Youtube."""
         random_youtuber = random.choice(self.youtubers)
         category = self.yt_vids[random_youtuber]
         random_vid = random.choice(category)
@@ -33,6 +34,6 @@ class AprilFoolVideos(commands.Cog):
 
 
 def setup(bot):
-    """A function to add the cog."""
+    """April Fools' Cog load."""
     bot.add_cog(AprilFoolVideos(bot))
     log.info('April Fools videos cog loaded!')

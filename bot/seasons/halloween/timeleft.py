@@ -15,13 +15,11 @@ class TimeLeft(commands.Cog):
     @staticmethod
     def in_october():
         """Return True if the current month is October."""
-
         return datetime.utcnow().month == 10
 
     @staticmethod
     def load_date():
         """Return of a tuple of the current time and the end and start times of the next October."""
-
         now = datetime.utcnow()
         year = now.year
         if now.month > 10:
@@ -38,7 +36,6 @@ class TimeLeft(commands.Cog):
         Whilst in October, displays the days, hours and minutes left.
         Only displays the days left until the beginning and end whilst in a different month
         """
-
         now, end, start = self.load_date()
         diff = end - now
         days, seconds = diff.days, diff.seconds
@@ -58,6 +55,5 @@ class TimeLeft(commands.Cog):
 
 def setup(bot):
     """Cog load."""
-
     bot.add_cog(TimeLeft(bot))
     log.info("TimeLeft cog loaded")

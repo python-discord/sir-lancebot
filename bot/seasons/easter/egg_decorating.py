@@ -51,7 +51,6 @@ class EggDecorating(commands.Cog):
         Colours are split by spaces, unless you wrap the colour name in double quotes.
         Discord colour names, HTML colour names, XKCD colour names and hex values are accepted.
         """
-
         if len(colours) < 2:
             return await ctx.send("You must include at least 2 colours!")
 
@@ -72,7 +71,7 @@ class EggDecorating(commands.Cog):
             return await ctx.send(f"Sorry, I don't know the colour {invalid[0]}!")
 
         async with ctx.typing():
-            # expand list to 8 colours
+            # Expand list to 8 colours
             colours_n = len(colours)
             if colours_n < 8:
                 q, r = divmod(8, colours_n)
@@ -113,7 +112,6 @@ class EggDecorating(commands.Cog):
 
 
 def setup(bot):
-    """Cog load."""
-
+    """Egg decorating Cog load."""
     bot.add_cog(EggDecorating(bot))
     log.info("EggDecorating cog loaded.")

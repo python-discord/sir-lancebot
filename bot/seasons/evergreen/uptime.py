@@ -18,7 +18,6 @@ class Uptime(commands.Cog):
     @commands.command(name="uptime")
     async def uptime(self, ctx):
         """Responds with the uptime of the bot."""
-
         difference = relativedelta(start_time - arrow.utcnow())
         uptime_string = start_time.shift(
             seconds=-difference.seconds,
@@ -31,6 +30,5 @@ class Uptime(commands.Cog):
 
 def setup(bot):
     """Uptime Cog load."""
-
     bot.add_cog(Uptime(bot))
     log.info("Uptime cog loaded")

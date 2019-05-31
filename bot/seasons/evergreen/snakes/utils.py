@@ -112,20 +112,17 @@ ANGLE_RANGE = math.pi * 2
 
 def get_resource(file: str) -> List[dict]:
     """Load Snake resources JSON."""
-
     with (SNAKE_RESOURCES / f"{file}.json").open(encoding="utf-8") as snakefile:
         return json.load(snakefile)
 
 
 def smoothstep(t):
     """Smooth curve with a zero derivative at 0 and 1, making it useful for interpolating."""
-
     return t * t * (3. - 2. * t)
 
 
 def lerp(t, a, b):
     """Linear interpolation between a and b, given a fraction t."""
-
     return a + t * (b - a)
 
 
@@ -158,7 +155,6 @@ class PerlinNoiseFactory(object):
         If ``unbias`` is true, the smoothstep function will be applied to the output before returning
         it, to counteract some of Perlin noise's significant bias towards the center of its output range.
         """
-
         self.dimension = dimension
         self.octaves = octaves
         self.tile = tile + (0,) * dimension
@@ -176,7 +172,6 @@ class PerlinNoiseFactory(object):
 
         This is the "gradient" vector, in that the grid tile slopes towards it
         """
-
         # 1 dimension is special, since the only unit vector is trivial;
         # instead, use a slope between -1 and 1
         if self.dimension == 1:
@@ -193,7 +188,6 @@ class PerlinNoiseFactory(object):
 
     def get_plain_noise(self, *point):
         """Get plain noise for a single point, without taking into account either octaves or tiling."""
-
         if len(point) != self.dimension:
             raise ValueError("Expected {0} values, got {1}".format(
                 self.dimension, len(point)))
@@ -246,7 +240,6 @@ class PerlinNoiseFactory(object):
 
         The number of values given should match the number of dimensions.
         """
-
         ret = 0
         for o in range(self.octaves):
             o2 = 1 << o
@@ -307,7 +300,6 @@ def create_snek_frame(
     :param text_color: the color of the text.
     :return: a PIL image, representing a single frame.
     """
-
     start_x = random.randint(image_margins[X], image_dimensions[X] - image_margins[X])
     start_y = random.randint(image_margins[Y], image_dimensions[Y] - image_margins[Y])
     points = [(start_x, start_y)]
@@ -360,12 +352,12 @@ def create_snek_frame(
     return image
 
 
-def frame_to_png_bytes(image: Image):
+def frame_to_png_bytes(image: Image) -> io.BytesIO:
     """Convert image to byte stream."""
-
     stream = io.BytesIO()
     image.save(stream, format='PNG')
-    return stream.getvalue()
+    stream.seek(0)
+    return stream
 
 
 log = logging.getLogger(__name__)
@@ -409,10 +401,8 @@ class SnakeAndLaddersGame:
         Listen for reactions until players have joined,
         and the game has been started.
         """
-
         def startup_event_check(reaction_: Reaction, user_: Member):
             """Make sure that this reaction is what we want to operate on."""
-
             return (
                 all((
                     reaction_.message.id == startup.id,       # Reaction is on startup message
@@ -491,7 +481,6 @@ class SnakeAndLaddersGame:
         Prevent player joining if they have already joined, if the game is full, or if the game is
         in a waiting state.
         """
-
         for p in self.players:
             if user == p:
                 await self.channel.send(user.mention + " You are already in the game.", delete_after=10)
@@ -518,7 +507,6 @@ class SnakeAndLaddersGame:
         Leaving is prevented if the user initiated the game or if they weren't part of it in the
         first place.
         """
-
         if user == self.author:
             await self.channel.send(
                 user.mention + " You are the author, and cannot leave the game. Execute "
@@ -544,7 +532,6 @@ class SnakeAndLaddersGame:
 
     async def cancel_game(self, user: Member):
         """Allow the game author to cancel the running game."""
-
         if not user == self.author:
             await self.channel.send(user.mention + " Only the author of the game can cancel it.", delete_after=10)
             return
@@ -558,7 +545,6 @@ class SnakeAndLaddersGame:
         The game cannot be started if there aren't enough players joined or if the game is in a
         waiting state.
         """
-
         if not user == self.author:
             await self.channel.send(user.mention + " Only the author of the game can start it.", delete_after=10)
             return
@@ -578,10 +564,8 @@ class SnakeAndLaddersGame:
 
     async def start_round(self):
         """Begin the round."""
-
         def game_event_check(reaction_: Reaction, user_: Member):
             """Make sure that this reaction is what we want to operate on."""
-
             return (
                 all((
                     reaction_.message.id == self.positions.id,  # Reaction is on positions message
@@ -673,7 +657,6 @@ class SnakeAndLaddersGame:
 
     async def player_roll(self, user: Member):
         """Handle the player's roll."""
-
         if user.id not in self.player_tiles:
             await self.channel.send(user.mention + " You are not in the match.", delete_after=10)
             return
