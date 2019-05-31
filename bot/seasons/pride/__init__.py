@@ -1,3 +1,4 @@
+from bot.constants import Colours
 from bot.seasons import SeasonBase
 
 
@@ -27,3 +28,7 @@ class Pride(SeasonBase):
     # Duration of season
     start_date = "01/06"
     end_date = "30/06"
+
+    # Season logo
+    colour = Colours.soft_red
+    icon = "/logos/logo_seasonal/pride/logo_pride.png"
