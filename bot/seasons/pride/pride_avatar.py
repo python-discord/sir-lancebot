@@ -60,7 +60,6 @@ class PrideAvatar(commands.Cog):
     @staticmethod
     def crop_avatar(avatar):
         """This crops the avatar into a circle."""
-
         mask = Image.new("L", avatar.size, 0)
         draw = ImageDraw.Draw(mask)
         draw.ellipse((0, 0) + avatar.size, fill=255)
@@ -70,7 +69,6 @@ class PrideAvatar(commands.Cog):
     @staticmethod
     def crop_ring(ring, px):
         """This crops the ring into a circle."""
-
         mask = Image.new("L", ring.size, 0)
         draw = ImageDraw.Draw(mask)
         draw.ellipse((0, 0) + ring.size, fill=255)
@@ -88,7 +86,6 @@ class PrideAvatar(commands.Cog):
         This has a maximum of 512px and defaults to a 64px border.
         The full image is 1024x1024.
         """
-
         pixels = 0 if pixels < 0 else 512 if pixels > 512 else pixels
 
         option = option.lower()
@@ -129,6 +126,5 @@ class PrideAvatar(commands.Cog):
 
 def setup(bot):
     """Cog load."""
-
     bot.add_cog(PrideAvatar(bot))
     log.info("PrideAvatar cog loaded")
