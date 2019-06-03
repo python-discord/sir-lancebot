@@ -8,8 +8,7 @@ log = logging.getLogger()
 
 
 def inversion(im):
-    """
-    Inverts the image.
+    """Inverts an image.
 
     Returns an inverted image when supplied with an Image object.
     """
@@ -19,7 +18,7 @@ def inversion(im):
 
 
 def pentagram(im):
-    """Adds pentagram to the image."""
+    """Adds pentagram to image."""
     im = im.convert('RGB')
     wt, ht = im.size
     penta = Image.open('bot/resources/halloween/bloody-pentagram.png')
@@ -29,12 +28,10 @@ def pentagram(im):
 
 
 def bat(im):
-    """
-    Adds a bat silhoutte to the image.
+    """Adds a bat silhoutte to the image.
 
-    The bat silhoutte is of a size at least one-fifths that of the original image and may be rotated
-    up to 90 degrees anti-clockwise.
-    """
+    The bat silhoutte is of a size at least one-fifths that of the original
+    image and may be rotated upto 90 degrees anti-clockwise."""
     im = im.convert('RGB')
     wt, ht = im.size
     bat = Image.open('bot/resources/halloween/bat-clipart.png')

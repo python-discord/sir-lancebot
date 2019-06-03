@@ -14,7 +14,6 @@ log = logging.getLogger(__name__)
 
 
 def with_role(*role_ids: int):
-    """Check to see whether the invoking user has any of the roles specified in role_ids."""
     async def predicate(ctx: Context):
         if not ctx.guild:  # Return False in a DM
             log.debug(f"{ctx.author} tried to use the '{ctx.command.name}'command from a DM. "
@@ -33,7 +32,6 @@ def with_role(*role_ids: int):
 
 
 def without_role(*role_ids: int):
-    """Check whether the invoking user does not have all of the roles specified in role_ids."""
     async def predicate(ctx: Context):
         if not ctx.guild:  # Return False in a DM
             log.debug(f"{ctx.author} tried to use the '{ctx.command.name}' command from a DM. "
@@ -49,7 +47,6 @@ def without_role(*role_ids: int):
 
 
 def in_channel(channel_id):
-    """Check that the command invocation is in the channel specified by channel_id."""
     async def predicate(ctx: Context):
         check = ctx.channel.id == channel_id
         log.debug(f"{ctx.author} tried to call the '{ctx.command.name}' command. "
@@ -61,11 +58,12 @@ def in_channel(channel_id):
 def locked():
     """
     Allows the user to only run one instance of the decorated command at a time.
-
-    Subsequent calls to the command from the same author are ignored until the command has completed invocation.
+    Subsequent calls to the command from the same author are
+    ignored until the command has completed invocation.
 
     This decorator has to go before (below) the `command` decorator.
     """
+
     def wrap(func):
         func.__locks = WeakValueDictionary()
 

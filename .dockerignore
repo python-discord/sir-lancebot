@@ -1,8 +1,0 @@
-# Exclude everything
-*
-
-# Make exceptions for what's needed
-!bot
-!Pipfile
-!Pipfile.lock
-!LICENSE

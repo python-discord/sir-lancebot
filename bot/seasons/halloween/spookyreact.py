@@ -2,7 +2,6 @@ import logging
 import re
 
 import discord
-from discord.ext.commands import Cog
 
 log = logging.getLogger(__name__)
 
@@ -17,16 +16,18 @@ SPOOKY_TRIGGERS = {
 }
 
 
-class SpookyReact(Cog):
-    """A cog that makes the bot react to message triggers."""
+class SpookyReact:
+
+    """
+    A cog that makes the bot react to message triggers.
+    """
 
     def __init__(self, bot):
         self.bot = bot
 
-    @Cog.listener()
     async def on_message(self, ctx: discord.Message):
         """
-        A command to send the seasonalbot github project.
+        A command to send the seasonalbot github project
 
         Lines that begin with the bot's command prefix are ignored
 
@@ -67,6 +68,5 @@ class SpookyReact(Cog):
 
 
 def setup(bot):
-    """Spooky reaction Cog load."""
     bot.add_cog(SpookyReact(bot))
-    log.info("SpookyReact cog loaded")
+    log.debug("SpookyReact cog loaded")

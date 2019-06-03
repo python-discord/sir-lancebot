@@ -10,8 +10,10 @@ from discord.ext.commands.cooldowns import BucketType
 log = logging.getLogger(__name__)
 
 
-class Halloweenify(commands.Cog):
-    """A cog to change a invokers nickname to a spooky one!"""
+class Halloweenify:
+    """
+    A cog to change a invokers nickname to a spooky one!
+    """
 
     def __init__(self, bot):
         self.bot = bot
@@ -19,7 +21,9 @@ class Halloweenify(commands.Cog):
     @commands.cooldown(1, 300, BucketType.user)
     @commands.command()
     async def halloweenify(self, ctx):
-        """Change your nickname into a much spookier one!"""
+        """
+        Change your nickname into a much spookier one!
+        """
         async with ctx.typing():
             with open(Path('bot', 'resources', 'halloween', 'halloweenify.json'), 'r') as f:
                 data = load(f)
@@ -47,6 +51,5 @@ class Halloweenify(commands.Cog):
 
 
 def setup(bot):
-    """Halloweenify Cog load."""
     bot.add_cog(Halloweenify(bot))
-    log.info("Halloweenify cog loaded")
+    log.debug("Halloweenify cog loaded")

@@ -8,15 +8,17 @@ import discord
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
 
-from bot.constants import Channels, Client, Colours, Lovefest
+from bot.constants import Client, Colours, Lovefest
 
 log = logging.getLogger(__name__)
 
 HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_heart:", ":two_hearts:"]
 
 
-class BeMyValentine(commands.Cog):
-    """A cog that sends Valentines to other users!"""
+class BeMyValentine:
+    """
+    A cog that sends valentines to other users !
+    """
 
     def __init__(self, bot):
         self.bot = bot
@@ -24,7 +26,6 @@ class BeMyValentine(commands.Cog):
 
     @staticmethod
     def load_json():
-        """Load Valentines messages from the static resources."""
         p = Path('bot', 'resources', 'valentines', 'bemyvalentine_valentines.json')
         with p.open() as json_data:
             valentines = load(json_data)
@@ -33,18 +34,19 @@ class BeMyValentine(commands.Cog):
     @commands.group(name="lovefest", invoke_without_command=True)
     async def lovefest_role(self, ctx):
         """
-        Subscribe or unsubscribe from the lovefest role.
-
+        You can have yourself the lovefest role or remove it.
         The lovefest role makes you eligible to receive anonymous valentines from other users.
 
         1) use the command \".lovefest sub\" to get the lovefest role.
         2) use the command \".lovefest unsub\" to get rid of the lovefest role.
         """
-        await ctx.send_help(ctx.command)
+        await ctx.invoke(self.bot.get_command("help"), "lovefest")
 
     @lovefest_role.command(name="sub")
     async def add_role(self, ctx):
-        """Adds the lovefest role."""
+        """
+        This command adds the lovefest role.
+        """
         user = ctx.author
         role = discord.utils.get(ctx.guild.roles, id=Lovefest.role_id)
         if Lovefest.role_id not in [role.id for role in ctx.message.author.roles]:
@@ -55,7 +57,9 @@ class BeMyValentine(commands.Cog):
 
     @lovefest_role.command(name="unsub")
     async def remove_role(self, ctx):
-        """Removes the lovefest role."""
+        """
+        This command removes the lovefest role.
+        """
         user = ctx.author
         role = discord.utils.get(ctx.guild.roles, id=Lovefest.role_id)
         if Lovefest.role_id not in [role.id for role in ctx.message.author.roles]:
@@ -68,7 +72,7 @@ class BeMyValentine(commands.Cog):
     @commands.group(name='bemyvalentine', invoke_without_command=True)
     async def send_valentine(self, ctx, user: typing.Optional[discord.Member] = None, *, valentine_type=None):
         """
-        Send a valentine to user, if specified, or to a random user with the lovefest role.
+        This command sends valentine to user if specified or a random user having lovefest role.
 
         syntax: .bemyvalentine [user](optional) [p/poem/c/compliment/or you can type your own valentine message]
         (optional)
@@ -78,6 +82,7 @@ class BeMyValentine(commands.Cog):
         example: .bemyvalentine Iceman Hey I love you, wanna hang around ? (sends the custom message to Iceman)
         NOTE : AVOID TAGGING THE USER MOST OF THE TIMES.JUST TRIM THE '@' when using this command.
         """
+
         if ctx.guild is None:
             # This command should only be used in the server
             msg = "You are supposed to use this command in the server."
@@ -94,7 +99,7 @@ class BeMyValentine(commands.Cog):
 
         emoji_1, emoji_2 = self.random_emoji()
         lovefest_role = discord.utils.get(ctx.guild.roles, id=Lovefest.role_id)
-        channel = self.bot.get_channel(Channels.seasonalbot_chat)
+        channel = self.bot.get_channel(Lovefest.channel_id)
         valentine, title = self.valentine_check(valentine_type)
 
         if user is None:
@@ -114,7 +119,7 @@ class BeMyValentine(commands.Cog):
     @send_valentine.command(name='secret')
     async def anonymous(self, ctx, user: typing.Optional[discord.Member] = None, *, valentine_type=None):
         """
-        Send an anonymous Valentine via DM to to a user, if specified, or to a random with the lovefest role.
+        This command DMs a valentine to be given anonymous to a user if specified or a random user having lovefest role.
 
         **This command should be DMed to the bot.**
 
@@ -127,6 +132,7 @@ class BeMyValentine(commands.Cog):
         example : .bemyvalentine secret Iceman#6508 Hey I love you, wanna hang around ? (sends the custom message to
         Iceman in DM making you anonymous)
         """
+
         if ctx.guild is not None:
             # This command is only DM specific
             msg = "You are not supposed to use this command in the server, DM the command to the bot."
@@ -165,7 +171,6 @@ class BeMyValentine(commands.Cog):
             await ctx.author.send(f"Your message has been sent to {user}")
 
     def valentine_check(self, valentine_type):
-        """Return the appropriate Valentine type & title based on the invoking user's input."""
         if valentine_type is None:
             valentine, title = self.random_valentine()
 
@@ -186,9 +191,8 @@ class BeMyValentine(commands.Cog):
     @staticmethod
     def random_user(author, members):
         """
-        Picks a random member from the list provided in `members`.
-
-        The invoking author is ignored.
+        Picks a random member from the list provided in `members`, ensuring
+        the author is not one of the options.
 
         :param author: member who invoked the command
         :param members: list of discord.Member objects
@@ -200,13 +204,14 @@ class BeMyValentine(commands.Cog):
 
     @staticmethod
     def random_emoji():
-        """Return two random emoji from the module-defined constants."""
         EMOJI_1 = random.choice(HEART_EMOJIS)
         EMOJI_2 = random.choice(HEART_EMOJIS)
         return EMOJI_1, EMOJI_2
 
     def random_valentine(self):
-        """Grabs a random poem or a compliment (any message)."""
+        """
+        Grabs a random poem or a compliment (any message).
+        """
         valentine_poem = random.choice(self.valentines['valentine_poems'])
         valentine_compliment = random.choice(self.valentines['valentine_compliments'])
         random_valentine = random.choice([valentine_compliment, valentine_poem])
@@ -217,17 +222,20 @@ class BeMyValentine(commands.Cog):
         return random_valentine, title
 
     def valentine_poem(self):
-        """Grabs a random poem."""
+        """
+        Grabs a random poem.
+        """
         valentine_poem = random.choice(self.valentines['valentine_poems'])
         return valentine_poem
 
     def valentine_compliment(self):
-        """Grabs a random compliment."""
+        """
+        Grabs a random compliment.
+        """
         valentine_compliment = random.choice(self.valentines['valentine_compliments'])
         return valentine_compliment
 
 
 def setup(bot):
-    """Be my Valentine Cog load."""
     bot.add_cog(BeMyValentine(bot))
-    log.info("BeMyValentine cog loaded")
+    log.debug("Be My Valentine cog loaded")

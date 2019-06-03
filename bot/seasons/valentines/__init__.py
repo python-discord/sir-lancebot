@@ -8,7 +8,6 @@ class Valentines(SeasonBase):
 
     Get yourself into the bot-commands channel and check out the new features!
     """
-
     name = "valentines"
     bot_name = "Tenderbot"
     greeting = "Get loved-up!"

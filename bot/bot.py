@@ -6,6 +6,7 @@ from typing import List
 from aiohttp import AsyncResolver, ClientSession, TCPConnector
 from discord import Embed
 from discord.ext import commands
+from discord.ext.commands import Bot
 
 from bot import constants
 
@@ -14,17 +15,21 @@ log = logging.getLogger(__name__)
 __all__ = ('SeasonalBot',)
 
 
-class SeasonalBot(commands.Bot):
-    """Base bot instance."""
-
+class SeasonalBot(Bot):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.http_session = ClientSession(
-            connector=TCPConnector(resolver=AsyncResolver(), family=socket.AF_INET)
+            connector=TCPConnector(
+                resolver=AsyncResolver(),
+                family=socket.AF_INET,
+            )
         )
 
     def load_extensions(self, exts: List[str]):
-        """Unload all current extensions, then load the given extensions."""
+        """
+        Unload all current cogs, then load in the ones passed into `cogs`
+        """
+
         # Unload all cogs
         extensions = list(self.extensions.keys())
         for extension in extensions:
@@ -41,7 +46,9 @@ class SeasonalBot(commands.Bot):
                 log.error(f'Failed to load extension {cog}: {repr(e)} {format_exc()}')
 
     async def send_log(self, title: str, details: str = None, *, icon: str = None):
-        """Send an embed message to the devlog channel."""
+        """
+        Send an embed message to the devlog channel
+        """
         devlog = self.get_channel(constants.Channels.devlog)
 
         if not devlog:
@@ -57,7 +64,7 @@ class SeasonalBot(commands.Bot):
         await devlog.send(embed=embed)
 
     async def on_command_error(self, context, exception):
-        """Check command errors for UserInputError and reset the cooldown if thrown."""
+        # Don't punish the user for getting the arguments wrong
         if isinstance(exception, commands.UserInputError):
             context.command.reset_cooldown(context)
         else:

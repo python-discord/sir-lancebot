@@ -11,16 +11,20 @@ TMDB_API_KEY = environ.get("TMDB_API_KEY")
 log = logging.getLogger(__name__)
 
 
-class RomanceMovieFinder(commands.Cog):
-    """A Cog that returns a random romance movie suggestion to a user."""
+class RomanceMovieFinder:
+    """
+    A cog that returns a random romance movie suggestion to a user
+    """
 
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(name="romancemovie")
     async def romance_movie(self, ctx):
-        """Randomly selects a romance movie and displays information about it."""
-        # Selecting a random int to parse it to the page parameter
+        """
+        Randomly selects a romance movie and displays information about it
+        """
+        # selecting a random int to parse it to the page parameter
         random_page = random.randint(0, 20)
         # TMDB api params
         params = {
@@ -32,13 +36,13 @@ class RomanceMovieFinder(commands.Cog):
             "page": random_page,
             "with_genres": "10749"
         }
-        # The api request url
+        # the api request url
         request_url = "https://api.themoviedb.org/3/discover/movie?" + parse.urlencode(params)
         async with self.bot.http_session.get(request_url) as resp:
-            # Trying to load the json file returned from the api
+            # trying to load the json file returned from the api
             try:
                 data = await resp.json()
-                # Selecting random result from results object in the json file
+                # selecting random result from results object in the json file
                 selected_movie = random.choice(data["results"])
 
                 embed = discord.Embed(
@@ -58,6 +62,5 @@ class RomanceMovieFinder(commands.Cog):
 
 
 def setup(bot):
-    """Romance movie Cog load."""
     bot.add_cog(RomanceMovieFinder(bot))
-    log.info("RomanceMovieFinder cog loaded")
+    log.debug("Random romance movie cog loaded!")

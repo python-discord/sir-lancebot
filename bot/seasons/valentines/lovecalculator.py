@@ -9,7 +9,7 @@ from typing import Union
 import discord
 from discord import Member
 from discord.ext import commands
-from discord.ext.commands import BadArgument, Cog, clean_content
+from discord.ext.commands import BadArgument, clean_content
 
 from bot.constants import Roles
 
@@ -20,8 +20,10 @@ with Path('bot', 'resources', 'valentines', 'love_matches.json').open() as file:
     LOVE_DATA = sorted((int(key), value) for key, value in LOVE_DATA.items())
 
 
-class LoveCalculator(Cog):
-    """A cog for calculating the love between two people."""
+class LoveCalculator:
+    """
+    A cog for calculating the love between two people
+    """
 
     def __init__(self, bot):
         self.bot = bot
@@ -49,39 +51,41 @@ class LoveCalculator(Cog):
 
         If only one argument is provided, the subject will become one of the helpers at random.
         """
+
         if whom is None:
             staff = ctx.guild.get_role(Roles.helpers).members
             whom = random.choice(staff)
 
         def normalize(arg):
             if isinstance(arg, Member):
-                # If we are given a member, return name#discrim without any extra changes
+                # if we are given a member, return name#discrim without any extra changes
                 arg = str(arg)
             else:
-                # Otherwise normalise case and remove any leading/trailing whitespace
+                # otherwise normalise case and remove any leading/trailing whitespace
                 arg = arg.strip().title()
-            # This has to be done manually to be applied to usernames
+            # this has to be done manually to be applied to usernames
             return clean_content(escape_markdown=True).convert(ctx, arg)
 
         who, whom = [await normalize(arg) for arg in (who, whom)]
 
-        # Make sure user didn't provide something silly such as 10 spaces
+        # make sure user didn't provide something silly such as 10 spaces
         if not (who and whom):
             raise BadArgument('Arguments be non-empty strings.')
 
-        # Hash inputs to guarantee consistent results (hashing algorithm choice arbitrary)
+        # hash inputs to guarantee consistent results (hashing algorithm choice arbitrary)
         #
-        # hashlib is used over the builtin hash() to guarantee same result over multiple runtimes
+        # hashlib is used over the builtin hash() function
+        # to guarantee same result over multiple runtimes
         m = hashlib.sha256(who.encode() + whom.encode())
-        # Mod 101 for [0, 100]
+        # mod 101 for [0, 100]
         love_percent = sum(m.digest()) % 101
 
         # We need the -1 due to how bisect returns the point
         # see the documentation for further detail
         # https://docs.python.org/3/library/bisect.html#bisect.bisect
         index = bisect.bisect(LOVE_DATA, (love_percent,)) - 1
-        # We already have the nearest "fit" love level
-        # We only need the dict, so we can ditch the first element
+        # we already have the nearest "fit" love level
+        # we only need the dict, so we can ditch the first element
         _, data = LOVE_DATA[index]
 
         status = random.choice(data['titles'])
@@ -99,6 +103,4 @@ class LoveCalculator(Cog):
 
 
 def setup(bot):
-    """Love calculator Cog load."""
     bot.add_cog(LoveCalculator(bot))
-    log.info("LoveCalculator cog loaded")

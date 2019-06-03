@@ -1,13 +1,5 @@
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.2.3
+    rev: v2.0.0
     hooks:
     - id: flake8
-      additional_dependencies: [
-        "flake8-bugbear",
-        "flake8-docstrings",
-        "flake8-import-order",
-        "flake8-polyfill",
-        "flake8-string-format",
-        "flake8-tidy-imports"
-      ]
