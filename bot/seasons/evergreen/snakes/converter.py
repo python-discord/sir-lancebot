@@ -13,10 +13,13 @@ log = logging.getLogger(__name__)
 
 
 class Snake(Converter):
+    """Snake converter for the Snakes Cog."""
+
     snakes = None
     special_cases = None
 
     async def convert(self, ctx, name):
+        """Convert the input snake name to the closest matching Snake object."""
         await self.build_list()
         name = name.lower()
 
@@ -56,6 +59,7 @@ class Snake(Converter):
 
     @classmethod
     async def build_list(cls):
+        """Build list of snakes from the static snake resources."""
         # Get all the snakes
         if cls.snakes is None:
             with (SNAKE_RESOURCES / "snake_names.json").open() as snakefile:
@@ -70,10 +74,10 @@ class Snake(Converter):
     @classmethod
     async def random(cls):
         """
-        This is stupid. We should find a way to
-        somehow get the global session into a
-        global context, so I can get it from here.
-        :return:
+        Get a random Snake from the loaded resources.
+
+        This is stupid. We should find a way to somehow get the global session into a global context,
+        so I can get it from here.
         """
         await cls.build_list()
         names = [snake['scientific'] for snake in cls.snakes]

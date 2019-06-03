@@ -15,7 +15,7 @@ import aiohttp
 import async_timeout
 from PIL import Image, ImageDraw, ImageFont
 from discord import Colour, Embed, File, Member, Message, Reaction
-from discord.ext.commands import BadArgument, Bot, Context, bot_has_permissions, group
+from discord.ext.commands import BadArgument, Bot, Cog, Context, bot_has_permissions, group
 
 from bot.constants import ERROR_REPLIES, Tokens
 from bot.decorators import locked
@@ -132,14 +132,13 @@ CARD = {
 # endregion
 
 
-class Snakes:
+class Snakes(Cog):
     """
-    Commands related to snakes. These were created by our
-    community during the first code jam.
+    Commands related to snakes, created by our community during the first code jam.
 
     More information can be found in the code-jam-1 repo.
 
-    https://gitlab_bot_repo.com/discord-python/code-jams/code-jam-1
+    https://github.com/python-discord/code-jam-1
     """
 
     wiki_brief = re.compile(r'(.*?)(=+ (.*?) =+)', flags=re.DOTALL)
@@ -156,9 +155,7 @@ class Snakes:
     # region: Helper methods
     @staticmethod
     def _beautiful_pastel(hue):
-        """
-        Returns random bright pastels.
-        """
+        """Returns random bright pastels."""
         light = random.uniform(0.7, 0.85)
         saturation = 1
 
@@ -254,9 +251,7 @@ class Snakes:
 
     @staticmethod
     def _snakify(message):
-        """
-        Sssnakifffiesss a sstring.
-        """
+        """Sssnakifffiesss a sstring."""
         # Replace fricatives with exaggerated snake fricatives.
         simple_fricatives = [
             "f", "s", "z", "h",
@@ -278,9 +273,7 @@ class Snakes:
         return message
 
     async def _fetch(self, session, url, params=None):
-        """
-        Asyncronous web request helper method.
-        """
+        """Asynchronous web request helper method."""
         if params is None:
             params = {}
 
@@ -290,10 +283,9 @@ class Snakes:
 
     def _get_random_long_message(self, messages, retries=10):
         """
-        Fetch a message that's at least 3 words long,
-        but only if it is possible to do so in retries
-        attempts. Else, just return whatever the last
-        message is.
+        Fetch a message that's at least 3 words long, if possible to do so in retries attempts.
+
+        Else, just return whatever the last message is.
         """
         long_message = random.choice(messages)
         if len(long_message.split()) < 3 and retries > 0:
@@ -306,8 +298,9 @@ class Snakes:
 
     async def _get_snek(self, name: str) -> Dict[str, Any]:
         """
-        Goes online and fetches all the data from a wikipedia article
-        about a snake. Builds a dict that the .get() method can use.
+        Fetches all the data from a wikipedia article about a snake.
+
+        Builds a dict that the .get() method can use.
 
         Created by Ava and eivl.
 
@@ -328,7 +321,7 @@ class Snakes:
 
             json = await self._fetch(session, URL, params=params)
 
-            # wikipedia does have a error page
+            # Wikipedia does have a error page
             try:
                 pageid = json["query"]["search"][0]["pageid"]
             except KeyError:
@@ -349,7 +342,7 @@ class Snakes:
 
             json = await self._fetch(session, URL, params=params)
 
-            # constructing dict - handle exceptions later
+            # Constructing dict - handle exceptions later
             try:
                 snake_info["title"] = json["query"]["pages"][f"{pageid}"]["title"]
                 snake_info["extract"] = json["query"]["pages"][f"{pageid}"]["extract"]
@@ -381,7 +374,7 @@ class Snakes:
                 ]
 
                 for image in snake_info["images"]:
-                    # images come in the format of `File:filename.extension`
+                    # Images come in the format of `File:filename.extension`
                     file, sep, filename = image["title"].partition(':')
                     filename = filename.replace(" ", "%20")  # Wikipedia returns good data!
 
@@ -412,20 +405,15 @@ class Snakes:
     async def _get_snake_name(self) -> Dict[str, str]:
         """
         Gets a random snake name.
+
         :return: A random snake name, as a string.
         """
         return random.choice(self.snake_names)
 
     async def _validate_answer(self, ctx: Context, message: Message, answer: str, options: list):
-        """
-        Validate the answer using a reaction event loop
-        :return:
-        """
-
+        """Validate the answer using a reaction event loop."""
         def predicate(reaction, user):
-            """
-            Test if the the answer is valid and can be evaluated.
-            """
+            """Test if the the answer is valid and can be evaluated."""
             return (
                 reaction.message.id == message.id                  # The reaction is attached to the question we asked.
                 and user == ctx.author                             # It's the user who triggered the quiz.
@@ -457,15 +445,14 @@ class Snakes:
     @group(name='snakes', aliases=('snake',), invoke_without_command=True)
     async def snakes_group(self, ctx: Context):
         """Commands from our first code jam."""
-
-        await ctx.invoke(self.bot.get_command("help"), "snake")
+        await ctx.send_help(ctx.command)
 
     @bot_has_permissions(manage_messages=True)
     @snakes_group.command(name='antidote')
     @locked()
     async def antidote_command(self, ctx: Context):
         """
-        Antidote - Can you create the antivenom before the patient dies?
+        Antidote! Can you create the antivenom before the patient dies?
 
         Rules:  You have 4 ingredients for each antidote, you only have 10 attempts
                 Once you synthesize the antidote, you will be presented with 4 markers
@@ -478,12 +465,8 @@ class Snakes:
 
         This game was created by Lord Bisk and Runew0lf.
         """
-
         def predicate(reaction_: Reaction, user_: Member):
-            """
-            Make sure that this reaction is what we want to operate on
-            """
-
+            """Make sure that this reaction is what we want to operate on."""
             return (
                 all((
                     # Reaction is on this message
@@ -610,12 +593,11 @@ class Snakes:
     @snakes_group.command(name='draw')
     async def draw_command(self, ctx: Context):
         """
-        Draws a random snek using Perlin noise
+        Draws a random snek using Perlin noise.
 
         Written by Momo and kel.
         Modified by juan and lemon.
         """
-
         with ctx.typing():
 
             # Generate random snake attributes
@@ -642,8 +624,8 @@ class Snakes:
                 text_color=text_color,
                 bg_color=bg_color
             )
-            png_bytes = utils.frame_to_png_bytes(image_frame)
-            file = File(png_bytes, filename='snek.png')
+            png_bytesIO = utils.frame_to_png_bytes(image_frame)
+            file = File(png_bytesIO, filename='snek.png')
             await ctx.send(file=file)
 
     @snakes_group.command(name='get')
@@ -652,6 +634,7 @@ class Snakes:
     async def get_command(self, ctx: Context, *, name: Snake = None):
         """
         Fetches information about a snake from Wikipedia.
+
         :param ctx: Context object passed from discord.py
         :param name: Optional, the name of the snake to get information
                      for - omit for a random snake
@@ -702,7 +685,7 @@ class Snakes:
     @locked()
     async def guess_command(self, ctx):
         """
-        Snake identifying game!
+        Snake identifying game.
 
         Made by Ava and eivl.
         Modified by lemon.
@@ -736,7 +719,7 @@ class Snakes:
     @snakes_group.command(name='hatch')
     async def hatch_command(self, ctx: Context):
         """
-        Hatches your personal snake
+        Hatches your personal snake.
 
         Written by Momo and kel.
         """
@@ -862,6 +845,8 @@ class Snakes:
     @snakes_group.command(name='name', aliases=('name_gen',))
     async def name_command(self, ctx: Context, *, name: str = None):
         """
+        Snakifies a username.
+
         Slices the users name at the last vowel (or second last if the name
         ends with a vowel), and then combines it with a random snake name,
         which is sliced at the first vowel (or second if the name starts with
@@ -932,12 +917,12 @@ class Snakes:
     @locked()
     async def sal_command(self, ctx: Context):
         """
-        Play a game of Snakes and Ladders!
+        Play a game of Snakes and Ladders.
 
         Written by Momo and kel.
         Modified by lemon.
         """
-        # check if there is already a game in this channel
+        # Check if there is already a game in this channel
         if ctx.channel in self.active_sal:
             await ctx.send(f"{ctx.author.mention} A game is already in progress in this channel.")
             return
@@ -949,10 +934,7 @@ class Snakes:
 
     @snakes_group.command(name='about')
     async def about_command(self, ctx: Context):
-        """
-        A command that shows an embed with information about the event,
-        it's participants, and its winners.
-        """
+        """Show an embed with information about the event, its participants, and its winners."""
         contributors = [
             "<@!245270749919576066>",
             "<@!396290259907903491>",
@@ -996,7 +978,7 @@ class Snakes:
     @snakes_group.command(name='card')
     async def card_command(self, ctx: Context, *, name: Snake = None):
         """
-        Create an interesting little card from a snake!
+        Create an interesting little card from a snake.
 
         Created by juan and Someone during the first code jam.
         """
@@ -1034,7 +1016,7 @@ class Snakes:
     @snakes_group.command(name='fact')
     async def fact_command(self, ctx: Context):
         """
-        Gets a snake-related fact
+        Gets a snake-related fact.
 
         Written by Andrew and Prithaj.
         Modified by lemon.
@@ -1047,18 +1029,11 @@ class Snakes:
         )
         await ctx.channel.send(embed=embed)
 
-    @snakes_group.command(name='help')
-    async def help_command(self, ctx: Context):
-        """
-        This just invokes the help command on this cog.
-        """
-        log.debug(f"{ctx.author} requested info about the snakes cog")
-        return await ctx.invoke(self.bot.get_command("help"), "Snakes")
-
     @snakes_group.command(name='snakify')
     async def snakify_command(self, ctx: Context, *, message: str = None):
         """
         How would I talk if I were a snake?
+
         :param ctx: context
         :param message: If this is passed, it will snakify the message.
                         If not, it will snakify a random message from
@@ -1100,7 +1075,7 @@ class Snakes:
     @snakes_group.command(name='video', aliases=('get_video',))
     async def video_command(self, ctx: Context, *, search: str = None):
         """
-        Gets a YouTube video about snakes
+        Gets a YouTube video about snakes.
 
         :param ctx: Context object passed from discord.py
         :param search: Optional, a name of a snake. Used to search for videos with that name
@@ -1141,8 +1116,7 @@ class Snakes:
     @snakes_group.command(name='zen')
     async def zen_command(self, ctx: Context):
         """
-        Gets a random quote from the Zen of Python,
-        except as if spoken by a snake.
+        Gets a random quote from the Zen of Python, except as if spoken by a snake.
 
         Written by Prithaj and Andrew.
         Modified by lemon.
@@ -1168,7 +1142,7 @@ class Snakes:
     @card_command.error
     @video_command.error
     async def command_error(self, ctx, error):
-
+        """Local error handler for the Snake Cog."""
         embed = Embed()
         embed.colour = Colour.red()
 
@@ -1187,8 +1161,3 @@ class Snakes:
 
         await ctx.send(embed=embed)
     # endregion
-
-
-def setup(bot):
-    bot.add_cog(Snakes(bot))
-    log.info("Cog loaded: Snakes")

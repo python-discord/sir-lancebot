@@ -10,10 +10,8 @@ from bot.constants import Hacktoberfest
 log = logging.getLogger(__name__)
 
 
-class SpookySound:
-    """
-    A cog that plays a spooky sound in a voice channel on command.
-    """
+class SpookySound(commands.Cog):
+    """A cog that plays a spooky sound in a voice channel on command."""
 
     def __init__(self, bot):
         self.bot = bot
@@ -24,8 +22,9 @@ class SpookySound:
     @commands.command(brief="Play a spooky sound, restricted to once per 2 mins")
     async def spookysound(self, ctx):
         """
-        Connect to the Hacktoberbot voice channel, play a random spooky sound, then disconnect. Cannot be used more than
-        once in 2 minutes.
+        Connect to the Hacktoberbot voice channel, play a random spooky sound, then disconnect.
+
+        Cannot be used more than once in 2 minutes.
         """
         if not self.channel:
             await self.bot.wait_until_ready()
@@ -39,12 +38,11 @@ class SpookySound:
 
     @staticmethod
     async def disconnect(voice):
-        """
-        Helper method to disconnect a given voice client.
-        """
+        """Helper method to disconnect a given voice client."""
         await voice.disconnect()
 
 
 def setup(bot):
+    """Spooky sound Cog load."""
     bot.add_cog(SpookySound(bot))
-    log.debug("SpookySound cog loaded")
+    log.info("SpookySound cog loaded")

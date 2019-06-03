@@ -13,7 +13,9 @@ from discord.ext import commands
 log = logging.getLogger(__name__)
 
 
-class HacktoberStats:
+class HacktoberStats(commands.Cog):
+    """Hacktoberfest statistics Cog."""
+
     def __init__(self, bot):
         self.bot = bot
         self.link_json = Path("bot", "resources", "github_links.json")
@@ -26,10 +28,11 @@ class HacktoberStats:
     )
     async def hacktoberstats_group(self, ctx: commands.Context, github_username: str = None):
         """
-        If invoked without a subcommand or github_username, get the invoking user's stats if
-        they've linked their Discord name to GitHub using .stats link
+        Display an embed for a user's Hacktoberfest contributions.
 
-        If invoked with a github_username, get that user's contributions
+        If invoked without a subcommand or github_username, get the invoking user's stats if they've
+        linked their Discord name to GitHub using .stats link. If invoked with a github_username,
+        get that user's contributions
         """
         if not github_username:
             author_id, author_mention = HacktoberStats._author_mention_from_context(ctx)
@@ -51,7 +54,7 @@ class HacktoberStats:
     @hacktoberstats_group.command(name="link")
     async def link_user(self, ctx: commands.Context, github_username: str = None):
         """
-        Link the invoking user's Github github_username to their Discord ID
+        Link the invoking user's Github github_username to their Discord ID.
 
         Linked users are stored as a nested dict:
             {
@@ -83,9 +86,7 @@ class HacktoberStats:
 
     @hacktoberstats_group.command(name="unlink")
     async def unlink_user(self, ctx: commands.Context):
-        """
-        Remove the invoking user's account link from the log
-        """
+        """Remove the invoking user's account link from the log."""
         author_id, author_mention = HacktoberStats._author_mention_from_context(ctx)
 
         stored_user = self.linked_accounts.pop(author_id, None)
@@ -100,7 +101,7 @@ class HacktoberStats:
 
     def load_linked_users(self) -> typing.Dict:
         """
-        Load list of linked users from local JSON file
+        Load list of linked users from local JSON file.
 
         Linked users are stored as a nested dict:
             {
@@ -123,7 +124,7 @@ class HacktoberStats:
 
     def save_linked_users(self):
         """
-        Save list of linked users to local JSON file
+        Save list of linked users to local JSON file.
 
         Linked users are stored as a nested dict:
             {
@@ -140,11 +141,9 @@ class HacktoberStats:
 
     async def get_stats(self, ctx: commands.Context, github_username: str):
         """
-        Query GitHub's API for PRs created by a GitHub user during the month of October that
-        do not have an 'invalid' tag
+        Query GitHub's API for PRs created by a GitHub user during the month of October.
 
-        For example:
-            !getstats heavysaturn
+        PRs with the 'invalid' tag are ignored
 
         If a valid github_username is provided, an embed is generated and posted to the channel
 
@@ -160,9 +159,7 @@ class HacktoberStats:
                 await ctx.send(f"No October GitHub contributions found for '{github_username}'")
 
     def build_embed(self, github_username: str, prs: typing.List[dict]) -> discord.Embed:
-        """
-        Return a stats embed built from github_username's PRs
-        """
+        """Return a stats embed built from github_username's PRs."""
         logging.info(f"Building Hacktoberfest embed for GitHub user: '{github_username}'")
         pr_stats = self._summarize_prs(prs)
 
@@ -202,8 +199,9 @@ class HacktoberStats:
     @staticmethod
     async def get_october_prs(github_username: str) -> typing.List[dict]:
         """
-        Query GitHub's API for PRs created during the month of October by github_username
-        that do not have an 'invalid' tag
+        Query GitHub's API for PRs created during the month of October by github_username.
+
+        PRs with an 'invalid' tag are ignored
 
         If PRs are found, return a list of dicts with basic PR information
 
@@ -265,7 +263,7 @@ class HacktoberStats:
     @staticmethod
     def _get_shortname(in_url: str) -> str:
         """
-        Extract shortname from https://api.github.com/repos/* URL
+        Extract shortname from https://api.github.com/repos/* URL.
 
         e.g. "https://api.github.com/repos/python-discord/seasonalbot"
              |
@@ -278,7 +276,7 @@ class HacktoberStats:
     @staticmethod
     def _summarize_prs(prs: typing.List[dict]) -> typing.Dict:
         """
-        Generate statistics from an input list of PR dictionaries, as output by get_october_prs
+        Generate statistics from an input list of PR dictionaries, as output by get_october_prs.
 
         Return a dictionary containing:
             {
@@ -292,7 +290,7 @@ class HacktoberStats:
     @staticmethod
     def _build_top5str(stats: typing.List[tuple]) -> str:
         """
-        Build a string from the Top 5 contributions that is compatible with a discord.Embed field
+        Build a string from the Top 5 contributions that is compatible with a discord.Embed field.
 
         Top 5 contributions should be a list of tuples, as output in the stats dictionary by
         _summarize_prs
@@ -311,9 +309,7 @@ class HacktoberStats:
 
     @staticmethod
     def _contributionator(n: int) -> str:
-        """
-        Return "contribution" or "contributions" based on the value of n
-        """
+        """Return "contribution" or "contributions" based on the value of n."""
         if n == 1:
             return "contribution"
         else:
@@ -321,9 +317,7 @@ class HacktoberStats:
 
     @staticmethod
     def _author_mention_from_context(ctx: commands.Context) -> typing.Tuple:
-        """
-        Return stringified Message author ID and mentionable string from commands.Context
-        """
+        """Return stringified Message author ID and mentionable string from commands.Context."""
         author_id = str(ctx.message.author.id)
         author_mention = ctx.message.author.mention
 
@@ -331,5 +325,6 @@ class HacktoberStats:
 
 
 def setup(bot):
+    """Hacktoberstats Cog load."""
     bot.add_cog(HacktoberStats(bot))
-    log.debug("HacktoberStats cog loaded")
+    log.info("HacktoberStats cog loaded")

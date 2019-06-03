@@ -14,15 +14,15 @@ with open(Path("bot", "resources", "valentines", "valentine_facts.json"), "r") a
     FACTS = json.load(file)
 
 
-class ValentineFacts:
+class ValentineFacts(commands.Cog):
+    """A Cog for displaying facts about Saint Valentine."""
+
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(aliases=('whoisvalentine', 'saint_valentine'))
     async def who_is_valentine(self, ctx):
-        """
-        Displays info about Saint Valentine.
-        """
+        """Displays info about Saint Valentine."""
         embed = discord.Embed(
             title="Who is Saint Valentine?",
             description=FACTS['whois'],
@@ -37,9 +37,7 @@ class ValentineFacts:
 
     @commands.command()
     async def valentine_fact(self, ctx):
-        """
-        Shows a random fact about Valentine's Day.
-        """
+        """Shows a random fact about Valentine's Day."""
         embed = discord.Embed(
             title=choice(FACTS['titles']),
             description=choice(FACTS['text']),
@@ -50,4 +48,6 @@ class ValentineFacts:
 
 
 def setup(bot):
+    """Who is Valentine Cog load."""
     bot.add_cog(ValentineFacts(bot))
+    log.info("ValentineFacts cog loaded")

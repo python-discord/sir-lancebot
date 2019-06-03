@@ -296,5 +296,5 @@ After a successful review by a maintainer, the PR may be merged successfully, an
 - [Git](https://try.github.io)
 - [PyCharm](https://www.jetbrains.com/help/pycharm/quick-start-guide.html)
 - [Pipenv](https://pipenv.readthedocs.io)
-- [discord.py rewrite](https://discordpy.readthedocs.io/en/rewrite)
+- [discord.py](https://discordpy.readthedocs.io/en/v1.1.1/)
 - [Environment Variables (youtube)](https://youtu.be/bEroNNzqlF4?t=27)

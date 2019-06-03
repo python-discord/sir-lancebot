@@ -14,16 +14,16 @@ LETTER_EMOJI = ':love_letter:'
 HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_heart:", ":two_hearts:"]
 
 
-class ValentineZodiac:
-    """
-    A cog that returns a counter compatible zodiac sign to the given user's zodiac sign.
-    """
+class ValentineZodiac(commands.Cog):
+    """A Cog that returns a counter compatible zodiac sign to the given user's zodiac sign."""
+
     def __init__(self, bot):
         self.bot = bot
         self.zodiacs = self.load_json()
 
     @staticmethod
     def load_json():
+        """Load zodiac compatibility from static JSON resource."""
         p = Path('bot', 'resources', 'valentines', 'zodiac_compatibility.json')
         with p.open() as json_data:
             zodiacs = load(json_data)
@@ -31,9 +31,7 @@ class ValentineZodiac:
 
     @commands.command(name="partnerzodiac")
     async def counter_zodiac(self, ctx, zodiac_sign):
-        """
-        Provides a counter compatible zodiac sign to the given user's zodiac sign.
-        """
+        """Provides a counter compatible zodiac sign to the given user's zodiac sign."""
         try:
             compatible_zodiac = random.choice(self.zodiacs[zodiac_sign.lower()])
         except KeyError:
@@ -55,5 +53,6 @@ class ValentineZodiac:
 
 
 def setup(bot):
+    """Valentine zodiac Cog load."""
     bot.add_cog(ValentineZodiac(bot))
-    log.debug("Valentine Zodiac cog loaded")
+    log.info("ValentineZodiac cog loaded")

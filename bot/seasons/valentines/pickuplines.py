@@ -14,10 +14,8 @@ with open(Path('bot', 'resources', 'valentines', 'pickup_lines.json'), 'r', enco
     pickup_lines = load(f)
 
 
-class PickupLine:
-    """
-    A cog that gives random cheesy pickup lines.
-    """
+class PickupLine(commands.Cog):
+    """A cog that gives random cheesy pickup lines."""
 
     def __init__(self, bot):
         self.bot = bot
@@ -25,7 +23,9 @@ class PickupLine:
     @commands.command()
     async def pickupline(self, ctx):
         """
-        Gives you a random pickup line. Note that most of them are very cheesy!
+        Gives you a random pickup line.
+
+        Note that most of them are very cheesy.
         """
         random_line = random.choice(pickup_lines['lines'])
         embed = discord.Embed(
@@ -40,5 +40,6 @@ class PickupLine:
 
 
 def setup(bot):
+    """Pickup lines Cog load."""
     bot.add_cog(PickupLine(bot))
-    log.info('Pickup line cog loaded')
+    log.info('PickupLine cog loaded')
