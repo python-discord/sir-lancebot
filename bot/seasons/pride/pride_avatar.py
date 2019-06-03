@@ -76,7 +76,7 @@ class PrideAvatar(commands.Cog):
         ring.putalpha(mask)
         return ring
 
-    @commands.command(aliases=["avatarpride", "pridepfp", "prideprofile"])
+    @commands.group(aliases=["avatarpride", "pridepfp", "prideprofile"], invoke_without_command=True)
     async def prideavatar(self, ctx, option="lgbt", pixels: int = 64):
         """
         This surrounds an avatar with a border of a specified LGBT flag.
@@ -122,6 +122,12 @@ class PrideAvatar(commands.Cog):
             embed.set_footer(text=f"Made by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
 
         await ctx.send(file=file, embed=embed)
+
+    @prideavatar.command()
+    async def flags(self, ctx):
+        """This lists the flags that can be used with the prideavatar command."""
+        options = "\n".join(set(OPTIONS.values()))
+        await ctx.send(f"**I have the following flags:**\n{options}")
 
 
 def setup(bot):
