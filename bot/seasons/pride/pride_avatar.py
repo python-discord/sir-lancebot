@@ -6,6 +6,8 @@ import discord
 from PIL import Image, ImageDraw
 from discord.ext import commands
 
+from bot.constants import Colours
+
 log = logging.getLogger(__name__)
 
 OPTIONS = {
@@ -126,8 +128,15 @@ class PrideAvatar(commands.Cog):
     @prideavatar.command()
     async def flags(self, ctx):
         """This lists the flags that can be used with the prideavatar command."""
-        options = "\n".join(set(OPTIONS.values()))
-        await ctx.send(f"**I have the following flags:**\n{options}")
+        choices = sorted(set(OPTIONS.values()))
+        options = "- " + "\n- ".join(choices)
+        embed = discord.Embed(
+            title="I have the following flags:",
+            description=options,
+            colour=Colours.soft_red
+        )
+
+        await ctx.send(embed=embed)
 
 
 def setup(bot):
