@@ -129,7 +129,7 @@ class PrideAvatar(commands.Cog):
     async def flags(self, ctx):
         """This lists the flags that can be used with the prideavatar command."""
         choices = sorted(set(OPTIONS.values()))
-        options = "- " + "\n- ".join(choices)
+        options = "• " + "\n• ".join(choices)
         embed = discord.Embed(
             title="I have the following flags:",
             description=options,
