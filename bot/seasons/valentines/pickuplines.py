@@ -27,7 +27,6 @@ class PickupLine(commands.Cog):
 
         Note that most of them are very cheesy.
         """
-
         random_line = random.choice(pickup_lines['lines'])
         embed = discord.Embed(
             title=':cheese: Your pickup line :cheese:',
@@ -42,6 +41,5 @@ class PickupLine(commands.Cog):
 
 def setup(bot):
     """Pickup lines Cog load."""
-
     bot.add_cog(PickupLine(bot))
     log.info('PickupLine cog loaded')

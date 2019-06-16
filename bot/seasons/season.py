@@ -22,7 +22,6 @@ ICON_BASE_URL = "https://raw.githubusercontent.com/python-discord/branding/maste
 
 def get_seasons() -> List[str]:
     """Returns all the Season objects located in /bot/seasons/."""
-
     seasons = []
 
     for module in pkgutil.iter_modules([Path("bot", "seasons")]):
@@ -33,7 +32,6 @@ def get_seasons() -> List[str]:
 
 def get_season_class(season_name: str) -> Type["SeasonBase"]:
     """Gets the season class of the season module."""
-
     season_lib = importlib.import_module(f"bot.seasons.{season_name}")
     class_name = season_name.replace("_", " ").title().replace(" ", "")
     return getattr(season_lib, class_name)
@@ -41,7 +39,6 @@ def get_season_class(season_name: str) -> Type["SeasonBase"]:
 
 def get_season(season_name: str = None, date: datetime.datetime = None) -> "SeasonBase":
     """Returns a Season object based on either a string or a date."""
-
     # If either both or neither are set, raise an error.
     if not bool(season_name) ^ bool(date):
         raise UserWarning("This function requires either a season or a date in order to run.")
@@ -91,7 +88,6 @@ class SeasonBase:
     @staticmethod
     def current_year() -> int:
         """Returns the current year."""
-
         return datetime.date.today().year
 
     @classmethod
@@ -101,7 +97,6 @@ class SeasonBase:
 
         If no start_date was defined, returns the minimum datetime to ensure it's always below checked dates.
         """
-
         if not cls.start_date:
             return datetime.datetime.min
         return datetime.datetime.strptime(f"{cls.start_date}/{cls.current_year()}", cls.date_format)
@@ -113,7 +108,6 @@ class SeasonBase:
 
         If no end_date was defined, returns the minimum datetime to ensure it's always above checked dates.
         """
-
         if not cls.end_date:
             return datetime.datetime.max
         return datetime.datetime.strptime(f"{cls.end_date}/{cls.current_year()}", cls.date_format)
@@ -121,13 +115,11 @@ class SeasonBase:
     @classmethod
     def is_between_dates(cls, date: datetime.datetime) -> bool:
         """Determines if the given date falls between the season's date range."""
-
         return cls.start() <= date <= cls.end()
 
     @property
     def name_clean(self) -> str:
         """Return the Season's name with underscores replaced by whitespace."""
-
         return self.name.replace("_", " ").title()
 
     @property
@@ -138,7 +130,6 @@ class SeasonBase:
         It's recommended to define one in most cases by overwriting this as a normal attribute in the
         inheriting class.
         """
-
         return f"New Season, {self.name_clean}!"
 
     async def get_icon(self, avatar: bool = False) -> bytes:
@@ -151,7 +142,6 @@ class SeasonBase:
         including the starting slash.
         e.g. `/logos/logo_seasonal/valentines/loved_up.png`
         """
-
         if avatar:
             icon = self.bot_icon or self.icon
         else:
@@ -171,7 +161,6 @@ class SeasonBase:
         Returns False if it failed to change the username, falling back to nick.
         Returns None if `debug` was True and username change wasn't attempted.
         """
-
         guild = bot.get_guild(Client.guild)
         result = None
 
@@ -183,12 +172,12 @@ class SeasonBase:
 
         else:
             if bot.user.name != self.bot_name:
-                # attempt to change user details
+                # Attempt to change user details
                 log.debug(f"Changing username to {self.bot_name}")
                 with contextlib.suppress(discord.HTTPException):
                     await bot.user.edit(username=self.bot_name)
 
-                # fallback on nickname if failed due to ratelimit
+                # Fallback on nickname if failed due to ratelimit
                 if bot.user.name != self.bot_name:
                     log.warning(f"Username failed to change: Changing nickname to {self.bot_name}")
                     await guild.me.edit(nick=self.bot_name)
@@ -196,7 +185,7 @@ class SeasonBase:
                 else:
                     result = True
 
-            # remove nickname if an old one exists
+            # Remove nickname if an old one exists
             if guild.me.nick and guild.me.nick != self.bot_name:
                 log.debug(f"Clearing old nickname of {guild.me.nick}")
                 await guild.me.edit(nick=None)
@@ -209,11 +198,10 @@ class SeasonBase:
 
         Returns True if successful.
         """
-
-        # track old avatar hash for later comparison
+        # Track old avatar hash for later comparison
         old_avatar = bot.user.avatar
 
-        # attempt the change
+        # Attempt the change
         log.debug(f"Changing avatar to {self.bot_icon or self.icon}")
         icon = await self.get_icon(avatar=True)
         with contextlib.suppress(discord.HTTPException, asyncio.TimeoutError):
@@ -233,13 +221,12 @@ class SeasonBase:
 
         Returns True if was successful.
         """
-
         guild = bot.get_guild(Client.guild)
 
-        # track old icon hash for later comparison
+        # Track old icon hash for later comparison
         old_icon = guild.icon
 
-        # attempt the change
+        # Attempt the change
         log.debug(f"Changing server icon to {self.icon}")
         icon = await self.get_icon()
         with contextlib.suppress(discord.HTTPException, asyncio.TimeoutError):
@@ -260,8 +247,7 @@ class SeasonBase:
 
         It will skip the announcement if the current active season is the "evergreen" default season.
         """
-
-        # don't actually announce if reverting to normal season
+        # Don't actually announce if reverting to normal season
         if self.name == "evergreen":
             log.debug(f"Season Changed: {self.name}")
             return
@@ -270,11 +256,11 @@ class SeasonBase:
         channel = guild.get_channel(Channels.announcements)
         mention = f"<@&{Roles.announcements}>"
 
-        # build cog info output
+        # Build cog info output
         doc = inspect.getdoc(self)
         announce = "\n\n".join(l.replace("\n", " ") for l in doc.split("\n\n"))
 
-        # no announcement message found
+        # No announcement message found
         if not doc:
             return
 
@@ -284,7 +270,7 @@ class SeasonBase:
         if self.icon:
             embed.set_image(url=ICON_BASE_URL+self.icon)
 
-        # find any seasonal commands
+        # Find any seasonal commands
         cogs = []
         for cog in bot.cogs.values():
             if "evergreen" in cog.__module__:
@@ -317,7 +303,6 @@ class SeasonBase:
 
         If in debug mode, the avatar, server icon, and announcement will be skipped.
         """
-
         # Prepare all the seasonal cogs, and then the evergreen ones.
         extensions = []
         for ext_folder in {self.name, "evergreen"}:
@@ -371,13 +356,12 @@ class SeasonManager(commands.Cog):
 
     async def load_seasons(self):
         """Asynchronous timer loop to check for a new season every midnight."""
-
         await self.bot.wait_until_ready()
         await self.season.load()
 
         while True:
-            await asyncio.sleep(self.sleep_time)  # sleep until midnight
-            self.sleep_time = 86400  # next time, sleep for 24 hours.
+            await asyncio.sleep(self.sleep_time)  # Sleep until midnight
+            self.sleep_time = 86400  # Next time, sleep for 24 hours.
 
             # If the season has changed, load it.
             new_season = get_season(date=datetime.datetime.utcnow())
@@ -388,7 +372,6 @@ class SeasonManager(commands.Cog):
     @commands.command(name="season")
     async def change_season(self, ctx, new_season: str):
         """Changes the currently active season on the bot."""
-
         self.season = get_season(season_name=new_season)
         await self.season.load()
         await ctx.send(f"Season changed to {new_season}.")
@@ -397,8 +380,7 @@ class SeasonManager(commands.Cog):
     @commands.command(name="seasons")
     async def show_seasons(self, ctx):
         """Shows the available seasons and their dates."""
-
-        # sort by start order, followed by lower duration
+        # Sort by start order, followed by lower duration
         def season_key(season_class: Type[SeasonBase]):
             return season_class.start(), season_class.end() - datetime.datetime.max
 
@@ -420,11 +402,11 @@ class SeasonManager(commands.Cog):
             else:
                 period = f"{start} to {end}"
 
-            # bold period if current date matches season date range
+            # Bold period if current date matches season date range
             is_current = season.is_between_dates(datetime.datetime.utcnow())
             pdec = "**" if is_current else ""
 
-            # underline currently active season
+            # Underline currently active season
             is_active = current_season == season.name
             sdec = "__" if is_active else ""
 
@@ -442,13 +424,12 @@ class SeasonManager(commands.Cog):
     async def refresh(self, ctx):
         """Refreshes certain seasonal elements without reloading seasons."""
         if not ctx.invoked_subcommand:
-            await ctx.invoke(bot.get_command("help"), "refresh")
+            await ctx.send_help(ctx.command)
 
     @refresh.command(name="avatar")
     async def refresh_avatar(self, ctx):
         """Re-applies the bot avatar for the currently loaded season."""
-
-        # attempt the change
+        # Attempt the change
         is_changed = await self.season.apply_avatar()
 
         if is_changed:
@@ -458,7 +439,7 @@ class SeasonManager(commands.Cog):
             colour = discord.Colour.red()
             title = "Avatar Failed to Refresh"
 
-        # report back details
+        # Report back details
         season_name = type(self.season).__name__
         embed = discord.Embed(
             description=f"**Season:** {season_name}\n**Avatar:** {self.season.bot_icon or self.season.icon}",
@@ -471,8 +452,7 @@ class SeasonManager(commands.Cog):
     @refresh.command(name="icon")
     async def refresh_server_icon(self, ctx):
         """Re-applies the server icon for the currently loaded season."""
-
-        # attempt the change
+        # Attempt the change
         is_changed = await self.season.apply_server_icon()
 
         if is_changed:
@@ -482,7 +462,7 @@ class SeasonManager(commands.Cog):
             colour = discord.Colour.red()
             title = "Server Icon Failed to Refresh"
 
-        # report back details
+        # Report back details
         season_name = type(self.season).__name__
         embed = discord.Embed(
             description=f"**Season:** {season_name}\n**Icon:** {self.season.icon}",
@@ -495,11 +475,10 @@ class SeasonManager(commands.Cog):
     @refresh.command(name="username", aliases=("name",))
     async def refresh_username(self, ctx):
         """Re-applies the bot username for the currently loaded season."""
-
         old_username = str(bot.user)
         old_display_name = ctx.guild.me.display_name
 
-        # attempt the change
+        # Attempt the change
         is_changed = await self.season.apply_username()
 
         if is_changed:
@@ -511,7 +490,7 @@ class SeasonManager(commands.Cog):
         else:
             colour = discord.Colour.red()
 
-            # if None, it's because it wasn't meant to change username
+            # If None, it's because it wasn't meant to change username
             if is_changed is None:
                 title = "Nickname Refreshed"
             else:
@@ -520,7 +499,7 @@ class SeasonManager(commands.Cog):
             old_name = old_display_name
             new_name = self.season.bot_name
 
-        # report back details
+        # Report back details
         season_name = type(self.season).__name__
         embed = discord.Embed(
             description=f"**Season:** {season_name}\n"
@@ -535,10 +514,8 @@ class SeasonManager(commands.Cog):
     @commands.command()
     async def announce(self, ctx):
         """Announces the currently loaded season."""
-
         await self.season.announce_season()
 
     def cog_unload(self):
         """Cancel season-related tasks on cog unload."""
-
         self.season_task.cancel()

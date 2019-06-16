@@ -43,7 +43,6 @@ class LinePaginator(Paginator):
 
         Allows for configuration of the maximum number of lines per page.
         """
-
         self.prefix = prefix
         self.suffix = suffix
         self.max_size = max_size - len(suffix)
@@ -74,7 +73,6 @@ class LinePaginator(Paginator):
         RuntimeError
             The line was too big for the current `max_size`.
         """
-
         if len(line) > self.max_size - len(self.prefix) - 2:
             raise RuntimeError('Line exceeds maximum page size %s' % (self.max_size - len(self.prefix) - 2))
 
@@ -130,10 +128,8 @@ class LinePaginator(Paginator):
         :param timeout: The amount of time in seconds to disable pagination of no reaction is added
         :param footer_text: Text to prefix the page number in the footer with
         """
-
         def event_check(reaction_: Reaction, user_: Member):
             """Make sure that this reaction is what we want to operate on."""
-
             no_restrictions = (
                 # Pagination is not restricted
                 not restrict_to_user
@@ -321,7 +317,6 @@ class ImagePaginator(Paginator):
         :param line: str to be page content / title
         :param empty: if there should be new lines between entries
         """
-
         if line:
             self._count = len(line)
         else:
@@ -335,7 +330,6 @@ class ImagePaginator(Paginator):
 
         :param image: image url to be appended
         """
-
         self.images.append(image)
 
     @classmethod
@@ -365,7 +359,6 @@ class ImagePaginator(Paginator):
         :param suffix: suffix of message
         :param timeout: timeout for when reactions get auto-removed
         """
-
         def check_event(reaction_: Reaction, member: Member) -> bool:
             """
             Checks each reaction added, if it matches our conditions pass the wait_for.
@@ -373,7 +366,6 @@ class ImagePaginator(Paginator):
             :param reaction_: reaction added
             :param member: reaction added by member
             """
-
             return all((
                 # Reaction is on the same message sent
                 reaction_.message.id == message.id,

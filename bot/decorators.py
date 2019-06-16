@@ -15,7 +15,6 @@ log = logging.getLogger(__name__)
 
 def with_role(*role_ids: int):
     """Check to see whether the invoking user has any of the roles specified in role_ids."""
-
     async def predicate(ctx: Context):
         if not ctx.guild:  # Return False in a DM
             log.debug(f"{ctx.author} tried to use the '{ctx.command.name}'command from a DM. "
@@ -35,7 +34,6 @@ def with_role(*role_ids: int):
 
 def without_role(*role_ids: int):
     """Check whether the invoking user does not have all of the roles specified in role_ids."""
-
     async def predicate(ctx: Context):
         if not ctx.guild:  # Return False in a DM
             log.debug(f"{ctx.author} tried to use the '{ctx.command.name}' command from a DM. "
@@ -52,7 +50,6 @@ def without_role(*role_ids: int):
 
 def in_channel(channel_id):
     """Check that the command invocation is in the channel specified by channel_id."""
-
     async def predicate(ctx: Context):
         check = ctx.channel.id == channel_id
         log.debug(f"{ctx.author} tried to call the '{ctx.command.name}' command. "
@@ -69,7 +66,6 @@ def locked():
 
     This decorator has to go before (below) the `command` decorator.
     """
-
     def wrap(func):
         func.__locks = WeakValueDictionary()
 

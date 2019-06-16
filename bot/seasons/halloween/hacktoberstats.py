@@ -34,7 +34,6 @@ class HacktoberStats(commands.Cog):
         linked their Discord name to GitHub using .stats link. If invoked with a github_username,
         get that user's contributions
         """
-
         if not github_username:
             author_id, author_mention = HacktoberStats._author_mention_from_context(ctx)
 
@@ -65,7 +64,6 @@ class HacktoberStats(commands.Cog):
                 }
             }
         """
-
         author_id, author_mention = HacktoberStats._author_mention_from_context(ctx)
         if github_username:
             if str(author_id) in self.linked_accounts.keys():
@@ -89,7 +87,6 @@ class HacktoberStats(commands.Cog):
     @hacktoberstats_group.command(name="unlink")
     async def unlink_user(self, ctx: commands.Context):
         """Remove the invoking user's account link from the log."""
-
         author_id, author_mention = HacktoberStats._author_mention_from_context(ctx)
 
         stored_user = self.linked_accounts.pop(author_id, None)
@@ -114,7 +111,6 @@ class HacktoberStats(commands.Cog):
                 }
             }
         """
-
         if self.link_json.exists():
             logging.info(f"Loading linked GitHub accounts from '{self.link_json}'")
             with open(self.link_json, 'r') as fID:
@@ -138,7 +134,6 @@ class HacktoberStats(commands.Cog):
                 }
             }
         """
-
         logging.info(f"Saving linked_accounts to '{self.link_json}'")
         with open(self.link_json, 'w') as fID:
             json.dump(self.linked_accounts, fID, default=str)
@@ -154,7 +149,6 @@ class HacktoberStats(commands.Cog):
 
         Otherwise, post a helpful error message
         """
-
         async with ctx.typing():
             prs = await self.get_october_prs(github_username)
 
@@ -166,7 +160,6 @@ class HacktoberStats(commands.Cog):
 
     def build_embed(self, github_username: str, prs: typing.List[dict]) -> discord.Embed:
         """Return a stats embed built from github_username's PRs."""
-
         logging.info(f"Building Hacktoberfest embed for GitHub user: '{github_username}'")
         pr_stats = self._summarize_prs(prs)
 
@@ -221,7 +214,6 @@ class HacktoberStats(commands.Cog):
 
         Otherwise, return None
         """
-
         logging.info(f"Generating Hacktoberfest PR query for GitHub user: '{github_username}'")
         base_url = "https://api.github.com/search/issues?q="
         not_label = "invalid"
@@ -278,7 +270,6 @@ class HacktoberStats(commands.Cog):
              V
              "python-discord/seasonalbot"
         """
-
         exp = r"https?:\/\/api.github.com\/repos\/([/\-\_\.\w]+)"
         return re.findall(exp, in_url)[0]
 
@@ -293,7 +284,6 @@ class HacktoberStats(commands.Cog):
             "top5": [(repo_shortname, ncontributions), ...]
             }
         """
-
         contributed_repos = [pr["repo_shortname"] for pr in prs]
         return {"n_prs": len(prs), "top5": Counter(contributed_repos).most_common(5)}
 
@@ -309,7 +299,6 @@ class HacktoberStats(commands.Cog):
            n contribution(s) to [shortname](url)
            ...
         """
-
         baseURL = "https://www.github.com/"
         contributionstrs = []
         for repo in stats['top5']:
@@ -321,7 +310,6 @@ class HacktoberStats(commands.Cog):
     @staticmethod
     def _contributionator(n: int) -> str:
         """Return "contribution" or "contributions" based on the value of n."""
-
         if n == 1:
             return "contribution"
         else:
@@ -330,7 +318,6 @@ class HacktoberStats(commands.Cog):
     @staticmethod
     def _author_mention_from_context(ctx: commands.Context) -> typing.Tuple:
         """Return stringified Message author ID and mentionable string from commands.Context."""
-
         author_id = str(ctx.message.author.id)
         author_mention = ctx.message.author.mention
 
@@ -339,6 +326,5 @@ class HacktoberStats(commands.Cog):
 
 def setup(bot):
     """Hacktoberstats Cog load."""
-
     bot.add_cog(HacktoberStats(bot))
     log.info("HacktoberStats cog loaded")

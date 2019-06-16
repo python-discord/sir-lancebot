@@ -13,6 +13,7 @@ RUN apk add --no-cache --update \
         build-base \
         git \
         libffi-dev \
+        libwebp-dev \
         # Pillow dependencies
         freetype-dev \
         libjpeg-turbo-dev \

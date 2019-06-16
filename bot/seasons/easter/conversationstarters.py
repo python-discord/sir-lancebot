@@ -20,12 +20,10 @@ class ConvoStarters(commands.Cog):
     @commands.command()
     async def topic(self, ctx):
         """Responds with a random topic to start a conversation."""
-
         await ctx.send(random.choice(starters['starters']))
 
 
 def setup(bot):
     """Conversation starters Cog load."""
-
     bot.add_cog(ConvoStarters(bot))
     log.info("ConvoStarters cog loaded")

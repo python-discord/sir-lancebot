@@ -25,7 +25,6 @@ class SaveTheDate(commands.Cog):
     @commands.command()
     async def savethedate(self, ctx):
         """Gives you ideas for what to do on a date with your valentine."""
-
         random_date = random.choice(VALENTINES_DATES['ideas'])
         emoji_1 = random.choice(HEART_EMOJIS)
         emoji_2 = random.choice(HEART_EMOJIS)
@@ -39,6 +38,5 @@ class SaveTheDate(commands.Cog):
 
 def setup(bot):
     """Save the date Cog Load."""
-
     bot.add_cog(SaveTheDate(bot))
     log.info("SaveTheDate cog loaded")

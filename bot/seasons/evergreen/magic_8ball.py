@@ -18,7 +18,7 @@ class Magic8ball(commands.Cog):
 
     @commands.command(name="8ball")
     async def output_answer(self, ctx, *, question):
-        """Return a magic 8 ball answer from answers list."""
+        """Return a Magic 8ball answer from answers list."""
         if len(question.split()) >= 3:
             answer = random.choice(self.answers)
             await ctx.send(answer)
@@ -27,7 +27,6 @@ class Magic8ball(commands.Cog):
 
 
 def setup(bot):
-    """Magic 8ball cog load."""
-
+    """Magic 8ball Cog load."""
     bot.add_cog(Magic8ball(bot))
     log.info("Magic8ball cog loaded")
