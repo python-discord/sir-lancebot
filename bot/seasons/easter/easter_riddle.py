@@ -23,17 +23,15 @@ class EasterRiddle(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.quiz_messages = {}
-        self.winner = " "
+        self.winner = ""
         self.correct = ""
 
     @commands.command(aliases=["riddlemethis", "riddleme"])
     async def riddle(self, ctx):
-        """
-        Gives a random riddle questions, then provides 2 hints at 10 second intervals before revealing the answer
-
-        """
+        """Gives a random riddle questions, then provides 2 hints at 10 second intervals before revealing the answer"""
         random_question = random.choice(RIDDLE_QUESTIONS)
-        question, hints = random_question["question"], random_question["riddles"]
+        question = random_question["question"]
+        hints = random_question["riddles"]
         self.correct = random_question["correct_answer"]
 
         description = f"You have {TIMELIMIT} seconds before the first hint.\n\n"
@@ -59,8 +57,8 @@ class EasterRiddle(commands.Cog):
         await ctx.send(embed=h_embed)
         await asyncio.sleep(TIMELIMIT)
 
-        if self.winner != " ":
-            content = "Well done " + self.winner + "for getting it correct!"
+        if not self.winner:
+            content = f"Well done {self.winner} for getting it correct!"
         else:
             content = "Nobody got it right..."
 
@@ -71,10 +69,11 @@ class EasterRiddle(commands.Cog):
 
         await ctx.send(content, embed=a_embed)
 
-        self.winner = " "
+        self.winner = ""
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        """If a non-bot user enters a correct answer, their username gets added to self.winner"""
         if self.bot.user != message.author:
             if message.content.lower() == self.correct.lower():
                 self.winner = self.winner + message.author.mention + " "
