@@ -23,7 +23,7 @@ class EasterRiddle(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.quiz_messages = {}
-        self.winner = ""
+        self.winner = []
         self.correct = ""
 
     @commands.command(aliases=["riddlemethis", "riddleme"])
@@ -57,8 +57,10 @@ class EasterRiddle(commands.Cog):
         await ctx.send(embed=h_embed)
         await asyncio.sleep(TIMELIMIT)
 
-        if not self.winner:
-            content = f"Well done {self.winner} for getting it correct!"
+        if self.winner:
+            win_list = " "
+            win_list = win_list.join(self.winner)
+            content = f"Well done {win_list} for getting it correct!"
         else:
             content = "Nobody got it right..."
 
@@ -76,7 +78,7 @@ class EasterRiddle(commands.Cog):
         """If a non-bot user enters a correct answer, their username gets added to self.winner"""
         if self.bot.user != message.author:
             if message.content.lower() == self.correct.lower():
-                self.winner = self.winner + message.author.mention + " "
+                self.winner.append(message.author.mention)
 
 
 def setup(bot):
