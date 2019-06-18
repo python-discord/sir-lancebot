@@ -15,7 +15,7 @@ class PrideAnthem(commands.Cog):
         self.bot = bot
         self.anthems = self.load_vids()
 
-    def get_video(self, genre: str = None):
+    def get_video(self, genre: str = None) -> dict:
         if not genre:
             return choice(self.anthems)
         else:
@@ -26,13 +26,13 @@ class PrideAnthem(commands.Cog):
                 log.info('No videos for that genre.')
 
     @staticmethod
-    def load_vids():
+    def load_vids() -> list:
         with open(Path('bot', 'resources', 'pride', 'anthems.json').absolute(), 'r') as f:
             anthems = load(f)
         return anthems
 
     @commands.command(name='prideanthem')
-    async def send_anthem(self, ctx, genre=None):
+    async def send_anthem(self, ctx, genre: str = None):
         anthem = self.get_video(genre)
         # embed = Embed(title='Pride Anthem',
         #               description="Here is a pride anthem to check out!")
