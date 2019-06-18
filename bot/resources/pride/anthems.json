@@ -2,329 +2,498 @@
   {
     "title": "Girls Like Girls",
     "artist": "Hayley Kiyoko",
-    "video": "https://www.youtube.com/watch?v=I0MT8SwNa_U",
-    "genre": ["Pop", "Electropop"]
+    "url": "https://www.youtube.com/watch?v=I0MT8SwNa_U",
+    "genre": [
+      "pop",
+      "electropop"
+    ]
   },
   {
     "title": "I don't do boys",
     "artist": "Elektra",
-    "video": "https://www.youtube.com/watch?v=MxAvsYrHOmI",
-    "genre": ["Rock", "Pop"]
+    "url": "https://www.youtube.com/watch?v=MxAvsYrHOmI",
+    "genre": [
+      "rock",
+      "pop"
+    ]
   },
   {
     "title": "Girls/Girls/Boys",
     "artist": "Panic! at the Disco",
-    "video": "https://www.youtube.com/watch?v=Yk8jV7r6VMk",
-    "genre": ["Alt", "Alternative", "Indie", "New wave", "Electropop", "Pop", "Rock"]
+    "url": "https://www.youtube.com/watch?v=Yk8jV7r6VMk",
+    "genre": [
+      "alt",
+      "alternative",
+      "indie",
+      "new-wave",
+      "electropop",
+      "pop",
+      "rock"
+    ]
   },
   {
     "title": "I Will Survive",
     "artist": "Gloria Gaynor",
-    "video": "https://www.youtube.com/watch?v=gYkACVDFmeg",
-    "genre": ["Jazz", "Disco", "RnB", "R&B", "Rhythm and Blues", "Soul", "Dance", "Electronic", "Pop"]
+    "url": "https://www.youtube.com/watch?v=gYkACVDFmeg",
+    "genre": [
+      "jazz",
+      "disco",
+      "rnb",
+      "r&b",
+      "rhythm and blues",
+      "soul",
+      "dance",
+      "electronic",
+      "pop"
+    ]
   },
   {
     "title": "Born This Way",
     "artist": "Lady Gaga",
-    "video": "https://www.youtube.com/watch?v=wV1FrqwZyKw",
-    "genre": ["Pop", "Electropop"]
+    "url": "https://www.youtube.com/watch?v=wV1FrqwZyKw",
+    "genre": [
+      "pop",
+      "electropop"
+    ]
   },
   {
     "title": "Raise Your Glass",
     "artist": "P!nk",
-    "video": "https://www.youtube.com/watch?v=XjVNlG5cZyQ",
-    "genre": ["Pop", "Rock", "Pop-rock"]
+    "url": "https://www.youtube.com/watch?v=XjVNlG5cZyQ",
+    "genre": [
+      "pop",
+      "rock",
+      "pop-rock"
+    ]
   },
   {
     "title": "We R Who We R",
     "artist": "Ke$ha",
-    "video": "https://www.youtube.com/watch?v=mXvmSaE0JXA",
-    "genre": ["Pop", "Dance-pop"]
+    "url": "https://www.youtube.com/watch?v=mXvmSaE0JXA",
+    "genre": [
+      "pop",
+      "dance-pop"
+    ]
   },
   {
     "title": "I'm Coming Out",
     "artist": "Diana Ross",
-    "video": "https://www.youtube.com/watch?v=zbYcte4ZEgQ",
-    "genre": ["Disco", "Funk", "Soul"]
+    "url": "https://www.youtube.com/watch?v=zbYcte4ZEgQ",
+    "genre": [
+      "disco",
+      "funk",
+      "soul"
+    ]
   },
   {
     "title": "She Keeps Me Warm",
     "artist": "Mary Lambert",
-    "video": "https://www.youtube.com/watch?v=NhqH-r7Xj0E",
-    "genre": ["Pop"]
+    "url": "https://www.youtube.com/watch?v=NhqH-r7Xj0E",
+    "genre": [
+      "pop"
+    ]
   },
   {
     "title": "June",
     "artist": "Florence + The Machine",
-    "video": "https://www.youtube.com/watch?v=Sosmd6RjeA0",
-    "genre": ["Alt", "Indie", "Alternative"]
+    "url": "https://www.youtube.com/watch?v=Sosmd6RjeA0",
+    "genre": [
+      "alt",
+      "indie",
+      "alternative"
+    ]
   },
   {
     "title": "Do I Wanna Know",
     "artist": "MS MR",
-    "video": "https://youtu.be/0DCDf1O4e1Q",
-    "genre": ["Indie", "Indie-pop"]
+    "url": "https://youtu.be/0DCDf1O4e1Q",
+    "genre": [
+      "indie",
+      "indie-pop"
+    ]
   },
   {
     "title": "Delilah",
     "artist": "Florence + The Machine",
-    "video": "https://www.youtube.com/watch?v=zZr5Tid3Qw4",
-    "genre": ["Alt", "Alternative", "Indie"]
+    "url": "https://www.youtube.com/watch?v=zZr5Tid3Qw4",
+    "genre": [
+      "alt",
+      "alternative",
+      "indie"
+    ]
   },
   {
     "title": "Pynk",
     "artist": "Janelle Monae",
-    "video": "https://www.youtube.com/watch?v=PaYvlVR_BEc",
-    "genre": ["RnB", "Rhythm and Blues", "R&B", "Soul"]
+    "url": "https://www.youtube.com/watch?v=PaYvlVR_BEc",
+    "genre": [
+      "rnb",
+      "rhythm and blues",
+      "r&b",
+      "soul"
+    ]
   },
   {
     "title": "Queen",
     "artist": "Janelle Monae",
-    "video": "https://www.youtube.com/watch?v=tEddixS-UoU",
-    "genre": ["Neo-soul"]
+    "url": "https://www.youtube.com/watch?v=tEddixS-UoU",
+    "genre": [
+      "neo-soul"
+    ]
   },
   {
     "title": "Aesthetic",
     "artist": "Hi, I'm Case",
-    "video": "https://www.youtube.com/watch?v=cgq-XaSC1aY",
-    "genre": ["Pop", "Pop-rock"]
+    "url": "https://www.youtube.com/watch?v=cgq-XaSC1aY",
+    "genre": [
+      "pop",
+      "pop-rock"
+    ]
   },
   {
     "title": "Break Free",
     "artist": "Queen",
-    "video": "https://www.youtube.com/watch?v=f4Mc-NYPHaQ",
-    "genre": ["Rock", "Synth-pop"]
+    "url": "https://www.youtube.com/watch?v=f4Mc-NYPHaQ",
+    "genre": [
+      "rock",
+      "synth-pop"
+    ]
   },
   {
     "title": "LGBT",
     "artist": "CupcakKe",
-    "video": "https://www.youtube.com/watch?v=U_OArkw5yeQ",
-    "genre": ["Hip-Hop", "Rap"]
+    "url": "https://www.youtube.com/watch?v=U_OArkw5yeQ",
+    "genre": [
+      "hip-hop",
+      "rap"
+    ]
   },
   {
     "title": "Rainbow Connections",
     "artist": "Garfunkel and Oates",
-    "video": "https://www.youtube.com/watch?v=MneRtx7x2vs",
-    "genre": ["Folk"]
+    "url": "https://www.youtube.com/watch?v=MneRtx7x2vs",
+    "genre": [
+      "folk"
+    ]
   },
   {
     "title": "Proud",
     "artist": "Heather Small",
-    "video": "https://www.youtube.com/watch?v=LEoxGJ79PMs",
-    "genre": ["Dance-pop", "R&B", "Rhythm and Blues", "RnB"]
+    "url": "https://www.youtube.com/watch?v=LEoxGJ79PMs",
+    "genre": [
+      "dance-pop",
+      "r&b",
+      "rhythm and blues",
+      "rnb"
+    ]
   },
   {
     "title": "LGBT",
     "artist": "Lowell",
-    "video": "https://www.youtube.com/watch?v=QgE6nZmTGLw",
-    "genre": ["Alternative", "Indie", "Alt", "Pop"]
+    "url": "https://www.youtube.com/watch?v=QgE6nZmTGLw",
+    "genre": [
+      "alternative",
+      "indie",
+      "alt",
+      "pop"
+    ]
   },
   {
     "title": "Kiss the Boy",
     "artist": "Keiynan Lonsdale",
-    "video": "https://www.youtube.com/watch?v=bXzLZ7QQnpQ",
-    "genre": ["Pop"]
+    "url": "https://www.youtube.com/watch?v=bXzLZ7QQnpQ",
+    "genre": [
+      "pop"
+    ]
   },
   {
     "title": "Boys Aside",
     "artist": "Sofya Wang",
-    "video": "https://www.youtube.com/watch?v=NlAW7l6dmeA",
-    "genre": ["Pop"]
+    "url": "https://www.youtube.com/watch?v=NlAW7l6dmeA",
+    "genre": [
+      "pop"
+    ]
   },
   {
     "title": "Everyone is Gay",
     "artist": "A Great Big World",
-    "video": "https://www.youtube.com/watch?v=0VG1bj4Lj1Q",
-    "genre": ["Pop"]
+    "url": "https://www.youtube.com/watch?v=0VG1bj4Lj1Q",
+    "genre": [
+      "pop"
+    ]
   },
   {
     "title": "The Queer Gospel",
     "artist": "Erin McKeown",
-    "video": "https://www.youtube.com/watch?v=2vvOEoT-q_o",
-    "genre": ["Christian", "Gospel"]
+    "url": "https://www.youtube.com/watch?v=2vvOEoT-q_o",
+    "genre": [
+      "christian",
+      "gospel"
+    ]
   },
   {
     "title": "Girls",
     "artist": "Girl in Red",
-    "video": "https://www.youtube.com/watch?v=_BMBDY01kPk",
-    "genre": ["Alternative", "Indie", "Alt"]
+    "url": "https://www.youtube.com/watch?v=_BMBDY01kPk",
+    "genre": [
+      "alternative",
+      "indie",
+      "alt"
+    ]
   },
   {
     "title": "Crazy World",
     "artist": "MNEK",
-    "video": "https://www.youtube.com/watch?v=YBwzTgNL-zw",
-    "genre": ["Pop"]
+    "url": "https://www.youtube.com/watch?v=YBwzTgNL-zw",
+    "genre": [
+      "pop"
+    ]
   },
   {
     "title": "It Girl",
     "artist": "Mister Wallace",
-    "video": "https://www.youtube.com/watch?v=NEnmporrBuo",
-    "genre": ["Dance", "Electronic"]
+    "url": "https://www.youtube.com/watch?v=NEnmporrBuo",
+    "genre": [
+      "dance",
+      "electronic"
+    ]
   },
   {
     "title": "Gay Sex",
     "artist": "Be Steadwell",
-    "video": "https://www.youtube.com/watch?v=XnbQu_pzf8o",
-    "genre": ["Pop"]
+    "url": "https://www.youtube.com/watch?v=XnbQu_pzf8o",
+    "genre": [
+      "pop"
+    ]
   },
   {
     "title": "Bisexual Anthem",
     "artist": "Domo Wilson",
-    "video": "https://www.youtube.com/watch?v=RBX4IwvGjm8",
-    "genre": ["Hip-Hop", "Rap"]
+    "url": "https://www.youtube.com/watch?v=RBX4IwvGjm8",
+    "genre": [
+      "hip-hop",
+      "rap"
+    ]
   },
   {
     "title": "Pride",
     "artist": "Grace Petrie",
-    "video": "https://www.youtube.com/watch?v=y5rMrPJzFGs",
-    "genre": ["Alt", "Alternative", "Indie"]
+    "url": "https://www.youtube.com/watch?v=y5rMrPJzFGs",
+    "genre": [
+      "alt",
+      "alternative",
+      "indie"
+    ]
   },
   {
     "title": "Good Guys",
     "artist": "MIKA",
-    "video": "https://www.youtube.com/watch?v=VZQ_9eebry0",
-    "genre": ["Pop"]
+    "url": "https://www.youtube.com/watch?v=VZQ_9eebry0",
+    "genre": [
+      "pop"
+    ]
   },
   {
     "title": "Gender is Boring",
     "artist": "She/Her/Hers",
-    "video": "https://www.youtube.com/watch?v=glJW2vlBAQg",
-    "genre": ["Punk"]
+    "url": "https://www.youtube.com/watch?v=glJW2vlBAQg",
+    "genre": [
+      "punk"
+    ]
   },
   {
     "title": "I Like Boys",
     "artist": "Todrick Hall",
-    "video": "https://www.youtube.com/watch?v=RIbGksV3YBY",
-    "genre": ["Dance", "Electronic"]
+    "url": "https://www.youtube.com/watch?v=RIbGksV3YBY",
+    "genre": [
+      "dance",
+      "electronic"
+    ]
   },
   {
     "title": "Girls",
     "artist": "Beatrice Eli",
-    "video": "https://www.youtube.com/watch?v=Orffm0v0mS0",
-    "genre": ["Pop"]
+    "url": "https://www.youtube.com/watch?v=Orffm0v0mS0",
+    "genre": [
+      "pop"
+    ]
   },
   {
     "title": "GUY.exe",
     "artist": "Superfruit",
-    "video": "https://www.youtube.com/watch?v=r2Kh_XMIDPU",
-    "genre": ["Pop"]
+    "url": "https://www.youtube.com/watch?v=r2Kh_XMIDPU",
+    "genre": [
+      "pop"
+    ]
   },
   {
     "title": "That's So Gay",
     "artist": "Pansy Division",
-    "video": "https://www.youtube.com/watch?v=xlpcyeadaTk",
-    "genre": ["Rock"]
+    "url": "https://www.youtube.com/watch?v=xlpcyeadaTk",
+    "genre": [
+      "rock"
+    ]
   },
   {
     "title": "Queer Kidz",
     "artist": "Ashby and the Oceanns",
-    "video": "https://www.youtube.com/watch?v=tSdCciMIlO8",
-    "genre": ["Folk"]
+    "url": "https://www.youtube.com/watch?v=tSdCciMIlO8",
+    "genre": [
+      "folk"
+    ]
   },
   {
     "title": "Butch in the Streets",
     "artist": "Tribe 8",
-    "video": "https://www.youtube.com/watch?v=HWxFym7h8LQ",
-    "genre": ["Rock"]
+    "url": "https://www.youtube.com/watch?v=HWxFym7h8LQ",
+    "genre": [
+      "rock"
+    ]
   },
   {
     "title": "Strangers",
     "artist": "Halsey",
-    "video": "https://www.youtube.com/watch?v=RVd_71ZdRd4",
-    "genre": ["Pop", "Alt", "Alternative", "Indie", "Electropop"]
+    "url": "https://www.youtube.com/watch?v=RVd_71ZdRd4",
+    "genre": [
+      "pop",
+      "alt",
+      "alternative",
+      "indie",
+      "electropop"
+    ]
   },
   {
     "title": "LGBTQIA",
     "artist": "Matt Fishel",
-    "video": "https://www.youtube.com/watch?v=KQq9f5hNOxE",
-    "genre": ["Rock"]
+    "url": "https://www.youtube.com/watch?v=KQq9f5hNOxE",
+    "genre": [
+      "rock"
+    ]
   },
   {
     "title": "Tell Me a Story",
     "artist": "Skylar Kergil",
-    "video": "https://www.youtube.com/watch?v=nbQDTE2s3dI",
-    "genre": ["Folk"]
+    "url": "https://www.youtube.com/watch?v=nbQDTE2s3dI",
+    "genre": [
+      "folk"
+    ]
   },
   {
     "title": "Bi",
     "artist": "Alicia Champion",
-    "video": "https://www.youtube.com/watch?v=HekhW9STg58",
-    "genre": ["Pop"]
+    "url": "https://www.youtube.com/watch?v=HekhW9STg58",
+    "genre": [
+      "pop"
+    ]
   },
   {
     "title": "Trans Is Love",
     "artist": "Marissa Kay",
-    "video": "https://www.youtube.com/watch?v=-5f_1H0RD1I",
-    "genre": ["Alt", "Alternative", "Indie", "Alt-country", "Alt-folk", "Indie-rock", "New-southern-rock"]
+    "url": "https://www.youtube.com/watch?v=-5f_1H0RD1I",
+    "genre": [
+      "alt",
+      "alternative",
+      "indie",
+      "alt-country",
+      "alt-folk",
+      "indie-rock",
+      "new-southern-rock"
+    ]
   },
   {
     "title": "You Can't Tell Me",
     "artist": "Jake Edwards",
-    "video": "https://www.youtube.com/watch?v=CwqDG5269Ak",
-    "genre": ["Pop"]
+    "url": "https://www.youtube.com/watch?v=CwqDG5269Ak",
+    "genre": [
+      "pop"
+    ]
   },
   {
     "title": "Closet Femme",
     "artist": "Kate Reid",
-    "video": "https://www.youtube.com/watch?v=va-nqcNxP_k",
-    "genre": ["Folk"]
+    "url": "https://www.youtube.com/watch?v=va-nqcNxP_k",
+    "genre": [
+      "folk"
+    ]
   },
   {
     "title": "Make Me Feel",
     "artist": "Janelle Monae",
-    "video": "https://www.youtube.com/watch?v=tGRzz0oqgUE",
-    "genre": ["Rhythm and Blues", "RnB", "R&B", "Soul"]
+    "url": "https://www.youtube.com/watch?v=tGRzz0oqgUE",
+    "genre": [
+      "rhythm and blues",
+      "rnb",
+      "r&b",
+      "soul"
+    ]
   },
   {
     "title": "Let's Have a Kiki",
     "artist": "Scissor Sisters",
-    "video": "https://www.youtube.com/watch?v=eGCD4xb-Tr8",
-    "genre":["Electropop", "Pop"]
+    "url": "https://www.youtube.com/watch?v=eGCD4xb-Tr8",
+    "genre": [
+      "electropop",
+      "pop"
+    ]
   },
   {
     "title": "Gimme Gimme Gimme",
     "artist": "ABBA",
-    "video": "https://www.youtube.com/watch?v=JWay7CDEyAI",
-    "genre": ["Disco"]
+    "url": "https://www.youtube.com/watch?v=JWay7CDEyAI",
+    "genre": [
+      "disco"
+    ]
   },
   {
     "title": "Dancing Queen",
     "artist": "ABBA",
-    "video": "https://www.youtube.com/watch?v=xFrGuyw1V8s",
-    "genre": ["Disco", "Europop", "Euero-disco"]
+    "url": "https://www.youtube.com/watch?v=xFrGuyw1V8s",
+    "genre": [
+      "disco",
+      "europop",
+      "euero-disco"
+    ]
   },
   {
     "title": "City Grrl",
     "artist": "CSS",
-    "video": "https://www.youtube.com/watch?v=duOA3FgpZqY",
-    "genre": ["Electropop"]
+    "url": "https://www.youtube.com/watch?v=duOA3FgpZqY",
+    "genre": [
+      "electropop"
+    ]
   },
   {
     "title": "Blame it on the Girls",
     "artist": "MIKA",
-    "video": "https://www.youtube.com/watch?v=iF_w7oaBHNo",
-    "genre": ["Pop", "Pop-rock"]
+    "url": "https://www.youtube.com/watch?v=iF_w7oaBHNo",
+    "genre": [
+      "pop",
+      "pop-rock"
+    ]
   },
   {
     "title": "Bye Bye Bye",
     "artist": "*NSYNC",
-    "video": "https://www.youtube.com/watch?v=Eo-KmOd3i7s",
-    "genre": ["Pop", "Europop"]
+    "url": "https://www.youtube.com/watch?v=Eo-KmOd3i7s",
+    "genre": [
+      "pop",
+      "europop"
+    ]
   },
   {
     "title": "Gettin Bi",
     "artist": "Crazy Ex-Girlfriend",
-    "video": "https://www.youtube.com/watch?v=5e7844P77Is",
-    "genre": ["Pop"]
+    "url": "https://www.youtube.com/watch?v=5e7844P77Is",
+    "genre": [
+      "pop"
+    ]
   },
   {
     "title": "Heterosexuality is a Construct",
     "artist": "One Night Stand in North Dakota",
-    "video": "https://www.youtube.com/watch?v=linQQ_XIVjI",
-    "genre": ["Punk"]
-  },
-  {
-    "title": "Love You So Bad",
-    "artist": "Ezra Furman",
+    "url": "https://www.youtube.com/watch?v=linQQ_XIVjI",
+    "genre": [
+      "punk"
+    ]
   }
 ]

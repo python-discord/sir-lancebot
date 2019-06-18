@@ -1,17 +1,11 @@
 import logging
-from pathlib import Path
 from json import load
+from pathlib import Path
 from random import choice
 
 from discord.ext import commands
 
-
 log = logging.getLogger(__name__)
-
-
-OPTIONS = {
-
-}
 
 
 class PrideAnthem(commands.Cog):
@@ -21,12 +15,15 @@ class PrideAnthem(commands.Cog):
         self.bot = bot
         self.anthems = self.load_vids()
 
-    def get_video(self, genre=None):
+    def get_video(self, genre: str = None):
         if not genre:
             return choice(self.anthems)
         else:
-            songs = [song for song in self.anthems if genre in song.genre]
-            return choice(songs)
+            songs = [song for song in self.anthems if genre.casefold() in song['genre']]
+            try:
+                return choice(songs)
+            except IndexError:
+                log.info('No videos for that genre.')
 
     @staticmethod
     def load_vids():
@@ -36,8 +33,13 @@ class PrideAnthem(commands.Cog):
 
     @commands.command(name='prideanthem')
     async def send_anthem(self, ctx, genre=None):
-        video = self.get_video(genre)
-        await ctx.send(f'Here\'s a pride anthem for you! {video.url}')
+        anthem = self.get_video(genre)
+        # embed = Embed(title='Pride Anthem',
+        #               description="Here is a pride anthem to check out!")
+        if anthem:
+            await ctx.send(anthem['url'])
+        else:
+            await ctx.send("I couldn't find a video, sorry!")
 
 
 def setup(bot):
