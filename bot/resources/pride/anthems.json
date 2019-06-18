@@ -1,11 +1,55 @@
 [
   {
-    "title": "Girls Like Girls",
-    "artist": "Hayley Kiyoko",
-    "url": "https://www.youtube.com/watch?v=I0MT8SwNa_U",
+    "title": "Bi",
+    "artist": "Alicia Champion",
+    "url": "https://www.youtube.com/watch?v=HekhW9STg58",
     "genre": [
-      "pop",
-      "electropop"
+      "pop"
+    ]
+  },
+  {
+    "title": "Queer Kidz",
+    "artist": "Ashby and the Oceanns",
+    "url": "https://www.youtube.com/watch?v=tSdCciMIlO8",
+    "genre": [
+      "folk"
+    ]
+  },
+  {
+    "title": "I Like Boys",
+    "artist": "Todrick Hall",
+    "url": "https://www.youtube.com/watch?v=RIbGksV3YBY",
+    "genre": [
+      "dance",
+      "electronic"
+    ]
+  },
+  {
+    "title": "It Girl",
+    "artist": "Mister Wallace",
+    "url": "https://www.youtube.com/watch?v=NEnmporrBuo",
+    "genre": [
+      "dance",
+      "electronic"
+    ]
+  },
+  {
+    "title": "Gay Sex",
+    "artist": "Be Steadwell",
+    "url": "https://www.youtube.com/watch?v=XnbQu_pzf8o",
+    "genre": [
+      "pop"
+    ]
+  },
+  {
+    "title": "Pynk",
+    "artist": "Janelle Monae",
+    "url": "https://www.youtube.com/watch?v=PaYvlVR_BEc",
+    "genre": [
+      "rnb",
+      "rhythm and blues",
+      "r&b",
+      "soul"
     ]
   },
   {
@@ -15,6 +59,15 @@
     "genre": [
       "rock",
       "pop"
+    ]
+  },
+  {
+    "title": "Girls Like Girls",
+    "artist": "Hayley Kiyoko",
+    "url": "https://www.youtube.com/watch?v=I0MT8SwNa_U",
+    "genre": [
+      "pop",
+      "electropop"
     ]
   },
   {
@@ -120,17 +173,6 @@
       "alt",
       "alternative",
       "indie"
-    ]
-  },
-  {
-    "title": "Pynk",
-    "artist": "Janelle Monae",
-    "url": "https://www.youtube.com/watch?v=PaYvlVR_BEc",
-    "genre": [
-      "rnb",
-      "rhythm and blues",
-      "r&b",
-      "soul"
     ]
   },
   {
@@ -250,32 +292,6 @@
     ]
   },
   {
-    "title": "It Girl",
-    "artist": "Mister Wallace",
-    "url": "https://www.youtube.com/watch?v=NEnmporrBuo",
-    "genre": [
-      "dance",
-      "electronic"
-    ]
-  },
-  {
-    "title": "Gay Sex",
-    "artist": "Be Steadwell",
-    "url": "https://www.youtube.com/watch?v=XnbQu_pzf8o",
-    "genre": [
-      "pop"
-    ]
-  },
-  {
-    "title": "Bisexual Anthem",
-    "artist": "Domo Wilson",
-    "url": "https://www.youtube.com/watch?v=RBX4IwvGjm8",
-    "genre": [
-      "hip-hop",
-      "rap"
-    ]
-  },
-  {
     "title": "Pride",
     "artist": "Grace Petrie",
     "url": "https://www.youtube.com/watch?v=y5rMrPJzFGs",
@@ -302,23 +318,6 @@
     ]
   },
   {
-    "title": "I Like Boys",
-    "artist": "Todrick Hall",
-    "url": "https://www.youtube.com/watch?v=RIbGksV3YBY",
-    "genre": [
-      "dance",
-      "electronic"
-    ]
-  },
-  {
-    "title": "Girls",
-    "artist": "Beatrice Eli",
-    "url": "https://www.youtube.com/watch?v=Orffm0v0mS0",
-    "genre": [
-      "pop"
-    ]
-  },
-  {
     "title": "GUY.exe",
     "artist": "Superfruit",
     "url": "https://www.youtube.com/watch?v=r2Kh_XMIDPU",
@@ -330,22 +329,6 @@
     "title": "That's So Gay",
     "artist": "Pansy Division",
     "url": "https://www.youtube.com/watch?v=xlpcyeadaTk",
-    "genre": [
-      "rock"
-    ]
-  },
-  {
-    "title": "Queer Kidz",
-    "artist": "Ashby and the Oceanns",
-    "url": "https://www.youtube.com/watch?v=tSdCciMIlO8",
-    "genre": [
-      "folk"
-    ]
-  },
-  {
-    "title": "Butch in the Streets",
-    "artist": "Tribe 8",
-    "url": "https://www.youtube.com/watch?v=HWxFym7h8LQ",
     "genre": [
       "rock"
     ]
@@ -379,14 +362,6 @@
     ]
   },
   {
-    "title": "Bi",
-    "artist": "Alicia Champion",
-    "url": "https://www.youtube.com/watch?v=HekhW9STg58",
-    "genre": [
-      "pop"
-    ]
-  },
-  {
     "title": "Trans Is Love",
     "artist": "Marissa Kay",
     "url": "https://www.youtube.com/watch?v=-5f_1H0RD1I",
@@ -414,17 +389,6 @@
     "url": "https://www.youtube.com/watch?v=va-nqcNxP_k",
     "genre": [
       "folk"
-    ]
-  },
-  {
-    "title": "Make Me Feel",
-    "artist": "Janelle Monae",
-    "url": "https://www.youtube.com/watch?v=tGRzz0oqgUE",
-    "genre": [
-      "rhythm and blues",
-      "rnb",
-      "r&b",
-      "soul"
     ]
   },
   {
@@ -486,14 +450,6 @@
     "url": "https://www.youtube.com/watch?v=5e7844P77Is",
     "genre": [
       "pop"
-    ]
-  },
-  {
-    "title": "Heterosexuality is a Construct",
-    "artist": "One Night Stand in North Dakota",
-    "url": "https://www.youtube.com/watch?v=linQQ_XIVjI",
-    "genre": [
-      "punk"
     ]
   }
 ]
