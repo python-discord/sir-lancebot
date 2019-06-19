@@ -1,7 +1,7 @@
+import json
 import logging
-from json import load
+import random
 from pathlib import Path
-from random import choice
 
 from discord.ext import commands
 
@@ -23,24 +23,24 @@ class PrideAnthem(commands.Cog):
         If none can be found, it will log this as well as provide that information to the user.
         """
         if not genre:
-            return choice(self.anthems)
+            return random.choice(self.anthems)
         else:
             songs = [song for song in self.anthems if genre.casefold() in song['genre']]
             try:
-                return choice(songs)
+                return random.choice(songs)
             except IndexError:
                 log.info('No videos for that genre.')
 
     @staticmethod
     def load_vids() -> list:
-        """Loads a list of videos from the resources folder as dictionaries"""
-        with open(Path('bot', 'resources', 'pride', 'anthems.json').absolute(), 'r') as f:
-            anthems = load(f)
+        """Loads a list of videos from the resources folder as dictionaries."""
+        with open(Path('bot/resources/pride/anthems.json').absolute(), 'r') as f:
+            anthems = json.load(f)
         return anthems
 
-    @commands.command(name='prideanthem')
+    @commands.group(aliases=["prideanthem", "anthem", "pridesong"], invoke_without_command=True)
     async def send_anthem(self, ctx, genre: str = None):
-        """Generates and sends message with youtube link"""
+        """Generates and sends message with youtube link."""
         anthem = self.get_video(genre)
         if anthem:
             await ctx.send(anthem['url'])
@@ -49,6 +49,6 @@ class PrideAnthem(commands.Cog):
 
 
 def setup(bot):
-    """Cog loader for pride anthem"""
+    """Cog loader for pride anthem."""
     bot.add_cog(PrideAnthem(bot))
     log.info('Pride anthems cog loaded!')
