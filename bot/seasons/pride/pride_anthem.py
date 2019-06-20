@@ -34,13 +34,17 @@ class PrideAnthem(commands.Cog):
     @staticmethod
     def load_vids() -> list:
         """Loads a list of videos from the resources folder as dictionaries."""
-        with open(Path('bot/resources/pride/anthems.json').absolute(), 'r') as f:
+        with open(Path('bot/resources/pride/anthems.json'), 'r', encoding='utf-8') as f:
             anthems = json.load(f)
         return anthems
 
-    @commands.group(aliases=["prideanthem", "anthem", "pridesong"], invoke_without_command=True)
-    async def send_anthem(self, ctx, genre: str = None):
-        """Generates and sends message with youtube link."""
+    @commands.command(name='prideanthem', aliases=['anthem', 'pridesong'])
+    async def prideanthem(self, ctx, genre: str = None):
+        """
+        Sends a message with a video of a random pride anthem.
+
+        If `genre` is supplied, it will select from that genre only.
+        """
         anthem = self.get_video(genre)
         if anthem:
             await ctx.send(anthem['url'])
