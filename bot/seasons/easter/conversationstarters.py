@@ -7,7 +7,7 @@ from discord.ext import commands
 
 log = logging.getLogger(__name__)
 
-with open(Path('bot', 'resources', 'easter', 'starter.json'), 'r', encoding="utf8") as f:
+with open(Path("bot/resources/easter/starter.json"), "r", encoding="utf8") as f:
     starters = json.load(f)
 
 

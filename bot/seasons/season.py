@@ -24,7 +24,7 @@ def get_seasons() -> List[str]:
     """Returns all the Season objects located in /bot/seasons/."""
     seasons = []
 
-    for module in pkgutil.iter_modules([Path("bot", "seasons")]):
+    for module in pkgutil.iter_modules([Path("bot/seasons")]):
         if module.ispkg:
             seasons.append(module.name)
     return seasons
@@ -308,7 +308,7 @@ class SeasonBase:
         for ext_folder in {self.name, "evergreen"}:
             if ext_folder:
                 log.info(f"Start loading extensions from seasons/{ext_folder}/")
-                path = Path("bot", "seasons", ext_folder)
+                path = Path("bot/seasons") / ext_folder
                 for ext_name in [i[1] for i in pkgutil.iter_modules([path])]:
                     extensions.append(f"bot.seasons.{ext_folder}.{ext_name}")
 

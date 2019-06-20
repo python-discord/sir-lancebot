@@ -25,20 +25,20 @@ class PrideAnthem(commands.Cog):
         if not genre:
             return random.choice(self.anthems)
         else:
-            songs = [song for song in self.anthems if genre.casefold() in song['genre']]
+            songs = [song for song in self.anthems if genre.casefold() in song["genre"]]
             try:
                 return random.choice(songs)
             except IndexError:
-                log.info('No videos for that genre.')
+                log.info("No videos for that genre.")
 
     @staticmethod
     def load_vids() -> list:
         """Loads a list of videos from the resources folder as dictionaries."""
-        with open(Path('bot/resources/pride/anthems.json'), 'r', encoding='utf-8') as f:
+        with open(Path("bot/resources/pride/anthems.json"), "r", encoding="utf-8") as f:
             anthems = json.load(f)
         return anthems
 
-    @commands.command(name='prideanthem', aliases=['anthem', 'pridesong'])
+    @commands.command(name="prideanthem", aliases=["anthem", "pridesong"])
     async def prideanthem(self, ctx, genre: str = None):
         """
         Sends a message with a video of a random pride anthem.
@@ -47,7 +47,7 @@ class PrideAnthem(commands.Cog):
         """
         anthem = self.get_video(genre)
         if anthem:
-            await ctx.send(anthem['url'])
+            await ctx.send(anthem["url"])
         else:
             await ctx.send("I couldn't find a video, sorry!")
 
@@ -55,4 +55,4 @@ class PrideAnthem(commands.Cog):
 def setup(bot):
     """Cog loader for pride anthem."""
     bot.add_cog(PrideAnthem(bot))
-    log.info('Pride anthems cog loaded!')
+    log.info("Pride anthems cog loaded!")

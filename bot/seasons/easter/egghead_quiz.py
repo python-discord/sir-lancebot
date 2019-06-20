@@ -11,7 +11,7 @@ from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
-with open(Path('bot', 'resources', 'easter', 'egghead_questions.json'), 'r', encoding="utf8") as f:
+with open(Path("bot/resources/easter/egghead_questions.json"), "r", encoding="utf8") as f:
     EGGHEAD_QUESTIONS = load(f)
 
 
