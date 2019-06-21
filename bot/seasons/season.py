@@ -399,6 +399,7 @@ class SeasonManager(commands.Cog):
             # If the season has changed, load it.
             new_season = get_season(date=datetime.datetime.utcnow())
             if new_season.name != self.season.name:
+                self.season = new_season
                 await self.season.load()
             else:
                 await self.season.change_server_icon()
