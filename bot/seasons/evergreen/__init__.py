@@ -5,9 +5,9 @@ class Evergreen(SeasonBase):
     """Evergreen Seasonal event attributes."""
 
     bot_icon = "/logos/logo_seasonal/evergreen/logo_evergreen.png"
-    icon = [
+    icon = (
         "/logos/logo_animated/heartbeat/heartbeat.gif",
         "/logos/logo_animated/spinner/spinner.gif",
         "/logos/logo_animated/tongues/tongues.gif",
         "/logos/logo_animated/winky/winky.gif"
-    ]
+    )

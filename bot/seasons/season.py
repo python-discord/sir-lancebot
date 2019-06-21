@@ -6,7 +6,7 @@ import inspect
 import logging
 import pkgutil
 from pathlib import Path
-from typing import List, Optional, Type, Union
+from typing import List, Optional, Sequence, Tuple, Type, Union
 
 import async_timeout
 import discord
@@ -134,12 +134,7 @@ class SeasonBase:
         """
         return f"New Season, {self.name_clean}!"
 
-    @property
-    def cycle(self) -> bool:
-        """Return whether the icon attribute is a list and hence needs to be cycled through."""
-        return isinstance(self.icon, list)
-
-    async def get_icon(self, avatar: bool = False, index: int = 0) -> List[Union[bytes, str]]:
+    async def get_icon(self, avatar: bool = False, index: int = 0) -> Tuple[bytes, str]:
         """
         Retrieve the season's icon from the branding repository using the Season's icon attribute.
 
@@ -155,7 +150,7 @@ class SeasonBase:
             icon = self.bot_icon or self.icon
         else:
             icon = self.icon
-        if self.cycle and not self.bot_icon:
+        if isinstance(self.icon, Sequence) and not self.bot_icon:
             icon = icon[index]
 
         full_url = ICON_BASE_URL + icon
@@ -263,7 +258,7 @@ class SeasonBase:
         This only has an effect when the Season's icon attribute is a list, in which it cycles through.
         Returns True if was successful.
         """
-        if not self.cycle:
+        if not isinstance(self.icon, Sequence):
             return False
 
         self.index += 1
@@ -299,7 +294,7 @@ class SeasonBase:
 
         if isinstance(self.icon, str):
             embed.set_image(url=ICON_BASE_URL+self.icon)
-        elif self.cycle:
+        elif isinstance(self.icon, Sequence):
             embed.set_image(url=ICON_BASE_URL+self.icon[0])
 
         # Find any seasonal commands
