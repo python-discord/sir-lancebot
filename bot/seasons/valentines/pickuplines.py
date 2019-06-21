@@ -10,7 +10,7 @@ from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
-with open(Path('bot', 'resources', 'valentines', 'pickup_lines.json'), 'r', encoding="utf8") as f:
+with open(Path("bot/resources/valentines/pickup_lines.json"), "r", encoding="utf8") as f:
     pickup_lines = load(f)
 
 

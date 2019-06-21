@@ -18,7 +18,7 @@ class HacktoberStats(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.link_json = Path("bot", "resources", "github_links.json")
+        self.link_json = Path("bot/resources/github_links.json")
         self.linked_accounts = self.load_linked_users()
 
     @commands.group(

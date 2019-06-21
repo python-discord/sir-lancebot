@@ -15,7 +15,7 @@ from .constants import Colours, EggHuntSettings, Emoji, Roles
 
 log = logging.getLogger(__name__)
 
-DB_PATH = Path("bot", "resources", "persist", "egg_hunt.sqlite")
+DB_PATH = Path("bot/resources/persist/egg_hunt.sqlite")
 
 TEAM_MAP = {
     Roles.white: Emoji.egg_white,
