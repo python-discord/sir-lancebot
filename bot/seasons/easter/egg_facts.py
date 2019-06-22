@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import random
 from json import load
 from pathlib import Path
@@ -6,7 +7,11 @@ from pathlib import Path
 import discord
 from discord.ext import commands
 
+from bot.constants import Channels
 from bot.constants import Colours
+
+
+log = logging.getLogger(__name__)
 
 
 class EasterFacts(commands.Cog):
@@ -32,7 +37,7 @@ class EasterFacts(commands.Cog):
     async def send_egg_fact_daily(self):
         """A background task that sends an easter egg fact in the event channel everyday."""
 
-        channel = self.bot.get_channel(426566445124812815)
+        channel = Channels.seasonalbot_chat
         while True:
             embed = self.make_embed()
             await channel.send(embed=embed)
@@ -61,3 +66,4 @@ def setup(bot):
 
     bot.loop.create_task(EasterFacts(bot).send_egg_fact_daily())
     bot.add_cog(EasterFacts(bot))
+    log.info("EasterFacts cog loaded")
