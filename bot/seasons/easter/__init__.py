@@ -30,4 +30,6 @@ class Easter(SeasonBase):
     end_date = "30/04"
 
     colour = Colours.pink
-    icon = "/logos/logo_seasonal/easter/easter.png"
+    icon = (
+        "/logos/logo_seasonal/easter/easter.png",
+    )

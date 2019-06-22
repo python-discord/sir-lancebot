@@ -80,7 +80,7 @@ class SeasonBase:
     end_date: Optional[str] = None
 
     colour: Optional[int] = None
-    icon: str = "/logos/logo_full/logo_full.png"
+    icon: Tuple[str, ...] = ("/logos/logo_full/logo_full.png",)
     bot_icon: Optional[str] = None
 
     date_format: str = "%d/%m/%Y"
