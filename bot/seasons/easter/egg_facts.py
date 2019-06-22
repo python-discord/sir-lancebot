@@ -20,6 +20,7 @@ class EasterFacts(commands.Cog):
 
     It also contains a background task which sends an easter egg fact in the event channel everyday.
     """
+    
     def __init__(self, bot):
         self.bot = bot
         self.facts = self.load_json()
