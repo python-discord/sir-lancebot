@@ -6,7 +6,7 @@ import inspect
 import logging
 import pkgutil
 from pathlib import Path
-from typing import List, Optional, Sequence, Tuple, Type, Union
+from typing import List, Optional, Tuple, Type, Union
 
 import async_timeout
 import discord
@@ -140,18 +140,15 @@ class SeasonBase:
 
         This also returns the relative URL path for logging purposes
         If `avatar` is True, uses optional bot-only avatar icon if present.
-        If the Season's icon attribute is a list, returns the data for the given `index`.
+        Returns the data for the given `index`, defaulting to the first item.
 
         The icon attribute must provide the url path, starting from the master branch base url,
         including the starting slash.
         e.g. `/logos/logo_seasonal/valentines/loved_up.png`
         """
-        if avatar:
-            icon = self.bot_icon or self.icon
-        else:
-            icon = self.icon
-        if isinstance(self.icon, Sequence) and not self.bot_icon:
-            icon = icon[index]
+        icon = self.icon[index]
+        if avatar and self.bot_icon:
+            icon = self.bot_icon
 
         full_url = ICON_BASE_URL + icon
         log.debug(f"Getting icon from: {full_url}")
@@ -258,8 +255,8 @@ class SeasonBase:
         This only has an effect when the Season's icon attribute is a list, in which it cycles through.
         Returns True if was successful.
         """
-        if not isinstance(self.icon, Sequence):
-            return False
+        if len(self.icon) == 1:
+            return
 
         self.index += 1
         self.index %= len(self.icon)
@@ -292,9 +289,7 @@ class SeasonBase:
         embed = discord.Embed(description=f"{announce}\n\n", colour=self.colour or guild.me.colour)
         embed.set_author(name=self.greeting)
 
-        if isinstance(self.icon, str):
-            embed.set_image(url=ICON_BASE_URL+self.icon)
-        elif isinstance(self.icon, Sequence):
+        if self.icon:
             embed.set_image(url=ICON_BASE_URL+self.icon[0])
 
         # Find any seasonal commands
