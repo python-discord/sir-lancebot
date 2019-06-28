@@ -13,4 +13,6 @@ class Halloween(SeasonBase):
     end_date = "31/10"
 
     colour = Colours.orange
-    icon = "/logos/logo_seasonal/halloween/spooky.png"
+    icon = (
+        "/logos/logo_seasonal/halloween/spooky.png",
+    )

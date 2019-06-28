@@ -21,4 +21,6 @@ class Christmas(SeasonBase):
     end_date = "31/12"
 
     colour = Colours.dark_green
-    icon = "/logos/logo_seasonal/christmas/festive.png"
+    icon = (
+        "/logos/logo_seasonal/christmas/festive.png",
+    )

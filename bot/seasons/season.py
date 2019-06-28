@@ -6,7 +6,7 @@ import inspect
 import logging
 import pkgutil
 from pathlib import Path
-from typing import List, Optional, Type, Union
+from typing import List, Optional, Tuple, Type, Union
 
 import async_timeout
 import discord
@@ -80,10 +80,12 @@ class SeasonBase:
     end_date: Optional[str] = None
 
     colour: Optional[int] = None
-    icon: str = "/logos/logo_full/logo_full.png"
+    icon: Tuple[str, ...] = ("/logos/logo_full/logo_full.png",)
     bot_icon: Optional[str] = None
 
     date_format: str = "%d/%m/%Y"
+
+    index: int = 0
 
     @staticmethod
     def current_year() -> int:
@@ -132,24 +134,26 @@ class SeasonBase:
         """
         return f"New Season, {self.name_clean}!"
 
-    async def get_icon(self, avatar: bool = False) -> bytes:
+    async def get_icon(self, avatar: bool = False, index: int = 0) -> Tuple[bytes, str]:
         """
         Retrieve the season's icon from the branding repository using the Season's icon attribute.
 
+        This also returns the relative URL path for logging purposes
         If `avatar` is True, uses optional bot-only avatar icon if present.
+        Returns the data for the given `index`, defaulting to the first item.
 
         The icon attribute must provide the url path, starting from the master branch base url,
         including the starting slash.
         e.g. `/logos/logo_seasonal/valentines/loved_up.png`
         """
-        if avatar:
-            icon = self.bot_icon or self.icon
-        else:
-            icon = self.icon
+        icon = self.icon[index]
+        if avatar and self.bot_icon:
+            icon = self.bot_icon
+
         full_url = ICON_BASE_URL + icon
         log.debug(f"Getting icon from: {full_url}")
         async with bot.http_session.get(full_url) as resp:
-            return await resp.read()
+            return (await resp.read(), icon)
 
     async def apply_username(self, *, debug: bool = False) -> Union[bool, None]:
         """
@@ -202,17 +206,17 @@ class SeasonBase:
         old_avatar = bot.user.avatar
 
         # Attempt the change
-        log.debug(f"Changing avatar to {self.bot_icon or self.icon}")
-        icon = await self.get_icon(avatar=True)
+        icon, name = await self.get_icon(avatar=True)
+        log.debug(f"Changing avatar to {name}")
         with contextlib.suppress(discord.HTTPException, asyncio.TimeoutError):
             async with async_timeout.timeout(5):
                 await bot.user.edit(avatar=icon)
 
         if bot.user.avatar != old_avatar:
-            log.debug(f"Avatar changed to {self.bot_icon or self.icon}")
+            log.debug(f"Avatar changed to {name}")
             return True
 
-        log.warning(f"Changing avatar failed: {self.bot_icon or self.icon}")
+        log.warning(f"Changing avatar failed: {name}")
         return False
 
     async def apply_server_icon(self) -> bool:
@@ -227,19 +231,37 @@ class SeasonBase:
         old_icon = guild.icon
 
         # Attempt the change
-        log.debug(f"Changing server icon to {self.icon}")
-        icon = await self.get_icon()
+
+        icon, name = await self.get_icon(index=self.index)
+
+        log.debug(f"Changing server icon to {name}")
+
         with contextlib.suppress(discord.HTTPException, asyncio.TimeoutError):
             async with async_timeout.timeout(5):
                 await guild.edit(icon=icon, reason=f"Seasonbot Season Change: {self.name}")
 
         new_icon = bot.get_guild(Client.guild).icon
         if new_icon != old_icon:
-            log.debug(f"Server icon changed to {self.icon}")
+            log.debug(f"Server icon changed to {name}")
             return True
 
-        log.warning(f"Changing server icon failed: {self.icon}")
+        log.warning(f"Changing server icon failed: {name}")
         return False
+
+    async def change_server_icon(self) -> bool:
+        """
+        Changes the server icon.
+
+        This only has an effect when the Season's icon attribute is a list, in which it cycles through.
+        Returns True if was successful.
+        """
+        if len(self.icon) == 1:
+            return
+
+        self.index += 1
+        self.index %= len(self.icon)
+
+        return await self.apply_server_icon()
 
     async def announce_season(self):
         """
@@ -268,7 +290,7 @@ class SeasonBase:
         embed.set_author(name=self.greeting)
 
         if self.icon:
-            embed.set_image(url=ICON_BASE_URL+self.icon)
+            embed.set_image(url=ICON_BASE_URL+self.icon[0])
 
         # Find any seasonal commands
         cogs = []
@@ -303,6 +325,7 @@ class SeasonBase:
 
         If in debug mode, the avatar, server icon, and announcement will be skipped.
         """
+        self.index = 0
         # Prepare all the seasonal cogs, and then the evergreen ones.
         extensions = []
         for ext_folder in {self.name, "evergreen"}:
@@ -366,7 +389,10 @@ class SeasonManager(commands.Cog):
             # If the season has changed, load it.
             new_season = get_season(date=datetime.datetime.utcnow())
             if new_season.name != self.season.name:
+                self.season = new_season
                 await self.season.load()
+            else:
+                await self.season.change_server_icon()
 
     @with_role(Roles.moderator, Roles.admin, Roles.owner)
     @commands.command(name="season")
