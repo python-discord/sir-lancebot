@@ -10,7 +10,7 @@ class Halloween(SeasonBase):
     greeting = "Happy Halloween!"
 
     start_date = "01/10"
-    end_date = "31/10"
+    end_date = "01/11"
 
     colour = Colours.orange
     icon = (
