@@ -4,13 +4,13 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-discord-py = {ref = "43b4475",git = "https://github.com/Rapptz/discord.py",editable = true}
 arrow = "*"
 beautifulsoup4 = "*"
 aiodns = "*"
 pillow = "*"
 pytz = "*"
 fuzzywuzzy = "*"
+discord-py = "~=1.2"
 
 [dev-packages]
 "flake8" = "*"
