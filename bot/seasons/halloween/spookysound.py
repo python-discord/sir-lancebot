@@ -15,7 +15,7 @@ class SpookySound(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.sound_files = list(Path("bot", "resources", "halloween", "spookysounds").glob("*.mp3"))
+        self.sound_files = list(Path("bot/resources/halloween/spookysounds").glob("*.mp3"))
         self.channel = None
 
     @commands.cooldown(rate=1, per=1)
@@ -26,7 +26,6 @@ class SpookySound(commands.Cog):
 
         Cannot be used more than once in 2 minutes.
         """
-
         if not self.channel:
             await self.bot.wait_until_ready()
             self.channel = self.bot.get_channel(Hacktoberfest.voice_id)
@@ -45,6 +44,5 @@ class SpookySound(commands.Cog):
 
 def setup(bot):
     """Spooky sound Cog load."""
-
     bot.add_cog(SpookySound(bot))
     log.info("SpookySound cog loaded")

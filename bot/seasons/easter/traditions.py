@@ -7,7 +7,7 @@ from discord.ext import commands
 
 log = logging.getLogger(__name__)
 
-with open(Path('bot', 'resources', 'easter', 'traditions.json'), 'r', encoding="utf8") as f:
+with open(Path("bot/resources/easter/traditions.json"), "r", encoding="utf8") as f:
     traditions = json.load(f)
 
 
@@ -20,7 +20,6 @@ class Traditions(commands.Cog):
     @commands.command(aliases=('eastercustoms',))
     async def easter_tradition(self, ctx):
         """Responds with a random tradition or custom"""
-
         random_country = random.choice(list(traditions))
 
         await ctx.send(f"{random_country}:\n{traditions[random_country]}")
@@ -28,6 +27,5 @@ class Traditions(commands.Cog):
 
 def setup(bot):
     """Traditions Cog load."""
-
     bot.add_cog(Traditions(bot))
     log.info("Traditions cog loaded")

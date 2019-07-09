@@ -11,7 +11,7 @@ from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
-with Path('bot', 'resources', 'halloween', 'spooky_rating.json').open() as file:
+with Path("bot/resources/halloween/spooky_rating.json").open() as file:
     SPOOKY_DATA = json.load(file)
     SPOOKY_DATA = sorted((int(key), value) for key, value in SPOOKY_DATA.items())
 
@@ -31,7 +31,6 @@ class SpookyRating(commands.Cog):
 
         Any user will always yield the same result, no matter who calls the command
         """
-
         if who is None:
             who = ctx.author
 
@@ -63,6 +62,6 @@ class SpookyRating(commands.Cog):
 
 
 def setup(bot):
-    """Cog load."""
+    """Spooky Rating Cog load."""
     bot.add_cog(SpookyRating(bot))
     log.info("SpookyRating cog loaded")

@@ -25,7 +25,6 @@ class SeasonalBot(commands.Bot):
 
     def load_extensions(self, exts: List[str]):
         """Unload all current extensions, then load the given extensions."""
-
         # Unload all cogs
         extensions = list(self.extensions.keys())
         for extension in extensions:
@@ -43,7 +42,6 @@ class SeasonalBot(commands.Bot):
 
     async def send_log(self, title: str, details: str = None, *, icon: str = None):
         """Send an embed message to the devlog channel."""
-
         devlog = self.get_channel(constants.Channels.devlog)
 
         if not devlog:
@@ -60,7 +58,6 @@ class SeasonalBot(commands.Bot):
 
     async def on_command_error(self, context, exception):
         """Check command errors for UserInputError and reset the cooldown if thrown."""
-
         if isinstance(exception, commands.UserInputError):
             context.command.reset_cooldown(context)
         else:

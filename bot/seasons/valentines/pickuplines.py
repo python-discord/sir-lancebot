@@ -10,7 +10,7 @@ from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
-with open(Path('bot', 'resources', 'valentines', 'pickup_lines.json'), 'r', encoding="utf8") as f:
+with open(Path("bot/resources/valentines/pickup_lines.json"), "r", encoding="utf8") as f:
     pickup_lines = load(f)
 
 
@@ -27,7 +27,6 @@ class PickupLine(commands.Cog):
 
         Note that most of them are very cheesy.
         """
-
         random_line = random.choice(pickup_lines['lines'])
         embed = discord.Embed(
             title=':cheese: Your pickup line :cheese:',
@@ -42,6 +41,5 @@ class PickupLine(commands.Cog):
 
 def setup(bot):
     """Pickup lines Cog load."""
-
     bot.add_cog(PickupLine(bot))
     log.info('PickupLine cog loaded')

@@ -32,7 +32,6 @@ class SpookyReact(Cog):
 
         Seasonalbot's own messages are ignored
         """
-
         for trigger in SPOOKY_TRIGGERS.keys():
             trigger_test = re.search(SPOOKY_TRIGGERS[trigger][0], ctx.content.lower())
             if trigger_test:
@@ -52,7 +51,6 @@ class SpookyReact(Cog):
           * author is the bot
           * prefix is not None
         """
-
         # Check for self reaction
         if ctx.author == self.bot.user:
             logging.debug(f"Ignoring reactions on self message. Message ID: {ctx.id}")
@@ -70,6 +68,5 @@ class SpookyReact(Cog):
 
 def setup(bot):
     """Spooky reaction Cog load."""
-
     bot.add_cog(SpookyReact(bot))
     log.info("SpookyReact cog loaded")

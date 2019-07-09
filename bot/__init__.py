@@ -20,7 +20,6 @@ def monkeypatch_trace(self, msg, *args, **kwargs):
     To pass exception information, use the keyword argument exc_info with a true value, e.g.
     logger.trace("Houston, we have an %s", "interesting problem", exc_info=1)
     """
-
     if self.isEnabledFor(logging.TRACE):
         self._log(logging.TRACE, msg, args, **kwargs)
 
@@ -31,7 +30,7 @@ logging.Logger.trace = monkeypatch_trace
 start_time = arrow.utcnow()
 
 # Set up file logging
-log_dir = Path("bot", "log")
+log_dir = Path("bot/log")
 log_file = log_dir / "hackbot.log"
 os.makedirs(log_dir, exist_ok=True)
 

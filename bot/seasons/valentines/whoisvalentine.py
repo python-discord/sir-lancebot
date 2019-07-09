@@ -10,7 +10,7 @@ from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
-with open(Path("bot", "resources", "valentines", "valentine_facts.json"), "r") as file:
+with open(Path("bot/resources/valentines/valentine_facts.json"), "r") as file:
     FACTS = json.load(file)
 
 
@@ -23,7 +23,6 @@ class ValentineFacts(commands.Cog):
     @commands.command(aliases=('whoisvalentine', 'saint_valentine'))
     async def who_is_valentine(self, ctx):
         """Displays info about Saint Valentine."""
-
         embed = discord.Embed(
             title="Who is Saint Valentine?",
             description=FACTS['whois'],
@@ -39,7 +38,6 @@ class ValentineFacts(commands.Cog):
     @commands.command()
     async def valentine_fact(self, ctx):
         """Shows a random fact about Valentine's Day."""
-
         embed = discord.Embed(
             title=choice(FACTS['titles']),
             description=choice(FACTS['text']),
@@ -51,6 +49,5 @@ class ValentineFacts(commands.Cog):
 
 def setup(bot):
     """Who is Valentine Cog load."""
-
     bot.add_cog(ValentineFacts(bot))
     log.info("ValentineFacts cog loaded")

@@ -26,14 +26,12 @@ COUNTDOWN_STEP = 60 * 5
 
 def is_in_advent() -> bool:
     """Utility function to check if we are between December 1st and December 25th."""
-
     # Run the code from the 1st to the 24th
     return datetime.now(EST).day in range(1, 25) and datetime.now(EST).month == 12
 
 
 def time_left_to_aoc_midnight() -> Tuple[datetime, timedelta]:
     """Calculates the amount of time left until midnight in UTC-5 (Advent of Code maintainer timezone)."""
-
     # Change all time properties back to 00:00
     todays_midnight = datetime.now(EST).replace(microsecond=0,
                                                 second=0,
@@ -49,7 +47,6 @@ def time_left_to_aoc_midnight() -> Tuple[datetime, timedelta]:
 
 async def countdown_status(bot: commands.Bot):
     """Set the playing status of the bot to the minutes & hours left until the next day's challenge."""
-
     while is_in_advent():
         _, time_left = time_left_to_aoc_midnight()
 
@@ -77,12 +74,11 @@ async def countdown_status(bot: commands.Bot):
 
 async def day_countdown(bot: commands.Bot):
     """
-    Calculate the number of seconds left until the next day of advent.
+    Calculate the number of seconds left until the next day of Advent.
 
     Once we have calculated this we should then sleep that number and when the time is reached, ping
     the Advent of Code role notifying them that the new challenge is ready.
     """
-
     while is_in_advent():
         tomorrow, time_left = time_left_to_aoc_midnight()
 
@@ -104,7 +100,7 @@ async def day_countdown(bot: commands.Bot):
 
 
 class AdventOfCode(commands.Cog):
-    """Advent of Code festivities! Ho Ho Ho."""
+    """Advent of Code festivities! Ho Ho Ho!"""
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -131,8 +127,7 @@ class AdventOfCode(commands.Cog):
     @commands.group(name="adventofcode", aliases=("aoc",), invoke_without_command=True)
     async def adventofcode_group(self, ctx: commands.Context):
         """All of the Advent of Code commands."""
-
-        await ctx.invoke(self.bot.get_command("help"), "adventofcode")
+        await ctx.send_help(ctx.command)
 
     @adventofcode_group.command(
         name="subscribe",
@@ -141,7 +136,6 @@ class AdventOfCode(commands.Cog):
     )
     async def aoc_subscribe(self, ctx: commands.Context):
         """Assign the role for notifications about new days being ready."""
-
         role = ctx.guild.get_role(AocConfig.role_id)
         unsubscribe_command = f"{ctx.prefix}{ctx.command.root_parent} unsubscribe"
 
@@ -156,7 +150,6 @@ class AdventOfCode(commands.Cog):
     @adventofcode_group.command(name="unsubscribe", aliases=("unsub",), brief="Notifications for new days")
     async def aoc_unsubscribe(self, ctx: commands.Context):
         """Remove the role for notifications about new days being ready."""
-
         role = ctx.guild.get_role(AocConfig.role_id)
 
         if role in ctx.author.roles:
@@ -168,7 +161,6 @@ class AdventOfCode(commands.Cog):
     @adventofcode_group.command(name="countdown", aliases=("count", "c"), brief="Return time left until next day")
     async def aoc_countdown(self, ctx: commands.Context):
         """Return time left until next day."""
-
         if not is_in_advent():
             datetime_now = datetime.now(EST)
             december_first = datetime(datetime_now.year + 1, 12, 1, tzinfo=EST)
@@ -186,13 +178,11 @@ class AdventOfCode(commands.Cog):
     @adventofcode_group.command(name="about", aliases=("ab", "info"), brief="Learn about Advent of Code")
     async def about_aoc(self, ctx: commands.Context):
         """Respond with an explanation of all things Advent of Code."""
-
         await ctx.send("", embed=self.cached_about_aoc)
 
     @adventofcode_group.command(name="join", aliases=("j",), brief="Learn how to join PyDis' private AoC leaderboard")
     async def join_leaderboard(self, ctx: commands.Context):
         """DM the user the information for joining the PyDis AoC private leaderboard."""
-
         author = ctx.message.author
         log.info(f"{author.name} ({author.id}) has requested the PyDis AoC leaderboard code")
 
@@ -219,7 +209,6 @@ class AdventOfCode(commands.Cog):
         Advent of Code section of the bot constants. number_of_people_to_display values greater than this
         limit will default to this maximum and provide feedback to the user.
         """
-
         async with ctx.typing():
             await self._check_leaderboard_cache(ctx)
 
@@ -259,7 +248,6 @@ class AdventOfCode(commands.Cog):
 
         Embed will display the total members and the number of users who have completed each day's puzzle
         """
-
         async with ctx.typing():
             await self._check_leaderboard_cache(ctx)
 
@@ -305,7 +293,6 @@ class AdventOfCode(commands.Cog):
         Advent of Code section of the bot constants. number_of_people_to_display values greater than this
         limit will default to this maximum and provide feedback to the user.
         """
-
         async with ctx.typing():
             await self._check_leaderboard_cache(ctx, global_board=True)
 
@@ -336,7 +323,6 @@ class AdventOfCode(commands.Cog):
 
         global_board is a boolean to toggle between the global board and the Pydis private board
         """
-
         # Toggle between global & private leaderboards
         if global_board:
             log.debug("Checking global leaderboard cache")
@@ -371,7 +357,7 @@ class AdventOfCode(commands.Cog):
             )
 
     async def _check_n_entries(self, ctx: commands.Context, number_of_people_to_display: int) -> int:
-        # Check for n > max_entries and n <= 0
+        """Check for n > max_entries and n <= 0"""
         max_entries = AocConfig.leaderboard_max_displayed_members
         author = ctx.message.author
         if not 0 <= number_of_people_to_display <= max_entries:
@@ -390,7 +376,6 @@ class AdventOfCode(commands.Cog):
 
     def _build_about_embed(self) -> discord.Embed:
         """Build and return the informational "About AoC" embed from the resources file."""
-
         with self.about_aoc_filepath.open("r") as f:
             embed_fields = json.load(f)
 
@@ -405,7 +390,6 @@ class AdventOfCode(commands.Cog):
 
     async def _boardgetter(self, global_board: bool):
         """Invoke the proper leaderboard getter based on the global_board boolean."""
-
         if global_board:
             self.cached_global_leaderboard = await AocGlobalLeaderboard.from_url()
         else:
@@ -426,7 +410,6 @@ class AocMember:
 
     def __repr__(self):
         """Generate a user-friendly representation of the AocMember & their score."""
-
         return f"<{self.name} ({self.aoc_id}): {self.local_score}>"
 
     @classmethod
@@ -440,7 +423,6 @@ class AocMember:
 
         Returns an AocMember object
         """
-
         return cls(
             name=injson["name"] if injson["name"] else "Anonymous User",
             aoc_id=int(injson["id"]),
@@ -462,7 +444,6 @@ class AocMember:
         Returns a list of 25 lists, where each nested list contains a pair of booleans representing
         the code challenge completion status for that day
         """
-
         # Basic input validation
         if not isinstance(injson, dict):
             raise ValueError
@@ -487,7 +468,6 @@ class AocMember:
     @staticmethod
     def _completions_from_starboard(starboard: list) -> tuple:
         """Return days completed, as a (1 star, 2 star) tuple, from starboard."""
-
         completions = [0, 0]
         for day in starboard:
             if day[0]:
@@ -515,7 +495,6 @@ class AocPrivateLeaderboard:
 
         If n is not specified, default to the top 10
         """
-
         return self.members[:n]
 
     def calculate_daily_completion(self) -> List[tuple]:
@@ -525,7 +504,6 @@ class AocPrivateLeaderboard:
         Return a list of tuples for each day containing the number of users who completed each part
         of the challenge
         """
-
         daily_member_completions = []
         for day in range(25):
             one_star_count = 0
@@ -550,7 +528,6 @@ class AocPrivateLeaderboard:
 
         If no year is input, year defaults to the current year
         """
-
         api_url = f"https://adventofcode.com/{year}/leaderboard/private/view/{leaderboard_id}.json"
 
         log.debug("Querying Advent of Code Private Leaderboard API")
@@ -567,7 +544,6 @@ class AocPrivateLeaderboard:
     @classmethod
     def from_json(cls, injson: dict) -> "AocPrivateLeaderboard":
         """Generate an AocPrivateLeaderboard object from AoC's private leaderboard API JSON."""
-
         return cls(
             members=cls._sorted_members(injson["members"]), owner_id=injson["owner_id"], event_year=injson["event"]
         )
@@ -575,7 +551,6 @@ class AocPrivateLeaderboard:
     @classmethod
     async def from_url(cls) -> "AocPrivateLeaderboard":
         """Helper wrapping of AocPrivateLeaderboard.json_from_url and AocPrivateLeaderboard.from_json."""
-
         api_json = await cls.json_from_url()
         return cls.from_json(api_json)
 
@@ -586,7 +561,6 @@ class AocPrivateLeaderboard:
 
         Output list is sorted based on the AocMember.local_score
         """
-
         members = [AocMember.member_from_json(injson[member]) for member in injson]
         members.sort(key=lambda x: x.local_score, reverse=True)
 
@@ -599,7 +573,6 @@ class AocPrivateLeaderboard:
 
         Returns a string to be used as the content of the bot's leaderboard response
         """
-
         stargroup = f"{Emojis.star}, {Emojis.star*2}"
         header = f"{' '*3}{'Score'} {'Name':^25} {stargroup:^7}\n{'-'*44}"
         table = ""
@@ -632,7 +605,6 @@ class AocGlobalLeaderboard:
 
         If n is not specified, default to the top 10
         """
-
         return self.members[:n]
 
     @classmethod
@@ -642,7 +614,6 @@ class AocGlobalLeaderboard:
 
         Because there is no API for this, web scraping needs to be used
         """
-
         aoc_url = f"https://adventofcode.com/{AocConfig.year}/leaderboard"
 
         async with aiohttp.ClientSession(headers=AOC_REQUEST_HEADER) as session:
@@ -688,7 +659,6 @@ class AocGlobalLeaderboard:
 
         Returns a string to be used as the content of the bot's leaderboard response
         """
-
         header = f"{' '*4}{'Score'} {'Name':^25}\n{'-'*36}"
         table = ""
         for member in members_to_print:
@@ -706,12 +676,10 @@ class AocGlobalLeaderboard:
 
 def _error_embed_helper(title: str, description: str) -> discord.Embed:
     """Return a red-colored Embed with the given title and description."""
-
     return discord.Embed(title=title, description=description, colour=discord.Colour.red())
 
 
 def setup(bot: commands.Bot) -> None:
     """Advent of Code Cog load."""
-
     bot.add_cog(AdventOfCode(bot))
     log.info("AdventOfCode cog loaded")

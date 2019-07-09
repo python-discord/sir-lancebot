@@ -49,6 +49,8 @@ class Channels(NamedTuple):
     staff_lounge = 464905259261755392
     verification = 352442727016693763
     python_discussion = 267624335836053506
+    show_your_projects = 303934982764625920
+    show_your_projects_discussion = 360148304664723466
 
 
 class Client(NamedTuple):
@@ -78,7 +80,7 @@ class Emojis:
     terning1 = "<:terning1:431249668983488527>"
     terning2 = "<:terning2:462339216987127808>"
     terning3 = "<:terning3:431249694467948544>"
-    terning4 = "<:terning4:431249704769290241>"
+    terning4 = "<:terning4:579980271475228682>"
     terning5 = "<:terning5:431249716328792064>"
     terning6 = "<:terning6:431249726705369098>"
 
