@@ -7,15 +7,14 @@ log = logging.getLogger(__name__)
 
 
 class Issues(commands.Cog):
-    """Cog that allows users to retrieve issues from GitHub"""
+    """Cog that allows users to retrieve issues from GitHub."""
 
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(aliases=("issues",))
     async def issue(self, ctx, number: int, repository: str = "seasonalbot", user: str = "python-discord"):
-        """Command to retrieve issues from a GitHub repository"""
-
+        """Command to retrieve issues from a GitHub repository."""
         url = f"https://api.github.com/repos/{user}/{repository}/issues/{str(number)}"
         status = {"404": f"Issue #{str(number)} doesn't exist in the repository {user}/{repository}.",
                   "403": f"Rate limit exceeded. Please wait a while before trying again!"}
@@ -37,7 +36,6 @@ class Issues(commands.Cog):
 
 
 def setup(bot):
-    """Cog Retrieves Issues From Github"""
-
+    """Github Issues Cog Load."""
     bot.add_cog(Issues(bot))
     log.info("Issues cog loaded")
