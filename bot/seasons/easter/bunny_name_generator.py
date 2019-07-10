@@ -20,7 +20,6 @@ class BunnyNameGenerator(commands.Cog):
 
     def find_separators(self, displayname):
         """Check if Discord name contains spaces so we can bunnify an individual word in the name."""
-
         new_name = re.split(r'[_.\s]', str(displayname))
         if displayname not in new_name:
             return new_name
@@ -33,31 +32,21 @@ class BunnyNameGenerator(commands.Cog):
         it will match one or more of these patterns.
         Only the most recently matched pattern will apply the changes.
         """
+        expressions = [
+            (r'a.+y', 'patchy'),
+            (r'e.+y', 'ears'),
+            (r'i.+y', 'ditsy'),
+            (r'o.+y', 'oofy'),
+            (r'u.+y', 'uffy'),
+        ]
 
-        new_name = None
-
-        option1 = re.sub(r'a.+y', 'patchy', displayname)
-        option2 = re.sub(r'e.+y', 'ears', displayname)
-        option3 = re.sub(r'i.+y', 'ditsy', displayname)
-        option4 = re.sub(r'o.+y', 'oofy', displayname)
-        option5 = re.sub(r'u.+y', 'uffy', displayname)
-
-        if option1 != displayname:
-            new_name = option1
-        if option2 != displayname:
-            new_name = option2
-        if option3 != displayname:
-            new_name = option3
-        if option4 != displayname:
-            new_name = option4
-        if option5 != displayname:
-            new_name = option5
-
-        return new_name
+        for exp, vowel_sub in expressions:
+            new_name = re.sub(exp, vowel_sub, displayname)
+            if new_name != displayname:
+                return new_name
 
     def append_name(self, displayname):
         """Adds a suffix to the end of the Discord name"""
-
         extensions = ['foot', 'ear', 'nose', 'tail']
         suffix = random.choice(extensions)
         appended_name = displayname + suffix
@@ -67,13 +56,11 @@ class BunnyNameGenerator(commands.Cog):
     @commands.command()
     async def bunnyname(self, ctx):
         """Picks a random bunny name from a JSON file"""
-
         await ctx.send(random.choice(BUNNY_NAMES["names"]))
 
     @commands.command()
     async def bunnifyme(self, ctx):
         """Gets your Discord username and bunnifies it"""
-
         username = ctx.message.author.display_name
 
         # If name contains spaces or other separators, get the individual words to randomly bunnify
@@ -100,7 +87,6 @@ class BunnyNameGenerator(commands.Cog):
 
 
 def setup(bot):
-    """Cog load."""
-
+    """Bunny Name Generator Cog load."""
     bot.add_cog(BunnyNameGenerator(bot))
     log.info("BunnyNameGenerator cog loaded.")
