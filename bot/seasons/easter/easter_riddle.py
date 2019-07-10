@@ -75,6 +75,8 @@ class EasterRiddle(commands.Cog):
             await ctx.send(content, embed=a_embed)
 
             self.current_channel = None
+        else:
+            await ctx.send(f"A riddle is already being solved in {self.current_channel.mention}!")
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -88,6 +90,6 @@ class EasterRiddle(commands.Cog):
 
 
 def setup(bot):
-    """Cog load."""
+    """Easter Riddle Cog load."""
     bot.add_cog(EasterRiddle(bot))
     log.info("Easter Riddle bot loaded")
