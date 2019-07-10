@@ -47,7 +47,7 @@
             "1999",
             "1970"
         ],
-        "correct_answer": 2
+        "correct_answer": 3
     },
     {
         "question": "Who is considered to be the founder of Earth Day?",
@@ -55,7 +55,7 @@
             "President Jimmy Carter",
             "President John F. Kennedy",
             "Vice President Al Gore",
-            "Senator Gaylord Nelson"
+           "Senator Gaylord Nelson"
         ],
         "correct_answer": 3
     },
