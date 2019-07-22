@@ -31,4 +31,6 @@ class Pride(SeasonBase):
 
     # Season logo
     colour = Colours.soft_red
-    icon = "/logos/logo_seasonal/pride/logo_pride.png"
+    icon = (
+        "/logos/logo_seasonal/pride/logo_pride.png",
+    )

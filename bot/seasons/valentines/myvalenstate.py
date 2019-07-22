@@ -11,7 +11,7 @@ from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
-with open(Path('bot', 'resources', 'valentines', 'valenstates.json'), 'r') as file:
+with open(Path("bot/resources/valentines/valenstates.json"), "r") as file:
     STATES = json.load(file)
 
 

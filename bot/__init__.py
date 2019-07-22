@@ -30,7 +30,7 @@ logging.Logger.trace = monkeypatch_trace
 start_time = arrow.utcnow()
 
 # Set up file logging
-log_dir = Path("bot", "log")
+log_dir = Path("bot/log")
 log_file = log_dir / "hackbot.log"
 os.makedirs(log_dir, exist_ok=True)
 

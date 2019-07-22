@@ -17,4 +17,6 @@ class Valentines(SeasonBase):
     end_date = "01/03"
 
     colour = Colours.pink
-    icon = "/logos/logo_seasonal/valentines/loved_up.png"
+    icon = (
+        "/logos/logo_seasonal/valentines/loved_up.png",
+    )

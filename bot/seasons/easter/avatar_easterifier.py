@@ -104,7 +104,7 @@ class AvatarEasterifier(commands.Cog):
                 im.alpha_composite(egg, (im.width - egg.width, (im.height - egg.height)//2))  # Right centre.
                 ctx.send = send_message  # Reassigns ctx.send
             else:
-                bunny = Image.open(Path("bot", "resources", "easter", "chocolate_bunny.png"))
+                bunny = Image.open(Path("bot/resources/easter/chocolate_bunny.png"))
                 im.alpha_composite(bunny, (im.width - bunny.width, (im.height - bunny.height)//2))  # Right centre.
 
             bufferedio = BytesIO()

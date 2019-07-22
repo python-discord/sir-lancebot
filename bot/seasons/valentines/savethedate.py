@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 
 HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_heart:", ":two_hearts:"]
 
-with open(Path('bot', 'resources', 'valentines', 'date_ideas.json'), 'r', encoding="utf8") as f:
+with open(Path("bot/resources/valentines/date_ideas.json"), "r", encoding="utf8") as f:
     VALENTINES_DATES = load(f)
 
 

@@ -25,7 +25,7 @@ class BeMyValentine(commands.Cog):
     @staticmethod
     def load_json():
         """Load Valentines messages from the static resources."""
-        p = Path('bot', 'resources', 'valentines', 'bemyvalentine_valentines.json')
+        p = Path("bot/resources/valentines/bemyvalentine_valentines.json")
         with p.open() as json_data:
             valentines = load(json_data)
             return valentines

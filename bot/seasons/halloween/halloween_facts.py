@@ -30,7 +30,7 @@ class HalloweenFacts(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        with open(Path("bot", "resources", "halloween", "halloween_facts.json"), "r") as file:
+        with open(Path("bot/resources/halloween/halloween_facts.json"), "r") as file:
             self.halloween_facts = json.load(file)
         self.channel = None
         self.facts = list(enumerate(self.halloween_facts))

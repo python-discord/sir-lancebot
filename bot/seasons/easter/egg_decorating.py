@@ -12,10 +12,10 @@ from discord.ext import commands
 
 log = logging.getLogger(__name__)
 
-with open(Path("bot", "resources", "evergreen", "html_colours.json")) as f:
+with open(Path("bot/resources/evergreen/html_colours.json")) as f:
     HTML_COLOURS = json.load(f)
 
-with open(Path("bot", "resources", "evergreen", "xkcd_colours.json")) as f:
+with open(Path("bot/resources/evergreen/xkcd_colours.json")) as f:
     XKCD_COLOURS = json.load(f)
 
 COLOURS = [
@@ -77,7 +77,7 @@ class EggDecorating(commands.Cog):
                 q, r = divmod(8, colours_n)
                 colours = colours * q + colours[:r]
             num = random.randint(1, 6)
-            im = Image.open(Path("bot", "resources", "easter", "easter_eggs", f"design{num}.png"))
+            im = Image.open(Path(f"bot/resources/easter/easter_eggs/design{num}.png"))
             data = list(im.getdata())
 
             replaceable = {x for x in data if x not in IRREPLACEABLE}

@@ -13,7 +13,7 @@ from PIL.ImageDraw import ImageDraw
 from discord import File, Member, Reaction
 from discord.ext.commands import Context
 
-SNAKE_RESOURCES = Path('bot', 'resources', 'snakes').absolute()
+SNAKE_RESOURCES = Path("bot/resources/snakes").absolute()
 
 h1 = r'''```
         ----
