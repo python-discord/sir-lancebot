@@ -30,7 +30,7 @@ class EasterRiddle(commands.Cog):
     async def riddle(self, ctx):
         """
         Gives a random riddle, then provides 2 hints at certain intervals before revealing the answer.
-        
+
         The duration of the hint interval can be configured by changing the TIMELIMIT constant in this file.
         """
         if not self.current_channel:
@@ -43,25 +43,25 @@ class EasterRiddle(commands.Cog):
 
             description = f"You have {TIMELIMIT} seconds before the first hint.\n\n"
 
-            q_embed = discord.Embed(title=question, description=description, colour=Colours.pink)
+            riddle_embed = discord.Embed(title=question, description=description, colour=Colours.pink)
 
-            await ctx.send(embed=q_embed)
+            await ctx.send(embed=riddle_embed)
             await asyncio.sleep(TIMELIMIT)
 
-            h_embed = discord.Embed(
+            hint_embed = discord.Embed(
                 title=f"Here's a hint: {hints[0]}!",
                 colour=Colours.pink
             )
 
-            await ctx.send(embed=h_embed)
+            await ctx.send(embed=hint_embed)
             await asyncio.sleep(TIMELIMIT)
 
-            h_embed = discord.Embed(
+            hint_embed = discord.Embed(
                 title=f"Here's a hint: {hints[1]}!",
                 colour=Colours.pink
             )
 
-            await ctx.send(embed=h_embed)
+            await ctx.send(embed=hint_embed)
             await asyncio.sleep(TIMELIMIT)
 
             if self.winners:
@@ -71,12 +71,12 @@ class EasterRiddle(commands.Cog):
             else:
                 content = "Nobody got it right..."
 
-            a_embed = discord.Embed(
+            answer_embed = discord.Embed(
                 title=f"The answer is: {self.correct}!",
                 colour=Colours.pink
             )
 
-            await ctx.send(content, embed=a_embed)
+            await ctx.send(content, embed=answer_embed)
 
             self.current_channel = None
         else:
