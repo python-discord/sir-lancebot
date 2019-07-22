@@ -8,7 +8,7 @@ from discord.ext import commands
 
 log = logging.getLogger(__name__)
 
-with open(Path("bot", "resources", "easter", "bunny_names.json"), "r", encoding="utf8") as f:
+with Path("bot/resources/easter/bunny_names.json").open("r", encoding="utf8") as f:
     BUNNY_NAMES = json.load(f)
 
 
@@ -20,7 +20,7 @@ class BunnyNameGenerator(commands.Cog):
 
     def find_separators(self, displayname):
         """Check if Discord name contains spaces so we can bunnify an individual word in the name."""
-        new_name = re.split(r'[_.\s]', str(displayname))
+        new_name = re.split(r'[_.\s]', displayname)
         if displayname not in new_name:
             return new_name
 

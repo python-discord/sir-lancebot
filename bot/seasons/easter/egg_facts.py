@@ -28,7 +28,7 @@ class EasterFacts(commands.Cog):
     @staticmethod
     def load_json():
         """Load a list of easter egg facts from the resource JSON file."""
-        p = Path('bot', 'resources', 'easter', 'easter_egg_facts.json')
+        p = Path("bot/resources/easter/easter_egg_facts.json")
         with p.open(encoding="utf8") as f:
             facts = load(f)
         return facts
@@ -39,7 +39,7 @@ class EasterFacts(commands.Cog):
         while True:
             embed = self.make_embed()
             await channel.send(embed=embed)
-            await asyncio.sleep(24*60*60)
+            await asyncio.sleep(24 * 60 * 60)
 
     @commands.command(name='eggfact', aliases=['fact'])
     async def easter_facts(self, ctx):

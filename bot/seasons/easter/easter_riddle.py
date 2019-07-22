@@ -11,7 +11,7 @@ from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
-with open(Path('bot', 'resources', 'easter', 'easter_riddle.json'), 'r', encoding="utf8") as f:
+with Path("bot/resources/easter/easter_riddle.json").open("r", encoding="utf8") as f:
     RIDDLE_QUESTIONS = load(f)
 
 TIMELIMIT = 10
