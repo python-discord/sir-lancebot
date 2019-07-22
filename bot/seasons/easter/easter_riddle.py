@@ -28,7 +28,11 @@ class EasterRiddle(commands.Cog):
 
     @commands.command(aliases=["riddlemethis", "riddleme"])
     async def riddle(self, ctx):
-        """Gives a random riddle questions, then provides 2 hints at 10 second intervals before revealing the answer"""
+        """
+        Gives a random riddle, then provides 2 hints at certain intervals before revealing the answer.
+        
+        The duration of the hint interval can be configured by changing the TIMELIMIT constant in this file.
+        """
         if not self.current_channel:
             self.current_channel = ctx.message.channel
 
@@ -62,7 +66,7 @@ class EasterRiddle(commands.Cog):
 
             if self.winners:
                 win_list = " ".join(self.winners)
-                content = f"Well done {win_list} for getting it correct!"
+                content = f"Well done {win_list} for getting it right!"
                 self.winners = []
             else:
                 content = "Nobody got it right..."
