@@ -89,8 +89,6 @@ class EasterRiddle(commands.Cog):
             if self.bot.user != message.author:
                 if message.content.lower() == self.correct.lower():
                     self.winners.append(message.author.mention)
-        else:
-            return
 
 
 def setup(bot):

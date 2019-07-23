@@ -30,8 +30,7 @@ class EasterFacts(commands.Cog):
         """Load a list of easter egg facts from the resource JSON file."""
         p = Path("bot/resources/easter/easter_egg_facts.json")
         with p.open(encoding="utf8") as f:
-            facts = load(f)
-        return facts
+            return load(f)
 
     async def send_egg_fact_daily(self):
         """A background task that sends an easter egg fact in the event channel everyday."""
@@ -49,12 +48,11 @@ class EasterFacts(commands.Cog):
 
     def make_embed(self):
         """Makes a nice embed for the message to be sent."""
-        embed = discord.Embed()
-        embed.colour = Colours.soft_red
-        embed.title = 'Easter Egg Fact'
-        random_fact = random.choice(self.facts)
-        embed.description = random_fact
-        return embed
+        return discord.Embed(
+            colour=Colours.soft_red,
+            title="Easter Egg Fact",
+            description=random.choice(self.facts)
+        )
 
 
 def setup(bot):
