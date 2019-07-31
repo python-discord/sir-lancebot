@@ -4,7 +4,6 @@ from bot.seasons import SeasonBase
 class Wildcard(SeasonBase):
     """
     For the month of August, the season is a Wildcard.
-    That means it changes every year.
 
     This docstring will not be used for announcements.
     Instead, we'll do the announcement manually, since
