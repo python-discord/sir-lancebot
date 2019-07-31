@@ -29,10 +29,10 @@ class Issues(commands.Cog):
             return await ctx.send(failed_status[response_code])
 
         issue_embed = discord.Embed(colour=0x00ff37)
-        issue_embed.add_field(name="Repository", value=f"{user}/{repository}", inline=False)
+        issue_embed.add_field(name="Repository", value=f"[{user}/{repository}](json_data['repository_url'])", inline=False)
         issue_embed.add_field(name="Issue Number", value=f"#{number}", inline=False)
         issue_embed.add_field(name="Status", value=json_data["state"].title())
-        issue_embed.add_field(name="Link", value=url, inline=False)
+        issue_embed.add_field(name="Link", value=json_data["url"], inline=False)
 
         description = json_data["body"]
         if len(description) > 1024:
