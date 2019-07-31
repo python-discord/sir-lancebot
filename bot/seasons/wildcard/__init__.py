@@ -1,4 +1,3 @@
-from bot.constants import Colours
 from bot.seasons import SeasonBase
 
 
@@ -23,8 +22,8 @@ class Wildcard(SeasonBase):
     bot_name = "RetroBot"
 
     # Duration of season
-    start_date = "01/07"
-    end_date = "31/07"
+    start_date = "01/08"
+    end_date = "01/09"
 
     # Season logo
     bot_icon = "/logos/logo_seasonal/retro_gaming/logo_8bit_indexed_504.png"
