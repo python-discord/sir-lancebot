@@ -23,12 +23,12 @@ class AdventOfCode:
 
 class Channels(NamedTuple):
     admins = 365960823622991872
-    announcements = int(environ.get('CHANNEL_ANNOUNCEMENTS', 354619224620138496))
+    announcements = int(environ.get("CHANNEL_ANNOUNCEMENTS", 354619224620138496))
     big_brother_logs = 468507907357409333
     bot = 267659945086812160
     checkpoint_test = 422077681434099723
     devalerts = 460181980097675264
-    devlog = int(environ.get('CHANNEL_DEVLOG', 548438471685963776))
+    devlog = int(environ.get("CHANNEL_DEVLOG", 548438471685963776))
     devtest = 414574275865870337
     help_0 = 303906576991780866
     help_1 = 303906556754395136
@@ -45,22 +45,22 @@ class Channels(NamedTuple):
     off_topic_2 = 463035268514185226
     python = 267624335836053506
     reddit = 458224812528238616
-    seasonalbot_chat = int(environ.get('CHANNEL_SEASONALBOT_CHAT', 542272993192050698))
-    seasonalbot_commands = int(environ.get('CHANNEL_SEASONALBOT_COMMANDS', 607247579608121354))
-    seasonalbot_voice = int(environ.get('CHANNEL_SEASONALBOT_VOICE', 606259004230074378))
+    seasonalbot_chat = int(environ.get("CHANNEL_SEASONALBOT_CHAT", 542272993192050698))
+    seasonalbot_commands = int(environ.get("CHANNEL_SEASONALBOT_COMMANDS", 607247579608121354))
+    seasonalbot_voice = int(environ.get("CHANNEL_SEASONALBOT_VOICE", 606259004230074378))
     staff_lounge = 464905259261755392
     verification = 352442727016693763
     python_discussion = 267624335836053506
-    show_your_projects = int(environ.get('CHANNEL_SHOW_YOUR_PROJECTS', 303934982764625920))
+    show_your_projects = int(environ.get("CHANNEL_SHOW_YOUR_PROJECTS", 303934982764625920))
     show_your_projects_discussion = 360148304664723466
 
 
 class Client(NamedTuple):
-    guild = int(environ.get('SEASONALBOT_GUILD', 267624335836053506))
+    guild = int(environ.get("SEASONALBOT_GUILD", 267624335836053506))
     prefix = environ.get("PREFIX", ".")
-    token = environ.get('SEASONALBOT_TOKEN')
-    debug = environ.get('SEASONALBOT_DEBUG', '').lower() == 'true'
-    season_override = environ.get('SEASON_OVERRIDE')
+    token = environ.get("SEASONALBOT_TOKEN")
+    debug = environ.get("SEASONALBOT_DEBUG", "").lower() == "true"
+    season_override = environ.get("SEASON_OVERRIDE")
 
 
 class Colours:
@@ -96,7 +96,7 @@ class Hacktoberfest(NamedTuple):
 
 
 class Roles(NamedTuple):
-    admin = int(environ.get('SEASONALBOT_ADMIN_ROLE_ID', 267628507062992896))
+    admin = int(environ.get("SEASONALBOT_ADMIN_ROLE_ID", 267628507062992896))
     announcements = 463658397560995840
     champion = 430492892331769857
     contributor = 295488872404484098
