@@ -46,10 +46,12 @@ class Channels(NamedTuple):
     python = 267624335836053506
     reddit = 458224812528238616
     seasonalbot_chat = int(environ.get('CHANNEL_SEASONALBOT_CHAT', 542272993192050698))
+    seasonalbot_commands = int(environ.get('CHANNEL_SEASONALBOT_COMMANDS', 607247579608121354))
+    seasonalbot_voice = int(environ.get('CHANNEL_SEASONALBOT_VOICE', 606259004230074378))
     staff_lounge = 464905259261755392
     verification = 352442727016693763
     python_discussion = 267624335836053506
-    show_your_projects = 303934982764625920
+    show_your_projects = int(environ.get('CHANNEL_SHOW_YOUR_PROJECTS', 303934982764625920))
     show_your_projects_discussion = 360148304664723466
 
 
