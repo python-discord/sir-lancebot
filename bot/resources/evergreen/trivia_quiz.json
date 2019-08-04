@@ -1,0 +1,20 @@
+{
+  "general_questions":[
+    {
+      "question": "Question goes here.",
+      "answers": [],
+      "fact": "a fact related to the question or information.",
+      "comments": "Comments on this question if any."
+    },
+    {}
+  ],
+  "halloween_question":[
+
+  ],
+  "christmas_question": [
+
+  ],
+  "easter_question": [
+
+  ]
+}
