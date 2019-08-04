@@ -39,7 +39,7 @@ class EightBitify(commands.Cog):
             file = discord.File(bufferedio, filename="8bitavatar.png")
 
             embed = discord.Embed(
-                name="You're 8-bit avatar",
+                title="Your 8-bit avatar",
                 description='Here is your avatar. I think it looks all cool and "retro"'
             )
 
