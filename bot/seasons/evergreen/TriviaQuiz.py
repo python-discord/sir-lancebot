@@ -14,6 +14,11 @@ class TriviaQuiz(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.questions = self.load_questions()
+        self.game_data = {
+            "games": [],
+            "players": [],
+            "points": []
+        }
 
     @staticmethod
     def load_questions():
@@ -27,18 +32,35 @@ class TriviaQuiz(commands.Cog):
         pass
 
     @tquiz.command(name="invite")
-    async def invite_players(self, ctx):
-        """Invite a friend to play quiz with."""
-        # TODO need a plan to implement this.
+    async def join(self, ctx, quiz_id):
+        """Join a quiz game."""
+        pass
 
     @tquiz.command(name="start")
     async def start_quiz(self, ctx):
         """Start the quiz!"""
-        pass
 
-    async def send_question(self):
+        for player_list in self.game_data["players"]:
+            if ctx.author.id in player_list:
+                return await ctx.send("You are already in a game!")
+
+        game_id = "abc"  # should be randomly generated id
+
+        started = False
+        new_game = [ctx.author.id, game_id, ctx.channel.id, started]
+
+        self.game_data["games"].append(new_game)
+        self.game_data["players"].append([ctx.author.id])
+        self.game_data["points"].append([0])
+
+        print(self.game_data)
+        await self.send_question(ctx.channel)
+
+    async def send_question(self, channel):
         """This function is to be called whenever a question needs to be sent."""
-        pass
+
+        embed = discord.Embed(colour=discord.Colour.dark_gold())
+        await channel.send("here is the question.")
 
     async def send_hint(self):
         """Function to be called whenever a hint has to be sent."""
