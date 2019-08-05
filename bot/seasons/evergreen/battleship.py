@@ -64,9 +64,16 @@ grid_typehint = typing.List[typing.List[Square]]
 class Game:
     """A Battleship Game."""
 
-    def __init__(self, bot: commands.Bot, player1: discord.Member, player2: discord.Member) -> None:
+    def __init__(
+        self,
+        bot: commands.Bot,
+        channel: discord.TextChannel,
+        player1: discord.Member,
+        player2: discord.Member
+    ) -> None:
 
         self.bot = bot
+        self.public_channel = channel
         self.player1 = player1
         self.player2 = player2
 
@@ -114,8 +121,29 @@ class Game:
 
         return grid[number-1][index[letter]]  # -1 since lists are indexed from 0
 
-    def game_over(self) -> None:
-        """Removes games from list of current games."""
+    async def game_over(
+        self,
+        *,
+        timeout: bool = False,
+        winner: typing.Optional[discord.Member] = None,
+        loser: typing.Optional[discord.Member] = None
+    ) -> None:
+        """Removes games from list of current games and announces to public chat."""
+        if not timeout:  # If someone won and not the game timed out
+            await self.public_channel.send(f"Game Over! {winner.mention} won against {loser.mention}")
+            self_grid_1 = self.format_grid([
+                [ship_emojis[bool(square.boat), square.aimed] for square in row]
+                for row in self.grids[self.player1]
+            ])
+
+            self_grid_2 = self.format_grid([
+                [ship_emojis[bool(square.boat), square.aimed] for square in row]
+                for row in self.grids[self.player2]
+            ])
+
+            await self.public_channel.send(f"{self.player1}'s Board:\n{self_grid_1}")
+            await self.public_channel.send(f"{self.player2}'s Board:\n{self_grid_2}")
+
         self.bot.get_cog("Battleship").games.remove(self)
 
     @staticmethod
@@ -237,7 +265,7 @@ class Game:
                         break
 
             if self.gameover:
-                self.game_over()
+                await self.game_over(timeout=True)
                 break
 
             square.aimed = True
@@ -258,7 +286,7 @@ class Game:
                         await self.turn.send("You win!")
                         await self.next.send("You lose!")
                         self.gameover = True
-                        self.game_over()
+                        await self.game_over(winner=self.turn, loser=self.next)
                         break
             else:
                 await self.turn.send("Miss!", delete_after=3.0)
@@ -330,7 +358,7 @@ class Battleship(commands.Cog):
             try:
                 if self.already_playing(ctx.author):
                     return
-                game = Game(self.bot, ctx.author, user)
+                game = Game(self.bot, ctx.channel, ctx.author, user)
                 self.games.append(game)
                 await game.start_game()
             except discord.Forbidden:
