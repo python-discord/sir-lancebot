@@ -1,9 +1,14 @@
 import logging
 import math
+import random
 import sys
 import traceback
 
+from discord import Colour, Embed
 from discord.ext import commands
+
+from bot.constants import NEGATIVE_REPLIES
+from bot.decorators import InChannelCheckFailure
 
 log = logging.getLogger(__name__)
 
@@ -33,6 +38,16 @@ class CommandErrorHandler(commands.Cog):
             )
 
         error = getattr(error, 'original', error)
+
+        if isinstance(error, InChannelCheckFailure):
+            logging.debug(
+                f"{ctx.author} the command '{ctx.command}', but they did not have "
+                f"permissions to run commands in the channel {ctx.channel}!"
+            )
+            embed = Embed(colour=Colour.red())
+            embed.title = random.choice(NEGATIVE_REPLIES)
+            embed.description = str(error)
+            return await ctx.send(embed=embed)
 
         if isinstance(error, commands.CommandNotFound):
             return logging.debug(
