@@ -3,8 +3,9 @@ from os import environ
 from typing import NamedTuple
 
 __all__ = (
-    "AdventOfCode", "Channels", "Client", "Colours", "Emojis", "Hacktoberfest", "Roles",
-    "Tokens", "ERROR_REPLIES",
+    "AdventOfCode", "Channels", "Client", "Colours", "Emojis", "Hacktoberfest", "Roles", "Tokens",
+    "WHITELISTED_CHANNELS", "STAFF_ROLES", "MODERATION_ROLES",
+    "POSITIVE_REPLIES", "NEGATIVE_REPLIES", "ERROR_REPLIES",
 )
 
 log = logging.getLogger(__name__)
@@ -115,6 +116,58 @@ class Tokens(NamedTuple):
     omdb = environ.get("OMDB_API_KEY")
     youtube = environ.get("YOUTUBE_API_KEY")
 
+
+# Default role combinations
+MODERATION_ROLES = Roles.moderator, Roles.admin, Roles.owner
+STAFF_ROLES = Roles.helpers, Roles.moderator, Roles.admin, Roles.owner
+
+# Whitelisted channels
+WHITELISTED_CHANNELS = (
+    Channels.bot, Channels.seasonalbot_commands,
+    Channels.off_topic_0, Channels.off_topic_1, Channels.off_topic_2,
+    Channels.devtest,
+)
+
+# Bot replies
+NEGATIVE_REPLIES = [
+    "Noooooo!!",
+    "Nope.",
+    "I'm sorry Dave, I'm afraid I can't do that.",
+    "I don't think so.",
+    "Not gonna happen.",
+    "Out of the question.",
+    "Huh? No.",
+    "Nah.",
+    "Naw.",
+    "Not likely.",
+    "No way, José.",
+    "Not in a million years.",
+    "Fat chance.",
+    "Certainly not.",
+    "NEGATORY.",
+    "Nuh-uh.",
+    "Not in my house!",
+]
+
+POSITIVE_REPLIES = [
+    "Yep.",
+    "Absolutely!",
+    "Can do!",
+    "Affirmative!",
+    "Yeah okay.",
+    "Sure.",
+    "Sure thing!",
+    "You're the boss!",
+    "Okay.",
+    "No problem.",
+    "I got you.",
+    "Alright.",
+    "You got it!",
+    "ROGER THAT",
+    "Of course!",
+    "Aye aye, cap'n!",
+    "I'll allow it.",
+]
 
 ERROR_REPLIES = [
     "Please don't do that.",
