@@ -2,11 +2,9 @@ import logging
 from os import environ
 from typing import NamedTuple
 
-from bot.bot import SeasonalBot
-
 __all__ = (
     "AdventOfCode", "Channels", "Client", "Colours", "Emojis", "Hacktoberfest", "Roles",
-    "Tokens", "ERROR_REPLIES", "bot"
+    "Tokens", "ERROR_REPLIES",
 )
 
 log = logging.getLogger(__name__)
@@ -130,6 +128,3 @@ ERROR_REPLIES = [
     "Noooooo!!",
     "I can't believe you've done this",
 ]
-
-
-bot = SeasonalBot(command_prefix=Client.prefix)

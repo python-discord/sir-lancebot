@@ -1,6 +1,7 @@
 import logging
 
-from bot.constants import Client, bot
+from bot.bot import bot
+from bot.constants import Client
 
 log = logging.getLogger(__name__)
 

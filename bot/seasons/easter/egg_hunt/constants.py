@@ -2,7 +2,8 @@ import os
 
 from discord import Colour
 
-from bot.constants import Channels, Client, bot
+from bot.bot import bot
+from bot.constants import Channels, Client
 
 
 GUILD = bot.get_guild(Client.guild)
