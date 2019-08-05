@@ -593,9 +593,8 @@ class SnakeAndLaddersGame:
             y_offset -= BOARD_PLAYER_SIZE * math.floor(i / player_row_size)
             board_img.paste(self.avatar_images[player.id],
                             box=(x_offset, y_offset))
-        stream = io.BytesIO()
-        board_img.save(stream, format='JPEG')
-        board_file = File(stream.getvalue(), filename='Board.jpg')
+
+        board_file = File(frame_to_png_bytes(board_img), filename='Board.jpg')
         player_list = '\n'.join((user.mention + ": Tile " + str(self.player_tiles[user.id])) for user in self.players)
 
         # Store and send new messages
