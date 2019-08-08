@@ -18,11 +18,11 @@ class TriviaQuiz(commands.Cog):
         self.questions = self.load_questions()
         self.games = []
         self.channels = []  # Channels in which the quiz is running.
-        # self.done_questions = []
-        # self.scoreboard = {
-        #     "players": [],
-        #     "points": []
-        # }
+        self.question_dicts = []
+        self.categories = {
+            "mixed": "Questions from all categories",
+            "climate": "Questions related to climate change.",
+        }
 
     @staticmethod
     def load_questions():
@@ -31,62 +31,106 @@ class TriviaQuiz(commands.Cog):
             questions = load(json_data)
             return questions
 
-    @commands.group(name="tquiz", invoke_without_commands=True)
+    @commands.group(name="tquiz", invoke_without_command=False)
     async def tquiz(self, ctx):
         pass
+        # embed = self.category_embed()
+        # await ctx.send(embed=embed)
 
     @tquiz.command(name="start")
-    async def start(self, ctx):
+    async def start(self, ctx, category=None):
         """start a guiz!"""
+        if ctx.channel.id in self.channels:
+            return await ctx.send("Game already running in this channel!")
 
-        index = self.get_index(ctx.channel.id)
-        if index is None:
-            return await ctx.send("")
-        if ctx.author.id in self.games[]:
-            pass
+        category = category.lower()
 
+        if category not in self.categories.keys():
+            embed = self.category_embed()
+            return await ctx.send(f"Category {category} does not exist!", embed=embed)
 
-    @tquiz.command(name="start")
-    async def start_quiz(self, ctx):
-        """start the quiz."""
+        if category is None:
+            category = random.choice(self.categories)
 
-        index = self.get_index(ctx.author.id)
-        if index is None:
-            return await ctx.send("You must setup a game first in order to start/play it.")
-        self.game_data["games"][index][3] = True
-        channel = self.game_data["games"][index][2]
+        self.channels.append(ctx.channel.id)
+        self.question_dicts.append(0)
+
+        game_dict = {
+            "owner": ctx.author.id,
+            "players": [],
+            "points": [],
+            "done_questions": [],
+            "category": category
+        }
+        self.games.append(game_dict)
+
+        await self.send_question(ctx.channel)
+
+    def category_embed(self):
         embed = discord.Embed(colour=discord.Colour.blue())
-        embed.title = "Game starting with the following players: "
+        embed.title = "The available question categories are:"
         embed.description = ""
-        for player_id in self.game_data["players"][index]:
-            guild = ctx.guild
-            player = guild.get_member(player_id)
-            embed.description += f"- {player}"
-        await ctx.send(embed=embed)
-        await asyncio.sleep(2)
-        await self.send_question(channel, index)
+        for cat, description in self.categories.items():
+            embed.description += f"**- {cat.capitalize()}**\n{description.capitalize()}\n"
+        embed.set_footer(text="If not category is chosen, then a random one will be selected.")
+        return embed
 
-    async def send_question(self, channel, index):
+    async def send_question(self, channel):
         """This function is to be called whenever a question needs to be sent."""
+        game_index = self.channels.index(channel.id)
+        category = self.games[game_index]["category"]
+        category_dict = self.questions[category]
+        question_dict = random.choice(category_dict)
+
+        same_question = True
+        while same_question is True:
+            question_dict = random.choice(category_dict)
+            if question_dict["id"] not in self.games[game_index]["done_questions"]:
+                same_question = False
+            else:
+                pass
+
+        self.question_dicts[game_index] = question_dict
 
         embed = discord.Embed(colour=discord.Colour.dark_gold())
-        qtype = "climate"
-        q_category = self.questions[qtype]
-        q_data = random.choice(q_category)
 
-        self.game_data["done_questions"][index].append(q_data["id"])
-        question = q_data["question"]
-        no_done_q = len(self.game_data["done_questions"][index])
-        embed.title = f"Question #{no_done_q}"
+        question = question_dict["question"]
+        question_id = question_dict["id"]
+        answer = question_dict["answer"]
+
+        self.games[game_index]["done_questions"].append(question_id)
+        question_number = len(self.games[game_index]["done_questions"])
+
+        embed.title = f"#{question_number} Question"
         embed.description = question
-        message = await channel.send(embed=embed)
-        self.game_data["games"][index].append(message)
 
-        if q_data["type"] == "True_or_False":
-            t_emoji = "\U0001F1F9"
-            f_emoji = "\U0001F1EB"
-            await message.add_reaction(t_emoji)
-            await message.add_reaction(f_emoji)
+        await channel.send(embed=embed)
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+
+        channel = message.channel
+        if channel.id not in self.channels:
+            pass
+
+        else:
+            if message.author.bot:
+                pass
+
+            game_index = self.channels.index(channel.id)
+            game = self.games[game_index]
+            question_data = self.question_dicts[game_index]
+            if message.content.lower() == question_data["answer"].lower():
+                if message.author in game["players"]:
+                    author_index = game["players"].index(message.author)
+                    game["points"][author_index] = game["points"][author_index] + 100
+                else:
+                    game["players"].append(message.author)
+                    game["points"].append(100)
+
+                await channel.send(f"{message.author.mention} got it right! Good job :tada:")
+                await asyncio.sleep(2)
+                await self.send_question(channel)
 
     async def send_hint(self):
         """Function to be called whenever a hint has to be sent."""
