@@ -13,6 +13,8 @@ from PIL.ImageDraw import ImageDraw
 from discord import File, Member, Reaction
 from discord.ext.commands import Context
 
+from bot.constants import Roles
+
 SNAKE_RESOURCES = Path("bot/resources/snakes").absolute()
 
 h1 = r'''```
@@ -463,7 +465,7 @@ class SnakeAndLaddersGame:
 
             except asyncio.TimeoutError:
                 log.debug("Snakes and Ladders timed out waiting for a reaction")
-                self.cancel_game(self.author)
+                await self.cancel_game(self.author)
                 return  # We're done, no reactions for the last 5 minutes
 
     async def _add_player(self, user: Member):
@@ -532,8 +534,10 @@ class SnakeAndLaddersGame:
 
     async def cancel_game(self, user: Member):
         """Allow the game author to cancel the running game."""
-        if not user == self.author:
-            await self.channel.send(user.mention + " Only the author of the game can cancel it.", delete_after=10)
+
+        if not user == self.author and Roles.moderator not in [role.id for role in user.roles]:
+            await self.channel.send(user.mention + " Only the author of the game and server mods can cancel it.",
+                                    delete_after=10)
             return
         await self.channel.send("**Snakes and Ladders**: Game has been canceled.")
         self._destruct()
