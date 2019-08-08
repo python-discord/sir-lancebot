@@ -1,16 +1,12 @@
 {
-  "general_questions":[
+  "template":[
     {
       "id": 1,
       "question": "Question goes here.",
-      "answers": [],
+      "answers": "something",
       "fact": "a fact related to the question or information.",
       "comments": "Comments on this question if any."
-    },
-    {}
-  ],
-  "halloween_question":[
-
+    }
   ],
   "christmas_question": [
 

@@ -1,4 +1,6 @@
+import asyncio
 import logging
+import random
 from json import load
 from pathlib import Path
 
@@ -14,11 +16,13 @@ class TriviaQuiz(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.questions = self.load_questions()
-        self.game_data = {
-            "games": [],
-            "players": [],
-            "points": []
-        }
+        self.games = []
+        self.channels = []  # Channels in which the quiz is running.
+        # self.done_questions = []
+        # self.scoreboard = {
+        #     "players": [],
+        #     "points": []
+        # }
 
     @staticmethod
     def load_questions():
@@ -31,36 +35,58 @@ class TriviaQuiz(commands.Cog):
     async def tquiz(self, ctx):
         pass
 
-    @tquiz.command(name="invite")
-    async def join(self, ctx, quiz_id):
-        """Join a quiz game."""
-        pass
+    @tquiz.command(name="start")
+    async def start(self, ctx):
+        """start a guiz!"""
+
+        index = self.get_index(ctx.channel.id)
+        if index is None:
+            return await ctx.send("")
+        if ctx.author.id in self.games[]:
+            pass
+
 
     @tquiz.command(name="start")
     async def start_quiz(self, ctx):
-        """Start the quiz!"""
+        """start the quiz."""
 
-        for player_list in self.game_data["players"]:
-            if ctx.author.id in player_list:
-                return await ctx.send("You are already in a game!")
+        index = self.get_index(ctx.author.id)
+        if index is None:
+            return await ctx.send("You must setup a game first in order to start/play it.")
+        self.game_data["games"][index][3] = True
+        channel = self.game_data["games"][index][2]
+        embed = discord.Embed(colour=discord.Colour.blue())
+        embed.title = "Game starting with the following players: "
+        embed.description = ""
+        for player_id in self.game_data["players"][index]:
+            guild = ctx.guild
+            player = guild.get_member(player_id)
+            embed.description += f"- {player}"
+        await ctx.send(embed=embed)
+        await asyncio.sleep(2)
+        await self.send_question(channel, index)
 
-        game_id = "abc"  # should be randomly generated id
-
-        started = False
-        new_game = [ctx.author.id, game_id, ctx.channel.id, started]
-
-        self.game_data["games"].append(new_game)
-        self.game_data["players"].append([ctx.author.id])
-        self.game_data["points"].append([0])
-
-        print(self.game_data)
-        await self.send_question(ctx.channel)
-
-    async def send_question(self, channel):
+    async def send_question(self, channel, index):
         """This function is to be called whenever a question needs to be sent."""
 
         embed = discord.Embed(colour=discord.Colour.dark_gold())
-        await channel.send("here is the question.")
+        qtype = "climate"
+        q_category = self.questions[qtype]
+        q_data = random.choice(q_category)
+
+        self.game_data["done_questions"][index].append(q_data["id"])
+        question = q_data["question"]
+        no_done_q = len(self.game_data["done_questions"][index])
+        embed.title = f"Question #{no_done_q}"
+        embed.description = question
+        message = await channel.send(embed=embed)
+        self.game_data["games"][index].append(message)
+
+        if q_data["type"] == "True_or_False":
+            t_emoji = "\U0001F1F9"
+            f_emoji = "\U0001F1EB"
+            await message.add_reaction(t_emoji)
+            await message.add_reaction(f_emoji)
 
     async def send_hint(self):
         """Function to be called whenever a hint has to be sent."""
