@@ -536,8 +536,10 @@ class SnakeAndLaddersGame:
     async def cancel_game(self, user: Member):
         """Allow the game author to cancel the running game."""
         if not user == self.author and Roles.moderator not in [role.id for role in user.roles]:
-            await self.channel.send(user.mention + " Only the author of the game and server mods can cancel it.",
-                                    delete_after=10)
+            await self.channel.send(
+                f"{user.mention} Only the author of the game and server mods can cancel it.",
+                delete_after=10
+            )
             return
         await self.channel.send("**Snakes and Ladders**: Game has been canceled.")
         self._destruct()
