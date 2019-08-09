@@ -36,7 +36,7 @@ class Minesweeper(commands.Cog):
         return board
 
     @staticmethod
-    def format_for_discord(board: typing.List[typing.List[typing.Union[str, int]]]):
+    def format_for_discord(board: typing.List[typing.List[typing.Union[str, int]]]) -> str:
         """Format the board to a string for discord."""
         mapping = {
             0: ":stop_button:",
@@ -50,7 +50,9 @@ class Minesweeper(commands.Cog):
             8: ":eight:",
             9: ":nine:",
             10: ":keycap_ten:",
-            "bomb": ":bomb:"
+            "bomb": ":bomb:",
+            "hidden": ":grey_question:",
+            "flag": ":triangular_flag_on_post:"
         }
 
         discord_msg = ":stop_button:    :one::two::three::four::five::six::seven::eight::nine::keycap_ten:\n\n"
@@ -75,9 +77,19 @@ class Minesweeper(commands.Cog):
 
         # Add game to list
         board = self.generate_board()
-        await ctx.send(self.format_for_discord(board))
+        reveled_board = [["hidden" for _ in range(10)]for _ in range(10)]
+
+        await ctx.send(f"{ctx.author.mention} is playing minesweeper")
+        chat_msg = await ctx.send(self.format_for_discord(reveled_board))
+
+        await ctx.author.send("play by typing: `.reveal x y` and `.flag x y`")
+        dm_msg = await ctx.author.send(self.format_for_discord(reveled_board))
+
         self.games[ctx.author] = {
-            "board": board
+            "board": board,
+            "reveled": reveled_board,
+            "dm_msg": dm_msg,
+            "chat_msg": chat_msg
         }
 
 
