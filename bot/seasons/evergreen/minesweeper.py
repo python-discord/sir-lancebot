@@ -20,7 +20,7 @@ class Minesweeper(commands.Cog):
     def generate_board(self) -> typing.List[typing.List[typing.Union[str, int]]]:
         """Generate a 2d array for the board."""
         board: typing.List[typing.List[typing.Union[str, int]]] = [
-            ["bomb" if random() <= .2 else "number" for _ in range(10)] for _ in range(9)]
+            ["bomb" if random() <= .2 else "number" for _ in range(10)] for _ in range(10)]
         for y, row in enumerate(board):
             for x, cell in enumerate(row):
                 if cell == "number":
@@ -28,12 +28,41 @@ class Minesweeper(commands.Cog):
                     to_check = []
                     for xt in [x - 1, x, x + 1]:
                         for yt in [y - 1, y, y + 1]:
-                            if xt != -1 and xt != 10 and yt != -1 and yt != 9:
+                            if xt != -1 and xt != 10 and yt != -1 and yt != 10:
                                 to_check.append(board[yt][xt])
 
                     bombs = sum(map(self.is_bomb, to_check))
                     board[y][x] = bombs
         return board
+
+    @staticmethod
+    def format_for_discord(board: typing.List[typing.List[typing.Union[str, int]]]):
+        """Format the board to a string for discord."""
+        mapping = {
+            0: ":stop_button:",
+            1: ":one:",
+            2: ":two:",
+            3: ":three:",
+            4: ":four:",
+            5: ":five:",
+            6: ":six:",
+            7: ":seven:",
+            8: ":eight:",
+            9: ":nine:",
+            10: ":keycap_ten:",
+            "bomb": ":bomb:"
+        }
+
+        discord_msg = ":stop_button:    :one::two::three::four::five::six::seven::eight::nine::keycap_ten:\n\n"
+        rows: typing.List[str] = []
+        for row_number, row in enumerate(board):
+            new_row = mapping[row_number + 1] + "    "
+            for cell in row:
+                new_row += mapping[cell]
+            rows.append(new_row)
+
+        discord_msg += "\n".join(rows)
+        return discord_msg
 
     @commands.command(name="minesweeper")
     async def minesweeper_command(self, ctx: commands.Context) -> None:
@@ -45,9 +74,10 @@ class Minesweeper(commands.Cog):
             return
 
         # Add game to list
-        await ctx.send(str(self.generate_board()))
+        board = self.generate_board()
+        await ctx.send(self.format_for_discord(board))
         self.games[ctx.author] = {
-
+            "board": board
         }
 
 
