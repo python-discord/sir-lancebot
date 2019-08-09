@@ -120,6 +120,59 @@ class Minesweeper(commands.Cog):
 
         await self.reload_board(ctx)
 
+    async def lost(self, ctx: commands.Context) -> None:
+        """The player lost the game"""
+        game = self.games[ctx.author]
+        game["reveled"] = game["board"]
+        await self.reload_board(ctx)
+        await ctx.author.send(":fire: You lost :fire: ")
+        await game["chat_msg"].channel.send(f":fire: {ctx.author.mention} just lost minesweeper :fire:")
+        del self.games[ctx.author]
+        print(self.games)
+
+    async def won(self, ctx: commands.Context):
+        """The player won the game"""
+        game = self.games[ctx.author]
+        game["reveled"] = game["board"]
+        await self.reload_board(ctx)
+        await ctx.author.send(":tada:  You won! :tada: ")
+        await game["chat_msg"].channel.send(f":tada: {ctx.author.mention} just won minesweeper :tada:")
+        del self.games[ctx.author]
+        print(self.games)
+
+    def reveal(self, reveled: typing.List, board: typing.List, x: int, y: int) -> None:
+        """Used when a 0 is encountered to do a flood fill"""
+        for x_ in [x - 1, x, x + 1]:
+            for y_ in [y - 1, y, y + 1]:
+                if x_ == -1 or x_ == 10 or y_ == -1 or y_ == 10 or reveled[y_][x_] != "hidden":
+                    continue
+                reveled[y_][x_] = board[y_][x_]
+                if board[y_][x_] == 0:
+                    self.reveal(reveled, board, x_, y_)
+
+    @commands.dm_only()
+    @commands.command(name="reveal")
+    async def reveal_command(self, ctx: commands.Context, value1, value2):
+        """Reveal a cell"""
+        x, y = self.get_cords(value1, value2)
+        game = self.games[ctx.author]
+        reveled = game["reveled"]
+        board = game["board"]
+        reveled[y][x] = board[y][x]
+        if board[y][x] == "bomb":
+            await self.lost(ctx)
+        elif board[y][x] == 0:
+            self.reveal(reveled, board, x, y)
+
+        # check if won
+        for x_ in range(10):
+            for y_ in range(10):
+                if not (reveled[y_][x_] == "hidden" and board[y_][x_] == "bomb"):
+                    await self.won(ctx)
+                    break
+
+        await self.reload_board(ctx)
+
 
 def setup(bot: commands.Bot) -> None:
     """Cog load."""
