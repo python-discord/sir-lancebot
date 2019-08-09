@@ -94,6 +94,32 @@ class Minesweeper(commands.Cog):
             "chat_msg": chat_msg
         }
 
+    @staticmethod
+    def get_cords(value1: str, value2: str) -> typing.Tuple[int, int]:
+        """Take in 2 values for the cords and turn them into numbers"""
+        if value1.isnumeric():
+            return int(value1) - 1, ord(value2.lower()) - 97
+        else:
+            return ord(value1.lower()) - 97, int(value2) - 1
+
+    async def reload_board(self, ctx: commands.Context) -> None:
+        """Update both playing boards."""
+        game = self.games[ctx.author]
+        await game["dm_msg"].delete()
+        game["dm_msg"] = await ctx.author.send(self.format_for_discord(game["reveled"]))
+        await game["chat_msg"].edit(content=self.format_for_discord(game["reveled"]))
+
+    @commands.dm_only()
+    @commands.command(name="flag")
+    async def flag_command(self, ctx: commands.Context, value1, value2) -> None:
+        """Place a flag on the board"""
+        x, y = self.get_cords(value1, value2)  # ints
+        board = self.games[ctx.author]["reveled"]
+        if board[y][x] == "hidden":
+            board[y][x] = "flag"
+
+        await self.reload_board(ctx)
+
 
 def setup(bot: commands.Bot) -> None:
     """Cog load."""
