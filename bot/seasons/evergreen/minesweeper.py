@@ -128,7 +128,6 @@ class Minesweeper(commands.Cog):
         await ctx.author.send(":fire: You lost :fire: ")
         await game["chat_msg"].channel.send(f":fire: {ctx.author.mention} just lost minesweeper :fire:")
         del self.games[ctx.author]
-        print(self.games)
 
     async def won(self, ctx: commands.Context):
         """The player won the game"""
@@ -138,7 +137,6 @@ class Minesweeper(commands.Cog):
         await ctx.author.send(":tada:  You won! :tada: ")
         await game["chat_msg"].channel.send(f":tada: {ctx.author.mention} just won minesweeper :tada:")
         del self.games[ctx.author]
-        print(self.games)
 
     def reveal(self, reveled: typing.List, board: typing.List, x: int, y: int) -> None:
         """Used when a 0 is encountered to do a flood fill"""
@@ -172,6 +170,17 @@ class Minesweeper(commands.Cog):
                     break
 
         await self.reload_board(ctx)
+
+    @commands.dm_only()
+    @commands.command(name="end")
+    async def end_command(self, ctx: commands.Context):
+        """End the current game"""
+        game = self.games[ctx.author]
+        game["reveled"] = game["board"]
+        await self.reload_board(ctx)
+        await ctx.author.send(":no_entry: you canceled the game :no_entry:")
+        await game["chat_msg"].channel.send(f"{ctx.author.mention} just canceled minesweeper")
+        del self.games[ctx.author]
 
 
 def setup(bot: commands.Bot) -> None:
