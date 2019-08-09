@@ -55,7 +55,9 @@ class Minesweeper(commands.Cog):
             "flag": ":triangular_flag_on_post:"
         }
 
-        discord_msg = ":stop_button:    :one::two::three::four::five::six::seven::eight::nine::keycap_ten:\n\n"
+        discord_msg = ":stop_button:    :regional_indicator_a::regional_indicator_b::regional_indicator_c:" \
+                      ":regional_indicator_d::regional_indicator_e::regional_indicator_f::regional_indicator_g:" \
+                      ":regional_indicator_h::regional_indicator_i::regional_indicator_j:\n\n"
         rows: typing.List[str] = []
         for row_number, row in enumerate(board):
             new_row = mapping[row_number + 1] + "    "
@@ -77,12 +79,12 @@ class Minesweeper(commands.Cog):
 
         # Add game to list
         board = self.generate_board()
-        reveled_board = [["hidden" for _ in range(10)]for _ in range(10)]
+        reveled_board = [["hidden" for _ in range(10)] for _ in range(10)]
 
         await ctx.send(f"{ctx.author.mention} is playing minesweeper")
         chat_msg = await ctx.send(self.format_for_discord(reveled_board))
 
-        await ctx.author.send("play by typing: `.reveal x y` and `.flag x y`")
+        await ctx.author.send("play by typing: `.reveal x y` or `.flag x y` \nclose the game with `.end`")
         dm_msg = await ctx.author.send(self.format_for_discord(reveled_board))
 
         self.games[ctx.author] = {
