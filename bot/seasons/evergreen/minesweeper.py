@@ -17,10 +17,10 @@ class Minesweeper(commands.Cog):
         """Returns 1 if `cell` is a bomb if not 0"""
         return 1 if cell == "bomb" else 0
 
-    def generate_board(self) -> typing.List[typing.List[typing.Union[str, int]]]:
+    def generate_board(self, bomb_chance: float) -> typing.List[typing.List[typing.Union[str, int]]]:
         """Generate a 2d array for the board."""
         board: typing.List[typing.List[typing.Union[str, int]]] = [
-            ["bomb" if random() <= .2 else "number" for _ in range(10)] for _ in range(10)]
+            ["bomb" if random() <= bomb_chance else "number" for _ in range(10)] for _ in range(10)]
         for y, row in enumerate(board):
             for x, cell in enumerate(row):
                 if cell == "number":
@@ -69,7 +69,7 @@ class Minesweeper(commands.Cog):
         return discord_msg
 
     @commands.command(name="minesweeper")
-    async def minesweeper_command(self, ctx: commands.Context) -> None:
+    async def minesweeper_command(self, ctx: commands.Context, bomb_chance: float = .2) -> None:
         """Start a game of minesweeper."""
         if ctx.author in self.games.keys():  # Player is already playing
             msg = await ctx.send(f"{ctx.author.mention} you already have a game running")
@@ -78,7 +78,7 @@ class Minesweeper(commands.Cog):
             return
 
         # Add game to list
-        board = self.generate_board()
+        board = self.generate_board(bomb_chance)
         reveled_board = [["hidden" for _ in range(10)] for _ in range(10)]
 
         await ctx.send(f"{ctx.author.mention} is playing minesweeper")
