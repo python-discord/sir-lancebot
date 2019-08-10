@@ -84,7 +84,8 @@ class Minesweeper(commands.Cog):
         await ctx.send(f"{ctx.author.mention} is playing minesweeper")
         chat_msg = await ctx.send(self.format_for_discord(reveled_board))
 
-        await ctx.author.send("play by typing: `.reveal xy xy ...` or `.flag xy xy ...` \nclose the game with `.end`")
+        await ctx.author.send("play by typing: `.reveal xy xy ...` or `.flag xy xy ...` \nclose the game with `.end`\n"
+                              "cords must be in format `<letter><number>")
         dm_msg = await ctx.author.send(self.format_for_discord(reveled_board))
 
         self.games[ctx.author] = {
@@ -97,10 +98,7 @@ class Minesweeper(commands.Cog):
     @staticmethod
     def get_cords(value1: str, value2: str) -> typing.Tuple[int, int]:
         """Take in 2 values for the cords and turn them into numbers"""
-        if value1.isnumeric():
-            return ord(value2.lower()) - 97, int(value1) - 1
-        else:
-            return ord(value1.lower()) - 97, int(value2) - 1
+        return ord(value1.lower()) - 97, int(value2) - 1
 
     async def reload_board(self, ctx: commands.Context) -> None:
         """Update both playing boards."""
@@ -115,7 +113,7 @@ class Minesweeper(commands.Cog):
         """Place multiple flags on the board"""
         board = self.games[ctx.author]["reveled"]
         for cord in cords:
-            x, y = self.get_cords(cord[0], cord[1])
+            x, y = self.get_cords(cord[0], cord[1:])
             if board[y][x] == "hidden":
                 board[y][x] = "flag"
 
@@ -178,7 +176,7 @@ class Minesweeper(commands.Cog):
         reveled = game["reveled"]
         board = game["board"]
         for cord in cords:
-            x, y = self.get_cords(cord[0], cord[1])
+            x, y = self.get_cords(cord[0], cord[1:])
             await self.reveal_one(ctx, reveled, board, x, y)
 
     @commands.dm_only()
