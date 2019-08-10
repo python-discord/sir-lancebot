@@ -84,7 +84,7 @@ class Minesweeper(commands.Cog):
         await ctx.send(f"{ctx.author.mention} is playing minesweeper")
         chat_msg = await ctx.send(self.format_for_discord(reveled_board))
 
-        await ctx.author.send("play by typing: `.reveal x y` or `.flag x y` \nclose the game with `.end`")
+        await ctx.author.send("play by typing: `.reveal xy xy ...` or `.flag xy xy ...` \nclose the game with `.end`")
         dm_msg = await ctx.author.send(self.format_for_discord(reveled_board))
 
         self.games[ctx.author] = {
@@ -111,12 +111,13 @@ class Minesweeper(commands.Cog):
 
     @commands.dm_only()
     @commands.command(name="flag")
-    async def flag_command(self, ctx: commands.Context, value1, value2) -> None:
-        """Place a flag on the board"""
-        x, y = self.get_cords(value1, value2)  # ints
+    async def flag_command(self, ctx: commands.Context, *cords) -> None:
+        """Place multiple flags on the board"""
         board = self.games[ctx.author]["reveled"]
-        if board[y][x] == "hidden":
-            board[y][x] = "flag"
+        for cord in cords:
+            x, y = self.get_cords(cord[0], cord[1])
+            if board[y][x] == "hidden":
+                board[y][x] = "flag"
 
         await self.reload_board(ctx)
 
@@ -138,7 +139,7 @@ class Minesweeper(commands.Cog):
         await game["chat_msg"].channel.send(f":tada: {ctx.author.mention} just won minesweeper :tada:")
         del self.games[ctx.author]
 
-    def reveal(self, reveled: typing.List, board: typing.List, x: int, y: int) -> None:
+    def reveal_zeros(self, reveled: typing.List, board: typing.List, x: int, y: int) -> None:
         """Used when a 0 is encountered to do a flood fill"""
         for x_ in [x - 1, x, x + 1]:
             for y_ in [y - 1, y, y + 1]:
@@ -146,21 +147,15 @@ class Minesweeper(commands.Cog):
                     continue
                 reveled[y_][x_] = board[y_][x_]
                 if board[y_][x_] == 0:
-                    self.reveal(reveled, board, x_, y_)
+                    self.reveal_zeros(reveled, board, x_, y_)
 
-    @commands.dm_only()
-    @commands.command(name="reveal")
-    async def reveal_command(self, ctx: commands.Context, value1, value2):
-        """Reveal a cell"""
-        x, y = self.get_cords(value1, value2)
-        game = self.games[ctx.author]
-        reveled = game["reveled"]
-        board = game["board"]
+    async def reveal_one(self, ctx: commands.Context, reveled: typing.List, board: typing.List, x: int, y: int) -> None:
+        """Reveal one square."""
         reveled[y][x] = board[y][x]
         if board[y][x] == "bomb":
             await self.lost(ctx)
         elif board[y][x] == 0:
-            self.reveal(reveled, board, x, y)
+            self.reveal_zeros(reveled, board, x, y)
 
         # check if won
         break_ = False
@@ -173,8 +168,18 @@ class Minesweeper(commands.Cog):
                 break
         else:
             await self.won(ctx)
-
         await self.reload_board(ctx)
+
+    @commands.dm_only()
+    @commands.command(name="reveal")
+    async def reveal_command(self, ctx: commands.Context, *cords):
+        """Reveal multiple cells"""
+        game = self.games[ctx.author]
+        reveled = game["reveled"]
+        board = game["board"]
+        for cord in cords:
+            x, y = self.get_cords(cord[0], cord[1])
+            await self.reveal_one(ctx, reveled, board, x, y)
 
     @commands.dm_only()
     @commands.command(name="end")
