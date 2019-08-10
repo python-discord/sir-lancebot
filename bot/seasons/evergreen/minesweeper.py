@@ -98,7 +98,7 @@ class Minesweeper(commands.Cog):
     def get_cords(value1: str, value2: str) -> typing.Tuple[int, int]:
         """Take in 2 values for the cords and turn them into numbers"""
         if value1.isnumeric():
-            return int(value1) - 1, ord(value2.lower()) - 97
+            return ord(value2.lower()) - 97, int(value1) - 1
         else:
             return ord(value1.lower()) - 97, int(value2) - 1
 
