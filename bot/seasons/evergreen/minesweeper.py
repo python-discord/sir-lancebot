@@ -163,11 +163,17 @@ class Minesweeper(commands.Cog):
             self.reveal(reveled, board, x, y)
 
         # check if won
+        break_ = False
         for x_ in range(10):
             for y_ in range(10):
-                if not (reveled[y_][x_] == "hidden" and board[y_][x_] == "bomb"):
-                    await self.won(ctx)
+                if reveled[y_][x_] == "hidden" and board[y_][x_] != "bomb":
+                    break_ = True
                     break
+            else:
+                await self.won(ctx)
+                break
+            if break_:
+                break
 
         await self.reload_board(ctx)
 
