@@ -86,6 +86,7 @@ class Minesweeper(commands.Cog):
 
         await ctx.author.send("play by typing: `.reveal x y` or `.flag x y` \nclose the game with `.end`")
         dm_msg = await ctx.author.send(self.format_for_discord(reveled_board))
+        await ctx.author.send(self.format_for_discord(board))
 
         self.games[ctx.author] = {
             "board": board,
@@ -169,11 +170,10 @@ class Minesweeper(commands.Cog):
                 if reveled[y_][x_] == "hidden" and board[y_][x_] != "bomb":
                     break_ = True
                     break
-            else:
-                await self.won(ctx)
-                break
             if break_:
                 break
+        else:
+            await self.won(ctx)
 
         await self.reload_board(ctx)
 
