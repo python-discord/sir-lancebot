@@ -7,6 +7,24 @@ GameBoard = typing.List[typing.List[typing.Union[str, int]]]
 DictOfGames = typing.Dict[int, typing.Dict]
 
 
+class CordConverter(commands.Converter):
+    """Converter for cords."""
+
+    async def convert(self, ctx, cord: str) -> typing.Tuple[int, int]:
+        """Take in a cord string and turn it into x, y"""
+        if not 2 <= len(cord) <= 3:
+            raise commands.ArgumentParsingError()
+        value1 = cord[0]
+        value2 = cord[1:]
+        if not value2.isdigit():
+            raise commands.ArgumentParsingError()
+        x = ord(value1) - 97
+        y = int(value2) - 1
+        if (not 0 <= x <= 9) or (not 0 <= y <= 9):
+            raise commands.ArgumentParsingError()
+        return x, y
+
+
 class Minesweeper(commands.Cog):
     """Play a game of minesweeper."""
 
@@ -97,11 +115,6 @@ class Minesweeper(commands.Cog):
             "chat_msg": chat_msg
         }
 
-    @staticmethod
-    def get_cords(value1: str, value2: str) -> typing.Tuple[int, int]:
-        """Take in 2 values for the cords and turn them into numbers"""
-        return ord(value1.lower()) - 97, int(value2) - 1
-
     async def reload_board(self, ctx: commands.Context) -> None:
         """Update both playing boards."""
         game = self.games[ctx.author.id]
@@ -111,11 +124,10 @@ class Minesweeper(commands.Cog):
 
     @commands.dm_only()
     @commands.command(name="flag")
-    async def flag_command(self, ctx: commands.Context, *cords) -> None:
+    async def flag_command(self, ctx: commands.Context, *cords: CordConverter) -> None:
         """Place multiple flags on the board"""
         board: GameBoard = self.games[ctx.author.id]["revealed"]
-        for cord in cords:
-            x, y = self.get_cords(cord[0], cord[1:])
+        for x, y in cords:
             if board[y][x] == "hidden":
                 board[y][x] = "flag"
 
@@ -149,38 +161,41 @@ class Minesweeper(commands.Cog):
                 if board[y_][x_] == 0:
                     self.reveal_zeros(revealed, board, x_, y_)
 
-    async def check_if_won(self, ctx, revealed: GameBoard, board: GameBoard) -> None:
+    async def check_if_won(self, ctx, revealed: GameBoard, board: GameBoard) -> bool:
         """Checks if a player has won"""
         for x_ in range(10):
             for y_ in range(10):
                 if revealed[y_][x_] == "hidden" and board[y_][x_] != "bomb":
-                    return
+                    return True
         else:
             await self.won(ctx)
+            return False
 
-    async def reveal_one(self, ctx: commands.Context, revealed: GameBoard, board: GameBoard, x: int, y: int) -> None:
+    async def reveal_one(self, ctx: commands.Context, revealed: GameBoard, board: GameBoard, x: int, y: int) -> bool:
         """Reveal one square."""
         revealed[y][x] = board[y][x]
         if board[y][x] == "bomb":
             await self.lost(ctx)
+            return False
         elif board[y][x] == 0:
             self.reveal_zeros(revealed, board, x, y)
-        await self.check_if_won(ctx, revealed, board)
-
-        await self.reload_board(ctx)
+        return await self.check_if_won(ctx, revealed, board)
 
     @commands.dm_only()
     @commands.command(name="reveal")
-    async def reveal_command(self, ctx: commands.Context, *cords) -> None:
+    async def reveal_command(self, ctx: commands.Context, *cords: CordConverter) -> None:
         """Reveal multiple cells"""
         game = self.games[ctx.author.id]
         revealed: GameBoard = game["revealed"]
         board: GameBoard = game["board"]
-        for cord in cords:
-            x, y = self.get_cords(cord[0], cord[1:])
-            await self.reveal_one(ctx, revealed, board, x, y)
 
-    @commands.dm_only()
+        reload_board = True
+        for x, y in cords:
+            if not await self.reveal_one(ctx, revealed, board, x, y):
+                reload_board = False
+        if reload_board:
+            await self.reload_board(ctx)
+
     @commands.command(name="end")
     async def end_command(self, ctx: commands.Context):
         """End the current game"""
