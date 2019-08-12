@@ -6,6 +6,8 @@ from random import choice
 from discord.ext import commands
 
 log = logging.getLogger(__name__)
+with Path('bot/resources/evergreen/speedrun_links.json').open(encoding="utf-8") as file:
+    LINKS = json.load(file)
 
 
 class Speedrun(commands.Cog):
@@ -13,13 +15,11 @@ class Speedrun(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        with Path('bot/resources/evergreen/speedrun_links.json').open(encoding="utf-8") as file:
-            self.data = json.load(file)
 
     @commands.command(name="speedrun")
     async def get_speedrun(self, ctx):
         """Sends a link to a video of a random speedrun."""
-        await ctx.send(choice(self.data))
+        await ctx.send(choice(LINKS))
 
 
 def setup(bot):
