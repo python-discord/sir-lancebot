@@ -13,14 +13,13 @@ class Speedrun(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        with Path('bot/resources/evergreen/speedrun_links.json').open(encoding="utf-8") as file:
+            self.data = json.load(file)
 
     @commands.command(name="speedrun")
     async def get_speedrun(self, ctx):
         """Sends a link to a video of a random speedrun."""
-        with open(Path('bot/resources/evergreen/speedrun_links.json')) as file:
-            data = json.load(file)
-        # links = data['links']
-        await ctx.send(choice(data))
+        await ctx.send(choice(self.data))
 
 
 def setup(bot):
