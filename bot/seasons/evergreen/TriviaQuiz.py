@@ -1,13 +1,28 @@
 import asyncio
 import logging
 import random
+from dataclasses import dataclass
 from json import load
 from pathlib import Path
+
+from fuzzywuzzy import fuzz
 
 import discord
 from discord.ext import commands
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class GameData:
+    """TODO documentation"""
+    owner: int
+    players = []
+    points = []
+    done_questions = []
+    category: str
+    question: dict = None
+    hints = 0
 
 
 class TriviaQuiz(commands.Cog):
@@ -16,11 +31,9 @@ class TriviaQuiz(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.questions = self.load_questions()
-        self.games = []
-        self.channels = []  # Channels in which the quiz is running.
-        self.question_dicts = []
+        self.games = {}  # channel as key and value as instinct of dataclass GameData
         self.categories = {
-            "mixed": "Questions from all categories",
+            # "mixed": "Questions from all categories",
             "climate": "Questions related to climate change.",
         }
 
@@ -40,7 +53,7 @@ class TriviaQuiz(commands.Cog):
     @tquiz.command(name="start")
     async def start(self, ctx, category=None):
         """start a guiz!"""
-        if ctx.channel.id in self.channels:
+        if ctx.channel.id in list(self.games.keys()):
             return await ctx.send("Game already running in this channel!")
 
         if category is None:
@@ -52,17 +65,10 @@ class TriviaQuiz(commands.Cog):
                 embed = self.category_embed()
                 return await ctx.send(f"Category {category} does not exist!", embed=embed)
 
-        self.channels.append(ctx.channel.id)
-        self.question_dicts.append(0)
-
-        game_dict = {
-            "owner": ctx.author.id,
-            "players": [],
-            "points": [],
-            "done_questions": [],
-            "category": category
-        }
-        self.games.append(game_dict)
+        self.games[ctx.channel.id] = GameData(
+            owner=ctx.author.id,
+            category=category
+        )
 
         await self.send_question(ctx.channel)
 
@@ -77,62 +83,61 @@ class TriviaQuiz(commands.Cog):
 
     async def send_question(self, channel):
         """This function is to be called whenever a question needs to be sent."""
-        # task = asyncio.create_task(self.send_hint(channel))
-        game_index = self.channels.index(channel.id)
-        category = self.games[game_index]["category"]
-        self.games[game_index]["hint_index"] = 0
+        game = self.games[channel.id]
+        category = game.category
         category_dict = self.questions[category]
         question_dict = random.choice(category_dict)
 
         same_question = True
         while same_question is True:
             question_dict = random.choice(category_dict)
-            if question_dict["id"] not in self.games[game_index]["done_questions"]:
+            if question_dict["id"] not in game.done_questions:
                 same_question = False
             else:
                 pass
 
         question_dict["points"] = 100
-        self.question_dicts[game_index] = question_dict
+        # game.question = question_dict
 
         embed = discord.Embed(colour=discord.Colour.dark_gold())
 
         question = question_dict["question"]
         question_id = question_dict["id"]
-        answer = question_dict["answer"]
 
-        self.games[game_index]["done_questions"].append(question_id)
-        question_number = len(self.games[game_index]["done_questions"])
+        game.done_questions.append(question_id)
+        question_number = len(game.done_questions)
 
         embed.title = f"#{question_number} Question"
         embed.description = question
         embed.set_footer(text="A hint will be provided after every 10s if no one gives the right answer.Max of 2 hints")
 
         await channel.send(embed=embed)
-        # await task
+        await self.send_hint(channel, question_dict)
+        # game.question = question_dict
 
     @commands.Cog.listener()
     async def on_message(self, message):
 
         channel = message.channel
-        if channel.id not in self.channels:
+        if channel.id not in list(self.games.keys()):
             pass
-
         else:
             if message.author.bot:
                 pass
 
-            game_index = self.channels.index(channel.id)
-            game = self.games[game_index]
-            question_data = self.question_dicts[game_index]
+            game = self.games[message.channel.id]
+            question_data = game.question
             points = question_data["points"]
-            if message.content.lower() == question_data["answer"].lower():
-                if message.author in game["players"]:
-                    author_index = game["players"].index(message.author)
-                    game["points"][author_index] = game["points"][author_index] + points
+            answer = question_data["answer"].lower()
+            user_answer = message.content.lower()
+            ratio = fuzz.ratio(answer, user_answer)
+            if ratio > 84:
+                if message.author in game.players:
+                    author_index = game.players.index(message.author)
+                    game.points[author_index] = game.points[author_index] + points
                 else:
-                    game["players"].append(message.author)
-                    game["points"].append(points)
+                    game.players.append(message.author)
+                    game.points.append(points)
 
                 await channel.send(f"{message.author.mention} got it right! Good job :tada:"
                                    f"You got {points} points.")
@@ -140,20 +145,21 @@ class TriviaQuiz(commands.Cog):
                 await self.score_embed(channel)
                 await self.send_question(channel)
 
-    async def send_hint(self, channel):
+    async def send_hint(self, channel, question_dict):
         """Function to be called whenever a hint has to be sent."""
         await asyncio.sleep(10)
-        game_index = self.channels.index(channel.id)
-        self.question_dicts[game_index]["points"] -= 25
-        hints = self.question_dicts[game_index]["hints"]
-        hint_index = self.games[game_index]["hint_index"]
-        self.games[game_index]["hint_index"] += 1
-        hint = hints[hint_index]
-        embed = discord.Embed(colour=discord.Colour.blue())
-        embed.title = f"Hint #{hint_index + 1}"
-        embed.description = hint
-        embed.set_footer(text=f"Remaining hints: {1 - hint_index}.")
-        await channel.send(embed=embed)
+        game = self.games[channel.id]
+        if question_dict == game.question:
+            hint_list = question_dict["hints"]
+            hint_index = game.hints
+            hint = hint_list[hint_index]
+            game.hints += 1
+            embed = discord.Embed(colour=discord.Colour.blue())
+            embed.title = f"Hint No.{game.hints}"
+            embed.description = hint
+            embed.set_footer(text=f"Number of hints remaining: {2-game.hints}")
+        else:
+            pass
 
     @tquiz.command(name="score")
     async def send_score(self, ctx):
@@ -161,12 +167,11 @@ class TriviaQuiz(commands.Cog):
 
     async def score_embed(self, channel):
         """Show score of each player in the quiz."""
-        if channel.id not in self.channels:
+        if channel.id not in list(self.games.keys()):
             return await channel.send("There are no games running in this channel!")
-        game_index = self.channels.index(channel.id)
-        game = self.games[game_index]
-        players = game["players"]
-        points = game["points"]
+        game = self.games[channel.id]
+        players = game.players
+        points = game.points
         embed = discord.Embed(color=discord.Colour.dark_gold())
         embed.title = "Scoreboard"
         embed.description = "```\n"
