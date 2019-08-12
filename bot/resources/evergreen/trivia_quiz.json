@@ -1,25 +1,18 @@
 {
+  "retro": [
+    {
+      "id": 0,
+      "hints": [],
+      "question": "",
+      "answer": ""
+    }
+  ],
   "climate":[
     {
-      "id": 1,
+      "id": 100,
       "hints": ["hint1", "hint2"],
       "question": "How much has the average global temperature risen by since 1880 (in Fahrenheit)?",
-      "answer": "1.6 degrees",
-      "fact": "The average global temperature has risen by 1.69 degrees F (0.94 degrees C) since the twentieth century with more significant warming toward the poles than in the equatorial region."
-    },
-    {
-      "id": 2,
-      "hints": ["hint1", "hint2"],
-      "question": "Which is the first specie to go extinct due to human-driven climate change?",
-      "answer": "Bramble cay melomys",
-      "fact": "A small rodent that lived only on a single island off Australia is likely the world's first mammal to become a casualty of climate change, scientists reported in June 2016. The government of Australia has now officially recognized the Bramble Cay melomys (Melomys rubicola) as extinct."
-    },
-    {
-      "id": 3,
-      "hints": ["hint1", "hint2"],
-      "question": "Wasting less food is a way to reduce greenhouse gas emissions.True or False?",
-      "answer": "True",
-      "fact": "More than a third of food produced globally never makes it to the table. Some of this wasted food spoils  in transit, while consumers throw some of this food out. During the production, harvesting, transporting, and packaging of the wasted food, more than 3.3 billion metric tons of carbon dioxide is emitted."
+      "answer": "1.6 degrees"
     }
   ]
 }

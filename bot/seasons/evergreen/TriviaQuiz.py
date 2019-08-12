@@ -97,7 +97,8 @@ class TriviaQuiz(commands.Cog):
                 pass
 
         question_dict["points"] = 100
-        # game.question = question_dict
+        game.question = question_dict
+        game.hints = 0
 
         embed = discord.Embed(colour=discord.Colour.dark_gold())
 
@@ -113,7 +114,6 @@ class TriviaQuiz(commands.Cog):
 
         await channel.send(embed=embed)
         await self.send_hint(channel, question_dict)
-        # game.question = question_dict
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -141,7 +141,6 @@ class TriviaQuiz(commands.Cog):
 
                 await channel.send(f"{message.author.mention} got it right! Good job :tada:"
                                    f"You got {points} points.")
-                await asyncio.sleep(2)
                 await self.score_embed(channel)
                 await self.send_question(channel)
 
@@ -149,7 +148,12 @@ class TriviaQuiz(commands.Cog):
         """Function to be called whenever a hint has to be sent."""
         await asyncio.sleep(10)
         game = self.games[channel.id]
-        if question_dict == game.question:
+        print(f"QD: {question_dict}")
+        print(f"GD: {game.question}")
+
+        if question_dict["id"] == game.question["id"]:
+            if 2 - game.hints == 0:
+                return await self.send_answer(channel)
             hint_list = question_dict["hints"]
             hint_index = game.hints
             hint = hint_list[hint_index]
@@ -158,8 +162,18 @@ class TriviaQuiz(commands.Cog):
             embed.title = f"Hint No.{game.hints}"
             embed.description = hint
             embed.set_footer(text=f"Number of hints remaining: {2-game.hints}")
+            await channel.send(embed=embed)
+            await self.send_hint(channel, question_dict)
         else:
-            pass
+            await channel.send("no hint")
+
+    async def send_answer(self, channel):
+        """A function to send the answer in the channel if no user have given the correct answer even after 2 hints."""
+        game = self.games[channel.id]
+        answer = game.question["answer"]
+        await channel.send(f"All of you failed, the correct answer is {answer}.")
+        await self.score_embed(channel)
+        await self.send_question(channel)
 
     @tquiz.command(name="score")
     async def send_score(self, ctx):
@@ -174,15 +188,18 @@ class TriviaQuiz(commands.Cog):
         points = game.points
         embed = discord.Embed(color=discord.Colour.dark_gold())
         embed.title = "Scoreboard"
-        embed.description = "```\n"
+        embed.description = ""
         for player, score in zip(players, points):
             embed.description = f"{player} - {score}\n"
         await channel.send(embed=embed)
 
     @tquiz.command(name="stop")
     async def stop_quiz(self, ctx):
-        """Stops the quiz"""
-        pass
+        """Stop the quiz."""
+        await ctx.send("Game is not running anymore!")
+        await self.score_embed(ctx.channel)
+        await asyncio.sleep(2)
+        del self.games[ctx.channel.id]
 
 
 def setup(bot):
