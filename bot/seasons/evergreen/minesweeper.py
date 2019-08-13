@@ -239,7 +239,7 @@ class Minesweeper(commands.Cog):
         board: GameBoard = game.board
 
         for x, y in coordinates:
-            # reveal_one returns True if the revealed cell is a bomb or the player won., ending the game
+            # reveal_one returns True if the revealed cell is a bomb or the player won, ending the game
             if await self.reveal_one(ctx, revealed, board, x, y):
                 await self.update_boards(ctx)
                 del self.games[ctx.author.id]
