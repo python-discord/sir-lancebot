@@ -5,7 +5,37 @@
       "hints": [],
       "question": "",
       "answer": ""
-    }
+    },
+    {
+      "id": 1,
+      "hints": ["It was not a mainline Mario Game, although the plumber was present.", "It was not a mainline Zelda Game, although Link was present."],
+      "question": "What was the best selling game on the Nintendo Gamecube?",
+      "answer": "Super Smash Bros. Melee"
+    },
+    {
+      "id": 2,
+      "hints": ["It was released before the 90s.", "It was released after 1980."],
+      "question": "What year was Tetris released?",
+      "answer": "1984"
+    },
+    {
+      "id": 3,
+      "hints": ["The occupation was in construction", "He appeared as this kind of worker in 1981's Donkey Kong"],
+      "question": "What was Mario's original occupation?",
+      "answer": "Carpenter"
+    },
+    {
+      "id": 4,
+      "hints": ["It was revelead in the Nintendo Character Guide in 1993.", "His last name has to do with eating Mario's enemies."],
+      "question": "What is Yoshi's(from Mario Bros) full name?",
+      "answer": "T. Yoshisaur Munchakoopas"
+    },
+    {
+      "id": 5,
+      "hints": ["The game was released in 1990.", "It was released on the SNES."],
+      "question": "What was the first game Yoshi appeared in?",
+      "answer": "Super Mario World"
+    }  
   ],
   "climate":[
     {
