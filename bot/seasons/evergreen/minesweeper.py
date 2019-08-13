@@ -139,7 +139,7 @@ class Minesweeper(commands.Cog):
         game["revealed"] = game["board"]
         await self.reload_board(ctx)
         await ctx.author.send(":fire: You lost :fire: ")
-        await game["chat_msg"].channel.send(f":fire: {ctx.author.mention} just lost minesweeper :fire:")
+        await game["chat_msg"].channel.send(f":fire: {ctx.author.mention} just lost Minesweeper! :fire:")
         del self.games[ctx.author.id]
 
     async def won(self, ctx: commands.Context) -> None:
@@ -147,8 +147,8 @@ class Minesweeper(commands.Cog):
         game = self.games[ctx.author.id]
         game["revealed"] = game["board"]
         await self.reload_board(ctx)
-        await ctx.author.send(":tada:  You won! :tada: ")
-        await game["chat_msg"].channel.send(f":tada: {ctx.author.mention} just won minesweeper :tada:")
+        await ctx.author.send(":tada: You won! :tada: ")
+        await game["chat_msg"].channel.send(f":tada: {ctx.author.mention} just won Minesweeper! :tada:")
         del self.games[ctx.author.id]
 
     def reveal_zeros(self, revealed: GameBoard, board: GameBoard, x: int, y: int) -> None:
@@ -203,7 +203,7 @@ class Minesweeper(commands.Cog):
         game["revealed"] = game["board"]
         await self.reload_board(ctx)
         await ctx.author.send(":no_entry: you canceled the game :no_entry:")
-        await game["chat_msg"].channel.send(f"{ctx.author.mention} just canceled minesweeper")
+        await game["chat_msg"].channel.send(f"{ctx.author.mention} just canceled Minesweeper.")
         del self.games[ctx.author.id]
 
 
