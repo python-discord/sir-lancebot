@@ -130,7 +130,7 @@ class Minesweeper(commands.Cog):
 
         await ctx.author.send(
             f"Play by typing: `{Client.prefix}reveal xy [xy]` or `{Client.prefix}flag xy [xy]` \n"
-            "Close the game with `.end`\n"
+            f"Close the game with `{Client.prefix}end`\n"
             "Coordinates must be in format `<letter><number>`"
         )
         dm_msg = await ctx.author.send(self.format_for_discord(revealed_board))
@@ -164,15 +164,15 @@ class Minesweeper(commands.Cog):
         """The player lost the game"""
         game = self.games[ctx.author.id]
         game.revealed = game.board
-        await ctx.author.send(":fire: You lost! :fire: ")
-        await game.chat_msg.channel.send(f":fire: {ctx.author.mention} just lost minesweeper :fire:")
+        await ctx.author.send(":fire: You lost! :fire:")
+        await game.chat_msg.channel.send(f":fire: {ctx.author.mention} just lost Minesweeper! :fire:")
 
     async def won(self, ctx: commands.Context) -> None:
         """The player won the game"""
         game = self.games[ctx.author.id]
         game.revealed = game.board
-        await ctx.author.send(":tada:  You won! :tada: ")
-        await game.chat_msg.channel.send(f":tada: {ctx.author.mention} just won minesweeper :tada:")
+        await ctx.author.send(":tada: You won! :tada:")
+        await game.chat_msg.channel.send(f":tada: {ctx.author.mention} just won Minesweeper! :tada:")
 
     def reveal_zeros(self, revealed: GameBoard, board: GameBoard, x: int, y: int) -> None:
         """Recursively reveal adjacent cells when a 0 cell is encountered."""
@@ -187,7 +187,7 @@ class Minesweeper(commands.Cog):
         """Checks if a player has won"""
         for x in range(10):
             for y in range(10):
-                if revealed[y][x] == "hidden" and board[y][x] != "bomb":
+                if revealed[y][x] == "hidden":
                     return False
         else:
             await self.won(ctx)
@@ -238,4 +238,4 @@ class Minesweeper(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Load the Minesweeper cog."""
     bot.add_cog(Minesweeper(bot))
-    log.info("minesweeper cog loaded")
+    log.info("Minesweeper cog loaded")
