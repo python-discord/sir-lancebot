@@ -34,18 +34,18 @@ class CoordinateConverter(commands.Converter):
     async def convert(self, ctx, coordinate: str) -> typing.Tuple[int, int]:
         """Take in a coordinate string and turn it into x, y"""
         if not 2 <= len(coordinate) <= 3:
-            raise commands.ArgumentParsingError()
+            raise commands.BadArgument('Invalid co-ordinate provided')
 
         digit, letter = sorted(coordinate.lower())
 
         if not letter.isdigit():
-            raise commands.ArgumentParsingError()
+            raise commands.BadArgument
 
-        x = ord(letter.lower()) - 97
+        x = ord(letter) - ord('a')
         y = int(digit) - 1
 
         if (not 0 <= x <= 9) or (not 0 <= y <= 9):
-            raise commands.ArgumentParsingError()
+            raise commands.BadArgument
         return x, y
 
 
@@ -58,8 +58,8 @@ class Game:
 
     board: GameBoard
     revealed: GameBoard
-    dm_msg: discord.message
-    chat_msg: discord.message
+    dm_msg: discord.Message
+    chat_msg: discord.Message
     activated_on_server: bool
 
 
@@ -125,7 +125,7 @@ class Minesweeper(commands.Cog):
     async def start_command(self, ctx: commands.Context, bomb_chance: float = .2) -> None:
         """Start a game of Minesweeper."""
         if ctx.author.id in self.games:  # Player is already playing
-            await ctx.send(f"{ctx.author.mention} you already have a game running!")
+            await ctx.send(f"{ctx.author.mention} you already have a game running!", delete_after=2)
             await ctx.message.delete(delay=2)
             return
 
