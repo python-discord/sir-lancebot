@@ -229,7 +229,7 @@ class Minesweeper(commands.Cog):
         game = self.games[ctx.author.id]
         game.revealed = game.board
         await self.update_boards(ctx)
-        new_msg = f":no_entry: Game canceled :no_entry:\n{self.format_for_discord(game.revealed)}"
+        new_msg = f":no_entry: Game canceled :no_entry:\n{game.dm_msg.content}"
         await game.dm_msg.edit(content=new_msg)
         await game.chat_msg.edit(content=new_msg)
         del self.games[ctx.author.id]
