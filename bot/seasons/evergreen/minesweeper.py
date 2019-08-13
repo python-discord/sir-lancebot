@@ -31,42 +31,46 @@ log = logging.getLogger(__name__)
 class CoordinateConverter(commands.Converter):
     """Converter for Coordinates."""
 
-    async def convert(self, ctx, Coordinate: str) -> typing.Tuple[int, int]:
-        """Take in a Coordinate string and turn it into x, y"""
-        if not 2 <= len(Coordinate) <= 3:
+    async def convert(self, ctx, coordinate: str) -> typing.Tuple[int, int]:
+        """Take in a coordinate string and turn it into x, y"""
+        if not 2 <= len(coordinate) <= 3:
             raise commands.ArgumentParsingError()
-        value1 = Coordinate[0]
-        value2 = Coordinate[1:]
+
+        value1 = coordinate[0]
+        value2 = coordinate[1:]
+
         if not value2.isdigit():
             raise commands.ArgumentParsingError()
+
         x = ord(value1) - 97
         y = int(value2) - 1
+
         if (not 0 <= x <= 9) or (not 0 <= y <= 9):
             raise commands.ArgumentParsingError()
         return x, y
 
 
-GameDict = typing.List[typing.List[typing.Union[str, int]]]
+GameBoard = typing.List[typing.List[typing.Union[str, int]]]
 
 
 @dataclass
 class Game:
     """The data for a game."""
 
-    board: GameDict
-    revealed: GameDict
+    board: GameBoard
+    revealed: GameBoard
     dm_msg: discord.message
     chat_msg: discord.message
 
 
-DictOfGames = typing.Dict[int, Game]
+GamesDict = typing.Dict[int, Game]
 
 
 class Minesweeper(commands.Cog):
     """Play a game of Minesweeper."""
 
     def __init__(self, bot: commands.Bot) -> None:
-        self.games: DictOfGames = {}  # Store the currently running games
+        self.games: GamesDict = {}  # Store the currently running games
 
     @staticmethod
     def get_neighbours(x: int, y: int) -> typing.Generator:
@@ -76,9 +80,9 @@ class Minesweeper(commands.Cog):
                 if x_ != -1 and x_ != 10 and y_ != -1 and y_ != 10:
                     yield x_, y_
 
-    def generate_board(self, bomb_chance: float) -> GameDict:
+    def generate_board(self, bomb_chance: float) -> GameBoard:
         """Generate a 2d array for the board."""
-        board: GameDict = [["bomb" if random() <= bomb_chance else "number" for _ in range(10)] for _ in range(10)]
+        board: GameBoard = [["bomb" if random() <= bomb_chance else "number" for _ in range(10)] for _ in range(10)]
         for y, row in enumerate(board):
             for x, cell in enumerate(row):
                 if cell == "number":
@@ -91,7 +95,7 @@ class Minesweeper(commands.Cog):
         return board
 
     @staticmethod
-    def format_for_discord(board: GameDict) -> str:
+    def format_for_discord(board: GameBoard) -> str:
         """Format the board as a string for Discord."""
         discord_msg = (
             ":stop_button:    :regional_indicator_a::regional_indicator_b::regional_indicator_c:"
@@ -118,8 +122,8 @@ class Minesweeper(commands.Cog):
             return
 
         # Add game to list
-        board: GameDict = self.generate_board(bomb_chance)
-        revealed_board: GameDict = [["hidden"] * 10 for _ in range(10)]
+        board: GameBoard = self.generate_board(bomb_chance)
+        revealed_board: GameBoard = [["hidden"] * 10 for _ in range(10)]
 
         await ctx.send(f"{ctx.author.mention} is playing Minesweeper")
         chat_msg = await ctx.send(self.format_for_discord(revealed_board))
@@ -147,10 +151,10 @@ class Minesweeper(commands.Cog):
 
     @commands.dm_only()
     @commands.command(name="flag")
-    async def flag_command(self, ctx: commands.Context, *Coordinates: CoordinateConverter) -> None:
+    async def flag_command(self, ctx: commands.Context, *coordinates: CoordinateConverter) -> None:
         """Place multiple flags on the board"""
-        board: GameDict = self.games[ctx.author.id].revealed
-        for x, y in Coordinates:
+        board: GameBoard = self.games[ctx.author.id].revealed
+        for x, y in coordinates:
             if board[y][x] == "hidden":
                 board[y][x] = "flag"
 
@@ -170,7 +174,7 @@ class Minesweeper(commands.Cog):
         await ctx.author.send(":tada:  You won! :tada: ")
         await game.chat_msg.channel.send(f":tada: {ctx.author.mention} just won minesweeper :tada:")
 
-    def reveal_zeros(self, revealed: GameDict, board: GameDict, x: int, y: int) -> None:
+    def reveal_zeros(self, revealed: GameBoard, board: GameBoard, x: int, y: int) -> None:
         """Recursively reveal adjacent cells when a 0 cell is encountered."""
         for x_, y_ in self.get_neighbours(x, y):
             if revealed[y_][x_] != "hidden":
@@ -179,7 +183,7 @@ class Minesweeper(commands.Cog):
             if board[y_][x_] == 0:
                 self.reveal_zeros(revealed, board, x_, y_)
 
-    async def check_if_won(self, ctx, revealed: GameDict, board: GameDict) -> bool:
+    async def check_if_won(self, ctx, revealed: GameBoard, board: GameBoard) -> bool:
         """Checks if a player has won"""
         for x in range(10):
             for y in range(10):
@@ -189,26 +193,29 @@ class Minesweeper(commands.Cog):
             await self.won(ctx)
             return True
 
-    async def reveal_one(self, ctx: commands.Context, revealed: GameDict, board: GameDict, x: int, y: int) -> bool:
-        """Reveal one square."""
+    async def reveal_one(self, ctx: commands.Context, revealed: GameBoard, board: GameBoard, x: int, y: int) -> bool:
+        """
+        Reveal one square.
+
+        return is True if the game ended, breaking the loop in `reveal_command` and deleting the game
+        """
         revealed[y][x] = board[y][x]
         if board[y][x] == "bomb":
             await self.lost(ctx)
             return True  # game ended
         elif board[y][x] == 0:
             self.reveal_zeros(revealed, board, x, y)
-        won = await self.check_if_won(ctx, revealed, board)
-        return won
+        return await self.check_if_won(ctx, revealed, board)
 
     @commands.dm_only()
     @commands.command(name="reveal")
-    async def reveal_command(self, ctx: commands.Context, *Coordinates: CoordinateConverter) -> None:
+    async def reveal_command(self, ctx: commands.Context, *coordinates: CoordinateConverter) -> None:
         """Reveal multiple cells"""
         game = self.games[ctx.author.id]
-        revealed: GameDict = game.revealed
-        board: GameDict = game.board
+        revealed: GameBoard = game.revealed
+        board: GameBoard = game.board
 
-        for x, y in Coordinates:
+        for x, y in coordinates:
             if await self.reveal_one(ctx, revealed, board, x, y):  # game ended
                 await self.update_boards(ctx)
                 del self.games[ctx.author.id]
@@ -222,8 +229,9 @@ class Minesweeper(commands.Cog):
         game = self.games[ctx.author.id]
         game.revealed = game.board
         await self.update_boards(ctx)
-        await ctx.author.send(":no_entry: you canceled the game :no_entry:")
-        await game.chat_msg.channel.send(f"{ctx.author.mention} just canceled minesweeper")
+        new_msg = f":no_entry: Game canceled :no_entry:\n{self.format_for_discord(game.revealed)}"
+        await game.dm_msg.edit(content=new_msg)
+        await game.chat_msg.edit(content=new_msg)
         del self.games[ctx.author.id]
 
 
