@@ -7,11 +7,11 @@ from aiohttp import AsyncResolver, ClientSession, TCPConnector
 from discord import Embed
 from discord.ext import commands
 
-from bot import constants
+from bot.constants import Channels, Client
 
 log = logging.getLogger(__name__)
 
-__all__ = ('SeasonalBot',)
+__all__ = ('SeasonalBot', 'bot')
 
 
 class SeasonalBot(commands.Bot):
@@ -42,7 +42,7 @@ class SeasonalBot(commands.Bot):
 
     async def send_log(self, title: str, details: str = None, *, icon: str = None):
         """Send an embed message to the devlog channel."""
-        devlog = self.get_channel(constants.Channels.devlog)
+        devlog = self.get_channel(Channels.devlog)
 
         if not devlog:
             log.warning("Log failed to send. Devlog channel not found.")
@@ -62,3 +62,6 @@ class SeasonalBot(commands.Bot):
             context.command.reset_cooldown(context)
         else:
             await super().on_command_error(context, exception)
+
+
+bot = SeasonalBot(command_prefix=Client.prefix)

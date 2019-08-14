@@ -9,7 +9,8 @@ from pathlib import Path
 import discord
 from discord.ext import commands
 
-from bot.constants import Channels, Client, Roles as MainRoles, bot
+from bot.bot import bot
+from bot.constants import Channels, Client, Roles as MainRoles
 from bot.decorators import with_role
 from .constants import Colours, EggHuntSettings, Emoji, Roles
 
