@@ -36,11 +36,13 @@ class CoordinateConverter(commands.Converter):
         if not 2 <= len(coordinate) <= 3:
             raise commands.BadArgument('Invalid co-ordinate provided')
 
-        if len(coordinate) == 3:
-            digit = "10"
-            letter = sorted(coordinate.lower())[-1]
+        coordinate = coordinate.lower()
+        if coordinate[0].isalpha():
+            digit = coordinate[1:]
+            letter = coordinate[0]
         else:
-            digit, letter = sorted(coordinate.lower())
+            digit = coordinate[:-1]
+            letter = coordinate[-1]
 
         if not digit.isdigit():
             raise commands.BadArgument
