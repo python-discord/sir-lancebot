@@ -38,7 +38,7 @@ class CoordinateConverter(commands.Converter):
 
         digit, letter = sorted(coordinate.lower())
 
-        if not letter.isdigit():
+        if not digit.isdigit():
             raise commands.BadArgument
 
         x = ord(letter) - ord('a')
@@ -140,8 +140,8 @@ class Minesweeper(commands.Cog):
             chat_msg = None
 
         await ctx.author.send(
-            f"Play by typing: `{Client.prefix}reveal xy [xy]` or `{Client.prefix}flag xy [xy]` \n"
-            f"Close the game with `{Client.prefix}end`\n"
+            f"Play by typing: `{Client.prefix}ms reveal xy [xy]` or `{Client.prefix}ms flag xy [xy]` \n"
+            f"Close the game with `{Client.prefix}ms end`\n"
         )
         dm_msg = await ctx.author.send(self.format_for_discord(revealed_board))
 
