@@ -135,7 +135,7 @@ class Minesweeper(commands.Cog):
 
         if ctx.guild:
             await ctx.send(f"{ctx.author.mention} is playing Minesweeper")
-            chat_msg = await ctx.send(self.format_for_discord(revealed_board))
+            chat_msg = await ctx.send(f"Here's there board!\n{self.format_for_discord(revealed_board)}")
         else:
             chat_msg = None
 
@@ -143,7 +143,7 @@ class Minesweeper(commands.Cog):
             f"Play by typing: `{Client.prefix}ms reveal xy [xy]` or `{Client.prefix}ms flag xy [xy]` \n"
             f"Close the game with `{Client.prefix}ms end`\n"
         )
-        dm_msg = await ctx.author.send(self.format_for_discord(revealed_board))
+        dm_msg = await ctx.author.send(f"Here's your board!\n{self.format_for_discord(revealed_board)}")
 
         self.games[ctx.author.id] = Game(
             board=board,
@@ -157,9 +157,9 @@ class Minesweeper(commands.Cog):
         """Update both playing boards."""
         game = self.games[ctx.author.id]
         await game.dm_msg.delete()
-        game.dm_msg = await ctx.author.send(self.format_for_discord(game.revealed))
+        game.dm_msg = await ctx.author.send(f"Here's your board!\n{self.format_for_discord(game.revealed)}")
         if game.activated_on_server:
-            await game.chat_msg.edit(content=self.format_for_discord(game.revealed))
+            await game.chat_msg.edit(content=f"Here's there board!\n{self.format_for_discord(game.revealed)}")
 
     @commands.dm_only()
     @minesweeper_group.command(name="flag")
