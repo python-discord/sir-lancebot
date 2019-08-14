@@ -36,7 +36,11 @@ class CoordinateConverter(commands.Converter):
         if not 2 <= len(coordinate) <= 3:
             raise commands.BadArgument('Invalid co-ordinate provided')
 
-        digit, letter = sorted(coordinate.lower())
+        if len(coordinate) == 3:
+            digit = "10"
+            letter = sorted(coordinate.lower())[-1]
+        else:
+            digit, letter = sorted(coordinate.lower())
 
         if not digit.isdigit():
             raise commands.BadArgument
