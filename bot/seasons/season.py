@@ -12,7 +12,8 @@ import async_timeout
 import discord
 from discord.ext import commands
 
-from bot.constants import Channels, Client, Roles, bot
+from bot.bot import bot
+from bot.constants import Channels, Client, Roles
 from bot.decorators import with_role
 
 log = logging.getLogger(__name__)

@@ -4,6 +4,7 @@ import discord
 from discord.ext import commands
 
 from bot.constants import Colours
+from bot.decorators import override_in_channel
 
 log = logging.getLogger(__name__)
 
@@ -15,6 +16,7 @@ class Issues(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=("issues",))
+    @override_in_channel
     async def issue(self, ctx, number: int, repository: str = "seasonalbot", user: str = "python-discord"):
         """Command to retrieve issues from a GitHub repository."""
         api_url = f"https://api.github.com/repos/{user}/{repository}/issues/{number}"

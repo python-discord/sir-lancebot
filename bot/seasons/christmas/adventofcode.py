@@ -14,6 +14,7 @@ from discord.ext import commands
 from pytz import timezone
 
 from bot.constants import AdventOfCode as AocConfig, Channels, Colours, Emojis, Tokens
+from bot.decorators import override_in_channel
 
 log = logging.getLogger(__name__)
 
@@ -125,6 +126,7 @@ class AdventOfCode(commands.Cog):
         self.status_task = asyncio.ensure_future(self.bot.loop.create_task(status_coro))
 
     @commands.group(name="adventofcode", aliases=("aoc",), invoke_without_command=True)
+    @override_in_channel
     async def adventofcode_group(self, ctx: commands.Context):
         """All of the Advent of Code commands."""
         await ctx.send_help(ctx.command)
