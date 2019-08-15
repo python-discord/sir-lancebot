@@ -1,15 +1,7 @@
 {
   "title": "Elder Scrolls V: Skyrim",
   "recText": "The latest mainline Elder Scrolls game offered a fantastic role-playing experience with untethered freedom and a great story. Offering vast mod support, the game has endless customization and replay value.",
-  "console": [
-    "xbox 360",
-    "ps3",
-    "pc",
-    "nintendo switch",
-    "xbox one",
-    "ps4"
-  ],
   "image": "https://upload.wikimedia.org/wikipedia/en/1/15/The_Elder_Scrolls_V_Skyrim_cover.png",
-  "wikiLink": "https://elderscrolls.fandom.com/wiki/Skyrim",
+  "wikiLink": "https://rawg.io/games/the-elder-scrolls-v-skyrim",
   "author": "352635617709916161"
 }
