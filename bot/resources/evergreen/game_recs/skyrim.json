@@ -1,6 +1,6 @@
 {
   "title": "Elder Scrolls V: Skyrim",
-  "recText": "The last mainline Elder Scrolls game offered a fantastic role-playing experience with untethered freedom and a great story",
+  "recText": "The latest mainline Elder Scrolls game offered a fantastic role-playing experience with untethered freedom and a great story. Offering vast mod support, the game has endless customization and replay value.",
   "console": [
     "xbox 360",
     "ps3",
@@ -9,5 +9,7 @@
     "xbox one",
     "ps4"
   ],
-  "image": "https://upload.wikimedia.org/wikipedia/en/1/15/The_Elder_Scrolls_V_Skyrim_cover.png"
+  "image": "https://upload.wikimedia.org/wikipedia/en/1/15/The_Elder_Scrolls_V_Skyrim_cover.png",
+  "wikiLink": "https://elderscrolls.fandom.com/wiki/Skyrim",
+  "author": "352635617709916161"
 }
