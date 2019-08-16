@@ -22,7 +22,7 @@ MESSAGE_MAPPING = {
     10: ":keycap_ten:",
     "bomb": ":bomb:",
     "hidden": ":grey_question:",
-    "flag": ":pyflag:"
+    "flag": ":flag_black:"
 }
 
 log = logging.getLogger(__name__)
