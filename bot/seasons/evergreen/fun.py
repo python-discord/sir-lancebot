@@ -2,21 +2,21 @@ import logging
 import random
 
 from discord.ext import commands
-from discord.ext.commands import Context, MessageConverter
+from discord.ext.commands import Bot, Cog, Context, MessageConverter
 
 from bot.constants import Emojis
 
 log = logging.getLogger(__name__)
 
 
-class Fun(commands.Cog):
+class Fun(Cog):
     """A collection of general commands for fun."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
     @commands.command()
-    async def roll(self, ctx, num_rolls: int = 1):
+    async def roll(self, ctx: Context, num_rolls: int = 1) -> None:
         """Outputs a number of random dice emotes (up to 6)."""
         output = ""
         if num_rolls > 6:
