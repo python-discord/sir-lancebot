@@ -20,12 +20,12 @@ shuffle(game_recs)
 class RecommendGame(commands.Cog):
     """Commands related to recommending games."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.index = 0
 
     @commands.command(name="recommendgame", aliases=['gamerec'])
-    async def recommend_game(self, ctx):
+    async def recommend_game(self, ctx: commands.Context) -> None:
         """Sends an Embed of a random game recommendation."""
         if self.index >= len(game_recs):
             self.index = 0
@@ -45,7 +45,7 @@ class RecommendGame(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot):
+def setup(bot: commands.Bot) -> None:
     """Loads the RecommendGame cog."""
     bot.add_cog(RecommendGame(bot))
     log.info("RecommendGame cog loaded")
