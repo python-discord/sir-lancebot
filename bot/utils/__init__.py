@@ -1,4 +1,6 @@
 import asyncio
+import re
+import string
 from typing import List
 
 import discord
@@ -77,3 +79,57 @@ async def disambiguate(
         return entries[index - 1]
     except IndexError:
         raise BadArgument('Invalid choice.')
+
+
+def replace_many(
+        sentence: str, replacements: dict, *, ignore_case: bool = False, match_case: bool = False
+) -> str:
+    """
+    Replaces multiple substrings in a string given a mapping of strings.
+
+    By default replaces long strings before short strings, and lowercase before uppercase.
+    Example:
+        var = replace_many("This is a sentence", {"is": "was", "This": "That"})
+        assert var == "That was a sentence"
+
+    If `ignore_case` is given, does a case insensitive match.
+    Example:
+        var = replace_many("THIS is a sentence", {"IS": "was", "tHiS": "That"}, ignore_case=True)
+        assert var == "That was a sentence"
+
+    If `match_case` is given, matches the case of the replacement with the replaced word.
+    Example:
+        var = replace_many(
+            "This IS a sentence", {"is": "was", "this": "that"}, ignore_case=True, match_case=True
+        )
+        assert var == "That WAS a sentence"
+    """
+    if ignore_case:
+        replacements = dict(
+            (word.lower(), replacement) for word, replacement in replacements.items()
+        )
+
+    words_to_replace = sorted(replacements, key=lambda s: (-len(s), s))
+
+    # Join and compile words to replace into a regex
+    pattern = "|".join(re.escape(word) for word in words_to_replace)
+    regex = re.compile(pattern, re.I if ignore_case else 0)
+
+    def _repl(match):
+        """Returns replacement depending on `ignore_case` and `match_case`"""
+        word = match.group(0)
+        replacement = replacements[word.lower() if ignore_case else word]
+
+        if not match_case:
+            return replacement
+
+        # Clean punctuation from word so string methods work
+        cleaned_word = word.translate(str.maketrans('', '', string.punctuation))
+        if cleaned_word.isupper():
+            return replacement.upper()
+        elif cleaned_word[0].isupper():
+            return replacement.capitalize()
+        else:
+            return replacement.lower()
+
+    return regex.sub(_repl, sentence)
