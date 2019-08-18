@@ -4,9 +4,21 @@ import random
 from discord.ext import commands
 from discord.ext.commands import Bot, Cog, Context, MessageConverter
 
+from bot import utils
 from bot.constants import Emojis
 
 log = logging.getLogger(__name__)
+
+UWU_WORDS = {
+    "fi": "fwi",
+    "l": "w",
+    "r": "w",
+    "th": "d",
+    "tho": "fo",
+    "you're": "yuw'we",
+    "your": "yur",
+    "you": "yuw",
+}
 
 
 class Fun(Cog):
@@ -28,14 +40,26 @@ class Fun(Cog):
             output += getattr(Emojis, terning, '')
         await ctx.send(output)
 
+    @commands.group(name="uwu", aliases=("uwuwize", "uwuify",), invoke_without_command=True)
+    async def uwu_group(self, ctx: Context, *, text: str) -> None:
+        """Commands for making text uwu."""
+        await ctx.invoke(self.convert_uwu, text=text)
+
+    @uwu_group.command(name="convert")
+    async def convert_uwu(self, ctx: Context, *, text: str) -> None:
+        """Converts a given `text` into it's uwu equivalent."""
+        text = await Fun.text_to_message(ctx, text)
+        converted = utils.replace_many(text, UWU_WORDS, ignore_case=True, match_case=True)
+        await ctx.send(f">>> {converted}")
+
     @commands.group(name="randomcase", aliases=("rcase", "randomcaps", "rcaps",), invoke_without_command=True)
     async def randomcase_group(self, ctx: Context, *, text: str) -> None:
-        """Commands for returning text in randomcase"""
+        """Commands for returning text in randomcase."""
         await ctx.invoke(self.convert_randomcase, text=text)
 
     @randomcase_group.command(name="convert")
     async def convert_randomcase(self, ctx: Context, *, text: str) -> None:
-        """Randomly converts the casing of a given `text`"""
+        """Randomly converts the casing of a given `text`."""
         text = await Fun.text_to_message(ctx, text)
         converted = (
             char.upper() if round(random.random()) else char.lower() for char in text
@@ -52,7 +76,7 @@ class Fun(Cog):
         try:
             message = await MessageConverter().convert(ctx, text)
         except commands.BadArgument:
-            log.debug(f"Input {text} is not a valid Discord Message")
+            log.debug(f"Input '{text:.20}...' is not a valid Discord Message")
         else:
             text = message.content
         finally:
