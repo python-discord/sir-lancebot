@@ -9,21 +9,15 @@ from bot.pagination import LinePaginator
 
 async def disambiguate(
         ctx: Context, entries: List[str], *, timeout: float = 30,
-        per_page: int = 20, empty: bool = False, embed: discord.Embed = None
-):
+        entries_per_page: int = 20, empty: bool = False, embed: discord.Embed = None
+) -> str:
     """
     Has the user choose between multiple entries in case one could not be chosen automatically.
 
+    Disambiguation will be canceled after `timeout` seconds.
+
     This will raise a BadArgument if entries is empty, if the disambiguation event times out,
     or if the user makes an invalid choice.
-
-    :param ctx: Context object from discord.py
-    :param entries: List of items for user to choose from
-    :param timeout: Number of seconds to wait before canceling disambiguation
-    :param per_page: Entries per embed page
-    :param empty: Whether the paginator should have an extra line between items
-    :param embed: The embed that the paginator will use.
-    :return: Users choice for correct entry.
     """
     if len(entries) == 0:
         raise BadArgument('No matches found.')
@@ -43,7 +37,7 @@ async def disambiguate(
             embed = discord.Embed()
 
         coro1 = ctx.bot.wait_for('message', check=check, timeout=timeout)
-        coro2 = LinePaginator.paginate(choices, ctx, embed=embed, max_lines=per_page,
+        coro2 = LinePaginator.paginate(choices, ctx, embed=embed, max_lines=entries_per_page,
                                        empty=empty, max_size=6000, timeout=9000)
 
         # wait_for timeout will go to except instead of the wait_for thing as I expected

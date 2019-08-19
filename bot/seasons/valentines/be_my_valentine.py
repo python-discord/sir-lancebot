@@ -184,14 +184,11 @@ class BeMyValentine(commands.Cog):
         return valentine, title
 
     @staticmethod
-    def random_user(author, members):
+    def random_user(author: discord.Member, members: discord.Member):
         """
         Picks a random member from the list provided in `members`.
 
         The invoking author is ignored.
-
-        :param author: member who invoked the command
-        :param members: list of discord.Member objects
         """
         if author in members:
             members.remove(author)
