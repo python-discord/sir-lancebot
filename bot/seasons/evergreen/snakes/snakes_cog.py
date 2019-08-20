@@ -400,11 +400,7 @@ class Snakes(Cog):
         return snake_info
 
     async def _get_snake_name(self) -> Dict[str, str]:
-        """
-        Gets a random snake name.
-
-        :return: A random snake name, as a string.
-        """
+        """Gets a random snake name."""
         return random.choice(self.snake_names)
 
     async def _validate_answer(self, ctx: Context, message: Message, answer: str, options: list):
