@@ -144,9 +144,7 @@ class MonsterSurvey(Cog):
         name='show'
     )
     async def monster_show(self, ctx: Context, name=None) -> None:
-        """
-        Shows the named monster. If one is not named, it sends the default voting embed instead.
-        """
+        """Shows the named monster. If one is not named, it sends the default voting embed instead."""
         if name is None:
             await ctx.invoke(self.monster_leaderboard)
             return
@@ -177,9 +175,7 @@ class MonsterSurvey(Cog):
         aliases=('lb',)
     )
     async def monster_leaderboard(self, ctx: Context) -> None:
-        """
-        Shows the current standings.
-        """
+        """Shows the current standings."""
         async with ctx.typing():
             vr = self.voter_registry
             top = sorted(vr, key=lambda k: len(vr[k]['votes']), reverse=True)

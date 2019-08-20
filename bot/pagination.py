@@ -294,9 +294,7 @@ class ImagePaginator(Paginator):
         self.close_page()
 
     def add_image(self, image: str = None) -> None:
-        """
-        Adds an image to a page given the url.
-        """
+        """Adds an image to a page given the url."""
         self.images.append(image)
 
     @classmethod
