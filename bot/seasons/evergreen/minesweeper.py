@@ -1,7 +1,7 @@
 import logging
 import typing
 from dataclasses import dataclass
-from random import random, randint
+from random import randint, random
 
 import discord
 from discord.ext import commands
