@@ -1,7 +1,7 @@
 import logging
 import typing
 from dataclasses import dataclass
-from random import random
+from random import randint, random
 
 import discord
 from discord.ext import commands
@@ -99,6 +99,10 @@ class Minesweeper(commands.Cog):
                 for _ in range(10)
             ] for _ in range(10)
         ]
+
+        # make sure there is always a free cell
+        board[randint(0, 9)][randint(0, 9)] = "number"
+
         for y, row in enumerate(board):
             for x, cell in enumerate(row):
                 if cell == "number":
