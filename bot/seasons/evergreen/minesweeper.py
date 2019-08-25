@@ -22,7 +22,8 @@ MESSAGE_MAPPING = {
     10: ":keycap_ten:",
     "bomb": ":bomb:",
     "hidden": ":grey_question:",
-    "flag": ":flag_black:"
+    "flag": ":flag_black:",
+    "x": ":x:"
 }
 
 log = logging.getLogger(__name__)
@@ -182,10 +183,18 @@ class Minesweeper(commands.Cog):
 
         await self.update_boards(ctx)
 
+    @staticmethod
+    def reveal_bombs(revealed: GameBoard, board: GameBoard) -> None:
+        """Reveals all the bombs"""
+        for y, row in enumerate(board):
+            for x, cell in enumerate(row):
+                if cell == "bomb":
+                    revealed[y][x] = cell
+
     async def lost(self, ctx: commands.Context) -> None:
         """The player lost the game"""
         game = self.games[ctx.author.id]
-        game.revealed = game.board
+        self.reveal_bombs(game.revealed, game.board)
         await ctx.author.send(":fire: You lost! :fire:")
         if game.activated_on_server:
             await game.chat_msg.channel.send(f":fire: {ctx.author.mention} just lost Minesweeper! :fire:")
@@ -193,7 +202,6 @@ class Minesweeper(commands.Cog):
     async def won(self, ctx: commands.Context) -> None:
         """The player won the game"""
         game = self.games[ctx.author.id]
-        game.revealed = game.board
         await ctx.author.send(":tada: You won! :tada:")
         if game.activated_on_server:
             await game.chat_msg.channel.send(f":tada: {ctx.author.mention} just won Minesweeper! :tada:")
@@ -235,6 +243,7 @@ class Minesweeper(commands.Cog):
         revealed[y][x] = board[y][x]
         if board[y][x] == "bomb":
             await self.lost(ctx)
+            revealed[y][x] = "x"  # mark bomb that made you lose with a x
             return True
         elif board[y][x] == 0:
             self.reveal_zeros(revealed, board, x, y)
