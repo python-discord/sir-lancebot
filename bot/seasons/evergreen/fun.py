@@ -14,6 +14,7 @@ UWU_WORDS = {
     "l": "w",
     "r": "w",
     "th": "d",
+    "thing": "fing",
     "tho": "fo",
     "you're": "yuw'we",
     "your": "yur",
@@ -40,25 +41,15 @@ class Fun(Cog):
             output += getattr(Emojis, terning, '')
         await ctx.send(output)
 
-    @commands.group(name="uwu", aliases=("uwuwize", "uwuify",), invoke_without_command=True)
-    async def uwu_group(self, ctx: Context, *, text: str) -> None:
-        """Commands for making text uwu."""
-        await ctx.invoke(self.convert_uwu, text=text)
-
-    @uwu_group.command(name="convert")
-    async def convert_uwu(self, ctx: Context, *, text: str) -> None:
+    @commands.command(name="uwu", aliases=("uwuwize", "uwuify",))
+    async def uwu_command(self, ctx: Context, *, text: str) -> None:
         """Converts a given `text` into it's uwu equivalent."""
         text = await Fun.text_to_message(ctx, text)
         converted = utils.replace_many(text, UWU_WORDS, ignore_case=True, match_case=True)
         await ctx.send(f">>> {converted}")
 
-    @commands.group(name="randomcase", aliases=("rcase", "randomcaps", "rcaps",), invoke_without_command=True)
-    async def randomcase_group(self, ctx: Context, *, text: str) -> None:
-        """Commands for returning text in randomcase."""
-        await ctx.invoke(self.convert_randomcase, text=text)
-
-    @randomcase_group.command(name="convert")
-    async def convert_randomcase(self, ctx: Context, *, text: str) -> None:
+    @commands.command(name="randomcase", aliases=("rcase", "randomcaps", "rcaps",))
+    async def randomcase_command(self, ctx: Context, *, text: str) -> None:
         """Randomly converts the casing of a given `text`."""
         text = await Fun.text_to_message(ctx, text)
         converted = (
@@ -83,7 +74,7 @@ class Fun(Cog):
             return text
 
 
-def setup(bot):
+def setup(bot) -> None:
     """Fun Cog load."""
     bot.add_cog(Fun(bot))
     log.info("Fun cog loaded")
