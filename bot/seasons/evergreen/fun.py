@@ -44,23 +44,26 @@ class Fun(Cog):
     @commands.command(name="uwu", aliases=("uwuwize", "uwuify",))
     async def uwu_command(self, ctx: Context, *, text: str) -> None:
         """Converts a given `text` into it's uwu equivalent."""
-        text = await Fun.text_to_message(ctx, text)
+        text = await Fun.get_discord_message(ctx, text)
         converted = utils.replace_many(text, UWU_WORDS, ignore_case=True, match_case=True)
         await ctx.send(f">>> {converted}")
 
     @commands.command(name="randomcase", aliases=("rcase", "randomcaps", "rcaps",))
     async def randomcase_command(self, ctx: Context, *, text: str) -> None:
         """Randomly converts the casing of a given `text`."""
-        text = await Fun.text_to_message(ctx, text)
+        text = await Fun.get_discord_message(ctx, text)
         converted = (
             char.upper() if round(random.random()) else char.lower() for char in text
         )
         await ctx.send(f">>> {''.join(converted)}")
 
     @staticmethod
-    async def text_to_message(ctx: Context, text: str) -> str:
+    async def get_discord_message(ctx: Context, text: str) -> str:
         """
-        Attempts to convert a given `text` to a discord Message, then return the contents.
+        Attempts to convert a given `text` to a discord Message object, then return the contents.
+
+        Useful if the user enters a link or an id to a valid Discord message, because the contents
+        of the message get returned.
 
         Returns `text` if the conversion fails.
         """
