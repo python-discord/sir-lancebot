@@ -8,7 +8,7 @@ log = logging.getLogger(__name__)
 
 
 class ShowProjects(commands.Cog):
-    """Cog that reacts to posts in the #show-your-projects"""
+    """Cog that reacts to posts in the #show-your-projects."""
 
     def __init__(self, bot):
         self.bot = bot
@@ -16,7 +16,7 @@ class ShowProjects(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        """Adds reactions to posts in #show-your-projects"""
+        """Adds reactions to posts in #show-your-projects."""
         reactions = ["\U0001f44d", "\U00002764", "\U0001f440", "\U0001f389", "\U0001f680", "\U00002b50", "\U0001f6a9"]
         if (message.channel.id == Channels.show_your_projects
                 and message.author.bot is False
@@ -28,6 +28,6 @@ class ShowProjects(commands.Cog):
 
 
 def setup(bot):
-    """Show Projects Reaction Cog"""
+    """Show Projects Reaction Cog."""
     bot.add_cog(ShowProjects(bot))
     log.info("ShowProjects cog loaded")
