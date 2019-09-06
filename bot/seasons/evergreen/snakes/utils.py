@@ -436,7 +436,7 @@ class SnakeAndLaddersGame:
                 if reaction.emoji == JOIN_EMOJI:
                     await self.player_join(user)
                 elif reaction.emoji == CANCEL_EMOJI:
-                    if user == self.author or not self._mod_in_game_check(user):
+                    if user == self.author or all((self._is_moderator(user), user not in self.players)):
                         # Allow game author or non-playing moderation staff to cancel a waiting game
                         await self.cancel_game()
                         return
@@ -705,10 +705,6 @@ class SnakeAndLaddersGame:
         if is_reversed:
             x_level = 9 - x_level
         return x_level, y_level
-
-    def _mod_in_game_check(self, user: Member) -> bool:
-        """Return True if user is a Moderator and playing the currently running game."""
-        return all((self._is_moderator(user), user in self.players))
 
     @staticmethod
     def _is_moderator(user: Member) -> bool:
