@@ -436,7 +436,7 @@ class SnakeAndLaddersGame:
                 if reaction.emoji == JOIN_EMOJI:
                     await self.player_join(user)
                 elif reaction.emoji == CANCEL_EMOJI:
-                    if user == self.author or all((self._is_moderator(user), user not in self.players)):
+                    if user == self.author or (self._is_moderator(user) and user not in self.players):
                         # Allow game author or non-playing moderation staff to cancel a waiting game
                         await self.cancel_game()
                         return
