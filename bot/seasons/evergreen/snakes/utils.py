@@ -494,7 +494,7 @@ class SnakeAndLaddersGame:
         """
         Handle players leaving the game.
 
-        Leaving is prevented if the user wesn't part of the game.
+        Leaving is prevented if the user wasn't part of the game.
 
         If the number of players reaches 0, the game is terminated. In this case, a sentinel boolean
         is returned True to prevent a game from continuing after it's destroyed.
@@ -616,7 +616,7 @@ class SnakeAndLaddersGame:
                 if reaction.emoji == ROLL_EMOJI:
                     await self.player_roll(user)
                 elif reaction.emoji == CANCEL_EMOJI:
-                    if self._is_moderator(user) and not self._mod_in_game_check(user):
+                    if self._is_moderator(user) and user not in self.players:
                         # Only allow non-playing moderation staff to cancel a running game
                         await self.cancel_game()
                         return
@@ -713,4 +713,4 @@ class SnakeAndLaddersGame:
     @staticmethod
     def _is_moderator(user: Member) -> bool:
         """Return True if the user is a Moderator."""
-        return Roles.moderator in [role.id for role in user.roles]
+        return any(Roles.moderator == role.id for role in user.roles)
