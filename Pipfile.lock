@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "0d4a825399a5c48cd15c096608f8e935c70c101bdfa0711264a2f4270512b865"
+            "sha256": "8861de068d14f2c48bebdc2691ab62753c502ffb20735aa7b037b154f9f84a9c"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -53,11 +53,11 @@
         },
         "arrow": {
             "hashes": [
-                "sha256:8c53fad4e723a56c02d8df75fd7a879800148d6e51df4713f91502e70a65e1be",
-                "sha256:9f1503d359011a74cd41169652f0eb0232822f58c67c414229f4174a15ae71f9"
+                "sha256:704f5403299fe092c69479e0a2516a434003e82d37439a9e47c31285faf3947b",
+                "sha256:9b92a8e151e168b742a36b622deadf860d1686af8c5bbe46eca8da04b10fe92f"
             ],
             "index": "pypi",
-            "version": "==0.14.6"
+            "version": "==0.15.0"
         },
         "async-timeout": {
             "hashes": [
@@ -230,6 +230,7 @@
         },
         "pycparser": {
             "hashes": [
+                "sha256:83870b0dff6e9c1b1f721ee062f2e198c1ce7f107220020bf4de788dca009944",
                 "sha256:a988718abfad80b6b157acce7bf130a30876d27603738ac39f140993246b25b3"
             ],
             "version": "==2.19"
@@ -342,6 +343,14 @@
             ],
             "index": "pypi",
             "version": "==3.7.8"
+        },
+        "flake8-annotations": {
+            "hashes": [
+                "sha256:1309f2bc9853a2d77d578b089d331b0b832b40c97932641e136e1b49d3650c82",
+                "sha256:3ecdd27054c3eed6484139025698465e3c9f4e68dbd5043d0204fcb2550ee27b"
+            ],
+            "index": "pypi",
+            "version": "==1.0.0"
         },
         "flake8-bugbear": {
             "hashes": [
@@ -480,9 +489,9 @@
         },
         "snowballstemmer": {
             "hashes": [
-                "sha256:9f3b9ffe0809d174f7047e121431acf99c89a7040f0ca84f94ba53a498e6d0c9"
+                "sha256:713e53b79cbcf97bc5245a06080a33d54a77e7cce2f789c835a143bcdb5c033e"
             ],
-            "version": "==1.9.0"
+            "version": "==1.9.1"
         },
         "toml": {
             "hashes": [
