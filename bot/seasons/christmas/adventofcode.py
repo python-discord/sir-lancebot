@@ -46,7 +46,7 @@ def time_left_to_aoc_midnight() -> Tuple[datetime, timedelta]:
     return tomorrow, tomorrow - datetime.now(EST)
 
 
-async def countdown_status(bot: commands.Bot):
+async def countdown_status(bot: commands.Bot) -> None:
     """Set the playing status of the bot to the minutes & hours left until the next day's challenge."""
     while is_in_advent():
         _, time_left = time_left_to_aoc_midnight()
@@ -73,7 +73,7 @@ async def countdown_status(bot: commands.Bot):
         await asyncio.sleep(delay)
 
 
-async def day_countdown(bot: commands.Bot):
+async def day_countdown(bot: commands.Bot) -> None:
     """
     Calculate the number of seconds left until the next day of Advent.
 
@@ -127,7 +127,7 @@ class AdventOfCode(commands.Cog):
 
     @commands.group(name="adventofcode", aliases=("aoc",), invoke_without_command=True)
     @override_in_channel
-    async def adventofcode_group(self, ctx: commands.Context):
+    async def adventofcode_group(self, ctx: commands.Context) -> None:
         """All of the Advent of Code commands."""
         await ctx.send_help(ctx.command)
 
@@ -136,7 +136,7 @@ class AdventOfCode(commands.Cog):
         aliases=("sub", "notifications", "notify", "notifs"),
         brief="Notifications for new days"
     )
-    async def aoc_subscribe(self, ctx: commands.Context):
+    async def aoc_subscribe(self, ctx: commands.Context) -> None:
         """Assign the role for notifications about new days being ready."""
         role = ctx.guild.get_role(AocConfig.role_id)
         unsubscribe_command = f"{ctx.prefix}{ctx.command.root_parent} unsubscribe"
@@ -150,7 +150,7 @@ class AdventOfCode(commands.Cog):
                            f"If you don't want them any more, run `{unsubscribe_command}` instead.")
 
     @adventofcode_group.command(name="unsubscribe", aliases=("unsub",), brief="Notifications for new days")
-    async def aoc_unsubscribe(self, ctx: commands.Context):
+    async def aoc_unsubscribe(self, ctx: commands.Context) -> None:
         """Remove the role for notifications about new days being ready."""
         role = ctx.guild.get_role(AocConfig.role_id)
 
@@ -161,7 +161,7 @@ class AdventOfCode(commands.Cog):
             await ctx.send("Hey, you don't even get any notifications about new Advent of Code tasks currently anyway.")
 
     @adventofcode_group.command(name="countdown", aliases=("count", "c"), brief="Return time left until next day")
-    async def aoc_countdown(self, ctx: commands.Context):
+    async def aoc_countdown(self, ctx: commands.Context) -> None:
         """Return time left until next day."""
         if not is_in_advent():
             datetime_now = datetime.now(EST)
@@ -178,12 +178,12 @@ class AdventOfCode(commands.Cog):
         await ctx.send(f"There are {hours} hours and {minutes} minutes left until day {tomorrow.day}.")
 
     @adventofcode_group.command(name="about", aliases=("ab", "info"), brief="Learn about Advent of Code")
-    async def about_aoc(self, ctx: commands.Context):
+    async def about_aoc(self, ctx: commands.Context) -> None:
         """Respond with an explanation of all things Advent of Code."""
         await ctx.send("", embed=self.cached_about_aoc)
 
     @adventofcode_group.command(name="join", aliases=("j",), brief="Learn how to join PyDis' private AoC leaderboard")
-    async def join_leaderboard(self, ctx: commands.Context):
+    async def join_leaderboard(self, ctx: commands.Context) -> None:
         """DM the user the information for joining the PyDis AoC private leaderboard."""
         author = ctx.message.author
         log.info(f"{author.name} ({author.id}) has requested the PyDis AoC leaderboard code")
@@ -203,7 +203,7 @@ class AdventOfCode(commands.Cog):
         aliases=("board", "lb"),
         brief="Get a snapshot of the PyDis private AoC leaderboard",
     )
-    async def aoc_leaderboard(self, ctx: commands.Context, number_of_people_to_display: int = 10):
+    async def aoc_leaderboard(self, ctx: commands.Context, number_of_people_to_display: int = 10) -> None:
         """
         Pull the top number_of_people_to_display members from the PyDis leaderboard and post an embed.
 
@@ -244,7 +244,7 @@ class AdventOfCode(commands.Cog):
         aliases=("dailystats", "ds"),
         brief="Get daily statistics for the PyDis private leaderboard"
     )
-    async def private_leaderboard_daily_stats(self, ctx: commands.Context):
+    async def private_leaderboard_daily_stats(self, ctx: commands.Context) -> None:
         """
         Respond with a table of the daily completion statistics for the PyDis private leaderboard.
 
@@ -287,7 +287,7 @@ class AdventOfCode(commands.Cog):
         aliases=("globalboard", "gb"),
         brief="Get a snapshot of the global AoC leaderboard",
     )
-    async def global_leaderboard(self, ctx: commands.Context, number_of_people_to_display: int = 10):
+    async def global_leaderboard(self, ctx: commands.Context, number_of_people_to_display: int = 10) -> None:
         """
         Pull the top number_of_people_to_display members from the global AoC leaderboard and post an embed.
 
@@ -319,7 +319,7 @@ class AdventOfCode(commands.Cog):
             embed=aoc_embed,
         )
 
-    async def _check_leaderboard_cache(self, ctx, global_board: bool = False):
+    async def _check_leaderboard_cache(self, ctx: commands.Context, global_board: bool = False) -> None:
         """
         Check age of current leaderboard & pull a new one if the board is too old.
 
@@ -390,7 +390,7 @@ class AdventOfCode(commands.Cog):
 
         return about_embed
 
-    async def _boardgetter(self, global_board: bool):
+    async def _boardgetter(self, global_board: bool) -> None:
         """Invoke the proper leaderboard getter based on the global_board boolean."""
         if global_board:
             self.cached_global_leaderboard = await AocGlobalLeaderboard.from_url()

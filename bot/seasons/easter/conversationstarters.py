@@ -14,16 +14,16 @@ with open(Path("bot/resources/easter/starter.json"), "r", encoding="utf8") as f:
 class ConvoStarters(commands.Cog):
     """Easter conversation topics."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.command()
-    async def topic(self, ctx):
+    async def topic(self, ctx: commands.Context) -> None:
         """Responds with a random topic to start a conversation."""
         await ctx.send(random.choice(starters['starters']))
 
 
-def setup(bot):
+def setup(bot: commands.Bot) -> None:
     """Conversation starters Cog load."""
     bot.add_cog(ConvoStarters(bot))
     log.info("ConvoStarters cog loaded")

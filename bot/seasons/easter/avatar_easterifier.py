@@ -2,7 +2,7 @@ import asyncio
 import logging
 from io import BytesIO
 from pathlib import Path
-from typing import Union
+from typing import Tuple, Union
 
 import discord
 from PIL import Image
@@ -21,11 +21,11 @@ COLOURS = [
 class AvatarEasterifier(commands.Cog):
     """Put an Easter spin on your avatar or image!"""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @staticmethod
-    def closest(x):
+    def closest(x: Tuple[int, int, int]) -> Tuple[int, int, int]:
         """
         Finds the closest easter colour to a given pixel.
 
@@ -33,7 +33,7 @@ class AvatarEasterifier(commands.Cog):
         """
         r1, g1, b1 = x
 
-        def distance(point):
+        def distance(point: Tuple[int, int, int]) -> Tuple[int, int, int]:
             """Finds the difference between a pastel colour and the original pixel colour"""
             r2, g2, b2 = point
             return ((r1 - r2)**2 + (g1 - g2)**2 + (b1 - b2)**2)
@@ -47,7 +47,7 @@ class AvatarEasterifier(commands.Cog):
         return (r, g, b)
 
     @commands.command(pass_context=True, aliases=["easterify"])
-    async def avatareasterify(self, ctx, *colours: Union[discord.Colour, str]):
+    async def avatareasterify(self, ctx: commands.Context, *colours: Union[discord.Colour, str]) -> None:
         """
         This "Easterifies" the user's avatar.
 
@@ -123,7 +123,7 @@ class AvatarEasterifier(commands.Cog):
         await ctx.send(file=file, embed=embed)
 
 
-def setup(bot):
+def setup(bot: commands.Bot) -> None:
     """Avatar Easterifier Cog load."""
     bot.add_cog(AvatarEasterifier(bot))
     log.info("AvatarEasterifier cog loaded")

@@ -4,7 +4,7 @@ import random
 import sys
 import traceback
 
-from discord import Colour, Embed
+from discord import Colour, Embed, Message
 from discord.ext import commands
 
 from bot.constants import NEGATIVE_REPLIES
@@ -16,11 +16,11 @@ log = logging.getLogger(__name__)
 class CommandErrorHandler(commands.Cog):
     """A error handler for the PythonDiscord server."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @staticmethod
-    def revert_cooldown_counter(command, message):
+    def revert_cooldown_counter(command: commands.Command, message: Message) -> None:
         """Undoes the last cooldown counter for user-error cases."""
         if command._buckets.valid:
             bucket = command._buckets.get_bucket(message)
@@ -30,7 +30,7 @@ class CommandErrorHandler(commands.Cog):
             )
 
     @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
+    async def on_command_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
         """Activates when a command opens an error."""
         if hasattr(ctx.command, 'on_error'):
             return logging.debug(
@@ -113,7 +113,7 @@ class CommandErrorHandler(commands.Cog):
         traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
 
-def setup(bot):
+def setup(bot: commands.Bot) -> None:
     """Error handler Cog load."""
     bot.add_cog(CommandErrorHandler(bot))
     log.info("CommandErrorHandler cog loaded")

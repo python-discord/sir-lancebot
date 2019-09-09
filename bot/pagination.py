@@ -24,7 +24,7 @@ class EmptyPaginatorEmbed(Exception):
 class LinePaginator(Paginator):
     """A class that aids in paginating code blocks for Discord messages."""
 
-    def __init__(self, prefix='```', suffix='```', max_size=2000, max_lines=None):
+    def __init__(self, prefix: str = '```', suffix: str = '```', max_size: int = 2000, max_lines: int = None):
         """
         Overrides the Paginator.__init__ from inside discord.ext.commands.
 
@@ -42,7 +42,7 @@ class LinePaginator(Paginator):
         self._count = len(prefix) + 1  # prefix + newline
         self._pages = []
 
-    def add_line(self, line='', *, empty=False):
+    def add_line(self, line: str = '', *, empty: bool = False) -> None:
         """
         Adds a line to the current page.
 
@@ -98,7 +98,7 @@ class LinePaginator(Paginator):
         ...     ctx, embed
         ... )
         """
-        def event_check(reaction_: Reaction, user_: Member):
+        def event_check(reaction_: Reaction, user_: Member) -> bool:
             """Make sure that this reaction is what we want to operate on."""
             no_restrictions = (
                 # Pagination is not restricted
@@ -274,7 +274,7 @@ class ImagePaginator(Paginator):
     Refer to ImagePaginator.paginate for documentation on how to use.
     """
 
-    def __init__(self, prefix="", suffix=""):
+    def __init__(self, prefix: str = "", suffix: str = ""):
         super().__init__(prefix, suffix)
         self._current_page = [prefix]
         self.images = []

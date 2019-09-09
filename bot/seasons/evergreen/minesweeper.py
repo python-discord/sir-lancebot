@@ -32,7 +32,7 @@ log = logging.getLogger(__name__)
 class CoordinateConverter(commands.Converter):
     """Converter for Coordinates."""
 
-    async def convert(self, ctx, coordinate: str) -> typing.Tuple[int, int]:
+    async def convert(self, ctx: commands.Context, coordinate: str) -> typing.Tuple[int, int]:
         """Take in a coordinate string and turn it into x, y"""
         if not 2 <= len(coordinate) <= 3:
             raise commands.BadArgument('Invalid co-ordinate provided')
@@ -80,7 +80,7 @@ class Minesweeper(commands.Cog):
         self.games: GamesDict = {}  # Store the currently running games
 
     @commands.group(name='minesweeper', aliases=('ms',), invoke_without_command=True)
-    async def minesweeper_group(self, ctx: commands.Context):
+    async def minesweeper_group(self, ctx: commands.Context) -> None:
         """Commands for Playing Minesweeper"""
         await ctx.send_help(ctx.command)
 
@@ -215,7 +215,7 @@ class Minesweeper(commands.Cog):
             if board[y_][x_] == 0:
                 self.reveal_zeros(revealed, board, x_, y_)
 
-    async def check_if_won(self, ctx, revealed: GameBoard, board: GameBoard) -> bool:
+    async def check_if_won(self, ctx: commands.Context, revealed: GameBoard, board: GameBoard) -> bool:
         """Checks if a player has won"""
         if any(
             revealed[y][x] in ["hidden", "flag"] and board[y][x] != "bomb"
@@ -267,7 +267,7 @@ class Minesweeper(commands.Cog):
             await self.update_boards(ctx)
 
     @minesweeper_group.command(name="end")
-    async def end_command(self, ctx: commands.Context):
+    async def end_command(self, ctx: commands.Context) -> None:
         """End your current game"""
         game = self.games[ctx.author.id]
         game.revealed = game.board

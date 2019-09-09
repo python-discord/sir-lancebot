@@ -12,12 +12,14 @@ log = logging.getLogger(__name__)
 class Issues(commands.Cog):
     """Cog that allows users to retrieve issues from GitHub."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.command(aliases=("issues",))
     @override_in_channel
-    async def issue(self, ctx, number: int, repository: str = "seasonalbot", user: str = "python-discord"):
+    async def issue(
+        self, ctx: commands.Context, number: int, repository: str = "seasonalbot", user: str = "python-discord"
+    ) -> None:
         """Command to retrieve issues from a GitHub repository."""
         api_url = f"https://api.github.com/repos/{user}/{repository}/issues/{number}"
         failed_status = {
@@ -49,7 +51,7 @@ class Issues(commands.Cog):
         await ctx.send(embed=issue_embed)
 
 
-def setup(bot):
+def setup(bot: commands.Bot) -> None:
     """Github Issues Cog Load."""
     bot.add_cog(Issues(bot))
     log.info("Issues cog loaded")
