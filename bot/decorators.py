@@ -117,7 +117,7 @@ def override_in_channel(func: typing.Callable) -> typing.Callable:
     return func
 
 
-def locked():
+def locked() -> typing.Union[typing.Callable, None]:
     """
     Allows the user to only run one instance of the decorated command at a time.
 
@@ -125,11 +125,11 @@ def locked():
 
     This decorator has to go before (below) the `command` decorator.
     """
-    def wrap(func: typing.Callable):
+    def wrap(func: typing.Callable) -> typing.Union[typing.Callable, None]:
         func.__locks = WeakValueDictionary()
 
         @wraps(func)
-        async def inner(self, ctx: Context, *args, **kwargs):
+        async def inner(self: typing.Callable, ctx: Context, *args, **kwargs) -> typing.Union[typing.Callable, None]:
             lock = func.__locks.setdefault(ctx.author.id, Lock())
             if lock.locked():
                 embed = Embed()
