@@ -73,7 +73,7 @@ class Fun(Cog):
         Also accepts a valid discord Message ID or link.
         """
         def conversion_func(text):
-            """Randomly converts the casing of a given string"""
+            """Randomly converts the casing of a given string."""
             return "".join(
                 char.upper() if round(random.random()) else char.lower() for char in text
             )
