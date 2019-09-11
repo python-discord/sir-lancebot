@@ -13,6 +13,8 @@ from PIL.ImageDraw import ImageDraw
 from discord import File, Member, Reaction
 from discord.ext.commands import Context
 
+from bot.constants import Roles
+
 SNAKE_RESOURCES = Path("bot/resources/snakes").absolute()
 
 h1 = r'''```
@@ -285,20 +287,8 @@ def create_snek_frame(
     """
     Creates a single random snek frame using Perlin noise.
 
-    :param perlin_factory: the perlin noise factory used. Required.
-    :param perlin_lookup_vertical_shift: the Perlin noise shift in the Y-dimension for this frame
-    :param image_dimensions: the size of the output image.
-    :param image_margins: the margins to respect inside of the image.
-    :param snake_length: the length of the snake, in segments.
-    :param snake_color: the color of the snake.
-    :param bg_color: the background color.
-    :param segment_length_range: the range of the segment length. Values will be generated inside
-                                 this range, including the bounds.
-    :param snake_width: the width of the snek, in pixels.
-    :param text: the text to display with the snek. Set to None for no text.
-    :param text_position: the position of the text.
-    :param text_color: the color of the text.
-    :return: a PIL image, representing a single frame.
+    `perlin_lookup_vertical_shift` represents the Perlin noise shift in the Y-dimension for this frame.
+    If `text` is given, display the given text with the snek.
     """
     start_x = random.randint(image_margins[X], image_dimensions[X] - image_margins[X])
     start_y = random.randint(image_margins[Y], image_dimensions[Y] - image_margins[Y])
@@ -424,7 +414,6 @@ class SnakeAndLaddersGame:
             "**Snakes and Ladders**: A new game is about to start!",
             file=File(
                 str(SNAKE_RESOURCES / "snakes_and_ladders" / "banner.jpg"),
-                # os.path.join("bot", "resources", "snakes", "snakes_and_ladders", "banner.jpg"),
                 filename='Snakes and Ladders.jpg'
             )
         )
@@ -447,8 +436,9 @@ class SnakeAndLaddersGame:
                 if reaction.emoji == JOIN_EMOJI:
                     await self.player_join(user)
                 elif reaction.emoji == CANCEL_EMOJI:
-                    if self.ctx.author == user:
-                        await self.cancel_game(user)
+                    if user == self.author or (self._is_moderator(user) and user not in self.players):
+                        # Allow game author or non-playing moderation staff to cancel a waiting game
+                        await self.cancel_game()
                         return
                     else:
                         await self.player_leave(user)
@@ -463,7 +453,7 @@ class SnakeAndLaddersGame:
 
             except asyncio.TimeoutError:
                 log.debug("Snakes and Ladders timed out waiting for a reaction")
-                self.cancel_game(self.author)
+                await self.cancel_game()
                 return  # We're done, no reactions for the last 5 minutes
 
     async def _add_player(self, user: Member):
@@ -500,20 +490,16 @@ class SnakeAndLaddersGame:
             delete_after=10
         )
 
-    async def player_leave(self, user: Member):
+    async def player_leave(self, user: Member) -> bool:
         """
         Handle players leaving the game.
 
-        Leaving is prevented if the user initiated the game or if they weren't part of it in the
-        first place.
+        Leaving is prevented if the user wasn't part of the game.
+
+        If the number of players reaches 0, the game is terminated. In this case, a sentinel boolean
+        is returned True to prevent a game from continuing after it's destroyed.
         """
-        if user == self.author:
-            await self.channel.send(
-                user.mention + " You are the author, and cannot leave the game. Execute "
-                "`sal cancel` to cancel the game.",
-                delete_after=10
-            )
-            return
+        is_surrendered = False  # Sentinel value to assist with stopping a surrendered game
         for p in self.players:
             if user == p:
                 self.players.remove(p)
@@ -524,17 +510,18 @@ class SnakeAndLaddersGame:
                     delete_after=10
                 )
 
-                if self.state != 'waiting' and len(self.players) == 1:
+                if self.state != 'waiting' and len(self.players) == 0:
                     await self.channel.send("**Snakes and Ladders**: The game has been surrendered!")
+                    is_surrendered = True
                     self._destruct()
-                return
-        await self.channel.send(user.mention + " You are not in the match.", delete_after=10)
 
-    async def cancel_game(self, user: Member):
-        """Allow the game author to cancel the running game."""
-        if not user == self.author:
-            await self.channel.send(user.mention + " Only the author of the game can cancel it.", delete_after=10)
-            return
+                return is_surrendered
+        else:
+            await self.channel.send(user.mention + " You are not in the match.", delete_after=10)
+            return is_surrendered
+
+    async def cancel_game(self):
+        """Cancel the running game."""
         await self.channel.send("**Snakes and Ladders**: Game has been canceled.")
         self._destruct()
 
@@ -542,21 +529,16 @@ class SnakeAndLaddersGame:
         """
         Allow the game author to begin the game.
 
-        The game cannot be started if there aren't enough players joined or if the game is in a
-        waiting state.
+        The game cannot be started if the game is in a waiting state.
         """
         if not user == self.author:
             await self.channel.send(user.mention + " Only the author of the game can start it.", delete_after=10)
             return
-        if len(self.players) < 1:
-            await self.channel.send(
-                user.mention + " A minimum of 2 players is required to start the game.",
-                delete_after=10
-            )
-            return
+
         if not self.state == 'waiting':
             await self.channel.send(user.mention + " The game cannot be started at this time.", delete_after=10)
             return
+
         self.state = 'starting'
         player_list = ', '.join(user.mention for user in self.players)
         await self.channel.send("**Snakes and Ladders**: The game is starting!\nPlayers: " + player_list)
@@ -577,8 +559,6 @@ class SnakeAndLaddersGame:
         self.state = 'roll'
         for user in self.players:
             self.round_has_rolled[user.id] = False
-        # board_img = Image.open(os.path.join(
-        #     "bot", "resources", "snakes", "snakes_and_ladders", "board.jpg"))
         board_img = Image.open(str(SNAKE_RESOURCES / "snakes_and_ladders" / "board.jpg"))
         player_row_size = math.ceil(MAX_PLAYERS / 2)
 
@@ -624,6 +604,7 @@ class SnakeAndLaddersGame:
         for emoji in GAME_SCREEN_EMOJI:
             await self.positions.add_reaction(emoji)
 
+        is_surrendered = False
         while True:
             try:
                 reaction, user = await self.ctx.bot.wait_for(
@@ -635,11 +616,12 @@ class SnakeAndLaddersGame:
                 if reaction.emoji == ROLL_EMOJI:
                     await self.player_roll(user)
                 elif reaction.emoji == CANCEL_EMOJI:
-                    if self.ctx.author == user:
-                        await self.cancel_game(user)
+                    if self._is_moderator(user) and user not in self.players:
+                        # Only allow non-playing moderation staff to cancel a running game
+                        await self.cancel_game()
                         return
                     else:
-                        await self.player_leave(user)
+                        is_surrendered = await self.player_leave(user)
 
                 await self.positions.remove_reaction(reaction.emoji, user)
 
@@ -648,11 +630,14 @@ class SnakeAndLaddersGame:
 
             except asyncio.TimeoutError:
                 log.debug("Snakes and Ladders timed out waiting for a reaction")
-                await self.cancel_game(self.author)
+                await self.cancel_game()
                 return  # We're done, no reactions for the last 5 minutes
 
         # Round completed
-        await self._complete_round()
+        # Check to see if the game was surrendered before completing the round, without this
+        # sentinel, the game object would be deleted but the next round still posted into purgatory
+        if not is_surrendered:
+            await self._complete_round()
 
     async def player_roll(self, user: Member):
         """Handle the player's roll."""
@@ -720,3 +705,8 @@ class SnakeAndLaddersGame:
         if is_reversed:
             x_level = 9 - x_level
         return x_level, y_level
+
+    @staticmethod
+    def _is_moderator(user: Member) -> bool:
+        """Return True if the user is a Moderator."""
+        return any(Roles.moderator == role.id for role in user.roles)

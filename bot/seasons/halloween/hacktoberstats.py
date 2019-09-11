@@ -1,16 +1,19 @@
 import json
 import logging
 import re
-import typing
 from collections import Counter
 from datetime import datetime
 from pathlib import Path
+from typing import List, Tuple
 
 import aiohttp
 import discord
 from discord.ext import commands
 
 log = logging.getLogger(__name__)
+
+CURRENT_YEAR = datetime.now().year  # Used to construct GH API query
+PRS_FOR_SHIRT = 4  # Minimum number of PRs before a shirt is awarded
 
 
 class HacktoberStats(commands.Cog):
@@ -21,12 +24,8 @@ class HacktoberStats(commands.Cog):
         self.link_json = Path("bot/resources/github_links.json")
         self.linked_accounts = self.load_linked_users()
 
-    @commands.group(
-        name='hacktoberstats',
-        aliases=('hackstats',),
-        invoke_without_command=True
-    )
-    async def hacktoberstats_group(self, ctx: commands.Context, github_username: str = None):
+    @commands.group(name="hacktoberstats", aliases=("hackstats",), invoke_without_command=True)
+    async def hacktoberstats_group(self, ctx: commands.Context, github_username: str = None) -> None:
         """
         Display an embed for a user's Hacktoberfest contributions.
 
@@ -43,8 +42,8 @@ class HacktoberStats(commands.Cog):
             else:
                 msg = (
                     f"{author_mention}, you have not linked a GitHub account\n\n"
-                    f"You can link your GitHub account using:\n```{ctx.prefix}stats link github_username```\n"
-                    f"Or query GitHub stats directly using:\n```{ctx.prefix}stats github_username```"
+                    f"You can link your GitHub account using:\n```{ctx.prefix}hackstats link github_username```\n"
+                    f"Or query GitHub stats directly using:\n```{ctx.prefix}hackstats github_username```"
                 )
                 await ctx.send(msg)
                 return
@@ -52,7 +51,7 @@ class HacktoberStats(commands.Cog):
         await self.get_stats(ctx, github_username)
 
     @hacktoberstats_group.command(name="link")
-    async def link_user(self, ctx: commands.Context, github_username: str = None):
+    async def link_user(self, ctx: commands.Context, github_username: str = None) -> None:
         """
         Link the invoking user's Github github_username to their Discord ID.
 
@@ -85,7 +84,7 @@ class HacktoberStats(commands.Cog):
             await ctx.send(f"{author_mention}, a GitHub username is required to link your account")
 
     @hacktoberstats_group.command(name="unlink")
-    async def unlink_user(self, ctx: commands.Context):
+    async def unlink_user(self, ctx: commands.Context) -> None:
         """Remove the invoking user's account link from the log."""
         author_id, author_mention = HacktoberStats._author_mention_from_context(ctx)
 
@@ -99,7 +98,7 @@ class HacktoberStats(commands.Cog):
 
         self.save_linked_users()
 
-    def load_linked_users(self) -> typing.Dict:
+    def load_linked_users(self) -> dict:
         """
         Load list of linked users from local JSON file.
 
@@ -122,7 +121,7 @@ class HacktoberStats(commands.Cog):
             logging.info(f"Linked account log: '{self.link_json}' does not exist")
             return {}
 
-    def save_linked_users(self):
+    def save_linked_users(self) -> None:
         """
         Save list of linked users to local JSON file.
 
@@ -139,7 +138,7 @@ class HacktoberStats(commands.Cog):
             json.dump(self.linked_accounts, fID, default=str)
         logging.info(f"linked_accounts saved to '{self.link_json}'")
 
-    async def get_stats(self, ctx: commands.Context, github_username: str):
+    async def get_stats(self, ctx: commands.Context, github_username: str) -> None:
         """
         Query GitHub's API for PRs created by a GitHub user during the month of October.
 
@@ -158,18 +157,18 @@ class HacktoberStats(commands.Cog):
             else:
                 await ctx.send(f"No October GitHub contributions found for '{github_username}'")
 
-    def build_embed(self, github_username: str, prs: typing.List[dict]) -> discord.Embed:
+    def build_embed(self, github_username: str, prs: List[dict]) -> discord.Embed:
         """Return a stats embed built from github_username's PRs."""
         logging.info(f"Building Hacktoberfest embed for GitHub user: '{github_username}'")
         pr_stats = self._summarize_prs(prs)
 
         n = pr_stats['n_prs']
-        if n >= 5:
+        if n >= PRS_FOR_SHIRT:
             shirtstr = f"**{github_username} has earned a tshirt!**"
-        elif n == 4:
+        elif n == PRS_FOR_SHIRT - 1:
             shirtstr = f"**{github_username} is 1 PR away from a tshirt!**"
         else:
-            shirtstr = f"**{github_username} is {5 - n} PRs away from a tshirt!**"
+            shirtstr = f"**{github_username} is {PRS_FOR_SHIRT - n} PRs away from a tshirt!**"
 
         stats_embed = discord.Embed(
             title=f"{github_username}'s Hacktoberfest",
@@ -186,7 +185,7 @@ class HacktoberStats(commands.Cog):
         stats_embed.set_author(
             name="Hacktoberfest",
             url="https://hacktoberfest.digitalocean.com",
-            icon_url="https://hacktoberfest.digitalocean.com/assets/logo-hacktoberfest.png"
+            icon_url="https://hacktoberfest.digitalocean.com/pretty_logo.png"
         )
         stats_embed.add_field(
             name="Top 5 Repositories:",
@@ -197,7 +196,7 @@ class HacktoberStats(commands.Cog):
         return stats_embed
 
     @staticmethod
-    async def get_october_prs(github_username: str) -> typing.List[dict]:
+    async def get_october_prs(github_username: str) -> List[dict]:
         """
         Query GitHub's API for PRs created during the month of October by github_username.
 
@@ -219,7 +218,7 @@ class HacktoberStats(commands.Cog):
         not_label = "invalid"
         action_type = "pr"
         is_query = f"public+author:{github_username}"
-        date_range = "2018-10-01..2018-10-31"
+        date_range = f"{CURRENT_YEAR}-10-01..{CURRENT_YEAR}-10-31"
         per_page = "300"
         query_url = (
             f"{base_url}"
@@ -274,7 +273,7 @@ class HacktoberStats(commands.Cog):
         return re.findall(exp, in_url)[0]
 
     @staticmethod
-    def _summarize_prs(prs: typing.List[dict]) -> typing.Dict:
+    def _summarize_prs(prs: List[dict]) -> dict:
         """
         Generate statistics from an input list of PR dictionaries, as output by get_october_prs.
 
@@ -288,7 +287,7 @@ class HacktoberStats(commands.Cog):
         return {"n_prs": len(prs), "top5": Counter(contributed_repos).most_common(5)}
 
     @staticmethod
-    def _build_top5str(stats: typing.List[tuple]) -> str:
+    def _build_top5str(stats: List[tuple]) -> str:
         """
         Build a string from the Top 5 contributions that is compatible with a discord.Embed field.
 
@@ -316,7 +315,7 @@ class HacktoberStats(commands.Cog):
             return "contributions"
 
     @staticmethod
-    def _author_mention_from_context(ctx: commands.Context) -> typing.Tuple:
+    def _author_mention_from_context(ctx: commands.Context) -> Tuple:
         """Return stringified Message author ID and mentionable string from commands.Context."""
         author_id = str(ctx.message.author.id)
         author_mention = ctx.message.author.mention
@@ -324,7 +323,7 @@ class HacktoberStats(commands.Cog):
         return author_id, author_mention
 
 
-def setup(bot):
+def setup(bot):  # Noqa
     """Hacktoberstats Cog load."""
     bot.add_cog(HacktoberStats(bot))
     log.info("HacktoberStats cog loaded")

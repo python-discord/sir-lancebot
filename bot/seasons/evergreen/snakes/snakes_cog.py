@@ -303,9 +303,6 @@ class Snakes(Cog):
         Builds a dict that the .get() method can use.
 
         Created by Ava and eivl.
-
-        :param name: The name of the snake to get information for - omit for a random snake
-        :return: A dict containing information on a snake
         """
         snake_info = {}
 
@@ -403,11 +400,7 @@ class Snakes(Cog):
         return snake_info
 
     async def _get_snake_name(self) -> Dict[str, str]:
-        """
-        Gets a random snake name.
-
-        :return: A random snake name, as a string.
-        """
+        """Gets a random snake name."""
         return random.choice(self.snake_names)
 
     async def _validate_answer(self, ctx: Context, message: Message, answer: str, options: list):
@@ -631,13 +624,9 @@ class Snakes(Cog):
     @snakes_group.command(name='get')
     @bot_has_permissions(manage_messages=True)
     @locked()
-    async def get_command(self, ctx: Context, *, name: Snake = None):
+    async def get_command(self, ctx: Context, *, name: Snake = None) -> None:
         """
         Fetches information about a snake from Wikipedia.
-
-        :param ctx: Context object passed from discord.py
-        :param name: Optional, the name of the snake to get information
-                     for - omit for a random snake
 
         Created by Ava and eivl.
         """
@@ -1034,10 +1023,8 @@ class Snakes(Cog):
         """
         How would I talk if I were a snake?
 
-        :param ctx: context
-        :param message: If this is passed, it will snakify the message.
-                        If not, it will snakify a random message from
-                        the users history.
+        If `message` is passed, the bot will snakify the message.
+        Otherwise, a random message from the user's history is snakified.
 
         Written by Momo and kel.
         Modified by lemon.
@@ -1077,8 +1064,7 @@ class Snakes(Cog):
         """
         Gets a YouTube video about snakes.
 
-        :param ctx: Context object passed from discord.py
-        :param search: Optional, a name of a snake. Used to search for videos with that name
+        If `search` is given, a snake with that name will be searched on Youtube.
 
         Written by Andrew and Prithaj.
         """
