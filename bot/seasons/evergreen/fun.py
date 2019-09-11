@@ -16,6 +16,7 @@ UWU_WORDS = {
     "fi": "fwi",
     "l": "w",
     "r": "w",
+    "some": "sum",
     "th": "d",
     "thing": "fing",
     "tho": "fo",
