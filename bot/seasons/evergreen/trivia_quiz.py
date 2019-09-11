@@ -79,11 +79,11 @@ class TriviaQuiz(commands.Cog):
             return await ctx.send("Game already running in this channel!")
 
         if category is None:
-            category = random.choice(list(self.categories.keys()))
+            category = random.choice(self.categories)
 
         else:
             category = category.lower()
-            if category not in self.categories.keys():
+            if category not in self.categories:
                 embed = self.category_embed()
                 return await ctx.send(f"Category {category} does not exist!", embed=embed)
 
