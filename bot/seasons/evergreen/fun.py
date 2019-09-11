@@ -54,20 +54,37 @@ class Fun(Cog):
         conversion_func = functools.partial(
             utils.replace_many, replacements=UWU_WORDS, ignore_case=True, match_case=True
         )
-        text, embed = Fun._get_text_and_embed(ctx, text)
+        text, embed = await Fun._get_text_and_embed(ctx, text)
+        # Convert embed if it exists
         if embed is not None:
-            embed = await Fun._convert_embed(conversion_func, embed)
+            embed = Fun._convert_embed(conversion_func, embed)
         converted_text = conversion_func(text)
-        await ctx.send(content=f">>> {converted_text.lstrip('> ')}", embed=embed)
+        # Don't put >>> if only embed present
+        if converted_text:
+            converted_text = f">>> {converted_text.lstrip('> ')}"
+        await ctx.send(content=converted_text, embed=embed)
 
     @commands.command(name="randomcase", aliases=("rcase", "randomcaps", "rcaps",))
     async def randomcase_command(self, ctx: Context, *, text: str) -> None:
-        """Randomly converts the casing of a given `text`."""
-        text = await Fun._get_discord_message(ctx, text)
-        converted = (
-            char.upper() if round(random.random()) else char.lower() for char in text
-        )
-        await ctx.send(f">>> {''.join(converted)}")
+        """
+        Randomly converts the casing of a given `text`.
+
+        Also accepts a valid discord Message ID or link.
+        """
+        def conversion_func(text):
+            """Randomly converts the casing of a given string"""
+            return "".join(
+                char.upper() if round(random.random()) else char.lower() for char in text
+            )
+        text, embed = await Fun._get_text_and_embed(ctx, text)
+        # Convert embed if it exists
+        if embed is not None:
+            embed = Fun._convert_embed(conversion_func, embed)
+        converted_text = conversion_func(text)
+        # Don't put >>> if only embed present
+        if converted_text:
+            converted_text = f">>> {converted_text.lstrip('> ')}"
+        await ctx.send(content=converted_text, embed=embed)
 
     @staticmethod
     async def _get_text_and_embed(ctx: Context, text: str) -> Tuple[str, Union[Embed, None]]:
@@ -79,9 +96,9 @@ class Fun(Cog):
             Union[Embed, None]: The embed if found in the valid Message, else None
         """
         embed = None
-        message = Fun._get_discord_message(ctx, text)
+        message = await Fun._get_discord_message(ctx, text)
         if isinstance(message, Message):
-            text = text.content
+            text = message.content
             # Take first embed because we can't send multiple embeds
             if message.embeds:
                 embed = message.embeds[0]
@@ -102,7 +119,7 @@ class Fun(Cog):
         return text
 
     @staticmethod
-    async def _convert_embed(func: Callable[[str, ], str], embed: Embed) -> Embed:
+    def _convert_embed(func: Callable[[str, ], str], embed: Embed) -> Embed:
         """
         Converts the text in an embed using a given conversion function, then return the embed.
 
