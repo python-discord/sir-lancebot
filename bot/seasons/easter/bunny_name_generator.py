@@ -29,8 +29,8 @@ class BunnyNameGenerator(commands.Cog):
         """
         Finds vowels in the user's display name.
 
-        If the Discord name contains a vowel and the letter y,
-        it will match one or more of these patterns.
+        If the Discord name contains a vowel and the letter y, it will match one or more of these patterns.
+
         Only the most recently matched pattern will apply the changes.
         """
         expressions = [

@@ -359,7 +359,7 @@ class AdventOfCode(commands.Cog):
             )
 
     async def _check_n_entries(self, ctx: commands.Context, number_of_people_to_display: int) -> int:
-        """Check for n > max_entries and n <= 0"""
+        """Check for n > max_entries and n <= 0."""
         max_entries = AocConfig.leaderboard_max_displayed_members
         author = ctx.message.author
         if not 0 <= number_of_people_to_display <= max_entries:

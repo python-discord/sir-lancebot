@@ -9,7 +9,7 @@ log = logging.getLogger(__name__)
 
 
 class ShowProjects(commands.Cog):
-    """Cog that reacts to posts in the #show-your-projects"""
+    """Cog that reacts to posts in the #show-your-projects."""
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot

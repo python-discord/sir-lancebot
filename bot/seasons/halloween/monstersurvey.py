@@ -60,7 +60,7 @@ class MonsterSurvey(Cog):
 
     @commands.group(
         name='monster',
-        aliases=('ms',)
+        aliases=('mon',)
     )
     async def monster_group(self, ctx: Context) -> None:
         """The base voting command. If nothing is called, then it will return an embed."""
