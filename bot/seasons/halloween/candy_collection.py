@@ -121,15 +121,16 @@ class CandyCollection(commands.Cog):
     async def ten_recent_msg(self):
         """Get the last 10 messages sent in the channel."""
         ten_recent = []
-        recent_msg = max(message.id for message
-                         in self.bot._connection._messages
-                         if message.channel.id == Channels.seasonalbot_chat)
+        recent_msg_id = max(
+            message.id for message in self.bot._connection._messages
+            if message.channel.id == Channels.seasonalbot_chat
+        )
 
         channel = await self.hacktober_channel()
-        ten_recent.append(recent_msg.id)
+        ten_recent.append(recent_msg_id)
 
         for i in range(9):
-            o = discord.Object(id=recent_msg.id + i)
+            o = discord.Object(id=recent_msg_id + i)
             msg = await next(channel.history(limit=1, before=o))
             ten_recent.append(msg.id)
 

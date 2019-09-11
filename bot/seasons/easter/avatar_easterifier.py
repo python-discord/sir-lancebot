@@ -34,7 +34,7 @@ class AvatarEasterifier(commands.Cog):
         r1, g1, b1 = x
 
         def distance(point):
-            """Finds the difference between a pastel colour and the original pixel colour"""
+            """Finds the difference between a pastel colour and the original pixel colour."""
             r2, g2, b2 = point
             return ((r1 - r2)**2 + (g1 - g2)**2 + (b1 - b2)**2)
 
