@@ -388,8 +388,7 @@ class SnakeAndLaddersGame:
         """
         Create a new Snakes and Ladders game.
 
-        Listen for reactions until players have joined,
-        and the game has been started.
+        Listen for reactions until players have joined, and the game has been started.
         """
         def startup_event_check(reaction_: Reaction, user_: Member) -> bool:
             """Make sure that this reaction is what we want to operate on."""
@@ -457,6 +456,7 @@ class SnakeAndLaddersGame:
                 return  # We're done, no reactions for the last 5 minutes
 
     async def _add_player(self, user: Member) -> None:
+        """Add player to game."""
         self.players.append(user)
         self.player_tiles[user.id] = 1
 
@@ -490,7 +490,7 @@ class SnakeAndLaddersGame:
             delete_after=10
         )
 
-    async def player_leave(self, user: Member) -> None:
+    async def player_leave(self, user: Member) -> bool:
         """
         Handle players leaving the game.
 
@@ -515,11 +515,13 @@ class SnakeAndLaddersGame:
                     is_surrendered = True
                     self._destruct()
 
-    async def cancel_game(self, user: Member) -> None:
-        """Allow the game author to cancel the running game."""
-        if not user == self.author:
-            await self.channel.send(user.mention + " Only the author of the game can cancel it.", delete_after=10)
-            return
+                return is_surrendered
+        else:
+            await self.channel.send(user.mention + " You are not in the match.", delete_after=10)
+            return is_surrendered
+
+    async def cancel_game(self) -> None:
+        """Cancel the running game."""
         await self.channel.send("**Snakes and Ladders**: Game has been canceled.")
         self._destruct()
 
@@ -670,6 +672,7 @@ class SnakeAndLaddersGame:
         self.round_has_rolled[user.id] = True
 
     async def _complete_round(self) -> None:
+        """At the conclusion of a round check to see if there's been a winner."""
         self.state = 'post_round'
 
         # check for winner
@@ -684,19 +687,22 @@ class SnakeAndLaddersGame:
         self._destruct()
 
     def _check_winner(self) -> Member:
+        """Return a winning member if we're in the post-round state and there's a winner."""
         if self.state != 'post_round':
             return None
         return next((player for player in self.players if self.player_tiles[player.id] == 100),
                     None)
 
     def _check_all_rolled(self) -> bool:
+        """Check if all members have made their roll."""
         return all(rolled for rolled in self.round_has_rolled.values())
 
     def _destruct(self) -> None:
+        """Clean up the finished game object."""
         del self.snakes.active_sal[self.channel]
 
-    def _board_coordinate_from_index(self, index: int) -> Tuple[float, float]:
-        # converts the tile number to the x/y coordinates for graphical purposes
+    def _board_coordinate_from_index(self, index: int) -> Tuple[int, int]:
+        """Convert the tile number to the x/y coordinates for graphical purposes."""
         y_level = 9 - math.floor((index - 1) / 10)
         is_reversed = math.floor((index - 1) / 10) % 2 != 0
         x_level = (index - 1) % 10

@@ -47,7 +47,7 @@ class BunnyNameGenerator(commands.Cog):
                 return new_name
 
     def append_name(self, displayname: str) -> str:
-        """Adds a suffix to the end of the Discord name"""
+        """Adds a suffix to the end of the Discord name."""
         extensions = ['foot', 'ear', 'nose', 'tail']
         suffix = random.choice(extensions)
         appended_name = displayname + suffix
@@ -56,12 +56,12 @@ class BunnyNameGenerator(commands.Cog):
 
     @commands.command()
     async def bunnyname(self, ctx: commands.Context) -> None:
-        """Picks a random bunny name from a JSON file"""
+        """Picks a random bunny name from a JSON file."""
         await ctx.send(random.choice(BUNNY_NAMES["names"]))
 
     @commands.command()
     async def bunnifyme(self, ctx: commands.Context) -> None:
-        """Gets your Discord username and bunnifies it"""
+        """Gets your Discord username and bunnifies it."""
         username = ctx.message.author.display_name
 
         # If name contains spaces or other separators, get the individual words to randomly bunnify

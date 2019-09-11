@@ -19,7 +19,7 @@ class Traditions(commands.Cog):
 
     @commands.command(aliases=('eastercustoms',))
     async def easter_tradition(self, ctx: commands.Context) -> None:
-        """Responds with a random tradition or custom"""
+        """Responds with a random tradition or custom."""
         random_country = random.choice(list(traditions))
 
         await ctx.send(f"{random_country}:\n{traditions[random_country]}")

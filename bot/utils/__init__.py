@@ -110,7 +110,7 @@ def replace_many(
     regex = re.compile(pattern, re.I if ignore_case else 0)
 
     def _repl(match: re.Match) -> str:
-        """Returns replacement depending on `ignore_case` and `match_case`"""
+        """Returns replacement depending on `ignore_case` and `match_case`."""
         word = match.group(0)
         replacement = replacements[word.lower() if ignore_case else word]
 
