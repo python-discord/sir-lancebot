@@ -1,8 +1,8 @@
 import asyncio
+import json
 import logging
 import random
 from dataclasses import dataclass
-from json import load
 from pathlib import Path
 
 import discord
@@ -44,7 +44,7 @@ class TriviaQuiz(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.questions = self.load_questions()
-        self.games = {}  # channel as key and value as instinct of dataclass GameData
+        self.running_games = {}  # channel as key and value as instance of dataclass GameData
         self.categories = {
             "retro": "Questions related to retro gaming."
         }
@@ -53,19 +53,20 @@ class TriviaQuiz(commands.Cog):
     @staticmethod
     def load_questions():
         """Load the questions from  json file."""
-        p = Path("bot", "resources", "evergreen", "trivia_quiz.json ")
+        p = Path("bot", "resources", "evergreen", "trivia_quiz.json")
         with p.open() as json_data:
-            questions = load(json_data)
+            questions = json.load(json_data)
             return questions
 
-    @commands.group(name="tquiz", invoke_without_command=False)
+    @commands.group(name="tquiz", invoke_without_command=True)
     async def tquiz(self, ctx):
         """Trivia Quiz game for fun!"""
         await ctx.send_help("tquiz")
 
     @tquiz.command(name="start")
     async def start(self, ctx, category=None):
-        """Start a quiz!
+        """
+        Start a quiz!
 
         Questions for the quiz can be selected from the following categories:
         - Retro : questions related to retro gaming.
@@ -74,7 +75,7 @@ class TriviaQuiz(commands.Cog):
         await asyncio.sleep(1)
 
         # Checking if there is already a game running in that channel.
-        if ctx.channel.id in list(self.games.keys()):
+        if ctx.channel.id in self.running_games:
             return await ctx.send("Game already running in this channel!")
 
         if category is None:
@@ -86,7 +87,7 @@ class TriviaQuiz(commands.Cog):
                 embed = self.category_embed()
                 return await ctx.send(f"Category {category} does not exist!", embed=embed)
 
-        self.games[ctx.channel.id] = GameData(
+        self.running_games[ctx.channel.id] = GameData(
             owner=ctx.author.id,
             category=category
         )
@@ -106,9 +107,9 @@ class TriviaQuiz(commands.Cog):
     async def send_question(self, channel):
         """This function is to be called whenever a question needs to be sent."""
         await asyncio.sleep(2)
-        game = self.games[channel.id]
+        game = self.running_games[channel.id]
         if game.unanswered_questions == self.inactivity_limit:
-            del self.games[channel.id]
+            del self.running_games[channel.id]
             return await channel.send("Game stopped due to inactivity.")
 
         category = game.category
@@ -122,8 +123,6 @@ class TriviaQuiz(commands.Cog):
             question_dict = random.choice(category_dict)
             if question_dict["id"] not in game.done_questions:
                 same_question = False
-            else:
-                pass
 
         # Initial points for a question.
         question_dict["points"] = 100
@@ -149,12 +148,12 @@ class TriviaQuiz(commands.Cog):
     async def on_message(self, message):
         """A function triggered when a message is sent."""
         channel = message.channel
-        if channel.id not in list(self.games.keys()):
+        if channel.id not in self.running_games:
             return
         if message.author.bot:
             return
 
-        game = self.games[message.channel.id]
+        game = self.running_games[message.channel.id]
         question_data = game.question
         answer = question_data["answer"].lower()
         user_answer = message.content.lower()
@@ -170,7 +169,7 @@ class TriviaQuiz(commands.Cog):
 
             await channel.send(f"{message.author.mention} got it right! Good job :tada:"
                                f"You got {points} points.")
-            await self.score_embed(channel)
+            await self.send_score(channel)
             await self.send_question(channel)
         elif ratio in range(75, 84):
             await channel.send(f"Your close to the answer {message.author.mention}")
@@ -179,7 +178,7 @@ class TriviaQuiz(commands.Cog):
         """Function to be called whenever a hint has to be sent."""
         await asyncio.sleep(10)
         try:
-            game = self.games[channel.id]
+            game = self.running_games[channel.id]
         except KeyError:
             return
 
@@ -197,30 +196,28 @@ class TriviaQuiz(commands.Cog):
             message = f"**Hint {game.hints}**: {hint}\n*Number of hints remaining: {2-game.hints}*"
             await channel.send(message)
             await self.send_hint(channel, question_dict)
-        else:
-            pass
 
     async def send_answer(self, channel):
         """A function to send the answer in the channel if no user have given the correct answer even after 2 hints."""
-        game = self.games[channel.id]
+        game = self.running_games[channel.id]
         answer = game.question["answer"]
         response = random.choice(wrong_ans_responses)
         expression = random.choice(annoyed_expressions)
         await channel.send(f"{response} {expression}, the correct answer is **{answer}**.")
-        self.games[channel.id].unanswered_questions += 1
-        await self.score_embed(channel)
+        self.running_games[channel.id].unanswered_questions += 1
+        await self.send_score(channel)
         await self.send_question(channel)
 
     @tquiz.command(name="score")
-    async def send_score(self, ctx):
+    async def show_score(self, ctx):
         """Show scoreboard of the game running in this channel."""
-        await self.score_embed(ctx.channel)
+        await self.send_score(ctx.channel)
 
-    async def score_embed(self, channel):
+    async def send_score(self, channel):
         """Show score of each player in the quiz."""
-        if channel.id not in list(self.games.keys()):
+        if channel.id not in self.running_games:
             return await channel.send("There are no games running in this channel!")
-        game = self.games[channel.id]
+        game = self.running_games[channel.id]
         players = game.players
         if len(players) == 0:
             return
@@ -229,30 +226,36 @@ class TriviaQuiz(commands.Cog):
         embed.title = "Scoreboard"
         embed.description = ""
         for player, score in zip(players, points):
-            embed.description = f"{player} - {score}\n"
+            embed.description += f"{player} - {score}\n"
         await channel.send(embed=embed)
 
     @tquiz.command(name="stop")
     async def stop_quiz(self, ctx):
         """Stop the quiz."""
-        if ctx.channel.id not in list(self.games.keys()):
+        if ctx.channel.id not in self.running_games:
             return await ctx.send("No game running, nothing to stop here -.-")
-        game = self.games[ctx.channel.id]
+        game = self.running_games[ctx.channel.id]
         owner = game.owner
         mods = Roles.moderator
         if ctx.author.id == owner or mods in [role.id for role in ctx.author.roles]:
             await ctx.send("Game is not running anymore!")
-            await self.score_embed(ctx.channel)
+            await self.send_score(ctx.channel)
             if game.players:
                 highest_points = max(game.points)
-                author_index = game.points.index(highest_points)
-                winner = game.players[author_index]
-                await ctx.send(
-                    f"Congratz {winner.mention} :tada: "
-                    f"You have won this quiz game with a grand total of {highest_points} points!!"
-                )
+
+                # Check if more than 1 player has highest points.
+
+                if game.points.count(highest_points) > 1:
+                    pass
+                else:
+                    author_index = game.points.index(highest_points)
+                    winner = game.players[author_index]
+                    await ctx.send(
+                        f"Congratz {winner.mention} :tada: "
+                        f"You have won this quiz game with a grand total of {highest_points} points!!"
+                    )
             await asyncio.sleep(2)
-            del self.games[ctx.channel.id]
+            del self.running_games[ctx.channel.id]
         else:
             await ctx.send("You are not authorised to close this game!")
 
