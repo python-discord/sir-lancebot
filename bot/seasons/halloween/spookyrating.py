@@ -17,7 +17,7 @@ with Path("bot/resources/halloween/spooky_rating.json").open() as file:
 
 
 class SpookyRating(commands.Cog):
-    """A cog for calculating one's spooky rating"""
+    """A cog for calculating one's spooky rating."""
 
     def __init__(self, bot):
         self.bot = bot

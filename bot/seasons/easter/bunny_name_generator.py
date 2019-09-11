@@ -28,8 +28,8 @@ class BunnyNameGenerator(commands.Cog):
         """
         Finds vowels in the user's display name.
 
-        If the Discord name contains a vowel and the letter y,
-        it will match one or more of these patterns.
+        If the Discord name contains a vowel and the letter y, it will match one or more of these patterns.
+
         Only the most recently matched pattern will apply the changes.
         """
         expressions = [
@@ -46,7 +46,7 @@ class BunnyNameGenerator(commands.Cog):
                 return new_name
 
     def append_name(self, displayname):
-        """Adds a suffix to the end of the Discord name"""
+        """Adds a suffix to the end of the Discord name."""
         extensions = ['foot', 'ear', 'nose', 'tail']
         suffix = random.choice(extensions)
         appended_name = displayname + suffix
@@ -55,12 +55,12 @@ class BunnyNameGenerator(commands.Cog):
 
     @commands.command()
     async def bunnyname(self, ctx):
-        """Picks a random bunny name from a JSON file"""
+        """Picks a random bunny name from a JSON file."""
         await ctx.send(random.choice(BUNNY_NAMES["names"]))
 
     @commands.command()
     async def bunnifyme(self, ctx):
-        """Gets your Discord username and bunnifies it"""
+        """Gets your Discord username and bunnifies it."""
         username = ctx.message.author.display_name
 
         # If name contains spaces or other separators, get the individual words to randomly bunnify
