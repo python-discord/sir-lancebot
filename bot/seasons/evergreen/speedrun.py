@@ -13,12 +13,11 @@ from discord.ext import commands
 log = logging.getLogger(__name__)
 API = srcomapi.SpeedrunCom()
 
-with Path('bot/resources/evergreen/speedrun_links.json').open(encoding="utf-8") as file:
-    LINKS = json.load(file)
-with Path('bot/resources/evergreen/speedrun_platforms.json').open(encoding='utf-8') as file:
-    PLATFORMS = json.load(file)
-with Path('bot/resources/evergreen/speedrun_genres.json').open(encoding='utf-8') as file:
-    GENRES = json.load(file)
+with Path('bot/resources/evergreen/speedrun_resources.json').open(encoding='utf-8') as file:
+    data = json.load(file)
+    PLATFORMS = data[0]
+    GENRES = data[1]
+    LINKS = data[2]
 
 
 class Speedrun(commands.Cog):
@@ -29,7 +28,7 @@ class Speedrun(commands.Cog):
 
     @commands.group(name="speedrun", invoke_without_command=True)
     async def speedrun(self, ctx: commands.context) -> None:
-        """Commands for the Speedrun cog"""
+        """Commands for the Speedrun cog."""
         await ctx.send_help(ctx.command)
 
     @speedrun.command(name="video")
@@ -37,9 +36,10 @@ class Speedrun(commands.Cog):
         """Sends a link to a video of a random speedrun."""
         await ctx.send(choice(LINKS))
 
-    @speedrun.command(name="platform")
+    @speedrun.command(name="platform", aliases=['pf'])
     async def find_by_platform(self, ctx: commands.Context, *, platform: str) -> None:
-        """Finds a random speedrun record by platform."""
+        """Sends an embed of a random speedrun record by platform."""
+        platform = platform.lower()
         res = API.search(dt.Game, {"platform": PLATFORMS[platform], '_bulk': True})
         if len(res) != 0:
             index = 250
@@ -50,13 +50,13 @@ class Speedrun(commands.Cog):
             run = chosen_game.records[0].runs[0]['run']
 
             await ctx.send(embed=format_embed(chosen_game, run))
-            await ctx.send(run.data['videos']['links'][0]['uri'])
         else:
             await ctx.send("There are no speedrun records for this platform.")
 
     @speedrun.command(name="genre")
     async def find_by_genre(self, ctx: commands.Context, *, genre: str) -> None:
-        """Finds a random speedrun record by genre."""
+        """Sends an embed of a random speedrun record by genre."""
+        genre = genre.lower()
         res = API.search(dt.Game, {'genre': GENRES[genre], '_bulk': True})
         if len(res) != 0:
             index = 250
@@ -67,13 +67,12 @@ class Speedrun(commands.Cog):
             run = chosen_game.records[0].runs[0]['run']
 
             await ctx.send(embed=format_embed(chosen_game, run))
-            await ctx.send(run.data['videos']['links'][0]['uri'])
         else:
             await ctx.send("There are no speedrun records for this genre.")
 
     @speedrun.command(name="year")
-    async def find_by_year(self, ctx: commands.Context, *, year: int) -> None:
-        """Finds a random speedrun record by year."""
+    async def find_by_year(self, ctx: commands.Context, year: int) -> None:
+        """Sends an embed of a random speedrun record by year."""
         res = API.search(dt.Game, {'released': year, '_bulk': True})
         if len(res) != 0:
             index = 250
@@ -84,21 +83,21 @@ class Speedrun(commands.Cog):
             run = chosen_game.records[0].runs[0]['run']
 
             await ctx.send(embed=format_embed(chosen_game, run))
-            await ctx.send(run.data['videos']['links'][0]['uri'])
         else:
             await ctx.send("There are no speedrun records for this year.")
 
 
 def format_embed(game: srcomapi.datatypes.Game, run: srcomapi.datatypes.Run) -> Embed:
-    """Helper function that formats the embed."""
+    """Helper function that formats and returns an embed."""
     game_name = game.data['names']['international']
+    vid_link = run.data['videos']['links'][0]['uri']
     embed = Embed(
         color=colour.Color.dark_green()
     )
-    embed.add_field(name=game_name, value=run.weblink)
-    embed.add_field(name="Record Time", value=get_time_record(game))
-    embed.add_field(name="Player", value=run.players[0].name)
-    embed.add_field(name="Video Link", value=run.data['videos']['links'][0]['uri'])
+    embed.add_field(name=game_name, value=run.weblink, inline=False)
+    embed.add_field(name="Player", value=run.players[0].name, inline=True)
+    embed.add_field(name="Record Time", value=get_time_record(game), inline=True)
+    embed.add_field(name="Video Link", value="None" if vid_link is None else vid_link, inline=False)
     return embed
 
 
@@ -132,6 +131,6 @@ def get_time_record(game: srcomapi.datatypes.Game) -> str:
 
 
 def setup(bot: commands.bot) -> None:
-    """Load the Speedrun cog"""
+    """Load the Speedrun cog."""
     bot.add_cog(Speedrun(bot))
     log.info("Speedrun cog loaded")
