@@ -77,7 +77,7 @@ class Fun(Cog):
             return text
 
 
-def setup(bot) -> None:
+def setup(bot: commands.Bot) -> None:
     """Fun Cog load."""
     bot.add_cog(Fun(bot))
     log.info("Fun cog loaded")

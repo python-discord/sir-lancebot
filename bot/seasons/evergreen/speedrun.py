@@ -13,16 +13,16 @@ with Path('bot/resources/evergreen/speedrun_links.json').open(encoding="utf-8") 
 class Speedrun(commands.Cog):
     """Commands about the video game speedrunning community."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.command(name="speedrun")
-    async def get_speedrun(self, ctx):
+    async def get_speedrun(self, ctx: commands.Context) -> None:
         """Sends a link to a video of a random speedrun."""
         await ctx.send(choice(LINKS))
 
 
-def setup(bot):
+def setup(bot: commands.Bot) -> None:
     """Load the Speedrun cog."""
     bot.add_cog(Speedrun(bot))
     log.info("Speedrun cog loaded")
