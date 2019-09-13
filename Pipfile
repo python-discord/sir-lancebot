@@ -11,6 +11,7 @@ discord-py = "~=1.2"
 fuzzywuzzy = "~=0.17"
 pillow = "~=6.1"
 pytz = "~=2019.2"
+srcomapi = "*"
 
 [dev-packages]
 flake8 = "~=3.7"
