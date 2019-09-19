@@ -130,7 +130,7 @@ def get_time_record(game: srcomapi.datatypes.Game) -> str:
         return "Error"
 
 
-def setup(bot: commands.bot) -> None:
+def setup(bot: commands.Bot) -> None:
     """Load the Speedrun cog."""
     bot.add_cog(Speedrun(bot))
     log.info("Speedrun cog loaded")

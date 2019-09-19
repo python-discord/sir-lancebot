@@ -11,7 +11,7 @@ log = logging.getLogger(__name__)
 class PrideAnthem(commands.Cog):
     """Embed a random youtube video for a gay anthem!"""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.anthems = self.load_vids()
 
@@ -39,7 +39,7 @@ class PrideAnthem(commands.Cog):
         return anthems
 
     @commands.command(name="prideanthem", aliases=["anthem", "pridesong"])
-    async def prideanthem(self, ctx, genre: str = None):
+    async def prideanthem(self, ctx: commands.Context, genre: str = None) -> None:
         """
         Sends a message with a video of a random pride anthem.
 
@@ -52,7 +52,7 @@ class PrideAnthem(commands.Cog):
             await ctx.send("I couldn't find a video, sorry!")
 
 
-def setup(bot):
+def setup(bot: commands.Bot) -> None:
     """Cog loader for pride anthem."""
     bot.add_cog(PrideAnthem(bot))
     log.info("Pride anthems cog loaded!")
