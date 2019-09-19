@@ -10,6 +10,8 @@ import aiohttp
 import discord
 from discord.ext import commands
 
+from bot.utils.persist import datafile
+
 log = logging.getLogger(__name__)
 
 CURRENT_YEAR = datetime.now().year  # Used to construct GH API query
@@ -21,7 +23,7 @@ class HacktoberStats(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.link_json = Path("bot/resources/github_links.json")
+        self.link_json = datafile(Path("bot", "resources", "halloween", "github_links.json"))
         self.linked_accounts = self.load_linked_users()
 
     @commands.group(name="hacktoberstats", aliases=("hackstats",), invoke_without_command=True)
