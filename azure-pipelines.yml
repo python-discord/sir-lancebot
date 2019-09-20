@@ -39,17 +39,10 @@ jobs:
 
   steps:
   - task: Docker@2
-    displayName: 'Login to Docker Hub'
-
+    displayName: 'Build & Push Container'
     inputs:
-      containerregistrytype: 'Container Registry'
-      dockerRegistryEndpoint: 'DockerHub'
-      command: 'login'
-
-  - task: Docker@2
-    displayName: 'Build & Push'
-
-    inputs:
-      command: buildAndPush
-      repository: pythondiscord/seasonalbot
-      tags: latest
+      containerRegistry: 'DockerHubV2'
+      repository: 'pythondiscord/seasonalbot'
+      command: 'buildAndPush'
+      Dockerfile: '**/Dockerfile'
+      tags: 'latest'
