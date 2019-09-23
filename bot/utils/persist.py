@@ -23,7 +23,7 @@ def datafile(file_path: Path) -> Path:
     >>> clean_default_datafile = Path("bot", "resources", "datafile.json")
     >>> persistent_file_path = datafile(clean_default_datafile)
     """
-    if not file_path.exists():
+    if not file_path.is_file():
         raise OSError(f"File not found at {file_path}.")
 
     persistant_path = Path(DIRECTORY, file_path.name)
