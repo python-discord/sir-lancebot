@@ -10,7 +10,7 @@ import aiohttp
 import discord
 from discord.ext import commands
 
-from bot.utils.persist import datafile
+from bot.utils.persist import make_persistent
 
 log = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ class HacktoberStats(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.link_json = datafile(Path("bot", "resources", "halloween", "github_links.json"))
+        self.link_json = make_persistent(Path("bot", "resources", "halloween", "github_links.json"))
         self.linked_accounts = self.load_linked_users()
 
     @commands.group(name="hacktoberstats", aliases=("hackstats",), invoke_without_command=True)
