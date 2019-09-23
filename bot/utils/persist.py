@@ -35,8 +35,7 @@ def make_persistent(file_path: Path) -> Path:
     >>>     data = json.load(f)
     """
     # ensure the persistent data directory exists
-    if not DIRECTORY.exists():
-        DIRECTORY.mkdir()
+    DIRECTORY.mkdir(exist_ok=True)
 
     if not file_path.is_file():
         raise OSError(f"File not found at {file_path}.")
@@ -47,8 +46,7 @@ def make_persistent(file_path: Path) -> Path:
     if season:
         # make sure subdirectory exists first
         subdirectory = Path(DIRECTORY, season)
-        if not subdirectory.exists():
-            subdirectory.mkdir()
+        subdirectory.mkdir(exist_ok=True)
 
         persistent_path = Path(subdirectory, file_path.name)
 
