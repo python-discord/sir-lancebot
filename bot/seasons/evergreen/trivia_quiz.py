@@ -32,7 +32,8 @@ game_rules = [
 class TriviaQuiz(commands.Cog):
     """A cog for all quiz commands."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot) -> None:
+        print(type(bot))
         self.bot = bot
         self.questions = self.load_questions()
         self.game_status = {}
@@ -52,7 +53,7 @@ class TriviaQuiz(commands.Cog):
             return questions
 
     @commands.command(name="quiz")
-    async def start(self, ctx, option: str, category: str = "retro") -> None:
+    async def start(self, ctx: commands.Context, option: str, category: str = "retro") -> None:
         """
         Start/Stop a quiz!
 
@@ -73,7 +74,8 @@ class TriviaQuiz(commands.Cog):
 
         if option == "start":
             if self.game_status[ctx.channel.id] is True:
-                return await ctx.send("Game already running.")
+                await ctx.send("Game already running.")
+                return
             else:
                 self.game_owners[ctx.channel.id] = ctx.author
                 self.game_status[ctx.channel.id] = True
@@ -88,7 +90,8 @@ class TriviaQuiz(commands.Cog):
 
         elif option == "stop":
             if self.game_status[ctx.channel.id] is False:
-                return await ctx.send("No game running, nothing to stop here.")
+                await ctx.send("No game running, nothing to stop here.")
+                return
             else:
                 if (
                         ctx.author == self.game_owners[ctx.channel.id]
@@ -100,7 +103,8 @@ class TriviaQuiz(commands.Cog):
                     await ctx.send(f"{ctx.author.mention}, you are not authorised to stop this game :ghost: !")
         else:
             self.game_status[ctx.channel.id] = False
-            return await ctx.send("start or stop only")
+            await ctx.send("start or stop only")
+            return
 
         unanswerd = 0
         done_question = []
@@ -169,7 +173,7 @@ class TriviaQuiz(commands.Cog):
                 await self.send_score(ctx.channel, player_data)
 
     @staticmethod
-    async def send_score(channel, player_data):
+    async def send_score(channel: discord.TextChannel, player_data: dict) -> None:
         """A function which sends the score."""
         embed = discord.Embed(colour=discord.Colour.blue())
         embed.title = "Score Board"
@@ -179,7 +183,7 @@ class TriviaQuiz(commands.Cog):
         await channel.send(embed=embed)
 
     @staticmethod
-    async def declare_winner(channel, player_data):
+    async def declare_winner(channel: discord.TextChannel, player_data: dict) -> None:
         """A function declare the winner of the quiz."""
         if player_data:
             highest_points = max(list(player_data.values()))
@@ -218,7 +222,7 @@ class TriviaQuiz(commands.Cog):
         return embed
 
 
-def setup(bot):
+def setup(bot: commands.Bot) -> None:
     """Loading the cog."""
     bot.add_cog(TriviaQuiz(bot))
     logger.debug("TriviaQuiz cog loaded!")
