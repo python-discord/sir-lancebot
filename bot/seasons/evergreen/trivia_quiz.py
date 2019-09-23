@@ -14,18 +14,11 @@ from bot.constants import Roles
 logger = logging.getLogger(__name__)
 
 
-annoyed_expressions = ["-_-", "-.-"]
+ANNOYED_EXPRESSIONS = ["-_-", "-.-"]
 
-wrong_ans_responses = [
+WRONG_ANS_RESPONSE = [
     "No one gave the correct answer",
-    "Losers",
-    "You guys really need to learn"
-]
-
-game_rules = [
-    "No cheating!",
-    "Idk what rules to put in here haha."
-
+    "Better luck next time"
 ]
 
 
@@ -33,7 +26,6 @@ class TriviaQuiz(commands.Cog):
     """A cog for all quiz commands."""
 
     def __init__(self, bot: commands.Bot) -> None:
-        print(type(bot))
         self.bot = bot
         self.questions = self.load_questions()
         self.game_status = {}
@@ -53,7 +45,7 @@ class TriviaQuiz(commands.Cog):
             return questions
 
     @commands.command(name="quiz")
-    async def start(self, ctx: commands.Context, option: str, category: str = "retro") -> None:
+    async def start(self, ctx: commands.Context, option: str, category: str = "general") -> None:
         """
         Start/Stop a quiz!
 
@@ -82,9 +74,7 @@ class TriviaQuiz(commands.Cog):
                 start_embed = discord.Embed(colour=discord.Colour.red())
                 start_embed.title = "Quiz game Starting!!"
                 start_embed.description = "Each game consists of 5 questions.\n"
-                start_embed.description += "**Rules :**\n"
-                for rule in game_rules:
-                    start_embed.description += f"- {rule}\n"
+                start_embed.description += "**Rules :**\nNo cheating and have fun!"
                 start_embed.set_footer(text="2 hints per question sent after every 10s")
                 await ctx.send(embed=start_embed)  # send an embed with the rules
 
@@ -99,14 +89,17 @@ class TriviaQuiz(commands.Cog):
                 ):
                     await self.declare_winner(ctx.channel, player_data)
                     self.game_status[ctx.channel.id] = False
+                    del self.game_owners[ctx.channel.id]
                 else:
                     await ctx.send(f"{ctx.author.mention}, you are not authorised to stop this game :ghost: !")
-        else:
-            self.game_status[ctx.channel.id] = False
-            await ctx.send("start or stop only")
-            return
 
-        unanswerd = 0
+        if category not in self.categories:
+            embed = self.category_embed
+            await ctx.send(embed=embed)
+            return
+        topic = self.questions[category]
+
+        unanswered = 0
         done_question = []
         hint_no = 0
         answer = None
@@ -116,15 +109,10 @@ class TriviaQuiz(commands.Cog):
                 await ctx.send("The round ends here.")
                 await self.declare_winner(ctx.channel, player_data)
                 break
-            if unanswerd > 3:
+            if unanswered > 3:
                 await ctx.send("Game stopped due to inactivity.")
                 await self.declare_winner(ctx.channel, player_data)
                 break
-            if category not in self.categories:
-                embed = self.category_embed
-                await ctx.send(embed=embed)
-                break
-            topic = self.questions[category]
             if hint_no == 0:
                 while True:
                     question_dict = random.choice(topic)
@@ -153,11 +141,11 @@ class TriviaQuiz(commands.Cog):
                         await ctx.send(f"**Hint #{hint_no+1}\n**{hints[hint_no]}")
                         hint_no += 1
                     else:
-                        response = random.choice(wrong_ans_responses)
-                        expression = random.choice(annoyed_expressions)
+                        response = random.choice(WRONG_ANS_RESPONSE)
+                        expression = random.choice(ANNOYED_EXPRESSIONS)
                         await ctx.send(f"{response} {expression}, the correct answer is **{answer}**.")
                         hint_no = 0
-                        unanswerd += 1
+                        unanswered += 1
                         await self.send_score(ctx.channel, player_data)
 
             else:
@@ -167,7 +155,7 @@ class TriviaQuiz(commands.Cog):
                 else:
                     player_data[msg.author] = points
                 hint_no = 0
-                unanswerd = 0
+                unanswered = 0
                 await ctx.send(f"{msg.author.mention} got the correct answer :tada: {points} points for ya.")
                 await ctx.send(f"Correct answer is **{answer}**")
                 await self.send_score(ctx.channel, player_data)
