@@ -20,5 +20,4 @@ ENTRYPOINT ["python"]
 CMD ["-m", "bot"]
 
 # Define docker persistent volumes
-VOLUME /bot/bot/log
-VOLUME /bot/data
+VOLUME /bot/bot/log /bot/data
