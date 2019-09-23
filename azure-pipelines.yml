@@ -41,7 +41,7 @@ jobs:
   - task: Docker@2
     displayName: 'Build & Push Container'
     inputs:
-      containerRegistry: 'DockerHubV2'
+      containerRegistry: 'DockerHub'
       repository: 'pythondiscord/seasonalbot'
       command: 'buildAndPush'
       Dockerfile: '**/Dockerfile'
