@@ -91,8 +91,8 @@ class TriviaQuiz(commands.Cog):
                 return await ctx.send("No game running, nothing to stop here.")
             else:
                 if (
-                        ctx.author == self.game_owners[ctx.channel.id] or
-                        Roles.moderator in [role.id for role in ctx.author.roles]
+                        ctx.author == self.game_owners[ctx.channel.id]
+                        or Roles.moderator in [role.id for role in ctx.author.roles]
                 ):
                     await self.declare_winner(ctx.channel, player_data)
                     self.game_status[ctx.channel.id] = False
@@ -101,7 +101,7 @@ class TriviaQuiz(commands.Cog):
         else:
             self.game_status[ctx.channel.id] = False
             return await ctx.send("start or stop only")
-        
+
         unanswerd = 0
         done_question = []
         hint_no = 0
@@ -181,7 +181,6 @@ class TriviaQuiz(commands.Cog):
     @staticmethod
     async def declare_winner(channel, player_data):
         """A function declare the winner of the quiz."""
-
         if player_data:
             highest_points = max(list(player_data.values()))
             no_of_winners = list(player_data.values()).count(highest_points)
