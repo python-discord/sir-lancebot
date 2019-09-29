@@ -31,5 +31,133 @@
       "answer": "Super Mario World"
     }  
   ],
-  "general":[]
+  "general":[
+    {
+      "id": 100,
+      "question": "Name the land of thousand lakes",
+      "answer": "Finland",
+      "info": "Finland is a country in Northern Europe. Sweden borders it to the northwest, Estonia to the south, Russia to the east, and Norway to the north. Finland is part of the European Union with its capital city being Helsinki. With a population of 5.5 million people, it has over 187,000 lakes. The thousands of lakes in Finland are the reason why the country's nickname is “the land of a thousand lakes."
+    },
+    {
+      "id": 101,
+      "question": "Winner of FIFA 2018",
+      "answer": "France",
+      "info": "France 4 - 2 Croatia"
+    },
+    {
+      "id": 102,
+      "question": "Remind me the largest Ocean in the world.",
+      "answer": "Pacific",
+      "info": "The Pacific Ocean is the largest and deepest of the world ocean basins. Covering approximately 63 million square miles and containing more than half of the free water on Earth, the Pacific is by far the largest of the world's ocean basins."
+    },
+    {
+      "id": 103,
+      "question": "Have you heard of The Statue Of Liberty ? Who gifted it?",
+      "answer": "French",
+      "info": "The Statue of Liberty was a gift from the French people commemorating the alliance of France and the United States during the American Revolution. Yet, it represented much more to those individuals who proposed the gift. A photograph of Edouard de Laboulaye from the Galerie Contemporaine collection."
+    },
+    {
+      "id": 104,
+      "question": "Land Of The Rising Sun?",
+      "answer": "Japan",
+      "info": "According to the words of the Japanese envoy himself, that name was chosen because the country was so close to where the sun rises. In any event, the name stuck, and for the last 1400 years or so, the world has referred to Japan as Nippon, the land of the rising sun."
+    },
+    {
+      "id": 105,
+      "question": "Is there a play ground in Europe ?Name the Play Ground of Europe",
+      "answer": "SWITZERLAND",
+      "info": "It comes from the title of a book written in 1870 by Leslie Stephen (father of Virginia Woolf) detailing his exploits of mountain climbing (not skiing) of which sport he was one of the pioneers and trekking or walking."
+    },
+    {
+      "id": 106,
+      "question": "Have you been struck by Thunder ? If not your very lucky but this place has gone through lot of large violent thunderstorms, called the Land Of Thunderbolt, name it.",
+      "answer": "Bhutan",
+      "info": "Bhutan is called Land of Thunder Dragon. Because of the violent and large thunderstorms that whip down through the valleys from the Himalayas, Bhutan is known as the Land of Thunderbolt. The sparkling light of thunderbolts were believed to be red fire of a dragon."
+    },
+    {
+      "id": 107,
+      "question": "Largest producer of tea in the world?",
+      "answer": "China",
+      "info": "Tea is mainly grown in Asia, Africa, South America, and around the Black and Caspian Seas. The four biggest tea-producing countries today are China, India, Sri Lanka and Kenya. Together they represent 75% of world production."
+    },
+    {
+      "id": 108,
+      "question": "Remind me the largest producer of Coffee ?",
+      "answer": "Brazil",
+      "info": "Brazil is the world's largest coffee producer. In 2016, Brazil produced a staggering 2,595,000 metric tons of coffee beans. It is not a new development, as Brazil has been the highest global producer of coffee beans for over 150 years."
+    },
+    {
+      "id": 109,
+      "question": "Mount Etna, one of the active volcano, where is it located?",
+      "answer": "Italy",
+      "info": "Mount Etna is the highest and most active volcano in Europe. Towering above the city of Catania on the island of Sicily, it has been growing for about 500,000 years and is in the midst of a series of eruptions that began in 2001.It is also possible to visit Mount Etna independently, but the advantages of a guided excursion are very numerous. Mount Etna is on of the highest volcano in Europe and on of the most active in the world. The volcano shaped the Sicilian history and landscape and still affects the island today."
+    },
+    {
+      "id": 110,
+      "question": "Which country is called Battleground of Europe?",
+      "answer": "Belgium",
+      "info": "Belgium has been the battleground of Europe since the Roman Empire… Belgium was the battleground of Europe for centuries as it had no natural protection from its big neighboring countries. ... The battles of Oudenaarde, Ramillies, Waterloo, Ypres and Bastogne were all fought on Belgian soil."
+    },
+    {
+      "id": 111,
+      "question": "Largest tropical rain forest in the world?",
+      "answer": "Amazon",
+      "info": "The Amazon is regarded as vital in the fight against global warming due to its ability to absorb carbon from the air. It's often referred to as the “lungs of the Earth,” as more than 20 per cent of the world's oxygen is produced there."
+    },
+    {
+      "id": 112,
+      "question": "Do you know the biggest Island in the World ?",
+      "answer": "Greenland",
+      "info": ""
+    },
+    {
+      "id": 113,
+      "question": "Give me the name of the tallest waterfall in the world.",
+      "answer": "Angel",
+      "info": "Angel Falls (Salto Ángel) in Venezuela is the highest waterfall in the world. The falls are 3230 feet in height, with an uninterrupted drop of 2647 feet. Angel Falls is located on a tributary of the Rio Caroni."
+    },
+    {
+      "id": 114,
+      "question": "Have you seen white elephants? If not then there is a place called Land of White Elephants, does anyone know the place?",
+      "answer": "Thailand",
+      "info": "White elephants were regarded to be holy creatures in ancient Thailand and some other countries. Today, white elephants are still used as a symbol of divine and royal power in the country. Ownership of a white elephant symbolizes wealth, success, royalty, political power, wisdom, and prosperity."
+    },
+    {
+      "id": 115,
+      "question": "How many continents have you been to? Maybe you can visit 2 at once, name the city of two continents.",
+      "answer": "Istanbul",
+      "info": "Istanbul embraces two continents, one arm reaching out to Asia, the other to Europe."
+    },
+    {
+      "id": 116,
+      "question": "the Vally Of The Kings is located in the country...?",
+      "answer": "Egypt",
+      "info": "The Valley of the Kings, also known as the Valley of the Gates of the Kings, is a valley in Egypt where, for a period of nearly 500 years from the 16th to 11th century BC, rock cut tombs were excavated for the pharaohs and powerful nobles of the New Kingdom (the Eighteenth to the Twentieth Dynasties of Ancient Egypt)."
+    },
+    {
+      "id": 117,
+      "question": "Diamonds are always nice in Minecraft, but did you know that there is a \"Diamond Capital in the World?\" can anyone name it?",
+      "answer": "Antwerp",
+      "info": "Antwerp, Belgium is where 60-80% of the world's diamonds are cut and traded, and is known as the \"Diamond Capital of the World.\""
+    },
+    {
+      "id": 118,
+      "question": "Where is the \"International Court Of Justice\" located at?",
+      "answer": "Hague",
+      "info": ""
+    },
+    {
+      "id": 119,
+      "question": "In which country is Bali located in?",
+      "answer": "Indonesia",
+      "info": ""
+    },
+    {
+      "id": 120,
+      "question": "The world's largest coral reef system \"Great Barrier Reef\" is located in?",
+      "answer": "Australia",
+      "info": "The Great Barrier Reef is the world's largest coral reef system composed of over 2,900 individual reefs and 900 islands stretching for over 2,300 kilometres (1,400 mi) over an area of approximately 344,400 square kilometres (133,000 sq mi). The reef is located in the Coral Sea, off the coast of Queensland, Australia."
+    }
+
+  ]
 }

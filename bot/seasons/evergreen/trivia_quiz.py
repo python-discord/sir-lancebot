@@ -32,8 +32,8 @@ class TriviaQuiz(commands.Cog):
         self.game_owners = {}
         self.question_limit = 3
         self.categories = {
-            "general": "Test your general knwoledge",
-            "retro": "Questions related to retro gaming."
+            "general": "Test your general knwoledge"
+            # "retro": "Questions related to retro gaming."
         }
 
     @staticmethod
@@ -45,7 +45,7 @@ class TriviaQuiz(commands.Cog):
             return questions
 
     @commands.command(name="quiz")
-    async def start(self, ctx: commands.Context, option: str, category: str = "general") -> None:
+    async def quiz_game(self, ctx: commands.Context, option: str, category: str = "general") -> None:
         """
         Start/Stop a quiz!
 
@@ -56,7 +56,7 @@ class TriviaQuiz(commands.Cog):
 
         Questions for the quiz can be selected from the following categories:
         - general : Test your general knowledge. (default)
-        - Retro : questions related to retro gaming.
+        (we wil be adding more later)
         """
         category = category.lower()
         player_data = {}  # a dict to store players and their points.
@@ -75,8 +75,11 @@ class TriviaQuiz(commands.Cog):
                 start_embed.title = "Quiz game Starting!!"
                 start_embed.description = "Each game consists of 5 questions.\n"
                 start_embed.description += "**Rules :**\nNo cheating and have fun!"
-                start_embed.set_footer(text="2 hints per question sent after every 10s")
+                start_embed.set_footer(
+                    text="Points for that question reduces by 25 after 10s.Total time is 30s per question"
+                )
                 await ctx.send(embed=start_embed)  # send an embed with the rules
+                await asyncio.sleep(1)
 
         elif option == "stop":
             if self.game_status[ctx.channel.id] is False:
@@ -121,7 +124,6 @@ class TriviaQuiz(commands.Cog):
                         break
                 q = question_dict["question"]
                 answer = question_dict["answer"]
-                hints = question_dict["hints"]
 
                 embed = discord.Embed(colour=discord.Colour.gold())
                 embed.title = f"Question #{len(done_question)}"
@@ -129,7 +131,7 @@ class TriviaQuiz(commands.Cog):
                 await ctx.send(embed=embed)
 
             def check(m):
-                ratio = fuzz.ratio(answer.lower(), m.content)
+                ratio = fuzz.ratio(answer.lower(), m.content.lower())
                 return ratio > 80 and m.channel == ctx.channel
             try:
                 msg = await self.bot.wait_for('message', check=check, timeout=10)
@@ -138,12 +140,19 @@ class TriviaQuiz(commands.Cog):
                     break
                 if isinstance(e, asyncio.TimeoutError):
                     if hint_no < 2:
-                        await ctx.send(f"**Hint #{hint_no+1}\n**{hints[hint_no]}")
                         hint_no += 1
+                        if "hints" in question_dict:
+                            hints = question_dict["hints"]
+                            await ctx.send(f"**Hint #{hint_no+1}\n**{hints[hint_no]}")
+                        else:
+                            await ctx.send(f"Cmon guys, {30-hint_no*10}s left!")
+
                     else:
                         response = random.choice(WRONG_ANS_RESPONSE)
                         expression = random.choice(ANNOYED_EXPRESSIONS)
-                        await ctx.send(f"{response} {expression}, the correct answer is **{answer}**.")
+                        await ctx.send(f"{response} {expression}")
+                        await self.send_answer(ctx.channel, question_dict)
+                        await asyncio.sleep(1)
                         hint_no = 0
                         unanswered += 1
                         await self.send_score(ctx.channel, player_data)
@@ -157,7 +166,7 @@ class TriviaQuiz(commands.Cog):
                 hint_no = 0
                 unanswered = 0
                 await ctx.send(f"{msg.author.mention} got the correct answer :tada: {points} points for ya.")
-                await ctx.send(f"Correct answer is **{answer}**")
+                await self.send_answer(ctx.channel, question_dict)
                 await self.send_score(ctx.channel, player_data)
 
     @staticmethod
@@ -208,6 +217,19 @@ class TriviaQuiz(commands.Cog):
             embed.description += f"**- {cat.capitalize()}**\n{description.capitalize()}\n"
         embed.set_footer(text="If not category is chosen, then a random one will be selected.")
         return embed
+
+    @staticmethod
+    async def send_answer(channel: discord.TextChannel, question_dict: dict) -> None:
+        """A function that sends the answer."""
+        answer = question_dict["answer"]
+        info = question_dict["info"]
+        embed = discord.Embed(color=discord.Colour.red())
+        embed.title = f"The correct answer is **{answer}**\n"
+        embed.description = ""
+        if info != "":
+            embed.description += f"**Information**\n{info}\n"
+        embed.description += "Lets move to the next question."
+        await channel.send(embed=embed)
 
 
 def setup(bot: commands.Bot) -> None:
