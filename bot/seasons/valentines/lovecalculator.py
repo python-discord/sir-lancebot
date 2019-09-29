@@ -53,7 +53,7 @@ class LoveCalculator(Cog):
             staff = ctx.guild.get_role(Roles.helpers).members
             whom = random.choice(staff)
 
-        def normalize(arg):
+        def normalize(arg: Union[Member, str]) -> str:
             if isinstance(arg, Member):
                 # If we are given a member, return name#discrim without any extra changes
                 arg = str(arg)

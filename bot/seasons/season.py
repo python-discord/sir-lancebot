@@ -303,7 +303,7 @@ class SeasonBase:
                 cogs.append(cog_name)
 
         if cogs:
-            def cog_name(cog):
+            def cog_name(cog: commands.Cog) -> str:
                 return type(cog).__name__
 
             cog_info = []
