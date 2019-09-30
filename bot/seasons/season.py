@@ -271,7 +271,7 @@ class SeasonBase:
         It will skip the announcement if the current active season is the "evergreen" default season.
         """
         # Don't actually announce if reverting to normal season
-        if self.name in ("evergreen", "wildcard"):
+        if self.name in ("evergreen", "wildcard", "halloween"):
             log.debug(f"Season Changed: {self.name}")
             return
 
