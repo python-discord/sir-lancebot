@@ -14,18 +14,18 @@ with open(Path("bot/resources/easter/traditions.json"), "r", encoding="utf8") as
 class Traditions(commands.Cog):
     """A cog which allows users to get a random easter tradition or custom from a random country."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.command(aliases=('eastercustoms',))
-    async def easter_tradition(self, ctx):
-        """Responds with a random tradition or custom"""
+    async def easter_tradition(self, ctx: commands.Context) -> None:
+        """Responds with a random tradition or custom."""
         random_country = random.choice(list(traditions))
 
         await ctx.send(f"{random_country}:\n{traditions[random_country]}")
 
 
-def setup(bot):
+def setup(bot: commands.Bot) -> None:
     """Traditions Cog load."""
     bot.add_cog(Traditions(bot))
     log.info("Traditions cog loaded")

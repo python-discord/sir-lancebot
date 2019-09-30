@@ -17,11 +17,11 @@ with open(Path("bot/resources/valentines/pickup_lines.json"), "r", encoding="utf
 class PickupLine(commands.Cog):
     """A cog that gives random cheesy pickup lines."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.command()
-    async def pickupline(self, ctx):
+    async def pickupline(self, ctx: commands.Context) -> None:
         """
         Gives you a random pickup line.
 
@@ -39,7 +39,7 @@ class PickupLine(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot):
+def setup(bot: commands.Bot) -> None:
     """Pickup lines Cog load."""
     bot.add_cog(PickupLine(bot))
     log.info('PickupLine cog loaded')

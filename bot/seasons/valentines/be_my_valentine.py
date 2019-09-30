@@ -1,8 +1,8 @@
 import logging
 import random
-import typing
 from json import load
 from pathlib import Path
+from typing import Optional, Tuple
 
 import discord
 from discord.ext import commands
@@ -18,12 +18,12 @@ HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_hea
 class BeMyValentine(commands.Cog):
     """A cog that sends Valentines to other users!"""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.valentines = self.load_json()
 
     @staticmethod
-    def load_json():
+    def load_json() -> dict:
         """Load Valentines messages from the static resources."""
         p = Path("bot/resources/valentines/bemyvalentine_valentines.json")
         with p.open() as json_data:
@@ -31,7 +31,7 @@ class BeMyValentine(commands.Cog):
             return valentines
 
     @commands.group(name="lovefest", invoke_without_command=True)
-    async def lovefest_role(self, ctx):
+    async def lovefest_role(self, ctx: commands.Context) -> None:
         """
         Subscribe or unsubscribe from the lovefest role.
 
@@ -43,7 +43,7 @@ class BeMyValentine(commands.Cog):
         await ctx.send_help(ctx.command)
 
     @lovefest_role.command(name="sub")
-    async def add_role(self, ctx):
+    async def add_role(self, ctx: commands.Context) -> None:
         """Adds the lovefest role."""
         user = ctx.author
         role = discord.utils.get(ctx.guild.roles, id=Lovefest.role_id)
@@ -54,7 +54,7 @@ class BeMyValentine(commands.Cog):
             await ctx.send("You already have the role !")
 
     @lovefest_role.command(name="unsub")
-    async def remove_role(self, ctx):
+    async def remove_role(self, ctx: commands.Context) -> None:
         """Removes the lovefest role."""
         user = ctx.author
         role = discord.utils.get(ctx.guild.roles, id=Lovefest.role_id)
@@ -66,7 +66,9 @@ class BeMyValentine(commands.Cog):
 
     @commands.cooldown(1, 1800, BucketType.user)
     @commands.group(name='bemyvalentine', invoke_without_command=True)
-    async def send_valentine(self, ctx, user: typing.Optional[discord.Member] = None, *, valentine_type=None):
+    async def send_valentine(
+        self, ctx: commands.Context, user: Optional[discord.Member] = None, *, valentine_type: str = None
+    ) -> None:
         """
         Send a valentine to user, if specified, or to a random user with the lovefest role.
 
@@ -112,7 +114,9 @@ class BeMyValentine(commands.Cog):
 
     @commands.cooldown(1, 1800, BucketType.user)
     @send_valentine.command(name='secret')
-    async def anonymous(self, ctx, user: typing.Optional[discord.Member] = None, *, valentine_type=None):
+    async def anonymous(
+        self, ctx: commands.Context, user: Optional[discord.Member] = None, *, valentine_type: str = None
+    ) -> None:
         """
         Send an anonymous Valentine via DM to to a user, if specified, or to a random with the lovefest role.
 
@@ -164,7 +168,7 @@ class BeMyValentine(commands.Cog):
         else:
             await ctx.author.send(f"Your message has been sent to {user}")
 
-    def valentine_check(self, valentine_type):
+    def valentine_check(self, valentine_type: str) -> Tuple[str, str]:
         """Return the appropriate Valentine type & title based on the invoking user's input."""
         if valentine_type is None:
             valentine, title = self.random_valentine()
@@ -184,14 +188,11 @@ class BeMyValentine(commands.Cog):
         return valentine, title
 
     @staticmethod
-    def random_user(author, members):
+    def random_user(author: discord.Member, members: discord.Member) -> None:
         """
         Picks a random member from the list provided in `members`.
 
         The invoking author is ignored.
-
-        :param author: member who invoked the command
-        :param members: list of discord.Member objects
         """
         if author in members:
             members.remove(author)
@@ -199,13 +200,13 @@ class BeMyValentine(commands.Cog):
         return random.choice(members) if members else None
 
     @staticmethod
-    def random_emoji():
+    def random_emoji() -> Tuple[str, str]:
         """Return two random emoji from the module-defined constants."""
         EMOJI_1 = random.choice(HEART_EMOJIS)
         EMOJI_2 = random.choice(HEART_EMOJIS)
         return EMOJI_1, EMOJI_2
 
-    def random_valentine(self):
+    def random_valentine(self) -> Tuple[str, str]:
         """Grabs a random poem or a compliment (any message)."""
         valentine_poem = random.choice(self.valentines['valentine_poems'])
         valentine_compliment = random.choice(self.valentines['valentine_compliments'])
@@ -216,18 +217,18 @@ class BeMyValentine(commands.Cog):
             title = 'A compliment for '
         return random_valentine, title
 
-    def valentine_poem(self):
+    def valentine_poem(self) -> str:
         """Grabs a random poem."""
         valentine_poem = random.choice(self.valentines['valentine_poems'])
         return valentine_poem
 
-    def valentine_compliment(self):
+    def valentine_compliment(self) -> str:
         """Grabs a random compliment."""
         valentine_compliment = random.choice(self.valentines['valentine_compliments'])
         return valentine_compliment
 
 
-def setup(bot):
+def setup(bot: commands.Bot) -> None:
     """Be my Valentine Cog load."""
     bot.add_cog(BeMyValentine(bot))
     log.info("BeMyValentine cog loaded")

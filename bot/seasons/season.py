@@ -12,7 +12,8 @@ import async_timeout
 import discord
 from discord.ext import commands
 
-from bot.constants import Channels, Client, Roles, bot
+from bot.bot import bot
+from bot.constants import Channels, Client, Roles
 from bot.decorators import with_role
 
 log = logging.getLogger(__name__)
@@ -263,14 +264,14 @@ class SeasonBase:
 
         return await self.apply_server_icon()
 
-    async def announce_season(self):
+    async def announce_season(self) -> None:
         """
         Announces a change in season in the announcement channel.
 
         It will skip the announcement if the current active season is the "evergreen" default season.
         """
         # Don't actually announce if reverting to normal season
-        if self.name == "evergreen":
+        if self.name in ("evergreen", "wildcard"):
             log.debug(f"Season Changed: {self.name}")
             return
 
@@ -302,7 +303,7 @@ class SeasonBase:
                 cogs.append(cog_name)
 
         if cogs:
-            def cog_name(cog):
+            def cog_name(cog: commands.Cog) -> str:
                 return type(cog).__name__
 
             cog_info = []
@@ -319,7 +320,7 @@ class SeasonBase:
 
         await channel.send(mention, embed=embed)
 
-    async def load(self):
+    async def load(self) -> None:
         """
         Loads extensions, bot name and avatar, server icon and announces new season.
 
@@ -360,7 +361,7 @@ class SeasonBase:
 class SeasonManager(commands.Cog):
     """A cog for managing seasons."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.season = get_season(date=datetime.datetime.utcnow())
         self.season_task = bot.loop.create_task(self.load_seasons())
@@ -377,7 +378,7 @@ class SeasonManager(commands.Cog):
         )
         self.sleep_time = (midnight - datetime.datetime.now()).seconds + 60
 
-    async def load_seasons(self):
+    async def load_seasons(self) -> None:
         """Asynchronous timer loop to check for a new season every midnight."""
         await self.bot.wait_until_ready()
         await self.season.load()
@@ -396,7 +397,7 @@ class SeasonManager(commands.Cog):
 
     @with_role(Roles.moderator, Roles.admin, Roles.owner)
     @commands.command(name="season")
-    async def change_season(self, ctx, new_season: str):
+    async def change_season(self, ctx: commands.Context, new_season: str) -> None:
         """Changes the currently active season on the bot."""
         self.season = get_season(season_name=new_season)
         await self.season.load()
@@ -404,10 +405,10 @@ class SeasonManager(commands.Cog):
 
     @with_role(Roles.moderator, Roles.admin, Roles.owner)
     @commands.command(name="seasons")
-    async def show_seasons(self, ctx):
+    async def show_seasons(self, ctx: commands.Context) -> None:
         """Shows the available seasons and their dates."""
         # Sort by start order, followed by lower duration
-        def season_key(season_class: Type[SeasonBase]):
+        def season_key(season_class: Type[SeasonBase]) -> Tuple[datetime.datetime, datetime.timedelta]:
             return season_class.start(), season_class.end() - datetime.datetime.max
 
         current_season = self.season.name
@@ -447,13 +448,13 @@ class SeasonManager(commands.Cog):
 
     @with_role(Roles.moderator, Roles.admin, Roles.owner)
     @commands.group()
-    async def refresh(self, ctx):
+    async def refresh(self, ctx: commands.Context) -> None:
         """Refreshes certain seasonal elements without reloading seasons."""
         if not ctx.invoked_subcommand:
             await ctx.send_help(ctx.command)
 
     @refresh.command(name="avatar")
-    async def refresh_avatar(self, ctx):
+    async def refresh_avatar(self, ctx: commands.Context) -> None:
         """Re-applies the bot avatar for the currently loaded season."""
         # Attempt the change
         is_changed = await self.season.apply_avatar()
@@ -476,7 +477,7 @@ class SeasonManager(commands.Cog):
         await ctx.send(embed=embed)
 
     @refresh.command(name="icon")
-    async def refresh_server_icon(self, ctx):
+    async def refresh_server_icon(self, ctx: commands.Context) -> None:
         """Re-applies the server icon for the currently loaded season."""
         # Attempt the change
         is_changed = await self.season.apply_server_icon()
@@ -499,7 +500,7 @@ class SeasonManager(commands.Cog):
         await ctx.send(embed=embed)
 
     @refresh.command(name="username", aliases=("name",))
-    async def refresh_username(self, ctx):
+    async def refresh_username(self, ctx: commands.Context) -> None:
         """Re-applies the bot username for the currently loaded season."""
         old_username = str(bot.user)
         old_display_name = ctx.guild.me.display_name
@@ -538,10 +539,10 @@ class SeasonManager(commands.Cog):
 
     @with_role(Roles.moderator, Roles.admin, Roles.owner)
     @commands.command()
-    async def announce(self, ctx):
+    async def announce(self, ctx: commands.Context) -> None:
         """Announces the currently loaded season."""
         await self.season.announce_season()
 
-    def cog_unload(self):
+    def cog_unload(self) -> None:
         """Cancel season-related tasks on cog unload."""
         self.season_task.cancel()

@@ -1,5 +1,6 @@
 import datetime
 import logging
+from typing import List
 
 from discord import Embed
 from discord.ext import commands
@@ -13,7 +14,7 @@ log = logging.getLogger(__name__)
 class HanukkahEmbed(commands.Cog):
     """A cog that returns information about Hanukkah festival."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.url = ("https://www.hebcal.com/hebcal/?v=1&cfg=json&maj=on&min=on&mod=on&nx=on&"
                     "year=now&month=x&ss=on&mf=on&c=on&geo=geoname&geonameid=3448439&m=50&s=on")
@@ -21,7 +22,7 @@ class HanukkahEmbed(commands.Cog):
         self.hanukkah_months = []
         self.hanukkah_years = []
 
-    async def get_hanukkah_dates(self):
+    async def get_hanukkah_dates(self) -> List[str]:
         """Gets the dates for hanukkah festival."""
         hanukkah_dates = []
         async with self.bot.http_session.get(self.url) as response:
@@ -34,7 +35,7 @@ class HanukkahEmbed(commands.Cog):
         return hanukkah_dates
 
     @commands.command(name='hanukkah', aliases=['chanukah'])
-    async def hanukkah_festival(self, ctx):
+    async def hanukkah_festival(self, ctx: commands.Context) -> None:
         """Tells you about the Hanukkah Festivaltime of festival, festival day, etc)."""
         hanukkah_dates = await self.get_hanukkah_dates()
         self.hanukkah_dates_split(hanukkah_dates)
@@ -98,7 +99,7 @@ class HanukkahEmbed(commands.Cog):
 
             await ctx.send(embed=embed)
 
-    def hanukkah_dates_split(self, hanukkah_dates):
+    def hanukkah_dates_split(self, hanukkah_dates: List[str]) -> None:
         """We are splitting the dates for hanukkah into days, months and years."""
         for date in hanukkah_dates:
             self.hanukkah_days.append(date[8:10])
@@ -106,7 +107,7 @@ class HanukkahEmbed(commands.Cog):
             self.hanukkah_years.append(date[0:4])
 
 
-def setup(bot):
+def setup(bot: commands.Bot) -> None:
     """Cog load."""
     bot.add_cog(HanukkahEmbed(bot))
     log.info("Hanukkah embed cog loaded")
