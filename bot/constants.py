@@ -126,7 +126,7 @@ STAFF_ROLES = Roles.helpers, Roles.moderator, Roles.admin, Roles.owner
 WHITELISTED_CHANNELS = (
     Channels.bot, Channels.seasonalbot_commands,
     Channels.off_topic_0, Channels.off_topic_1, Channels.off_topic_2,
-    Channels.devtest,
+    Channels.devtest, Channels.hacktoberfest_2019
 )
 
 # Bot replies
