@@ -52,6 +52,7 @@ class Channels(NamedTuple):
     python_discussion = 267624335836053506
     show_your_projects = int(environ.get("CHANNEL_SHOW_YOUR_PROJECTS", 303934982764625920))
     show_your_projects_discussion = 360148304664723466
+    hacktoberfest_2019 = 628184417646411776
 
 
 class Client(NamedTuple):
@@ -125,7 +126,7 @@ STAFF_ROLES = Roles.helpers, Roles.moderator, Roles.admin, Roles.owner
 WHITELISTED_CHANNELS = (
     Channels.bot, Channels.seasonalbot_commands,
     Channels.off_topic_0, Channels.off_topic_1, Channels.off_topic_2,
-    Channels.devtest,
+    Channels.devtest, Channels.hacktoberfest_2019,
 )
 
 # Bot replies
