@@ -130,7 +130,7 @@ class TriviaQuiz(commands.Cog):
                 embed.description = q
                 await ctx.send(embed=embed)
 
-            def check(m):
+            def check(m: discord.Message) -> bool:
                 ratio = fuzz.ratio(answer.lower(), m.content.lower())
                 return ratio > 80 and m.channel == ctx.channel
             try:
