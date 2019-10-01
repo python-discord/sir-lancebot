@@ -157,6 +157,96 @@
       "question": "The world's largest coral reef system \"Great Barrier Reef\" is located in?",
       "answer": "Australia",
       "info": "The Great Barrier Reef is the world's largest coral reef system composed of over 2,900 individual reefs and 900 islands stretching for over 2,300 kilometres (1,400 mi) over an area of approximately 344,400 square kilometres (133,000 sq mi). The reef is located in the Coral Sea, off the coast of Queensland, Australia."
+    },
+    {
+      "id": 121,
+      "question": "When did the First World War start?",
+      "answer": "1914",
+      "info": "The first world war began in August 1914. It was directly triggered by the assassination of the Austrian archduke, Franz Ferdinand and his wife, on 28th June 1914 by Bosnian revolutionary, Gavrilo Princip. This event was, however, simply the trigger that set off declarations of war."
+    },
+    {
+      "id": 122,
+      "question": "Which is the only mammal that can’t jump?",
+      "answer": "elephant",
+      "info": "It is true that adult elephants can't jump. But there are other mammals that can't either, like sloths, hippos and rhinos. Although, unlike elephants, hippos and rhinos can have all four feet off the ground at the same time when they run."
+
+    },
+    {
+      "id": 123,
+      "question": "Who lived at 221B, Baker Street, London?",
+      "answer": "Sherlock Holmes",
+      "info": "You guys know this very well, xD."
+
+    },
+    {
+      "id": 124,
+      "question": "When did the Second World War end?",
+      "answer": "1945",
+      "info": "World War 2 ended with the unconditional surrender of the Axis powers. On 8 May 1945, the Allies accepted Germany's surrender, about a week after Adolf Hitler had committed suicide. VE Day – Victory in Europe celebrates the end of the Second World War on 8 May 1945."
+
+    },
+    {
+      "id": 125,
+      "question": "Name the largest Dam in the World",
+      "answer": "Three Gorges Dam",
+      "info": "At 1.4 miles wide (2.3 kilometers) and 630 feet (192 meters) high, Three Gorges Dam is the largest hydroelectric dam in the world, according to International Water Power & Dam Construction magazine. Three Gorges impounds the Yangtze River about 1,000 miles (1,610 km) west of Shanghai."
+
+    },
+    {
+      "id": 126,
+      "question": "Name the largest river in the World.",
+      "answer": "Nile",
+      "info": "The Nile, which is about 6,650 km (4,130 mi) long, is an \"international\" river as its drainage basin covers eleven countries, namely, Tanzania, Uganda, Rwanda, Burundi, the Democratic Republic of the Congo, Kenya, Ethiopia, Eritrea, South Sudan, Republic of the Sudan and Egypt."
+
+    },
+    {
+      "id": 127,
+      "question": "Which is the smallest planet in the Solar System? Earth?",
+      "answer": "Mercury",
+      "info": "Mercury is the smallest planet in our solar system. It's just a little bigger than Earth's moon. It is the closest planet to the sun, but it's actually not the hottest. Venus is hotter."
+
+    },
+    {
+      "id": 128,
+      "question": "Is your country the smallest? Well it is if it is this perticular place, name the smallest country.",
+      "answer": "Vatican city",
+      "info": "With an area of 0.17 square miles (0.44 km2) and a population right around 1,000, Vatican City is the smallest country in the world, both in terms of size and population."
+
+    },
+    {
+      "id": 129,
+      "question": "Have you seen the largest bird? If so then name it.",
+      "answer": "Ostrich",
+      "info": "The largest living bird, a member of the Struthioniformes, is the ostrich (Struthio camelus), from the plains of Africa and Arabia. A large male ostrich can reach a height of 2.8 metres (9.2 feet) and weigh over 156 kilograms (344 pounds)."
+
+    },
+    {
+      "id": 130,
+      "question": "Expand GPRS",
+      "answer": "General Packet Radio Service",
+      "info": "General Packet Radio Service (GPRS) is a packet-based mobile data service on the global system for mobile communications (GSM) of 3G and 2G cellular communication systems. It is a non-voice, high-speed and useful packet-switching technology intended for GSM networks."
+
+    },
+    {
+      "id": 120,
+      "question": "",
+      "answer": "",
+      "info": ""
+
+    },
+    {
+      "id": 120,
+      "question": "",
+      "answer": "",
+      "info": ""
+
+    },
+    {
+      "id": 120,
+      "question": "",
+      "answer": "",
+      "info": ""
+
     }
 
   ]
