@@ -64,9 +64,11 @@ def without_role(*role_ids: int) -> bool:
 
 
 def in_channel_check(*channels: int, bypass_roles: typing.Container[int] = None) -> typing.Callable[[Context], bool]:
-    """Checks that the message is in a whitelisted channel or optionally has a bypass role.
+    """
+    Checks that the message is in a whitelisted channel or optionally has a bypass role.
 
-       If `in_channel_override` is present, check if it contains channels and use them in place of global whitelist"""
+    If `in_channel_override` is present, check if it contains channels and use them in place of global whitelist
+    """
     def predicate(ctx: Context) -> bool:
         if not ctx.guild:
             log.debug(f"{ctx.author} tried to use the '{ctx.command.name}' command from a DM.")
