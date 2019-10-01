@@ -2,7 +2,6 @@ import logging
 import math
 import random
 import sys
-import traceback
 
 from discord import Colour, Embed, Message
 from discord.ext import commands
@@ -47,7 +46,8 @@ class CommandErrorHandler(commands.Cog):
             embed = Embed(colour=Colour.red())
             embed.title = random.choice(NEGATIVE_REPLIES)
             embed.description = str(error)
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
+            return
 
         if isinstance(error, commands.CommandNotFound):
             return logging.debug(
@@ -61,10 +61,13 @@ class CommandErrorHandler(commands.Cog):
 
             self.revert_cooldown_counter(ctx.command, ctx.message)
 
-            return await ctx.send(
+            log.exception(type(error).__name__, exc_info=error)
+
+            await ctx.send(
                 ":no_entry: The command you specified failed to run. "
                 "This is because the arguments you provided were invalid."
             )
+            return
 
         if isinstance(error, commands.CommandOnCooldown):
             logging.debug(
@@ -72,23 +75,26 @@ class CommandErrorHandler(commands.Cog):
             )
             remaining_minutes, remaining_seconds = divmod(error.retry_after, 60)
 
-            return await ctx.send(
+            await ctx.send(
                 "This command is on cooldown, please retry in "
                 f"{int(remaining_minutes)} minutes {math.ceil(remaining_seconds)} seconds."
             )
+            return
 
         if isinstance(error, commands.DisabledCommand):
             logging.debug(
                 f"{ctx.author} called the command '{ctx.command}' but the command was disabled!"
             )
-            return await ctx.send(":no_entry: This command has been disabled.")
+            await ctx.send(":no_entry: This command has been disabled.")
+            return
 
         if isinstance(error, commands.NoPrivateMessage):
             logging.debug(
                 f"{ctx.author} called the command '{ctx.command}' "
                 "in a private message however the command was guild only!"
             )
-            return await ctx.author.send(":no_entry: This command can only be used in the server.")
+            await ctx.author.send(":no_entry: This command can only be used in the server.")
+            return
 
         if isinstance(error, commands.BadArgument):
             self.revert_cooldown_counter(ctx.command, ctx.message)
@@ -96,21 +102,22 @@ class CommandErrorHandler(commands.Cog):
             logging.debug(
                 f"{ctx.author} called the command '{ctx.command}' but entered a bad argument!"
             )
-            return await ctx.send("The argument you provided was invalid.")
+            await ctx.send("The argument you provided was invalid.")
+            return
 
         if isinstance(error, commands.CheckFailure):
             logging.debug(f"{ctx.author} called the command '{ctx.command}' but the checks failed!")
-            return await ctx.send(":no_entry: You are not authorized to use this command.")
+            await ctx.send(":no_entry: You are not authorized to use this command.")
+            return
 
         print(f"Ignoring exception in command {ctx.command}:", file=sys.stderr)
 
         logging.warning(
             f"{ctx.author} called the command '{ctx.command}' "
-            "however the command failed to run with the error:"
-            f"-------------\n{error}"
+            f"however the command failed to run with the error: {error}"
         )
 
-        traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
+        log.exception(type(error).__name__, exc_info=error)
 
 
 def setup(bot: commands.Bot) -> None:
