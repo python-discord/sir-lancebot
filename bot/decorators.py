@@ -129,7 +129,7 @@ def override_in_channel(channels: typing.Tuple[int] = None) -> typing.Callable:
 
     This decorator has to go before (below) below the `command` decorator.
     """
-    def inner(func: typing.Callable):
+    def inner(func: typing.Callable) -> typing.Callable:
         func.in_channel_override = channels
         return func
 
