@@ -10,7 +10,10 @@ import aiohttp
 import discord
 from discord.ext import commands
 
+from bot.constants import Channels, STAFF_ROLES, WHITELISTED_CHANNELS
+from bot.decorators import in_channel_check
 from bot.utils.persist import make_persistent
+
 
 log = logging.getLogger(__name__)
 
@@ -26,6 +29,7 @@ class HacktoberStats(commands.Cog):
         self.link_json = make_persistent(Path("bot", "resources", "halloween", "github_links.json"))
         self.linked_accounts = self.load_linked_users()
 
+    @commands.check(in_channel_check(*(*WHITELISTED_CHANNELS, Channels.hacktoberfest_2019), bypass_roles=STAFF_ROLES))
     @commands.group(name="hacktoberstats", aliases=("hackstats",), invoke_without_command=True)
     async def hacktoberstats_group(self, ctx: commands.Context, github_username: str = None) -> None:
         """
