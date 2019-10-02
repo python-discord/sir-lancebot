@@ -16,7 +16,7 @@ respValue = {404: "Issue/pull request not located! Please enter a valid number!"
 
 
 class Issues(commands.Cog):
-    """Cog that allows users to retrieve issues from GitHub"""
+    """Cog that allows users to retrieve issues from GitHub."""
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
