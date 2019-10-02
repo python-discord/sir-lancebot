@@ -56,7 +56,7 @@ class Issues(commands.Cog):
         await ctx.send(embed=resp)
 
 
-def setup(bot) -> None:
+def setup(bot: commands.Bot) -> None:
     """Cog Retrieves Issues From Github."""
-    bot.add_cog(Issues(bot: commands.Bot))
+    bot.add_cog(Issues(bot))
     log.info("Issues cog loaded")
