@@ -18,12 +18,13 @@ respValue = {404: "Issue/pull request not located! Please enter a valid number!"
 class Issues(commands.Cog):
     """Cog that allows users to retrieve issues from GitHub"""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.command(aliases=("pr",))
-    async def issues(self, ctx, number: int, repository: str = "seasonalbot", user: str = "python-discord") -> None:
-        """Command to get issues/pull request from GitHub"""
+    async def issues(self, ctx: commands.Context, number: int, repository: str = "seasonalbot",
+                     user: str = "python-discord") -> None:
+        """Command to get issues/pull request from GitHub."""
         url = f"https://api.github.com/repos/{user}/{repository}/issues/{str(number)}"
         mergeURL = f"https://api.github.com/repos/{user}/{repository}/pulls/{str(number)}/merge"
 
@@ -56,6 +57,6 @@ class Issues(commands.Cog):
 
 
 def setup(bot) -> None:
-    """Cog Retrieves Issues From Github"""
-    bot.add_cog(Issues(bot))
+    """Cog Retrieves Issues From Github."""
+    bot.add_cog(Issues(bot: commands.Bot))
     log.info("Issues cog loaded")
