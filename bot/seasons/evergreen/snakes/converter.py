@@ -1,9 +1,10 @@
 import json
 import logging
 import random
+from typing import Iterable, List
 
 import discord
-from discord.ext.commands import Converter
+from discord.ext.commands import Context, Converter
 from fuzzywuzzy import fuzz
 
 from bot.seasons.evergreen.snakes.utils import SNAKE_RESOURCES
@@ -18,16 +19,15 @@ class Snake(Converter):
     snakes = None
     special_cases = None
 
-    async def convert(self, ctx, name):
+    async def convert(self, ctx: Context, name: str) -> str:
         """Convert the input snake name to the closest matching Snake object."""
-
         await self.build_list()
         name = name.lower()
 
         if name == 'python':
             return 'Python (programming language)'
 
-        def get_potential(iterable, *, threshold=80):
+        def get_potential(iterable: Iterable, *, threshold: int = 80) -> List[str]:
             nonlocal name
             potential = []
 
@@ -59,9 +59,8 @@ class Snake(Converter):
         return names.get(name, name)
 
     @classmethod
-    async def build_list(cls):
+    async def build_list(cls) -> None:
         """Build list of snakes from the static snake resources."""
-
         # Get all the snakes
         if cls.snakes is None:
             with (SNAKE_RESOURCES / "snake_names.json").open() as snakefile:
@@ -74,16 +73,13 @@ class Snake(Converter):
             cls.special_cases = {snake['name'].lower(): snake for snake in special_cases}
 
     @classmethod
-    async def random(cls):
+    async def random(cls) -> str:
         """
         Get a random Snake from the loaded resources.
 
         This is stupid. We should find a way to somehow get the global session into a global context,
         so I can get it from here.
-
-        :return:
         """
-
         await cls.build_list()
         names = [snake['scientific'] for snake in cls.snakes]
         return random.choice(names)

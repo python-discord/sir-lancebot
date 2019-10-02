@@ -12,10 +12,10 @@ from discord.ext import commands
 
 log = logging.getLogger(__name__)
 
-with open(Path("bot", "resources", "evergreen", "html_colours.json")) as f:
+with open(Path("bot/resources/evergreen/html_colours.json")) as f:
     HTML_COLOURS = json.load(f)
 
-with open(Path("bot", "resources", "evergreen", "xkcd_colours.json")) as f:
+with open(Path("bot/resources/evergreen/xkcd_colours.json")) as f:
     XKCD_COLOURS = json.load(f)
 
 COLOURS = [
@@ -31,11 +31,11 @@ IRREPLACEABLE = [
 class EggDecorating(commands.Cog):
     """Decorate some easter eggs!"""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
     @staticmethod
-    def replace_invalid(colour: str):
+    def replace_invalid(colour: str) -> Union[int, None]:
         """Attempts to match with HTML or XKCD colour names, returning the int value."""
         with suppress(KeyError):
             return int(HTML_COLOURS[colour], 16)
@@ -44,14 +44,15 @@ class EggDecorating(commands.Cog):
         return None
 
     @commands.command(aliases=["decorateegg"])
-    async def eggdecorate(self, ctx, *colours: Union[discord.Colour, str]):
+    async def eggdecorate(
+        self, ctx: commands.Context, *colours: Union[discord.Colour, str]
+    ) -> Union[Image, discord.Message]:
         """
         Picks a random egg design and decorates it using the given colours.
 
         Colours are split by spaces, unless you wrap the colour name in double quotes.
         Discord colour names, HTML colour names, XKCD colour names and hex values are accepted.
         """
-
         if len(colours) < 2:
             return await ctx.send("You must include at least 2 colours!")
 
@@ -72,13 +73,13 @@ class EggDecorating(commands.Cog):
             return await ctx.send(f"Sorry, I don't know the colour {invalid[0]}!")
 
         async with ctx.typing():
-            # expand list to 8 colours
+            # Expand list to 8 colours
             colours_n = len(colours)
             if colours_n < 8:
                 q, r = divmod(8, colours_n)
                 colours = colours * q + colours[:r]
             num = random.randint(1, 6)
-            im = Image.open(Path("bot", "resources", "easter", "easter_eggs", f"design{num}.png"))
+            im = Image.open(Path(f"bot/resources/easter/easter_eggs/design{num}.png"))
             data = list(im.getdata())
 
             replaceable = {x for x in data if x not in IRREPLACEABLE}
@@ -112,8 +113,7 @@ class EggDecorating(commands.Cog):
         return new_im
 
 
-def setup(bot):
-    """Cog load."""
-
+def setup(bot: commands.bot) -> None:
+    """Egg decorating Cog load."""
     bot.add_cog(EggDecorating(bot))
     log.info("EggDecorating cog loaded.")

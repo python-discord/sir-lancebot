@@ -3,6 +3,7 @@ import logging
 import random
 from json import load
 from pathlib import Path
+from typing import Union
 
 import discord
 from discord.ext import commands
@@ -11,7 +12,7 @@ from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
-with open(Path('bot', 'resources', 'easter', 'egghead_questions.json'), 'r', encoding="utf8") as f:
+with open(Path("bot/resources/easter/egghead_questions.json"), "r", encoding="utf8") as f:
     EGGHEAD_QUESTIONS = load(f)
 
 
@@ -30,18 +31,17 @@ TIMELIMIT = 30
 class EggheadQuiz(commands.Cog):
     """This cog contains the command for the Easter quiz!"""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.quiz_messages = {}
 
     @commands.command(aliases=["eggheadquiz", "easterquiz"])
-    async def eggquiz(self, ctx):
+    async def eggquiz(self, ctx: commands.Context) -> None:
         """
-        Gives a random quiz question, waits 30 seconds and then outputs the answer
+        Gives a random quiz question, waits 30 seconds and then outputs the answer.
 
         Also informs of the percentages and votes of each option
         """
-
         random_question = random.choice(EGGHEAD_QUESTIONS)
         question, answers = random_question["question"], random_question["answers"]
         answers = [(EMOJIS[i], a) for i, a in enumerate(answers)]
@@ -69,7 +69,7 @@ class EggheadQuiz(commands.Cog):
         total_no = sum([len(await r.users().flatten()) for r in msg.reactions]) - len(valid_emojis)  # - bot's reactions
 
         if total_no == 0:
-            return await msg.delete()  # to avoid ZeroDivisionError if nobody reacts
+            return await msg.delete()  # To avoid ZeroDivisionError if nobody reacts
 
         results = ["**VOTES:**"]
         for emoji, _ in answers:
@@ -96,14 +96,14 @@ class EggheadQuiz(commands.Cog):
         await ctx.send(content, embed=a_embed)
 
     @staticmethod
-    async def already_reacted(message, user):
-        """Returns whether a given user has reacted more than once to a given message"""
+    async def already_reacted(message: discord.Message, user: Union[discord.Member, discord.User]) -> bool:
+        """Returns whether a given user has reacted more than once to a given message."""
         users = [u.id for reaction in [await r.users().flatten() for r in message.reactions] for u in reaction]
         return users.count(user.id) > 1  # Old reaction plus new reaction
 
     @commands.Cog.listener()
-    async def on_reaction_add(self, reaction, user):
-        """Listener to listen specifically for reactions of quiz messages"""
+    async def on_reaction_add(self, reaction: discord.Reaction, user: Union[discord.Member, discord.User]) -> None:
+        """Listener to listen specifically for reactions of quiz messages."""
         if user.bot:
             return
         if reaction.message.id not in self.quiz_messages:
@@ -114,8 +114,7 @@ class EggheadQuiz(commands.Cog):
             return await reaction.message.remove_reaction(reaction, user)
 
 
-def setup(bot):
-    """Cog load."""
-
+def setup(bot: commands.Bot) -> None:
+    """Egghead Quiz Cog load."""
     bot.add_cog(EggheadQuiz(bot))
     log.info("EggheadQuiz bot loaded")

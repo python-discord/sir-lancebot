@@ -2,7 +2,7 @@ import logging
 import re
 
 import discord
-from discord.ext.commands import Cog
+from discord.ext.commands import Bot, Cog
 
 log = logging.getLogger(__name__)
 
@@ -20,11 +20,11 @@ SPOOKY_TRIGGERS = {
 class SpookyReact(Cog):
     """A cog that makes the bot react to message triggers."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @Cog.listener()
-    async def on_message(self, ctx: discord.Message):
+    async def on_message(self, ctx: discord.Message) -> None:
         """
         A command to send the seasonalbot github project.
 
@@ -32,7 +32,6 @@ class SpookyReact(Cog):
 
         Seasonalbot's own messages are ignored
         """
-
         for trigger in SPOOKY_TRIGGERS.keys():
             trigger_test = re.search(SPOOKY_TRIGGERS[trigger][0], ctx.content.lower())
             if trigger_test:
@@ -52,7 +51,6 @@ class SpookyReact(Cog):
           * author is the bot
           * prefix is not None
         """
-
         # Check for self reaction
         if ctx.author == self.bot.user:
             logging.debug(f"Ignoring reactions on self message. Message ID: {ctx.id}")
@@ -68,8 +66,7 @@ class SpookyReact(Cog):
         return False
 
 
-def setup(bot):
+def setup(bot: Bot) -> None:
     """Spooky reaction Cog load."""
-
     bot.add_cog(SpookyReact(bot))
     log.info("SpookyReact cog loaded")

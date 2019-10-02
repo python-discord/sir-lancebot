@@ -9,30 +9,31 @@ log = logging.getLogger(__name__)
 
 
 class AprilFoolVideos(commands.Cog):
-    """A cog for april fools that gets a random april fools video from youtube."""
-    def __init__(self, bot):
+    """A cog for April Fools' that gets a random April Fools' video from Youtube."""
+
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.yt_vids = self.load_json()
         self.youtubers = ['google']  # will add more in future
 
     @staticmethod
-    def load_json():
-        """A function to load json data."""
-        p = Path('bot', 'resources', 'easter', 'april_fools_vids.json')
+    def load_json() -> dict:
+        """A function to load JSON data."""
+        p = Path('bot/resources/easter/april_fools_vids.json')
         with p.open() as json_file:
             all_vids = load(json_file)
         return all_vids
 
     @commands.command(name='fool')
-    async def aprial_fools(self, ctx):
-        """Gets a random april fools video from youtube."""
+    async def april_fools(self, ctx: commands.Context) -> None:
+        """Get a random April Fools' video from Youtube."""
         random_youtuber = random.choice(self.youtubers)
         category = self.yt_vids[random_youtuber]
         random_vid = random.choice(category)
         await ctx.send(f"Check out this April Fools' video by {random_youtuber}.\n\n{random_vid['link']}")
 
 
-def setup(bot):
-    """A function to add the cog."""
+def setup(bot: commands.Bot) -> None:
+    """April Fools' Cog load."""
     bot.add_cog(AprilFoolVideos(bot))
     log.info('April Fools videos cog loaded!')

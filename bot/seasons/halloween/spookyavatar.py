@@ -15,21 +15,19 @@ log = logging.getLogger(__name__)
 class SpookyAvatar(commands.Cog):
     """A cog that spookifies an avatar."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    async def get(self, url):
-        """Returns the contents of the supplied url."""
-
+    async def get(self, url: str) -> bytes:
+        """Returns the contents of the supplied URL."""
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 return await resp.read()
 
     @commands.command(name='savatar', aliases=('spookyavatar', 'spookify'),
                       brief='Spookify an user\'s avatar.')
-    async def spooky_avatar(self, ctx, user: discord.Member = None):
+    async def spooky_avatar(self, ctx: commands.Context, user: discord.Member = None) -> None:
         """A command to print the user's spookified avatar."""
-
         if user is None:
             user = ctx.message.author
 
@@ -49,8 +47,7 @@ class SpookyAvatar(commands.Cog):
         os.remove(str(ctx.message.id)+'.png')
 
 
-def setup(bot):
+def setup(bot: commands.Bot) -> None:
     """Spooky avatar Cog load."""
-
     bot.add_cog(SpookyAvatar(bot))
     log.info("SpookyAvatar cog loaded")

@@ -2,7 +2,7 @@ import asyncio
 import logging
 from io import BytesIO
 from pathlib import Path
-from typing import Union
+from typing import Tuple, Union
 
 import discord
 from PIL import Image
@@ -21,22 +21,20 @@ COLOURS = [
 class AvatarEasterifier(commands.Cog):
     """Put an Easter spin on your avatar or image!"""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @staticmethod
-    def closest(x):
+    def closest(x: Tuple[int, int, int]) -> Tuple[int, int, int]:
         """
         Finds the closest easter colour to a given pixel.
 
         Returns a merge between the original colour and the closest colour
         """
-
         r1, g1, b1 = x
 
-        def distance(point):
-            """Finds the difference between a pastel colour and the original pixel colour"""
-
+        def distance(point: Tuple[int, int, int]) -> Tuple[int, int, int]:
+            """Finds the difference between a pastel colour and the original pixel colour."""
             r2, g2, b2 = point
             return ((r1 - r2)**2 + (g1 - g2)**2 + (b1 - b2)**2)
 
@@ -45,10 +43,11 @@ class AvatarEasterifier(commands.Cog):
         r = (r1 + r2) // 2
         g = (g1 + g2) // 2
         b = (b1 + b2) // 2
+
         return (r, g, b)
 
     @commands.command(pass_context=True, aliases=["easterify"])
-    async def avatareasterify(self, ctx, *colours: Union[discord.Colour, str]):
+    async def avatareasterify(self, ctx: commands.Context, *colours: Union[discord.Colour, str]) -> None:
         """
         This "Easterifies" the user's avatar.
 
@@ -57,8 +56,7 @@ class AvatarEasterifier(commands.Cog):
         Colours are split by spaces, unless you wrap the colour name in double quotes.
         Discord colour names, HTML colour names, XKCD colour names and hex values are accepted.
         """
-
-        async def send(*args, **kwargs):
+        async def send(*args, **kwargs) -> str:
             """
             This replaces the original ctx.send.
 
@@ -106,7 +104,7 @@ class AvatarEasterifier(commands.Cog):
                 im.alpha_composite(egg, (im.width - egg.width, (im.height - egg.height)//2))  # Right centre.
                 ctx.send = send_message  # Reassigns ctx.send
             else:
-                bunny = Image.open(Path("bot", "resources", "easter", "chocolate_bunny.png"))
+                bunny = Image.open(Path("bot/resources/easter/chocolate_bunny.png"))
                 im.alpha_composite(bunny, (im.width - bunny.width, (im.height - bunny.height)//2))  # Right centre.
 
             bufferedio = BytesIO()
@@ -125,8 +123,7 @@ class AvatarEasterifier(commands.Cog):
         await ctx.send(file=file, embed=embed)
 
 
-def setup(bot):
-    """Cog load."""
-
+def setup(bot: commands.Bot) -> None:
+    """Avatar Easterifier Cog load."""
     bot.add_cog(AvatarEasterifier(bot))
     log.info("AvatarEasterifier cog loaded")

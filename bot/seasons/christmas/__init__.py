@@ -18,7 +18,9 @@ class Christmas(SeasonBase):
     greeting = "Happy Holidays!"
 
     start_date = "01/12"
-    end_date = "31/12"
+    end_date = "01/01"
 
     colour = Colours.dark_green
-    icon = "/logos/logo_seasonal/christmas/festive.png"
+    icon = (
+        "/logos/logo_seasonal/christmas/festive.png",
+    )

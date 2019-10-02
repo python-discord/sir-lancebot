@@ -2,11 +2,10 @@ import logging
 from os import environ
 from typing import NamedTuple
 
-from bot.bot import SeasonalBot
-
 __all__ = (
-    "AdventOfCode", "Channels", "Client", "Colours", "Emojis", "Hacktoberfest", "Roles",
-    "Tokens", "ERROR_REPLIES", "bot"
+    "AdventOfCode", "Channels", "Client", "Colours", "Emojis", "Hacktoberfest", "Roles", "Tokens",
+    "WHITELISTED_CHANNELS", "STAFF_ROLES", "MODERATION_ROLES",
+    "POSITIVE_REPLIES", "NEGATIVE_REPLIES", "ERROR_REPLIES",
 )
 
 log = logging.getLogger(__name__)
@@ -23,12 +22,12 @@ class AdventOfCode:
 
 class Channels(NamedTuple):
     admins = 365960823622991872
-    announcements = int(environ.get('CHANNEL_ANNOUNCEMENTS', 354619224620138496))
+    announcements = int(environ.get("CHANNEL_ANNOUNCEMENTS", 354619224620138496))
     big_brother_logs = 468507907357409333
     bot = 267659945086812160
     checkpoint_test = 422077681434099723
     devalerts = 460181980097675264
-    devlog = int(environ.get('CHANNEL_DEVLOG', 548438471685963776))
+    devlog = int(environ.get("CHANNEL_DEVLOG", 548438471685963776))
     devtest = 414574275865870337
     help_0 = 303906576991780866
     help_1 = 303906556754395136
@@ -45,20 +44,23 @@ class Channels(NamedTuple):
     off_topic_2 = 463035268514185226
     python = 267624335836053506
     reddit = 458224812528238616
-    seasonalbot_chat = int(environ.get('CHANNEL_SEASONALBOT_CHAT', 542272993192050698))
+    seasonalbot_chat = int(environ.get("CHANNEL_SEASONALBOT_CHAT", 542272993192050698))
+    seasonalbot_commands = int(environ.get("CHANNEL_SEASONALBOT_COMMANDS", 607247579608121354))
+    seasonalbot_voice = int(environ.get("CHANNEL_SEASONALBOT_VOICE", 606259004230074378))
     staff_lounge = 464905259261755392
     verification = 352442727016693763
     python_discussion = 267624335836053506
-    show_your_projects = 303934982764625920
+    show_your_projects = int(environ.get("CHANNEL_SHOW_YOUR_PROJECTS", 303934982764625920))
     show_your_projects_discussion = 360148304664723466
+    hacktoberfest_2019 = 628184417646411776
 
 
 class Client(NamedTuple):
-    guild = int(environ.get('SEASONALBOT_GUILD', 267624335836053506))
+    guild = int(environ.get("SEASONALBOT_GUILD", 267624335836053506))
     prefix = environ.get("PREFIX", ".")
-    token = environ.get('SEASONALBOT_TOKEN')
-    debug = environ.get('SEASONALBOT_DEBUG', '').lower() == 'true'
-    season_override = environ.get('SEASON_OVERRIDE')
+    token = environ.get("SEASONALBOT_TOKEN")
+    debug = environ.get("SEASONALBOT_DEBUG", "").lower() == "true"
+    season_override = environ.get("SEASON_OVERRIDE")
 
 
 class Colours:
@@ -80,7 +82,7 @@ class Emojis:
     terning1 = "<:terning1:431249668983488527>"
     terning2 = "<:terning2:462339216987127808>"
     terning3 = "<:terning3:431249694467948544>"
-    terning4 = "<:terning4:431249704769290241>"
+    terning4 = "<:terning4:579980271475228682>"
     terning5 = "<:terning5:431249716328792064>"
     terning6 = "<:terning6:431249726705369098>"
 
@@ -94,7 +96,7 @@ class Hacktoberfest(NamedTuple):
 
 
 class Roles(NamedTuple):
-    admin = int(environ.get('SEASONALBOT_ADMIN_ROLE_ID', 267628507062992896))
+    admin = int(environ.get("SEASONALBOT_ADMIN_ROLE_ID", 267628507062992896))
     announcements = 463658397560995840
     champion = 430492892331769857
     contributor = 295488872404484098
@@ -116,6 +118,58 @@ class Tokens(NamedTuple):
     youtube = environ.get("YOUTUBE_API_KEY")
 
 
+# Default role combinations
+MODERATION_ROLES = Roles.moderator, Roles.admin, Roles.owner
+STAFF_ROLES = Roles.helpers, Roles.moderator, Roles.admin, Roles.owner
+
+# Whitelisted channels
+WHITELISTED_CHANNELS = (
+    Channels.bot, Channels.seasonalbot_commands,
+    Channels.off_topic_0, Channels.off_topic_1, Channels.off_topic_2,
+    Channels.devtest,
+)
+
+# Bot replies
+NEGATIVE_REPLIES = [
+    "Noooooo!!",
+    "Nope.",
+    "I'm sorry Dave, I'm afraid I can't do that.",
+    "I don't think so.",
+    "Not gonna happen.",
+    "Out of the question.",
+    "Huh? No.",
+    "Nah.",
+    "Naw.",
+    "Not likely.",
+    "No way, José.",
+    "Not in a million years.",
+    "Fat chance.",
+    "Certainly not.",
+    "NEGATORY.",
+    "Nuh-uh.",
+    "Not in my house!",
+]
+
+POSITIVE_REPLIES = [
+    "Yep.",
+    "Absolutely!",
+    "Can do!",
+    "Affirmative!",
+    "Yeah okay.",
+    "Sure.",
+    "Sure thing!",
+    "You're the boss!",
+    "Okay.",
+    "No problem.",
+    "I got you.",
+    "Alright.",
+    "You got it!",
+    "ROGER THAT",
+    "Of course!",
+    "Aye aye, cap'n!",
+    "I'll allow it.",
+]
+
 ERROR_REPLIES = [
     "Please don't do that.",
     "You have to stop.",
@@ -128,6 +182,3 @@ ERROR_REPLIES = [
     "Noooooo!!",
     "I can't believe you've done this",
 ]
-
-
-bot = SeasonalBot(command_prefix=Client.prefix)

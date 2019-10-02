@@ -12,13 +12,12 @@ log = logging.getLogger(__name__)
 class SpookyGif(commands.Cog):
     """A cog to fetch a random spooky gif from the web!"""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.command(name="spookygif", aliases=("sgif", "scarygif"))
-    async def spookygif(self, ctx):
+    async def spookygif(self, ctx: commands.Context) -> None:
         """Fetches a random gif from the GIPHY API and responds with it."""
-
         async with ctx.typing():
             async with aiohttp.ClientSession() as session:
                 params = {'api_key': Tokens.giphy, 'tag': 'halloween', 'rating': 'g'}
@@ -34,8 +33,7 @@ class SpookyGif(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot):
+def setup(bot: commands.Bot) -> None:
     """Spooky GIF Cog load."""
-
     bot.add_cog(SpookyGif(bot))
     log.info("SpookyGif cog loaded")

@@ -25,30 +25,23 @@ class MonsterSurvey(Cog):
 
     def __init__(self, bot: Bot):
         """Initializes values for the bot to use within the voting commands."""
-
         self.bot = bot
         self.registry_location = os.path.join(os.getcwd(), 'bot', 'resources', 'halloween', 'monstersurvey.json')
         with open(self.registry_location, 'r') as jason:
             self.voter_registry = json.load(jason)
 
-    def json_write(self):
+    def json_write(self) -> None:
         """Write voting results to a local JSON file."""
-
         log.info("Saved Monster Survey Results")
         with open(self.registry_location, 'w') as jason:
             json.dump(self.voter_registry, jason, indent=2)
 
-    def cast_vote(self, id: int, monster: str):
+    def cast_vote(self, id: int, monster: str) -> None:
         """
         Cast a user's vote for the specified monster.
 
         If the user has already voted, their existing vote is removed.
-
-        :param id: The id of the person voting
-        :param monster: the string key of the json that represents a monster
-        :return: None
         """
-
         vr = self.voter_registry
         for m in vr.keys():
             if id not in vr[m]['votes'] and m == monster:
@@ -57,9 +50,8 @@ class MonsterSurvey(Cog):
                 if id in vr[m]['votes'] and m != monster:
                     vr[m]['votes'].remove(id)
 
-    def get_name_by_leaderboard_index(self, n):
+    def get_name_by_leaderboard_index(self, n: int) -> str:
         """Return the monster at the specified leaderboard index."""
-
         n = n - 1
         vr = self.voter_registry
         top = sorted(vr, key=lambda k: len(vr[k]['votes']), reverse=True)
@@ -68,11 +60,10 @@ class MonsterSurvey(Cog):
 
     @commands.group(
         name='monster',
-        aliases=('ms',)
+        aliases=('mon',)
     )
-    async def monster_group(self, ctx: Context):
+    async def monster_group(self, ctx: Context) -> None:
         """The base voting command. If nothing is called, then it will return an embed."""
-
         if ctx.invoked_subcommand is None:
             async with ctx.typing():
                 default_embed = Embed(
@@ -101,13 +92,12 @@ class MonsterSurvey(Cog):
     @monster_group.command(
         name='vote'
     )
-    async def monster_vote(self, ctx: Context, name=None):
+    async def monster_vote(self, ctx: Context, name: str = None) -> None:
         """
         Cast a vote for a particular monster.
 
         Displays a list of monsters that can be voted for if one is not specified.
         """
-
         if name is None:
             await ctx.invoke(self.monster_leaderboard)
             return
@@ -153,15 +143,8 @@ class MonsterSurvey(Cog):
     @monster_group.command(
         name='show'
     )
-    async def monster_show(self, ctx: Context, name=None):
-        """
-        Shows the named monster. If one is not named, it sends the default voting embed instead.
-
-        :param ctx:
-        :param name:
-        :return:
-        """
-
+    async def monster_show(self, ctx: Context, name: str = None) -> None:
+        """Shows the named monster. If one is not named, it sends the default voting embed instead."""
         if name is None:
             await ctx.invoke(self.monster_leaderboard)
             return
@@ -191,14 +174,8 @@ class MonsterSurvey(Cog):
         name='leaderboard',
         aliases=('lb',)
     )
-    async def monster_leaderboard(self, ctx: Context):
-        """
-        Shows the current standings.
-
-        :param ctx:
-        :return:
-        """
-
+    async def monster_leaderboard(self, ctx: Context) -> None:
+        """Shows the current standings."""
         async with ctx.typing():
             vr = self.voter_registry
             top = sorted(vr, key=lambda k: len(vr[k]['votes']), reverse=True)
@@ -223,8 +200,7 @@ class MonsterSurvey(Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot):
+def setup(bot: Bot) -> None:
     """Monster survey Cog load."""
-
     bot.add_cog(MonsterSurvey(bot))
     log.info("MonsterSurvey cog loaded")

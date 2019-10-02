@@ -11,27 +11,26 @@ from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
-with Path('bot', 'resources', 'halloween', 'spooky_rating.json').open() as file:
+with Path("bot/resources/halloween/spooky_rating.json").open() as file:
     SPOOKY_DATA = json.load(file)
     SPOOKY_DATA = sorted((int(key), value) for key, value in SPOOKY_DATA.items())
 
 
 class SpookyRating(commands.Cog):
-    """A cog for calculating one's spooky rating"""
+    """A cog for calculating one's spooky rating."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.local_random = random.Random()
 
     @commands.command()
     @commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
-    async def spookyrating(self, ctx, who: discord.Member = None):
+    async def spookyrating(self, ctx: commands.Context, who: discord.Member = None) -> None:
         """
         Calculates the spooky rating of someone.
 
         Any user will always yield the same result, no matter who calls the command
         """
-
         if who is None:
             who = ctx.author
 
@@ -62,7 +61,7 @@ class SpookyRating(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot):
-    """Cog load."""
+def setup(bot: commands.Bot) -> None:
+    """Spooky Rating Cog load."""
     bot.add_cog(SpookyRating(bot))
     log.info("SpookyRating cog loaded")
