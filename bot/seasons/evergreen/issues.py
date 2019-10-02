@@ -22,7 +22,7 @@ class Issues(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=("pr",))
-    async def issues(self, ctx, number: int, repository: str = "seasonalbot", user: str = "python-discord"):
+    async def issues(self, ctx, number: int, repository: str = "seasonalbot", user: str = "python-discord") -> None:
         """Command to get issues/pull request from GitHub"""
         url = f"https://api.github.com/repos/{user}/{repository}/issues/{str(number)}"
         mergeURL = f"https://api.github.com/repos/{user}/{repository}/pulls/{str(number)}/merge"
@@ -55,8 +55,7 @@ class Issues(commands.Cog):
         await ctx.send(embed=resp)
 
 
-def setup(bot):
+def setup(bot) -> None:
     """Cog Retrieves Issues From Github"""
-
     bot.add_cog(Issues(bot))
     log.info("Issues cog loaded")
