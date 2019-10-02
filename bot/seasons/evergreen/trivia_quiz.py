@@ -30,9 +30,10 @@ class TriviaQuiz(commands.Cog):
         self.questions = self.load_questions()
         self.game_status = {}
         self.game_owners = {}
-        self.question_limit = 3
+        self.question_limit = 4
+        self.player_dict = {}
         self.categories = {
-            "general": "Test your general knwoledge"
+            "general": "Test your general knowledge"
             # "retro": "Questions related to retro gaming."
         }
 
@@ -44,8 +45,8 @@ class TriviaQuiz(commands.Cog):
             questions = json.load(json_data)
             return questions
 
-    @commands.command(name="quiz")
-    async def quiz_game(self, ctx: commands.Context, option: str, category: str = "general") -> None:
+    @commands.command(name="quiz", aliases=["trivia", "tquiz"])
+    async def quiz_game(self, ctx: commands.Context, category: str = "general") -> None:
         """
         Start/Stop a quiz!
 
@@ -59,42 +60,36 @@ class TriviaQuiz(commands.Cog):
         (we wil be adding more later)
         """
         category = category.lower()
-        player_data = {}  # a dict to store players and their points.
+        # player_data = {}  # a dict to store players and their points.
 
         if ctx.channel.id not in self.game_status:
-            self.game_status[ctx.channel.id] = None
+            self.game_status[ctx.channel.id] = False
+            self.player_dict[ctx.channel.id] = {}
 
-        if option == "start":
-            if self.game_status[ctx.channel.id] is True:
-                await ctx.send("Game already running.")
-                return
-            else:
-                self.game_owners[ctx.channel.id] = ctx.author
-                self.game_status[ctx.channel.id] = True
-                start_embed = discord.Embed(colour=discord.Colour.red())
-                start_embed.title = "Quiz game Starting!!"
-                start_embed.description = "Each game consists of 5 questions.\n"
-                start_embed.description += "**Rules :**\nNo cheating and have fun!"
-                start_embed.set_footer(
-                    text="Points for that question reduces by 25 after 10s.Total time is 30s per question"
-                )
-                await ctx.send(embed=start_embed)  # send an embed with the rules
-                await asyncio.sleep(1)
+        if not self.game_status[ctx.channel.id]:
+            self.game_owners[ctx.channel.id] = ctx.author
+            self.game_status[ctx.channel.id] = True
+            start_embed = discord.Embed(colour=discord.Colour.red())
+            start_embed.title = "Quiz game Starting!!"
+            start_embed.description = "Each game consists of 5 questions.\n"
+            start_embed.description += "**Rules :**\nNo cheating and have fun!"
+            start_embed.set_footer(
+                text="Points for a question reduces by 25 after 10s or after a hint.Total time is 30s per question"
+            )
+            await ctx.send(embed=start_embed)  # send an embed with the rules
+            await asyncio.sleep(1)
 
-        elif option == "stop":
-            if self.game_status[ctx.channel.id] is False:
-                await ctx.send("No game running, nothing to stop here.")
-                return
+        else:
+            if (
+                    ctx.author == self.game_owners[ctx.channel.id]
+                    or Roles.moderator in [role.id for role in ctx.author.roles]
+            ):
+                await ctx.send("Quiz is no longer running.")
+                await self.declare_winner(ctx.channel, self.player_dict[ctx.channel.id])
+                self.game_status[ctx.channel.id] = False
+                del self.game_owners[ctx.channel.id]
             else:
-                if (
-                        ctx.author == self.game_owners[ctx.channel.id]
-                        or Roles.moderator in [role.id for role in ctx.author.roles]
-                ):
-                    await self.declare_winner(ctx.channel, player_data)
-                    self.game_status[ctx.channel.id] = False
-                    del self.game_owners[ctx.channel.id]
-                else:
-                    await ctx.send(f"{ctx.author.mention}, you are not authorised to stop this game :ghost: !")
+                await ctx.send(f"{ctx.author.mention}, you are not authorised to stop this game :ghost: !")
 
         if category not in self.categories:
             embed = self.category_embed
@@ -106,15 +101,14 @@ class TriviaQuiz(commands.Cog):
         done_question = []
         hint_no = 0
         answer = None
-        hints = None
-        while self.game_status[ctx.channel.id] is True:
+        while self.game_status[ctx.channel.id]:
             if len(done_question) > self.question_limit and hint_no == 0:
                 await ctx.send("The round ends here.")
-                await self.declare_winner(ctx.channel, player_data)
+                await self.declare_winner(ctx.channel, self.player_dict[ctx.channel.id])
                 break
             if unanswered > 3:
                 await ctx.send("Game stopped due to inactivity.")
-                await self.declare_winner(ctx.channel, player_data)
+                await self.declare_winner(ctx.channel, self.player_dict[ctx.channel.id])
                 break
             if hint_no == 0:
                 while True:
@@ -132,42 +126,43 @@ class TriviaQuiz(commands.Cog):
 
             def check(m: discord.Message) -> bool:
                 ratio = fuzz.ratio(answer.lower(), m.content.lower())
-                return ratio > 80 and m.channel == ctx.channel
+                return ratio > 85 and m.channel == ctx.channel
             try:
                 msg = await self.bot.wait_for('message', check=check, timeout=10)
-            except Exception as e:
+            except asyncio.TimeoutError:
                 if self.game_status[ctx.channel.id] is False:
                     break
-                if isinstance(e, asyncio.TimeoutError):
-                    if hint_no < 2:
-                        hint_no += 1
-                        if "hints" in question_dict:
-                            hints = question_dict["hints"]
-                            await ctx.send(f"**Hint #{hint_no+1}\n**{hints[hint_no]}")
-                        else:
-                            await ctx.send(f"Cmon guys, {30-hint_no*10}s left!")
-
+                if hint_no < 2:
+                    hint_no += 1
+                    if "hints" in question_dict:
+                        hints = question_dict["hints"]
+                        await ctx.send(f"**Hint #{hint_no+1}\n**{hints[hint_no]}")
                     else:
-                        response = random.choice(WRONG_ANS_RESPONSE)
-                        expression = random.choice(ANNOYED_EXPRESSIONS)
-                        await ctx.send(f"{response} {expression}")
-                        await self.send_answer(ctx.channel, question_dict)
-                        await asyncio.sleep(1)
-                        hint_no = 0
-                        unanswered += 1
-                        await self.send_score(ctx.channel, player_data)
+                        await ctx.send(f"Cmon guys, {30-hint_no*10}s left!")
+
+                else:
+                    response = random.choice(WRONG_ANS_RESPONSE)
+                    expression = random.choice(ANNOYED_EXPRESSIONS)
+                    await ctx.send(f"{response} {expression}")
+                    await self.send_answer(ctx.channel, question_dict)
+                    await asyncio.sleep(1)
+                    hint_no = 0
+                    unanswered += 1
+                    await self.send_score(ctx.channel, self.player_dict[ctx.channel.id])
+                    await asyncio.sleep(2)
 
             else:
                 points = 100 - 25*hint_no
-                if msg.author in player_data:
-                    player_data[msg.author] += points
+                if msg.author in self.player_dict[ctx.channel.id]:
+                    self.player_dict[ctx.channel.id][msg.author] += points
                 else:
-                    player_data[msg.author] = points
+                    self.player_dict[ctx.channel.id][msg.author] = points
                 hint_no = 0
                 unanswered = 0
                 await ctx.send(f"{msg.author.mention} got the correct answer :tada: {points} points for ya.")
                 await self.send_answer(ctx.channel, question_dict)
-                await self.send_score(ctx.channel, player_data)
+                await self.send_score(ctx.channel, self.player_dict[ctx.channel.id])
+                await asyncio.sleep(2)
 
     @staticmethod
     async def send_score(channel: discord.TextChannel, player_data: dict) -> None:
@@ -181,13 +176,14 @@ class TriviaQuiz(commands.Cog):
 
     @staticmethod
     async def declare_winner(channel: discord.TextChannel, player_data: dict) -> None:
-        """A function declare the winner of the quiz."""
+        """Announce the winner of the quiz in the game channel."""
         if player_data:
             highest_points = max(list(player_data.values()))
             no_of_winners = list(player_data.values()).count(highest_points)
 
             # Check if more than 1 player has highest points.
             if no_of_winners > 1:
+                word = "You guys"
                 winners = []
                 points_copy = list(player_data.values()).copy()
                 for _ in range(no_of_winners):
@@ -199,17 +195,18 @@ class TriviaQuiz(commands.Cog):
                     winners_mention += f"{winner.mention} "
 
             else:
+                word = "You"
                 author_index = list(player_data.values()).index(highest_points)
                 winner = list(player_data.keys())[author_index]
                 winners_mention = winner.mention
             await channel.send(
                 f"Congratz {winners_mention} :tada: "
-                f"You have won this quiz game with a grand total of {highest_points} points!!"
+                f"{word} have won this quiz game with a grand total of {highest_points} points!!"
             )
 
     @property
     def category_embed(self) -> discord.Embed:
-        """A function which returns an embed showing all avilable categories."""
+        """Build an embed showing all available trivia categories."""
         embed = discord.Embed(colour=discord.Colour.blue())
         embed.title = "The available question categories are:"
         embed.description = ""
@@ -220,19 +217,19 @@ class TriviaQuiz(commands.Cog):
 
     @staticmethod
     async def send_answer(channel: discord.TextChannel, question_dict: dict) -> None:
-        """A function that sends the answer."""
+        """Send the correct the answer of a question to the game channel."""
         answer = question_dict["answer"]
         info = question_dict["info"]
         embed = discord.Embed(color=discord.Colour.red())
         embed.title = f"The correct answer is **{answer}**\n"
         embed.description = ""
         if info != "":
-            embed.description += f"**Information**\n{info}\n"
-        embed.description += "Lets move to the next question."
+            embed.description += f"**Information**\n{info}\n\n"
+        embed.description += "Lets move to the next question.\nRemaining questions: "
         await channel.send(embed=embed)
 
 
 def setup(bot: commands.Bot) -> None:
     """Loading the cog."""
     bot.add_cog(TriviaQuiz(bot))
-    logger.debug("TriviaQuiz cog loaded!")
+    logger.debug("TriviaQuiz cog loaded")
