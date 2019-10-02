@@ -1,15 +1,16 @@
 import datetime
 import logging
+import random
 from typing import Dict, List
 
 import aiohttp
+import discord
 from discord.ext import commands
 
 log = logging.getLogger(__name__)
 
-URL = "https://api.github.com/search/issues"
+URL = "https://api.github.com/search/issues?q=label:hacktoberfest+language:python+state:open&per_page=100"
 HEADERS = {"Accept": "application / vnd.github.v3 + json"}
-SEARCH = "label:hacktoberfest+language:python+state:open"
 
 
 class HacktoberIssues(commands.Cog):
@@ -24,8 +25,10 @@ class HacktoberIssues(commands.Cog):
     async def hacktoberissues(self, ctx: commands.Context) -> None:
         """Get a random python hacktober issue from Github."""
         with ctx.typing():
-            data = await self.get_issues(ctx)
-            print("need to use data somehow to commit...", data)
+            issues = await self.get_issues(ctx)
+            issue = random.choice(issues)
+            embed = self.format_embed(issue)
+            await ctx.send(embed=embed)
 
     async def get_issues(self, ctx: commands.Context) -> List[Dict]:
         """Get a list of the python issues with the label 'hacktoberfest' from the Github api."""
@@ -34,17 +37,31 @@ class HacktoberIssues(commands.Cog):
 
         async with aiohttp.ClientSession() as session:
             # text = TEXT # + "+label:hacktober"
-            params = {
-                "q": SEARCH
-            }
-            async with session.get(URL, headers=HEADERS, params=params) as response:
+
+            async with session.get(URL, headers=HEADERS) as response:
                 if response.status != 200:
                     await ctx.send(f"ERROR: expected 200 status (got {response.status}) from the GitHub api.")
                     await ctx.send(await response.text())
-                data = (await response.json())["items"]
-                self.cache = data
+                data = await response.json()
+                issues = data["items"]
+                self.cache = issues
                 self.cache_timer = ctx.message.created_at
-                return data
+                return issues
+
+    @staticmethod
+    def format_embed(issue: Dict) -> discord.Embed:
+        """Format the issue data into a embed."""
+        title = issue["title"]
+        issue_url = issue["url"].replace("api.", "").replace("/repos/", "/")
+        body = issue["body"]
+        labels = [label["name"] for label in issue["labels"]]
+
+        embed = discord.Embed(title=title)
+        embed.description = body
+        embed.add_field(name="labels", value="\n".join(labels))
+        embed.url = issue_url
+
+        return embed
 
 
 def setup(bot: commands.Bot) -> None:
