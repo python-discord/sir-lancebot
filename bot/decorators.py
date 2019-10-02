@@ -95,6 +95,11 @@ def in_channel_check(*channels: int, bypass_roles: typing.Container[int] = None)
                         f"and the command was used in an overridden whitelisted channel."
                     )
                     return True
+
+                log.debug(
+                    f"{ctx.author} tried to call the '{ctx.command.name}' command. "
+                    f"The overridden in_channel check failed."
+                )
                 channels_str = ', '.join(f"<#{c_id}>" for c_id in override)
                 raise InChannelCheckFailure(
                     f"Sorry, but you may only use this command within {channels_str}."
