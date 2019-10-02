@@ -67,7 +67,8 @@ def in_channel_check(*channels: int, bypass_roles: typing.Container[int] = None)
     """
     Checks that the message is in a whitelisted channel or optionally has a bypass role.
 
-    If `in_channel_override` is present, check if it contains channels and use them in place of global whitelist
+    If `in_channel_override` is present, check if it contains channels
+    and use them in place of the global whitelist.
     """
     def predicate(ctx: Context) -> bool:
         if not ctx.guild:
