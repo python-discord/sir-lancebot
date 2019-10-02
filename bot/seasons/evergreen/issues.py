@@ -16,7 +16,7 @@ class Issues(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=("issues",))
-    @override_in_channel
+    @override_in_channel()
     async def issue(
         self, ctx: commands.Context, number: int, repository: str = "seasonalbot", user: str = "python-discord"
     ) -> None:
