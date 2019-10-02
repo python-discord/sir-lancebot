@@ -60,7 +60,6 @@ class TriviaQuiz(commands.Cog):
         (we wil be adding more later)
         """
         category = category.lower()
-        # player_data = {}  # a dict to store players and their points.
 
         if ctx.channel.id not in self.game_status:
             self.game_status[ctx.channel.id] = False
