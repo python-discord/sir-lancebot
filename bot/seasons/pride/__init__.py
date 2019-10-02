@@ -27,7 +27,7 @@ class Pride(SeasonBase):
 
     # Duration of season
     start_date = "01/06"
-    end_date = "30/06"
+    end_date = "01/07"
 
     # Season logo
     colour = Colours.soft_red

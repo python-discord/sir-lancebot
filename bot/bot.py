@@ -4,7 +4,7 @@ from traceback import format_exc
 from typing import List
 
 from aiohttp import AsyncResolver, ClientSession, TCPConnector
-from discord import Embed
+from discord import DiscordException, Embed
 from discord.ext import commands
 
 from bot.constants import Channels, Client
@@ -23,7 +23,7 @@ class SeasonalBot(commands.Bot):
             connector=TCPConnector(resolver=AsyncResolver(), family=socket.AF_INET)
         )
 
-    def load_extensions(self, exts: List[str]):
+    def load_extensions(self, exts: List[str]) -> None:
         """Unload all current extensions, then load the given extensions."""
         # Unload all cogs
         extensions = list(self.extensions.keys())
@@ -40,7 +40,7 @@ class SeasonalBot(commands.Bot):
             except Exception as e:
                 log.error(f'Failed to load extension {cog}: {repr(e)} {format_exc()}')
 
-    async def send_log(self, title: str, details: str = None, *, icon: str = None):
+    async def send_log(self, title: str, details: str = None, *, icon: str = None) -> None:
         """Send an embed message to the devlog channel."""
         devlog = self.get_channel(Channels.devlog)
 
@@ -56,7 +56,7 @@ class SeasonalBot(commands.Bot):
 
         await devlog.send(embed=embed)
 
-    async def on_command_error(self, context, exception):
+    async def on_command_error(self, context: commands.Context, exception: DiscordException) -> None:
         """Check command errors for UserInputError and reset the cooldown if thrown."""
         if isinstance(exception, commands.UserInputError):
             context.command.reset_cooldown(context)
