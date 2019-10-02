@@ -23,12 +23,12 @@ with Path("bot/resources/valentines/love_matches.json").open() as file:
 class LoveCalculator(Cog):
     """A cog for calculating the love between two people."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.command(aliases=('love_calculator', 'love_calc'))
     @commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
-    async def love(self, ctx, who: Union[Member, str], whom: Union[Member, str] = None):
+    async def love(self, ctx: commands.Context, who: Union[Member, str], whom: Union[Member, str] = None) -> None:
         """
         Tells you how much the two love each other.
 
@@ -53,7 +53,7 @@ class LoveCalculator(Cog):
             staff = ctx.guild.get_role(Roles.helpers).members
             whom = random.choice(staff)
 
-        def normalize(arg):
+        def normalize(arg: Union[Member, str]) -> str:
             if isinstance(arg, Member):
                 # If we are given a member, return name#discrim without any extra changes
                 arg = str(arg)
@@ -98,7 +98,7 @@ class LoveCalculator(Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot):
+def setup(bot: commands.Bot) -> None:
     """Love calculator Cog load."""
     bot.add_cog(LoveCalculator(bot))
     log.info("LoveCalculator cog loaded")

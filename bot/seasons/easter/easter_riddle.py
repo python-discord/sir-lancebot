@@ -20,14 +20,14 @@ TIMELIMIT = 10
 class EasterRiddle(commands.Cog):
     """This cog contains the command for the Easter quiz!"""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.winners = []
         self.correct = ""
         self.current_channel = None
 
     @commands.command(aliases=["riddlemethis", "riddleme"])
-    async def riddle(self, ctx):
+    async def riddle(self, ctx: commands.Context) -> None:
         """
         Gives a random riddle, then provides 2 hints at certain intervals before revealing the answer.
 
@@ -83,8 +83,8 @@ class EasterRiddle(commands.Cog):
         self.current_channel = None
 
     @commands.Cog.listener()
-    async def on_message(self, message):
-        """If a non-bot user enters a correct answer, their username gets added to self.winners"""
+    async def on_message(self, message: discord.Messaged) -> None:
+        """If a non-bot user enters a correct answer, their username gets added to self.winners."""
         if self.current_channel != message.channel:
             return
 
@@ -95,7 +95,7 @@ class EasterRiddle(commands.Cog):
             self.winners.append(message.author.mention)
 
 
-def setup(bot):
+def setup(bot: commands.Bot) -> None:
     """Easter Riddle Cog load."""
     bot.add_cog(EasterRiddle(bot))
     log.info("Easter Riddle bot loaded")

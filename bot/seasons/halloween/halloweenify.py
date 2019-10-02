@@ -13,12 +13,12 @@ log = logging.getLogger(__name__)
 class Halloweenify(commands.Cog):
     """A cog to change a invokers nickname to a spooky one!"""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.cooldown(1, 300, BucketType.user)
     @commands.command()
-    async def halloweenify(self, ctx):
+    async def halloweenify(self, ctx: commands.Context) -> None:
         """Change your nickname into a much spookier one!"""
         async with ctx.typing():
             with open(Path("bot/resources/halloween/halloweenify.json"), "r") as f:
@@ -46,7 +46,7 @@ class Halloweenify(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot):
+def setup(bot: commands.Bot) -> None:
     """Halloweenify Cog load."""
     bot.add_cog(Halloweenify(bot))
     log.info("Halloweenify cog loaded")

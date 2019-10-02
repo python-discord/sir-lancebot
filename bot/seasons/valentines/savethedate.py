@@ -19,11 +19,11 @@ with open(Path("bot/resources/valentines/date_ideas.json"), "r", encoding="utf8"
 class SaveTheDate(commands.Cog):
     """A cog that gives random suggestion for a Valentine's date."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.command()
-    async def savethedate(self, ctx):
+    async def savethedate(self, ctx: commands.Context) -> None:
         """Gives you ideas for what to do on a date with your valentine."""
         random_date = random.choice(VALENTINES_DATES['ideas'])
         emoji_1 = random.choice(HEART_EMOJIS)
@@ -36,7 +36,7 @@ class SaveTheDate(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot):
+def setup(bot: commands.Bot) -> None:
     """Save the date Cog Load."""
     bot.add_cog(SaveTheDate(bot))
     log.info("SaveTheDate cog loaded")

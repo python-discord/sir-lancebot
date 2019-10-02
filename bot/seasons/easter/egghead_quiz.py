@@ -3,6 +3,7 @@ import logging
 import random
 from json import load
 from pathlib import Path
+from typing import Union
 
 import discord
 from discord.ext import commands
@@ -30,14 +31,14 @@ TIMELIMIT = 30
 class EggheadQuiz(commands.Cog):
     """This cog contains the command for the Easter quiz!"""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.quiz_messages = {}
 
     @commands.command(aliases=["eggheadquiz", "easterquiz"])
-    async def eggquiz(self, ctx):
+    async def eggquiz(self, ctx: commands.Context) -> None:
         """
-        Gives a random quiz question, waits 30 seconds and then outputs the answer
+        Gives a random quiz question, waits 30 seconds and then outputs the answer.
 
         Also informs of the percentages and votes of each option
         """
@@ -95,14 +96,14 @@ class EggheadQuiz(commands.Cog):
         await ctx.send(content, embed=a_embed)
 
     @staticmethod
-    async def already_reacted(message, user):
-        """Returns whether a given user has reacted more than once to a given message"""
+    async def already_reacted(message: discord.Message, user: Union[discord.Member, discord.User]) -> bool:
+        """Returns whether a given user has reacted more than once to a given message."""
         users = [u.id for reaction in [await r.users().flatten() for r in message.reactions] for u in reaction]
         return users.count(user.id) > 1  # Old reaction plus new reaction
 
     @commands.Cog.listener()
-    async def on_reaction_add(self, reaction, user):
-        """Listener to listen specifically for reactions of quiz messages"""
+    async def on_reaction_add(self, reaction: discord.Reaction, user: Union[discord.Member, discord.User]) -> None:
+        """Listener to listen specifically for reactions of quiz messages."""
         if user.bot:
             return
         if reaction.message.id not in self.quiz_messages:
@@ -113,7 +114,7 @@ class EggheadQuiz(commands.Cog):
             return await reaction.message.remove_reaction(reaction, user)
 
 
-def setup(bot):
+def setup(bot: commands.Bot) -> None:
     """Egghead Quiz Cog load."""
     bot.add_cog(EggheadQuiz(bot))
     log.info("EggheadQuiz bot loaded")
