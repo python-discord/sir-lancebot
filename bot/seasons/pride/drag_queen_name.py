@@ -8,7 +8,7 @@ log = logging.getLogger(__name__)
 
 
 class DragNames(commands.Cog):
-    """Gives a random drag queen name"""
+    """Gives a random drag queen name!"""
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
