@@ -45,7 +45,7 @@ class TriviaQuiz(commands.Cog):
             questions = json.load(json_data)
             return questions
 
-    @commands.command(name="quiz", aliases=["trivia", "tquiz"])
+    @commands.command(name="quiz", aliases=["trivia"])
     async def quiz_game(self, ctx: commands.Context, category: str = "general") -> None:
         """
         Start/Stop a quiz!
@@ -73,7 +73,7 @@ class TriviaQuiz(commands.Cog):
             start_embed.description = "Each game consists of 5 questions.\n"
             start_embed.description += "**Rules :**\nNo cheating and have fun!"
             start_embed.set_footer(
-                text="Points for a question reduces by 25 after 10s or after a hint.Total time is 30s per question"
+                text="Points for a question reduces by 25 after 10s or after a hint. Total time is 30s per question"
             )
             await ctx.send(embed=start_embed)  # send an embed with the rules
             await asyncio.sleep(1)
@@ -216,7 +216,7 @@ class TriviaQuiz(commands.Cog):
 
     @staticmethod
     async def send_answer(channel: discord.TextChannel, question_dict: dict) -> None:
-        """Send the correct the answer of a question to the game channel."""
+        """Send the correct answer of a question to the game channel."""
         answer = question_dict["answer"]
         info = question_dict["info"]
         embed = discord.Embed(color=discord.Colour.red())

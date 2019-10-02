@@ -71,17 +71,17 @@
     {
       "id": 106,
       "question": "Which country is known as the \"Land of Thunderbolt\"?",
-      "info": "\"Bhutan is known as the \\\"Land of Thunder Dragon\\\" or \\\"Land of Thunderbolt\\\" due to the violent and large thunderstorms that whip down through the valleys from the Himalayas. The dragon reference was due to people thinking the sparkling light of thunderbolts was the red fire of a dragon.\""
+      "info": "Bhutan is known as the \"Land of Thunder Dragon\" or \"Land of Thunderbolt\" due to the violent and large thunderstorms that whip down through the valleys from the Himalayas. The dragon reference was due to people thinking the sparkling light of thunderbolts was the red fire of a dragon."
     },
     {
       "id": 107,
-      "question": "Which country is the largest producer of coffee?",
+      "question": "Which country is the largest producer of tea in the world?",
       "answer": "China",
       "info": "Tea is mainly grown in Asia, Africa, South America, and around the Black and Caspian Seas. The four biggest tea-producing countries today are China, India, Sri Lanka and Kenya. Together they represent 75% of world production."
     },
     {
       "id": 108,
-      "question": "Which country is the largest producer of tea in the world?",
+      "question": "Which country is the largest producer of coffee?",
       "answer": "Brazil",
       "info": "Brazil is the world's largest coffee producer. In 2016, Brazil produced a staggering 2,595,000 metric tons of coffee beans. It is not a new development, as Brazil has been the highest global producer of coffee beans for over 150 years."
     },
@@ -165,7 +165,7 @@
     },
     {
       "id": 122,
-      "question": "Which is the largest desert in the world (exclude cold deserts.) ?",
+      "question": "Which is the largest hot desert in the world?",
       "answer": "Sahara",
       "info": "The Sahara Desert covers 3.6 million square miles. It is almost the same size as the United States or China. There are sand dunes in the Sahara as tall as 590 feet."
     },
@@ -183,7 +183,7 @@
     },
     {
       "id": 125,
-      "question": "What is the name of the largest Dam in the world?",
+      "question": "What is the name of the largest dam in the world?",
       "answer": "Three Gorges Dam",
       "info": "At 1.4 miles wide (2.3 kilometers) and 630 feet (192 meters) high, Three Gorges Dam is the largest hydroelectric dam in the world, according to International Water Power & Dam Construction magazine. Three Gorges impounds the Yangtze River about 1,000 miles (1,610 km) west of Shanghai."
     },
@@ -213,7 +213,7 @@
     },
     {
       "id": 130,
-      "question": "Expand GPRS",
+      "question": "What does the acronym GPRS stand for?",
       "answer": "General Packet Radio Service",
       "info": "General Packet Radio Service (GPRS) is a packet-based mobile data service on the global system for mobile communications (GSM) of 3G and 2G cellular communication systems. It is a non-voice, high-speed and useful packet-switching technology intended for GSM networks."
     }
