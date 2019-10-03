@@ -3,6 +3,8 @@ import logging
 import discord
 from discord.ext import commands
 
+from bot.decorators import override_in_channel
+
 log = logging.getLogger(__name__)
 
 icons = {"issue": "https://i.imgur.com/HFV0nv9.png",
@@ -12,7 +14,7 @@ icons = {"issue": "https://i.imgur.com/HFV0nv9.png",
          "merge": "https://i.imgur.com/xzQZxXe.png"}
 
 RESP_VALUE = {404: "Issue/pull request not located! Please enter a valid number!",
-             403: "rate limit has been hit! Please try again later!"}
+              403: "rate limit has been hit! Please try again later!"}
 
 
 class Issues(commands.Cog):
@@ -24,7 +26,7 @@ class Issues(commands.Cog):
     @commands.command(aliases=("pr",))
     @override_in_channel()
     async def issue(self, ctx: commands.Context, number: int, repository: str = "seasonalbot",
-                     user: str = "python-discord") -> None:
+                    user: str = "python-discord") -> None:
         """Command to get issues/pull request from GitHub."""
         url = f"https://api.github.com/repos/{user}/{repository}/issues/{str(number)}"
         mergeURL = f"https://api.github.com/repos/{user}/{repository}/pulls/{str(number)}/merge"
