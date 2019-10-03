@@ -90,7 +90,7 @@ class PrideFacts(commands.Cog):
         else:
             await self.send_select_fact(ctx, message_body)
 
-    def make_embed(self, fact) -> discord.Embed:
+    def make_embed(self, fact: str) -> discord.Embed:
         """Makes a nice embed for the fact to be sent."""
         return discord.Embed(
             colour=Colours.pink,
