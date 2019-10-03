@@ -1,8 +1,8 @@
-from datetime import datetime
 import json
+from datetime import datetime
 import logging
-from typing import Union
 import random
+from typing import Union
 from pathlib import Path
 
 import dateutil.parser
@@ -24,7 +24,7 @@ class PrideFacts(commands.Cog):
         with open(Path("bot/resources/pride/facts.json"), "r", encoding="utf-8") as f:
             return json.load(f)
 
-    async def random_fact(self, ctx: commands.Context):
+    async def random_fact(self, ctx: commands.Context) -> None:
         """Provides a fact from any valid day."""
         now = datetime.utcnow()
         previous_years_facts = (self.facts[x] for x in self.facts.keys() if int(x) < now.year)
@@ -35,7 +35,7 @@ class PrideFacts(commands.Cog):
         except IndexError:
             await ctx.send("No facts available")
 
-    async def select_fact(self, ctx: commands.Context, _date: Union[str, datetime]):
+    async def select_fact(self, ctx: commands.Context, _date: Union[str, datetime]) -> None:
         """Provides the fact for the specified day, if valid."""
         now = datetime.utcnow()
         if isinstance(_date, str):
