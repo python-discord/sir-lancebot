@@ -13,7 +13,7 @@ from bs4 import BeautifulSoup
 from discord.ext import commands
 from pytz import timezone
 
-from bot.constants import AdventOfCode as AocConfig, Channels, Colours, Emojis, Tokens
+from bot.constants import AdventOfCode as AocConfig, Channels, Colours, Emojis, Tokens, WHITELISTED_CHANNELS
 from bot.decorators import override_in_channel
 
 log = logging.getLogger(__name__)
@@ -23,6 +23,8 @@ AOC_SESSION_COOKIE = {"session": Tokens.aoc_session_cookie}
 
 EST = timezone("EST")
 COUNTDOWN_STEP = 60 * 5
+
+AOC_WHITELIST = WHITELISTED_CHANNELS + (Channels.advent_of_code,)
 
 
 def is_in_advent() -> bool:
@@ -126,7 +128,7 @@ class AdventOfCode(commands.Cog):
         self.status_task = asyncio.ensure_future(self.bot.loop.create_task(status_coro))
 
     @commands.group(name="adventofcode", aliases=("aoc",), invoke_without_command=True)
-    @override_in_channel()
+    @override_in_channel(AOC_WHITELIST)
     async def adventofcode_group(self, ctx: commands.Context) -> None:
         """All of the Advent of Code commands."""
         await ctx.send_help(ctx.command)
