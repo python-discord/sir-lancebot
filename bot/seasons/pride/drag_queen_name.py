@@ -1,3 +1,4 @@
+import json
 import logging
 import random
 from pathlib import Path
@@ -17,8 +18,8 @@ class DragNames(commands.Cog):
     @staticmethod
     def load_names() -> list:
         """Loads a list of drag queen names."""
-        with open(Path("bot/resources/pride/drag_queen_names.txt"), "r", encoding="utf-8") as f:
-            return f.readlines()
+        with open(Path("bot/resources/pride/drag_queen_names.json"), "r", encoding="utf-8") as f:
+            return json.load(f)
 
     @commands.command(name="dragname", aliases=["dragqueenname", "queenme"])
     async def dragname(self, ctx: commands.Context) -> None:
