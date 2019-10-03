@@ -40,7 +40,7 @@ class PrideFacts(commands.Cog):
         now = datetime.utcnow()
         if isinstance(_date, str):
             try:
-                date = dateutil.parser.parse(_date, dayfirst=True, fuzzy=True)
+                date = dateutil.parser.parse(_date, dayfirst=False, yearfirst=False, fuzzy=True)
             except (ValueError, OverflowError) as err:
                 await ctx.send(f"Error parsing date: {err}")
                 return
