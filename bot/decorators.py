@@ -81,6 +81,13 @@ def in_channel_check(*channels: int, bypass_roles: typing.Container[int] = None)
             )
             return True
 
+        if bypass_roles and any(r.id in bypass_roles for r in ctx.author.roles):
+            log.debug(
+                f"{ctx.author} called the '{ctx.command.name}' command and "
+                f"had a role to bypass the in_channel check."
+            )
+            return True
+
         if hasattr(ctx.command.callback, "in_channel_override"):
             override = ctx.command.callback.in_channel_override
             if override is None:
@@ -105,13 +112,6 @@ def in_channel_check(*channels: int, bypass_roles: typing.Container[int] = None)
                 raise InChannelCheckFailure(
                     f"Sorry, but you may only use this command within {channels_str}."
                 )
-
-        if bypass_roles and any(r.id in bypass_roles for r in ctx.author.roles):
-            log.debug(
-                f"{ctx.author} called the '{ctx.command.name}' command and "
-                f"had a role to bypass the in_channel check."
-            )
-            return True
 
         log.debug(
             f"{ctx.author} tried to call the '{ctx.command.name}' command. "

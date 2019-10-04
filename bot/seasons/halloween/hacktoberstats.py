@@ -225,7 +225,7 @@ class HacktoberStats(commands.Cog):
         not_label = "invalid"
         action_type = "pr"
         is_query = f"public+author:{github_username}"
-        date_range = f"{CURRENT_YEAR}-10-01T00:00:00%2B14:00..{CURRENT_YEAR}-10-31T00:00:00-11:00"
+        date_range = f"{CURRENT_YEAR}-10-01T00:00:00%2B14:00..{CURRENT_YEAR}-10-31T23:59:59-11:00"
         per_page = "300"
         query_url = (
             f"{base_url}"
