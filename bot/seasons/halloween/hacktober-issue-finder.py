@@ -1,7 +1,7 @@
 import datetime
 import logging
 import random
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
 import aiohttp
 import discord
@@ -27,14 +27,14 @@ class HacktoberIssues(commands.Cog):
     async def hacktoberissues(self, ctx: commands.Context, option: str = "") -> None:
         """Get a random python hacktober issue from Github."""
         with ctx.typing():
-            issues = await self.get_issues(ctx, option)
+            issues = (await self.get_issues(ctx, option))["items"]
             if issues is None:
                 return
             issue = random.choice(issues)
             embed = self.format_embed(issue)
         await ctx.send(embed=embed)
 
-    async def get_issues(self, ctx: commands.Context, option: str) -> Optional[List[Dict]]:
+    async def get_issues(self, ctx: commands.Context, option: str) -> Optional[Dict]:
         """Get a list of the python issues with the label 'hacktoberfest' from the Github api."""
         if option == "beginner":
             if (ctx.message.created_at - self.cache_timer_beginner).seconds <= 60:
@@ -45,8 +45,14 @@ class HacktoberIssues(commands.Cog):
         async with aiohttp.ClientSession() as session:
             if option == "beginner":
                 url = URL + '+label:"good first issue"'
+                if self.cache_beginner is not None:
+                    page = random.randint(1, min(1000, self.cache_beginner["total_count"]) // 100)
+                    url += f"&page={page}"
             else:
                 url = URL
+                if self.cache_normal is not None:
+                    page = random.randint(1, min(1000, self.cache_normal["total_count"]))
+                    url += f"&page={page}"
 
             async with session.get(url, headers=HEADERS) as response:
                 if response.status != 200:
@@ -54,20 +60,19 @@ class HacktoberIssues(commands.Cog):
                     await ctx.send(await response.text())
                     return None
                 data = await response.json()
-                issues = data["items"]
 
-                if len(issues) == 0:
+                if len(data["items"]) == 0:
                     await ctx.send(f"ERROR: no issues returned from GitHub api. with url: {response.url}")
                     return None
 
                 if option == "beginner":
-                    self.cache_beginner = issues
+                    self.cache_beginner = data
                     self.cache_timer_beginner = ctx.message.created_at
                 else:
-                    self.cache_normal = issues
+                    self.cache_normal = data
                     self.cache_timer_normal = ctx.message.created_at
 
-                return issues
+                return data
 
     @staticmethod
     def format_embed(issue: Dict) -> discord.Embed:
