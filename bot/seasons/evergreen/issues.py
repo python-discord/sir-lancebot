@@ -7,11 +7,11 @@ from bot.decorators import override_in_channel
 
 log = logging.getLogger(__name__)
 
-icons = {"issue": "https://i.imgur.com/HFV0nv9.png",
-         "issue-closed": "https://i.imgur.com/uZSX7as.png",
-         "pull-request": "https://i.imgur.com/zHhnALX.png",
-         "pull-request-closed": "https://i.imgur.com/JYmTn5P.png",
-         "merge": "https://i.imgur.com/xzQZxXe.png"}
+icons = {"issue": "<:IssueOpen:629695470327037963>",
+         "issue-closed": "<:IssueClosed:629695470570307614>",
+         "pull-request": "<:PROpen:629695470175780875>",
+         "pull-request-closed": "<:PRClosed:629695470519713818>",
+         "merge": "<:PRMerged:629695470570176522>"}
 
 RESP_VALUE = {404: "Issue/pull request not located! Please enter a valid number!",
               403: "rate limit has been hit! Please try again later!"}
@@ -61,9 +61,8 @@ class Issues(commands.Cog):
 
         resp = discord.Embed(colour=0x6CC644)
         resp.set_author(
-            name=f"[{repository}] #{number} {json_data.get('title')}",
-            url=json_data.get("html_url"),
-            icon_url=iconURL)
+            name=f"{iconURL} | [{repository}] #{number} {json_data.get('title')}",
+            url=json_data.get("html_url"))
         await ctx.send(embed=resp)
 
 
