@@ -9,11 +9,11 @@ from bot.decorators import override_in_channel
 
 log = logging.getLogger(__name__)
 
-icons = {"issue": Emojis.issue,
-         "issue-closed": Emojis.issue_closed,
-         "pull-request": Emojis.pull_request,
-         "pull-request-closed": Emojis.pull_request_closed,
-         "merge": Emojis.merge}
+icons = {"ISSUE": Emojis.issue,
+         "ISSUE_CLOSED": Emojis.issue_closed,
+         "PULL_REQUEST": Emojis.pull_request,
+         "PULL_REQUEST_CLOSED": Emojis.pull_request_closed,
+         "MERGE": Emojis.merge}
 
 RESP_VALUE = {404: "Issue/pull request not located! Please enter a valid number!",
               403: "rate limit has been hit! Please try again later!"}
@@ -44,22 +44,22 @@ class Issues(commands.Cog):
         # return data received from the API
         if "issues" in json_data.get("html_url"):
             if json_data.get("state") == "open":
-                iconURL = icons.get("issue")
+                iconURL = icons.get("ISSUE")
             else:
-                iconURL = icons.get("issue_closed")
+                iconURL = icons.get("ISSUE_CLOSED")
         # if the word 'issues' is not contained within the returned data and there is no error code then we know that
         # the requested data is a pr, hence to get the specifics on it we have to call the PR API endpoint allowing us
         # to get the specific information in relation to the PR that is not provided via the issues endpoint
         else:
             async with self.bot.http_session.get(mergeURL) as m:
                 if json_data.get("state") == "open":
-                    iconURL = icons.get("pull-request")
+                    iconURL = icons.get("PULL_REQUEST")
                 # when the status is 204 this means that the state of the PR is merged
                 elif m.status == 204:
-                    iconURL = icons.get("merge")
+                    iconURL = icons.get("MERGE")
                 # else by the process of elimination, the pull request has been closed
                 else:
-                    iconURL = icons.get("pull-request-closed")
+                    iconURL = icons.get("PULL_REQUEST_CLOSED")
 
         resp = discord.Embed(colour=Colours.bright_green)
         resp.set_author(
