@@ -3,6 +3,7 @@ import logging
 import discord
 from discord.ext import commands
 
+from bot.constants import Colours
 from bot.constants import Emojis
 from bot.decorators import override_in_channel
 
@@ -60,7 +61,7 @@ class Issues(commands.Cog):
                 else:
                     iconURL = icons.get("pull-request-closed")
 
-        resp = discord.Embed(colour=0x6CC644)
+        resp = discord.Embed(colour=Colours.bright_green)
         resp.set_author(
             name=f"{iconURL} | [{repository}] #{number} {json_data.get('title')}",
             url=json_data.get("html_url"))
