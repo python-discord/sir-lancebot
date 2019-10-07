@@ -186,7 +186,7 @@ class TriviaQuiz(commands.Cog):
                 await asyncio.sleep(2)
 
     @commands.command(name="scoreboard")
-    async def overall_scoreboard(self, ctx):
+    async def overall_scoreboard(self, ctx: commands.Context)-> None:
         """View everyone's score for this bot session."""
         await self.send_score(ctx.channel, self.player_scores)
 
