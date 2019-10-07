@@ -28,10 +28,11 @@ class TriviaQuiz(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.questions = self.load_questions()
-        self.game_status = {}
-        self.game_owners = {}
+        self.game_status = {}  # A variable to store the game status: either running or not running.
+        self.game_owners = {}  # A variable to store the person's ID who started the quiz game in a channel.
         self.question_limit = 4
-        self.player_dict = {}
+        self.player_scores = {}  # A variable to store all player's scores for a bot session.
+        self.game_player_scores = {}  # A variable to store temporary game player's scores.
         self.categories = {
             "general": "Test your general knowledge"
             # "retro": "Questions related to retro gaming."
@@ -50,21 +51,22 @@ class TriviaQuiz(commands.Cog):
         """
         Start/Stop a quiz!
 
-        arguments:
-        option:
-        - start : to start a quiz in a channel
-        - stop  : stop the quiz running in that channel.
+        If the quiz game is running, then the owner or a mod can stop it by using this command
+        without providing any arguments and vice versa.
 
         Questions for the quiz can be selected from the following categories:
         - general : Test your general knowledge. (default)
-        (we wil be adding more later)
+        (we wil be adding more later.)
         """
         category = category.lower()
 
         if ctx.channel.id not in self.game_status:
             self.game_status[ctx.channel.id] = False
-            self.player_dict[ctx.channel.id] = {}
 
+        if ctx.channel.id not in self.game_player_scores:
+            self.game_player_scores[ctx.channel.id] = {}
+
+        # Start game if not running.
         if not self.game_status[ctx.channel.id]:
             self.game_owners[ctx.channel.id] = ctx.author
             self.game_status[ctx.channel.id] = True
@@ -77,16 +79,18 @@ class TriviaQuiz(commands.Cog):
             )
             await ctx.send(embed=start_embed)  # send an embed with the rules
             await asyncio.sleep(1)
-
+        # Stop game is running.
         else:
+            # Check if the author is the owner or a mod.
             if (
                     ctx.author == self.game_owners[ctx.channel.id]
                     or Roles.moderator in [role.id for role in ctx.author.roles]
             ):
                 await ctx.send("Quiz is no longer running.")
-                await self.declare_winner(ctx.channel, self.player_dict[ctx.channel.id])
+                await self.declare_winner(ctx.channel, self.game_player_scores[ctx.channel.id])
                 self.game_status[ctx.channel.id] = False
                 del self.game_owners[ctx.channel.id]
+                self.game_player_scores[ctx.channel.id] = {}
             else:
                 await ctx.send(f"{ctx.author.mention}, you are not authorised to stop this game :ghost: !")
 
@@ -94,21 +98,23 @@ class TriviaQuiz(commands.Cog):
             embed = self.category_embed
             await ctx.send(embed=embed)
             return
+
         topic = self.questions[category]
 
-        unanswered = 0
         done_question = []
         hint_no = 0
         answer = None
         while self.game_status[ctx.channel.id]:
+
+            # Exit quiz if number of questions for a round are already sent.
             if len(done_question) > self.question_limit and hint_no == 0:
                 await ctx.send("The round ends here.")
-                await self.declare_winner(ctx.channel, self.player_dict[ctx.channel.id])
+                await self.declare_winner(ctx.channel, self.game_player_scores[ctx.channel.id])
+                self.game_status[ctx.channel.id] = False
+                del self.game_owners[ctx.channel.id]
+                self.game_player_scores[ctx.channel.id] = {}
                 break
-            if unanswered > 3:
-                await ctx.send("Game stopped due to inactivity.")
-                await self.declare_winner(ctx.channel, self.player_dict[ctx.channel.id])
-                break
+            # If no hint has been sent or any time alert. Basically if hint_no = 0  means it is a new question.
             if hint_no == 0:
                 while True:
                     question_dict = random.choice(topic)
@@ -121,16 +127,20 @@ class TriviaQuiz(commands.Cog):
                 embed = discord.Embed(colour=discord.Colour.gold())
                 embed.title = f"Question #{len(done_question)}"
                 embed.description = q
-                await ctx.send(embed=embed)
+                await ctx.send(embed=embed)  # Send question embed.
 
+            # A function to check whether user input is the correct answer(close to the right answer)
             def check(m: discord.Message) -> bool:
                 ratio = fuzz.ratio(answer.lower(), m.content.lower())
                 return ratio > 85 and m.channel == ctx.channel
             try:
                 msg = await self.bot.wait_for('message', check=check, timeout=10)
             except asyncio.TimeoutError:
+                # In case of TimeoutError and the game has been stopped, then do nothing.
                 if self.game_status[ctx.channel.id] is False:
                     break
+
+                # if number of hints sent or time alerts sent is less than 2, then send one.
                 if hint_no < 2:
                     hint_no += 1
                     if "hints" in question_dict:
@@ -139,29 +149,46 @@ class TriviaQuiz(commands.Cog):
                     else:
                         await ctx.send(f"Cmon guys, {30-hint_no*10}s left!")
 
+                # Once hint or time alerts has been sent 2 times, the hint_no value will be 3
+                # If hint_no > 2, then it means that all hints/time alerts have been sent.
+                # Also means that the answer is not yet given and the bot sends the answer and the next question.
                 else:
                     response = random.choice(WRONG_ANS_RESPONSE)
                     expression = random.choice(ANNOYED_EXPRESSIONS)
                     await ctx.send(f"{response} {expression}")
                     await self.send_answer(ctx.channel, question_dict)
                     await asyncio.sleep(1)
-                    hint_no = 0
-                    unanswered += 1
-                    await self.send_score(ctx.channel, self.player_dict[ctx.channel.id])
+
+                    hint_no = 0  # init hint_no = 0 so that 2 hints/time alerts can be sent for the new question.
+
+                    await self.send_score(ctx.channel, self.game_player_scores[ctx.channel.id])
                     await asyncio.sleep(2)
 
             else:
+                # Reduce points by 25 for every hint/time alert that has been sent.
                 points = 100 - 25*hint_no
-                if msg.author in self.player_dict[ctx.channel.id]:
-                    self.player_dict[ctx.channel.id][msg.author] += points
+                if msg.author in self.game_player_scores[ctx.channel.id]:
+                    self.game_player_scores[ctx.channel.id][msg.author] += points
                 else:
-                    self.player_dict[ctx.channel.id][msg.author] = points
+                    self.game_player_scores[ctx.channel.id][msg.author] = points
+
+                # Also updating the overall scoreboard.
+                if msg.author in self.player_scores:
+                    self.player_scores[msg.author] += points
+                else:
+                    self.player_scores[msg.author] = points
+
                 hint_no = 0
-                unanswered = 0
+
                 await ctx.send(f"{msg.author.mention} got the correct answer :tada: {points} points for ya.")
                 await self.send_answer(ctx.channel, question_dict)
-                await self.send_score(ctx.channel, self.player_dict[ctx.channel.id])
+                await self.send_score(ctx.channel, self.game_player_scores[ctx.channel.id])
                 await asyncio.sleep(2)
+
+    @commands.command(name="scoreboard")
+    async def overall_scoreboard(self, ctx):
+        """View everyone's score for this bot session."""
+        await self.send_score(ctx.channel, self.player_scores)
 
     @staticmethod
     async def send_score(channel: discord.TextChannel, player_data: dict) -> None:
@@ -169,6 +196,9 @@ class TriviaQuiz(commands.Cog):
         embed = discord.Embed(colour=discord.Colour.blue())
         embed.title = "Score Board"
         embed.description = ""
+        if len(player_data) == 0:
+            await channel.send("No one has made it to the scoreboard yet.")
+            return
         for k, v in player_data.items():
             embed.description += f"{k} : {v}\n"
         await channel.send(embed=embed)
