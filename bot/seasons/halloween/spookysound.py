@@ -13,14 +13,14 @@ log = logging.getLogger(__name__)
 class SpookySound(commands.Cog):
     """A cog that plays a spooky sound in a voice channel on command."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.sound_files = list(Path("bot/resources/halloween/spookysounds").glob("*.mp3"))
         self.channel = None
 
     @commands.cooldown(rate=1, per=1)
     @commands.command(brief="Play a spooky sound, restricted to once per 2 mins")
-    async def spookysound(self, ctx):
+    async def spookysound(self, ctx: commands.Context) -> None:
         """
         Connect to the Hacktoberbot voice channel, play a random spooky sound, then disconnect.
 
@@ -37,12 +37,12 @@ class SpookySound(commands.Cog):
         voice.play(src, after=lambda e: self.bot.loop.create_task(self.disconnect(voice)))
 
     @staticmethod
-    async def disconnect(voice):
+    async def disconnect(voice: discord.VoiceClient) -> None:
         """Helper method to disconnect a given voice client."""
         await voice.disconnect()
 
 
-def setup(bot):
+def setup(bot: commands.Bot) -> None:
     """Spooky sound Cog load."""
     bot.add_cog(SpookySound(bot))
     log.info("SpookySound cog loaded")

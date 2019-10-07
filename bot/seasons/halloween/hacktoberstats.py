@@ -19,7 +19,7 @@ PRS_FOR_SHIRT = 4  # Minimum number of PRs before a shirt is awarded
 class HacktoberStats(commands.Cog):
     """Hacktoberfest statistics Cog."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.link_json = Path("bot/resources/github_links.json")
         self.linked_accounts = self.load_linked_users()

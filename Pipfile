@@ -11,10 +11,11 @@ discord-py = "~=1.2"
 fuzzywuzzy = "~=0.17"
 pillow = "~=6.1"
 pytz = "~=2019.2"
-srcomapi = "*"
+srcomapi = "~=0.3"
 
 [dev-packages]
 flake8 = "~=3.7"
+flake8-annotations = "~=1.0"
 flake8-bugbear = "~=19.8"
 flake8-docstrings = "~=1.4"
 flake8-import-order = "~=0.18"

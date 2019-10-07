@@ -11,7 +11,7 @@ from typing import List, Tuple
 from PIL import Image
 from PIL.ImageDraw import ImageDraw
 from discord import File, Member, Reaction
-from discord.ext.commands import Context
+from discord.ext.commands import Cog, Context
 
 from bot.constants import Roles
 
@@ -118,12 +118,12 @@ def get_resource(file: str) -> List[dict]:
         return json.load(snakefile)
 
 
-def smoothstep(t):
+def smoothstep(t: float) -> float:
     """Smooth curve with a zero derivative at 0 and 1, making it useful for interpolating."""
     return t * t * (3. - 2. * t)
 
 
-def lerp(t, a, b):
+def lerp(t: float, a: float, b: float) -> float:
     """Linear interpolation between a and b, given a fraction t."""
     return a + t * (b - a)
 
@@ -140,7 +140,7 @@ class PerlinNoiseFactory(object):
     Licensed under ISC
     """
 
-    def __init__(self, dimension, octaves=1, tile=(), unbias=False):
+    def __init__(self, dimension: int, octaves: int = 1, tile: Tuple[int] = (), unbias: bool = False):
         """
         Create a new Perlin noise factory in the given number of dimensions.
 
@@ -154,7 +154,7 @@ class PerlinNoiseFactory(object):
 
         This will produce noise that tiles every 3 units vertically, but never tiles horizontally.
 
-        If ``unbias`` is true, the smoothstep function will be applied to the output before returning
+        If ``unbias`` is True, the smoothstep function will be applied to the output before returning
         it, to counteract some of Perlin noise's significant bias towards the center of its output range.
         """
         self.dimension = dimension
@@ -168,7 +168,7 @@ class PerlinNoiseFactory(object):
 
         self.gradient = {}
 
-    def _generate_gradient(self):
+    def _generate_gradient(self) -> Tuple[float, ...]:
         """
         Generate a random unit vector at each grid point.
 
@@ -188,7 +188,7 @@ class PerlinNoiseFactory(object):
         scale = sum(n * n for n in random_point) ** -0.5
         return tuple(coord * scale for coord in random_point)
 
-    def get_plain_noise(self, *point):
+    def get_plain_noise(self, *point) -> float:
         """Get plain noise for a single point, without taking into account either octaves or tiling."""
         if len(point) != self.dimension:
             raise ValueError("Expected {0} values, got {1}".format(
@@ -236,7 +236,7 @@ class PerlinNoiseFactory(object):
 
         return dots[0] * self.scale_factor
 
-    def __call__(self, *point):
+    def __call__(self, *point) -> float:
         """
         Get the value of this Perlin noise function at the given point.
 
@@ -369,7 +369,7 @@ GAME_SCREEN_EMOJI = [
 class SnakeAndLaddersGame:
     """Snakes and Ladders game Cog."""
 
-    def __init__(self, snakes, context: Context):
+    def __init__(self, snakes: Cog, context: Context):
         self.snakes = snakes
         self.ctx = context
         self.channel = self.ctx.channel
@@ -384,14 +384,13 @@ class SnakeAndLaddersGame:
         self.positions = None
         self.rolls = []
 
-    async def open_game(self):
+    async def open_game(self) -> None:
         """
         Create a new Snakes and Ladders game.
 
-        Listen for reactions until players have joined,
-        and the game has been started.
+        Listen for reactions until players have joined, and the game has been started.
         """
-        def startup_event_check(reaction_: Reaction, user_: Member):
+        def startup_event_check(reaction_: Reaction, user_: Member) -> bool:
             """Make sure that this reaction is what we want to operate on."""
             return (
                 all((
@@ -456,7 +455,8 @@ class SnakeAndLaddersGame:
                 await self.cancel_game()
                 return  # We're done, no reactions for the last 5 minutes
 
-    async def _add_player(self, user: Member):
+    async def _add_player(self, user: Member) -> None:
+        """Add player to game."""
         self.players.append(user)
         self.player_tiles[user.id] = 1
 
@@ -464,7 +464,7 @@ class SnakeAndLaddersGame:
         im = Image.open(io.BytesIO(avatar_bytes)).resize((BOARD_PLAYER_SIZE, BOARD_PLAYER_SIZE))
         self.avatar_images[user.id] = im
 
-    async def player_join(self, user: Member):
+    async def player_join(self, user: Member) -> None:
         """
         Handle players joining the game.
 
@@ -520,12 +520,12 @@ class SnakeAndLaddersGame:
             await self.channel.send(user.mention + " You are not in the match.", delete_after=10)
             return is_surrendered
 
-    async def cancel_game(self):
+    async def cancel_game(self) -> None:
         """Cancel the running game."""
         await self.channel.send("**Snakes and Ladders**: Game has been canceled.")
         self._destruct()
 
-    async def start_game(self, user: Member):
+    async def start_game(self, user: Member) -> None:
         """
         Allow the game author to begin the game.
 
@@ -544,9 +544,9 @@ class SnakeAndLaddersGame:
         await self.channel.send("**Snakes and Ladders**: The game is starting!\nPlayers: " + player_list)
         await self.start_round()
 
-    async def start_round(self):
+    async def start_round(self) -> None:
         """Begin the round."""
-        def game_event_check(reaction_: Reaction, user_: Member):
+        def game_event_check(reaction_: Reaction, user_: Member) -> bool:
             """Make sure that this reaction is what we want to operate on."""
             return (
                 all((
@@ -639,7 +639,7 @@ class SnakeAndLaddersGame:
         if not is_surrendered:
             await self._complete_round()
 
-    async def player_roll(self, user: Member):
+    async def player_roll(self, user: Member) -> None:
         """Handle the player's roll."""
         if user.id not in self.player_tiles:
             await self.channel.send(user.mention + " You are not in the match.", delete_after=10)
@@ -671,7 +671,8 @@ class SnakeAndLaddersGame:
         self.player_tiles[user.id] = min(100, next_tile)
         self.round_has_rolled[user.id] = True
 
-    async def _complete_round(self):
+    async def _complete_round(self) -> None:
+        """At the conclusion of a round check to see if there's been a winner."""
         self.state = 'post_round'
 
         # check for winner
@@ -686,19 +687,22 @@ class SnakeAndLaddersGame:
         self._destruct()
 
     def _check_winner(self) -> Member:
+        """Return a winning member if we're in the post-round state and there's a winner."""
         if self.state != 'post_round':
             return None
         return next((player for player in self.players if self.player_tiles[player.id] == 100),
                     None)
 
-    def _check_all_rolled(self):
+    def _check_all_rolled(self) -> bool:
+        """Check if all members have made their roll."""
         return all(rolled for rolled in self.round_has_rolled.values())
 
-    def _destruct(self):
+    def _destruct(self) -> None:
+        """Clean up the finished game object."""
         del self.snakes.active_sal[self.channel]
 
-    def _board_coordinate_from_index(self, index: int):
-        # converts the tile number to the x/y coordinates for graphical purposes
+    def _board_coordinate_from_index(self, index: int) -> Tuple[int, int]:
+        """Convert the tile number to the x/y coordinates for graphical purposes."""
         y_level = 9 - math.floor((index - 1) / 10)
         is_reversed = math.floor((index - 1) / 10) % 2 != 0
         x_level = (index - 1) % 10

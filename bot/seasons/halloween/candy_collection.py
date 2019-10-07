@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import random
+from typing import List, Union
 
 import discord
 from discord.ext import commands
@@ -23,7 +24,7 @@ ADD_SKULL_EXISTING_REACTION_CHANCE = 20  # 5%
 class CandyCollection(commands.Cog):
     """Candy collection game Cog."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         with open(json_location) as candy:
             self.candy_json = json.load(candy)
@@ -34,7 +35,7 @@ class CandyCollection(commands.Cog):
             self.get_candyinfo[userid] = userinfo
 
     @commands.Cog.listener()
-    async def on_message(self, message):
+    async def on_message(self, message: discord.Message) -> None:
         """Randomly adds candy or skull reaction to non-bot messages in the Event channel."""
         # make sure its a human message
         if message.author.bot:
@@ -55,7 +56,7 @@ class CandyCollection(commands.Cog):
             return await message.add_reaction('\N{CANDY}')
 
     @commands.Cog.listener()
-    async def on_reaction_add(self, reaction, user):
+    async def on_reaction_add(self, reaction: discord.Reaction, user: discord.Member) -> None:
         """Add/remove candies from a person if the reaction satisfies criteria."""
         message = reaction.message
         # check to ensure the reactor is human
@@ -101,7 +102,7 @@ class CandyCollection(commands.Cog):
                         self.candy_json['records'].append(d)
                 await self.remove_reactions(reaction)
 
-    async def reacted_msg_chance(self, message):
+    async def reacted_msg_chance(self, message: discord.Message) -> None:
         """
         Randomly add a skull or candy reaction to a message if there is a reaction there already.
 
@@ -118,7 +119,7 @@ class CandyCollection(commands.Cog):
             self.msg_reacted.append(d)
             return await message.add_reaction('\N{CANDY}')
 
-    async def ten_recent_msg(self):
+    async def ten_recent_msg(self) -> List[int]:
         """Get the last 10 messages sent in the channel."""
         ten_recent = []
         recent_msg_id = max(
@@ -136,7 +137,7 @@ class CandyCollection(commands.Cog):
 
         return ten_recent
 
-    async def get_message(self, msg_id):
+    async def get_message(self, msg_id: int) -> Union[discord.Message, None]:
         """Get the message from its ID."""
         try:
             o = discord.Object(id=msg_id + 1)
@@ -152,11 +153,11 @@ class CandyCollection(commands.Cog):
         except Exception:
             return None
 
-    async def hacktober_channel(self):
+    async def hacktober_channel(self) -> discord.TextChannel:
         """Get #hacktoberbot channel from its ID."""
         return self.bot.get_channel(id=Channels.seasonalbot_chat)
 
-    async def remove_reactions(self, reaction):
+    async def remove_reactions(self, reaction: discord.Reaction) -> None:
         """Remove all candy/skull reactions."""
         try:
             async for user in reaction.users():
@@ -165,20 +166,20 @@ class CandyCollection(commands.Cog):
         except discord.HTTPException:
             pass
 
-    async def send_spook_msg(self, author, channel, candies):
+    async def send_spook_msg(self, author: discord.Member, channel: discord.TextChannel, candies: int) -> None:
         """Send a spooky message."""
         e = discord.Embed(colour=author.colour)
         e.set_author(name="Ghosts and Ghouls and Jack o' lanterns at night; "
                           f"I took {candies} candies and quickly took flight.")
         await channel.send(embed=e)
 
-    def save_to_json(self):
+    def save_to_json(self) -> None:
         """Save JSON to a local file."""
         with open(json_location, 'w') as outfile:
             json.dump(self.candy_json, outfile)
 
     @commands.command()
-    async def candy(self, ctx):
+    async def candy(self, ctx: commands.Context) -> None:
         """Get the candy leaderboard and save to JSON."""
         # Use run_in_executor to prevent blocking
         thing = functools.partial(self.save_to_json)
@@ -214,7 +215,7 @@ class CandyCollection(commands.Cog):
         await ctx.send(embed=e)
 
 
-def setup(bot):
+def setup(bot: commands.Bot) -> None:
     """Candy Collection game Cog load."""
     bot.add_cog(CandyCollection(bot))
     log.info("CandyCollection cog loaded")

@@ -156,7 +156,7 @@ async def fetch(session: aiohttp.client.ClientSession, uri: str) -> dict:
         return await resp.json()
 
 
-def setup(bot: commands.bot) -> None:
+def setup(bot: commands.Bot) -> None:
     """Load the Speedrun cog."""
     bot.add_cog(Speedrun(bot))
     log.info("Speedrun cog loaded")

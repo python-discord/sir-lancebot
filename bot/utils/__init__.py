@@ -29,7 +29,7 @@ async def disambiguate(
 
     choices = (f'{index}: {entry}' for index, entry in enumerate(entries, start=1))
 
-    def check(message):
+    def check(message: discord.Message) -> bool:
         return (message.content.isdigit()
                 and message.author == ctx.author
                 and message.channel == ctx.channel)
@@ -109,7 +109,7 @@ def replace_many(
     pattern = "|".join(re.escape(word) for word in words_to_replace)
     regex = re.compile(pattern, re.I if ignore_case else 0)
 
-    def _repl(match):
+    def _repl(match: re.Match) -> str:
         """Returns replacement depending on `ignore_case` and `match_case`."""
         word = match.group(0)
         replacement = replacements[word.lower() if ignore_case else word]
