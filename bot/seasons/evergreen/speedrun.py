@@ -4,14 +4,14 @@ import re
 from pathlib import Path
 from random import choice
 
-import srcomapi
-import srcomapi.datatypes as dt
+import aiohttp
 from discord import Embed, colour
 from discord.ext import commands
 
 
 log = logging.getLogger(__name__)
-API = srcomapi.SpeedrunCom()
+URL = 'http://www.speedrun.com/api/v1/'
+
 
 with Path('bot/resources/evergreen/speedrun_resources.json').open(encoding='utf-8') as file:
     data = json.load(file)
@@ -36,69 +36,98 @@ class Speedrun(commands.Cog):
         """Sends a link to a video of a random speedrun."""
         await ctx.send(choice(LINKS))
 
-    @speedrun.command(name="platform", aliases=['pf'])
-    async def find_by_platform(self, ctx: commands.Context, *, platform: str) -> None:
-        """Sends an embed of a random speedrun record by platform."""
-        platform = platform.lower()
-        res = API.search(dt.Game, {"platform": PLATFORMS[platform], '_bulk': True})
-        if len(res) != 0:
-            index = 250
-            while len(res) % 250 == 0:
-                res = API.search(dt.Game, {"platform": PLATFORMS[platform], '_bulk': True, 'offset': index})
-                index += 250
-            chosen_game = choice(res)
-            run = chosen_game.records[0].runs[0]['run']
-
-            await ctx.send(embed=format_embed(chosen_game, run))
-        else:
-            await ctx.send("There are no speedrun records for this platform.")
-
-    @speedrun.command(name="genre")
-    async def find_by_genre(self, ctx: commands.Context, *, genre: str) -> None:
-        """Sends an embed of a random speedrun record by genre."""
-        genre = genre.lower()
-        res = API.search(dt.Game, {'genre': GENRES[genre], '_bulk': True})
-        if len(res) != 0:
-            index = 250
-            while len(res) % 250 == 0:
-                res = API.search(dt.Game, {"genre": GENRES[genre], '_bulk': True, 'offset': index})
-                index += 250
-            chosen_game = choice(res)
-            run = chosen_game.records[0].runs[0]['run']
-
-            await ctx.send(embed=format_embed(chosen_game, run))
-        else:
-            await ctx.send("There are no speedrun records for this genre.")
-
-    @speedrun.command(name="year")
+    @speedrun.command(name='year')
     async def find_by_year(self, ctx: commands.Context, year: int) -> None:
         """Sends an embed of a random speedrun record by year."""
-        res = API.search(dt.Game, {'released': year, '_bulk': True})
-        if len(res) != 0:
-            index = 250
-            while len(res) % 250 == 0:
-                res += API.search(dt.Game, {'released': year, '_bulk': True, 'offset': index})
-                index += 250
-            chosen_game = choice(res)
-            run = chosen_game.records[0].runs[0]['run']
+        async with aiohttp.ClientSession() as session:
+            page_size, page_max = 0, 0
+            uri = URL + f'games?released={year}&_bulk=True'
+            games = []
+            while page_size == page_max:
+                resp = await fetch(session, uri)
+                if len(resp['data']) == 0:
+                    await ctx.send(f'There are no records for the year "{year}"')
+                    return
+                games += resp['data']
+                pagination = resp['pagination']
+                uri = pagination['links'][len(pagination['links']) - 1]['uri']
+                page_size, page_max = pagination['size'], pagination['max']
+            chosen_game = choice(games)
+            embed = await format_embed_async(session, chosen_game)
+            if embed is None:
+                await ctx.send("There are no speedrun records for the selected game, please try the command again")
+            else:
+                await ctx.send(embed=embed)
 
-            await ctx.send(embed=format_embed(chosen_game, run))
-        else:
-            await ctx.send("There are no speedrun records for this year.")
+    @speedrun.command(name='platform', aliases=['pf'])
+    async def find_by_platform(self, ctx: commands.Context, *, platform: str) -> None:
+        """Sends an embed of a random speedrun record by platform."""
+        async with aiohttp.ClientSession() as session:
+            page_size, page_max = 0, 0
+            try:
+                uri = URL + f'games?platform={PLATFORMS[platform.lower()]}&_bulk=True'
+            except KeyError:
+                await ctx.send(f'There are no records for the platform "{platform}"')
+                return
+            games = []
+            while page_size == page_max:
+                resp = await fetch(session, uri)
+                games += resp['data']
+                pagination = resp['pagination']
+                uri = pagination['links'][len(pagination['links']) - 1]['uri']
+                page_size, page_max = pagination['size'], pagination['max']
+            chosen_game = choice(games)
+            embed = await format_embed_async(session, chosen_game)
+            if embed is None:
+                await ctx.send("There are no speedrun records for the selected game, please try the command again")
+            else:
+                await ctx.send(embed=embed)
+
+    @speedrun.command(name='genre')
+    async def find_by_genre(self, ctx: commands.Context, *, genre: str) -> None:
+        """Sends an embed of a random speedrun record by year."""
+        async with aiohttp.ClientSession() as session:
+            page_size, page_max = 0, 0
+            try:
+                uri = URL + f'games?genre={GENRES[genre.lower()]}&_bulk=True'
+            except KeyError:
+                await ctx.send(f'There are no records for the genre "{genre}"')
+                return
+            games = []
+            while page_size == page_max:
+                resp = await fetch(session, uri)
+                games += resp['data']
+                pagination = resp['pagination']
+                uri = pagination['links'][len(pagination['links']) - 1]['uri']
+                page_size, page_max = pagination['size'], pagination['max']
+            chosen_game = choice(games)
+            embed = await format_embed_async(session, chosen_game)
+            if embed is None:
+                await ctx.send("There are no speedrun records for the selected game, please try the command again")
+            else:
+                await ctx.send(embed=embed)
 
 
-def format_embed(game: srcomapi.datatypes.Game, run: srcomapi.datatypes.Run) -> Embed:
+async def format_embed_async(session: aiohttp.client.ClientSession, game: dict) -> Embed:
     """Helper function that formats and returns an embed."""
-    game_name = game.data['names']['international']
-    vid_link = run.data['videos']['links'][0]['uri']
-    embed = Embed(
-        color=colour.Color.dark_green()
-    )
-    embed.add_field(name=game_name, value=run.weblink, inline=False)
-    embed.add_field(name="Player", value=run.players[0].name, inline=True)
-    embed.add_field(name="Record Time", value=get_time_record(game), inline=True)
-    embed.add_field(name="Video Link", value="None" if vid_link is None else vid_link, inline=False)
-    return embed
+    record = await fetch(session, URL + f'games/{game["id"]}/records?top=1')
+    try:
+        run = record['data'][0]['runs'][0]['run']
+    except IndexError:
+        return None
+    else:
+        player = await fetch(session, URL + f'users/{run["players"][0]["id"]}')
+        record_time = format_time(run['times']['primary'])
+        vid_link = run['videos']['links'][0]['uri']
+
+        embed = Embed(
+            color=colour.Color.dark_green()
+        )
+        embed.add_field(name=game['names']['international'], value=run['weblink'], inline=False)
+        embed.add_field(name="Player", value=player['data']['names']['international'], inline=True)
+        embed.add_field(name="Record Time", value=format_time(record_time), inline=True)
+        embed.add_field(name="Video Link", value="None" if vid_link is None else vid_link, inline=False)
+        return embed
 
 
 def format_time(time: str) -> str:
@@ -121,13 +150,10 @@ def format_time(time: str) -> str:
     return ret_string[:-2]
 
 
-def get_time_record(game: srcomapi.datatypes.Game) -> str:
-    """Helper function that fetches the time and formats it."""
-    try:
-        time = game.records[0].runs[0]['run'].times['primary']  # this line takes about 5 secs, try to speed it up
-        return format_time(time)
-    except IndexError:
-        return "Error"
+async def fetch(session: aiohttp.client.ClientSession, uri: str) -> dict:
+    """Helper function to keep session.get() calls clean."""
+    async with session.get(uri) as resp:
+        return await resp.json()
 
 
 def setup(bot: commands.bot) -> None:
