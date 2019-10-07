@@ -27,10 +27,10 @@ class HacktoberIssues(commands.Cog):
     async def hacktoberissues(self, ctx: commands.Context, option: str = "") -> None:
         """Get a random python hacktober issue from Github."""
         with ctx.typing():
-            issues = (await self.get_issues(ctx, option))["items"]
+            issues = await self.get_issues(ctx, option)
             if issues is None:
                 return
-            issue = random.choice(issues)
+            issue = random.choice(issues["items"])
             embed = self.format_embed(issue)
         await ctx.send(embed=embed)
 
@@ -38,8 +38,10 @@ class HacktoberIssues(commands.Cog):
         """Get a list of the python issues with the label 'hacktoberfest' from the Github api."""
         if option == "beginner":
             if (ctx.message.created_at - self.cache_timer_beginner).seconds <= 60:
+                log.debug("using cache")
                 return self.cache_beginner
         elif (ctx.message.created_at - self.cache_timer_normal).seconds <= 60:
+            log.debug("using cache")
             return self.cache_normal
 
         async with aiohttp.ClientSession() as session:
@@ -54,14 +56,17 @@ class HacktoberIssues(commands.Cog):
                     page = random.randint(1, min(1000, self.cache_normal["total_count"]))
                     url += f"&page={page}"
 
+            log.debug(f"making api request to url: {url}")
             async with session.get(url, headers=HEADERS) as response:
                 if response.status != 200:
+                    log.error(f"expected 200 status (got {response.status}) from the GitHub api.")
                     await ctx.send(f"ERROR: expected 200 status (got {response.status}) from the GitHub api.")
                     await ctx.send(await response.text())
                     return None
                 data = await response.json()
 
                 if len(data["items"]) == 0:
+                    log.error(f"no issues returned from GitHub api. with url: {response.url}")
                     await ctx.send(f"ERROR: no issues returned from GitHub api. with url: {response.url}")
                     return None
 
