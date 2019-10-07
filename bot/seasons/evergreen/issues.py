@@ -3,15 +3,16 @@ import logging
 import discord
 from discord.ext import commands
 
+from bot.constants import Emojis
 from bot.decorators import override_in_channel
 
 log = logging.getLogger(__name__)
 
-icons = {"issue": "<:IssueOpen:629695470327037963>",
-         "issue-closed": "<:IssueClosed:629695470570307614>",
-         "pull-request": "<:PROpen:629695470175780875>",
-         "pull-request-closed": "<:PRClosed:629695470519713818>",
-         "merge": "<:PRMerged:629695470570176522>"}
+icons = {"issue": Emojis.issue,
+         "issue-closed": Emojis.issue_closed,
+         "pull-request": Emojis.pull_request,
+         "pull-request-closed": Emojis.pull_request_closed,
+         "merge": Emojis.merge}
 
 RESP_VALUE = {404: "Issue/pull request not located! Please enter a valid number!",
               403: "rate limit has been hit! Please try again later!"}
