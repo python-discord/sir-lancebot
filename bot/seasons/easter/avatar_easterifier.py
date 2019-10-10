@@ -56,7 +56,7 @@ class AvatarEasterifier(commands.Cog):
         Colours are split by spaces, unless you wrap the colour name in double quotes.
         Discord colour names, HTML colour names, XKCD colour names and hex values are accepted.
         """
-        async def send(*args, **kwargs):
+        async def send(*args, **kwargs) -> str:
             """
             This replaces the original ctx.send.
 

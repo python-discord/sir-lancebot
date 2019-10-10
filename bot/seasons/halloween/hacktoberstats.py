@@ -10,10 +10,16 @@ import aiohttp
 import discord
 from discord.ext import commands
 
+from bot.constants import Channels, WHITELISTED_CHANNELS
+from bot.decorators import override_in_channel
+from bot.utils.persist import make_persistent
+
+
 log = logging.getLogger(__name__)
 
 CURRENT_YEAR = datetime.now().year  # Used to construct GH API query
 PRS_FOR_SHIRT = 4  # Minimum number of PRs before a shirt is awarded
+HACKTOBER_WHITELIST = WHITELISTED_CHANNELS + (Channels.hacktoberfest_2019,)
 
 
 class HacktoberStats(commands.Cog):
@@ -21,10 +27,11 @@ class HacktoberStats(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.link_json = Path("bot/resources/github_links.json")
+        self.link_json = make_persistent(Path("bot", "resources", "halloween", "github_links.json"))
         self.linked_accounts = self.load_linked_users()
 
     @commands.group(name="hacktoberstats", aliases=("hackstats",), invoke_without_command=True)
+    @override_in_channel(HACKTOBER_WHITELIST)
     async def hacktoberstats_group(self, ctx: commands.Context, github_username: str = None) -> None:
         """
         Display an embed for a user's Hacktoberfest contributions.
@@ -218,7 +225,7 @@ class HacktoberStats(commands.Cog):
         not_label = "invalid"
         action_type = "pr"
         is_query = f"public+author:{github_username}"
-        date_range = f"{CURRENT_YEAR}-10-01..{CURRENT_YEAR}-10-31"
+        date_range = f"{CURRENT_YEAR}-10-01T00:00:00%2B14:00..{CURRENT_YEAR}-10-31T23:59:59-11:00"
         per_page = "300"
         query_url = (
             f"{base_url}"
@@ -229,7 +236,7 @@ class HacktoberStats(commands.Cog):
             f"&per_page={per_page}"
         )
 
-        headers = {"user-agent": "Discord Python Hactoberbot"}
+        headers = {"user-agent": "Discord Python Hacktoberbot"}
         async with aiohttp.ClientSession() as session:
             async with session.get(query_url, headers=headers) as resp:
                 jsonresp = await resp.json()
