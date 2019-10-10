@@ -263,13 +263,6 @@
             ],
             "version": "==1.9.3"
         },
-        "urllib3": {
-            "hashes": [
-                "sha256:319cef72311e511d94be1bb478d202fde499935d0347a9e8f0d232dc3bce47c6",
-                "sha256:8a8090dd02b145256534c205e624eb20161080428ffa14408f6f283c0d0c356e"
-            ],
-            "version": "==1.25.4"
-        },
         "websockets": {
             "hashes": [
                 "sha256:0e2f7d6567838369af074f0ef4d0b802d19fa1fee135d864acc656ceefa33136",
