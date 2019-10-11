@@ -126,7 +126,7 @@ class AdventOfCode(commands.Cog):
         self.status_task = asyncio.ensure_future(self.bot.loop.create_task(status_coro))
 
     @commands.group(name="adventofcode", aliases=("aoc",), invoke_without_command=True)
-    @override_in_channel
+    @override_in_channel()
     async def adventofcode_group(self, ctx: commands.Context) -> None:
         """All of the Advent of Code commands."""
         await ctx.send_help(ctx.command)
