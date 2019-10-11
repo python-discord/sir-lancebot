@@ -64,23 +64,20 @@ def without_role(*role_ids: int) -> bool:
 
 
 def in_channel_check(*channels: int, bypass_roles: typing.Container[int] = None) -> typing.Callable[[Context], bool]:
-    """Checks that the message is in a whitelisted channel or optionally has a bypass role."""
+    """
+    Checks that the message is in a whitelisted channel or optionally has a bypass role.
+
+    If `in_channel_override` is present, check if it contains channels
+    and use them in place of the global whitelist.
+    """
     def predicate(ctx: Context) -> bool:
         if not ctx.guild:
             log.debug(f"{ctx.author} tried to use the '{ctx.command.name}' command from a DM.")
             return True
-
         if ctx.channel.id in channels:
             log.debug(
                 f"{ctx.author} tried to call the '{ctx.command.name}' command "
                 f"and the command was used in a whitelisted channel."
-            )
-            return True
-
-        if hasattr(ctx.command.callback, "in_channel_override"):
-            log.debug(
-                f"{ctx.author} called the '{ctx.command.name}' command "
-                f"and the command was whitelisted to bypass the in_channel check."
             )
             return True
 
@@ -90,6 +87,31 @@ def in_channel_check(*channels: int, bypass_roles: typing.Container[int] = None)
                 f"had a role to bypass the in_channel check."
             )
             return True
+
+        if hasattr(ctx.command.callback, "in_channel_override"):
+            override = ctx.command.callback.in_channel_override
+            if override is None:
+                log.debug(
+                    f"{ctx.author} called the '{ctx.command.name}' command "
+                    f"and the command was whitelisted to bypass the in_channel check."
+                )
+                return True
+            else:
+                if ctx.channel.id in override:
+                    log.debug(
+                        f"{ctx.author} tried to call the '{ctx.command.name}' command "
+                        f"and the command was used in an overridden whitelisted channel."
+                    )
+                    return True
+
+                log.debug(
+                    f"{ctx.author} tried to call the '{ctx.command.name}' command. "
+                    f"The overridden in_channel check failed."
+                )
+                channels_str = ', '.join(f"<#{c_id}>" for c_id in override)
+                raise InChannelCheckFailure(
+                    f"Sorry, but you may only use this command within {channels_str}."
+                )
 
         log.debug(
             f"{ctx.author} tried to call the '{ctx.command.name}' command. "
@@ -107,14 +129,19 @@ def in_channel_check(*channels: int, bypass_roles: typing.Container[int] = None)
 in_channel = commands.check(in_channel_check)
 
 
-def override_in_channel(func: typing.Callable) -> typing.Callable:
+def override_in_channel(channels: typing.Tuple[int] = None) -> typing.Callable:
     """
     Set command callback attribute for detection in `in_channel_check`.
 
+    Override global whitelist if channels are specified.
+
     This decorator has to go before (below) below the `command` decorator.
     """
-    func.in_channel_override = True
-    return func
+    def inner(func: typing.Callable) -> typing.Callable:
+        func.in_channel_override = channels
+        return func
+
+    return inner
 
 
 def locked() -> typing.Union[typing.Callable, None]:
