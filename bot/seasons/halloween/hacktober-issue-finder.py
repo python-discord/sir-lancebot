@@ -28,7 +28,7 @@ class HacktoberIssues(commands.Cog):
         """
         Get a random python hacktober issue from Github.
 
-        If the command is run with beginner (`!hacktoberissues beginner`):
+        If the command is run with beginner (`.hacktoberissues beginner`):
         It will also narrow it down to the "first good issue" label.
         """
         with ctx.typing():
