@@ -16,4 +16,4 @@ This later evolved into a bot that runs all year, providing season-appropriate f
 ## Getting started
 Before you start, please take some time to read through our [contributing guidelines](CONTRIBUTING.md).
 
-See [Seasonalbot's Wiki](https://github.com/python-discord/seasonalbot/wiki) for in-depth guides on getting started with the project!
+See [Seasonalbot's Wiki](https://pythondiscord.com/pages/contributing/seasonalbot/) for in-depth guides on getting started with the project!
