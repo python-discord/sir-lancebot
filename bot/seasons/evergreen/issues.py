@@ -39,7 +39,7 @@ class Issues(commands.Cog):
             return await ctx.send(f"[{str(r.status)}] {RESP_VALUE.get(r.status)}")
         # the original call is made to the issues API endpoint
         # if a issue or PR exists then there will be something returned
-        # if the word 'issues' is present within the response then we can simply pull the  data we need from the
+        # if the word 'issues' is present within the response then we can simply pull the data we need from the
         # return data received from the API
         if "issues" in json_data.get("html_url"):
             if json_data.get("state") == "open":
