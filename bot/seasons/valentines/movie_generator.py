@@ -1,5 +1,7 @@
 import logging
+
 from discord.ext import commands
+
 from bot.utils.movies import send_random_movie_embed
 
 log = logging.getLogger(__name__)
