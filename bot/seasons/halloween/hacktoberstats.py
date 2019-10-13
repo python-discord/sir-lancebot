@@ -236,11 +236,16 @@ class HacktoberStats(commands.Cog):
             f"&per_page={per_page}"
         )
 
-        headers = {"user-agent": "Discord Python Hacktoberbot"}
+        # Use custom media type in Accept header to get `draft` field in API returns
+        # https://developer.github.com/changes/2019-02-14-draft-pull-requests/
+        headers = {
+            "user-agent": "Discord Python Hacktoberbot",
+            "Accept": "application/vnd.github.shadow-cat-preview+json"
+        }
+
         async with aiohttp.ClientSession() as session:
             async with session.get(query_url, headers=headers) as resp:
                 jsonresp = await resp.json()
-
         if "message" in jsonresp.keys():
             # One of the parameters is invalid, short circuit for now
             api_message = jsonresp["errors"][0]["message"]
@@ -255,6 +260,8 @@ class HacktoberStats(commands.Cog):
                 logging.info(f"Found {len(jsonresp['items'])} Hacktoberfest PRs for GitHub user: '{github_username}'")
                 outlist = []
                 for item in jsonresp["items"]:
+                    if item["draft"] is True:  # Draft PRs don't count
+                        continue
                     shortname = HacktoberStats._get_shortname(item["repository_url"])
                     itemdict = {
                         "repo_url": f"https://www.github.com/{shortname}",
@@ -264,6 +271,7 @@ class HacktoberStats(commands.Cog):
                         ),
                     }
                     outlist.append(itemdict)
+                logging.info(f"Found {len(outlist)} valid Hacktoberfest PRs for GitHub user: '{github_username}'")
                 return outlist
 
     @staticmethod
