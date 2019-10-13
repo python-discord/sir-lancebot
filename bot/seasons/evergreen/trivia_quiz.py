@@ -46,7 +46,7 @@ class TriviaQuiz(commands.Cog):
             questions = json.load(json_data)
             return questions
 
-    @commands.command(name="quiz", aliases=["trivia"])
+    @commands.group(name="quiz", aliases=["trivia"], invoke_without_command=True)
     async def quiz_game(self, ctx: commands.Context, category: str = "general") -> None:
         """
         Start/Stop a quiz!
@@ -56,7 +56,7 @@ class TriviaQuiz(commands.Cog):
 
         Questions for the quiz can be selected from the following categories:
         - general : Test your general knowledge. (default)
-        (we wil be adding more later.)
+        (More to come!)
         """
         category = category.lower()
 
@@ -79,12 +79,12 @@ class TriviaQuiz(commands.Cog):
             )
             await ctx.send(embed=start_embed)  # send an embed with the rules
             await asyncio.sleep(1)
-        # Stop game is running.
+        # Stop game if running.
         else:
-            # Check if the author is the owner or a mod.
+            # Check if the author is the game starter or a moderator.
             if (
                     ctx.author == self.game_owners[ctx.channel.id]
-                    or Roles.moderator in [role.id for role in ctx.author.roles]
+                    or any(Roles.moderator == role.id for role in ctx.author.roles)
             ):
                 await ctx.send("Quiz is no longer running.")
                 await self.declare_winner(ctx.channel, self.game_player_scores[ctx.channel.id])
@@ -185,8 +185,8 @@ class TriviaQuiz(commands.Cog):
                 await self.send_score(ctx.channel, self.game_player_scores[ctx.channel.id])
                 await asyncio.sleep(2)
 
-    @commands.command(name="scoreboard")
-    async def overall_scoreboard(self, ctx: commands.Context) -> None:
+    @quiz_game.command(name="leaderboard")
+    async def leaderboard(self, ctx: commands.Context) -> None:
         """View everyone's score for this bot session."""
         await self.send_score(ctx.channel, self.player_scores)
 
@@ -197,10 +197,12 @@ class TriviaQuiz(commands.Cog):
         embed.title = "Score Board"
         embed.description = ""
         if len(player_data) == 0:
-            await channel.send("No one has made it to the scoreboard yet.")
+            await channel.send("No one has made it to the leaderboard yet.")
             return
-        for k, v in player_data.items():
-            embed.description += f"{k} : {v}\n"
+        sorted_dict = sorted(player_data.items(), key=lambda a: a[1], reverse=True)
+        for item in sorted_dict:
+
+            embed.description += f"{item[0]} : {item[1]}\n"
         await channel.send(embed=embed)
 
     @staticmethod
