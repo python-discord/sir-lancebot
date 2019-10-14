@@ -43,28 +43,28 @@ class Issues(commands.Cog):
         # return data received from the API
         if "issues" in json_data.get("html_url"):
             if json_data.get("state") == "open":
-                iconURL = ICONS.get("ISSUE")
+                icon_URL = ICONS.get("ISSUE")
             else:
-                iconURL = ICONS.get("ISSUE_CLOSED")
+                icon_URL = ICONS.get("ISSUE_CLOSED")
         # if the word 'issues' is not contained within the returned data and there is no error code then we know that
         # the requested data is a pr, hence to get the specifics on it we have to call the PR API endpoint allowing us
         # to get the specific information in relation to the PR that is not provided via the issues endpoint
         else:
             async with self.bot.http_session.get(mergeURL) as m:
                 if json_data.get("state") == "open":
-                    iconURL = ICONS.get("PULL_REQUEST")
+                    icon_URL = ICONS.get("PULL_REQUEST")
                 # when the status is 204 this means that the state of the PR is merged
                 elif m.status == 204:
-                    iconURL = ICONS.get("MERGE")
+                    icon_URL = ICONS.get("MERGE")
                 # else by the process of elimination, the pull request has been closed
                 else:
-                    iconURL = ICONS.get("PULL_REQUEST_CLOSED")
+                    icon_URL = ICONS.get("PULL_REQUEST_CLOSED")
 
         issue_url = json_data.get("html_url")
         description_text = f"[{repository}] #{number} {json_data.get('title')}"
         resp = discord.Embed(
             colour=Colours.bright_green,
-            description=f"{iconURL} [{description_text}]({issue_url})"
+            description=f"{icon_URL} [{description_text}]({issue_url})"
         )
         resp.set_author(name="GitHub", url=issue_url)
         await ctx.send(embed=resp)
