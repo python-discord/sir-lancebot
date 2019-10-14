@@ -3,21 +3,16 @@ import logging
 import discord
 from discord.ext import commands
 
-
 from bot.constants import Channels, Colours, Emojis, WHITELISTED_CHANNELS
 from bot.decorators import override_in_channel
 
 log = logging.getLogger(__name__)
 ISSUE_WHITELIST = WHITELISTED_CHANNELS + (Channels.seasonalbot_chat,)
 
-ICONS = {"ISSUE": Emojis.issue,
-         "ISSUE_CLOSED": Emojis.issue_closed,
-         "PULL_REQUEST": Emojis.pull_request,
-         "PULL_REQUEST_CLOSED": Emojis.pull_request_closed,
-         "MERGE": Emojis.merge}
-
-RESP_VALUE = {404: "Issue/pull request not located! Please enter a valid number!",
-              403: "Rate limit has been hit! Please try again later!"}
+BAD_RESPONSE = {
+    404: "Issue/pull request not located! Please enter a valid number!",
+    403: "Rate limit has been hit! Please try again later!"
+}
 
 
 class Issues(commands.Cog):
@@ -33,41 +28,45 @@ class Issues(commands.Cog):
     ) -> None:
         """Command to retrieve issues from a GitHub repository."""
         url = f"https://api.github.com/repos/{user}/{repository}/issues/{number}"
-        mergeURL = f"https://api.github.com/repos/{user}/{repository}/pulls/{number}/merge"
+        merge_url = f"https://api.github.com/repos/{user}/{repository}/pulls/{number}/merge"
 
+        log.trace(f"Querying GH issues API: {url}")
         async with self.bot.http_session.get(url) as r:
             json_data = await r.json()
 
-        if r.status in RESP_VALUE:
-            return await ctx.send(f"[{str(r.status)}] {RESP_VALUE.get(r.status)}")
-        # the original call is made to the issues API endpoint
-        # if a issue or PR exists then there will be something returned
-        # if the word 'issues' is present within the response then we can simply pull the data we need from the
-        # return data received from the API
+        if r.status in BAD_RESPONSE:
+            log.warning(f"Received response {r.status} from: {url}")
+            return await ctx.send(f"[{str(r.status)}] {BAD_RESPONSE.get(r.status)}")
+
+        # The initial API request is made to the issues API endpoint, which will return information
+        # if the issue or PR is present. However, the scope of information returned for PRs differs
+        # from issues: if the 'issues' key is present in the response then we can pull the data we
+        # need from the initial API call.
         if "issues" in json_data.get("html_url"):
             if json_data.get("state") == "open":
-                icon_URL = ICONS.get("ISSUE")
+                icon_url = Emojis.issue
             else:
-                icon_URL = ICONS.get("ISSUE_CLOSED")
-        # if the word 'issues' is not contained within the returned data and there is no error code then we know that
-        # the requested data is a pr, hence to get the specifics on it we have to call the PR API endpoint allowing us
-        # to get the specific information in relation to the PR that is not provided via the issues endpoint
+                icon_url = Emojis.issue_closed
+
+        # If the 'issues' key is not contained in the API response and there is no error code, then
+        # we know that a PR has been requested and a call to the pulls API endpoint is necessary
+        # to get the desired information for the PR.
         else:
-            async with self.bot.http_session.get(mergeURL) as m:
+            log.trace(f"PR provided, querying GH pulls API for additional information: {merge_url}")
+            async with self.bot.http_session.get(merge_url) as m:
                 if json_data.get("state") == "open":
-                    icon_URL = ICONS.get("PULL_REQUEST")
-                # when the status is 204 this means that the state of the PR is merged
+                    icon_url = Emojis.pull_request
+                # When the status is 204 this means that the state of the PR is merged
                 elif m.status == 204:
-                    icon_URL = ICONS.get("MERGE")
-                # else by the process of elimination, the pull request has been closed
+                    icon_url = Emojis.merge
                 else:
-                    icon_URL = ICONS.get("PULL_REQUEST_CLOSED")
+                    icon_url = Emojis.pull_request_closed
 
         issue_url = json_data.get("html_url")
         description_text = f"[{repository}] #{number} {json_data.get('title')}"
         resp = discord.Embed(
             colour=Colours.bright_green,
-            description=f"{icon_URL} [{description_text}]({issue_url})"
+            description=f"{icon_url} [{description_text}]({issue_url})"
         )
         resp.set_author(name="GitHub", url=issue_url)
         await ctx.send(embed=resp)
