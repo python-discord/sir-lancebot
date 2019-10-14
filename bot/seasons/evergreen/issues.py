@@ -15,7 +15,7 @@ ICONS = {"ISSUE": Emojis.issue,
          "MERGE": Emojis.merge}
 
 RESP_VALUE = {404: "Issue/pull request not located! Please enter a valid number!",
-              403: "rate limit has been hit! Please try again later!"}
+              403: "Rate limit has been hit! Please try again later!"}
 
 
 class Issues(commands.Cog):
