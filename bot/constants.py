@@ -22,6 +22,7 @@ class AdventOfCode:
 
 class Channels(NamedTuple):
     admins = 365960823622991872
+    advent_of_code = 517745814039166986
     announcements = int(environ.get("CHANNEL_ANNOUNCEMENTS", 354619224620138496))
     big_brother_logs = 468507907357409333
     bot = 267659945086812160

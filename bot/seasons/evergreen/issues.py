@@ -3,10 +3,12 @@ import logging
 import discord
 from discord.ext import commands
 
-from bot.constants import Colours, Emojis
+
+from bot.constants import Channels, Colours, Emojis, WHITELISTED_CHANNELS
 from bot.decorators import override_in_channel
 
 log = logging.getLogger(__name__)
+ISSUE_WHITELIST = WHITELISTED_CHANNELS + (Channels.seasonalbot_chat,)
 
 ICONS = {"ISSUE": Emojis.issue,
          "ISSUE_CLOSED": Emojis.issue_closed,
@@ -25,10 +27,11 @@ class Issues(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=("pr",))
-    @override_in_channel()
-    async def issue(self, ctx: commands.Context, number: int, repository: str = "seasonalbot",
-                    user: str = "python-discord") -> None:
-        """Command to get issues/pull request from GitHub."""
+    @override_in_channel(ISSUE_WHITELIST)
+    async def issue(
+        self, ctx: commands.Context, number: int, repository: str = "seasonalbot", user: str = "python-discord"
+    ) -> None:
+        """Command to retrieve issues from a GitHub repository."""
         url = f"https://api.github.com/repos/{user}/{repository}/issues/{number}"
         mergeURL = f"https://api.github.com/repos/{user}/{repository}/pulls/{number}/merge"
 
