@@ -13,7 +13,7 @@ from bs4 import BeautifulSoup
 from discord.ext import commands
 from pytz import timezone
 
-from bot.constants import AdventOfCode as AocConfig, Channels, Colours, Emojis, Tokens
+from bot.constants import AdventOfCode as AocConfig, Channels, Colours, Emojis, Tokens, WHITELISTED_CHANNELS
 from bot.decorators import override_in_channel
 
 log = logging.getLogger(__name__)
@@ -23,6 +23,8 @@ AOC_SESSION_COOKIE = {"session": Tokens.aoc_session_cookie}
 
 EST = timezone("EST")
 COUNTDOWN_STEP = 60 * 5
+
+AOC_WHITELIST = WHITELISTED_CHANNELS + (Channels.advent_of_code,)
 
 
 def is_in_advent() -> bool:
@@ -126,7 +128,7 @@ class AdventOfCode(commands.Cog):
         self.status_task = asyncio.ensure_future(self.bot.loop.create_task(status_coro))
 
     @commands.group(name="adventofcode", aliases=("aoc",), invoke_without_command=True)
-    @override_in_channel()
+    @override_in_channel(AOC_WHITELIST)
     async def adventofcode_group(self, ctx: commands.Context) -> None:
         """All of the Advent of Code commands."""
         await ctx.send_help(ctx.command)
@@ -136,6 +138,7 @@ class AdventOfCode(commands.Cog):
         aliases=("sub", "notifications", "notify", "notifs"),
         brief="Notifications for new days"
     )
+    @override_in_channel(AOC_WHITELIST)
     async def aoc_subscribe(self, ctx: commands.Context) -> None:
         """Assign the role for notifications about new days being ready."""
         role = ctx.guild.get_role(AocConfig.role_id)
@@ -150,6 +153,7 @@ class AdventOfCode(commands.Cog):
                            f"If you don't want them any more, run `{unsubscribe_command}` instead.")
 
     @adventofcode_group.command(name="unsubscribe", aliases=("unsub",), brief="Notifications for new days")
+    @override_in_channel(AOC_WHITELIST)
     async def aoc_unsubscribe(self, ctx: commands.Context) -> None:
         """Remove the role for notifications about new days being ready."""
         role = ctx.guild.get_role(AocConfig.role_id)
@@ -161,6 +165,7 @@ class AdventOfCode(commands.Cog):
             await ctx.send("Hey, you don't even get any notifications about new Advent of Code tasks currently anyway.")
 
     @adventofcode_group.command(name="countdown", aliases=("count", "c"), brief="Return time left until next day")
+    @override_in_channel(AOC_WHITELIST)
     async def aoc_countdown(self, ctx: commands.Context) -> None:
         """Return time left until next day."""
         if not is_in_advent():
@@ -178,11 +183,13 @@ class AdventOfCode(commands.Cog):
         await ctx.send(f"There are {hours} hours and {minutes} minutes left until day {tomorrow.day}.")
 
     @adventofcode_group.command(name="about", aliases=("ab", "info"), brief="Learn about Advent of Code")
+    @override_in_channel(AOC_WHITELIST)
     async def about_aoc(self, ctx: commands.Context) -> None:
         """Respond with an explanation of all things Advent of Code."""
         await ctx.send("", embed=self.cached_about_aoc)
 
     @adventofcode_group.command(name="join", aliases=("j",), brief="Learn how to join PyDis' private AoC leaderboard")
+    @override_in_channel(AOC_WHITELIST)
     async def join_leaderboard(self, ctx: commands.Context) -> None:
         """DM the user the information for joining the PyDis AoC private leaderboard."""
         author = ctx.message.author
@@ -203,6 +210,7 @@ class AdventOfCode(commands.Cog):
         aliases=("board", "lb"),
         brief="Get a snapshot of the PyDis private AoC leaderboard",
     )
+    @override_in_channel(AOC_WHITELIST)
     async def aoc_leaderboard(self, ctx: commands.Context, number_of_people_to_display: int = 10) -> None:
         """
         Pull the top number_of_people_to_display members from the PyDis leaderboard and post an embed.
@@ -244,6 +252,7 @@ class AdventOfCode(commands.Cog):
         aliases=("dailystats", "ds"),
         brief="Get daily statistics for the PyDis private leaderboard"
     )
+    @override_in_channel(AOC_WHITELIST)
     async def private_leaderboard_daily_stats(self, ctx: commands.Context) -> None:
         """
         Respond with a table of the daily completion statistics for the PyDis private leaderboard.
@@ -287,6 +296,7 @@ class AdventOfCode(commands.Cog):
         aliases=("globalboard", "gb"),
         brief="Get a snapshot of the global AoC leaderboard",
     )
+    @override_in_channel(AOC_WHITELIST)
     async def global_leaderboard(self, ctx: commands.Context, number_of_people_to_display: int = 10) -> None:
         """
         Pull the top number_of_people_to_display members from the global AoC leaderboard and post an embed.

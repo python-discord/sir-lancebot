@@ -3,10 +3,11 @@ import logging
 import discord
 from discord.ext import commands
 
-from bot.constants import Colours
+from bot.constants import Channels, Colours, WHITELISTED_CHANNELS
 from bot.decorators import override_in_channel
 
 log = logging.getLogger(__name__)
+ISSUE_WHITELIST = WHITELISTED_CHANNELS + (Channels.seasonalbot_chat,)
 
 
 class Issues(commands.Cog):
@@ -16,7 +17,7 @@ class Issues(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=("issues",))
-    @override_in_channel()
+    @override_in_channel(ISSUE_WHITELIST)
     async def issue(
         self, ctx: commands.Context, number: int, repository: str = "seasonalbot", user: str = "python-discord"
     ) -> None:
