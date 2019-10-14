@@ -29,7 +29,7 @@ class Issues(commands.Cog):
     async def issue(self, ctx: commands.Context, number: int, repository: str = "seasonalbot",
                     user: str = "python-discord") -> None:
         """Command to get issues/pull request from GitHub."""
-        url = f"https://api.github.com/repos/{user}/{repository}/issues/{str(number)}"
+        url = f"https://api.github.com/repos/{user}/{repository}/issues/{number}"
         mergeURL = f"https://api.github.com/repos/{user}/{repository}/pulls/{str(number)}/merge"
 
         async with self.bot.http_session.get(url) as r:
