@@ -30,7 +30,7 @@ class Issues(commands.Cog):
                     user: str = "python-discord") -> None:
         """Command to get issues/pull request from GitHub."""
         url = f"https://api.github.com/repos/{user}/{repository}/issues/{number}"
-        mergeURL = f"https://api.github.com/repos/{user}/{repository}/pulls/{str(number)}/merge"
+        mergeURL = f"https://api.github.com/repos/{user}/{repository}/pulls/{number}/merge"
 
         async with self.bot.http_session.get(url) as r:
             json_data = await r.json()
