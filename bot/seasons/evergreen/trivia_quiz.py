@@ -58,29 +58,14 @@ class TriviaQuiz(commands.Cog):
         - general : Test your general knowledge. (default)
         (More to come!)
         """
-        category = category.lower()
-
         if ctx.channel.id not in self.game_status:
             self.game_status[ctx.channel.id] = False
 
         if ctx.channel.id not in self.game_player_scores:
             self.game_player_scores[ctx.channel.id] = {}
 
-        # Start game if not running.
-        if not self.game_status[ctx.channel.id]:
-            self.game_owners[ctx.channel.id] = ctx.author
-            self.game_status[ctx.channel.id] = True
-            start_embed = discord.Embed(colour=discord.Colour.red())
-            start_embed.title = "Quiz game Starting!!"
-            start_embed.description = "Each game consists of 5 questions.\n"
-            start_embed.description += "**Rules :**\nNo cheating and have fun!"
-            start_embed.set_footer(
-                text="Points for a question reduces by 25 after 10s or after a hint. Total time is 30s per question"
-            )
-            await ctx.send(embed=start_embed)  # send an embed with the rules
-            await asyncio.sleep(1)
         # Stop game if running.
-        else:
+        if self.game_status[ctx.channel.id] is True:
             # Check if the author is the game starter or a moderator.
             if (
                     ctx.author == self.game_owners[ctx.channel.id]
@@ -93,11 +78,28 @@ class TriviaQuiz(commands.Cog):
                 self.game_player_scores[ctx.channel.id] = {}
             else:
                 await ctx.send(f"{ctx.author.mention}, you are not authorised to stop this game :ghost: !")
+            return
 
+        category = category.lower()
+        # Send embed showing available categories if inputted category is invalid.
         if category not in self.categories:
             embed = self.category_embed
             await ctx.send(embed=embed)
             return
+
+        # Start game if not running.
+        if self.game_status[ctx.channel.id] is False:
+            self.game_owners[ctx.channel.id] = ctx.author
+            self.game_status[ctx.channel.id] = True
+            start_embed = discord.Embed(colour=discord.Colour.red())
+            start_embed.title = "Quiz game Starting!!"
+            start_embed.description = "Each game consists of 5 questions.\n"
+            start_embed.description += "**Rules :**\nNo cheating and have fun!"
+            start_embed.set_footer(
+                text="Points for a question reduces by 25 after 10s or after a hint. Total time is 30s per question"
+            )
+            await ctx.send(embed=start_embed)  # send an embed with the rules
+            await asyncio.sleep(1)
 
         topic = self.questions[category]
 
