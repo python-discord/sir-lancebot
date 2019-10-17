@@ -87,6 +87,12 @@ class Emojis:
     terning5 = "<:terning5:431249716328792064>"
     terning6 = "<:terning6:431249726705369098>"
 
+    issue = "<:IssueOpen:629695470327037963>"
+    issue_closed = "<:IssueClosed:629695470570307614>"
+    pull_request = "<:PROpen:629695470175780875>"
+    pull_request_closed = "<:PRClosed:629695470519713818>"
+    merge = "<:PRMerged:629695470570176522>"
+
 
 class Lovefest:
     role_id = int(environ.get("LOVEFEST_ROLE_ID", 542431903886606399))
