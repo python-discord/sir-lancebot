@@ -24,7 +24,6 @@ WRONG_ANS_RESPONSE = [
 
 class TriviaQuiz(commands.Cog):
     """A cog for all quiz commands."""
-
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.questions = self.load_questions()
@@ -66,19 +65,7 @@ class TriviaQuiz(commands.Cog):
 
         # Stop game if running.
         if self.game_status[ctx.channel.id] is True:
-            # Check if the author is the game starter or a moderator.
-            if (
-                    ctx.author == self.game_owners[ctx.channel.id]
-                    or any(Roles.moderator == role.id for role in ctx.author.roles)
-            ):
-                await ctx.send("Quiz is no longer running.")
-                await self.declare_winner(ctx.channel, self.game_player_scores[ctx.channel.id])
-                self.game_status[ctx.channel.id] = False
-                del self.game_owners[ctx.channel.id]
-                self.game_player_scores[ctx.channel.id] = {}
-            else:
-                await ctx.send(f"{ctx.author.mention}, you are not authorised to stop this game :ghost: !")
-            return
+            await self.stop_quiz(ctx.author, ctx.channel)
 
         category = category.lower()
         # Send embed showing available categories if inputted category is invalid.
@@ -89,15 +76,11 @@ class TriviaQuiz(commands.Cog):
 
         # Start game if not running.
         if self.game_status[ctx.channel.id] is False:
+
             self.game_owners[ctx.channel.id] = ctx.author
             self.game_status[ctx.channel.id] = True
-            start_embed = discord.Embed(colour=discord.Colour.red())
-            start_embed.title = "Quiz game Starting!!"
-            start_embed.description = "Each game consists of 5 questions.\n"
-            start_embed.description += "**Rules :**\nNo cheating and have fun!"
-            start_embed.set_footer(
-                text="Points for a question reduces by 25 after 10s or after a hint. Total time is 30s per question"
-            )
+            start_embed = self.make_start_embed()
+
             await ctx.send(embed=start_embed)  # send an embed with the rules
             await asyncio.sleep(1)
 
@@ -116,8 +99,10 @@ class TriviaQuiz(commands.Cog):
                 del self.game_owners[ctx.channel.id]
                 self.game_player_scores[ctx.channel.id] = {}
                 break
+
             # If no hint has been sent or any time alert. Basically if hint_no = 0  means it is a new question.
             if hint_no == 0:
+                # Select a random question which has not been used yet.
                 while True:
                     question_dict = random.choice(topic)
                     if question_dict["id"] not in done_question:
@@ -155,6 +140,8 @@ class TriviaQuiz(commands.Cog):
                 # If hint_no > 2, then it means that all hints/time alerts have been sent.
                 # Also means that the answer is not yet given and the bot sends the answer and the next question.
                 else:
+                    if self.game_status[ctx.channel.id] is False:
+                        break
                     response = random.choice(WRONG_ANS_RESPONSE)
                     expression = random.choice(ANNOYED_EXPRESSIONS)
                     await ctx.send(f"{response} {expression}")
@@ -167,6 +154,8 @@ class TriviaQuiz(commands.Cog):
                     await asyncio.sleep(2)
 
             else:
+                if self.game_status[ctx.channel.id] is False:
+                    break
                 # Reduce points by 25 for every hint/time alert that has been sent.
                 points = 100 - 25*hint_no
                 if msg.author in self.game_player_scores[ctx.channel.id]:
@@ -186,6 +175,33 @@ class TriviaQuiz(commands.Cog):
                 await self.send_answer(ctx.channel, question_dict)
                 await self.send_score(ctx.channel, self.game_player_scores[ctx.channel.id])
                 await asyncio.sleep(2)
+
+    @staticmethod
+    def make_start_embed():
+        """Generate a starting/introduction embed for the quiz."""
+        start_embed = discord.Embed(colour=discord.Colour.red())
+        start_embed.title = "Quiz game Starting!!"
+        start_embed.description = "Each game consists of 5 questions.\n"
+        start_embed.description += "**Rules :**\nNo cheating and have fun!"
+        start_embed.set_footer(
+            text="Points for a question reduces by 25 after 10s or after a hint. Total time is 30s per question"
+        )
+        return start_embed
+
+    async def stop_quiz(self, author, channel):
+        # Check if the author is the game starter or a moderator.
+        if (
+                author == self.game_owners[channel.id]
+                or any(Roles.moderator == role.id for role in author.roles)
+        ):
+            await channel.send("Quiz is no longer running.")
+            await self.declare_winner(channel, self.game_player_scores[channel.id])
+            self.game_status[channel.id] = False
+            del self.game_owners[channel.id]
+            self.game_player_scores[channel.id] = {}
+        else:
+            await channel.send(f"{author.mention}, you are not authorised to stop this game :ghost: !")
+        return
 
     @quiz_game.command(name="leaderboard")
     async def leaderboard(self, ctx: commands.Context) -> None:
