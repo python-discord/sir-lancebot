@@ -6,6 +6,8 @@ from pathlib import Path
 
 import discord
 from discord.ext import commands
+from discord.ext.commands import cooldown
+from discord.ext.commands.cooldowns import BucketType
 from fuzzywuzzy import fuzz
 
 from bot.constants import Roles
@@ -45,6 +47,7 @@ class TriviaQuiz(commands.Cog):
             questions = json.load(json_data)
             return questions
 
+    @cooldown(1, 20, BucketType.channel)
     @commands.group(name="quiz", aliases=["trivia"], invoke_without_command=True)
     async def quiz_game(self, ctx: commands.Context, category: str = "general") -> None:
         """
@@ -177,7 +180,7 @@ class TriviaQuiz(commands.Cog):
                 await asyncio.sleep(2)
 
     @staticmethod
-    def make_start_embed():
+    def make_start_embed() -> discord.Embed:
         """Generate a starting/introduction embed for the quiz."""
         start_embed = discord.Embed(colour=discord.Colour.red())
         start_embed.title = "Quiz game Starting!!"
@@ -188,7 +191,8 @@ class TriviaQuiz(commands.Cog):
         )
         return start_embed
 
-    async def stop_quiz(self, author, channel):
+    async def stop_quiz(self, author: discord.Member, channel: discord.TextChannel) -> None:
+        """Stop the quiz."""
         # Check if the author is the game starter or a moderator.
         if (
                 author == self.game_owners[channel.id]
