@@ -58,7 +58,7 @@ class HacktoberIssues(commands.Cog):
             else:
                 url = URL
                 if self.cache_normal is not None:
-                    page = random.randint(1, min(1000, self.cache_normal["total_count"]))
+                    page = random.randint(1, min(1000, self.cache_normal["total_count"]) // 100)
                     url += f"&page={page}"
 
             log.debug(f"making api request to url: {url}")
