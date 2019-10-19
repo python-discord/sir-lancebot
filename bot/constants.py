@@ -22,6 +22,7 @@ class AdventOfCode:
 
 class Channels(NamedTuple):
     admins = 365960823622991872
+    advent_of_code = 517745814039166986
     announcements = int(environ.get("CHANNEL_ANNOUNCEMENTS", 354619224620138496))
     big_brother_logs = 468507907357409333
     bot = 267659945086812160
@@ -86,6 +87,12 @@ class Emojis:
     terning4 = "<:terning4:579980271475228682>"
     terning5 = "<:terning5:431249716328792064>"
     terning6 = "<:terning6:431249726705369098>"
+
+    issue = "<:IssueOpen:629695470327037963>"
+    issue_closed = "<:IssueClosed:629695470570307614>"
+    pull_request = "<:PROpen:629695470175780875>"
+    pull_request_closed = "<:PRClosed:629695470519713818>"
+    merge = "<:PRMerged:629695470570176522>"
 
 
 class Lovefest:
