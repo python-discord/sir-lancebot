@@ -26,6 +26,7 @@ WRONG_ANS_RESPONSE = [
 
 class TriviaQuiz(commands.Cog):
     """A cog for all quiz commands."""
+
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.questions = self.load_questions()
@@ -69,6 +70,7 @@ class TriviaQuiz(commands.Cog):
         # Stop game if running.
         if self.game_status[ctx.channel.id] is True:
             await self.stop_quiz(ctx.author, ctx.channel)
+            return
 
         category = category.lower()
         # Send embed showing available categories if inputted category is invalid.
@@ -205,7 +207,6 @@ class TriviaQuiz(commands.Cog):
             self.game_player_scores[channel.id] = {}
         else:
             await channel.send(f"{author.mention}, you are not authorised to stop this game :ghost: !")
-        return
 
     @quiz_game.command(name="leaderboard")
     async def leaderboard(self, ctx: commands.Context) -> None:
