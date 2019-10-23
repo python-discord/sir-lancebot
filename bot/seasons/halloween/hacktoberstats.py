@@ -238,8 +238,9 @@ class HacktoberStats(commands.Cog):
             f"&per_page={per_page}"
         )
 
+        headers = {"user-agent": "Discord Python Hacktoberbot"}
         async with aiohttp.ClientSession() as session:
-            async with session.get(query_url) as resp:
+            async with session.get(query_url, headers=headers) as resp:
                 jsonresp = await resp.json()
 
         if "message" in jsonresp.keys():
