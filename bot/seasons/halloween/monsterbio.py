@@ -17,6 +17,9 @@ with open(Path("bot/resources/halloween/monster.json"), "r", encoding="utf8") as
 class MonsterBio(commands.Cog):
     """A cog that generates a spooky monster biography."""
 
+    def __init__(self, bot: commands.Bot):
+        self.bot = bot
+
     def generate_name(self, length: int) -> str:
         """Generates a name (for either monster species or monster name)."""
         return "".join([random.choice(TEXT_OPTIONS["monster_type"][i]) for i in range(length)])
