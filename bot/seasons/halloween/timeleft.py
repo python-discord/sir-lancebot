@@ -25,7 +25,7 @@ class TimeLeft(commands.Cog):
         year = now.year
         if now.month > 10:
             year += 1
-        end = datetime(year, 10, 31, 11, 59, 59)
+        end = datetime(year, 11, 1, 11, 59, 59)
         start = datetime(year, 10, 1)
         return now, end, start
 
