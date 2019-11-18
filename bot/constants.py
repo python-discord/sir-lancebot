@@ -1,6 +1,7 @@
 import logging
 from os import environ
 from typing import NamedTuple
+from datetime import datetime
 
 __all__ = (
     "AdventOfCode", "Channels", "Client", "Colours", "Emojis", "Hacktoberfest", "Roles", "Tokens",
@@ -16,7 +17,7 @@ class AdventOfCode:
     leaderboard_id = 363275
     leaderboard_join_code = str(environ.get("AOC_JOIN_CODE", None))
     leaderboard_max_displayed_members = 10
-    year = 2018
+    year = datetime.utcnow().year
     role_id = int(environ.get("AOC_ROLE_ID", 518565788744024082))
 
 
