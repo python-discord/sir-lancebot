@@ -16,10 +16,8 @@ from bot.constants import Roles
 logger = logging.getLogger(__name__)
 
 
-ANNOYED_EXPRESSIONS = ["-_-", "-.-"]
-
 WRONG_ANS_RESPONSE = [
-    "No one gave the correct answer",
+    "No answered correctly!",
     "Better luck next time"
 ]
 
@@ -42,7 +40,7 @@ class TriviaQuiz(commands.Cog):
 
     @staticmethod
     def load_questions() -> dict:
-        """Load the questions from  json file."""
+        """Load the questions from the JSON file."""
         p = Path("bot", "resources", "evergreen", "trivia_quiz.json")
         with p.open() as json_data:
             questions = json.load(json_data)
@@ -55,7 +53,7 @@ class TriviaQuiz(commands.Cog):
         Start/Stop a quiz!
 
         If the quiz game is running, then the owner or a mod can stop it by using this command
-        without providing any arguments and vice versa.
+        without providing any arguments or vice versa.
 
         Questions for the quiz can be selected from the following categories:
         - general : Test your general knowledge. (default)
@@ -98,7 +96,7 @@ class TriviaQuiz(commands.Cog):
 
             # Exit quiz if number of questions for a round are already sent.
             if len(done_question) > self.question_limit and hint_no == 0:
-                await ctx.send("The round ends here.")
+                await ctx.send("The round has ended.")
                 await self.declare_winner(ctx.channel, self.game_player_scores[ctx.channel.id])
                 self.game_status[ctx.channel.id] = False
                 del self.game_owners[ctx.channel.id]
@@ -139,7 +137,7 @@ class TriviaQuiz(commands.Cog):
                         hints = question_dict["hints"]
                         await ctx.send(f"**Hint #{hint_no+1}\n**{hints[hint_no]}")
                     else:
-                        await ctx.send(f"Cmon guys, {30-hint_no*10}s left!")
+                        await ctx.send(f"{30-hint_no*10}s left!")
 
                 # Once hint or time alerts has been sent 2 times, the hint_no value will be 3
                 # If hint_no > 2, then it means that all hints/time alerts have been sent.
@@ -148,8 +146,7 @@ class TriviaQuiz(commands.Cog):
                     if self.game_status[ctx.channel.id] is False:
                         break
                     response = random.choice(WRONG_ANS_RESPONSE)
-                    expression = random.choice(ANNOYED_EXPRESSIONS)
-                    await ctx.send(f"{response} {expression}")
+                    await ctx.send(response)
                     await self.send_answer(ctx.channel, question_dict)
                     await asyncio.sleep(1)
 
@@ -176,7 +173,7 @@ class TriviaQuiz(commands.Cog):
 
                 hint_no = 0
 
-                await ctx.send(f"{msg.author.mention} got the correct answer :tada: {points} points for ya.")
+                await ctx.send(f"{msg.author.mention} got the correct answer :tada: {points} points!")
                 await self.send_answer(ctx.channel, question_dict)
                 await self.send_score(ctx.channel, self.game_player_scores[ctx.channel.id])
                 await asyncio.sleep(2)
@@ -189,7 +186,7 @@ class TriviaQuiz(commands.Cog):
         start_embed.description = "Each game consists of 5 questions.\n"
         start_embed.description += "**Rules :**\nNo cheating and have fun!"
         start_embed.set_footer(
-            text="Points for a question reduces by 25 after 10s or after a hint. Total time is 30s per question"
+            text="Points for each question reduces by 25 after 10s or after a hint. Total time is 30s per question"
         )
         return start_embed
 
@@ -200,13 +197,13 @@ class TriviaQuiz(commands.Cog):
                 author == self.game_owners[channel.id]
                 or any(Roles.moderator == role.id for role in author.roles)
         ):
-            await channel.send("Quiz is no longer running.")
+            await channel.send("Quiz stopped.")
             await self.declare_winner(channel, self.game_player_scores[channel.id])
             self.game_status[channel.id] = False
             del self.game_owners[channel.id]
             self.game_player_scores[channel.id] = {}
         else:
-            await channel.send(f"{author.mention}, you are not authorised to stop this game :ghost: !")
+            await channel.send(f"{author.mention}, you are not authorised to stop this game :ghost:!")
 
     @quiz_game.command(name="leaderboard")
     async def leaderboard(self, ctx: commands.Context) -> None:
@@ -220,7 +217,7 @@ class TriviaQuiz(commands.Cog):
         embed.title = "Score Board"
         embed.description = ""
         if len(player_data) == 0:
-            await channel.send("No one has made it to the leaderboard yet.")
+            await channel.send("No one has made it onto the leaderboard yet.")
             return
         sorted_dict = sorted(player_data.items(), key=lambda a: a[1], reverse=True)
         for item in sorted_dict:
@@ -247,15 +244,15 @@ class TriviaQuiz(commands.Cog):
                 winners_mention = None
                 for winner in winners:
                     winners_mention += f"{winner.mention} "
-
             else:
                 word = "You"
                 author_index = list(player_data.values()).index(highest_points)
                 winner = list(player_data.keys())[author_index]
                 winners_mention = winner.mention
+
             await channel.send(
-                f"Congratz {winners_mention} :tada: "
-                f"{word} have won this quiz game with a grand total of {highest_points} points!!"
+                f"Congratulations {winners_mention} :tada: "
+                f"{word} have won this quiz game with a grand total of {highest_points} points!"
             )
 
     @property
@@ -279,11 +276,11 @@ class TriviaQuiz(commands.Cog):
         embed.description = ""
         if info != "":
             embed.description += f"**Information**\n{info}\n\n"
-        embed.description += "Lets move to the next question.\nRemaining questions: "
+        embed.description += "Let's move to the next question.\nRemaining questions: "
         await channel.send(embed=embed)
 
 
 def setup(bot: commands.Bot) -> None:
-    """Loading the cog."""
+    """Load the cog."""
     bot.add_cog(TriviaQuiz(bot))
     logger.debug("TriviaQuiz cog loaded")
