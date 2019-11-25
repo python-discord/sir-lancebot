@@ -17,7 +17,7 @@ class AdventOfCode:
     leaderboard_id = 631135
     leaderboard_join_code = str(environ.get("AOC_JOIN_CODE", None))
     leaderboard_max_displayed_members = 10
-    year = datetime.utcnow().year
+    year = int(environ.get("AOC_YEAR", datetime.utcnow().year))
     role_id = int(environ.get("AOC_ROLE_ID", 518565788744024082))
 
 
