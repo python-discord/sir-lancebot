@@ -6,8 +6,6 @@ from pathlib import Path
 
 import discord
 from discord.ext import commands
-from discord.ext.commands import cooldown
-from discord.ext.commands.cooldowns import BucketType
 from fuzzywuzzy import fuzz
 
 from bot.constants import Roles
@@ -17,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 WRONG_ANS_RESPONSE = [
-    "No answered correctly!",
+    "No one answered correctly!",
     "Better luck next time"
 ]
 
@@ -46,11 +44,10 @@ class TriviaQuiz(commands.Cog):
             questions = json.load(json_data)
             return questions
 
-    @cooldown(1, 20, BucketType.channel)
     @commands.group(name="quiz", aliases=["trivia"], invoke_without_command=True)
     async def quiz_game(self, ctx: commands.Context, category: str = "general") -> None:
         """
-        Start/Stop a quiz!
+        Start a quiz!
 
         If the quiz game is running, then the owner or a mod can stop it by using this command
         without providing any arguments or vice versa.
@@ -67,6 +64,10 @@ class TriviaQuiz(commands.Cog):
 
         # Stop game if running.
         if self.game_status[ctx.channel.id] is True:
+            return await ctx.send(
+                f"Game is already running..."
+                f"do `{self.bot.command_prefix}quiz stop`"
+            )
             await self.stop_quiz(ctx.author, ctx.channel)
             return
 
@@ -190,7 +191,15 @@ class TriviaQuiz(commands.Cog):
         )
         return start_embed
 
-    async def stop_quiz(self, author: discord.Member, channel: discord.TextChannel) -> None:
+    @quiz_game.command(name="stop")
+    async def stop_quiz(self, ctx: commands.Context) -> None:
+        """Stop a quiz game if its running in the channel."""
+        if self.game_status[ctx.channel.id] is True:
+            await self.stop(ctx.author, ctx.channel)
+        else:
+            await ctx.send("No quiz running.")
+
+    async def stop(self, author: discord.Member, channel: discord.TextChannel) -> None:
         """Stop the quiz."""
         # Check if the author is the game starter or a moderator.
         if (
