@@ -22,5 +22,5 @@ class Christmas(SeasonBase):
 
     colour = Colours.dark_green
     icon = (
-        "/logos/logo_seasonal/christmas/festive.png",
+        "/logos/logo_seasonal/christmas/2019/festive_512.gif",
     )

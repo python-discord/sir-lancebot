@@ -79,6 +79,7 @@ class SeasonBase:
 
     start_date: Optional[str] = None
     end_date: Optional[str] = None
+    should_announce: bool = False
 
     colour: Optional[int] = None
     icon: Tuple[str, ...] = ("/logos/logo_full/logo_full.png",)
@@ -268,11 +269,11 @@ class SeasonBase:
         """
         Announces a change in season in the announcement channel.
 
-        It will skip the announcement if the current active season is the "evergreen" default season.
+        Auto-announcement is configured by the `should_announce` `SeasonBase` attribute
         """
-        # Don't actually announce if reverting to normal season
-        if self.name in ("evergreen", "wildcard", "halloween"):
-            log.debug(f"Season Changed: {self.name}")
+        # Short circuit if the season had disabled automatic announcements
+        if not self.should_announce:
+            log.debug(f"Season changed without announcement: {self.name}")
             return
 
         guild = bot.get_guild(Client.guild)
