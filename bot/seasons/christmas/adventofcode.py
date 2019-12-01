@@ -188,7 +188,7 @@ class AdventOfCode(commands.Cog):
         """Respond with an explanation of all things Advent of Code."""
         await ctx.send("", embed=self.cached_about_aoc)
 
-    @adventofcode_group.command(name="join", aliases=("j",), brief="Learn how to join PyDis' private AoC leaderboard")
+    @adventofcode_group.command(name="join", aliases=("j",), brief="Send a DM with information on how to join the leaderboard")
     @override_in_channel(AOC_WHITELIST)
     async def join_leaderboard(self, ctx: commands.Context) -> None:
         """DM the user the information for joining the PyDis AoC private leaderboard."""
