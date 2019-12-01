@@ -1,0 +1,41 @@
+{
+  "monster_type": [
+    ["El", "Go", "Ma", "Nya", "Wo", "Hom", "Shar", "Gronn", "Grom", "Blar"],
+    ["gaf", "mot", "phi", "zyme", "qur", "tile", "pim"],
+    ["yam", "ja", "rok", "pym", "el"],
+    ["ya", "tor", "tir", "tyre", "pam"]
+  ],
+  "scientist_first_name": ["Ellis", "Elliot", "Rick", "Laurent", "Morgan", "Sophia", "Oak"],
+  "scientist_last_name": ["E. M.", "E. T.", "Smith", "Schimm", "Schiftner", "Smile", "Tomson", "Thompson", "Huffson", "Argor", "Lephtain", "S. M.", "A. R.", "P. G."],
+  "verb": [
+    "discovered", "created", "found"
+  ],
+  "adjective": [
+    "ferocious", "spectacular", "incredible", "terrifying"
+  ],
+  "physical_adjective": [
+    "springy", "rubbery", "bouncy", "tough", "notched", "chipped"
+  ],
+  "color": [
+    "blue", "green", "teal", "black", "pure white", "obsidian black", "purple", "bright red", "bright yellow"
+  ],
+  "attribute": [
+    "horns", "teeth", "shell", "fur", "bones", "exoskeleton", "spikes"
+  ],
+  "ability": [
+    "breathe fire", "devour dreams", "lift thousand-pound weights", "devour metal", "chew up diamonds", "create diamonds", "create gemstones", "breathe icy cold air", "spit poison", "live forever"
+  ],
+  "ingredients": [
+    "witch's eye", "frog legs", "slime", "true love's kiss", "a lock of golden hair", "the skin of a snake", "a never-melting chunk of ice"
+  ],
+  "time": [
+    "dusk", "dawn", "mid-day", "midnight on a full moon", "midnight on Halloween night", "the time of a solar eclipse", "the time of a lunar eclipse."
+  ],
+  "year": [
+    "1996", "1594", "1330", "1700"
+  ],
+  "biography_text": [
+    {"scientist_first_name": 1, "scientist_last_name": 1, "verb": 1, "adjective": 1, "attribute": 1, "ability": 1, "color": 1, "year": 1, "time": 1, "physical_adjective": 1, "text": "Your name is {monster_name}, a member of the {adjective} species {monster_species}. The first {monster_species} was {verb} by {scientist_first_name} {scientist_last_name} in {year} at {time}. The species {monster_species} is known for its {physical_adjective} {color} {attribute}. It is said to even be able to {ability}!"},
+    {"scientist_first_name": 1, "scientist_last_name": 1, "adjective": 1, "attribute": 1, "physical_adjective": 1, "ingredients": 2, "time": 1, "ability": 1, "verb": 1, "color": 1, "year": 1, "text": "The {monster_species} is an {adjective} species, and you, {monster_name}, are no exception. {monster_species} is famed for its {physical_adjective} {attribute}. Whispers say that when brewed with {ingredients[0]} and {ingredients[1]} at {time}, a foul, {color} brew will be produced, granting it's drinker the ability to {ability}! This species was {verb} by {scientist_first_name} {scientist_last_name} in {year}."}
+  ]
+}

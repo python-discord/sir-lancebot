@@ -74,6 +74,7 @@ class Colours:
     soft_green = 0x68c290
     soft_red = 0xcd6d6d
     yellow = 0xf9f586
+    purple = 0xb734eb
 
 
 class Emojis:
