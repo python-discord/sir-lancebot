@@ -406,7 +406,7 @@ class AdventOfCode(commands.Cog):
             self.cached_global_leaderboard = await AocGlobalLeaderboard.from_url()
         else:
             self.cached_private_leaderboard = await AocPrivateLeaderboard.from_url()
-        
+
     def cog_unload(self) -> None:
         """Cancel season-related tasks on cog unload."""
         self.countdown_task.cancel()
