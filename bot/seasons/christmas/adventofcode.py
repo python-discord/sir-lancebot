@@ -407,6 +407,11 @@ class AdventOfCode(commands.Cog):
         else:
             self.cached_private_leaderboard = await AocPrivateLeaderboard.from_url()
 
+    def cog_unload(self) -> None:
+        """Cancel season-related tasks on cog unload."""
+        self.countdown_task.cancel()
+        self.status_task.cancel()
+
 
 class AocMember:
     """Object representing the Advent of Code user."""
