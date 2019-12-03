@@ -170,10 +170,21 @@ class AdventOfCode(commands.Cog):
         """Return time left until next day."""
         if not is_in_advent():
             datetime_now = datetime.now(EST)
-            december_first = datetime(datetime_now.year + 1, 12, 1, tzinfo=EST)
-            delta = december_first - datetime_now
+
+            # Calculate the delta to this & next year's December 1st to see which one is closest and not in the past
+            this_year = datetime(datetime_now.year, 12, 1, tzinfo=EST)
+            next_year = datetime(datetime_now.year + 1, 12, 1, tzinfo=EST)
+            deltas = (dec_first - datetime_now for dec_first in (this_year, next_year))
+            delta = min(delta for delta in deltas if delta >= timedelta())  # timedelta() gives 0 duration delta
+
+            # Add a finer timedelta if there's less than a day left
+            if delta.days == 0:
+                delta_str = f"approximately {delta.seconds // 3600} hours"
+            else:
+                delta_str = f"{delta.days} days"
+
             await ctx.send(f"The Advent of Code event is not currently running. "
-                           f"The next event will start in {delta.days} days.")
+                           f"The next event will start in {delta_str}.")
             return
 
         tomorrow, time_left = time_left_to_aoc_midnight()

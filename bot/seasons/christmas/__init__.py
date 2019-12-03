@@ -1,3 +1,5 @@
+import datetime
+
 from bot.constants import Colours
 from bot.seasons import SeasonBase
 
@@ -24,3 +26,8 @@ class Christmas(SeasonBase):
     icon = (
         "/logos/logo_seasonal/christmas/2019/festive_512.gif",
     )
+
+    @classmethod
+    def end(cls) -> datetime.datetime:
+        """Overload the `SeasonBase` method to account for the event ending in the next year."""
+        return datetime.datetime.strptime(f"{cls.end_date}/{cls.current_year() + 1}", cls.date_format)
