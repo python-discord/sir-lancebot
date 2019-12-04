@@ -46,7 +46,7 @@ class EggDecorating(commands.Cog):
     @commands.command(aliases=["decorateegg"])
     async def eggdecorate(
         self, ctx: commands.Context, *colours: Union[discord.Colour, str]
-    ) -> Union[Image, discord.Message]:
+    ) -> Union[Image.Image, discord.Message]:
         """
         Picks a random egg design and decorates it using the given colours.
 
