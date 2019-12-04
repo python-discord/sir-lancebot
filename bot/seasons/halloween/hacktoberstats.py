@@ -227,6 +227,7 @@ class HacktoberStats(commands.Cog):
         not_label = "invalid"
         action_type = "pr"
         is_query = f"public+author:{github_username}"
+        not_query = "draft"
         date_range = f"{CURRENT_YEAR}-10-01T00:00:00%2B14:00..{CURRENT_YEAR}-10-31T23:59:59-11:00"
         per_page = "300"
         query_url = (
@@ -234,6 +235,7 @@ class HacktoberStats(commands.Cog):
             f"-label:{not_label}"
             f"+type:{action_type}"
             f"+is:{is_query}"
+            f"+-is:{not_query}"
             f"+created:{date_range}"
             f"&per_page={per_page}"
         )
