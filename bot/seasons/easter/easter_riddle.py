@@ -83,7 +83,7 @@ class EasterRiddle(commands.Cog):
         self.current_channel = None
 
     @commands.Cog.listener()
-    async def on_message(self, message: discord.Messaged) -> None:
+    async def on_message(self, message: discord.Message) -> None:
         """If a non-bot user enters a correct answer, their username gets added to self.winners."""
         if self.current_channel != message.channel:
             return

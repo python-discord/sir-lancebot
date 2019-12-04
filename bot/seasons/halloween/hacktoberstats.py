@@ -58,6 +58,7 @@ class HacktoberStats(commands.Cog):
         await self.get_stats(ctx, github_username)
 
     @hacktoberstats_group.command(name="link")
+    @override_in_channel(HACKTOBER_WHITELIST)
     async def link_user(self, ctx: commands.Context, github_username: str = None) -> None:
         """
         Link the invoking user's Github github_username to their Discord ID.
@@ -91,6 +92,7 @@ class HacktoberStats(commands.Cog):
             await ctx.send(f"{author_mention}, a GitHub username is required to link your account")
 
     @hacktoberstats_group.command(name="unlink")
+    @override_in_channel(HACKTOBER_WHITELIST)
     async def unlink_user(self, ctx: commands.Context) -> None:
         """Remove the invoking user's account link from the log."""
         author_id, author_mention = HacktoberStats._author_mention_from_context(ctx)

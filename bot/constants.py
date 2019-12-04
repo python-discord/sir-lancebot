@@ -1,6 +1,7 @@
 import logging
 from os import environ
 from typing import NamedTuple
+from datetime import datetime
 
 __all__ = (
     "AdventOfCode", "Channels", "Client", "Colours", "Emojis", "Hacktoberfest", "Roles", "Tokens",
@@ -13,15 +14,16 @@ log = logging.getLogger(__name__)
 
 class AdventOfCode:
     leaderboard_cache_age_threshold_seconds = 3600
-    leaderboard_id = 363275
+    leaderboard_id = 631135
     leaderboard_join_code = str(environ.get("AOC_JOIN_CODE", None))
     leaderboard_max_displayed_members = 10
-    year = 2018
+    year = int(environ.get("AOC_YEAR", datetime.utcnow().year))
     role_id = int(environ.get("AOC_ROLE_ID", 518565788744024082))
 
 
 class Channels(NamedTuple):
     admins = 365960823622991872
+    advent_of_code = 517745814039166986
     announcements = int(environ.get("CHANNEL_ANNOUNCEMENTS", 354619224620138496))
     big_brother_logs = 468507907357409333
     bot = 267659945086812160
@@ -72,12 +74,14 @@ class Colours:
     soft_green = 0x68c290
     soft_red = 0xcd6d6d
     yellow = 0xf9f586
+    purple = 0xb734eb
 
 
 class Emojis:
     star = "\u2B50"
     christmas_tree = "\U0001F384"
     check = "\u2611"
+    envelope = "\U0001F4E8"
 
     terning1 = "<:terning1:431249668983488527>"
     terning2 = "<:terning2:462339216987127808>"
@@ -85,6 +89,12 @@ class Emojis:
     terning4 = "<:terning4:579980271475228682>"
     terning5 = "<:terning5:431249716328792064>"
     terning6 = "<:terning6:431249726705369098>"
+
+    issue = "<:IssueOpen:629695470327037963>"
+    issue_closed = "<:IssueClosed:629695470570307614>"
+    pull_request = "<:PROpen:629695470175780875>"
+    pull_request_closed = "<:PRClosed:629695470519713818>"
+    merge = "<:PRMerged:629695470570176522>"
 
 
 class Lovefest:
