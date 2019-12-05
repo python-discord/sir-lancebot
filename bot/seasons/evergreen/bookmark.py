@@ -44,7 +44,6 @@ class Bookmark(commands.Cog):
         if hint == "":
             hint = "No hint provided."
 
-        embed.set_footer(text="Why everything so heavy ?")
         embed.set_thumbnail(
             url="https://emojipedia-us.s3."
                 "dualstack.us-west-1.amazonaws.com"
