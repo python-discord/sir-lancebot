@@ -1,8 +1,12 @@
+import asyncio
+import contextlib
 import logging
 import socket
 from traceback import format_exc
-from typing import List
+from typing import List, Optional
 
+import async_timeout
+import discord
 from aiohttp import AsyncResolver, ClientSession, TCPConnector
 from discord import DiscordException, Embed
 from discord.ext import commands
@@ -62,6 +66,98 @@ class SeasonalBot(commands.Bot):
             context.command.reset_cooldown(context)
         else:
             await super().on_command_error(context, exception)
+
+    @property
+    def member(self) -> Optional[discord.Member]:
+        """Retrieves the guild member object for the bot."""
+        guild = bot.get_guild(Client.guild)
+        if not guild:
+            return None
+        return guild.me
+
+    async def set_avatar(self, url: str) -> bool:
+        """Sets the bot's avatar based on a URL."""
+        # Track old avatar hash for later comparison
+        old_avatar = bot.user.avatar
+
+        image = await self._fetch_image(url)
+        with contextlib.suppress(discord.HTTPException, asyncio.TimeoutError):
+            async with async_timeout.timeout(5):
+                await bot.user.edit(avatar=image)
+
+        if bot.user.avatar != old_avatar:
+            log.debug(f"Avatar changed to {url}")
+            return True
+
+        log.warning(f"Changing avatar failed: {url}")
+        return False
+
+    async def set_icon(self, url: str) -> bool:
+        """Sets the guild's icon based on a URL."""
+        guild = bot.get_guild(Client.guild)
+        # Track old icon hash for later comparison
+        old_icon = guild.icon
+
+        image = await self._fetch_image(url)
+        with contextlib.suppress(discord.HTTPException, asyncio.TimeoutError):
+            async with async_timeout.timeout(5):
+                await guild.edit(icon=image)
+
+        new_icon = bot.get_guild(Client.guild).icon
+        if new_icon != old_icon:
+            log.debug(f"Icon changed to {url}")
+            return True
+
+        log.warning(f"Changing icon failed: {url}")
+        return False
+
+    async def _fetch_image(self, url: str) -> bytes:
+        """Retrieve an image based on a URL."""
+        log.debug(f"Getting image from: {url}")
+        async with self.http_session.get(url) as resp:
+            return await resp.read()
+
+    async def set_username(self, new_name: str, nick_only: bool = False) -> Optional[bool]:
+        """
+        Set the bot username and/or nickname to given new name.
+
+        Returns True/False based on success, or None if nickname fallback also failed.
+        """
+        old_username = self.user.name
+
+        if nick_only:
+            return await self.set_nickname(new_name)
+
+        if old_username == new_name:
+            # since the username is correct, make sure nickname is removed
+            return await self.set_nickname()
+
+        log.debug(f"Changing username to {new_name}")
+        with contextlib.suppress(discord.HTTPException):
+            await bot.user.edit(username=new_name, nick=None)
+
+        if not new_name == self.member.display_name:
+            # name didn't change, try to changing nickname as fallback
+            if await self.set_nickname(new_name):
+                log.warning(f"Changing username failed, changed nickname instead.")
+                return False
+            log.warning(f"Changing username and nickname failed.")
+            return None
+
+        return True
+
+    async def set_nickname(self, new_name: str = None) -> bool:
+        """Set the bot nickname in the main guild."""
+        old_display_name = self.member.display_name
+
+        if old_display_name == new_name:
+            return False
+
+        log.debug(f"Changing nickname to {new_name}")
+        with contextlib.suppress(discord.HTTPException):
+            await self.member.edit(nick=new_name)
+
+        return not old_display_name == self.member.display_name
 
 
 bot = SeasonalBot(command_prefix=Client.prefix)
