@@ -1,4 +1,3 @@
-import asyncio
 import contextlib
 import datetime
 import importlib
@@ -8,7 +7,6 @@ import pkgutil
 from pathlib import Path
 from typing import List, Optional, Tuple, Type, Union
 
-import async_timeout
 import discord
 from discord.ext import commands
 
@@ -136,27 +134,6 @@ class SeasonBase:
         """
         return f"New Season, {self.name_clean}!"
 
-    async def get_icon(self, avatar: bool = False, index: int = 0) -> Tuple[bytes, str]:
-        """
-        Retrieve the season's icon from the branding repository using the Season's icon attribute.
-
-        This also returns the relative URL path for logging purposes
-        If `avatar` is True, uses optional bot-only avatar icon if present.
-        Returns the data for the given `index`, defaulting to the first item.
-
-        The icon attribute must provide the url path, starting from the master branch base url,
-        including the starting slash.
-        e.g. `/logos/logo_seasonal/valentines/loved_up.png`
-        """
-        icon = self.icon[index]
-        if avatar and self.bot_icon:
-            icon = self.bot_icon
-
-        full_url = ICON_BASE_URL + icon
-        log.debug(f"Getting icon from: {full_url}")
-        async with bot.http_session.get(full_url) as resp:
-            return (await resp.read(), icon)
-
     async def apply_username(self, *, debug: bool = False) -> Union[bool, None]:
         """
         Applies the username for the current season.
@@ -197,73 +174,6 @@ class SeasonBase:
                 await guild.me.edit(nick=None)
 
             return result
-
-    async def apply_avatar(self) -> bool:
-        """
-        Applies the avatar for the current season.
-
-        Returns True if successful.
-        """
-        # Track old avatar hash for later comparison
-        old_avatar = bot.user.avatar
-
-        # Attempt the change
-        icon, name = await self.get_icon(avatar=True)
-        log.debug(f"Changing avatar to {name}")
-        with contextlib.suppress(discord.HTTPException, asyncio.TimeoutError):
-            async with async_timeout.timeout(5):
-                await bot.user.edit(avatar=icon)
-
-        if bot.user.avatar != old_avatar:
-            log.debug(f"Avatar changed to {name}")
-            return True
-
-        log.warning(f"Changing avatar failed: {name}")
-        return False
-
-    async def apply_server_icon(self) -> bool:
-        """
-        Applies the server icon for the current season.
-
-        Returns True if was successful.
-        """
-        guild = bot.get_guild(Client.guild)
-
-        # Track old icon hash for later comparison
-        old_icon = guild.icon
-
-        # Attempt the change
-
-        icon, name = await self.get_icon(index=self.index)
-
-        log.debug(f"Changing server icon to {name}")
-
-        with contextlib.suppress(discord.HTTPException, asyncio.TimeoutError):
-            async with async_timeout.timeout(5):
-                await guild.edit(icon=icon, reason=f"Seasonbot Season Change: {self.name}")
-
-        new_icon = bot.get_guild(Client.guild).icon
-        if new_icon != old_icon:
-            log.debug(f"Server icon changed to {name}")
-            return True
-
-        log.warning(f"Changing server icon failed: {name}")
-        return False
-
-    async def change_server_icon(self) -> bool:
-        """
-        Changes the server icon.
-
-        This only has an effect when the Season's icon attribute is a list, in which it cycles through.
-        Returns True if was successful.
-        """
-        if len(self.icon) == 1:
-            return
-
-        self.index += 1
-        self.index %= len(self.icon)
-
-        return await self.apply_server_icon()
 
     async def announce_season(self) -> None:
         """
@@ -364,37 +274,9 @@ class SeasonManager(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.season = get_season(date=datetime.datetime.utcnow())
-        self.season_task = bot.loop.create_task(self.load_seasons())
-
-        # Figure out number of seconds until a minute past midnight
-        tomorrow = datetime.datetime.now() + datetime.timedelta(1)
-        midnight = datetime.datetime(
-            year=tomorrow.year,
-            month=tomorrow.month,
-            day=tomorrow.day,
-            hour=0,
-            minute=0,
-            second=0
-        )
-        self.sleep_time = (midnight - datetime.datetime.now()).seconds + 60
-
-    async def load_seasons(self) -> None:
-        """Asynchronous timer loop to check for a new season every midnight."""
-        await self.bot.wait_until_ready()
-        await self.season.load()
-
-        while True:
-            await asyncio.sleep(self.sleep_time)  # Sleep until midnight
-            self.sleep_time = 86400  # Next time, sleep for 24 hours.
-
-            # If the season has changed, load it.
-            new_season = get_season(date=datetime.datetime.utcnow())
-            if new_season.name != self.season.name:
-                self.season = new_season
-                await self.season.load()
-            else:
-                await self.season.change_server_icon()
+        season_class = get_season_class("evergreen")
+        self.season = season_class()
+        self.season_task = bot.loop.create_task(self.season.load())
 
     @with_role(Roles.moderator, Roles.admin, Roles.owner)
     @commands.command(name="season")
@@ -449,101 +331,71 @@ class SeasonManager(commands.Cog):
 
     @with_role(Roles.moderator, Roles.admin, Roles.owner)
     @commands.group()
-    async def refresh(self, ctx: commands.Context) -> None:
-        """Refreshes certain seasonal elements without reloading seasons."""
+    async def set(self, ctx: commands.Context) -> None:
+        """Change aspects of the bot or server."""
         if not ctx.invoked_subcommand:
             await ctx.send_help(ctx.command)
 
-    @refresh.command(name="avatar")
-    async def refresh_avatar(self, ctx: commands.Context) -> None:
-        """Re-applies the bot avatar for the currently loaded season."""
-        # Attempt the change
-        is_changed = await self.season.apply_avatar()
+    @set.command(name="avatar", aliases=["avy"])
+    async def set_avatar(self, ctx: commands.Context, *, image_url: str = None) -> None:
+        """Sets the bot avatar."""
+        if not image_url:
+            image_url = f"{ICON_BASE_URL}/logos/logo_seasonal/evergreen/logo_evergreen.png"
+        elif image_url.startswith("<"):
+            image_url = image_url.strip("<>")
 
-        if is_changed:
-            colour = ctx.guild.me.colour
-            title = "Avatar Refreshed"
-        else:
-            colour = discord.Colour.red()
-            title = "Avatar Failed to Refresh"
+        is_changed = await ctx.bot.set_avatar(image_url)
 
-        # Report back details
-        season_name = type(self.season).__name__
         embed = discord.Embed(
-            description=f"**Season:** {season_name}\n**Avatar:** {self.season.bot_icon or self.season.icon}",
-            colour=colour
+            title="Avatar changed." if is_changed else "Avatar change failed.",
+            colour=discord.Colour.green() if is_changed else discord.Colour.red()
         )
-        embed.set_author(name=title)
-        embed.set_thumbnail(url=bot.user.avatar_url_as(format="png"))
         await ctx.send(embed=embed)
 
-    @refresh.command(name="icon")
-    async def refresh_server_icon(self, ctx: commands.Context) -> None:
-        """Re-applies the server icon for the currently loaded season."""
-        # Attempt the change
-        is_changed = await self.season.apply_server_icon()
+    @set.command(name="icon")
+    async def set_server_icon(self, ctx: commands.Context, *, image_url: str = None) -> None:
+        """Sets the server icon."""
+        if not image_url:
+            image_url = f"{ICON_BASE_URL}/logos/logo_full/logo_full.png"
+        elif image_url.startswith("<"):
+            image_url = image_url.strip("<>")
 
-        if is_changed:
-            colour = ctx.guild.me.colour
-            title = "Server Icon Refreshed"
-        else:
-            colour = discord.Colour.red()
-            title = "Server Icon Failed to Refresh"
+        is_changed = await ctx.bot.set_icon(image_url)
 
-        # Report back details
-        season_name = type(self.season).__name__
         embed = discord.Embed(
-            description=f"**Season:** {season_name}\n**Icon:** {self.season.icon}",
-            colour=colour
+            title="Server icon changed." if is_changed else "Server icon change failed.",
+            colour=discord.Colour.green() if is_changed else discord.Colour.red()
         )
-        embed.set_author(name=title)
-        embed.set_thumbnail(url=bot.get_guild(Client.guild).icon_url_as(format="png"))
         await ctx.send(embed=embed)
 
-    @refresh.command(name="username", aliases=("name",))
-    async def refresh_username(self, ctx: commands.Context) -> None:
-        """Re-applies the bot username for the currently loaded season."""
-        old_username = str(bot.user)
-        old_display_name = ctx.guild.me.display_name
-
-        # Attempt the change
-        is_changed = await self.season.apply_username()
+    @set.command(name="username", aliases=["name"])
+    async def set_username(self, ctx: commands.Context, *, new_name: str = None) -> None:
+        """Sets the bot username."""
+        new_name = new_name or "SeasonalBot"
+        is_changed = await ctx.bot.set_username(new_name)
 
         if is_changed:
-            colour = ctx.guild.me.colour
-            title = "Username Refreshed"
-            changed_element = "Username"
-            old_name = old_username
-            new_name = str(bot.user)
+            title = f"Username changed to {new_name}"
         else:
-            colour = discord.Colour.red()
-
-            # If None, it's because it wasn't meant to change username
-            if is_changed is None:
-                title = "Nickname Refreshed"
+            if is_changed is False:
+                title = f"Username change failed, Nickname changed to {new_name} instead."
             else:
-                title = "Username Failed to Refresh"
-            changed_element = "Nickname"
-            old_name = old_display_name
-            new_name = self.season.bot_name
+                title = "Username change failed."
 
-        # Report back details
-        season_name = type(self.season).__name__
         embed = discord.Embed(
-            description=f"**Season:** {season_name}\n"
-                        f"**Old {changed_element}:** {old_name}\n"
-                        f"**New {changed_element}:** {new_name}",
-            colour=colour
+            colour=discord.Colour.green() if is_changed else discord.Colour.red(),
+            title=title
         )
-        embed.set_author(name=title)
         await ctx.send(embed=embed)
 
-    @with_role(Roles.moderator, Roles.admin, Roles.owner)
-    @commands.command()
-    async def announce(self, ctx: commands.Context) -> None:
-        """Announces the currently loaded season."""
-        await self.season.announce_season()
+    @set.command(name="nickname", aliases=["nick"])
+    async def set_nickname(self, ctx: commands.Context, *, new_name: str = None) -> None:
+        """Sets the bot nickname."""
+        new_name = new_name or "SeasonalBot"
+        is_changed = await ctx.bot.set_nickname(new_name)
 
-    def cog_unload(self) -> None:
-        """Cancel season-related tasks on cog unload."""
-        self.season_task.cancel()
+        embed = discord.Embed(
+            colour=discord.Colour.green() if is_changed else discord.Colour.red(),
+            title=f"Nickname changed to {new_name}" if is_changed else "Nickname change failed."
+        )
+        await ctx.send(embed=embed)
