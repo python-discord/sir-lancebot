@@ -1,9 +1,10 @@
 import logging
+import random
 
 import discord
 from discord.ext import commands
 
-from bot.constants import Colours
+from bot.constants import ERROR_REPLIES, Colours
 
 log = logging.getLogger(__name__)
 
@@ -16,14 +17,17 @@ class Bookmark(commands.Cog):
 
     @commands.command(name="bookmark", aliases=("bm", "pin"))
     async def bookmark(self, ctx: commands.Context, jump_url: str = None, *args) -> None:
-        """Send you a link to the provided message in DM."""
+        """Bookmarks a message."""
         if jump_url is not None and jump_url != "*":
             if "discordapp.com/channels" not in jump_url:
-                await ctx.send(
-                    "I can't find the associated message."
-                    " this command supports the following syntax:\n"
-                    "`[command alias] [message url] (bookmark name)`"
+                embed_error_1 = discord.Embed(
+                    title=random.choice(ERROR_REPLIES),
+                    description="I can't find the associated message. "
+                                "This command supports the following syntax:\n"
+                                "`[command alias] [message url] (bookmark name)`",
+                    colour=Colours.soft_red
                 )
+                await ctx.send(embed=embed_error_1)
                 return
         if jump_url is None or jump_url == "*":
             channel = ctx.channel
@@ -35,9 +39,8 @@ class Bookmark(commands.Cog):
             description=None,
             colour=Colours.soft_green
         )
-        hint = ""
-        for word in args:
-            hint = hint + " " + word
+        hint = ' '.join(args)
+    
         if hint == "":
             hint = "No hint provided."
 
@@ -54,9 +57,12 @@ class Bookmark(commands.Cog):
         try:
             await ctx.author.send(embed=embed)
         except discord.Forbidden:
-            await ctx.send(
-                ">>> You have to enable direct messages from this server to receive DM's from me."
+            embed_error_2 = discord.Embed(
+                title=random.choice(ERROR_REPLIES),
+                description="You have to enable direct messages from this server to receive DM's from me.",
+                colour=Colours.soft_red
             )
+            await ctx.send(embed=embed_error_2)
             return
         await ctx.send("Sent you a DM!")
 
