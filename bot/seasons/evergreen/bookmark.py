@@ -41,7 +41,7 @@ class Bookmark(commands.Cog):
         )
         hint = ' '.join(args)
 
-        if hint == "":
+        if not hint:
             hint = "No hint provided."
 
         embed.set_thumbnail(
