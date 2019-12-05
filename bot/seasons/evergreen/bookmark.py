@@ -56,7 +56,7 @@ class Bookmark(commands.Cog):
         try:
             await ctx.author.send(embed=embed)
         except discord.Forbidden:
-            embed_error_2 = discord.Embed(
+            embed_error = discord.Embed(
                 title=random.choice(ERROR_REPLIES),
                 description="You have to enable direct messages from this server to receive DM's from me.",
                 colour=Colours.soft_red
