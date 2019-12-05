@@ -20,7 +20,7 @@ class InChannelCheckFailure(CheckFailure):
     pass
 
 
-def with_role(*role_ids: int) -> bool:
+def with_role(*role_ids: int) -> typing.Callable:
     """Check to see whether the invoking user has any of the roles specified in role_ids."""
     async def predicate(ctx: Context) -> bool:
         if not ctx.guild:  # Return False in a DM
@@ -43,7 +43,7 @@ def with_role(*role_ids: int) -> bool:
     return commands.check(predicate)
 
 
-def without_role(*role_ids: int) -> bool:
+def without_role(*role_ids: int) -> typing.Callable:
     """Check whether the invoking user does not have all of the roles specified in role_ids."""
     async def predicate(ctx: Context) -> bool:
         if not ctx.guild:  # Return False in a DM
