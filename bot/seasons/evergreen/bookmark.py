@@ -4,7 +4,7 @@ import random
 import discord
 from discord.ext import commands
 
-from bot.constants import ERROR_REPLIES, Colours
+from bot.constants import Colours, ERROR_REPLIES
 
 log = logging.getLogger(__name__)
 
@@ -40,7 +40,7 @@ class Bookmark(commands.Cog):
             colour=Colours.soft_green
         )
         hint = ' '.join(args)
-    
+
         if hint == "":
             hint = "No hint provided."
 
