@@ -3,11 +3,13 @@ import logging
 import discord
 from discord.ext import commands
 
+from bot.constants import Colours
+
 log = logging.getLogger(__name__)
 
 
 class Bookmark(commands.Cog):
-    """A cog for Bookmarking a message. helps personal pinning a message in a busy server."""
+    """A cog that creates personal bookmarks by relaying a message to the user's DMs."""
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -15,7 +17,6 @@ class Bookmark(commands.Cog):
     @commands.command(name="bookmark", aliases=("bm", "pin"))
     async def bookmark(self, ctx: commands.Context, jump_url: str = None, *args) -> None:
         """Bookmarks a message."""
-        global message_id
         if jump_url is not None and jump_url != "*":
             if "discordapp.com/channels" not in jump_url:
                 await ctx.send(
@@ -26,24 +27,19 @@ class Bookmark(commands.Cog):
                 return
         if jump_url is None or jump_url == "*":
             channel = ctx.channel
-            async for x in channel.history(limit=2):
-                message_id = x.id
-            message = await channel.fetch_message(message_id)
-            jump_url = (
-                "https://discordapp.com/channels/"
-                f"{ctx.guild.id}/{channel.id}/{message.id}"
-            )
+            async for message in channel.history(limit=2):
+                jump_url = message.jump_url
 
         embed = discord.Embed(
             title="Your bookmark",
             description=None,
-            colour=0x2ecc71
+            colour=Colours.soft_green
         )
         hint = ""
         for word in args:
             hint = hint + " " + word
         if hint == "":
-            hint = "No hint provided"
+            hint = "No hint provided."
 
         embed.set_footer(text="Why everything so heavy ?")
         embed.set_thumbnail(
