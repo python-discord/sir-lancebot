@@ -27,7 +27,7 @@ class Bookmark(commands.Cog):
                                 "`[command alias] [message url] (bookmark name)`",
                     colour=Colours.soft_red
                 )
-                await ctx.send(embed=embed_error_1)
+                await ctx.send(embed=embed_error)
                 return
         if jump_url is None or jump_url == "*":
             channel = ctx.channel
@@ -61,7 +61,7 @@ class Bookmark(commands.Cog):
                 description="You have to enable direct messages from this server to receive DMs from me.",
                 colour=Colours.soft_red
             )
-            await ctx.send(embed=embed_error_2)
+            await ctx.send(embed=embed_error)
             return
         await ctx.send("Sent you a DM!")
 
