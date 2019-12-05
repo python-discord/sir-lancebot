@@ -20,7 +20,7 @@ class Bookmark(commands.Cog):
         """Bookmarks a message."""
         if jump_url is not None and jump_url != "*":
             if "discordapp.com/channels" not in jump_url:
-                embed_error_1 = discord.Embed(
+                embed_error = discord.Embed(
                     title=random.choice(ERROR_REPLIES),
                     description="I can't find the associated message. "
                                 "This command supports the following syntax:\n"
