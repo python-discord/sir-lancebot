@@ -16,7 +16,7 @@ class Bookmark(commands.Cog):
 
     @commands.command(name="bookmark", aliases=("bm", "pin"))
     async def bookmark(self, ctx: commands.Context, jump_url: str = None, *args) -> None:
-        """Bookmarks a message."""
+        """Send you a link to the provided message in DM."""
         if jump_url is not None and jump_url != "*":
             if "discordapp.com/channels" not in jump_url:
                 await ctx.send(
