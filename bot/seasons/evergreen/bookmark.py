@@ -22,18 +22,16 @@ class Bookmark(commands.Cog):
         log.info(f"{ctx.author} bookmarked {target_message.jump_url} with hints {title}.")
 
         if not title:
-            title = "No hint provided."
+            title = "No Title provided."
 
         embed = discord.Embed(
             title=title,
             colour=Colours.soft_green,
             description=f"{target_message.content} \n\n[Give it a visit.]({target_message.jump_url})"
         )
-        embed.set_author(name=target_message.author)
         embed.set_author(name=target_message.author, icon_url=target_message.author.avatar_url)
         embed.set_thumbnail(url="https://img.icons8.com/color/48/FF3333/"
                             "bookmark-ribbon.png")
-        embed.set_footer(text=f"{ctx.author}")
         try:
             await ctx.author.send(embed=embed)
         except discord.Forbidden:
