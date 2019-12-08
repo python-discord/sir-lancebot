@@ -16,43 +16,22 @@ class Bookmark(commands.Cog):
         self.bot = bot
 
     @commands.command(name="bookmark", aliases=("bm", "pin"))
-    async def bookmark(self, ctx: commands.Context, jump_url: str = None, *args) -> None:
+    async def bookmark(self, ctx: commands.Context, target_message: discord.Message, *,
+                       title: str = "Bookmark") -> None:
         """Send you a link to the provided message in DM."""
-        if jump_url is not None and jump_url != "*":
-            if "discordapp.com/channels" not in jump_url:
-                embed_error = discord.Embed(
-                    title=random.choice(ERROR_REPLIES),
-                    description="I can't find the associated message. "
-                                "This command supports the following syntax:\n"
-                                "`[command alias] [message url] (bookmark name)`",
-                    colour=Colours.soft_red
-                )
-                await ctx.send(embed=embed_error)
-                return
-        if jump_url is None or jump_url == "*":
-            channel = ctx.channel
-            async for message in channel.history(limit=2):
-                jump_url = message.jump_url
+        log.info(f"{ctx.author} bookmarked {target_message.jump_url} with hints {title}.")
 
-        embed = discord.Embed(
-            title="Your bookmark",
-            description=None,
-            colour=Colours.soft_green
-        )
-        hint = ' '.join(args)
+        embed = discord.Embed(title="Your bookmark", colour=Colours.soft_green)
 
-        if not hint:
-            hint = "No hint provided."
+        if not title:
+            title = "No hint provided."
 
-        embed.set_thumbnail(
-            url="https://emojipedia-us.s3."
-                "dualstack.us-west-1.amazonaws.com"
-                "/thumbs/240/twitter/"
-                "233/incoming-envelope_1f4e8.png"
-        )
-        embed.set_author(name=ctx.author)
-        embed.add_field(name='Hints', value=hint, inline=False)
-        embed.add_field(name='Link', value=jump_url, inline=False)
+        embed.set_author(name=target_message.author)
+        embed.add_field(name='Content', value=target_message.content, inline=False)
+        embed.add_field(name='Hints', value=title, inline=False)
+        embed.add_field(name='Link', value=target_message.jump_url, inline=False)
+        embed.set_author(name=target_message.author, icon_url=target_message.author.avatar_url)
+        # embed.set_image()
         try:
             await ctx.author.send(embed=embed)
         except discord.Forbidden:
@@ -63,8 +42,7 @@ class Bookmark(commands.Cog):
             )
             await ctx.send(embed=embed_error)
             return
-        await ctx.send("Sent you a DM!")
-        log.info(f"{ctx.author} Added a personal bookmark of {jump_url}.")
+        await ctx.send("Bookmark sent to your DMs.")
 
 
 def setup(bot: commands.Bot) -> None:
