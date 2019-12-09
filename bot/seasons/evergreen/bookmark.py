@@ -16,10 +16,11 @@ class Bookmark(commands.Cog):
         self.bot = bot
 
     @commands.command(name="bookmark", aliases=("bm", "pin"))
-    async def bookmark(self, ctx: commands.Context, target_message: discord.Message, *,
+    async def bookmark(self, ctx: commands.Context, 
+                       target_message: discord.Message, *,
                        title: str = None) -> None:
         """Send you a link to the provided message in DM."""
-        log.info(f"{ctx.author} bookmarked {target_message.jump_url} with hints {title}.")
+        log.info(f"{ctx.author} bookmarked {target_message.jump_url} with title {title}.")
 
         embed = discord.Embed(
             title=title,
