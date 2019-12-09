@@ -22,8 +22,8 @@ class Bookmark(commands.Cog):
             target_message: discord.Message,
             *, title: str = None
     ) -> None:
-        """Send you a link to the provided message in DM."""
-        log.info(f"{ctx.author} bookmarked {target_message.jump_url} with title {title}.")
+        """Send the author a link to `target_message` via DMs."""
+        log.info(f"{ctx.author} bookmarked {target_message.jump_url} with title {title}")
         embed = discord.Embed(
             title=title,
             colour=Colours.soft_green,
@@ -38,17 +38,17 @@ class Bookmark(commands.Cog):
         try:
             await ctx.author.send(embed=embed)
         except discord.Forbidden:
-            embed_error = discord.Embed(
+            error_embed = discord.Embed(
                 title=random.choice(ERROR_REPLIES),
-                description="You have to enable direct messages from this server to receive DMs from me.",
+                description=f"{ctx.author.mention}, please enable your DMs to receive the bookmark",
                 colour=Colours.soft_red
             )
-            await ctx.send(embed=embed_error)
+            await ctx.send(embed=error_embed)
             return
-        await ctx.send("Bookmark sent to your DM.")
+        await ctx.send("Bookmark sent to your DM")
 
 
 def setup(bot: commands.Bot) -> None:
-    """Bookmark Cog load."""
+    """Load the Bookmark cog."""
     bot.add_cog(Bookmark(bot))
     log.info("Bookmark cog loaded")
