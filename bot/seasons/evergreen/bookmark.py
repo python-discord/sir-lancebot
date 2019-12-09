@@ -4,7 +4,7 @@ import random
 import discord
 from discord.ext import commands
 
-from bot.constants import Colours, ERROR_REPLIES
+from bot.constants import Colours, ERROR_REPLIES, Emojis
 
 log = logging.getLogger(__name__)
 
@@ -44,8 +44,8 @@ class Bookmark(commands.Cog):
                 colour=Colours.soft_red
             )
             await ctx.send(embed=error_embed)
-            return
-        await ctx.send("Bookmark sent to your DM")
+        else:
+            await ctx.message.add_reaction(Emojis.envelope)
 
 
 def setup(bot: commands.Bot) -> None:
