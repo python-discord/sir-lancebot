@@ -16,20 +16,25 @@ class Bookmark(commands.Cog):
         self.bot = bot
 
     @commands.command(name="bookmark", aliases=("bm", "pin"))
-    async def bookmark(self, ctx: commands.Context, 
-    	    target_message: discord.Message, *, 
-    	    title: str = None) -> None:
+    async def bookmark(
+            self,
+            ctx: commands.Context,
+            target_message: discord.Message,
+            *, title: str = None
+    ) -> None:
         """Send you a link to the provided message in DM."""
         log.info(f"{ctx.author} bookmarked {target_message.jump_url} with title {title}.")
-
         embed = discord.Embed(
             title=title,
             colour=Colours.soft_green,
-            description=f"{target_message.content} \n\n[Give it a visit.]({target_message.jump_url})"
+            description=(
+                f"{target_message.content}\n\n"
+                f"[Give it a visit.]({target_message.jump_url})"
+            )
         )
         embed.set_author(name=target_message.author, icon_url=target_message.author.avatar_url)
-        embed.set_thumbnail(url="https://img.icons8.com/color/48/FF3333/"
-                            "bookmark-ribbon.png")
+        embed.set_thumbnail(url="https://img.icons8.com/color/48/FF3333/bookmark-ribbon.png")
+
         try:
             await ctx.author.send(embed=embed)
         except discord.Forbidden:
