@@ -23,7 +23,7 @@ class Bookmark(commands.Cog):
             *, title: str = "Bookmark"
     ) -> None:
         """Send the author a link to `target_message` via DMs."""
-        log.info(f"{ctx.author} bookmarked {target_message.jump_url} with title {title}")
+        log.info(f"{ctx.author} bookmarked {target_message.jump_url} with title '{title}'")
         embed = discord.Embed(
             title=title,
             colour=Colours.soft_green,
