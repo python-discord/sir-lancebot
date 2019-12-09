@@ -10,7 +10,7 @@ log = logging.getLogger(__name__)
 
 
 class Bookmark(commands.Cog):
-    """A cog that creates personal bookmarks by relaying a message to the user's DMs."""
+    """Creates personal bookmarks by relaying a message link to the user's DMs."""
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
