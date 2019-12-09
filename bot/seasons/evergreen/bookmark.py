@@ -29,7 +29,7 @@ class Bookmark(commands.Cog):
             colour=Colours.soft_green,
             description=(
                 f"{target_message.content}\n\n"
-                f"[Give it a visit.]({target_message.jump_url})"
+                f"[Visit original message]({target_message.jump_url})"
             )
         )
         embed.set_author(name=target_message.author, icon_url=target_message.author.avatar_url)
