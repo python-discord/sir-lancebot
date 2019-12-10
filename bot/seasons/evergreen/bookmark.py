@@ -4,7 +4,7 @@ import random
 import discord
 from discord.ext import commands
 
-from bot.constants import Colours, ERROR_REPLIES, Emojis
+from bot.constants import Colours, ERROR_REPLIES, Emojis, bookmark_icon_url
 
 log = logging.getLogger(__name__)
 
@@ -34,7 +34,7 @@ class Bookmark(commands.Cog):
             )
         )
         embed.set_author(name=target_message.author, icon_url=target_message.author.avatar_url)
-        embed.set_thumbnail(url="https://img.icons8.com/color/48/FF3333/bookmark-ribbon.png")
+        embed.set_thumbnail(url=bookmark_icon_url)
 
         try:
             await ctx.author.send(embed=embed)
