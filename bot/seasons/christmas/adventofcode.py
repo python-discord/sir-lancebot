@@ -15,6 +15,7 @@ from pytz import timezone
 
 from bot.constants import AdventOfCode as AocConfig, Channels, Colours, Emojis, Tokens, WHITELISTED_CHANNELS
 from bot.decorators import override_in_channel
+from bot.utils import unlocked_role
 
 log = logging.getLogger(__name__)
 
@@ -85,17 +86,42 @@ async def day_countdown(bot: commands.Bot) -> None:
     while is_in_advent():
         tomorrow, time_left = time_left_to_aoc_midnight()
 
-        await asyncio.sleep(time_left.seconds)
+        # Correct `time_left.seconds` for the sleep we have after unlocking the role (-5) and adding
+        # a second (+1) as the bot is consistently ~0.5 seconds early in announcing the puzzles.
+        await asyncio.sleep(time_left.seconds - 4)
 
-        channel = bot.get_channel(Channels.seasonalbot_chat)
+        channel = bot.get_channel(Channels.advent_of_code)
 
         if not channel:
             log.error("Could not find the AoC channel to send notification in")
             break
 
-        await channel.send(f"<@&{AocConfig.role_id}> Good morning! Day {tomorrow.day} is ready to be attempted. "
-                           f"View it online now at https://adventofcode.com/{AocConfig.year}/day/{tomorrow.day}"
-                           f" (this link could take a few minutes to start working). Good luck!")
+        aoc_role = channel.guild.get_role(AocConfig.role_id)
+        if not aoc_role:
+            log.error("Could not find the AoC role to announce the daily puzzle")
+            break
+
+        async with unlocked_role(aoc_role, delay=5):
+            puzzle_url = f"https://adventofcode.com/{AocConfig.year}/day/{tomorrow.day}"
+
+            # Check if the puzzle is already available to prevent our members from spamming
+            # the puzzle page before it's available by making a small HEAD request.
+            for retry in range(1, 5):
+                log.debug(f"Checking if the puzzle is already available (attempt {retry}/4)")
+                async with bot.http_session.head(puzzle_url, raise_for_status=False) as resp:
+                    if resp.status == 200:
+                        log.debug("Puzzle is available; let's send an announcement message.")
+                        break
+                log.debug(f"The puzzle is not yet available (status={resp.status})")
+                await asyncio.sleep(10)
+            else:
+                log.error("The puzzle does does not appear to be available at this time, canceling announcement")
+                break
+
+            await channel.send(
+                f"{aoc_role.mention} Good morning! Day {tomorrow.day} is ready to be attempted. "
+                f"View it online now at {puzzle_url}. Good luck!"
+            )
 
         # Wait a couple minutes so that if our sleep didn't sleep enough
         # time we don't end up announcing twice.
@@ -122,10 +148,10 @@ class AdventOfCode(commands.Cog):
         self.status_task = None
 
         countdown_coro = day_countdown(self.bot)
-        self.countdown_task = asyncio.ensure_future(self.bot.loop.create_task(countdown_coro))
+        self.countdown_task = self.bot.loop.create_task(countdown_coro)
 
         status_coro = countdown_status(self.bot)
-        self.status_task = asyncio.ensure_future(self.bot.loop.create_task(status_coro))
+        self.status_task = self.bot.loop.create_task(status_coro)
 
     @commands.group(name="adventofcode", aliases=("aoc",), invoke_without_command=True)
     @override_in_channel(AOC_WHITELIST)
@@ -422,6 +448,7 @@ class AdventOfCode(commands.Cog):
 
     def cog_unload(self) -> None:
         """Cancel season-related tasks on cog unload."""
+        log.debug("Unloading the cog and canceling the background task.")
         self.countdown_task.cancel()
         self.status_task.cancel()
 
