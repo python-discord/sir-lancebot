@@ -17,10 +17,11 @@ class Bookmark(commands.Cog):
 
     @commands.command(name="bookmark", aliases=("bm", "pin"))
     async def bookmark(
-            self,
-            ctx: commands.Context,
-            target_message: discord.Message,
-            *, title: str = "Bookmark"
+        self,
+        ctx: commands.Context,
+        target_message: discord.Message,
+        *,
+        title: str = "Bookmark"
     ) -> None:
         """Send the author a link to `target_message` via DMs."""
         log.info(f"{ctx.author} bookmarked {target_message.jump_url} with title '{title}'")
