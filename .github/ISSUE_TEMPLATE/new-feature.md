@@ -20,8 +20,8 @@ assignees: ''
 
 
 ## Additional Details
-<!-- Delete this section if not applicable. -->
 <!-- If alternate implementations were considered, add them here. -->
+<!-- Delete this section if not applicable. -->
 
 
 ## Would you like to reserve implementing it?
