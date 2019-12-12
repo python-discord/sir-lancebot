@@ -56,7 +56,7 @@ class CommandErrorHandler(commands.Cog):
             return
 
         if isinstance(error, InChannelCheckFailure):
-            await ctx.send(embed=self.error_embed(str(error), NEGATIVE_REPLIES))
+            await ctx.send(embed=self.error_embed(str(error), NEGATIVE_REPLIES), delete_after=7.5)
             return
 
         if isinstance(error, commands.UserInputError):
@@ -73,7 +73,7 @@ class CommandErrorHandler(commands.Cog):
                 f"This command is on cooldown:\nPlease retry in {mins} minutes {secs} seconds.",
                 NEGATIVE_REPLIES
             )
-            await ctx.send(embed=embed)
+            await ctx.send(embed=embed, delete_after=7.5)
             return
 
         if isinstance(error, commands.DisabledCommand):
