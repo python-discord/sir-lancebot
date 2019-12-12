@@ -35,3 +35,4 @@ assignees: ''
 - [ ] Join the [**Python Discord Community**](https://discord.gg/python)
 - [ ] Make changes in the **Pipenv** environment
 - [ ] **Lint your code** (`pipenv run lint`)
+- [ ] Set the PR to **allow edits from contributors**
