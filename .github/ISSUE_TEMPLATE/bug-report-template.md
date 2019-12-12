@@ -1,6 +1,9 @@
 ---
 name: Bug Report Template
 about: A simple bug report template.
+title: 
+labels: 
+assignees: 
 
 ---
 
