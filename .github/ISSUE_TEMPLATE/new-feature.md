@@ -23,10 +23,6 @@ assignees: ''
 <!-- List any possible alternatives to your proposed implementation -->
 
 
-## Possible Issues
-<!-- Outline any possible issues the feature might present -->
-
-
 ## Additional Details
 <!-- Delete this section if not applicable. -->
 
