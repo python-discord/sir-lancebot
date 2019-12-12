@@ -1,21 +1,33 @@
 ---
 name: Pull Request
-about: A simple pull request template.
-issue: Issue # if applicable
+about: Request to pull code changes into the repository.
+title: ''
+assignees: ''
 
 ---
 
-Provide a simple description of what the PR achieves. 
-
-## Pull Request Details
-
-Please ensure your PR fulfills the following criteria:
-
-- [ ] Have you joined the [PythonDiscord Community](https://pythondiscord.com/invite)?
-- [ ] Were your changes made in a Pipenv environment?
-- [ ] Does flake8 pass (```pipenv run lint```)
+## Relevant Issues
+<!-- List relevant issue tickets here. -->
+<!-- Say "Closes #0" for issues that the PR resolves, replacing 0 with the issue number. -->
 
 
-## Additional information
+## Description
+<!-- Describe the changes made in the pull request. -->
 
-Provide any additional information or clarifications here.
+
+## Reasoning
+<!-- Outline the reasoning for the changes made. -->
+
+
+## Screenshots
+<!-- Remove this section if the changes don't impact anything user-facing. -->
+<!-- You can add images by just copy pasting them directly in the editor. -->
+
+
+## Did you:
+<!-- These are required when contributing. -->
+<!-- Replace [ ] with [x] to mark items as done. -->
+
+- [ ] Join the [**Python Discord Community**](https://discord.gg/python)
+- [ ] Make changes in the **Pipenv** environment
+- [ ] **Lint your code** (`pipenv run lint`)
