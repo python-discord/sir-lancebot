@@ -19,12 +19,9 @@ assignees: ''
 <!-- If you had a way to implement the feature in mind, describe it here, including any command signatures and concept screenshots if possible -->
 
 
-## Possible Alternatives
-<!-- List any possible alternatives to your proposed implementation -->
-
-
 ## Additional Details
 <!-- Delete this section if not applicable. -->
+<!-- If alternate implementations were considered, add them here. -->
 
 
 ## Would you like to reserve implementing it?
