@@ -97,7 +97,7 @@ class CommandErrorHandler(commands.Cog):
             await ctx.send(embed=self.error_embed("You are not authorized to use this command.", NEGATIVE_REPLIES))
             return
 
-        log.exception(f"Unhandled command error: {str(error)}")
+        log.exception(f"Unhandled command error: {str(error)}", exc_info=error)
 
 
 def setup(bot: commands.Bot) -> None:
