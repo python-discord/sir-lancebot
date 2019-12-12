@@ -27,6 +27,11 @@ assignees: ''
 <!-- Outline any possible issues the enhancement might present -->
 
 
+## Additional Details
+<!-- Delete this section if not applicable. -->
+
+
 ## Would you like to reserve implementing it?
+<!-- Replace [ ] with [x] with your choice. -->
 - [ ] I'd like to implement the enhancement
 - [ ] Anyone can implement the enhancement

@@ -27,6 +27,11 @@ assignees: ''
 <!-- Outline any possible issues the feature might present -->
 
 
+## Additional Details
+<!-- Delete this section if not applicable. -->
+
+
 ## Would you like to reserve implementing it?
+<!-- Replace [ ] with [x] with your choice. -->
 - [ ] I'd like to implement the feature
 - [ ] Anyone can implement the feature

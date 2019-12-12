@@ -24,6 +24,10 @@ assignees: ''
 <!-- You can add images by just copy pasting them directly in the editor. -->
 
 
+## Additional Details
+<!-- Delete this section if not applicable. -->
+
+
 ## Did you:
 <!-- These are required when contributing. -->
 <!-- Replace [ ] with [x] to mark items as done. -->
