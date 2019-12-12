@@ -12,11 +12,11 @@ assignees: ''
 
 
 ## Description
-<!-- Describe the changes made in the pull request. -->
+<!-- Describe how you've implemented your changes. -->
 
 
 ## Reasoning
-<!-- Outline the reasoning for the changes made. -->
+<!-- Outline the reasoning for how it's been implemented. -->
 
 
 ## Screenshots
