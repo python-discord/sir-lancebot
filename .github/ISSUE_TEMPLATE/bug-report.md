@@ -15,11 +15,11 @@ assignees: ''
 <!-- Detail the exact list of steps to be able to encounter the bug -->
 
 
-## Expected Behavior
+## Expected Behaviour
 <!-- Outline what you expect to occur, include screenshots if relevant -->
 
 
-## Actual Behavior
+## Actual Behaviour
 <!-- Outline what occurs instead of the expected behaviour, include screenshots if relevant -->
 
 
