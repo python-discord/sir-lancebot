@@ -24,22 +24,25 @@ assignees: ''
 
 
 ## Known Impacted Platforms
-<!-- Replace [ ] with [x] to mark items. -->
+<!-- Replace [ ] with [x] to mark items -->
+
 - [ ] Web
 - [ ] Desktop
 - [ ] Android App
 - [ ] iOS App
 
 ## Possible Solutions
-<!-- Detail any solutions you might have in mind to be able to resolve the bug. -->
+<!-- Detail any solutions you might have in mind to be able to resolve the bug -->
 
 
 ## Additional Details
-<!-- Delete this section if not applicable. -->
+<!-- Delete this section if not applicable -->
 
 
 ## Would you like to implement a fix?
-***Note: For high/critical priority bugs, fixes may be implemented immediately by staff.***
-<!-- Replace [ ] with [x] with your choice. -->
+
+***Note: For high-priority or critical bugs, fixes may be implemented by staff.***
+<!-- Replace [ ] with [x] with your choice -->
+
 - [ ] I'd like to implement the bug fix
 - [ ] Anyone can implement the bug fix
