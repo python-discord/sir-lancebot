@@ -138,7 +138,7 @@ class TriviaQuiz(commands.Cog):
                         hints = question_dict["hints"]
                         await ctx.send(f"**Hint #{hint_no+1}\n**{hints[hint_no]}")
                     else:
-                        await ctx.send(f"{30-hint_no*10}s left!")
+                        await ctx.send(f"{30 - hint_no * 10}s left!")
 
                 # Once hint or time alerts has been sent 2 times, the hint_no value will be 3
                 # If hint_no > 2, then it means that all hints/time alerts have been sent.
