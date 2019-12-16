@@ -124,12 +124,12 @@ class TriviaQuiz(commands.Cog):
             def check(m: discord.Message) -> bool:
                 ratio = fuzz.ratio(answer.lower(), m.content.lower())
                 return ratio > 85 and m.channel == ctx.channel
-                try:
-                    msg = await self.bot.wait_for('message', check=check, timeout=10)
-                except asyncio.TimeoutError:
-                    # In case of TimeoutError and the game has been stopped, then do nothing.
-                    if self.game_status[ctx.channel.id] is False:
-                        break
+            try:
+                msg = await self.bot.wait_for('message', check=check, timeout=10)
+            except asyncio.TimeoutError:
+                # In case of TimeoutError and the game has been stopped, then do nothing.
+                if self.game_status[ctx.channel.id] is False:
+                    break
 
                 # if number of hints sent or time alerts sent is less than 2, then send one.
                 if hint_no < 2:
@@ -155,7 +155,6 @@ class TriviaQuiz(commands.Cog):
 
                     await self.send_score(ctx.channel, self.game_player_scores[ctx.channel.id])
                     await asyncio.sleep(2)
-
             else:
                 if self.game_status[ctx.channel.id] is False:
                     break
