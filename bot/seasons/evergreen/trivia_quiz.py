@@ -254,9 +254,7 @@ class TriviaQuiz(commands.Cog):
                     winners.append(list(player_data.keys())[index])
                     points_copy[index] = 0
 
-                winners_mention = None
-                for winner in winners:
-                    winners_mention += f"{winner.mention} "
+                winners_mention = " ".join(winner.mention for winner in winners)
             else:
                 word = "You"
                 author_index = list(player_data.values()).index(highest_points)
