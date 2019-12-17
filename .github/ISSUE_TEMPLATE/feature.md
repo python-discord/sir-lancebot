@@ -24,8 +24,8 @@ assignees: ''
 <!-- Delete this section if there are no details to add -->
 
 
-## Would you like to reserve implementing it?
+## Would you like to implement this yourself?
 <!-- Replace [ ] with [x] with your choice -->
 
-- [ ] I'd like to implement the feature
-- [ ] Anyone can implement the feature
+- [ ] I'd like to implement this feature myself
+- [ ] Anyone can implement this feature
