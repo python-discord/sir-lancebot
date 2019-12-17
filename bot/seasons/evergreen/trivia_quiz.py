@@ -270,7 +270,7 @@ class TriviaQuiz(commands.Cog):
         """Build an embed showing all available trivia categories."""
         embed = discord.Embed(colour=discord.Colour.blue())
         embed.title = "The available question categories are:"
-        embed.set_footer(text="If not category is chosen, then a random one will be selected.")
+        embed.set_footer(text="If a category is not chosen, a random one will be selected.")
         embed.description = ""
 
         for cat, description in self.categories.items():
