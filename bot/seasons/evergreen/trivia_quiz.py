@@ -45,12 +45,9 @@ class TriviaQuiz(commands.Cog):
             return questions
 
     @commands.group(name="quiz", aliases=["trivia"], invoke_without_command=True)
-    async def quiz_game(self, ctx: commands.Context, category: str = "general") -> None:
+    async def quiz_game(self, ctx: commands.Context, category: str = None) -> None:
         """
         Start a quiz!
-
-        If the quiz game is running, then the owner or a mod can stop it by using this command
-        without providing any arguments or vice versa.
 
         Questions for the quiz can be selected from the following categories:
         - general : Test your general knowledge. (default)
@@ -68,22 +65,22 @@ class TriviaQuiz(commands.Cog):
                 f"Game is already running..."
                 f"do `{self.bot.command_prefix}quiz stop`"
             )
-            await self.stop_quiz(ctx.author, ctx.channel)
-            return
 
-        category = category.lower()
-        # Send embed showing available categories if inputted category is invalid.
-        if category not in self.categories:
+        # Send embed showing available categori es if inputted category is invalid.
+        if category is None:
+            category = random.choice(list(self.categories))
+        if category.lower() not in self.categories:
             embed = self.category_embed()
             await ctx.send(embed=embed)
             return
+        
 
         # Start game if not running.
         if self.game_status[ctx.channel.id] is False:
 
             self.game_owners[ctx.channel.id] = ctx.author
             self.game_status[ctx.channel.id] = True
-            start_embed = self.make_start_embed()
+            start_embed = self.make_start_embed(category)
 
             await ctx.send(embed=start_embed)  # send an embed with the rules
             await asyncio.sleep(1)
@@ -179,12 +176,13 @@ class TriviaQuiz(commands.Cog):
                 await asyncio.sleep(2)
 
     @staticmethod
-    def make_start_embed() -> discord.Embed:
+    def make_start_embed(category: str) -> discord.Embed:
         """Generate a starting/introduction embed for the quiz."""
         start_embed = discord.Embed(colour=discord.Colour.red())
         start_embed.title = "Quiz game Starting!!"
         start_embed.description = "Each game consists of 5 questions.\n"
         start_embed.description += "**Rules :**\nNo cheating and have fun!"
+        start_embed.description += f"\n **Category** : {category}"
         start_embed.set_footer(
             text="Points for each question reduces by 25 after 10s or after a hint. Total time is 30s per question"
         )
@@ -192,7 +190,10 @@ class TriviaQuiz(commands.Cog):
 
     @quiz_game.command(name="stop")
     async def stop_quiz(self, ctx: commands.Context) -> None:
-        """Stop a quiz game if its running in the channel."""
+        """
+        Stop a quiz game if its running in the channel.
+        Note: Only mods or the owner of the quiz can stop it.
+        """
         if self.game_status[ctx.channel.id] is True:
             # Check if the author is the game starter or a moderator.
             if (
