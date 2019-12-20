@@ -66,7 +66,7 @@ class TriviaQuiz(commands.Cog):
                 f"do `{self.bot.command_prefix}quiz stop`"
             )
 
-        # Send embed showing available categori es if inputted category is invalid.
+        # Send embed showing available categories if inputted category is invalid.
         if category is None:
             category = random.choice(list(self.categories))
 
