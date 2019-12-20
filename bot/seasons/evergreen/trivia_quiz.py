@@ -77,7 +77,6 @@ class TriviaQuiz(commands.Cog):
 
         # Start game if not running.
         if self.game_status[ctx.channel.id] is False:
-
             self.game_owners[ctx.channel.id] = ctx.author
             self.game_status[ctx.channel.id] = True
             start_embed = self.make_start_embed(category)
@@ -91,14 +90,15 @@ class TriviaQuiz(commands.Cog):
         hint_no = 0
         answer = None
         while self.game_status[ctx.channel.id]:
-
             # Exit quiz if number of questions for a round are already sent.
             if len(done_question) > self.question_limit and hint_no == 0:
                 await ctx.send("The round has ended.")
                 await self.declare_winner(ctx.channel, self.game_player_scores[ctx.channel.id])
+
                 self.game_status[ctx.channel.id] = False
                 del self.game_owners[ctx.channel.id]
                 self.game_player_scores[ctx.channel.id] = {}
+
                 break
 
             # If no hint has been sent or any time alert. Basically if hint_no = 0  means it is a new question.
@@ -109,6 +109,7 @@ class TriviaQuiz(commands.Cog):
                     if question_dict["id"] not in done_question:
                         done_question.append(question_dict["id"])
                         break
+
                 q = question_dict["question"]
                 answer = question_dict["answer"]
 
@@ -121,6 +122,7 @@ class TriviaQuiz(commands.Cog):
             def check(m: discord.Message) -> bool:
                 ratio = fuzz.ratio(answer.lower(), m.content.lower())
                 return ratio > 85 and m.channel == ctx.channel
+
             try:
                 msg = await self.bot.wait_for('message', check=check, timeout=10)
             except asyncio.TimeoutError:
@@ -143,6 +145,7 @@ class TriviaQuiz(commands.Cog):
                 else:
                     if self.game_status[ctx.channel.id] is False:
                         break
+
                     response = random.choice(WRONG_ANS_RESPONSE)
                     await ctx.send(response)
                     await self.send_answer(ctx.channel, question_dict)
@@ -155,6 +158,7 @@ class TriviaQuiz(commands.Cog):
             else:
                 if self.game_status[ctx.channel.id] is False:
                     break
+
                 # Reduce points by 25 for every hint/time alert that has been sent.
                 points = 100 - 25*hint_no
                 if msg.author in self.game_player_scores[ctx.channel.id]:
@@ -202,6 +206,7 @@ class TriviaQuiz(commands.Cog):
             ):
                 await ctx.send("Quiz stopped.")
                 await self.declare_winner(ctx.channel, self.game_player_scores[ctx.channel.id])
+
                 self.game_status[ctx.channel.id] = False
                 del self.game_owners[ctx.channel.id]
                 self.game_player_scores[ctx.channel.id] = {}
@@ -221,12 +226,15 @@ class TriviaQuiz(commands.Cog):
         if len(player_data) == 0:
             await channel.send("No one has made it onto the leaderboard yet.")
             return
+
         embed = discord.Embed(colour=discord.Colour.blue())
         embed.title = "Score Board"
         embed.description = ""
+
         sorted_dict = sorted(player_data.items(), key=lambda a: a[1], reverse=True)
         for item in sorted_dict:
             embed.description += f"{item[0]} : {item[1]}\n"
+
         await channel.send(embed=embed)
 
     @staticmethod
@@ -241,13 +249,13 @@ class TriviaQuiz(commands.Cog):
                 word = "You guys"
                 winners = []
                 points_copy = list(player_data.values()).copy()
+
                 for _ in range(no_of_winners):
                     index = points_copy.index(highest_points)
                     winners.append(list(player_data.keys())[index])
                     points_copy[index] = 0
-                winners_mention = None
-                for winner in winners:
-                    winners_mention += f"{winner.mention} "
+
+                winners_mention = " ".join(winner.mention for winner in winners)
             else:
                 word = "You"
                 author_index = list(player_data.values()).index(highest_points)
@@ -263,10 +271,12 @@ class TriviaQuiz(commands.Cog):
         """Build an embed showing all available trivia categories."""
         embed = discord.Embed(colour=discord.Colour.blue())
         embed.title = "The available question categories are:"
+        embed.set_footer(text="If a category is not chosen, a random one will be selected.")
         embed.description = ""
+
         for cat, description in self.categories.items():
             embed.description += f"**- {cat.capitalize()}**\n{description.capitalize()}\n"
-        embed.set_footer(text="If not category is chosen, then a random one will be selected.")
+
         return embed
 
     @staticmethod
@@ -277,8 +287,10 @@ class TriviaQuiz(commands.Cog):
         embed = discord.Embed(color=discord.Colour.red())
         embed.title = f"The correct answer is **{answer}**\n"
         embed.description = ""
+
         if info != "":
             embed.description += f"**Information**\n{info}\n\n"
+
         embed.description += "Let's move to the next question.\nRemaining questions: "
         await channel.send(embed=embed)
 
