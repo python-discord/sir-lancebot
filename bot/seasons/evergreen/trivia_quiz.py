@@ -69,7 +69,9 @@ class TriviaQuiz(commands.Cog):
         # Send embed showing available categori es if inputted category is invalid.
         if category is None:
             category = random.choice(list(self.categories))
-        if category.lower() not in self.categories:
+
+        category = category.lower()
+        if category not in self.categories:
             embed = self.category_embed()
             await ctx.send(embed=embed)
             return
