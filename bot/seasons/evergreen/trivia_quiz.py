@@ -73,7 +73,6 @@ class TriviaQuiz(commands.Cog):
             embed = self.category_embed()
             await ctx.send(embed=embed)
             return
-        
 
         # Start game if not running.
         if self.game_status[ctx.channel.id] is False:
@@ -196,6 +195,7 @@ class TriviaQuiz(commands.Cog):
     async def stop_quiz(self, ctx: commands.Context) -> None:
         """
         Stop a quiz game if its running in the channel.
+
         Note: Only mods or the owner of the quiz can stop it.
         """
         if self.game_status[ctx.channel.id] is True:
