@@ -13,4 +13,5 @@ class Evergreen(SeasonBase):
         "/logos/logo_animated/jumper/jumper_512.gif",
         "/logos/logo_animated/apple/apple_512.gif",
         "/logos/logo_animated/blinky/blinky_512.gif",
+        "/logos/logo_animated/runner/runner_512.gif",
     )
