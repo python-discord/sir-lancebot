@@ -71,6 +71,7 @@
     {
       "id": 106,
       "question": "Which country is known as the \"Land of Thunderbolt\"?",
+      "answer": "Bhutan",
       "info": "Bhutan is known as the \"Land of Thunder Dragon\" or \"Land of Thunderbolt\" due to the violent and large thunderstorms that whip down through the valleys from the Himalayas. The dragon reference was due to people thinking the sparkling light of thunderbolts was the red fire of a dragon."
     },
     {
@@ -112,7 +113,7 @@
     {
       "id": 113,
       "question": "What's the name of the tallest waterfall in the world.",
-      "answer": "Angel",
+      "answer": "Angel Falls",
       "info": "Angel Falls (Salto Ángel) in Venezuela is the highest waterfall in the world. The falls are 3230 feet in height, with an uninterrupted drop of 2647 feet. Angel Falls is located on a tributary of the Rio Caroni."
     },
     {
@@ -129,7 +130,7 @@
     },
     {
       "id": 116,
-      "question": "The Vally Of The Kings is located in which country?",
+      "question": "The Valley Of The Kings is located in which country?",
       "answer": "Egypt",
       "info": "The Valley of the Kings, also known as the Valley of the Gates of the Kings, is a valley in Egypt where, for a period of nearly 500 years from the 16th to 11th century BC, rock cut tombs were excavated for the pharaohs and powerful nobles of the New Kingdom (the Eighteenth to the Twentieth Dynasties of Ancient Egypt)."
     },
@@ -142,7 +143,7 @@
     {
       "id": 118,
       "question": "Where is the \"International Court Of Justice\" located at?",
-      "answer": "Hague",
+      "answer": "The Hague",
       "info": ""
     },
     {
