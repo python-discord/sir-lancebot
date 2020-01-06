@@ -25,11 +25,14 @@ class Bookmark(commands.Cog):
     ) -> None:
         """Send the author a link to `target_message` via DMs."""
         log.info(f"{ctx.author} bookmarked {target_message.jump_url} with title '{title}'")
+        content = target_message.content
+        if len(content) > 250:
+            content = content[:250]+'......'
         embed = discord.Embed(
             title=title,
             colour=Colours.soft_green,
             description=(
-                f"{target_message.content}\n\n"
+                f"{content}\n\n"
                 f"[Visit original message]({target_message.jump_url})"
             )
         )
