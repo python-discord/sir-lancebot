@@ -32,7 +32,7 @@ assignees: ''
 <!-- These are required when contributing. -->
 <!-- Replace [ ] with [x] to mark items as done. -->
 
-- [ ] Join the [**Python Discord Community**](https://discord.gg/python)
-- [ ] Make changes in the **Pipenv** environment
-- [ ] **Lint your code** (`pipenv run lint`)
-- [ ] Set the PR to **allow edits from contributors**
+- [ ] Join the [**Python Discord Community**](https://discord.gg/python)?
+- [ ] If dependencies have been added or updated, run `pipenv lock`?
+- [ ] **Lint your code** (`pipenv run lint`)?
+- [ ] Set the PR to **allow edits from contributors**?
