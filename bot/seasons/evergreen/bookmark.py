@@ -25,6 +25,18 @@ class Bookmark(commands.Cog):
     ) -> None:
         """Send the author a link to `target_message` via DMs."""
         log.info(f"{ctx.author} bookmarked {target_message.jump_url} with title '{title}'")
+        permissions = ctx.author.permissions_in(target_message.channel)
+        if not permissions.read_messages:
+            embed = discord.Embed(
+                title=random.choice(ERROR_REPLIES),
+                color=Colours.soft_red,
+                description="You don't have permission to see what's in the channel so you can't "
+                            "bookmark a message from it."
+            )
+            embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
+            await ctx.send(embed=embed)
+            return
+
         embed = discord.Embed(
             title=title,
             colour=Colours.soft_green,
