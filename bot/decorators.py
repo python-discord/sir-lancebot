@@ -88,6 +88,8 @@ def in_channel_check(*channels: int, bypass_roles: typing.Container[int] = None)
             )
             return True
 
+        guild_channels = [channel.id for channel in ctx.guild.channels]
+
         if hasattr(ctx.command.callback, "in_channel_override"):
             override = ctx.command.callback.in_channel_override
             if override is None:
@@ -108,7 +110,7 @@ def in_channel_check(*channels: int, bypass_roles: typing.Container[int] = None)
                     f"{ctx.author} tried to call the '{ctx.command.name}' command. "
                     f"The overridden in_channel check failed."
                 )
-                channels_str = ', '.join(f"<#{c_id}>" for c_id in override)
+                channels_str = ', '.join(f"<#{c_id}>" for c_id in override if c_id in guild_channels)
                 raise InChannelCheckFailure(
                     f"Sorry, but you may only use this command within {channels_str}."
                 )
@@ -118,7 +120,7 @@ def in_channel_check(*channels: int, bypass_roles: typing.Container[int] = None)
             f"The in_channel check failed."
         )
 
-        channels_str = ', '.join(f"<#{c_id}>" for c_id in channels)
+        channels_str = ', '.join(f"<#{c_id}>" for c_id in channels if c_id in guild_channels)
         raise InChannelCheckFailure(
             f"Sorry, but you may only use this command within {channels_str}."
         )
