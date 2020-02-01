@@ -36,7 +36,6 @@ class Channels(NamedTuple):
     checkpoint_test = 422077681434099723
     devalerts = 460181980097675264
     devlog = int(environ.get("CHANNEL_DEVLOG", 548438471685963776))
-    devtest = 414574275865870337
     help_0 = 303906576991780866
     help_1 = 303906556754395136
     help_2 = 303906514266226689
@@ -142,7 +141,6 @@ STAFF_ROLES = Roles.helpers, Roles.moderator, Roles.admin, Roles.owner
 WHITELISTED_CHANNELS = (
     Channels.bot, Channels.seasonalbot_commands,
     Channels.off_topic_0, Channels.off_topic_1, Channels.off_topic_2,
-    Channels.devtest,
 )
 
 # Bot replies
