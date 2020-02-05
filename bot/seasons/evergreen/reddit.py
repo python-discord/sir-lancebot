@@ -1,35 +1,24 @@
-import asyncio
 import logging
 import random
 import discord
 
-from collections import deque
 
 from discord.ext import commands
-from discord.ext import buttons
 from discord.ext.commands.cooldowns import BucketType
 
+from bot.pagination import ImagePaginator
+
+
 log = logging.getLogger(__name__)
-
-
-class Paginator(buttons.Paginator):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class Reddit(commands.Cog):
 	"""Fetches reddit posts."""
 	def __init__(self, bot):
 		self.bot = bot
-		self.img_cache = deque(maxlen=10)
-	# 	self.cache_clear_task = bot.loop.create_task(self.clear_cache())
-
-	# async def clear_cache(self):
-	# 	self.img_cache.clear()
-	# 	await asyncio.sleep(43200)  # clear cache every 12 hours
 
 	async def fetch(self, session, url):
+		"""Send a get request to the reddit API and get json response"""
 		params = {
 			'limit': 50
 		}
@@ -45,7 +34,9 @@ class Reddit(commands.Cog):
 	async def get_reddit(self, ctx, subreddit='python', sort="hot"):
 		"""
 		Fetch reddit posts by using this command.
-		Gets a post from r/dndmemes by default.
+		Gets a post from r/python by default.
+		Usage:
+		--> .reddit [subreddit_name] [hot/top/new]
 		"""
 		pages=[]
 		sort_list = ["hot", "new", "top", "rising"]
@@ -70,9 +61,8 @@ class Reddit(commands.Cog):
 		comment_emoji = self.bot.get_emoji(565576076483624960)
 		user_emoji = "🎅"
 
-		embed_titles = discord.Embed(colour=0xf9f586)
-		embed_titles.title = f"Posts from {posts[0]['data']['subreddit']} Subreddit\n"
-		embed_titles.description = ""
+		# embed_titles = discord.Embed(colour=0xf9f586)
+		embed_titles = ""
 
 		random_posts = []
 		while True:
@@ -82,6 +72,18 @@ class Reddit(commands.Cog):
 			if rand_post not in random_posts:
 				random_posts.append(rand_post)
 
+		# -----------------------------------------------------------
+		# This code below is bound of change when the emojis are added.
+
+		upvote_emoji = self.bot.get_emoji(674608910656733185)
+		comment_emoji = self.bot.get_emoji(674608751784755200)
+		user_emoji = self.bot.get_emoji(674608692418707467)
+		text_emoji = self.bot.get_emoji(674608836312825877)
+		video_emoji = self.bot.get_emoji(674608791450550272)
+		image_emoji = self.bot.get_emoji(674594916655169536)
+		reddit_emoji = self.bot.get_emoji(674087978628284417)
+
+		# ------------------------------------------------------------
 
 		for i, post in enumerate(random_posts, start=1):
 			post_title = post["data"]["title"][0:50]
@@ -91,40 +93,44 @@ class Reddit(commands.Cog):
 			elif post_title == post_url:
 				post_title = "Title is itself a link."
 
-			embed_titles.description += f"**{i}.**[{post_title}]({post_url})\n"
-			post_stats = (
-				f'{upvote_emoji}{post["data"]["ups"]}  '
-				f'{comment_emoji}{post["data"]["num_comments"]}  '
-				f'{user_emoji}{post["data"]["author"]}\n\n'
-						  )
+			# ------------------------------------------------------------------
+			# Embed building.
 
-			embed_titles.description += post_stats
-			new_embed = discord.Embed()
-			new_embed.title = post_title + "\n"
-			new_embed.description = post_stats + "\n\n"
-			new_embed.description = post['data']['selftext'][0:100]
+			embed_titles += f"**{i}.[{post_title}]({post_url})**\n"
+			image_url = " "
+			post_stats = f"{text_emoji}"  # Set default content type to text.
 
-			if post["data"]["media_embed"] != {}:
-				content = post["data"]["media_embed"]["content"]
-				i1 = content.index("src")
-				i2 = content.index("frameborder")
-				print(content)
-				print(i1, i2)
-				imageURL = content[i1+4:i2]
-				print(imageURL)
-				# new_embed.set_image(url=imageURL)
+			if post["data"]["is_video"] is True or "youtube" in post_url.split("."):
+				# This means the content type in the post is a video.
+				post_stats = f"{video_emoji} "
 
-			new_embed.url = post_url
-			pages.append(new_embed)
+			elif post_url.endswith("jpg") or post_url.endswith("png") or post_url.endswith("gif"):
+				# This means the content type in the post is an image.
+				post_stats = f"{image_emoji} "
+				image_url = post_url
 
-		pages.append(embed_titles)
-		pages.reverse()
-		embed = Paginator(embed=True, timeout=200, use_defaults=True,
-                              extra_pages=pages)
+			votes = f'{upvote_emoji}{post["data"]["ups"]}'
+			comments = f'{comment_emoji}\u2002{ post["data"]["num_comments"]}'
+			post_stats += (
+					f"\u2002{votes}\u2003"
+					f"{comments}"
+					f'\u2003{user_emoji}\u2002{post["data"]["author"]}\n'
+				)
+			embed_titles += f"{post_stats}\n"
+			page_text = f"**[{post_title}]({post_url})**\n{post_stats}\n{post['data']['selftext'][0:200]}"
 
-		await embed.start(ctx)
+			embed = discord.Embed()
+			page_tuple = (page_text, image_url)
+			pages.append(page_tuple)
+
+			# ------------------------------------------------------------------
+
+		pages.insert(0, (embed_titles, " "))
+		embed.set_author(name=f"r/{posts[0]['data']['subreddit']} - {sort}", icon_url=reddit_emoji.url)
+		await ImagePaginator.paginate(pages, ctx, embed)
 
 
 def setup(bot):
+	"""Load the Cog"""
 	bot.add_cog(Reddit(bot))
 	log.debug('Loaded')
