@@ -31,11 +31,11 @@ IRREPLACEABLE = [
 class EggDecorating(commands.Cog):
     """Decorate some easter eggs!"""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
     @staticmethod
-    def replace_invalid(colour: str):
+    def replace_invalid(colour: str) -> Union[int, None]:
         """Attempts to match with HTML or XKCD colour names, returning the int value."""
         with suppress(KeyError):
             return int(HTML_COLOURS[colour], 16)
@@ -44,7 +44,9 @@ class EggDecorating(commands.Cog):
         return None
 
     @commands.command(aliases=["decorateegg"])
-    async def eggdecorate(self, ctx, *colours: Union[discord.Colour, str]):
+    async def eggdecorate(
+        self, ctx: commands.Context, *colours: Union[discord.Colour, str]
+    ) -> Union[Image.Image, discord.Message]:
         """
         Picks a random egg design and decorates it using the given colours.
 
@@ -111,7 +113,7 @@ class EggDecorating(commands.Cog):
         return new_im
 
 
-def setup(bot):
+def setup(bot: commands.bot) -> None:
     """Egg decorating Cog load."""
     bot.add_cog(EggDecorating(bot))
     log.info("EggDecorating cog loaded.")

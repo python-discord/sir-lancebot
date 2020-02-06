@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from typing import Tuple
 
 from discord.ext import commands
 
@@ -9,27 +10,27 @@ log = logging.getLogger(__name__)
 class TimeLeft(commands.Cog):
     """A Cog that tells you how long left until Hacktober is over!"""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @staticmethod
-    def in_october():
+    def in_october() -> bool:
         """Return True if the current month is October."""
         return datetime.utcnow().month == 10
 
     @staticmethod
-    def load_date():
+    def load_date() -> Tuple[int, datetime, datetime]:
         """Return of a tuple of the current time and the end and start times of the next October."""
         now = datetime.utcnow()
         year = now.year
         if now.month > 10:
             year += 1
-        end = datetime(year, 10, 31, 11, 59, 59)
+        end = datetime(year, 11, 1, 11, 59, 59)
         start = datetime(year, 10, 1)
         return now, end, start
 
     @commands.command()
-    async def timeleft(self, ctx):
+    async def timeleft(self, ctx: commands.Context) -> None:
         """
         Calculates the time left until the end of Hacktober.
 
@@ -53,7 +54,7 @@ class TimeLeft(commands.Cog):
             )
 
 
-def setup(bot):
+def setup(bot: commands.Bot) -> None:
     """Cog load."""
     bot.add_cog(TimeLeft(bot))
     log.info("TimeLeft cog loaded")

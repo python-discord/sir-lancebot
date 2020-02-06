@@ -1,7 +1,7 @@
 # SeasonalBot 
 
 [![Build Status](https://dev.azure.com/python-discord/Python%20Discord/_apis/build/status/Seasonal%20Bot%20(Mainline))](https://dev.azure.com/python-discord/Python%20Discord/_build/latest?definitionId=3)
-[![Discord](https://discordapp.com/api/guilds/267624335836053506/embed.png)](https://discord.gg/2B963hn)
+[![Discord](https://img.shields.io/static/v1?label=Python%20Discord&logo=discord&message=%3E30k%20members&color=%237289DA&logoColor=white)](https://discord.gg/2B963hn)
 
 A Discord bot for the Python Discord community which changes with the seasons, and provides useful event features.
 
@@ -16,4 +16,4 @@ This later evolved into a bot that runs all year, providing season-appropriate f
 ## Getting started
 Before you start, please take some time to read through our [contributing guidelines](CONTRIBUTING.md).
 
-See [Seasonalbot's Wiki](https://github.com/python-discord/seasonalbot/wiki) for in-depth guides on getting started with the project!
+See [Seasonalbot's Wiki](https://pythondiscord.com/pages/contributing/seasonalbot/) for in-depth guides on getting started with the project!

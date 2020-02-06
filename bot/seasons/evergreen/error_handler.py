@@ -1,9 +1,13 @@
 import logging
 import math
-import sys
-import traceback
+import random
+from typing import Iterable, Union
 
+from discord import Embed, Message
 from discord.ext import commands
+
+from bot.constants import Colours, ERROR_REPLIES, NEGATIVE_REPLIES
+from bot.decorators import InChannelCheckFailure
 
 log = logging.getLogger(__name__)
 
@@ -11,94 +15,92 @@ log = logging.getLogger(__name__)
 class CommandErrorHandler(commands.Cog):
     """A error handler for the PythonDiscord server."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @staticmethod
-    def revert_cooldown_counter(command, message):
+    def revert_cooldown_counter(command: commands.Command, message: Message) -> None:
         """Undoes the last cooldown counter for user-error cases."""
         if command._buckets.valid:
             bucket = command._buckets.get_bucket(message)
             bucket._tokens = min(bucket.rate, bucket._tokens + 1)
-            logging.debug(
-                "Cooldown counter reverted as the command was not used correctly."
-            )
+            logging.debug("Cooldown counter reverted as the command was not used correctly.")
+
+    @staticmethod
+    def error_embed(message: str, title: Union[Iterable, str] = ERROR_REPLIES) -> Embed:
+        """Build a basic embed with red colour and either a random error title or a title provided."""
+        embed = Embed(colour=Colours.soft_red)
+        if isinstance(title, str):
+            embed.title = title
+        else:
+            embed.title = random.choice(title)
+        embed.description = message
+        return embed
 
     @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
+    async def on_command_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
         """Activates when a command opens an error."""
         if hasattr(ctx.command, 'on_error'):
-            return logging.debug(
-                "A command error occured but the command had it's own error handler."
-            )
+            logging.debug("A command error occured but the command had it's own error handler.")
+            return
 
         error = getattr(error, 'original', error)
+        logging.debug(
+            f"Error Encountered: {type(error).__name__} - {str(error)}, "
+            f"Command: {ctx.command}, "
+            f"Author: {ctx.author}, "
+            f"Channel: {ctx.channel}"
+        )
 
         if isinstance(error, commands.CommandNotFound):
-            return logging.debug(
-                f"{ctx.author} called '{ctx.message.content}' but no command was found."
-            )
+            return
+
+        if isinstance(error, InChannelCheckFailure):
+            await ctx.send(embed=self.error_embed(str(error), NEGATIVE_REPLIES), delete_after=7.5)
+            return
 
         if isinstance(error, commands.UserInputError):
-            logging.debug(
-                f"{ctx.author} called the command '{ctx.command}' but entered invalid input!"
-            )
-
             self.revert_cooldown_counter(ctx.command, ctx.message)
-
-            return await ctx.send(
-                ":no_entry: The command you specified failed to run. "
-                "This is because the arguments you provided were invalid."
+            embed = self.error_embed(
+                f"Your input was invalid: {error}\n\nUsage:\n```{ctx.prefix}{ctx.command} {ctx.command.signature}```"
             )
+            await ctx.send(embed=embed)
+            return
 
         if isinstance(error, commands.CommandOnCooldown):
-            logging.debug(
-                f"{ctx.author} called the command '{ctx.command}' but they were on cooldown!"
+            mins, secs = divmod(math.ceil(error.retry_after), 60)
+            embed = self.error_embed(
+                f"This command is on cooldown:\nPlease retry in {mins} minutes {secs} seconds.",
+                NEGATIVE_REPLIES
             )
-            remaining_minutes, remaining_seconds = divmod(error.retry_after, 60)
-
-            return await ctx.send(
-                "This command is on cooldown, please retry in "
-                f"{int(remaining_minutes)} minutes {math.ceil(remaining_seconds)} seconds."
-            )
+            await ctx.send(embed=embed, delete_after=7.5)
+            return
 
         if isinstance(error, commands.DisabledCommand):
-            logging.debug(
-                f"{ctx.author} called the command '{ctx.command}' but the command was disabled!"
-            )
-            return await ctx.send(":no_entry: This command has been disabled.")
+            await ctx.send(embed=self.error_embed("This command has been disabled.", NEGATIVE_REPLIES))
+            return
 
         if isinstance(error, commands.NoPrivateMessage):
-            logging.debug(
-                f"{ctx.author} called the command '{ctx.command}' "
-                "in a private message however the command was guild only!"
-            )
-            return await ctx.author.send(":no_entry: This command can only be used in the server.")
+            await ctx.send(embed=self.error_embed("This command can only be used in the server.", NEGATIVE_REPLIES))
+            return
 
         if isinstance(error, commands.BadArgument):
             self.revert_cooldown_counter(ctx.command, ctx.message)
-
-            logging.debug(
-                f"{ctx.author} called the command '{ctx.command}' but entered a bad argument!"
+            embed = self.error_embed(
+                "The argument you provided was invalid: "
+                f"{error}\n\nUsage:\n```{ctx.prefix}{ctx.command} {ctx.command.signature}```"
             )
-            return await ctx.send("The argument you provided was invalid.")
+            await ctx.send(embed=embed)
+            return
 
         if isinstance(error, commands.CheckFailure):
-            logging.debug(f"{ctx.author} called the command '{ctx.command}' but the checks failed!")
-            return await ctx.send(":no_entry: You are not authorized to use this command.")
+            await ctx.send(embed=self.error_embed("You are not authorized to use this command.", NEGATIVE_REPLIES))
+            return
 
-        print(f"Ignoring exception in command {ctx.command}:", file=sys.stderr)
-
-        logging.warning(
-            f"{ctx.author} called the command '{ctx.command}' "
-            "however the command failed to run with the error:"
-            f"-------------\n{error}"
-        )
-
-        traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
+        log.exception(f"Unhandled command error: {str(error)}", exc_info=error)
 
 
-def setup(bot):
+def setup(bot: commands.Bot) -> None:
     """Error handler Cog load."""
     bot.add_cog(CommandErrorHandler(bot))
     log.info("CommandErrorHandler cog loaded")

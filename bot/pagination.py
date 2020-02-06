@@ -22,26 +22,16 @@ class EmptyPaginatorEmbed(Exception):
 
 
 class LinePaginator(Paginator):
-    """
-    A class that aids in paginating code blocks for Discord messages.
+    """A class that aids in paginating code blocks for Discord messages."""
 
-    Attributes
-    -----------
-    prefix: :class:`str`
-        The prefix inserted to every page. e.g. three backticks.
-    suffix: :class:`str`
-        The suffix appended at the end of every page. e.g. three backticks.
-    max_size: :class:`int`
-        The maximum amount of codepoints allowed in a page.
-    max_lines: :class:`int`
-        The maximum amount of lines allowed in a page.
-    """
-
-    def __init__(self, prefix='```', suffix='```', max_size=2000, max_lines=None):
+    def __init__(self, prefix: str = '```', suffix: str = '```', max_size: int = 2000, max_lines: int = None):
         """
         Overrides the Paginator.__init__ from inside discord.ext.commands.
 
-        Allows for configuration of the maximum number of lines per page.
+        `prefix` and `suffix` will be prepended and appended respectively to every page.
+
+        `max_size` and `max_lines` denote the maximum amount of codepoints and lines
+        allowed per page.
         """
         self.prefix = prefix
         self.suffix = suffix
@@ -52,26 +42,16 @@ class LinePaginator(Paginator):
         self._count = len(prefix) + 1  # prefix + newline
         self._pages = []
 
-    def add_line(self, line='', *, empty=False):
+    def add_line(self, line: str = '', *, empty: bool = False) -> None:
         """
         Adds a line to the current page.
 
-        If the line exceeds the `max_size` then an exception is raised.
+        If the line exceeds the `max_size` then a RuntimeError is raised.
 
         Overrides the Paginator.add_line from inside discord.ext.commands in order to allow
         configuration of the maximum number of lines per page.
 
-        Parameters
-        -----------
-        line: str
-            The line to add.
-        empty: bool
-            Indicates if another empty line should be added.
-
-        Raises
-        ------
-        RuntimeError
-            The line was too big for the current `max_size`.
+        If `empty` is True, an empty line will be placed after the a given `line`.
         """
         if len(line) > self.max_size - len(self.prefix) - 2:
             raise RuntimeError('Line exceeds maximum page size %s' % (self.max_size - len(self.prefix) - 2))
@@ -105,7 +85,11 @@ class LinePaginator(Paginator):
 
         When used, this will send a message using `ctx.send()` and apply a set of reactions to it.
         These reactions may be used to change page, or to remove pagination from the message.
-        Pagination will also be removed automatically if no reaction is added for five minutes (300 seconds).
+
+        Pagination will also be removed automatically if no reaction is added for `timeout` seconds,
+        defaulting to five minutes (300 seconds).
+
+        If `empty` is True, an empty line will be placed between each given line.
 
         >>> embed = Embed()
         >>> embed.set_author(name="Some Operation", url=url, icon_url=icon)
@@ -113,22 +97,8 @@ class LinePaginator(Paginator):
         ...     (line for line in lines),
         ...     ctx, embed
         ... )
-
-        :param lines: The lines to be paginated
-        :param ctx: Current context object
-        :param embed: A pre-configured embed to be used as a template for each page
-        :param prefix: Text to place before each page
-        :param suffix: Text to place after each page
-        :param max_lines: The maximum number of lines on each page
-        :param max_size: The maximum number of characters on each page
-        :param empty: Whether to place an empty line between each given line
-        :param restrict_to_user: A user to lock pagination operations to for this message, if supplied
-        :param exception_on_empty_embed: Should there be an exception if the embed is empty?
-        :param url: the url to use for the embed headline
-        :param timeout: The amount of time in seconds to disable pagination of no reaction is added
-        :param footer_text: Text to prefix the page number in the footer with
         """
-        def event_check(reaction_: Reaction, user_: Member):
+        def event_check(reaction_: Reaction, user_: Member) -> bool:
             """Make sure that this reaction is what we want to operate on."""
             no_restrictions = (
                 # Pagination is not restricted
@@ -304,7 +274,7 @@ class ImagePaginator(Paginator):
     Refer to ImagePaginator.paginate for documentation on how to use.
     """
 
-    def __init__(self, prefix="", suffix=""):
+    def __init__(self, prefix: str = "", suffix: str = ""):
         super().__init__(prefix, suffix)
         self._current_page = [prefix]
         self.images = []
@@ -314,8 +284,7 @@ class ImagePaginator(Paginator):
         """
         Adds a line to each page, usually just 1 line in this context.
 
-        :param line: str to be page content / title
-        :param empty: if there should be new lines between entries
+        If `empty` is True, an empty line will be placed after a given `line`.
         """
         if line:
             self._count = len(line)
@@ -325,11 +294,7 @@ class ImagePaginator(Paginator):
         self.close_page()
 
     def add_image(self, image: str = None) -> None:
-        """
-        Adds an image to a page.
-
-        :param image: image url to be appended
-        """
+        """Adds an image to a page given the url."""
         self.images.append(image)
 
     @classmethod
@@ -339,33 +304,21 @@ class ImagePaginator(Paginator):
         """
         Use a paginator and set of reactions to provide pagination over a set of title/image pairs.
 
-        The reactions are used to switch page, or to finish with pagination.
+        `pages` is a list of tuples of page title/image url pairs.
+        `prefix` and `suffix` will be prepended and appended respectively to the message.
 
         When used, this will send a message using `ctx.send()` and apply a set of reactions to it.
         These reactions may be used to change page, or to remove pagination from the message.
 
-        Note: Pagination will be removed automatically if no reaction is added for five minutes (300 seconds).
+        Note: Pagination will be removed automatically if no reaction is added for `timeout` seconds,
+              defaulting to five minutes (300 seconds).
 
         >>> embed = Embed()
         >>> embed.set_author(name="Some Operation", url=url, icon_url=icon)
         >>> await ImagePaginator.paginate(pages, ctx, embed)
-
-        Parameters
-        -----------
-        :param pages: An iterable of tuples with title for page, and img url
-        :param ctx: ctx for message
-        :param embed: base embed to modify
-        :param prefix: prefix of message
-        :param suffix: suffix of message
-        :param timeout: timeout for when reactions get auto-removed
         """
         def check_event(reaction_: Reaction, member: Member) -> bool:
-            """
-            Checks each reaction added, if it matches our conditions pass the wait_for.
-
-            :param reaction_: reaction added
-            :param member: reaction added by member
-            """
+            """Checks each reaction added, if it matches our conditions pass the wait_for."""
             return all((
                 # Reaction is on the same message sent
                 reaction_.message.id == message.id,

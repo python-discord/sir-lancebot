@@ -33,20 +33,16 @@ jobs:
     displayName: 'Run linter'
 
 - job: build
-  displayName: 'Build Containers'
+  displayName: 'Build & Push Container'
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
   dependsOn: 'test'
 
   steps:
-  - task: Docker@1
-    displayName: 'Login: Docker Hub'
-
+  - task: Docker@2
+    displayName: 'Build & Push Container'
     inputs:
-      containerregistrytype: 'Container Registry'
-      dockerRegistryEndpoint: 'DockerHub'
-      command: 'login'
-
-  - task: ShellScript@2
-    displayName: 'Build and deploy containers'
-
-    inputs:
-      scriptPath: scripts/deploy-azure.sh
+      containerRegistry: 'DockerHub'
+      repository: 'pythondiscord/seasonalbot'
+      command: 'buildAndPush'
+      Dockerfile: '**/Dockerfile'
+      tags: 'latest'

@@ -7,7 +7,7 @@ from PIL import ImageOps
 log = logging.getLogger()
 
 
-def inversion(im):
+def inversion(im: Image) -> Image:
     """
     Inverts the image.
 
@@ -18,7 +18,7 @@ def inversion(im):
     return inv
 
 
-def pentagram(im):
+def pentagram(im: Image) -> Image:
     """Adds pentagram to the image."""
     im = im.convert('RGB')
     wt, ht = im.size
@@ -28,7 +28,7 @@ def pentagram(im):
     return im
 
 
-def bat(im):
+def bat(im: Image) -> Image:
     """
     Adds a bat silhoutte to the image.
 
@@ -50,7 +50,7 @@ def bat(im):
     return im
 
 
-def get_random_effect(im):
+def get_random_effect(im: Image) -> Image:
     """Randomly selects and applies an effect."""
     effects = [inversion, pentagram, bat]
     effect = choice(effects)

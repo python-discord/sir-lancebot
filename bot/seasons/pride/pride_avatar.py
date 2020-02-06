@@ -56,11 +56,11 @@ OPTIONS = {
 class PrideAvatar(commands.Cog):
     """Put an LGBT spin on your avatar!"""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @staticmethod
-    def crop_avatar(avatar):
+    def crop_avatar(avatar: Image) -> Image:
         """This crops the avatar into a circle."""
         mask = Image.new("L", avatar.size, 0)
         draw = ImageDraw.Draw(mask)
@@ -69,7 +69,7 @@ class PrideAvatar(commands.Cog):
         return avatar
 
     @staticmethod
-    def crop_ring(ring, px):
+    def crop_ring(ring: Image, px: int) -> Image:
         """This crops the ring into a circle."""
         mask = Image.new("L", ring.size, 0)
         draw = ImageDraw.Draw(mask)
@@ -79,7 +79,7 @@ class PrideAvatar(commands.Cog):
         return ring
 
     @commands.group(aliases=["avatarpride", "pridepfp", "prideprofile"], invoke_without_command=True)
-    async def prideavatar(self, ctx, option="lgbt", pixels: int = 64):
+    async def prideavatar(self, ctx: commands.Context, option: str = "lgbt", pixels: int = 64) -> None:
         """
         This surrounds an avatar with a border of a specified LGBT flag.
 
@@ -126,7 +126,7 @@ class PrideAvatar(commands.Cog):
         await ctx.send(file=file, embed=embed)
 
     @prideavatar.command()
-    async def flags(self, ctx):
+    async def flags(self, ctx: commands.Context) -> None:
         """This lists the flags that can be used with the prideavatar command."""
         choices = sorted(set(OPTIONS.values()))
         options = "• " + "\n• ".join(choices)
@@ -139,7 +139,7 @@ class PrideAvatar(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot):
+def setup(bot: commands.Bot) -> None:
     """Cog load."""
     bot.add_cog(PrideAvatar(bot))
     log.info("PrideAvatar cog loaded")

@@ -13,17 +13,17 @@ class EightBitify(commands.Cog):
 
     @staticmethod
     def pixelate(image: Image) -> Image:
-        """Takes an image and pixelates it"""
+        """Takes an image and pixelates it."""
         return image.resize((32, 32)).resize((1024, 1024))
 
     @staticmethod
     def quantize(image: Image) -> Image:
-        """Reduces colour palette to 256 colours"""
+        """Reduces colour palette to 256 colours."""
         return image.quantize(colors=32)
 
     @commands.command(name="8bitify")
     async def eightbit_command(self, ctx: commands.Context) -> None:
-        """Pixelates your avatar and changes the palette to an 8bit one"""
+        """Pixelates your avatar and changes the palette to an 8bit one."""
         async with ctx.typing():
             image_bytes = await ctx.author.avatar_url.read()
             avatar = Image.open(BytesIO(image_bytes))

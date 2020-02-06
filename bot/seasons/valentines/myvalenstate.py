@@ -18,10 +18,10 @@ with open(Path("bot/resources/valentines/valenstates.json"), "r") as file:
 class MyValenstate(commands.Cog):
     """A Cog to find your most likely Valentine's vacation destination."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    def levenshtein(self, source, goal):
+    def levenshtein(self, source: str, goal: str) -> int:
         """Calculates the Levenshtein Distance between source and goal."""
         if len(source) < len(goal):
             return self.levenshtein(goal, source)
@@ -42,7 +42,7 @@ class MyValenstate(commands.Cog):
         return pre_row[-1]
 
     @commands.command()
-    async def myvalenstate(self, ctx, *, name=None):
+    async def myvalenstate(self, ctx: commands.Context, *, name: str = None) -> None:
         """Find the vacation spot(s) with the most matching characters to the invoking user."""
         eq_chars = collections.defaultdict(int)
         if name is None:
@@ -81,7 +81,7 @@ class MyValenstate(commands.Cog):
         await ctx.channel.send(embed=embed)
 
 
-def setup(bot):
+def setup(bot: commands.Bot) -> None:
     """Valenstate Cog load."""
     bot.add_cog(MyValenstate(bot))
     log.info("MyValenstate cog loaded")

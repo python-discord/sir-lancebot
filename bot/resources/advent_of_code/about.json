@@ -16,7 +16,7 @@
     },
     {
         "name": "How does scoring work?",
-        "value": "Getting a star first is worth 100 points, second is 99, and so on down to 1 point at 100th place.\n\nCheck out AoC's [global leaderboard](https://adventofcode.com/2018/leaderboard) to see who's leading this year's event!",
+        "value": "Getting a star first is worth 100 points, second is 99, and so on down to 1 point at 100th place.\n\nCheck out AoC's [global leaderboard](https://adventofcode.com/leaderboard) to see who's leading this year's event!",
         "inline": false
     },
     {

@@ -9,13 +9,13 @@ import textwrap
 import urllib
 from functools import partial
 from io import BytesIO
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 import aiohttp
 import async_timeout
 from PIL import Image, ImageDraw, ImageFont
 from discord import Colour, Embed, File, Member, Message, Reaction
-from discord.ext.commands import BadArgument, Bot, Cog, Context, bot_has_permissions, group
+from discord.ext.commands import BadArgument, Bot, Cog, CommandError, Context, bot_has_permissions, group
 
 from bot.constants import ERROR_REPLIES, Tokens
 from bot.decorators import locked
@@ -154,7 +154,7 @@ class Snakes(Cog):
 
     # region: Helper methods
     @staticmethod
-    def _beautiful_pastel(hue):
+    def _beautiful_pastel(hue: float) -> int:
         """Returns random bright pastels."""
         light = random.uniform(0.7, 0.85)
         saturation = 1
@@ -250,7 +250,7 @@ class Snakes(Cog):
         return buffer
 
     @staticmethod
-    def _snakify(message):
+    def _snakify(message: str) -> str:
         """Sssnakifffiesss a sstring."""
         # Replace fricatives with exaggerated snake fricatives.
         simple_fricatives = [
@@ -272,7 +272,7 @@ class Snakes(Cog):
 
         return message
 
-    async def _fetch(self, session, url, params=None):
+    async def _fetch(self, session: aiohttp.ClientSession, url: str, params: dict = None) -> dict:
         """Asynchronous web request helper method."""
         if params is None:
             params = {}
@@ -281,7 +281,7 @@ class Snakes(Cog):
             async with session.get(url, params=params) as response:
                 return await response.json()
 
-    def _get_random_long_message(self, messages, retries=10):
+    def _get_random_long_message(self, messages: List[str], retries: int = 10) -> str:
         """
         Fetch a message that's at least 3 words long, if possible to do so in retries attempts.
 
@@ -303,9 +303,6 @@ class Snakes(Cog):
         Builds a dict that the .get() method can use.
 
         Created by Ava and eivl.
-
-        :param name: The name of the snake to get information for - omit for a random snake
-        :return: A dict containing information on a snake
         """
         snake_info = {}
 
@@ -403,16 +400,12 @@ class Snakes(Cog):
         return snake_info
 
     async def _get_snake_name(self) -> Dict[str, str]:
-        """
-        Gets a random snake name.
-
-        :return: A random snake name, as a string.
-        """
+        """Gets a random snake name."""
         return random.choice(self.snake_names)
 
-    async def _validate_answer(self, ctx: Context, message: Message, answer: str, options: list):
+    async def _validate_answer(self, ctx: Context, message: Message, answer: str, options: list) -> None:
         """Validate the answer using a reaction event loop."""
-        def predicate(reaction, user):
+        def predicate(reaction: Reaction, user: Member) -> bool:
             """Test if the the answer is valid and can be evaluated."""
             return (
                 reaction.message.id == message.id                  # The reaction is attached to the question we asked.
@@ -443,14 +436,14 @@ class Snakes(Cog):
 
     # region: Commands
     @group(name='snakes', aliases=('snake',), invoke_without_command=True)
-    async def snakes_group(self, ctx: Context):
+    async def snakes_group(self, ctx: Context) -> None:
         """Commands from our first code jam."""
         await ctx.send_help(ctx.command)
 
     @bot_has_permissions(manage_messages=True)
     @snakes_group.command(name='antidote')
     @locked()
-    async def antidote_command(self, ctx: Context):
+    async def antidote_command(self, ctx: Context) -> None:
         """
         Antidote! Can you create the antivenom before the patient dies?
 
@@ -465,7 +458,7 @@ class Snakes(Cog):
 
         This game was created by Lord Bisk and Runew0lf.
         """
-        def predicate(reaction_: Reaction, user_: Member):
+        def predicate(reaction_: Reaction, user_: Member) -> bool:
             """Make sure that this reaction is what we want to operate on."""
             return (
                 all((
@@ -591,7 +584,7 @@ class Snakes(Cog):
         await board_id.clear_reactions()
 
     @snakes_group.command(name='draw')
-    async def draw_command(self, ctx: Context):
+    async def draw_command(self, ctx: Context) -> None:
         """
         Draws a random snek using Perlin noise.
 
@@ -631,13 +624,9 @@ class Snakes(Cog):
     @snakes_group.command(name='get')
     @bot_has_permissions(manage_messages=True)
     @locked()
-    async def get_command(self, ctx: Context, *, name: Snake = None):
+    async def get_command(self, ctx: Context, *, name: Snake = None) -> None:
         """
         Fetches information about a snake from Wikipedia.
-
-        :param ctx: Context object passed from discord.py
-        :param name: Optional, the name of the snake to get information
-                     for - omit for a random snake
 
         Created by Ava and eivl.
         """
@@ -683,7 +672,7 @@ class Snakes(Cog):
 
     @snakes_group.command(name='guess', aliases=('identify',))
     @locked()
-    async def guess_command(self, ctx):
+    async def guess_command(self, ctx: Context) -> None:
         """
         Snake identifying game.
 
@@ -717,7 +706,7 @@ class Snakes(Cog):
         await self._validate_answer(ctx, guess, answer, options)
 
     @snakes_group.command(name='hatch')
-    async def hatch_command(self, ctx: Context):
+    async def hatch_command(self, ctx: Context) -> None:
         """
         Hatches your personal snake.
 
@@ -748,7 +737,7 @@ class Snakes(Cog):
         await ctx.channel.send(embed=my_snake_embed)
 
     @snakes_group.command(name='movie')
-    async def movie_command(self, ctx: Context):
+    async def movie_command(self, ctx: Context) -> None:
         """
         Gets a random snake-related movie from OMDB.
 
@@ -818,7 +807,7 @@ class Snakes(Cog):
 
     @snakes_group.command(name='quiz')
     @locked()
-    async def quiz_command(self, ctx: Context):
+    async def quiz_command(self, ctx: Context) -> None:
         """
         Asks a snake-related question in the chat and validates the user's guess.
 
@@ -843,7 +832,7 @@ class Snakes(Cog):
         await self._validate_answer(ctx, quiz, answer, options)
 
     @snakes_group.command(name='name', aliases=('name_gen',))
-    async def name_command(self, ctx: Context, *, name: str = None):
+    async def name_command(self, ctx: Context, *, name: str = None) -> None:
         """
         Snakifies a username.
 
@@ -915,7 +904,7 @@ class Snakes(Cog):
 
     @snakes_group.command(name='sal')
     @locked()
-    async def sal_command(self, ctx: Context):
+    async def sal_command(self, ctx: Context) -> None:
         """
         Play a game of Snakes and Ladders.
 
@@ -933,7 +922,7 @@ class Snakes(Cog):
         await game.open_game()
 
     @snakes_group.command(name='about')
-    async def about_command(self, ctx: Context):
+    async def about_command(self, ctx: Context) -> None:
         """Show an embed with information about the event, its participants, and its winners."""
         contributors = [
             "<@!245270749919576066>",
@@ -976,7 +965,7 @@ class Snakes(Cog):
         await ctx.channel.send(embed=embed)
 
     @snakes_group.command(name='card')
-    async def card_command(self, ctx: Context, *, name: Snake = None):
+    async def card_command(self, ctx: Context, *, name: Snake = None) -> None:
         """
         Create an interesting little card from a snake.
 
@@ -1014,7 +1003,7 @@ class Snakes(Cog):
         )
 
     @snakes_group.command(name='fact')
-    async def fact_command(self, ctx: Context):
+    async def fact_command(self, ctx: Context) -> None:
         """
         Gets a snake-related fact.
 
@@ -1030,14 +1019,12 @@ class Snakes(Cog):
         await ctx.channel.send(embed=embed)
 
     @snakes_group.command(name='snakify')
-    async def snakify_command(self, ctx: Context, *, message: str = None):
+    async def snakify_command(self, ctx: Context, *, message: str = None) -> None:
         """
         How would I talk if I were a snake?
 
-        :param ctx: context
-        :param message: If this is passed, it will snakify the message.
-                        If not, it will snakify a random message from
-                        the users history.
+        If `message` is passed, the bot will snakify the message.
+        Otherwise, a random message from the user's history is snakified.
 
         Written by Momo and kel.
         Modified by lemon.
@@ -1073,12 +1060,11 @@ class Snakes(Cog):
             await ctx.channel.send(embed=embed)
 
     @snakes_group.command(name='video', aliases=('get_video',))
-    async def video_command(self, ctx: Context, *, search: str = None):
+    async def video_command(self, ctx: Context, *, search: str = None) -> None:
         """
         Gets a YouTube video about snakes.
 
-        :param ctx: Context object passed from discord.py
-        :param search: Optional, a name of a snake. Used to search for videos with that name
+        If `search` is given, a snake with that name will be searched on Youtube.
 
         Written by Andrew and Prithaj.
         """
@@ -1114,7 +1100,7 @@ class Snakes(Cog):
             log.warning(f"YouTube API error. Full response looks like {response}")
 
     @snakes_group.command(name='zen')
-    async def zen_command(self, ctx: Context):
+    async def zen_command(self, ctx: Context) -> None:
         """
         Gets a random quote from the Zen of Python, except as if spoken by a snake.
 
@@ -1141,7 +1127,7 @@ class Snakes(Cog):
     @get_command.error
     @card_command.error
     @video_command.error
-    async def command_error(self, ctx, error):
+    async def command_error(self, ctx: Context, error: CommandError) -> None:
         """Local error handler for the Snake Cog."""
         embed = Embed()
         embed.colour = Colour.red()
