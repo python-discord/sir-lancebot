@@ -69,13 +69,13 @@ class Reddit(commands.Cog):
         # -----------------------------------------------------------
         # This code below is bound of change when the emojis are added.
 
-        upvote_emoji = self.bot.get_emoji(674608910656733185)
-        comment_emoji = self.bot.get_emoji(674608751784755200)
-        user_emoji = self.bot.get_emoji(674608692418707467)
-        text_emoji = self.bot.get_emoji(674608836312825877)
-        video_emoji = self.bot.get_emoji(674608791450550272)
-        image_emoji = self.bot.get_emoji(674594916655169536)
-        reddit_emoji = self.bot.get_emoji(674087978628284417)
+        upvote_emoji = self.bot.get_emoji(638729835245731840)
+        comment_emoji = self.bot.get_emoji(638729835073765387)
+        user_emoji = self.bot.get_emoji(638729835442602003)
+        text_emoji = self.bot.get_emoji(676030265910493204)
+        video_emoji = self.bot.get_emoji(676030265839190047)
+        image_emoji = self.bot.get_emoji(676030265734201344)
+        reddit_emoji = self.bot.get_emoji(676030265734332427)
 
         # ------------------------------------------------------------
 
