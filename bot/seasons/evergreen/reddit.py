@@ -56,22 +56,15 @@ class Reddit(commands.Cog):
             return await ctx.send('No posts available!')
 
         if posts[1]["data"]["over_18"] is True:
-            return await ctx.send("You cannot access this Subreddit.")
+            return await ctx.send(
+                "You cannot access this Subreddit as it is ment for those who "
+                "are 18 years or older."
+            )
 
-        upvote_emoji = self.bot.get_emoji(565557799040319508)
-        comment_emoji = self.bot.get_emoji(565576076483624960)
-        user_emoji = "🎅"
-
-        # embed_titles = discord.Embed(colour=0xf9f586)
         embed_titles = ""
 
-        random_posts = []
-        while True:
-            if len(random_posts) == 5:
-                break
-            rand_post = random.choice(posts)
-            if rand_post not in random_posts:
-                random_posts.append(rand_post)
+        # Chooses k unique random elements from a population sequence or set.
+        random_posts = random.sample(posts, k=5)
 
         # -----------------------------------------------------------
         # This code below is bound of change when the emojis are added.
