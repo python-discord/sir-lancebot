@@ -57,6 +57,31 @@ class Bookmark(commands.Cog):
         else:
             log.info(f"{ctx.author} bookmarked {target_message.jump_url} with title '{title}'")
             await ctx.message.add_reaction(Emojis.envelope)
+            await ctx.message.add_reaction(Emojis.pin)
+
+        embed.add_field(
+            name=f'Bookmarked from {ctx.author.name}.',
+            value=f'[Visit original message]({ctx.message.jump_url})',
+            inline=False
+        )
+
+        def check(reaction: discord.Reaction, user: discord.User) -> bool:
+            return reaction.emoji == Emojis.pin
+
+        sent_person = [ctx.author]  # list of id who got the message
+        while True:
+            try:
+                reaction, user = await self.bot.wait_for("reaction_add", timeout=360.0, check=check)
+                if user != self.bot.user and (user not in sent_person):
+                    log.info(f"{user.name} bookmarked {target_message.jump_url} with title '{title}' from {ctx.author}")
+                    await user.send(embed=embed)
+                    sent_person.append(user)
+            except asyncio.TimeoutError:
+                for reaction in ctx.message.reactions:
+                    async for user in reaction.users():
+                        await reaction.remove(user)
+                await ctx.message.add_reaction(Emojis.envelope)
+                return
 
 
 def setup(bot: commands.Bot) -> None:
