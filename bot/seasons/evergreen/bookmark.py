@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import random
 
@@ -19,12 +20,14 @@ class Bookmark(commands.Cog):
     async def bookmark(
         self,
         ctx: commands.Context,
-        target_message: discord.Message,
+        target_message: discord.Message = None,
         *,
         title: str = "Bookmark"
     ) -> None:
         """Send the author a link to `target_message` via DMs."""
         # Prevent users from bookmarking a message in a channel they don't have access to
+        if target_message is None:
+            target_message = ctx.message
         permissions = ctx.author.permissions_in(target_message.channel)
         if not permissions.read_messages:
             log.info(f"{ctx.author} tried to bookmark a message in #{target_message.channel} but has no permissions")
@@ -80,7 +83,6 @@ class Bookmark(commands.Cog):
                 for reaction in ctx.message.reactions:
                     async for user in reaction.users():
                         await reaction.remove(user)
-                await ctx.message.add_reaction(Emojis.envelope)
                 return
 
 
