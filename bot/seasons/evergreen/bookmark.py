@@ -70,16 +70,22 @@ class Bookmark(commands.Cog):
         )
 
         def check(reaction: discord.Reaction, user: discord.User) -> bool:
-            return reaction.emoji == Emojis.pin
+            return (
+                user != self.bot.user
+                and reaction.emoji == Emojis.pin
+                and reaction.message == ctx.message
+                and user not in sent_person
+            )
 
         sent_person = [ctx.author]  # list of id who got the message
         while True:
             try:
                 reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
-                if user != self.bot.user and user not in sent_person:
-                    log.info(f"{user.name} bookmarked {target_message.jump_url} with title '{title}' from {ctx.author}")
-                    await user.send(embed=embed)
-                    sent_person.append(user)
+                log.info(f"{user.name} bookmarked {target_message.jump_url} with title '{title}' from {ctx.author}")
+                await user.send(embed=embed)
+                sent_person.append(user)
+            except discord.Forbidden:
+                pass
             except asyncio.TimeoutError:
                 await ctx.message.clear_reactions()
                 return
