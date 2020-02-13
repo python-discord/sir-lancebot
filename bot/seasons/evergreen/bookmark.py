@@ -24,10 +24,11 @@ class Bookmark(commands.Cog):
         *,
         title: str = "Bookmark"
     ) -> None:
-        """Send the author a link to `target_message` via DMs."""
-        # Prevent users from bookmarking a message in a channel they don't have access to
+        """Send the author a link to `target_message` via DMs. If Nothing is provided it take the commanding message."""
         if target_message is None:
             target_message = ctx.message
+
+        # Prevent users from bookmarking a message in a channel they don't have access to
         permissions = ctx.author.permissions_in(target_message.channel)
         if not permissions.read_messages:
             log.info(f"{ctx.author} tried to bookmark a message in #{target_message.channel} but has no permissions")
@@ -74,15 +75,13 @@ class Bookmark(commands.Cog):
         sent_person = [ctx.author]  # list of id who got the message
         while True:
             try:
-                reaction, user = await self.bot.wait_for("reaction_add", timeout=360.0, check=check)
-                if user != self.bot.user and (user not in sent_person):
+                reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
+                if user != self.bot.user and user not in sent_person:
                     log.info(f"{user.name} bookmarked {target_message.jump_url} with title '{title}' from {ctx.author}")
                     await user.send(embed=embed)
                     sent_person.append(user)
             except asyncio.TimeoutError:
-                for reaction in ctx.message.reactions:
-                    async for user in reaction.users():
-                        await reaction.remove(user)
+                await ctx.message.clear_reactions()
                 return
 
 
