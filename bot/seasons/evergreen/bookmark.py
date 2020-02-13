@@ -32,7 +32,7 @@ class Bookmark(commands.Cog):
         # Prevent users from bookmarking a message in a channel they don't have access to
         permissions = ctx.author.permissions_in(target_message.channel)
         if not permissions.read_messages:
-            log.info(f"{ctx.author} tried to bookmark a message in #{target_message.channel} but has no permissions")
+            log.info(f"{ctx.author} tried to bookmark a message in #{target_message.channel} but has no permissions.")
             embed = discord.Embed(
                 title=random.choice(ERROR_REPLIES),
                 color=Colours.soft_red,
@@ -55,12 +55,12 @@ class Bookmark(commands.Cog):
         except discord.Forbidden:
             error_embed = discord.Embed(
                 title=random.choice(ERROR_REPLIES),
-                description=f"{ctx.author.mention}, please enable your DMs to receive the bookmark",
+                description=f"{ctx.author.mention}, please enable your DMs to receive the bookmark.",
                 colour=Colours.soft_red
             )
             await ctx.send(embed=error_embed)
         else:
-            log.info(f"{ctx.author} bookmarked {target_message.jump_url} with title '{title}'")
+            log.info(f"{ctx.author} bookmarked {target_message.jump_url} with title '{title}'.")
             await ctx.message.add_reaction(Emojis.envelope)
             await ctx.message.add_reaction(Emojis.pin)
 
@@ -82,7 +82,7 @@ class Bookmark(commands.Cog):
         while True:
             try:
                 reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
-                log.info(f"{user.name} bookmarked {target_message.jump_url} with title '{title}' from {ctx.author}")
+                log.info(f"{user.name} bookmarked {target_message.jump_url} with title '{title}' from '{ctx.author}'.")
                 with contextlib.suppress(discord.Forbidden):
                     await user.send(embed=embed)
                 sent_person.add(user)
