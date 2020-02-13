@@ -78,14 +78,14 @@ class Bookmark(commands.Cog):
                 and user not in sent_person
             )
 
-        sent_person = [ctx.author]  # list of id who got the message
+        sent_person = {ctx.author}  # list of id who got the message
         while True:
             try:
                 reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
                 log.info(f"{user.name} bookmarked {target_message.jump_url} with title '{title}' from {ctx.author}")
                 with contextlib.suppress(discord.Forbidden):
                     await user.send(embed=embed)
-                sent_person.append(user)
+                sent_person.add(user)
             except asyncio.TimeoutError:
                 await ctx.message.clear_reactions()
                 return
