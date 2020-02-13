@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 import logging
 import random
 
@@ -82,10 +83,9 @@ class Bookmark(commands.Cog):
             try:
                 reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
                 log.info(f"{user.name} bookmarked {target_message.jump_url} with title '{title}' from {ctx.author}")
-                await user.send(embed=embed)
+                with contextlib.suppress(discord.Forbidden):
+                    await user.send(embed=embed)
                 sent_person.append(user)
-            except discord.Forbidden:
-                pass
             except asyncio.TimeoutError:
                 await ctx.message.clear_reactions()
                 return
