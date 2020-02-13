@@ -78,7 +78,7 @@ class Bookmark(commands.Cog):
                 and user not in sent_person
             )
 
-        sent_person = {ctx.author}  # list of id who got the message
+        sent_person = {ctx.author}  # set of id who got the message
         while True:
             try:
                 reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
