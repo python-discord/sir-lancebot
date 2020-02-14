@@ -1,5 +1,6 @@
 import logging
 import random
+from enum import Enum
 from os import environ
 from typing import List, Tuple
 from urllib.parse import urlencode
@@ -18,6 +19,29 @@ BASE_URL = "https://api.themoviedb.org/3/"
 
 # Get logger
 logger = logging.getLogger(__name__)
+
+
+# Genres with TMDB API IDs
+class MovieGenres(Enum):
+    """Genre names and IDs."""
+
+    Action = 28
+    Adventure = 12
+    Animation = 16
+    Comedy = 35
+    Crime = 80
+    Documentary = 99
+    Drama = 18
+    Family = 10751
+    Fantasy = 14
+    History = 36
+    Horror = 27
+    Music = 10402
+    Mystery = 9648
+    Romance = 10749
+    Science = 878
+    Thriller = 53
+    Western = 37
 
 
 async def get_random_movies(client: ClientSession,
@@ -181,66 +205,18 @@ class Movie(Cog):
             await ctx.send('You can\'t get less than 1 movies. Just logic.')
             return
 
-        # Make genre to lower characters due then users may use also like Genre
-        # or GENRE formats
-        genre = genre.lower()
+        # Capitalize genre for getting data from Enum
+        genre = genre.capitalize()
 
-        # Check genres, get pages and embed
-        if genre == 'action':
-            pages, embed = await get_random_movies(self.http_session,
-                                                   amount, 28, "Action")
-        elif genre == 'adventure':
-            pages, embed = await get_random_movies(self.http_session,
-                                                   amount, 12, "Adventure")
-        elif genre == 'animation':
-            pages, embed = await get_random_movies(self.http_session,
-                                                   amount, 16, "Animation")
-        elif genre == 'comedy':
-            pages, embed = await get_random_movies(self.http_session,
-                                                   amount, 35, "Comedy")
-        elif genre == 'crime':
-            pages, embed = await get_random_movies(self.http_session,
-                                                   amount, 80, "Crime")
-        elif genre == 'documentary':
-            pages, embed = await get_random_movies(self.http_session,
-                                                   amount, 99, "Documentary")
-        elif genre == 'drama':
-            pages, embed = await get_random_movies(self.http_session,
-                                                   amount, 18, "Drama")
-        elif genre == 'family':
-            pages, embed = await get_random_movies(self.http_session,
-                                                   amount, 10751, "Family")
-        elif genre == 'fantasy':
-            pages, embed = await get_random_movies(self.http_session,
-                                                   amount, 14, "Fantasy")
-        elif genre == 'history':
-            pages, embed = await get_random_movies(self.http_session,
-                                                   amount, 36, "History")
-        elif genre == 'horror':
-            pages, embed = await get_random_movies(self.http_session,
-                                                   amount, 27, "Horror")
-        elif genre == 'music':
-            pages, embed = await get_random_movies(self.http_session,
-                                                   amount, 10402, "Music")
-        elif genre == 'mystery':
-            pages, embed = await get_random_movies(self.http_session,
-                                                   amount, 9648, "Mystery")
-        elif genre == 'romance':
-            pages, embed = await get_random_movies(self.http_session,
-                                                   amount, 10749, "Romance")
-        elif genre == 'science':
-            pages, embed = await get_random_movies(self.http_session,
-                                                   amount, 878, "Science Fiction")
-        elif genre == 'thriller':
-            pages, embed = await get_random_movies(self.http_session,
-                                                   amount, 53, "Thriller")
-        elif genre == 'western':
-            pages, embed = await get_random_movies(self.http_session,
-                                                   amount, 37, "Western")
-        else:
+        # If invalid genre, send help message
+        if genre not in MovieGenres.__members__:
             await ctx.send_help('movies')
             return
 
+        # Get pages and embed of movies
+        pages, embed = await get_random_movies(self.http_session, amount, MovieGenres[genre].value, genre)
+
+        # Send movies, paginate
         await ImagePaginator.paginate(pages, ctx, embed)
 
 
