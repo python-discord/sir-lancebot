@@ -208,13 +208,12 @@ class Movie(Cog):
         # Capitalize genre for getting data from Enum
         genre = genre.capitalize()
 
-        # If invalid genre, send help message
-        if genre not in MovieGenres.__members__:
+        # Try to fetch pages and embed, when invalid genre, show help
+        try:
+            pages, embed = await get_random_movies(self.http_session, amount, MovieGenres[genre].value, genre)
+        except KeyError:
             await ctx.send_help('movies')
             return
-
-        # Get pages and embed of movies
-        pages, embed = await get_random_movies(self.http_session, amount, MovieGenres[genre].value, genre)
 
         # Send movies, paginate
         await ImagePaginator.paginate(pages, ctx, embed)
