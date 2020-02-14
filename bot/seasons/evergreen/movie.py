@@ -6,7 +6,7 @@ from urllib.parse import urlencode
 
 from aiohttp import ClientSession
 from discord import Embed
-from discord.ext.commands import Bot, Cog, Context, group
+from discord.ext.commands import Bot, Cog, Context, command
 
 from bot.pagination import ImagePaginator
 
@@ -32,7 +32,7 @@ async def get_random_movies(client: ClientSession,
     embed = Embed(title=f"Random {genre_name} Movies")
     embed.set_footer(text='Powered by TMDB (themoviedb.org)')
 
-    # Get random page between 1 and 600
+    # Get random page between 1 and 200
     page = random.randint(1, 200)
 
     # Define TMDB request parameters
@@ -145,334 +145,102 @@ class Movie(Cog):
         self.bot = bot
         self.http_session: ClientSession = bot.http_session
 
-    @group(name='movies', invoke_without_command=True)
-    async def movies(self, ctx: Context) -> None:
-        """Get random movies by specifing genre."""
-        await ctx.send_help('movies')
+    @command(name='movies', aliases=['movie'])
+    async def movies(self, ctx: Context, genre: str = "", amount: int = 5) -> None:
+        """
+        Get random movies by specifing genre.
 
-    @movies.command(name='action')
-    async def action(self, ctx: Context, movies_amount: int = 5) -> None:
-        """Get random Action genre movies."""
-        # Count can't be higher than 20, due one page return 20 items
-        # And also this can't be lower than 1, just logic
-        if movies_amount > 20:
-            await ctx.send("Max allowed amount of movies is 20.")
+        Also support amount parameter,
+        that define how much movies will be shown. Default 5
+
+        Available genres:
+        - Action
+        - Adventure
+        - Animation
+        - Comedy
+        - Crime
+        - Documentary
+        - Drama
+        - Family
+        - Fantasy
+        - History
+        - Horror
+        - Music
+        - Mystery
+        - Romance
+        - Science
+        - Thriller
+        - Western
+        """
+        # Check is there more than 20 movies specified, due TMDB return 20 movies
+        # per page, so this is max. Also you can't get less movies than 1, just logic
+        if amount > 20:
+            await ctx.send('You can\'t get more than 20 movies at once. (TMDB limits)')
             return
-        elif movies_amount < 1:
-            await ctx.send("You can't get less movies than 1.")
-            return
-
-        # Get pages and embed
-        pages, embed = await get_random_movies(self.http_session,
-                                               movies_amount, 28, "Action")
-
-        # Paginate
-        await ImagePaginator.paginate(pages, ctx, embed)
-
-    @movies.command(name='adventure')
-    async def adventure(self, ctx: Context, movies_amount: int = 5) -> None:
-        """Get random Adventure genre movies."""
-        # Count can't be higher than 20, due one page return 20 items
-        # And also this can't be lower than 1, just logic
-        if movies_amount > 20:
-            await ctx.send("Max allowed amount of movies is 20.")
-            return
-        elif movies_amount < 1:
-            await ctx.send("You can't get less movies than 1.")
-            return
-
-        # Get pages and embed
-        pages, embed = await get_random_movies(self.http_session,
-                                               movies_amount, 12, "Adventure")
-
-        # Paginate
-        await ImagePaginator.paginate(pages, ctx, embed)
-
-    @movies.command(name='animation')
-    async def animation(self, ctx: Context, movies_amount: int = 5) -> None:
-        """Get random Animation genre movies."""
-        # Count can't be higher than 20, due one page return 20 items
-        # And also this can't be lower than 1, just logic
-        if movies_amount > 20:
-            await ctx.send("Max allowed amount of movies is 20.")
-            return
-        elif movies_amount < 1:
-            await ctx.send("You can't get less movies than 1.")
+        elif amount < 1:
+            await ctx.send('You can\'t get less than 1 movies. Just logic.')
             return
 
-        # Get pages and embed
-        pages, embed = await get_random_movies(self.http_session,
-                                               movies_amount, 16, "Animation")
+        # Make genre to lower characters due then users may use also like Genre
+        # or GENRE formats
+        genre = genre.lower()
 
-        # Paginate
-        await ImagePaginator.paginate(pages, ctx, embed)
-
-    @movies.command(name='comedy')
-    async def comedy(self, ctx: Context, movies_amount: int = 5) -> None:
-        """Get random Comedy genre movies."""
-        # Count can't be higher than 20, due one page return 20 items
-        # And also this can't be lower than 1, just logic
-        if movies_amount > 20:
-            await ctx.send("Max allowed amount of movies is 20.")
-            return
-        elif movies_amount < 1:
-            await ctx.send("You can't get less movies than 1.")
-            return
-
-        # Get pages and embed
-        pages, embed = await get_random_movies(self.http_session,
-                                               movies_amount, 35, "Comedy")
-
-        # Paginate
-        await ImagePaginator.paginate(pages, ctx, embed)
-
-    @movies.command(name='crime')
-    async def crime(self, ctx: Context, movies_amount: int = 5) -> None:
-        """Get random Crime genre movies."""
-        # Count can't be higher than 20, due one page return 20 items
-        # And also this can't be lower than 1, just logic
-        if movies_amount > 20:
-            await ctx.send("Max allowed amount of movies is 20.")
-            return
-        elif movies_amount < 1:
-            await ctx.send("You can't get less movies than 1.")
-            return
-
-        # Get pages and embed
-        pages, embed = await get_random_movies(self.http_session,
-                                               movies_amount, 80, "Crime")
-
-        # Paginate
-        await ImagePaginator.paginate(pages, ctx, embed)
-
-    @movies.command(name='documentary')
-    async def documentary(self, ctx: Context, movies_amount: int = 5) -> None:
-        """Get random Documentary genre movies."""
-        # Count can't be higher than 20, due one page return 20 items
-        # And also this can't be lower than 1, just logic
-        if movies_amount > 20:
-            await ctx.send("Max allowed amount of movies is 20.")
-            return
-        elif movies_amount < 1:
-            await ctx.send("You can't get less movies than 1.")
-            return
-
-        # Get pages and embed
-        pages, embed = await get_random_movies(self.http_session,
-                                               movies_amount, 99, "Documentary")
-
-        # Paginate
-        await ImagePaginator.paginate(pages, ctx, embed)
-
-    @movies.command(name='drama')
-    async def drama(self, ctx: Context, movies_amount: int = 5) -> None:
-        """Get random Drama genre movies."""
-        # Count can't be higher than 20, due one page return 20 items
-        # And also this can't be lower than 1, just logic
-        if movies_amount > 20:
-            await ctx.send("Max allowed amount of movies is 20.")
-            return
-        elif movies_amount < 1:
-            await ctx.send("You can't get less movies than 1.")
+        # Check genres, get pages and embed
+        if genre == 'action':
+            pages, embed = await get_random_movies(self.http_session,
+                                                   amount, 28, "Action")
+        elif genre == 'adventure':
+            pages, embed = await get_random_movies(self.http_session,
+                                                   amount, 12, "Adventure")
+        elif genre == 'animation':
+            pages, embed = await get_random_movies(self.http_session,
+                                                   amount, 16, "Animation")
+        elif genre == 'comedy':
+            pages, embed = await get_random_movies(self.http_session,
+                                                   amount, 35, "Comedy")
+        elif genre == 'crime':
+            pages, embed = await get_random_movies(self.http_session,
+                                                   amount, 80, "Crime")
+        elif genre == 'documentary':
+            pages, embed = await get_random_movies(self.http_session,
+                                                   amount, 99, "Documentary")
+        elif genre == 'drama':
+            pages, embed = await get_random_movies(self.http_session,
+                                                   amount, 18, "Drama")
+        elif genre == 'family':
+            pages, embed = await get_random_movies(self.http_session,
+                                                   amount, 10751, "Family")
+        elif genre == 'fantasy':
+            pages, embed = await get_random_movies(self.http_session,
+                                                   amount, 14, "Fantasy")
+        elif genre == 'history':
+            pages, embed = await get_random_movies(self.http_session,
+                                                   amount, 36, "History")
+        elif genre == 'horror':
+            pages, embed = await get_random_movies(self.http_session,
+                                                   amount, 27, "Horror")
+        elif genre == 'music':
+            pages, embed = await get_random_movies(self.http_session,
+                                                   amount, 10402, "Music")
+        elif genre == 'mystery':
+            pages, embed = await get_random_movies(self.http_session,
+                                                   amount, 9648, "Mystery")
+        elif genre == 'romance':
+            pages, embed = await get_random_movies(self.http_session,
+                                                   amount, 10749, "Romance")
+        elif genre == 'science':
+            pages, embed = await get_random_movies(self.http_session,
+                                                   amount, 878, "Science Fiction")
+        elif genre == 'thriller':
+            pages, embed = await get_random_movies(self.http_session,
+                                                   amount, 53, "Thriller")
+        elif genre == 'western':
+            pages, embed = await get_random_movies(self.http_session,
+                                                   amount, 37, "Western")
+        else:
+            await ctx.send_help('movies')
             return
 
-        # Get pages and embed
-        pages, embed = await get_random_movies(self.http_session,
-                                               movies_amount, 18, "Drama")
-
-        # Paginate
-        await ImagePaginator.paginate(pages, ctx, embed)
-
-    @movies.command(name='family')
-    async def family(self, ctx: Context, movies_amount: int = 5) -> None:
-        """Get random Drama genre movies."""
-        # Count can't be higher than 20, due one page return 20 items
-        # And also this can't be lower than 1, just logic
-        if movies_amount > 20:
-            await ctx.send("Max allowed amount of movies is 20.")
-            return
-        elif movies_amount < 1:
-            await ctx.send("You can't get less movies than 1.")
-            return
-
-        # Get pages and embed
-        pages, embed = await get_random_movies(self.http_session,
-                                               movies_amount, 10751, "Family")
-
-        # Paginate
-        await ImagePaginator.paginate(pages, ctx, embed)
-
-    @movies.command(name='fantasy')
-    async def fantasy(self, ctx: Context, movies_amount: int = 5) -> None:
-        """Get random Fantasy genre movies."""
-        # Count can't be higher than 20, due one page return 20 items
-        # And also this can't be lower than 1, just logic
-        if movies_amount > 20:
-            await ctx.send("Max allowed amount of movies is 20.")
-            return
-        elif movies_amount < 1:
-            await ctx.send("You can't get less movies than 1.")
-            return
-
-        # Get pages and embed
-        pages, embed = await get_random_movies(self.http_session,
-                                               movies_amount, 14, "Fantasy")
-
-        # Paginate
-        await ImagePaginator.paginate(pages, ctx, embed)
-
-    @movies.command(name='history')
-    async def history(self, ctx: Context, movies_amount: int = 5) -> None:
-        """Get random History genre movies."""
-        # Count can't be higher than 20, due one page return 20 items
-        # And also this can't be lower than 1, just logic
-        if movies_amount > 20:
-            await ctx.send("Max allowed amount of movies is 20.")
-            return
-        elif movies_amount < 1:
-            await ctx.send("You can't get less movies than 1.")
-            return
-
-        # Get pages and embed
-        pages, embed = await get_random_movies(self.http_session,
-                                               movies_amount, 36, "History")
-
-        # Paginate
-        await ImagePaginator.paginate(pages, ctx, embed)
-
-    @movies.command(name='horror')
-    async def horror(self, ctx: Context, movies_amount: int = 5) -> None:
-        """Get random Horror genre movies."""
-        # Count can't be higher than 20, due one page return 20 items
-        # And also this can't be lower than 1, just logic
-        if movies_amount > 20:
-            await ctx.send("Max allowed amount of movies is 20.")
-            return
-        elif movies_amount < 1:
-            await ctx.send("You can't get less movies than 1.")
-            return
-
-        # Get pages and embed
-        pages, embed = await get_random_movies(self.http_session,
-                                               movies_amount, 27, "Horror")
-
-        # Paginate
-        await ImagePaginator.paginate(pages, ctx, embed)
-
-    @movies.command(name='music')
-    async def music(self, ctx: Context, movies_amount: int = 5) -> None:
-        """Get random Music genre movies."""
-        # Count can't be higher than 20, due one page return 20 items
-        # And also this can't be lower than 1, just logic
-        if movies_amount > 20:
-            await ctx.send("Max allowed amount of movies is 20.")
-            return
-        elif movies_amount < 1:
-            await ctx.send("You can't get less movies than 1.")
-            return
-
-        # Get pages and embed
-        pages, embed = await get_random_movies(self.http_session,
-                                               movies_amount, 10402, "Music")
-
-        # Paginate
-        await ImagePaginator.paginate(pages, ctx, embed)
-
-    @movies.command(name='mystery')
-    async def mystery(self, ctx: Context, movies_amount: int = 5) -> None:
-        """Get random Mystery genre movies."""
-        # Count can't be higher than 20, due one page return 20 items
-        # And also this can't be lower than 1, just logic
-        if movies_amount > 20:
-            await ctx.send("Max allowed amount of movies is 20.")
-            return
-        elif movies_amount < 1:
-            await ctx.send("You can't get less movies than 1.")
-            return
-
-        # Get pages and embed
-        pages, embed = await get_random_movies(self.http_session,
-                                               movies_amount, 9648, "Mystery")
-
-        # Paginate
-        await ImagePaginator.paginate(pages, ctx, embed)
-
-    @movies.command(name='romance')
-    async def romance(self, ctx: Context, movies_amount: int = 5) -> None:
-        """Get random Romance genre movies."""
-        # Count can't be higher than 20, due one page return 20 items
-        # And also this can't be lower than 1, just logic
-        if movies_amount > 20:
-            await ctx.send("Max allowed amount of movies is 20.")
-            return
-        elif movies_amount < 1:
-            await ctx.send("You can't get less movies than 1.")
-            return
-
-        # Get pages and embed
-        pages, embed = await get_random_movies(self.http_session,
-                                               movies_amount, 10749, "Romance")
-
-        # Paginate
-        await ImagePaginator.paginate(pages, ctx, embed)
-
-    @movies.command(name='science')
-    async def science(self, ctx: Context, movies_amount: int = 5) -> None:
-        """Get random Science Fiction genre movies."""
-        # Count can't be higher than 20, due one page return 20 items
-        # And also this can't be lower than 1, just logic
-        if movies_amount > 20:
-            await ctx.send("Max allowed amount of movies is 20.")
-            return
-        elif movies_amount < 1:
-            await ctx.send("You can't get less movies than 1.")
-            return
-
-        # Get pages and embed
-        pages, embed = await get_random_movies(self.http_session,
-                                               movies_amount, 878, "Science Fiction")
-
-        # Paginate
-        await ImagePaginator.paginate(pages, ctx, embed)
-
-    @movies.command(name='thriller')
-    async def thriller(self, ctx: Context, movies_amount: int = 5) -> None:
-        """Get random Thriller genre movies."""
-        # Count can't be higher than 20, due one page return 20 items
-        # And also this can't be lower than 1, just logic
-        if movies_amount > 20:
-            await ctx.send("Max allowed amount of movies is 20.")
-            return
-        elif movies_amount < 1:
-            await ctx.send("You can't get less movies than 1.")
-            return
-
-        # Get pages and embed
-        pages, embed = await get_random_movies(self.http_session,
-                                               movies_amount, 53,
-                                               "Thriller")
-
-        # Paginate
-        await ImagePaginator.paginate(pages, ctx, embed)
-
-    @movies.command(name='western')
-    async def western(self, ctx: Context, movies_amount: int = 5) -> None:
-        """Get random Western genre movies."""
-        # Count can't be higher than 20, due one page return 20 items
-        # And also this can't be lower than 1, just logic
-        if movies_amount > 20:
-            await ctx.send("Max allowed amount of movies is 20.")
-            return
-        elif movies_amount < 1:
-            await ctx.send("You can't get less movies than 1.")
-            return
-
-        # Get pages and embed
-        pages, embed = await get_random_movies(self.http_session,
-                                               movies_amount, 37,
-                                               "Western")
-
-        # Paginate
         await ImagePaginator.paginate(pages, ctx, embed)
 
 
