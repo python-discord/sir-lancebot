@@ -2,7 +2,7 @@ import logging
 import random
 from enum import Enum
 from os import environ
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 from urllib.parse import urlencode
 
 from aiohttp import ClientSession
@@ -25,141 +25,23 @@ logger = logging.getLogger(__name__)
 class MovieGenres(Enum):
     """Genre names and IDs."""
 
-    Action = 28
-    Adventure = 12
-    Animation = 16
-    Comedy = 35
-    Crime = 80
-    Documentary = 99
-    Drama = 18
-    Family = 10751
-    Fantasy = 14
-    History = 36
-    Horror = 27
-    Music = 10402
-    Mystery = 9648
-    Romance = 10749
-    Science = 878
-    Thriller = 53
-    Western = 37
-
-
-async def get_random_movies(client: ClientSession,
-                            count: int,
-                            genre_id: int,
-                            genre_name: str,) \
-        -> Tuple[List[Tuple[str, str]], Embed]:
-    """Get random movies by genre from TMDB."""
-    pages = []
-
-    # Create embed
-    embed = Embed(title=f"Random {genre_name} Movies")
-    embed.set_footer(text='Powered by TMDB (themoviedb.org)')
-
-    # Get random page between 1 and 200
-    page = random.randint(1, 200)
-
-    # Define TMDB request parameters
-    # (API key, exclusions, inclusions, sort)
-    params = {
-        "api_key": TMDB_API_KEY,
-        "language": "en-US",
-        "sort_by": "popularity.desc",
-        "include_adult": "false",
-        "include_video": "false",
-        "page": page,
-        "with_genres": str(genre_id)
-    }
-
-    # Create request URL
-    url = BASE_URL + "discover/movie" + "?" + urlencode(params)
-
-    # Do discover request to TMDB API and fetch information
-    async with client.get(url) as res:
-        try:
-            # Parse response data from JSON to dictionary
-            movie_list_data = await res.json()
-
-            # Loop and fetch movies
-            for i in range(count):
-                # Get movie ID
-                movie_id = movie_list_data["results"][i]["id"]
-
-                # Create movie params
-                movie_params = {
-                    "api_key": TMDB_API_KEY,
-                    "language": "en-US"
-                }
-
-                # Generate URL
-                movie_url = BASE_URL + f"movie/{movie_id}?" + urlencode(
-                    movie_params)
-
-                # Fetch movie
-                async with client.get(movie_url) as m_res:
-                    # Parse JSON to dict
-                    movie_data = await m_res.json()
-
-                    # Create embed text
-                    movie_text = ""
-
-                    # Add Title and tagline
-                    movie_text += f"**{movie_data['title']}**\n"
-                    if movie_data['tagline'] != "":
-                        movie_text += movie_data['tagline'] + "\n\n"
-                    else:
-                        movie_text += "\n"
-
-                    # Add movie rating and release date
-                    movie_text += f"**Rating:** {movie_data['vote_average']}/10 :star:\n"
-                    movie_text += f"**Release Date:** {movie_data['release_date']}\n\n"
-
-                    # Add production title
-                    movie_text += "__**Production Information**__\n"
-
-                    companies = movie_data['production_companies']
-                    countries = movie_data['production_countries']
-
-                    # Add production information
-                    movie_text += f"""**Made by:** {', '.join([comp['name']
-                                                               for comp in companies])}\n"""
-                    movie_text += f"""**Made in:** {', '.join([country['name']
-                                                               for country in countries])}\n\n"""
-
-                    # Add Some Numbers title
-                    movie_text += "__**Some Numbers**__\n"
-
-                    # Add Budget, Revenue and Duration
-                    movie_text += f"**Budget:** ${movie_data['budget'] if movie_data['budget'] != 0 else '?'}\n"
-                    movie_text += f"**Revenue:** ${movie_data['revenue'] if movie_data['revenue'] != 0 else '?'}\n"
-                    movie_text += f"**Duration:** {movie_data['runtime']} minutes\n\n"
-
-                    # Add description
-                    movie_text += movie_data['overview']
-
-                    # Define Movie Image URL
-                    movie_img_url = f"http://image.tmdb.org/t/p/w200{movie_data['poster_path']}"
-
-                    # Append this page to pages
-                    pages.append((movie_text, movie_img_url))
-        except KeyError as err:
-            # Create error message
-            msg = f"There was KeyError while executing HTTP request. API may " \
-                f"down or API key may be incorrect, however, some movies " \
-                f"have some missing fields, and this error will raise this " \
-                f"too. Problematic Key: \n```{err}``` "
-
-            # Create error embed
-            err_embed = Embed(title=":no_entry: Error :no_entry:")
-
-            # Log error
-            logger.warning(msg)
-
-            # Return error message + embed
-            return [(msg, "")], err_embed
-
-    # Return all movies pages
-    return pages, embed
+    Action = "28"
+    Adventure = "12"
+    Animation = "16"
+    Comedy = "35"
+    Crime = "80"
+    Documentary = "99"
+    Drama = "18"
+    Family = "10751"
+    Fantasy = "14"
+    History = "36"
+    Horror = "27"
+    Music = "10402"
+    Mystery = "9648"
+    Romance = "10749"
+    Science = "878"
+    Thriller = "53"
+    Western = "37"
 
 
 class Movie(Cog):
@@ -199,24 +81,129 @@ class Movie(Cog):
         # Check is there more than 20 movies specified, due TMDB return 20 movies
         # per page, so this is max. Also you can't get less movies than 1, just logic
         if amount > 20:
-            await ctx.send('You can\'t get more than 20 movies at once. (TMDB limits)')
+            await ctx.send("You can't get more than 20 movies at once. (TMDB limits)")
             return
         elif amount < 1:
-            await ctx.send('You can\'t get less than 1 movies. Just logic.')
+            await ctx.send("You can't get less than 1 movies. Just logic.")
             return
 
-        # Capitalize genre for getting data from Enum
+        # Capitalize genre for getting data from Enum, get random page
         genre = genre.capitalize()
+        page = random.randint(1, 200)
 
-        # Try to fetch pages and embed, when invalid genre, show help
+        # Get movies list from TMDB, check is results key in result. When not, raise error. When genre not exist,
+        # show help.
         try:
-            pages, embed = await get_random_movies(self.http_session, amount, MovieGenres[genre].value, genre)
+            movies = await self.get_movies_list(self.http_session, MovieGenres[genre].value, page)
         except KeyError:
             await ctx.send_help('movies')
             return
+        if 'results' not in movies.keys():
+            err_text = f'There was problem while fetching movies list. Problematic response:\n```{movies}```'
+            err = Embed(title=':no_entry: Error :no_entry:', description=err_text)
+
+            await ctx.send(embed=err)
+            logger.warning(err_text)
+
+            return
+
+        # Get all pages and embed
+        pages = await self.get_pages(self.http_session, movies, amount)
+        embed = await self.get_embed(genre)
 
         # Send movies, paginate
         await ImagePaginator.paginate(pages, ctx, embed)
+
+    async def get_movies_list(self, client: ClientSession, genre_id: str, page: int) -> Dict:
+        """Return JSON of TMDB discover request."""
+        # Define params of request
+        params = {
+            "api_key": TMDB_API_KEY,
+            "language": "en-US",
+            "sort_by": "popularity.desc",
+            "include_adult": "false",
+            "include_video": "false",
+            "page": page,
+            "with_genres": genre_id
+        }
+
+        # Create URL
+        url = BASE_URL + "discover/movie?" + urlencode(params)
+
+        # Make discover request to TMDB
+        async with client.get(url) as resp:
+            data = await resp.json()
+
+        # Return response result
+        return data
+
+    async def get_pages(self, client: ClientSession, movies: Dict, amount: int) -> (List[Tuple[str, str]]):
+        """Fetch all movie pages from movies dictionary. Return list of pages."""
+        pages = []
+
+        for i in range(amount):
+            # Get movie ID, fetch movie information
+            movie_id = movies['results'][i]['id']
+            movie = await self.get_movie(client, movie_id)
+
+            # Create page, append it to pages
+            page, img = await self.create_page(movie)
+            pages.append((page, img))
+
+        return pages
+
+    async def get_movie(self, client: ClientSession, movie: int) -> Dict:
+        """Get Movie by movie ID from TMDB. Return result dictionary."""
+        # Define URL params, generate URL
+        params = {
+            "api_key": TMDB_API_KEY,
+            "language": "en-US"
+        }
+        url = BASE_URL + f"movie/{movie}?" + urlencode(params)
+
+        # Do request, return result
+        async with client.get(url) as resp:
+            return await resp.json()
+
+    async def create_page(self, movie: Dict) -> (str, str):
+        """Create page from TMDB movie request result. Return formatted page + image."""
+        text = ""
+
+        # Add title + tagline (if not empty)
+        text += f"**{movie['title']}**\n"
+        if movie['tagline'] != "":
+            text += f"{movie['tagline']}\n\n"
+        else:
+            text += "\n"
+
+        # Add other information
+        text += f"**Rating:** {movie['vote_average']}/10 :star:\n"
+        text += f"**Release Date:** {movie['release_date']}\n\n"
+
+        text += "__**Production Information**__\n"
+
+        companies = movie['production_companies']
+        countries = movie['production_countries']
+
+        text += f"**Made by:** {', '.join(company['name'] for company in companies)}\n"
+        text += f"**Made in:** {', '.join(country['name'] for country in countries)}\n\n"
+
+        text += "__**Some Numbers**__\n"
+
+        text += f"**Budget:** ${movie['budget'] if movie['budget'] != 0 else '?'}\n"
+        text += f"**Revenue:** ${movie['revenue'] if movie['revenue'] != 0 else '?'}\n"
+        text += f"**Duration:** {movie['runtime']} minutes\n\n"
+
+        text += movie['overview']
+
+        img = f"http://image.tmdb.org/t/p/w200{movie['poster_path']}"
+
+        # Return page content and image
+        return text, img
+
+    async def get_embed(self, name: str) -> Embed:
+        """Return embed of random movies. Uses name in title."""
+        return Embed(title=f'Random {name} Movies').set_footer(text='Powered by TMDB (themoviedb.org)')
 
 
 def setup(bot: Bot) -> None:
