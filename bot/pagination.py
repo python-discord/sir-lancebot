@@ -10,7 +10,7 @@ FIRST_EMOJI = "\u23EE"   # [:track_previous:]
 LEFT_EMOJI = "\u2B05"    # [:arrow_left:]
 RIGHT_EMOJI = "\u27A1"   # [:arrow_right:]
 LAST_EMOJI = "\u23ED"    # [:track_next:]
-DELETE_EMOJI = "\u274c"  # [:x:]
+DELETE_EMOJI = "<:trashcan:637136429717389331>"  # [:trashcan:]
 
 PAGINATION_EMOJI = [FIRST_EMOJI, LEFT_EMOJI, RIGHT_EMOJI, LAST_EMOJI, DELETE_EMOJI]
 
@@ -113,7 +113,7 @@ class LinePaginator(Paginator):
                     # Reaction is on this message
                     reaction_.message.id == message.id,
                     # Reaction is one of the pagination emotes
-                    reaction_.emoji in PAGINATION_EMOJI,
+                    str(reaction_.emoji) in PAGINATION_EMOJI,  # Note: DELETE_EMOJI is a string and not unicode
                     # Reaction was not made by the Bot
                     user_.id != ctx.bot.user.id,
                     # There were no restrictions
@@ -185,7 +185,7 @@ class LinePaginator(Paginator):
                 log.debug("Timed out waiting for a reaction")
                 break  # We're done, no reactions for the last 5 minutes
 
-            if reaction.emoji == DELETE_EMOJI:
+            if str(reaction.emoji) == DELETE_EMOJI:  # Note: DELETE_EMOJI is a string and not unicode
                 log.debug("Got delete reaction")
                 break
 
@@ -261,8 +261,8 @@ class LinePaginator(Paginator):
 
                 await message.edit(embed=embed)
 
-        log.debug("Ending pagination and removing all reactions...")
-        await message.clear_reactions()
+        log.debug("Ending pagination and deleting the message")
+        await message.delete()
 
 
 class ImagePaginator(Paginator):
@@ -323,7 +323,7 @@ class ImagePaginator(Paginator):
                 # Reaction is on the same message sent
                 reaction_.message.id == message.id,
                 # The reaction is part of the navigation menu
-                reaction_.emoji in PAGINATION_EMOJI,
+                str(reaction_.emoji) in PAGINATION_EMOJI,  # Note: DELETE_EMOJI is a string and not unicode
                 # The reactor is not a bot
                 not member.bot
             ))
@@ -369,8 +369,8 @@ class ImagePaginator(Paginator):
             # Deletes the users reaction
             await message.remove_reaction(reaction.emoji, user)
 
-            # Delete reaction press - [:x:]
-            if reaction.emoji == DELETE_EMOJI:
+            # Delete reaction press - [:trashcan:]
+            if str(reaction.emoji) == DELETE_EMOJI:  # Note: DELETE_EMOJI is a string and not unicode
                 log.debug("Got delete reaction")
                 break
 
@@ -424,5 +424,5 @@ class ImagePaginator(Paginator):
 
             await message.edit(embed=embed)
 
-        log.debug("Ending pagination and removing all reactions...")
-        await message.clear_reactions()
+        log.debug("Ending pagination and deleting the message")
+        await message.delete()
