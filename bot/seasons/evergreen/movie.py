@@ -2,7 +2,7 @@ import logging
 import random
 from enum import Enum
 from os import environ
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
 from urllib.parse import urlencode
 
 from aiohttp import ClientSession
@@ -17,13 +17,17 @@ TMDB_API_KEY = environ.get('TMDB_API_KEY')
 # Define base URL of TMDB
 BASE_URL = "https://api.themoviedb.org/3/"
 
-# Get logger
 logger = logging.getLogger(__name__)
 
+# Define movie params, that will be used for every movie request
+MOVIE_PARAMS = {
+    "api_key": TMDB_API_KEY,
+    "language": "en-US"
+}
 
-# Genres with TMDB API IDs
+
 class MovieGenres(Enum):
-    """Genre names and IDs."""
+    """Movies Genre names and IDs."""
 
     Action = "28"
     Adventure = "12"
@@ -111,10 +115,9 @@ class Movie(Cog):
         pages = await self.get_pages(self.http_session, movies, amount)
         embed = await self.get_embed(genre)
 
-        # Send movies, paginate
         await ImagePaginator.paginate(pages, ctx, embed)
 
-    async def get_movies_list(self, client: ClientSession, genre_id: str, page: int) -> Dict:
+    async def get_movies_list(self, client: ClientSession, genre_id: str, page: int) -> Dict[str, Any]:
         """Return JSON of TMDB discover request."""
         # Define params of request
         params = {
@@ -127,26 +130,20 @@ class Movie(Cog):
             "with_genres": genre_id
         }
 
-        # Create URL
         url = BASE_URL + "discover/movie?" + urlencode(params)
 
-        # Make discover request to TMDB
+        # Make discover request to TMDB, return result
         async with client.get(url) as resp:
-            data = await resp.json()
+            return await resp.json()
 
-        # Return response result
-        return data
-
-    async def get_pages(self, client: ClientSession, movies: Dict, amount: int) -> (List[Tuple[str, str]]):
+    async def get_pages(self, client: ClientSession, movies: Dict[str, Any], amount: int) -> List[Tuple[str, str]]:
         """Fetch all movie pages from movies dictionary. Return list of pages."""
         pages = []
 
         for i in range(amount):
-            # Get movie ID, fetch movie information
             movie_id = movies['results'][i]['id']
             movie = await self.get_movie(client, movie_id)
 
-            # Create page, append it to pages
             page, img = await self.create_page(movie)
             pages.append((page, img))
 
@@ -154,24 +151,18 @@ class Movie(Cog):
 
     async def get_movie(self, client: ClientSession, movie: int) -> Dict:
         """Get Movie by movie ID from TMDB. Return result dictionary."""
-        # Define URL params, generate URL
-        params = {
-            "api_key": TMDB_API_KEY,
-            "language": "en-US"
-        }
-        url = BASE_URL + f"movie/{movie}?" + urlencode(params)
+        url = BASE_URL + f"movie/{movie}?" + urlencode(MOVIE_PARAMS)
 
-        # Do request, return result
         async with client.get(url) as resp:
             return await resp.json()
 
-    async def create_page(self, movie: Dict) -> (str, str):
+    async def create_page(self, movie: Dict[str, Any]) -> Tuple[str, str]:
         """Create page from TMDB movie request result. Return formatted page + image."""
         text = ""
 
         # Add title + tagline (if not empty)
         text += f"**{movie['title']}**\n"
-        if movie['tagline'] != "":
+        if movie['tagline']:
             text += f"{movie['tagline']}\n\n"
         else:
             text += "\n"
@@ -190,8 +181,8 @@ class Movie(Cog):
 
         text += "__**Some Numbers**__\n"
 
-        text += f"**Budget:** ${movie['budget'] if movie['budget'] != 0 else '?'}\n"
-        text += f"**Revenue:** ${movie['revenue'] if movie['revenue'] != 0 else '?'}\n"
+        text += f"**Budget:** ${movie['budget'] if movie['budget'] else '?'}\n"
+        text += f"**Revenue:** ${movie['revenue'] if movie['revenue'] else '?'}\n"
         text += f"**Duration:** {movie['runtime']} minutes\n\n"
 
         text += movie['overview']
