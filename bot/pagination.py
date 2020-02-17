@@ -187,7 +187,7 @@ class LinePaginator(Paginator):
 
             if str(reaction.emoji) == DELETE_EMOJI:  # Note: DELETE_EMOJI is a string and not unicode
                 log.debug("Got delete reaction")
-                break
+                return await message.delete()
 
             if reaction.emoji == FIRST_EMOJI:
                 await message.remove_reaction(reaction.emoji, user)
@@ -261,8 +261,8 @@ class LinePaginator(Paginator):
 
                 await message.edit(embed=embed)
 
-        log.debug("Ending pagination and deleting the message")
-        await message.delete()
+        log.debug("Ending pagination and clearing reactions...")
+        await message.clear_reactions()
 
 
 class ImagePaginator(Paginator):
@@ -372,7 +372,7 @@ class ImagePaginator(Paginator):
             # Delete reaction press - [:trashcan:]
             if str(reaction.emoji) == DELETE_EMOJI:  # Note: DELETE_EMOJI is a string and not unicode
                 log.debug("Got delete reaction")
-                break
+                return await message.delete()
 
             # First reaction press - [:track_previous:]
             if reaction.emoji == FIRST_EMOJI:
@@ -424,5 +424,5 @@ class ImagePaginator(Paginator):
 
             await message.edit(embed=embed)
 
-        log.debug("Ending pagination and deleting the message")
-        await message.delete()
+        log.debug("Ending pagination and clearing reactions...")
+        await message.clear_reactions()
