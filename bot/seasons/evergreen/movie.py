@@ -1,18 +1,15 @@
 import logging
 import random
 from enum import Enum
-from os import environ
 from typing import Any, Dict, List, Tuple
 from urllib.parse import urlencode
 
 from aiohttp import ClientSession
 from discord import Embed
-from discord.ext.commands import Bot, Cog, Context, command
+from discord.ext.commands import Bot, Cog, Context, group
 
+from bot.constants import Tokens
 from bot.pagination import ImagePaginator
-
-# Get TMDB API key from .env
-TMDB_API_KEY = environ.get('TMDB_API_KEY')
 
 # Define base URL of TMDB
 BASE_URL = "https://api.themoviedb.org/3/"
@@ -21,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 # Define movie params, that will be used for every movie request
 MOVIE_PARAMS = {
-    "api_key": TMDB_API_KEY,
+    "api_key": Tokens.tmdb,
     "language": "en-US"
 }
 
@@ -55,32 +52,12 @@ class Movie(Cog):
         self.bot = bot
         self.http_session: ClientSession = bot.http_session
 
-    @command(name='movies', aliases=['movie'])
+    @group(name='movies', aliases=['movie'], invoke_without_command=True)
     async def movies(self, ctx: Context, genre: str = "", amount: int = 5) -> None:
         """
-        Get random movies by specifing genre.
+        Get random movies by specifying genre. Also support amount parameter, that define how much movies will be shown.
 
-        Also support amount parameter,
-        that define how much movies will be shown. Default 5
-
-        Available genres:
-        - Action
-        - Adventure
-        - Animation
-        - Comedy
-        - Crime
-        - Documentary
-        - Drama
-        - Family
-        - Fantasy
-        - History
-        - Horror
-        - Music
-        - Mystery
-        - Romance
-        - Science
-        - Thriller
-        - Western
+        Default 5. Use .movies genres to get all available genres.
         """
         # Check is there more than 20 movies specified, due TMDB return 20 movies
         # per page, so this is max. Also you can't get less movies than 1, just logic
@@ -91,25 +68,31 @@ class Movie(Cog):
             await ctx.send("You can't get less than 1 movies. Just logic.")
             return
 
-        # Capitalize genre for getting data from Enum, get random page
+        # Capitalize genre for getting data from Enum, get random page, send help when genre don't exist.
         genre = genre.capitalize()
-        page = random.randint(1, 200)
-
-        # Get movies list from TMDB, check is results key in result. When not, raise error. When genre not exist,
-        # show help.
         try:
-            movies = await self.get_movies_list(self.http_session, MovieGenres[genre].value, page)
+            result = await self.get_movies_list(self.http_session, MovieGenres[genre].value, 1)
         except KeyError:
             await ctx.send_help('movies')
             return
+
+        # Check is results is result. If not, throw error.
+        if "results" not in result.keys():
+            err_msg = f"There is problem while making TMDB API request. Response Code: {result['status_code']}, " \
+                      f"{result['status_message']}."
+            await ctx.send(err_msg)
+            logger.warning(err_msg)
+
+        # Get random page. Max page is last page where is movies with this genre.
+        page = random.randint(1, result["total_pages"])
+
+        # Get movies list from TMDB, check is results key in result. When not, raise error.
+        movies = await self.get_movies_list(self.http_session, MovieGenres[genre].value, page)
         if 'results' not in movies.keys():
-            err_text = f'There was problem while fetching movies list. Problematic response:\n```{movies}```'
-            err = Embed(title=':no_entry: Error :no_entry:', description=err_text)
-
-            await ctx.send(embed=err)
-            logger.warning(err_text)
-
-            return
+            err_msg = f"There is problem while making TMDB API request. Response Code: {result['status_code']}, " \
+                      f"{result['status_message']}."
+            await ctx.send(err_msg)
+            logger.warning(err_msg)
 
         # Get all pages and embed
         pages = await self.get_pages(self.http_session, movies, amount)
@@ -117,11 +100,16 @@ class Movie(Cog):
 
         await ImagePaginator.paginate(pages, ctx, embed)
 
+    @movies.command(name='genres', aliases=['genre', 'g'])
+    async def genres(self, ctx: Context) -> None:
+        """Show all currently available genres for .movies command."""
+        await ctx.send(f"Current available genres: {', '.join('`' + genre.name + '`' for genre in MovieGenres)}")
+
     async def get_movies_list(self, client: ClientSession, genre_id: str, page: int) -> Dict[str, Any]:
         """Return JSON of TMDB discover request."""
         # Define params of request
         params = {
-            "api_key": TMDB_API_KEY,
+            "api_key": Tokens.tmdb,
             "language": "en-US",
             "sort_by": "popularity.desc",
             "include_adult": "false",
@@ -181,9 +169,17 @@ class Movie(Cog):
 
         text += "__**Some Numbers**__\n"
 
-        text += f"**Budget:** ${movie['budget'] if movie['budget'] else '?'}\n"
-        text += f"**Revenue:** ${movie['revenue'] if movie['revenue'] else '?'}\n"
-        text += f"**Duration:** {movie['runtime']} minutes\n\n"
+        budget = f"{movie['budget']:,d}" if movie['budget'] else "?"
+        revenue = f"{movie['revenue']:,d}" if movie['revenue'] else "?"
+
+        if movie['runtime'] is not None:
+            duration = divmod(movie['runtime'], 60)
+        else:
+            duration = ("?", "?")
+
+        text += f"**Budget:** ${budget}\n"
+        text += f"**Revenue:** ${revenue}\n"
+        text += f"**Duration:** {f'{duration[0]} hour(s) {duration[1]} minute(s)'}\n\n"
 
         text += movie['overview']
 
