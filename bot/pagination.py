@@ -6,11 +6,13 @@ from discord import Embed, Member, Reaction
 from discord.abc import User
 from discord.ext.commands import Context, Paginator
 
+from bot.constants import Emojis
+
 FIRST_EMOJI = "\u23EE"   # [:track_previous:]
 LEFT_EMOJI = "\u2B05"    # [:arrow_left:]
 RIGHT_EMOJI = "\u27A1"   # [:arrow_right:]
 LAST_EMOJI = "\u23ED"    # [:track_next:]
-DELETE_EMOJI = "<:trashcan:637136429717389331>"  # [:trashcan:]
+DELETE_EMOJI = Emojis.trashcan  # [:trashcan:]
 
 PAGINATION_EMOJI = (FIRST_EMOJI, LEFT_EMOJI, RIGHT_EMOJI, LAST_EMOJI, DELETE_EMOJI)
 
