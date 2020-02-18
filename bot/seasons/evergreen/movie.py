@@ -76,7 +76,7 @@ class Movie(Cog):
             await ctx.send_help('movies')
             return
 
-        # Check is results is result. If not, throw error.
+        # Check if "results" is in result. If not, throw error.
         if "results" not in result.keys():
             err_msg = f"There is problem while making TMDB API request. Response Code: {result['status_code']}, " \
                       f"{result['status_message']}."
@@ -86,7 +86,7 @@ class Movie(Cog):
         # Get random page. Max page is last page where is movies with this genre.
         page = random.randint(1, result["total_pages"])
 
-        # Get movies list from TMDB, check is results key in result. When not, raise error.
+        # Get movies list from TMDB, check if results key in result. When not, raise error.
         movies = await self.get_movies_list(self.http_session, MovieGenres[genre].value, page)
         if 'results' not in movies.keys():
             err_msg = f"There is problem while making TMDB API request. Response Code: {result['status_code']}, " \
