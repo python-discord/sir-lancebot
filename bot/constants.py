@@ -132,6 +132,7 @@ class Tokens(NamedTuple):
     aoc_session_cookie = environ.get("AOC_SESSION_COOKIE")
     omdb = environ.get("OMDB_API_KEY")
     youtube = environ.get("YOUTUBE_API_KEY")
+    tmdb = environ.get("TMDB_API_KEY")
 
 
 # Default role combinations
