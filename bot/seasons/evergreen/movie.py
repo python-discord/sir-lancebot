@@ -65,7 +65,7 @@ class Movie(Cog):
             await ctx.send("You can't get more than 20 movies at once. (TMDB limits)")
             return
         elif amount < 1:
-            await ctx.send("You can't get less than 1 movies. Just logic.")
+            await ctx.send("You can't get less than 1 movie.")
             return
 
         # Capitalize genre for getting data from Enum, get random page, send help when genre don't exist.
