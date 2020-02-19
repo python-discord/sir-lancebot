@@ -89,6 +89,7 @@ class Emojis:
     check = "\u2611"
     envelope = "\U0001F4E8"
     pin = '\U0001f4cc'
+    trashcan = "<:trashcan:637136429717389331>"
 
     terning1 = "<:terning1:431249668983488527>"
     terning2 = "<:terning2:462339216987127808>"
@@ -133,6 +134,7 @@ class Tokens(NamedTuple):
     aoc_session_cookie = environ.get("AOC_SESSION_COOKIE")
     omdb = environ.get("OMDB_API_KEY")
     youtube = environ.get("YOUTUBE_API_KEY")
+    tmdb = environ.get("TMDB_API_KEY")
 
 
 # Default role combinations
