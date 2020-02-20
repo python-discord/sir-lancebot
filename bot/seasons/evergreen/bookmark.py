@@ -1,5 +1,4 @@
 import asyncio
-import contextlib
 import logging
 import random
 
@@ -50,19 +49,20 @@ class Bookmark(commands.Cog):
         embed.set_author(name=target_message.author, icon_url=target_message.author.avatar_url)
         embed.set_thumbnail(url=bookmark_icon_url)
 
+        error_embed = discord.Embed(
+            title=random.choice(ERROR_REPLIES),
+            description=f"Please enable your DMs to receive the bookmark.",
+            colour=Colours.soft_red
+        )
+
         try:
             await ctx.author.send(embed=embed)
         except discord.Forbidden:
-            error_embed = discord.Embed(
-                title=random.choice(ERROR_REPLIES),
-                description=f"{ctx.author.mention}, please enable your DMs to receive the bookmark.",
-                colour=Colours.soft_red
-            )
             await ctx.send(embed=error_embed)
-        else:
-            log.info(f"{ctx.author} bookmarked {target_message.jump_url} with title '{title}'.")
-            await ctx.message.add_reaction(Emojis.envelope)
-            await ctx.message.add_reaction(Emojis.pin)
+
+        log.info(f"{ctx.author} bookmarked {target_message.jump_url} with title '{title}'.")
+        await ctx.message.add_reaction(Emojis.envelope)
+        await ctx.message.add_reaction(Emojis.pin)
 
         embed.add_field(
             name=f'Bookmarked from {ctx.author.name}.',
@@ -80,15 +80,17 @@ class Bookmark(commands.Cog):
 
         sent_person = {ctx.author}  # set of id who got the message
         while True:
+            reaction, user = await self.bot.wait_for("reaction_add", timeout=10.0, check=check)
+            log.info(f"{user.name} bookmarked {target_message.jump_url} with title '{title}' from '{ctx.author}'.")
             try:
-                reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
-                log.info(f"{user.name} bookmarked {target_message.jump_url} with title '{title}' from '{ctx.author}'.")
-                with contextlib.suppress(discord.Forbidden):
-                    await user.send(embed=embed)
-                sent_person.add(user)
+                await user.send(embed=embed)
             except asyncio.TimeoutError:
                 await ctx.message.clear_reactions()
                 return
+            except discord.Forbidden:  # Mention so that we can differentiate who it was for
+                await ctx.send(user.mention, embed=error_embed, delete_after=7.5)
+            else:
+                sent_person.add(user)
 
 
 def setup(bot: commands.Bot) -> None:
