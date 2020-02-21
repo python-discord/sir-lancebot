@@ -59,9 +59,10 @@ class Bookmark(commands.Cog):
             await ctx.author.send(embed=embed)
         except discord.Forbidden:
             await ctx.send(embed=error_embed)
+        else:
+            await ctx.message.add_reaction(Emojis.envelope)
 
         log.info(f"{ctx.author} bookmarked {target_message.jump_url} with title '{title}'.")
-        await ctx.message.add_reaction(Emojis.envelope)
         await ctx.message.add_reaction(Emojis.pin)
 
         embed.add_field(
@@ -80,15 +81,19 @@ class Bookmark(commands.Cog):
 
         sent_person = {ctx.author}  # set of id who got the message
         while True:
-            reaction, user = await self.bot.wait_for("reaction_add", timeout=10.0, check=check)
-            log.info(f"{user.name} bookmarked {target_message.jump_url} with title '{title}' from '{ctx.author}'.")
             try:
-                await user.send(embed=embed)
+                reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
             except asyncio.TimeoutError:
                 await ctx.message.clear_reactions()
                 return
+
+            log.info(f"{user.name} bookmarked {target_message.jump_url} with title '{title}' from '{ctx.author}'.")
+
+            try:
+                await user.send(embed=embed)
             except discord.Forbidden:  # Mention so that we can differentiate who it was for
-                await ctx.send(user.mention, embed=error_embed, delete_after=7.5)
+                await ctx.send(f"{user.mention} Please enable you're DM to receive the message.", delete_after=7.5)
+                await reaction.remove(user)
             else:
                 sent_person.add(user)
 
