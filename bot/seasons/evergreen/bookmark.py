@@ -1,4 +1,5 @@
 import asyncio
+from copy import deepcopy
 import logging
 import random
 
@@ -51,21 +52,26 @@ class Bookmark(commands.Cog):
 
         error_embed = discord.Embed(
             title=random.choice(ERROR_REPLIES),
-            description=f"Please enable your DMs to receive the bookmark.",
+            description=f"Please enable DMs to receive the bookmark. "
+                        f"Once done you can retry by reacting with {Emojis.pin}",
             colour=Colours.soft_red
         )
 
         try:
             await ctx.author.send(embed=embed)
         except discord.Forbidden:
-            await ctx.send(embed=error_embed)
+            await ctx.send(embed=error_embed, delete_after=7.5)
+            sent_person = set()
         else:
             await ctx.message.add_reaction(Emojis.envelope)
+            sent_person = {ctx.author}  # set of id who got the message
 
         log.info(f"{ctx.author} bookmarked {target_message.jump_url} with title '{title}'.")
         await ctx.message.add_reaction(Emojis.pin)
 
-        embed.add_field(
+        copied_embed = deepcopy(embed)
+
+        copied_embed.add_field(
             name=f'Bookmarked from {ctx.author.name}.',
             value=f'[Visit original message]({ctx.message.jump_url})',
             inline=False
@@ -79,7 +85,7 @@ class Bookmark(commands.Cog):
                 and user not in sent_person
             )
 
-        sent_person = {ctx.author}  # set of id who got the message
+
         while True:
             try:
                 reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
@@ -90,7 +96,11 @@ class Bookmark(commands.Cog):
             log.info(f"{user.name} bookmarked {target_message.jump_url} with title '{title}' from '{ctx.author}'.")
 
             try:
-                await user.send(embed=embed)
+                if user == ctx.author:
+                    await user.send(embed=embed)
+                else:
+                    await user.send(embed=copied_embed)
+
             except discord.Forbidden:  # Mention so that we can differentiate who it was for
                 await ctx.send(f"{user.mention} Please enable you're DM to receive the message.", delete_after=7.5)
                 await reaction.remove(user)
