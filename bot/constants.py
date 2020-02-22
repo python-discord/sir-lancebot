@@ -4,12 +4,18 @@ from typing import NamedTuple
 from datetime import datetime
 
 __all__ = (
+    "bookmark_icon_url",
     "AdventOfCode", "Channels", "Client", "Colours", "Emojis", "Hacktoberfest", "Roles", "Tokens",
     "WHITELISTED_CHANNELS", "STAFF_ROLES", "MODERATION_ROLES",
     "POSITIVE_REPLIES", "NEGATIVE_REPLIES", "ERROR_REPLIES",
 )
 
 log = logging.getLogger(__name__)
+
+bookmark_icon_url = (
+    "https://images-ext-2.discordapp.net/external/zl4oDwcmxUILY7sD9ZWE2fU5R7n6QcxEmPYSE5eddbg/"
+    "%3Fv%3D1/https/cdn.discordapp.com/emojis/654080405988966419.png?width=20&height=20"
+)
 
 
 class AdventOfCode:
@@ -82,6 +88,7 @@ class Emojis:
     christmas_tree = "\U0001F384"
     check = "\u2611"
     envelope = "\U0001F4E8"
+    trashcan = "<:trashcan:637136429717389331>"
 
     terning1 = "<:terning1:431249668983488527>"
     terning2 = "<:terning2:462339216987127808>"
@@ -126,6 +133,7 @@ class Tokens(NamedTuple):
     aoc_session_cookie = environ.get("AOC_SESSION_COOKIE")
     omdb = environ.get("OMDB_API_KEY")
     youtube = environ.get("YOUTUBE_API_KEY")
+    tmdb = environ.get("TMDB_API_KEY")
 
 
 # Default role combinations
