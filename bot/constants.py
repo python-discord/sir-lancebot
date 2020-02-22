@@ -1,11 +1,12 @@
+import enum
 import logging
+from datetime import datetime
 from os import environ
 from typing import NamedTuple
-from datetime import datetime
 
 __all__ = (
     "bookmark_icon_url",
-    "AdventOfCode", "Channels", "Client", "Colours", "Emojis", "Hacktoberfest", "Roles", "Tokens",
+    "AdventOfCode", "Channels", "Client", "Colours", "Emojis", "Hacktoberfest", "Month", "Roles", "Tokens",
     "WHITELISTED_CHANNELS", "STAFF_ROLES", "MODERATION_ROLES",
     "POSITIVE_REPLIES", "NEGATIVE_REPLIES", "ERROR_REPLIES",
 )
@@ -110,6 +111,21 @@ class Lovefest:
 
 class Hacktoberfest(NamedTuple):
     voice_id = 514420006474219521
+
+
+class Month(enum.IntEnum):
+    january = 1
+    february = 2
+    march = 3
+    april = 4
+    may = 5
+    june = 6
+    july = 7
+    august = 8
+    september = 9
+    october = 10
+    november = 11
+    december = 12
 
 
 class Roles(NamedTuple):
