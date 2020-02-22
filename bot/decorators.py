@@ -2,6 +2,7 @@ import logging
 import random
 import typing
 from asyncio import Lock
+from datetime import datetime
 from functools import wraps
 from weakref import WeakValueDictionary
 
@@ -9,7 +10,7 @@ from discord import Colour, Embed
 from discord.ext import commands
 from discord.ext.commands import CheckFailure, Context
 
-from bot.constants import ERROR_REPLIES
+from bot.constants import ERROR_REPLIES, Month
 
 log = logging.getLogger(__name__)
 
@@ -18,6 +19,24 @@ class InChannelCheckFailure(CheckFailure):
     """Check failure when the user runs a command in a non-whitelisted channel."""
 
     pass
+
+
+def in_month(*allowed_months: Month) -> typing.Callable:
+    """
+    Check whether the command was invoked in one of `enabled_months`.
+
+    Uses the current UTC month at the time of running the predicate.
+    """
+    async def predicate(ctx: Context) -> bool:
+        current_month = datetime.utcnow().month
+        can_run = current_month in allowed_months
+
+        log.debug(
+            f"Command '{ctx.command}' is locked to months {allowed_months}. "
+            f"Invoking it in month {current_month} is {'allowed' if can_run else 'disallowed'}."
+        )
+        return can_run
+    return commands.check(predicate)
 
 
 def with_role(*role_ids: int) -> typing.Callable:
