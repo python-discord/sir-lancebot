@@ -1,7 +1,7 @@
 import asyncio
-from copy import deepcopy
 import logging
 import random
+from copy import deepcopy
 
 import discord
 from discord.ext import commands
@@ -84,7 +84,6 @@ class Bookmark(commands.Cog):
                 and reaction.message == ctx.message
                 and user not in sent_person
             )
-
 
         while True:
             try:
