@@ -386,7 +386,7 @@ class SeasonManager(commands.Cog):
 
         while True:
             await asyncio.sleep(self.sleep_time)  # Sleep until midnight
-            self.sleep_time = 86400  # Next time, sleep for 24 hours.
+            self.sleep_time = 24 * 3600  # Next time, sleep for 24 hours
 
             # If the season has changed, load it.
             new_season = get_season(date=datetime.datetime.utcnow())
