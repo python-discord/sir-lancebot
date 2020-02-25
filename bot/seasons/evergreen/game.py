@@ -277,7 +277,7 @@ limit 50;"""
             # Add games name and rating, also attach URL to title
             line += f"**[{game['name']}]({game['url']})**\n"
             line += f"""{'{0:.2f}'.format(game['total_rating'] if 'total_rating' in game.keys() else 0)}/100 :star: (by {
-            game['total_rating_count'] if 'total_rating_count' in game.keys() else '?'} users)"""
+            game['total_rating_count'] if 'total_rating_count' in game else '?'} users)"""
 
             lines.append(line)
 
