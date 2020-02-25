@@ -121,7 +121,7 @@ class Games(Cog):
             return
 
         # Create pages and paginate
-        pages = await self.get_pages(games)
+        pages = [await self.create_page(game) for game in games]
 
         await ImagePaginator.paginate(pages, ctx, Embed(title=f'Random {genre} Games'))
 
@@ -172,7 +172,7 @@ class Games(Cog):
             return
 
         companies = await self.get_companies_list(self.http_session, amount, random.randint(0, 150))
-        pages = await self.get_company_pages(companies)
+        pages = [await self.create_company_page(co) for co in companies]
 
         await ImagePaginator.paginate(pages, ctx, Embed(title='Random Game Companies'))
 
@@ -205,12 +205,6 @@ class Games(Cog):
         ) as resp:
             return await resp.json()
 
-    async def get_pages(self, data: List[Dict[str, Any]]) -> List[Tuple[str, str]]:
-        """Generate all game pages, do additional requests to IGDB API."""
-        pages = []
-        [pages.append(await self.create_page(game)) for game in data]
-        return pages
-
     async def create_page(self, data: Dict[str, Any]) -> Tuple[str, str]:
         """Create content of Game Page."""
         # Create page content variable, what will be returned
@@ -240,8 +234,8 @@ class Games(Cog):
         page += f"**Status:** {GameStatus(data['status']).name if 'status' in data else '?'}\n"
 
         if 'age_ratings' in data:
-            rating = f"""{', '.join(AgeRatingCategories(age['category']).name + ' ' + AgeRatings(age['rating']).name
-                                    for age in data['age_ratings'])}"""
+            rating = ', '.join(f"{AgeRatingCategories(age['category']).name} {AgeRatings(age['rating']).name}"
+                               for age in data['age_ratings'])
             page += f"**Age Ratings:** {rating}\n"
 
         if 'involved_companies' in data:
@@ -296,15 +290,6 @@ offset {offset};"""
                 headers=HEADERS
         ) as resp:
             return await resp.json()
-
-    async def get_company_pages(self, data: List[Dict[str, Any]]) -> List[Tuple[str, str]]:
-        """Get all good formatted pages about Game Companies."""
-        pages = []
-
-        # Loop over companies, add them to pages listing and return pages
-        [pages.append(await self.create_company_page(co)) for co in data]
-
-        return pages
 
     async def create_company_page(self, data: Dict[str, Any]) -> Tuple[str, str]:
         """Create good formatted Game Company page."""
