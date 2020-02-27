@@ -260,6 +260,12 @@
             ],
             "version": "==1.9.5"
         },
+        "requests": {
+            "hashes": [
+                "sha256:43999036bfa82904b6af1d99e4882b560e5e2c68e5c4b0aa03b655f3d7d73fee",
+            ],
+            "version": "==2.23.0"
+        },
         "websockets": {
             "hashes": [
                 "sha256:0e2f7d6567838369af074f0ef4d0b802d19fa1fee135d864acc656ceefa33136",
