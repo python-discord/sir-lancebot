@@ -100,9 +100,13 @@ class Bookmark(commands.Cog):
                 else:
                     await user.send(embed=copied_embed)
 
-            except discord.Forbidden:  # Mention so that we can differentiate who it was for
+            except discord.Forbidden:
                 await ctx.send(f"{user.mention} Please enable your DM to receive the message.", delete_after=7.5)
                 await reaction.remove(user)
+            except discord.HTTPException:
+                pass
+            except discord.NotFound:
+                pass
             else:
                 sent_person.add(user)
 
