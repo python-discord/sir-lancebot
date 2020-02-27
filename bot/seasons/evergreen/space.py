@@ -8,6 +8,7 @@ import discord
 import requests
 from discord.ext import commands
 
+
 from bot.constants import Colours, ERROR_REPLIES
 
 log = logging.getLogger(__name__)
