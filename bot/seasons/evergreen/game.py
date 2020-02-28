@@ -1,23 +1,102 @@
-import asyncio
+import difflib
+import logging
 import random
-from datetime import datetime
+import textwrap
+from datetime import datetime as dt
 from enum import IntEnum
-from typing import Any, Dict, List, Tuple
+from string import Template
+from typing import Any, Dict, List, Optional, Tuple
 
 from aiohttp import ClientSession
 from discord import Embed
-from discord.ext.commands import Bot, Cog, Context, group
+from discord.ext.commands import Cog, Context, group
 
+from bot.bot import SeasonalBot
 from bot.constants import Tokens
 from bot.pagination import ImagePaginator, LinePaginator
 
 # Base URL of IGDB API
-BASE_URL = "https://api-v3.igdb.com/"
-IMAGE_BASE_URL = "https://images.igdb.com/igdb/image/upload/"
+BASE_URL = "https://api-v3.igdb.com"
 
 HEADERS = {
     "user-key": Tokens.igdb,
     "Accept": "application/json"
+}
+
+logger = logging.getLogger(__name__)
+
+# ---------
+# TEMPLATES
+# ---------
+
+# Body templates
+# Request body template for get_games_list
+GAMES_LIST_BODY = Template(
+    textwrap.dedent("""
+        fields cover.image_id, first_release_date, total_rating, name, storyline, url, platforms.name, status,
+        involved_companies.company.name, summary, age_ratings.category, age_ratings.rating, total_rating_count;
+        ${sort} ${limit} ${offset} ${genre} ${additional}
+    """)
+)
+
+# Request body template for get_companies_list
+COMPANIES_LIST_BODY = Template(
+    textwrap.dedent("""
+        fields name, url, start_date, logo.image_id, developed.name, published.name, description;
+        offset ${offset};
+        limit ${limit};
+    """)
+)
+
+# Request body template for games search
+SEARCH_BODY = Template('fields name, url, storyline, total_rating, total_rating_count; limit 50; search "${term}";')
+
+# Pages templates
+# Game embed layout
+GAME_PAGE = Template(
+    textwrap.dedent("""
+        **[${name}](${url})**
+        ${description}
+        **Release Date:** ${release_date}
+        **Rating:** ${rating}/100 :star: (based on ${rating_count} ratings)
+        **Platforms:** ${platforms}
+        **Status:** ${status}
+        **Age Ratings:** ${age_ratings}
+        **Made by:** ${made_by}
+
+        ${storyline}
+    """)
+)
+
+# .games company command page layout
+COMPANY_PAGE = Template(
+    textwrap.dedent("""
+        **[${name}](${url})**
+        ${description}
+        **Founded:** ${founded}
+        **Developed:** ${developed}
+        **Published:** ${published}
+    """)
+)
+
+# For .games search command line layout
+GAME_SEARCH_LINE = Template(
+    textwrap.dedent("""
+        **[${name}](${url})**
+        ${rating}/100 :star: (based on ${rating_count} ratings)
+    """)
+)
+
+# URL templates
+COVER_URL = Template("https://images.igdb.com/igdb/image/upload/t_cover_big/${image_id}.jpg")
+LOGO_URL = Template("https://images.igdb.com/igdb/image/upload/t_logo_med/${image_id}.png")
+
+# Create aliases for complex genre names
+ALIASES = {
+    "Role-playing (rpg)": ["Role-playing", "Rpg"],
+    "Turn-based strategy (tbs)": ["Turn-based-strategy", "Tbs"],
+    "Real time strategy (rts)": ["Real-time-strategy", "Rts"],
+    "Hack and slash/beat 'em up": ["Hack-and-slash"]
 }
 
 
@@ -60,264 +139,236 @@ class AgeRatings(IntEnum):
 class Games(Cog):
     """Games Cog contains commands that collect data from IGDB."""
 
-    def __init__(self, bot: Bot):
+    def __init__(self, bot: SeasonalBot):
         self.bot = bot
         self.http_session: ClientSession = bot.http_session
 
         # Initialize genres
-        asyncio.get_event_loop().create_task(self._get_genres())
+        bot.loop.create_task(self._get_genres())
 
     async def _get_genres(self) -> None:
         """Create genres variable for games command."""
         body = "fields name; limit 100;"
-        async with self.http_session.get(BASE_URL + "genres", data=body, headers=HEADERS) as resp:
+        async with self.http_session.get(f"{BASE_URL}/genres", data=body, headers=HEADERS) as resp:
             result = await resp.json()
 
-        genres = {genre['name'].capitalize(): genre['id'] for genre in result}
+        genres = {genre["name"].capitalize(): genre["id"] for genre in result}
 
         self.genres = {}
 
-        # Manual check genres, replace sentences with words
+        # Replace complex names with names from ALIASES
         for genre in genres:
-            if genre == "Role-playing (rpg)":
-                self.genres["Role-playing"] = genres[genre]
-                self.genres["Rpg"] = genres[genre]
-            elif genre == "Turn-based strategy (tbs)":
-                self.genres["Turn-based-strategy"] = genres[genre]
-                self.genres["Tbs"] = genres[genre]
-            elif genre == "Real time strategy (rts)":
-                self.genres["Real-time-strategy"] = genres[genre]
-                self.genres["Rts"] = genres[genre]
-            elif genre == "Hack and slash/beat 'em up":
-                self.genres["Hack-and-slash"] = genres[genre]
+            if genre in ALIASES:
+                for alias in ALIASES[genre]:
+                    self.genres[alias] = genres[genre]
             else:
                 self.genres[genre] = genres[genre]
 
-    @group(name='games', aliases=['game'], invoke_without_command=True)
-    async def games(self, ctx: Context, genre: str = "", amount: int = 5) -> None:
+    @group(name="games", aliases=["game"], invoke_without_command=True)
+    async def games(self, ctx: Context, genre: Optional[str] = None, amount: int = 5) -> None:
         """
-        Get random game(s) by genre from IGDB. Use .movies genres command to get all available genres.
+        Get random game(s) by genre from IGDB. Use .games genres command to get all available genres.
 
         Also support amount parameter, what max is 25 and min 1, default 5. Use quotes ("") for genres with multiple
         words.
         """
+        # When user didn't specified genre, send help message
+        if genre is None:
+            await ctx.send_help("games")
+            return
+
         # Capitalize genre for check
         genre = genre.capitalize()
 
         # Check for amounts, max is 25 and min 1
-        if amount > 25:
-            await ctx.send("You can't get more than 25 games at once.")
-            return
-        elif amount < 1:
-            await ctx.send("You can't get less than 1 game.")
+        if not 1 <= amount <= 25:
+            await ctx.send("Your provided amount is out of range. Our minimum is 1 and maximum 25.")
             return
 
-        # Get games listing, if genre don't exist, show help.
+        # Get games listing, if genre don't exist, show error message with possibilities.
         try:
-            games = await self.get_games_list(self.http_session, amount, self.genres[genre],
+            games = await self.get_games_list(amount, self.genres[genre],
                                               offset=random.randint(0, 150))
         except KeyError:
-            await ctx.send_help('games')
+            possibilities = "`, `".join(difflib.get_close_matches(genre, self.genres))
+            await ctx.send(f"Invalid genre `{genre}`. {f'Maybe you meant `{possibilities}`?' if possibilities else ''}")
             return
 
         # Create pages and paginate
         pages = [await self.create_page(game) for game in games]
 
-        await ImagePaginator.paginate(pages, ctx, Embed(title=f'Random {genre} Games'))
+        await ImagePaginator.paginate(pages, ctx, Embed(title=f"Random {genre} Games"))
 
-    @games.command(name='top', aliases=['t'])
+    @games.command(name="top", aliases=["t"])
     async def top(self, ctx: Context, amount: int = 10) -> None:
         """
         Get current Top games in IGDB.
 
         Support amount parameter. Max is 25, min is 1.
         """
-        if amount > 25:
-            await ctx.send("You can't get more than top 25 games.")
-            return
-        elif amount < 1:
-            await ctx.send("You can't get less than 1 top game.")
+        if not 1 <= amount <= 25:
+            await ctx.send("Your provided amount is out of range. Our minimum is 1 and maximum 25.")
             return
 
-        games = await self.get_games_list(self.http_session, amount, sort='total_rating desc',
+        games = await self.get_games_list(amount, sort="total_rating desc",
                                           additional_body="where total_rating >= 90; sort total_rating_count desc;")
 
-        pages = await self.get_pages(games)
-        await ImagePaginator.paginate(pages, ctx, Embed(title=f'Top {amount} Games'))
+        pages = [await self.create_page(game) for game in games]
+        await ImagePaginator.paginate(pages, ctx, Embed(title=f"Top {amount} Games"))
 
-    @games.command(name='genres', aliases=['genre', 'g'])
+    @games.command(name="genres", aliases=["genre", "g"])
     async def genres(self, ctx: Context) -> None:
         """Get all available genres."""
         await ctx.send(f"Currently available genres: {', '.join(f'`{genre}`' for genre in self.genres)}")
 
-    @games.command(name='search', aliases=['s'])
-    async def search(self, ctx: Context, *, search: str) -> None:
+    @games.command(name="search", aliases=["s"])
+    async def search(self, ctx: Context, *, search_term: str) -> None:
         """Find games by name."""
-        lines = await self.search_games(self.http_session, search)
+        lines = await self.search_games(search_term)
 
-        await LinePaginator.paginate((line for line in lines), ctx, Embed(title=f'Game Search Results: {search}'))
+        await LinePaginator.paginate((line for line in lines), ctx, Embed(title=f"Game Search Results: {search_term}"))
 
-    @games.command(name='company', aliases=['companies'])
+    @games.command(name="company", aliases=["companies"])
     async def company(self, ctx: Context, amount: int = 5) -> None:
         """
         Get random Game Companies companies from IGDB API.
 
         Support amount parameter. Max is 25, min is 1.
         """
-        if amount > 25:
-            await ctx.send("You can't get more than 25 companies at once.")
-            return
-        elif amount < 1:
-            await ctx.send("You can't get less than 1 company.")
+        if not 1 <= amount <= 25:
+            await ctx.send("Your provided amount is out of range. Our minimum is 1 and maximum 25.")
             return
 
-        companies = await self.get_companies_list(self.http_session, amount, random.randint(0, 150))
+        companies = await self.get_companies_list(amount, random.randint(0, 150))
         pages = [await self.create_company_page(co) for co in companies]
 
-        await ImagePaginator.paginate(pages, ctx, Embed(title='Random Game Companies'))
+        await ImagePaginator.paginate(pages, ctx, Embed(title="Random Game Companies"))
 
     async def get_games_list(self,
-                             client: ClientSession,
-                             limit: int,
-                             genre: str = None,
-                             sort: str = None,
+                             amount: int,
+                             genre: Optional[str] = None,
+                             sort: Optional[str] = None,
                              additional_body: str = "",
-                             offset: int = 0) \
-            -> List[Dict[str, Any]]:
-        """Get Games List from IGDB API."""
+                             offset: int = 0
+                             ) -> List[Dict[str, Any]]:
+        """
+        Get list of games from IGDB API by parameters that is provided.
+
+        Amount param show how much movies this get, genre is genre ID and at least one genre in game must this when
+        provided. Sort is sorting by specific field and direction, ex. total_rating desc/asc (total_rating is field,
+        desc/asc is direction). Additional_body is field where you can pass extra search parameters. Offset show start
+        position in API.
+        """
         # Create body of IGDB API request, define fields, sorting, offset, limit and genre
-        body = "fields cover.image_id, first_release_date, total_rating, name, storyline, url, platforms.name, "
-        body += "status, involved_companies.company.name, summary, age_ratings.category, age_ratings.rating, "
-        body += "total_rating_count;\n"
-
-        body += f"sort {sort};\n" if sort else ''
-        body += f"offset {offset};\n"
-        body += f"limit {limit};\n"
-
-        body += f"where genres = ({genre});" if genre else ''
-        body += additional_body
+        params = {
+            "sort": f"sort {sort};" if sort else "",
+            "limit": f"limit {amount};",
+            "offset": f"offset {offset};" if offset else "",
+            "genre": f"where genres = ({genre});" if genre else "",
+            "additional": additional_body
+        }
+        body = GAMES_LIST_BODY.substitute(params)
 
         # Do request to IGDB API, create headers, URL, define body, return result
-        async with client.get(
-                url=BASE_URL + "games",
-                data=body,
-                headers=HEADERS
-        ) as resp:
+        async with self.http_session.get(url=f"{BASE_URL}/games", data=body, headers=HEADERS) as resp:
             return await resp.json()
 
     async def create_page(self, data: Dict[str, Any]) -> Tuple[str, str]:
         """Create content of Game Page."""
-        # Create page content variable, what will be returned
-        page = ""
+        # Create cover image URL from template
+        url = COVER_URL.substitute({"image_id": data["cover"]["image_id"] if "cover" in data else ""})
 
-        # If game have cover, generate URL of Cover, if not, let url empty
-        if 'cover' in data:
-            url = f"{IMAGE_BASE_URL}t_cover_big/{data['cover']['image_id']}.jpg"
-        else:
-            url = ""
+        # Get release date separately with checking
+        release_date = dt.utcfromtimestamp(data["first_release_date"]).date() if "first_release_date" in data else "?"
 
-        # Add title with hyperlink and check for storyline
-        page += f"**[{data['name']}]({data['url']})**\n"
-        page += data['summary'] + "\n\n" if 'summary' in data else "\n"
+        # Create Age Ratings value
+        rating = ", ".join(f"{AgeRatingCategories(age['category']).name} {AgeRatings(age['rating']).name}"
+                           for age in data["age_ratings"]) if "age_ratings" in data else "?"
 
-        # Add release date if key is in game information
-        if 'first_release_date' in data:
-            page += f"**Release Date:** {datetime.utcfromtimestamp(data['first_release_date']).date()}\n"
+        companies = ", ".join(comp["company"]["name"] for comp in data["involved_companies"]) \
+            if "involved_companies" in data else "?"
 
-        # Add other information
-        page += f"**Rating:** {'{0:.2f}'.format(data['total_rating']) if 'total_rating' in data else '?'}/100 "
-        page += f":star: (based on {data['total_rating_count'] if 'total_rating_count' in data else '?'})\n"
-
-        page += f"**Platforms:** "
-        page += f"{', '.join(pf['name'] for pf in data['platforms']) if 'platforms' in data else '?'}\n"
-
-        page += f"**Status:** {GameStatus(data['status']).name if 'status' in data else '?'}\n"
-
-        if 'age_ratings' in data:
-            rating = ', '.join(f"{AgeRatingCategories(age['category']).name} {AgeRatings(age['rating']).name}"
-                               for age in data['age_ratings'])
-            page += f"**Age Ratings:** {rating}\n"
-
-        if 'involved_companies' in data:
-            companies = ', '.join(co['company']['name'] for co in data['involved_companies'])
-        else:
-            companies = "?"
-        page += f"**Made by:** {companies}\n"
-
-        page += "\n"
-        page += data['storyline'] if 'storyline' in data else ''
+        # Create formatting for template page
+        formatting = {
+            "name": data["name"],
+            "url": data["url"],
+            "description": f"{data['summary']}\n\n" if "summary" in data else "\n",
+            "release_date": release_date,
+            "rating": round(data["total_rating"] if "total_rating" in data else 0, 2),
+            "rating_count": data["total_rating_count"] if "total_rating_count" in data else "?",
+            "platforms": ", ".join(platform["name"] for platform in data["platforms"]) if "platforms" in data else "?",
+            "status": GameStatus(data["status"]).name if "status" in data else "?",
+            "age_ratings": rating,
+            "made_by": companies,
+            "storyline": data["storyline"] if "storyline" in data else ""
+        }
+        page = GAME_PAGE.substitute(formatting)
 
         return page, url
 
-    async def search_games(self, client: ClientSession, search: str) -> List[str]:
+    async def search_games(self, search_term: str) -> List[str]:
         """Search game from IGDB API by string, return listing of pages."""
         lines = []
 
         # Define request body of IGDB API request and do request
-        body = f"""fields name, url, storyline, total_rating, total_rating_count;
-search "{search}";
-limit 50;"""
+        body = SEARCH_BODY.substitute({"term": search_term})
 
-        async with client.get(
-                url=BASE_URL + "games",
-                data=body,
-                headers=HEADERS) as resp:
+        async with self.http_session.get(url=f"{BASE_URL}/games", data=body, headers=HEADERS) as resp:
             data = await resp.json()
 
         # Loop over games, format them to good format, make line and append this to total lines
         for game in data:
-            line = ""
-
-            # Add games name and rating, also attach URL to title
-            line += f"**[{game['name']}]({game['url']})**\n"
-            line += f"""{'{0:.2f}'.format(game['total_rating'] if 'total_rating' in game.keys() else 0)}/100 :star: (by {
-            game['total_rating_count'] if 'total_rating_count' in game else '?'} users)"""
-
+            formatting = {
+                "name": game["name"],
+                "url": game["url"],
+                "rating": round(game["total_rating"] if "total_rating" in game else 0, 2),
+                "rating_count": game["total_rating_count"] if "total_rating" in game else "?"
+            }
+            line = GAME_SEARCH_LINE.substitute(formatting)
             lines.append(line)
 
         return lines
 
-    async def get_companies_list(self, client: ClientSession, limit: int, offset: int = 0) -> List[Dict[str, Any]]:
+    async def get_companies_list(self, limit: int, offset: int = 0) -> List[Dict[str, Any]]:
         """Get random Game Companies from IGDB API."""
-        # Create request body, define included fields, limit and offset, do request
-        body = f"""fields name, url, start_date, logo.image_id, developed.name, published.name, description;
-limit {limit};
-offset {offset};"""
+        # Create request body from template
+        body = COMPANIES_LIST_BODY.substitute({
+            "limit": limit,
+            "offset": offset
+        })
 
-        async with client.get(
-                url=BASE_URL + "companies",
-                data=body,
-                headers=HEADERS
-        ) as resp:
+        async with self.http_session.get(url=f"{BASE_URL}/companies", data=body, headers=HEADERS) as resp:
             return await resp.json()
 
     async def create_company_page(self, data: Dict[str, Any]) -> Tuple[str, str]:
         """Create good formatted Game Company page."""
-        page = ""
-
         # Generate URL of company logo
-        url = f"{IMAGE_BASE_URL}t_logo_med/{data['logo']['image_id'] if 'logo' in data.keys() else ''}.png"
+        url = LOGO_URL.substitute({"image_id": data["logo"]["image_id"] if "logo" in data else ""})
 
-        # Add name and description of company, attach URL to title
-        page += f"[{data['name']}]({data['url']})\n"
-        page += data['description'] + "\n\n" if 'description' in data.keys() else '\n'
+        # Try to get found date of company
+        founded = dt.utcfromtimestamp(data["start_date"]).date() if "start_date" in data else "?"
 
-        # Add other information
-        if 'start_date' in data.keys():
-            founded = datetime.utcfromtimestamp(data['start_date']).date()
-        else:
-            founded = "?"
-        page += f"**Founded:** {founded}\n"
+        # Generate list of games, that company have developed or published
+        developed = ", ".join(game["name"] for game in data["developed"]) if "developed" in data else "?"
+        published = ", ".join(game["name"] for game in data["published"]) if "published" in data else "?"
 
-        page += "**Developed:** "
-        page += f"{', '.join(game['name'] for game in data['developed']) if 'developed' in data.keys() else '?'}\n"
-
-        page += "**Published:** "
-        page += f"{', '.join(game['name'] for game in data['published']) if 'published' in data.keys() else '?'}"
+        formatting = {
+            "name": data["name"],
+            "url": data["url"],
+            "description": f"{data['description']}\n\n" if "description" in data else "\n",
+            "founded": founded,
+            "developed": developed,
+            "published": published
+        }
+        page = COMPANY_PAGE.substitute(formatting)
 
         return page, url
 
 
-def setup(bot: Bot) -> None:
+def setup(bot: SeasonalBot) -> None:
     """Add/Load Games cog."""
+    # Check does IGDB API key exist, if not, log warning and don't load cog
+    if not Tokens.igdb:
+        logger.warning("No IGDB API key. Not loading Games cog.")
+        return
     bot.add_cog(Games(bot))
