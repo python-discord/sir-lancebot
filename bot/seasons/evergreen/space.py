@@ -1,4 +1,6 @@
 import logging
+from typing import Any, Dict
+from urllib.parse import urlencode
 
 from discord.ext.commands import Cog
 
@@ -24,6 +26,12 @@ class Space(Cog):
     def __init__(self, bot: SeasonalBot):
         self.bot = bot
         self.http_session = bot.http_session
+
+    async def fetch_from_nasa(self, endpoint: str, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Fetch information from NASA API, return result."""
+        # Generate request URL from base URL, endpoint and parsed params
+        async with self.http_session.get(url=f"{BASE_URL}{endpoint}?{urlencode(params)}") as resp:
+            return await resp.json()
 
 
 def setup(bot: SeasonalBot) -> None:
