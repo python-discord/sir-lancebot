@@ -1,8 +1,10 @@
 import logging
-from typing import Any, Dict
+from datetime import datetime
+from typing import Any, Dict, Optional
 from urllib.parse import urlencode
 
-from discord.ext.commands import Cog
+from discord import Embed
+from discord.ext.commands import Cog, Context, command
 
 from bot.bot import SeasonalBot
 from bot.constants import Tokens
@@ -26,6 +28,29 @@ class Space(Cog):
     def __init__(self, bot: SeasonalBot):
         self.bot = bot
         self.http_session = bot.http_session
+
+    @command(name="apod")
+    async def apod(self, ctx: Context, date: Optional[str] = None) -> None:
+        """Get Astronomy Picture of Day from NASA API. Date is optional parameter, what formatting is YYYY-MM-DD."""
+        # Make copy of parameters
+        params = APOD_PARAMS.copy()
+        # Parse date to params, when provided. Show error message when invalid formatting
+        if date:
+            try:
+                params["date"] = datetime.strptime(date, "%Y-%m-%d").date().isoformat()
+            except ValueError:
+                await ctx.send(f"Invalid date {date}. Please make sure your date is in format YYYY-MM-DD.")
+                return
+
+        # Do request to NASA API
+        result = await self.fetch_from_nasa("planetary/apod", params)
+
+        # Create embed from result
+        embed = Embed(title=f"Astronomy Picture of Day in {result['date']}", description=result["explanation"])
+        embed.set_image(url=result["hdurl"])
+        embed.set_footer(text="Powered by NASA API")
+
+        await ctx.send(embed=embed)
 
     async def fetch_from_nasa(self, endpoint: str, params: Dict[str, Any]) -> Dict[str, Any]:
         """Fetch information from NASA API, return result."""
