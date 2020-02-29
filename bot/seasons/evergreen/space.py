@@ -7,6 +7,16 @@ from bot.constants import Tokens
 
 logger = logging.getLogger(__name__)
 
+# NASA API base URL
+BASE_URL = "https://api.nasa.gov/"
+
+# Default Parameters:
+# .apod command default request parameters
+APOD_PARAMS = {
+    "api_key": Tokens.nasa,
+    "hd": True
+}
+
 
 class Space(Cog):
     """Space Cog contains commands, that show images, facts or other information about space."""
