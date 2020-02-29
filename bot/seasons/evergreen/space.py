@@ -1,6 +1,11 @@
+import logging
+
 from discord.ext.commands import Cog
 
 from bot.bot import SeasonalBot
+from bot.constants import Tokens
+
+logger = logging.getLogger(__name__)
 
 
 class Space(Cog):
@@ -13,4 +18,9 @@ class Space(Cog):
 
 def setup(bot: SeasonalBot) -> None:
     """Load Space Cog."""
+    # Check does bot have NASA API key in .env, when not, don't load Cog and print warning
+    if not Tokens.nasa:
+        logger.warning("Can't find NASA API key. Not loading Space Cog.")
+        return
+
     bot.add_cog(Space(bot))
