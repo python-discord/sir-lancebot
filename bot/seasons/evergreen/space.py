@@ -1,4 +1,5 @@
 import logging
+import textwrap
 from datetime import datetime
 from random import randint
 from typing import Any, Dict, Optional
@@ -69,7 +70,7 @@ class Space(Cog):
             data = await resp.json()
 
         # Get (random) item from result, that will be shown
-        item = await self.get_random_nasa_item(data)
+        item = data["collection"]["item"][randint(0, len(data["collection"]["item"]) - 1)]
 
         # Create embed and send it
         embed = Embed(title=item["data"][0]["title"], description=item["data"][0]["description"])
@@ -100,21 +101,44 @@ class Space(Cog):
 
         await ctx.send(embed=embed)
 
+    @command(name="mars")
+    async def mars(self, ctx: Context, date: str) -> None:
+        """
+        Get random Mars image by date.
+
+        Date formatting is YYYY-MM-DD. Current max date is 2019-09-28 and min 2012-08-06.
+        """
+        # Create API request parameters, try to parse date
+        params = {
+            "api_key": Tokens.nasa
+        }
+        try:
+            params["earth_date"] = datetime.strptime(date, "%Y-%m-%d")
+        except ValueError:
+            await ctx.send(f"Invalid date {date}. Please make sure your date is in format YYYY-MM-DD.")
+            return
+
+        result = await self.fetch_from_nasa("mars-photos/api/v1/rovers/curiosity/photos", params)
+
+        # Check for empty result
+        if len(result["photos"]) < 1:
+            await ctx.send(textwrap.dedent(f"""We can't find result in date {date}.
+                                               **Note:** Current dates must in range 2012-08-06 and 2019-09-28."""))
+
+        # Get random item from result, generate embed with it and send
+        item = result["photos"][randint(0, len(result["photos"]) - 1)]
+
+        embed = Embed(title=f"{item['rover']['name']}'s {item['camera']['full_name']} Mars Image")
+        embed.set_image(url=item["img_src"])
+        embed.set_footer(text="Powered by NASA API")
+
+        await ctx.send(embed=embed)
+
     async def fetch_from_nasa(self, endpoint: str, params: Dict[str, Any]) -> Dict[str, Any]:
         """Fetch information from NASA API, return result."""
         # Generate request URL from base URL, endpoint and parsed params
         async with self.http_session.get(url=f"{BASE_URL}{endpoint}?{urlencode(params)}") as resp:
             return await resp.json()
-
-    async def get_random_nasa_item(self, data: Dict[str, Any]) -> Dict[str, Any]:
-        """Get random item from Dictionary that is fetched from NASA API in .nasa command."""
-        # Get how much items is available
-        length = len(data["collection"]["items"])
-
-        # Get position of item that will be returned
-        pos = randint(0, length - 1)
-
-        return data["collection"]["items"][pos]
 
 
 def setup(bot: SeasonalBot) -> None:
