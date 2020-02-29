@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from random import randint
 from typing import Any, Dict, Optional
 from urllib.parse import urlencode
 
@@ -57,6 +58,16 @@ class Space(Cog):
         # Generate request URL from base URL, endpoint and parsed params
         async with self.http_session.get(url=f"{BASE_URL}{endpoint}?{urlencode(params)}") as resp:
             return await resp.json()
+
+    async def get_random_nasa_item(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Get random item from Dictionary that is fetched from NASA API in .nasa command."""
+        # Get how much items is available
+        length = len(data["collection"]["items"])
+
+        # Get position of item that will be returned
+        pos = randint(0, length - 1)
+
+        return data["collection"]["items"][pos]
 
 
 def setup(bot: SeasonalBot) -> None:
