@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 # NASA API base URL
 BASE_URL = "https://api.nasa.gov/"
+NASA_IMAGES_BASE = "https://images-api.nasa.gov/"
 
 # Default Parameters:
 # .apod command default request parameters
@@ -49,6 +50,29 @@ class Space(Cog):
         # Create embed from result
         embed = Embed(title=f"Astronomy Picture of Day in {result['date']}", description=result["explanation"])
         embed.set_image(url=result["hdurl"])
+        embed.set_footer(text="Powered by NASA API")
+
+        await ctx.send(embed=embed)
+
+    @command(name="nasa")
+    async def nasa(self, ctx: Context) -> None:
+        """Get random NASA information/facts + image."""
+        page = randint(1, 50)
+
+        # Create params for request, create URL and do request
+        params = {
+            "media_type": "image",
+            "page": page
+        }
+        async with self.http_session.get(url=f"{NASA_IMAGES_BASE}search?{urlencode(params)}") as resp:
+            data = await resp.json()
+
+        # Get (random) item from result, that will be shown
+        item = await self.get_random_nasa_item(data)
+
+        # Create embed and send it
+        embed = Embed(title=item["data"][0]["title"], description=item["data"][0]["description"])
+        embed.set_image(url=item["links"][0]["href"])
         embed.set_footer(text="Powered by NASA API")
 
         await ctx.send(embed=embed)
