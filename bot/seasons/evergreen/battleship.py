@@ -36,38 +36,39 @@ class Player:
     grid: Grid
 
 
-SHIPS = {
+SHIPS = {  # The name of the ship and its size
     "Carrier": 5,
     "Battleship": 4,
     "Cruiser": 3,
     "Submarine": 3,
     "Destroyer": 2,
-}  # The name of the ship and its size
+}
 
 
 # For these two variables, the first boolean is whether the square is a ship (True) or not (False).
 # The second boolean is whether the player has aimed for that square (True) or not (False)
-SHIP_EMOJIS = {
+
+SHIP_EMOJIS = {  # This is for the player's own board which shows the location of their own ships.
     (True, True): ":fire:",
     (True, False): ":ship:",
     (False, True): ":anger:",
     (False, False): ":ocean:",
-}  # This is for the player's own board which shows the location of their own ships.
+}
 
-HIDDEN_EMOJIS = {
+HIDDEN_EMOJIS = {  # This is for the opposing player's board which only shows aimed locations.
     (True, True): ":red_circle:",
     (True, False): ":black_circle:",
     (False, True): ":white_circle:",
     (False, False): ":black_circle:",
-}  # This is for the opposing player's board which only shows aimed locations.
+}
 
-LETTERS = (
+LETTERS = (  # For the top row of the board
     ":stop_button::regional_indicator_a::regional_indicator_b::regional_indicator_c::regional_indicator_d:"
     ":regional_indicator_e::regional_indicator_f::regional_indicator_g::regional_indicator_h:"
     ":regional_indicator_i::regional_indicator_j:"
-)  # For the top row of the board
+)
 
-NUMBERS = [
+NUMBERS = [  # For the first column of the board
     ":one:",
     ":two:",
     ":three:",
@@ -78,7 +79,7 @@ NUMBERS = [
     ":eight:",
     ":nine:",
     ":keycap_ten:",
-]  # For the first column of the board
+]
 
 CROSS_EMOJI = "\u274e"
 HAND_RAISED_EMOJI = "\U0001f64b"
@@ -107,6 +108,7 @@ class Game:
         self.next: typing.Optional[discord.Member] = None
 
         self.match: typing.Optional[typing.Match] = None
+        self.surrender: bool = False
 
         self.setup_grids()
 
@@ -166,7 +168,7 @@ class Game:
         for player in (self.p1, self.p2):
             for name, size in SHIPS.items():
                 while True:  # Repeats if about to overwrite another boat
-                    overwrite = False
+                    ship_collision = False
                     coords = []
 
                     coord1 = random.randint(0, 9)
@@ -183,9 +185,10 @@ class Game:
                         new_x = x + (xincr * i)
                         new_y = y + (yincr * i)
                         if player.grid[new_x][new_y].boat:  # Check if there's already a boat
-                            overwrite = True
+                            ship_collision = True
+                            break
                         coords.append((new_x, new_y))
-                    if not overwrite:  # If not overwriting any other boat spaces, break loop
+                    if not ship_collision:  # If not overwriting any other boat spaces, break loop
                         break
 
                 for x, y in coords:
@@ -216,6 +219,9 @@ class Game:
     def predicate(self, message: discord.Message) -> bool:
         """Predicate checking the message typed for each turn."""
         if message.author == self.turn.user and message.channel == self.turn.user.dm_channel:
+            if message.content.lower() == "surrender":
+                self.surrender = True
+                return True
             self.match = re.match("([A-J]|[a-j]) ?((10)|[1-9])", message.content.strip())
             if not self.match:
                 self.bot.loop.create_task(message.add_reaction(CROSS_EMOJI))
@@ -225,7 +231,8 @@ class Game:
         """Lets the player who's turn it is choose a square."""
         square = None
         turn_message = await self.turn.user.send(
-            "It's your turn! Type the square you want to fire at. Format it like this: A1"
+            "It's your turn! Type the square you want to fire at. Format it like this: A1\n"
+            "Type `surrender` to give up"
         )
         await self.next.user.send("Their turn", delete_after=3.0)
         while True:
@@ -234,9 +241,19 @@ class Game:
             except asyncio.TimeoutError:
                 await self.turn.user.send("You took too long. Game over!")
                 await self.next.user.send(f"{self.turn.user} took too long. Game over!")
+                await self.public_channel.send(
+                    f"Game over! {self.turn.user.mention} timed out so {self.next.user.mention} wins!"
+                )
                 self.gameover = True
                 break
             else:
+                if self.surrender:
+                    await self.next.user.send(f"{self.turn.user} surrendered. Game over!")
+                    await self.public_channel.send(
+                        f"Game over! {self.turn.user.mention} surrendered to {self.next.user.mention}!"
+                    )
+                    self.gameover = True
+                    break
                 square = self.get_square(self.next.grid, self.match.string)
                 if square.aimed:
                     await self.turn.user.send("You've already aimed at this square!", delete_after=3.0)
@@ -275,6 +292,8 @@ class Game:
                 return
 
             square = await self.take_turn()
+            if not square:
+                return
             square.aimed = True
 
             for message in alert_messages:
@@ -308,7 +327,7 @@ class Battleship(commands.Cog):
         announcement: discord.Message,
         reaction: discord.Reaction,
         user: discord.Member
-    ) -> typing.Optional[bool]:
+    ) -> bool:
         """Predicate checking the criteria for the announcement message."""
         if self.already_playing(ctx.author):  # If they've joined a game since requesting a player 2
             return True  # Is dealt with later on
@@ -319,7 +338,23 @@ class Battleship(commands.Cog):
         ):
             if self.already_playing(user):
                 self.bot.loop.create_task(ctx.send(f"{user.mention} You're already playing a game!"))
+                self.bot.loop.create_task(announcement.remove_reaction(reaction, user))
                 return False
+
+            if user in self.waiting:
+                self.bot.loop.create_task(ctx.send(
+                    f"{user.mention} Please cancel your game first before joining another one."
+                ))
+                self.bot.loop.create_task(announcement.remove_reaction(reaction, user))
+                return False
+
+            return True
+
+        if (
+            user.id == ctx.author.id
+            and str(reaction.emoji) == CROSS_EMOJI
+            and reaction.message.id == announcement.id
+        ):
             return True
         return False
 
@@ -345,13 +380,15 @@ class Battleship(commands.Cog):
 
         announcement = await ctx.send(
             "**Battleship**: A new game is about to start!\n"
-            f"Press :raising_hand: to play against {ctx.author.mention}!"
+            f"Press {HAND_RAISED_EMOJI} to play against {ctx.author.mention}!\n"
+            f"(Cancel the game with {CROSS_EMOJI}.)"
         )
         self.waiting.append(ctx.author)
         await announcement.add_reaction(HAND_RAISED_EMOJI)
+        await announcement.add_reaction(CROSS_EMOJI)
 
         try:
-            _reaction, user = await self.bot.wait_for(
+            reaction, user = await self.bot.wait_for(
                 "reaction_add",
                 check=partial(self.predicate, ctx, announcement),
                 timeout=60.0
@@ -360,6 +397,11 @@ class Battleship(commands.Cog):
             self.waiting.remove(ctx.author)
             await announcement.delete()
             return await ctx.send(f"{ctx.author.mention} Seems like there's no one here to play...")
+
+        if str(reaction.emoji) == CROSS_EMOJI:
+            self.waiting.remove(ctx.author)
+            await announcement.delete()
+            return await ctx.send(f"{ctx.author.mention} Game cancelled.")
 
         await announcement.delete()
         self.waiting.remove(ctx.author)
@@ -372,7 +414,7 @@ class Battleship(commands.Cog):
             self.games.remove(game)
         except discord.Forbidden:
             await ctx.send(
-                f"{ctx.author.mention} {user.mention}"
+                f"{ctx.author.mention} {user.mention} "
                 "Game failed. This is likely due to you not having your DMs open. Check and try again."
             )
             self.games.remove(game)
