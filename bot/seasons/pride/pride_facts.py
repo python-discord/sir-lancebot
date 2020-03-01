@@ -33,7 +33,7 @@ class PrideFacts(commands.Cog):
 
     async def send_pride_fact_daily(self) -> None:
         """Background task to post the daily pride fact every day."""
-        channel = self.bot.get_channel(Channels.seasonalbot_chat)
+        channel = self.bot.get_channel(Channels.seasonalbot_commands)
         while True:
             await self.send_select_fact(channel, datetime.utcnow())
             await asyncio.sleep(24 * 60 * 60)
