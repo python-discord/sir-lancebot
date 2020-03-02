@@ -254,7 +254,7 @@ class Games(Cog):
         """
         Get list of games from IGDB API by parameters that is provided.
 
-        Amount param show how much movies this get, genre is genre ID and at least one genre in game must this when
+        Amount param show how much games this get, genre is genre ID and at least one genre in game must this when
         provided. Sort is sorting by specific field and direction, ex. total_rating desc/asc (total_rating is field,
         desc/asc is direction). Additional_body is field where you can pass extra search parameters. Offset show start
         position in API.
@@ -330,7 +330,12 @@ class Games(Cog):
         return lines
 
     async def get_companies_list(self, limit: int, offset: int = 0) -> List[Dict[str, Any]]:
-        """Get random Game Companies from IGDB API."""
+        """
+        Get random Game Companies from IGDB API.
+
+        Limit is parameter, that show how much movies this should return, offset show in which position should API start
+        returning results.
+        """
         # Create request body from template
         body = COMPANIES_LIST_BODY.substitute({
             "limit": limit,
