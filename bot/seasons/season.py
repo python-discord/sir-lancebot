@@ -337,9 +337,6 @@ class SeasonBase:
                 for ext_name in [i[1] for i in pkgutil.iter_modules([path])]:
                     extensions.append(f"bot.seasons.{ext_folder}.{ext_name}")
 
-        # Append help command to listing
-        extensions.append("bot.help")
-
         # Finally we can load all the cogs we've prepared.
         bot.load_extensions(extensions)
 
