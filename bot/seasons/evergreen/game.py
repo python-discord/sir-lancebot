@@ -289,8 +289,7 @@ class Games(Cog):
         rating = ", ".join(f"{AgeRatingCategories(age['category']).name} {AgeRatings(age['rating']).name}"
                            for age in data["age_ratings"]) if "age_ratings" in data else "?"
 
-        companies = ", ".join(comp["company"]["name"] for comp in data["involved_companies"]) \
-            if "involved_companies" in data else "?"
+        companies = [c["company"]["name"] for c in data["involved_companies"]] if "involved_companies" in data else "?"
 
         # Create formatting for template page
         formatting = {
@@ -303,7 +302,7 @@ class Games(Cog):
             "platforms": ", ".join(platform["name"] for platform in data["platforms"]) if "platforms" in data else "?",
             "status": GameStatus(data["status"]).name if "status" in data else "?",
             "age_ratings": rating,
-            "made_by": companies,
+            "made_by": ", ".join(companies),
             "storyline": data["storyline"] if "storyline" in data else ""
         }
         page = GAME_PAGE.substitute(formatting)
