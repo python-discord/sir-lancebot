@@ -12,10 +12,9 @@ from bot.constants import Tokens
 
 logger = logging.getLogger(__name__)
 
-# NASA API base URL
-BASE_URL = "https://api.nasa.gov"
-NASA_IMAGES_BASE = "https://images-api.nasa.gov"
-EPIC_BASE_URL = "https://epic.gsfc.nasa.gov"
+NASA_BASE_URL = "https://api.nasa.gov"
+NASA_IMAGES_BASE_URL = "https://images-api.nasa.gov"
+NASA_EPIC_BASE_URL = "https://epic.gsfc.nasa.gov"
 
 # Default Parameters:
 # .apod command default request parameters
@@ -65,7 +64,7 @@ class Space(Cog):
             "media_type": "image",
             "page": page
         }
-        async with self.http_session.get(url=f"{NASA_IMAGES_BASE}/search?{urlencode(params)}") as resp:
+        async with self.http_session.get(url=f"{NASA_IMAGES_BASE_URL}/search?{urlencode(params)}") as resp:
             data = await resp.json()
 
         # Get (random) item from result, that will be shown
@@ -82,7 +81,7 @@ class Space(Cog):
     async def earth(self, ctx: Context) -> None:
         """Get one of latest random image of earth from NASA API."""
         # Generate URL and make request to API
-        async with self.http_session.get(url=f"{EPIC_BASE_URL}/api/natural") as resp:
+        async with self.http_session.get(url=f"{NASA_EPIC_BASE_URL}/api/natural") as resp:
             data = await resp.json()
 
         # Get random item from result that will be shown
@@ -91,7 +90,7 @@ class Space(Cog):
         # Split date for image URL
         year, month, day = item["date"].split(" ")[0].split("-")
 
-        image_url = f"{EPIC_BASE_URL}/archive/natural/{year}/{month}/{day}/jpg/{item['image']}.jpg"
+        image_url = f"{NASA_EPIC_BASE_URL}/archive/natural/{year}/{month}/{day}/jpg/{item['image']}.jpg"
 
         # Create embed, fill and send it
         embed = Embed(title="Earth Image", description=item["caption"])
@@ -140,7 +139,7 @@ class Space(Cog):
     async def fetch_from_nasa(self, endpoint: str, params: Dict[str, Any]) -> Dict[str, Any]:
         """Fetch information from NASA API, return result."""
         # Generate request URL from base URL, endpoint and parsed params
-        async with self.http_session.get(url=f"{BASE_URL}/{endpoint}?{urlencode(params)}") as resp:
+        async with self.http_session.get(url=f"{NASA_BASE_URL}/{endpoint}?{urlencode(params)}") as resp:
             return await resp.json()
 
 
