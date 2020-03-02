@@ -16,11 +16,8 @@ NASA_BASE_URL = "https://api.nasa.gov"
 NASA_IMAGES_BASE_URL = "https://images-api.nasa.gov"
 NASA_EPIC_BASE_URL = "https://epic.gsfc.nasa.gov"
 
-# Default Parameters:
-# .apod command default request parameters
-APOD_PARAMS = {
-    "api_key": Tokens.nasa,
-    "hd": True
+APOD_DEFAULT_PARAMS = {
+    "api_key": Tokens.nasa
 }
 
 
@@ -35,7 +32,7 @@ class Space(Cog):
     async def apod(self, ctx: Context, date: Optional[str] = None) -> None:
         """Get Astronomy Picture of Day from NASA API. Date is optional parameter, what formatting is YYYY-MM-DD."""
         # Make copy of parameters
-        params = APOD_PARAMS.copy()
+        params = APOD_DEFAULT_PARAMS.copy()
         # Parse date to params, when provided. Show error message when invalid formatting
         if date:
             try:
@@ -48,8 +45,8 @@ class Space(Cog):
         result = await self.fetch_from_nasa("planetary/apod", params)
 
         # Create embed from result
-        embed = Embed(title=f"Astronomy Picture of Day in {result['date']}", description=result["explanation"])
-        embed.set_image(url=result["hdurl"])
+        embed = Embed(title=f"Astronomy Picture of the Day - {result['date']}", description=result["explanation"])
+        embed.set_image(url=result["url"])
         embed.set_footer(text="Powered by NASA API")
 
         await ctx.send(embed=embed)
