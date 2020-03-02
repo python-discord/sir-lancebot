@@ -186,6 +186,8 @@ class Games(Cog):
             return
 
         # Get games listing, if genre don't exist, show error message with possibilities.
+        # Offset must be random, due otherwise we will get always same result (offset show in which position should
+        # API start returning result)
         try:
             games = await self.get_games_list(amount, self.genres[genre],
                                               offset=random.randint(0, 150))
@@ -239,7 +241,9 @@ class Games(Cog):
             await ctx.send("Your provided amount is out of range. Our minimum is 1 and maximum 25.")
             return
 
-        companies = await self.get_companies_list(amount, random.randint(0, 150))
+        # Get companies listing. Provide limit for limiting how much companies will be returned. Get random offset to
+        # get (almost) every time different companies (offset show in which position should API start returning result)
+        companies = await self.get_companies_list(limit=amount, offset=random.randint(0, 150))
         pages = [await self.create_company_page(co) for co in companies]
 
         await ImagePaginator.paginate(pages, ctx, Embed(title="Random Game Companies"))
