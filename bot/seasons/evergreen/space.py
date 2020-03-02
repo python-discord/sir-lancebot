@@ -1,6 +1,6 @@
 import logging
+import random
 from datetime import datetime
-from random import randint
 from typing import Any, Dict, Optional
 from urllib.parse import urlencode
 
@@ -54,7 +54,7 @@ class Space(Cog):
     @command(name="nasa")
     async def nasa(self, ctx: Context) -> None:
         """Get random NASA information/facts + image."""
-        page = randint(1, 50)
+        page = random.randint(1, 50)
 
         # Create params for request, create URL and do request
         params = {
@@ -65,7 +65,7 @@ class Space(Cog):
             data = await resp.json()
 
         # Get (random) item from result, that will be shown
-        item = data["collection"]["items"][randint(0, len(data["collection"]["items"]) - 1)]
+        item = random.choice(data["collection"]["items"])
 
         # Create embed and send it
         embed = Embed(title=item["data"][0]["title"], description=item["data"][0]["description"])
@@ -82,7 +82,7 @@ class Space(Cog):
             data = await resp.json()
 
         # Get random item from result that will be shown
-        item = data[randint(0, len(data) - 1)]
+        item = random.choice(data)
 
         # Split date for image URL
         year, month, day = item["date"].split(" ")[0].split("-")
@@ -125,7 +125,7 @@ class Space(Cog):
             return
 
         # Get random item from result, generate embed with it and send
-        item = result["photos"][randint(0, len(result["photos"]) - 1)]
+        item = random.choice(result["photos"])
 
         embed = Embed(title=f"{item['rover']['name']}'s {item['camera']['full_name']} Mars Image")
         embed.set_image(url=item["img_src"])
