@@ -157,12 +157,12 @@ class Games(Cog):
         self.genres = {}
 
         # Replace complex names with names from ALIASES
-        for genre in genres:
-            if genre in ALIASES:
-                for alias in ALIASES[genre]:
-                    self.genres[alias] = genres[genre]
+        for genre_name, genre in genres.items():
+            if genre_name in ALIASES:
+                for alias in ALIASES[genre_name]:
+                    self.genres[alias] = genre
             else:
-                self.genres[genre] = genres[genre]
+                self.genres[genre_name] = genre
 
     @group(name="games", aliases=["game"], invoke_without_command=True)
     async def games(self, ctx: Context, genre: Optional[str] = None, amount: int = 5) -> None:
