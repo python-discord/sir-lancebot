@@ -1,10 +1,8 @@
 import difflib
 import logging
 import random
-import textwrap
 from datetime import datetime as dt
 from enum import IntEnum
-from string import Template
 from typing import Any, Dict, List, Optional, Tuple
 
 from aiohttp import ClientSession
@@ -33,65 +31,53 @@ logger = logging.getLogger(__name__)
 
 # Body templates
 # Request body template for get_games_list
-GAMES_LIST_BODY = Template(
-    textwrap.dedent("""
-        fields cover.image_id, first_release_date, total_rating, name, storyline, url, platforms.name, status,
-        involved_companies.company.name, summary, age_ratings.category, age_ratings.rating, total_rating_count;
-        ${sort} ${limit} ${offset} ${genre} ${additional}
-    """)
+GAMES_LIST_BODY = (
+    "fields cover.image_id, first_release_date, total_rating, name, storyline, url, platforms.name, status,"
+    "involved_companies.company.name, summary, age_ratings.category, age_ratings.rating, total_rating_count;"
+    "{sort} {limit} {offset} {genre} {additional}"
 )
 
 # Request body template for get_companies_list
-COMPANIES_LIST_BODY = Template(
-    textwrap.dedent("""
-        fields name, url, start_date, logo.image_id, developed.name, published.name, description;
-        offset ${offset};
-        limit ${limit};
-    """)
+COMPANIES_LIST_BODY = (
+    "fields name, url, start_date, logo.image_id, developed.name, published.name, description;"
+    "offset {offset}; limit {limit};"
 )
 
 # Request body template for games search
-SEARCH_BODY = Template('fields name, url, storyline, total_rating, total_rating_count; limit 50; search "${term}";')
+SEARCH_BODY = 'fields name, url, storyline, total_rating, total_rating_count; limit 50; search "{term}";'
 
 # Pages templates
 # Game embed layout
-GAME_PAGE = Template(
-    textwrap.dedent("""
-        **[${name}](${url})**
-        ${description}
-        **Release Date:** ${release_date}
-        **Rating:** ${rating}/100 :star: (based on ${rating_count} ratings)
-        **Platforms:** ${platforms}
-        **Status:** ${status}
-        **Age Ratings:** ${age_ratings}
-        **Made by:** ${made_by}
-
-        ${storyline}
-    """)
+GAME_PAGE = (
+    "**[{name}]({url})**\n"
+    "{description}"
+    "**Release Date:** {release_date}\n"
+    "**Rating:** {rating}/100 :star: (based on {rating_count} ratings)\n"
+    "**Platforms:** {platforms}\n"
+    "**Status:** {status}\n"
+    "**Age Ratings:** {age_ratings}\n"
+    "**Made by:** {made_by}\n\n"
+    "{storyline}"
 )
 
 # .games company command page layout
-COMPANY_PAGE = Template(
-    textwrap.dedent("""
-        **[${name}](${url})**
-        ${description}
-        **Founded:** ${founded}
-        **Developed:** ${developed}
-        **Published:** ${published}
-    """)
+COMPANY_PAGE = (
+    "**[{name}]({url})**\n"
+    "{description}"
+    "**Founded:** {founded}\n"
+    "**Developed:** {developed}\n"
+    "**Published:** {published}"
 )
 
 # For .games search command line layout
-GAME_SEARCH_LINE = Template(
-    textwrap.dedent("""
-        **[${name}](${url})**
-        ${rating}/100 :star: (based on ${rating_count} ratings)
-    """)
+GAME_SEARCH_LINE = (
+    "**[{name}]({url})**\n"
+    "{rating}/100 :star: (based on {rating_count} ratings)"
 )
 
 # URL templates
-COVER_URL = Template("https://images.igdb.com/igdb/image/upload/t_cover_big/${image_id}.jpg")
-LOGO_URL = Template("https://images.igdb.com/igdb/image/upload/t_logo_med/${image_id}.png")
+COVER_URL = "https://images.igdb.com/igdb/image/upload/t_cover_big/{image_id}.jpg"
+LOGO_URL = "https://images.igdb.com/igdb/image/upload/t_logo_med/{image_id}.png"
 
 # Create aliases for complex genre names
 ALIASES = {
@@ -298,7 +284,7 @@ class Games(Cog):
             "genre": f"where genres = ({genre});" if genre else "",
             "additional": additional_body
         }
-        body = GAMES_LIST_BODY.substitute(params)
+        body = GAMES_LIST_BODY.format(**params)
 
         # Do request to IGDB API, create headers, URL, define body, return result
         async with self.http_session.get(url=f"{BASE_URL}/games", data=body, headers=HEADERS) as resp:
@@ -307,7 +293,7 @@ class Games(Cog):
     async def create_page(self, data: Dict[str, Any]) -> Tuple[str, str]:
         """Create content of Game Page."""
         # Create cover image URL from template
-        url = COVER_URL.substitute({"image_id": data["cover"]["image_id"] if "cover" in data else ""})
+        url = COVER_URL.format(**{"image_id": data["cover"]["image_id"] if "cover" in data else ""})
 
         # Get release date separately with checking
         release_date = dt.utcfromtimestamp(data["first_release_date"]).date() if "first_release_date" in data else "?"
@@ -332,7 +318,7 @@ class Games(Cog):
             "made_by": ", ".join(companies),
             "storyline": data["storyline"] if "storyline" in data else ""
         }
-        page = GAME_PAGE.substitute(formatting)
+        page = GAME_PAGE.format(**formatting)
 
         return page, url
 
@@ -341,7 +327,7 @@ class Games(Cog):
         lines = []
 
         # Define request body of IGDB API request and do request
-        body = SEARCH_BODY.substitute({"term": search_term})
+        body = SEARCH_BODY.format(**{"term": search_term})
 
         async with self.http_session.get(url=f"{BASE_URL}/games", data=body, headers=HEADERS) as resp:
             data = await resp.json()
@@ -354,7 +340,7 @@ class Games(Cog):
                 "rating": round(game["total_rating"] if "total_rating" in game else 0, 2),
                 "rating_count": game["total_rating_count"] if "total_rating" in game else "?"
             }
-            line = GAME_SEARCH_LINE.substitute(formatting)
+            line = GAME_SEARCH_LINE.format(**formatting)
             lines.append(line)
 
         return lines
@@ -367,7 +353,7 @@ class Games(Cog):
         returning results.
         """
         # Create request body from template
-        body = COMPANIES_LIST_BODY.substitute({
+        body = COMPANIES_LIST_BODY.format(**{
             "limit": limit,
             "offset": offset
         })
@@ -378,7 +364,7 @@ class Games(Cog):
     async def create_company_page(self, data: Dict[str, Any]) -> Tuple[str, str]:
         """Create good formatted Game Company page."""
         # Generate URL of company logo
-        url = LOGO_URL.substitute({"image_id": data["logo"]["image_id"] if "logo" in data else ""})
+        url = LOGO_URL.format(**{"image_id": data["logo"]["image_id"] if "logo" in data else ""})
 
         # Try to get found date of company
         founded = dt.utcfromtimestamp(data["start_date"]).date() if "start_date" in data else "?"
@@ -395,7 +381,7 @@ class Games(Cog):
             "developed": developed,
             "published": published
         }
-        page = COMPANY_PAGE.substitute(formatting)
+        page = COMPANY_PAGE.format(**formatting)
 
         return page, url
 
