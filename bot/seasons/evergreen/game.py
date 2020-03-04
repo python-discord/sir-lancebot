@@ -189,8 +189,7 @@ class Games(Cog):
         # Offset must be random, due otherwise we will get always same result (offset show in which position should
         # API start returning result)
         try:
-            games = await self.get_games_list(amount, self.genres[genre],
-                                              offset=random.randint(0, 150))
+            games = await self.get_games_list(amount, self.genres[genre], offset=random.randint(0, 150))
         except KeyError:
             possibilities = "`, `".join(difflib.get_close_matches(genre, self.genres))
             await ctx.send(f"Invalid genre `{genre}`. {f'Maybe you meant `{possibilities}`?' if possibilities else ''}")
