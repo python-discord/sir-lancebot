@@ -95,10 +95,10 @@ LOGO_URL = Template("https://images.igdb.com/igdb/image/upload/t_logo_med/${imag
 
 # Create aliases for complex genre names
 ALIASES = {
-    "Role-playing (rpg)": ["Role-playing", "Rpg"],
-    "Turn-based strategy (tbs)": ["Turn-based-strategy", "Tbs"],
-    "Real time strategy (rts)": ["Real-time-strategy", "Rts"],
-    "Hack and slash/beat 'em up": ["Hack-and-slash"]
+    "Role-playing (rpg)": ["Role playing", "Rpg"],
+    "Turn-based strategy (tbs)": ["Turn based strategy", "Tbs"],
+    "Real time strategy (rts)": ["Real time strategy", "Rts"],
+    "Hack and slash/beat 'em up": ["Hack and slash"]
 }
 
 
@@ -181,12 +181,13 @@ class Games(Cog):
                 self.genres[genre_name] = genre
 
     @group(name="games", aliases=["game"], invoke_without_command=True)
-    async def games(self, ctx: Context, genre: Optional[str] = None, amount: int = 5) -> None:
+    async def games(self, ctx: Context, amount: Optional[int] = 5, *, genre: Optional[str] = None) -> None:
         """
         Get random game(s) by genre from IGDB. Use .games genres command to get all available genres.
 
-        Also support amount parameter, what max is 25 and min 1, default 5. Use quotes ("") for genres with multiple
-        words.
+        Also support amount parameter, what max is 25 and min 1, default 5. Supported formats:
+        - .games <genre>
+        - .games <amount> <genre>
         """
         # When user didn't specified genre, send help message
         if genre is None:
@@ -194,7 +195,7 @@ class Games(Cog):
             return
 
         # Capitalize genre for check
-        genre = genre.capitalize()
+        genre = "".join(genre).capitalize()
 
         # Check for amounts, max is 25 and min 1
         if not 1 <= amount <= 25:
@@ -214,7 +215,7 @@ class Games(Cog):
         # Create pages and paginate
         pages = [await self.create_page(game) for game in games]
 
-        await ImagePaginator.paginate(pages, ctx, Embed(title=f"Random {genre} Games"))
+        await ImagePaginator.paginate(pages, ctx, Embed(title=f"Random {genre.title()} Games"))
 
     @games.command(name="top", aliases=["t"])
     async def top(self, ctx: Context, amount: int = 10) -> None:
