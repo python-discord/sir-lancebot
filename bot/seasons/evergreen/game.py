@@ -72,7 +72,7 @@ COMPANY_PAGE = (
 # For .games search command line layout
 GAME_SEARCH_LINE = (
     "**[{name}]({url})**\n"
-    "{rating}/100 :star: (based on {rating_count} ratings)"
+    "{rating}/100 :star: (based on {rating_count} ratings)\n"
 )
 
 # URL templates
@@ -194,7 +194,7 @@ class Games(Cog):
         try:
             games = await self.get_games_list(amount, self.genres[genre], offset=random.randint(0, 150))
         except KeyError:
-            possibilities = "`, `".join(difflib.get_close_matches(genre, self.genres, cutoff=0.4))
+            possibilities = "`, `".join(difflib.get_close_matches(genre, self.genres))
             await ctx.send(f"Invalid genre `{genre}`. {f'Maybe you meant `{possibilities}`?' if possibilities else ''}")
             return
 
