@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from aiohttp import ClientSession
 from discord import Embed
+from discord.ext import tasks
 from discord.ext.commands import Cog, Context, group
 
 from bot.bot import SeasonalBot
@@ -143,8 +144,12 @@ class Games(Cog):
         self.bot = bot
         self.http_session: ClientSession = bot.http_session
 
-        # Initialize genres
-        bot.loop.create_task(self._get_genres())
+        self.refresh_genres_task.start()
+
+    @tasks.loop(hours=1.0)
+    async def refresh_genres_task(self) -> None:
+        """Refresh genres in every hour."""
+        await self._get_genres()
 
     async def _get_genres(self) -> None:
         """Create genres variable for games command."""
