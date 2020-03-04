@@ -150,7 +150,12 @@ class Games(Cog):
     @tasks.loop(hours=1.0)
     async def refresh_genres_task(self) -> None:
         """Refresh genres in every hour."""
-        await self._get_genres()
+        try:
+            await self._get_genres()
+        except Exception as e:
+            logger.warning(f"There was error while refreshing genres: {e}")
+            return
+        logger.info("Successfully refreshed genres.")
 
     async def _get_genres(self) -> None:
         """Create genres variable for games command."""
