@@ -243,7 +243,7 @@ class Games(Cog):
         """Find games by name."""
         lines = await self.search_games(search_term)
 
-        await LinePaginator.paginate((line for line in lines), ctx, Embed(title=f"Game Search Results: {search_term}"))
+        await LinePaginator.paginate(lines, ctx, Embed(title=f"Game Search Results: {search_term}"), empty=False)
 
     @games.command(name="company", aliases=["companies"])
     async def company(self, ctx: Context, amount: int = 5) -> None:
