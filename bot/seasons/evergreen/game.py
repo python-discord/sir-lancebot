@@ -13,7 +13,8 @@ from discord.ext import tasks
 from discord.ext.commands import Cog, Context, group
 
 from bot.bot import SeasonalBot
-from bot.constants import Tokens
+from bot.constants import STAFF_ROLES, Tokens
+from bot.decorators import with_role
 from bot.pagination import ImagePaginator, LinePaginator
 
 # Base URL of IGDB API
@@ -251,6 +252,17 @@ class Games(Cog):
         pages = [await self.create_company_page(co) for co in companies]
 
         await ImagePaginator.paginate(pages, ctx, Embed(title="Random Game Companies"))
+
+    @with_role(*STAFF_ROLES)
+    @games.command(name="refresh", aliases=["r"])
+    async def refresh_genres_command(self, ctx: Context) -> None:
+        """Refresh .games command genres."""
+        try:
+            await self._get_genres()
+        except Exception as e:
+            await ctx.send(f"There was error while refreshing genres: `{e}`")
+            return
+        await ctx.send("Successfully refreshed genres.")
 
     async def get_games_list(self,
                              amount: int,
