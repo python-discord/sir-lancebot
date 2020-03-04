@@ -16,7 +16,7 @@ class Pride(SeasonBase):
     • [Pride issues are now available for SeasonalBot on the repo](https://git.io/pythonpride).
     • You may see Pride-themed esoteric challenges and other microevents.
 
-    If you'd like to contribute, head on over to <#542272993192050698> and we will help you get
+    If you'd like to contribute, head on over to <#635950537262759947> and we will help you get
     started. It doesn't matter if you're new to open source or Python, if you'd like to help, we
     will find you a task and teach you what you need to know.
     """

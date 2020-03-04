@@ -34,7 +34,7 @@ class EasterFacts(commands.Cog):
 
     async def send_egg_fact_daily(self) -> None:
         """A background task that sends an easter egg fact in the event channel everyday."""
-        channel = self.bot.get_channel(Channels.seasonalbot_chat)
+        channel = self.bot.get_channel(Channels.seasonalbot_commands)
         while True:
             embed = self.make_embed()
             await channel.send(embed=embed)

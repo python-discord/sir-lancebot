@@ -96,7 +96,7 @@ class BeMyValentine(commands.Cog):
 
         emoji_1, emoji_2 = self.random_emoji()
         lovefest_role = discord.utils.get(ctx.guild.roles, id=Lovefest.role_id)
-        channel = self.bot.get_channel(Channels.seasonalbot_chat)
+        channel = self.bot.get_channel(Channels.seasonalbot_commands)
         valentine, title = self.valentine_check(valentine_type)
 
         if user is None:
