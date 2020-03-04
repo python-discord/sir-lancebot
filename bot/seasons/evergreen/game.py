@@ -157,6 +157,11 @@ class Games(Cog):
             return
         logger.info("Successfully refreshed genres.")
 
+    def cog_unload(self) -> None:
+        """Cancel genres refreshing start when unloading Cog."""
+        self.refresh_genres_task.cancel()
+        logger.info("Successfully stopped Genres Refreshing task.")
+
     async def _get_genres(self) -> None:
         """Create genres variable for games command."""
         body = "fields name; limit 100;"
