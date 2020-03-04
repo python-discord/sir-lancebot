@@ -145,6 +145,8 @@ class Games(Cog):
         self.bot = bot
         self.http_session: ClientSession = bot.http_session
 
+        self.genres: Dict[str, int] = {}
+
         self.refresh_genres_task.start()
 
     @tasks.loop(hours=1.0)
@@ -169,8 +171,6 @@ class Games(Cog):
             result = await resp.json()
 
         genres = {genre["name"].capitalize(): genre["id"] for genre in result}
-
-        self.genres = {}
 
         # Replace complex names with names from ALIASES
         for genre_name, genre in genres.items():
@@ -208,7 +208,7 @@ class Games(Cog):
         try:
             games = await self.get_games_list(amount, self.genres[genre], offset=random.randint(0, 150))
         except KeyError:
-            possibilities = "`, `".join(difflib.get_close_matches(genre, self.genres))
+            possibilities = "`, `".join(difflib.get_close_matches(genre, self.genres, cutoff=0.4))
             await ctx.send(f"Invalid genre `{genre}`. {f'Maybe you meant `{possibilities}`?' if possibilities else ''}")
             return
 
