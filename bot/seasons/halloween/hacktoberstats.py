@@ -334,7 +334,7 @@ class HacktoberStats(commands.Cog):
         return author_id, author_mention
 
 
-def setup(bot):  # Noqa
+def setup(bot: commands.Bot) -> None:
     """Hacktoberstats Cog load."""
     bot.add_cog(HacktoberStats(bot))
     log.info("HacktoberStats cog loaded")
