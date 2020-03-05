@@ -202,9 +202,9 @@ class BeMyValentine(commands.Cog):
     @staticmethod
     def random_emoji() -> Tuple[str, str]:
         """Return two random emoji from the module-defined constants."""
-        EMOJI_1 = random.choice(HEART_EMOJIS)
-        EMOJI_2 = random.choice(HEART_EMOJIS)
-        return EMOJI_1, EMOJI_2
+        emoji_1 = random.choice(HEART_EMOJIS)
+        emoji_2 = random.choice(HEART_EMOJIS)
+        return emoji_1, emoji_2
 
     def random_valentine(self) -> Tuple[str, str]:
         """Grabs a random poem or a compliment (any message)."""
