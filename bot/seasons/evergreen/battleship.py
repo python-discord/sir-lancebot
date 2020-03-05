@@ -36,7 +36,8 @@ class Player:
     grid: Grid
 
 
-SHIPS = {  # The name of the ship and its size
+# The name of the ship and its size
+SHIPS = {
     "Carrier": 5,
     "Battleship": 4,
     "Cruiser": 3,
@@ -48,27 +49,31 @@ SHIPS = {  # The name of the ship and its size
 # For these two variables, the first boolean is whether the square is a ship (True) or not (False).
 # The second boolean is whether the player has aimed for that square (True) or not (False)
 
-SHIP_EMOJIS = {  # This is for the player's own board which shows the location of their own ships.
+# This is for the player's own board which shows the location of their own ships.
+SHIP_EMOJIS = {
     (True, True): ":fire:",
     (True, False): ":ship:",
     (False, True): ":anger:",
     (False, False): ":ocean:",
 }
 
-HIDDEN_EMOJIS = {  # This is for the opposing player's board which only shows aimed locations.
+# This is for the opposing player's board which only shows aimed locations.
+HIDDEN_EMOJIS = {
     (True, True): ":red_circle:",
     (True, False): ":black_circle:",
     (False, True): ":white_circle:",
     (False, False): ":black_circle:",
 }
 
-LETTERS = (  # For the top row of the board
+# For the top row of the board
+LETTERS = (
     ":stop_button::regional_indicator_a::regional_indicator_b::regional_indicator_c::regional_indicator_d:"
     ":regional_indicator_e::regional_indicator_f::regional_indicator_g::regional_indicator_h:"
     ":regional_indicator_i::regional_indicator_j:"
 )
 
-NUMBERS = [  # For the first column of the board
+# For the first column of the board
+NUMBERS = [
     ":one:",
     ":two:",
     ":three:",
