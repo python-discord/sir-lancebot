@@ -20,6 +20,7 @@ jobs:
     steps:
       - task: UsePythonVersion@0
         displayName: 'Set Python version'
+        name: PythonVersion
         inputs:
           versionSpec: '3.7.x'
           addToPath: true
