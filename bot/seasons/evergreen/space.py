@@ -94,11 +94,27 @@ class Space(Cog):
         await ctx.send(embed=embed)
 
     @space.command(name="epic")
-    async def epic(self, ctx: Context) -> None:
-        """Get one of latest random image of earth from NASA EPIC API."""
+    async def epic(self, ctx: Context, date: Optional[str] = None) -> None:
+        """Get one of latest random image of earth from NASA EPIC API. Support date parameter, format is YYYY-MM-DD."""
+        # Parse date if provided
+        if date:
+            try:
+                show_date = datetime.strptime(date, "%Y-%m-%d").date().isoformat()
+            except ValueError:
+                await ctx.send(f"Invalid date {date}. Please make sure your date is in format YYYY-MM-DD.")
+                return
+        else:
+            show_date = None
+
         # Generate URL and make request to API
-        async with self.http_session.get(url=f"{NASA_EPIC_BASE_URL}/api/natural") as resp:
+        async with self.http_session.get(
+                url=f"{NASA_EPIC_BASE_URL}/api/natural{f'/date/{show_date}' if show_date else ''}"
+        ) as resp:
             data = await resp.json()
+
+        if len(data) < 1:
+            await ctx.send("Can't find any images in this date.")
+            return
 
         # Get random item from result that will be shown
         item = random.choice(data)
