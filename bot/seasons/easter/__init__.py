@@ -16,7 +16,7 @@ class Easter(SeasonBase):
      • You may see stuff like an Easter themed esoteric challenge, a celebration of Earth Day, or
     Easter-related micro-events for you to join. Stay tuned!
 
-    If you'd like to contribute, head on over to <#542272993192050698> and we will help you get
+    If you'd like to contribute, head on over to <#635950537262759947> and we will help you get
     started. It doesn't matter if you're new to open source or Python, if you'd like to help, we
     will find you a task and teach you what you need to know.
     """

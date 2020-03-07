@@ -45,7 +45,7 @@ Seasonalbot utilizes [Pipenv](https://pipenv.readthedocs.io/en/latest/) for inst
 When pulling down changes from GitHub, remember to sync your environment using `pipenv sync --dev` to ensure you're using the most up-to-date versions the project's dependencies.
 
 ### Type Hinting
-[PEP 484](https://www.python.org/dev/peps/pep-0484/) formally specifies type hints for Python functions, added to the Python Standard Library in version 3.5. Type hints are recognized by most modern code editing tools and provide useful insight into both the input and output types of a function, preventing the user from having to go through the codebase to determine these types. 
+[PEP 484](https://www.python.org/dev/peps/pep-0484/) formally specifies type hints for Python functions, added to the Python Standard Library in version 3.5. Type hints are recognized by most modern code editing tools and provide useful insight into both the input and output types of a function, preventing the user from having to go through the codebase to determine these types.
 
 For example:
 
@@ -86,7 +86,7 @@ def foo(bar: int, baz: dict=None) -> bool:
     Does some things with some stuff.
 
     This function takes an index, `bar` and checks for its presence in the database `baz`, passed as a dictionary.
-    
+
     Returns `False` if `baz` is not passed.
     """
 ```
