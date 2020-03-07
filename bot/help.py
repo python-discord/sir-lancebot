@@ -11,9 +11,11 @@ from discord.ext.commands import CheckFailure, Cog as DiscordCog, Command, Conte
 from fuzzywuzzy import fuzz, process
 
 from bot import constants
-from bot.bot import Bot
-from bot.constants import Channels, Emojis, STAFF_ROLES
-from bot.decorators import redirect_output
+# from bot.bot import Bot (Changed to):
+from bot.bot import SeasonalBot
+# Original: from bot.constants import Channels, Emojis, STAFF_ROLES
+from bot.constants import Emojis
+# from bot.decorators import redirect_output (Removed)
 from bot.pagination import (
     FIRST_EMOJI, LAST_EMOJI,
     LEFT_EMOJI, LinePaginator, RIGHT_EMOJI,
@@ -35,6 +37,7 @@ Cog = namedtuple('Cog', ['name', 'description', 'commands'])
 class HelpQueryNotFound(ValueError):
     """
     Raised when a HelpSession Query doesn't match a command or cog.
+
     Contains the custom attribute of ``possible_matches``.
     Instances of this object contain a dictionary of any command(s) that were close to matching the
     query, where keys are the possible matched command names and values are the likeness match scores.
@@ -48,6 +51,7 @@ class HelpQueryNotFound(ValueError):
 class HelpSession:
     """
     An interactive session for bot and command help output.
+
     Expected attributes include:
         * title: str
             The title of the help message.
@@ -143,6 +147,7 @@ class HelpSession:
     def _handle_not_found(self, query: str) -> None:
         """
         Handles when a query does not match a valid command or cog.
+
         Will pass on possible close matches along with the `HelpQueryNotFound` exception.
         """
         # Combine command and cog names
@@ -226,6 +231,7 @@ class HelpSession:
     def _category_key(self, cmd: Command) -> str:
         """
         Returns a cog name of a given command for use as a key for `sorted` and `groupby`.
+
         A zero width space is used as a prefix for results with no cogs to force them last in ordering.
         """
         if cmd.cog:
@@ -242,6 +248,7 @@ class HelpSession:
     def _get_command_params(self, cmd: Command) -> str:
         """
         Returns the command usage signature.
+
         This is a custom implementation of `command.signature` in order to format the command
         signature without aliases.
         """
@@ -277,7 +284,8 @@ class HelpSession:
         # Use LinePaginator to restrict embed line height
         paginator = LinePaginator(prefix='', suffix='', max_lines=self._max_lines)
 
-        prefix = constants.Bot.prefix
+        # Original: prefix = constants.Bot.prefix
+        prefix = constants.Client.prefix
 
         # show signature if query is a command
         if isinstance(self.query, commands.Command):
@@ -410,7 +418,8 @@ class HelpSession:
         else:
             title = self.title
 
-        embed.set_author(name=title, icon_url=constants.Icons.questionmark)
+        # Original: embed.set_author(name=title, icon_url=constants.Icons.questionmark)
+        embed.set_author(name=title)
         embed.description = self._pages[page_number]
 
         # add page counter to footer if paginating
@@ -434,6 +443,7 @@ class HelpSession:
     async def start(cls, ctx: Context, *command, **options) -> "HelpSession":
         """
         Create and begin a help session based on the given command context.
+
         Available options kwargs:
             * cleanup: Optional[bool]
                 Set to `True` to have the message deleted on session end. Defaults to `False`.
@@ -499,8 +509,8 @@ class HelpSession:
 class Help(DiscordCog):
     """Custom Embed Pagination Help feature."""
 
+    # @redirect_output(destination_channel=Channels.bot_commands, bypass_roles=STAFF_ROLES) (Removed)
     @commands.command('help')
-    @redirect_output(destination_channel=Channels.bot_commands, bypass_roles=STAFF_ROLES)
     async def new_help(self, ctx: Context, *commands) -> None:
         """Shows Command Help."""
         try:
@@ -517,18 +527,22 @@ class Help(DiscordCog):
             await ctx.send(embed=embed)
 
 
-def unload(bot: Bot) -> None:
+# Original: def unload(bot: Bot) -> None:
+def unload(bot: SeasonalBot) -> None:
     """
     Reinstates the original help command.
+
     This is run if the cog raises an exception on load, or if the extension is unloaded.
     """
     bot.remove_command('help')
     bot.add_command(bot._old_help)
 
 
-def setup(bot: Bot) -> None:
+# Original: def setup(bot: Bot) -> None:
+def setup(bot: SeasonalBot) -> None:
     """
     The setup for the help extension.
+
     This is called automatically on `bot.load_extension` being run.
     Stores the original help command instance on the `bot._old_help` attribute for later
     reinstatement, before removing it from the command registry so the new help command can be
@@ -546,9 +560,11 @@ def setup(bot: Bot) -> None:
         raise
 
 
-def teardown(bot: Bot) -> None:
+# Original: def teardown(bot: Bot) -> None:
+def teardown(bot: SeasonalBot) -> None:
     """
     The teardown for the help extension.
+
     This is called automatically on `bot.unload_extension` being run.
     Calls `unload` in order to reinstate the original help command.
     """
