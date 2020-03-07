@@ -42,7 +42,7 @@ class Space(Cog):
         self.bot = bot
         self.http_session = bot.http_session
 
-    @group(name="space")
+    @group(name="space", invoke_without_command=True)
     async def space(self, ctx: Context) -> None:
         """Head command that contains commands about space."""
         await ctx.send_help("space")
