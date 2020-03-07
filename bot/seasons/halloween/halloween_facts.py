@@ -33,15 +33,8 @@ class HalloweenFacts(commands.Cog):
         self.bot = bot
         with open(Path("bot/resources/halloween/halloween_facts.json"), "r") as file:
             self.halloween_facts = json.load(file)
-        self.channel = None
         self.facts = list(enumerate(self.halloween_facts))
         random.shuffle(self.facts)
-
-    @commands.Cog.listener()
-    async def on_ready(self) -> None:
-        """Get event Channel object and initialize fact task loop."""
-        self.channel = self.bot.get_channel(Channels.seasonalbot_commands)
-        self.bot.loop.create_task(self._fact_publisher_task())
 
     def random_fact(self) -> Tuple[int, str]:
         """Return a random fact from the loaded facts."""
