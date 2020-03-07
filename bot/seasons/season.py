@@ -29,13 +29,6 @@ def get_seasons() -> List[str]:
     return seasons
 
 
-def get_season_class(season_name: str) -> Type["SeasonBase"]:
-    """Gets the season class of the season module."""
-    season_lib = importlib.import_module(f"bot.seasons.{season_name}")
-    class_name = season_name.replace("_", " ").title().replace(" ", "")
-    return getattr(season_lib, class_name)
-
-
 class SeasonBase:
     """Base class for Seasonal classes."""
 
