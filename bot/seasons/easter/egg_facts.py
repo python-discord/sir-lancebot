@@ -24,6 +24,7 @@ class EasterFacts(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.facts = self.load_json()
+        self.daily_fact_task = self.bot.loop.create_task(self.send_egg_fact_daily())
 
     @staticmethod
     def load_json() -> dict:
@@ -34,7 +35,9 @@ class EasterFacts(commands.Cog):
 
     async def send_egg_fact_daily(self) -> None:
         """A background task that sends an easter egg fact in the event channel everyday."""
+        await self.bot.wait_until_ready()
         channel = self.bot.get_channel(Channels.seasonalbot_commands)
+
         while True:
             embed = self.make_embed()
             await channel.send(embed=embed)
@@ -57,6 +60,5 @@ class EasterFacts(commands.Cog):
 
 def setup(bot: commands.Bot) -> None:
     """Easter Egg facts cog load."""
-    bot.loop.create_task(EasterFacts(bot).send_egg_fact_daily())
     bot.add_cog(EasterFacts(bot))
     log.info("EasterFacts cog loaded")

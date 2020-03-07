@@ -24,6 +24,7 @@ class PrideFacts(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.facts = self.load_facts()
+        self.daily_fact_task = self.bot.loop.create_task(self.send_pride_fact_daily())
 
     @staticmethod
     def load_facts() -> dict:
@@ -33,7 +34,9 @@ class PrideFacts(commands.Cog):
 
     async def send_pride_fact_daily(self) -> None:
         """Background task to post the daily pride fact every day."""
+        await self.bot.wait_until_ready()
         channel = self.bot.get_channel(Channels.seasonalbot_commands)
+
         while True:
             await self.send_select_fact(channel, datetime.utcnow())
             await asyncio.sleep(24 * 60 * 60)
@@ -101,6 +104,5 @@ class PrideFacts(commands.Cog):
 
 def setup(bot: commands.Bot) -> None:
     """Cog loader for pride facts."""
-    bot.loop.create_task(PrideFacts(bot).send_pride_fact_daily())
     bot.add_cog(PrideFacts(bot))
     log.info("Pride facts cog loaded!")
