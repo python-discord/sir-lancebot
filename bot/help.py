@@ -1,3 +1,4 @@
+# Help command from Python bot. All commands that will be added to there in futures should be added to here too.
 import asyncio
 import itertools
 from collections import namedtuple
