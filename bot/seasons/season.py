@@ -36,39 +36,6 @@ def get_season_class(season_name: str) -> Type["SeasonBase"]:
     return getattr(season_lib, class_name)
 
 
-def get_season(season_name: str = None, date: datetime.datetime = None) -> "SeasonBase":
-    """Returns a Season object based on either a string or a date."""
-    # If either both or neither are set, raise an error.
-    if not bool(season_name) ^ bool(date):
-        raise UserWarning("This function requires either a season or a date in order to run.")
-
-    seasons = get_seasons()
-
-    # Use season override if season name not provided
-    if not season_name and Client.season_override:
-        log.debug(f"Season override found: {Client.season_override}")
-        season_name = Client.season_override
-
-    # If name provided grab the specified class or fallback to evergreen.
-    if season_name:
-        season_name = season_name.lower()
-        if season_name not in seasons:
-            season_name = "evergreen"
-        season_class = get_season_class(season_name)
-        return season_class()
-
-    # If not, we have to figure out if the date matches any of the seasons.
-    seasons.remove("evergreen")
-    for season_name in seasons:
-        season_class = get_season_class(season_name)
-        # check if date matches before returning an instance
-        if season_class.is_between_dates(date):
-            return season_class()
-    else:
-        evergreen_class = get_season_class("evergreen")
-        return evergreen_class()
-
-
 class SeasonBase:
     """Base class for Seasonal classes."""
 
