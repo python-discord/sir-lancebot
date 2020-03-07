@@ -1,11 +1,11 @@
 import logging
 import random
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 from urllib.parse import urlencode
 
 from discord import Embed
-from discord.ext.commands import Cog, Context, group
+from discord.ext.commands import BadArgument, Cog, Context, Converter, group
 
 from bot.bot import SeasonalBot
 from bot.constants import Tokens
@@ -19,6 +19,20 @@ NASA_EPIC_BASE_URL = "https://epic.gsfc.nasa.gov"
 APOD_DEFAULT_PARAMS = {
     "api_key": Tokens.nasa
 }
+
+
+class DateConverter(Converter):
+    """Parse `str` into `datetime` or `int` object."""
+
+    async def convert(self, ctx: Context, argument: str) -> Union[int, datetime]:
+        """Parse `str` into `datetime` or `int`. When invalid value, raise error."""
+        if argument.isdigit():
+            return int(argument)
+        try:
+            date = datetime.strptime(argument, "%Y-%m-%d")
+        except ValueError:
+            raise BadArgument(f"Can't convert `{argument}` to `datetime` in format `YYYY-MM-DD` or `int` in SOL.")
+        return date
 
 
 class Space(Cog):
@@ -102,29 +116,44 @@ class Space(Cog):
         await ctx.send(embed=embed)
 
     @space.command(name="mars")
-    async def mars(self, ctx: Context, date: str) -> None:
+    async def mars(self,
+                   ctx: Context,
+                   date: DateConverter,
+                   rover: Optional[str] = "curiosity"
+                   ) -> None:
         """
-        Get random Mars image by date.
+        Get random Mars image by date. Support both SOL (martian solar day) and earth date and rovers.
 
-        Date formatting is YYYY-MM-DD. Current max date is 2019-09-28 and min 2012-08-06.
+        Earth date formatting is YYYY-MM-DD. Current max date is 2019-09-28 and min 2012-08-06.
+        Rovers images dates:
+        - Curiosity -> 2012-08-06 until 2019-09-28
+        - Opportunity -> 2004-01-25 until 2018-06-11
+        - Spirit -> 2004-01-04 until 2010-03-21
         """
+        # Check does user provided correct rover
+        rover = rover.lower()
+        if rover not in ["curiosity", "opportunity", "spirit"]:
+            await ctx.send(f"Invalid rover `{rover}`. Rovers: `Curiosity`, `Opportunity`, `Spirit`")
+            return
+
         # Create API request parameters, try to parse date
         params = {
             "api_key": Tokens.nasa
         }
-        try:
-            params["earth_date"] = datetime.strptime(date, "%Y-%m-%d")
-        except ValueError:
-            await ctx.send(f"Invalid date {date}. Please make sure your date is in format YYYY-MM-DD.")
-            return
+        if isinstance(date, int):
+            params["sol"] = date
+        else:
+            params["earth_date"] = date.date().isoformat()
 
-        result = await self.fetch_from_nasa("mars-photos/api/v1/rovers/curiosity/photos", params)
+        result = await self.fetch_from_nasa(f"mars-photos/api/v1/rovers/{rover}/photos", params)
 
         # Check for empty result
         if len(result["photos"]) < 1:
             err_msg = (
-                f"We can't find result in date {date}. "
-                "**Note:** Current dates must in range 2012-08-06 and 2019-09-28."
+                f"We can't find result in date "
+                f"{date.date().isoformat() if isinstance(date, datetime) else f'{date} SOL'}.\n"
+                f"**Note:** Dates must match with rover's working dates. Please use `{ctx.prefix}help space mars` to "
+                "see working dates for each rover."
             )
             await ctx.send(err_msg)
             return
