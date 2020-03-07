@@ -79,9 +79,9 @@ class Space(Cog):
 
         await ctx.send(embed=embed)
 
-    @space.command(name="earth")
-    async def earth(self, ctx: Context) -> None:
-        """Get one of latest random image of earth from NASA API."""
+    @space.command(name="epic")
+    async def epic(self, ctx: Context) -> None:
+        """Get one of latest random image of earth from NASA EPIC API."""
         # Generate URL and make request to API
         async with self.http_session.get(url=f"{NASA_EPIC_BASE_URL}/api/natural") as resp:
             data = await resp.json()
