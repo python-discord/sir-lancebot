@@ -8,8 +8,6 @@ from typing import Tuple
 import discord
 from discord.ext import commands
 
-from bot.constants import Channels
-
 log = logging.getLogger(__name__)
 
 SPOOKY_EMOJIS = [
