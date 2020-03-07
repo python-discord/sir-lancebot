@@ -71,17 +71,22 @@ class Space(Cog):
         await ctx.send(embed=embed)
 
     @space.command(name="nasa")
-    async def nasa(self, ctx: Context) -> None:
-        """Get random NASA information/facts + image."""
-        page = random.randint(1, 50)
-
+    async def nasa(self, ctx: Context, *, search_term: Optional[str] = None) -> None:
+        """Get random NASA information/facts + image. Support `search_term` parameter for more specific search."""
         # Create params for request, create URL and do request
         params = {
-            "media_type": "image",
-            "page": page
+            "media_type": "image"
         }
+        if search_term:
+            params["q"] = search_term
+
         async with self.http_session.get(url=f"{NASA_IMAGES_BASE_URL}/search?{urlencode(params)}") as resp:
             data = await resp.json()
+
+        # Check is there any items returned
+        if len(data["collection"]["items"]) == 0:
+            await ctx.send(f"Can't find any items with search term `{search_term}`.")
+            return
 
         # Get (random) item from result, that will be shown
         item = random.choice(data["collection"]["items"])
