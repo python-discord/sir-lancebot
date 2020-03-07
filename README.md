@@ -1,4 +1,4 @@
-# SeasonalBot 
+# SeasonalBot
 
 [![Build Status](https://dev.azure.com/python-discord/Python%20Discord/_apis/build/status/Seasonal%20Bot%20(Mainline))](https://dev.azure.com/python-discord/Python%20Discord/_build/latest?definitionId=3)
 [![Discord](https://img.shields.io/static/v1?label=Python%20Discord&logo=discord&message=%3E30k%20members&color=%237289DA&logoColor=white)](https://discord.gg/2B963hn)
