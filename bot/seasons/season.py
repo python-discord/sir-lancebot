@@ -19,16 +19,6 @@ log = logging.getLogger(__name__)
 ICON_BASE_URL = "https://raw.githubusercontent.com/python-discord/branding/master"
 
 
-def get_seasons() -> List[str]:
-    """Returns all the Season objects located in /bot/seasons/."""
-    seasons = []
-
-    for module in pkgutil.iter_modules([Path("bot/seasons")]):
-        if module.ispkg:
-            seasons.append(module.name)
-    return seasons
-
-
 class SeasonBase:
     """Base class for Seasonal classes."""
 
