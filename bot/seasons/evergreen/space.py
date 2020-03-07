@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 from urllib.parse import urlencode
 
 from discord import Embed
-from discord.ext.commands import Cog, Context, command
+from discord.ext.commands import Cog, Context, group
 
 from bot.bot import SeasonalBot
 from bot.constants import Tokens
@@ -28,7 +28,12 @@ class Space(Cog):
         self.bot = bot
         self.http_session = bot.http_session
 
-    @command(name="apod")
+    @group(name="space")
+    async def space(self, ctx: Context) -> None:
+        """Head command that contains commands about space."""
+        await ctx.send_help("space")
+
+    @space.command(name="apod")
     async def apod(self, ctx: Context, date: Optional[str] = None) -> None:
         """Get Astronomy Picture of Day from NASA API. Date is optional parameter, what formatting is YYYY-MM-DD."""
         # Make copy of parameters
@@ -51,7 +56,7 @@ class Space(Cog):
 
         await ctx.send(embed=embed)
 
-    @command(name="nasa")
+    @space.command(name="nasa")
     async def nasa(self, ctx: Context) -> None:
         """Get random NASA information/facts + image."""
         page = random.randint(1, 50)
@@ -74,7 +79,7 @@ class Space(Cog):
 
         await ctx.send(embed=embed)
 
-    @command(name="earth")
+    @space.command(name="earth")
     async def earth(self, ctx: Context) -> None:
         """Get one of latest random image of earth from NASA API."""
         # Generate URL and make request to API
@@ -96,7 +101,7 @@ class Space(Cog):
 
         await ctx.send(embed=embed)
 
-    @command(name="mars")
+    @space.command(name="mars")
     async def mars(self, ctx: Context, date: str) -> None:
         """
         Get random Mars image by date.
