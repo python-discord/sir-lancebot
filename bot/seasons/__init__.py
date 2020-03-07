@@ -1,9 +1,7 @@
 import logging
 import pkgutil
 from pathlib import Path
-from typing import List
-
-from bot.seasons.season import SeasonBase
+from typing import List, Optional, Tuple
 
 __all__ = ("SeasonBase", "get_seasons", "get_extensions")
 
@@ -37,3 +35,22 @@ def get_extensions() -> List[str]:
             extensions.append(f"bot.seasons.{package.name}.{module.name}")
 
     return extensions
+
+
+class SeasonBase:
+    """Base for Seasonal classes."""
+
+    name: Optional[str] = "evergreen"
+    bot_name: str = "SeasonalBot"
+
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    should_announce: bool = False
+
+    colour: Optional[int] = None
+    icon: Tuple[str, ...] = ("/logos/logo_full/logo_full.png",)
+    bot_icon: Optional[str] = None
+
+    date_format: str = "%d/%m/%Y"
+
+    index: int = 0
