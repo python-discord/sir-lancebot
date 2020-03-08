@@ -1,3 +1,4 @@
+from bot.constants import Month
 from bot.seasons import SeasonBase
 
 
@@ -17,15 +18,7 @@ class Wildcard(SeasonBase):
                TO THE EVERGREEN FOLDER!
     """
 
-    name = "wildcard"
+    season_name = "Wildcard"
     bot_name = "RetroBot"
 
-    # Duration of season
-    start_date = "01/08"
-    end_date = "01/09"
-
-    # Season logo
-    bot_icon = "/logos/logo_seasonal/retro_gaming/logo_8bit_indexed_504.png"
-    icon = (
-        "/logos/logo_seasonal/retro_gaming_animated/logo_spin_plain/logo_spin_plain_504.gif",
-    )
+    months = {Month.august}

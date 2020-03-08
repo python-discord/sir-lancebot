@@ -1,4 +1,4 @@
-from bot.constants import Colours
+from bot.constants import Month
 from bot.seasons import SeasonBase
 
 
@@ -11,14 +11,9 @@ class Halloween(SeasonBase):
     make sure to update this docstring accordingly.
     """
 
-    name = "halloween"
+    season_name = "Halloween"
     bot_name = "NeonBot"
-    greeting = "Happy Halloween!"
 
-    start_date = "01/10"
-    end_date = "01/11"
+    branding_path = "seasonal/halloween"
 
-    colour = Colours.pink
-    icon = (
-        "/logos/logo_seasonal/hacktober/hacktoberfest.png",
-    )
+    months = {Month.october}

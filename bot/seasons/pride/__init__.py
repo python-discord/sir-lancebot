@@ -1,4 +1,4 @@
-from bot.constants import Colours
+from bot.constants import Month
 from bot.seasons import SeasonBase
 
 
@@ -21,16 +21,9 @@ class Pride(SeasonBase):
     will find you a task and teach you what you need to know.
     """
 
-    name = "pride"
+    season_name = "Pride"
     bot_name = "ProudBot"
-    greeting = "Happy Pride Month!"
 
-    # Duration of season
-    start_date = "01/06"
-    end_date = "01/07"
+    branding_path = "seasonal/pride"
 
-    # Season logo
-    colour = Colours.soft_red
-    icon = (
-        "/logos/logo_seasonal/pride/logo_pride.png",
-    )
+    months = {Month.june}

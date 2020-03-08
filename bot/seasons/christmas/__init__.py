@@ -1,6 +1,4 @@
-import datetime
-
-from bot.constants import Colours
+from bot.constants import Month
 from bot.seasons import SeasonBase
 
 
@@ -15,19 +13,9 @@ class Christmas(SeasonBase):
     enjoy this festive season!
     """
 
-    name = "christmas"
+    season_name = "Festive season"
     bot_name = "Merrybot"
-    greeting = "Happy Holidays!"
 
-    start_date = "01/12"
-    end_date = "01/01"
+    branding_path = "seasonal/christmas"
 
-    colour = Colours.dark_green
-    icon = (
-        "/logos/logo_seasonal/christmas/2019/festive_512.gif",
-    )
-
-    @classmethod
-    def end(cls) -> datetime.datetime:
-        """Overload the `SeasonBase` method to account for the event ending in the next year."""
-        return datetime.datetime.strptime(f"{cls.end_date}/{cls.current_year() + 1}", cls.date_format)
+    months = {Month.december}

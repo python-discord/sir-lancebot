@@ -1,4 +1,4 @@
-from bot.constants import Colours
+from bot.constants import Month
 from bot.seasons import SeasonBase
 
 
@@ -21,15 +21,11 @@ class Easter(SeasonBase):
     will find you a task and teach you what you need to know.
     """
 
-    name = "easter"
+    season_name = "Easter"
     bot_name = "BunnyBot"
-    greeting = "Happy Easter!"
 
-    # Duration of season
-    start_date = "02/04"
-    end_date = "30/04"
+    description = "Bunny here, bunny there, bunny everywhere!"
 
-    colour = Colours.pink
-    icon = (
-        "/logos/logo_seasonal/easter/easter.png",
-    )
+    branding_path = "seasonal/easter"
+
+    months = {Month.april}

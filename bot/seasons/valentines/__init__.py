@@ -1,4 +1,4 @@
-from bot.constants import Colours
+from bot.constants import Month
 from bot.seasons import SeasonBase
 
 
@@ -9,14 +9,9 @@ class Valentines(SeasonBase):
     Get yourself into the bot-commands channel and check out the new features!
     """
 
-    name = "valentines"
-    bot_name = "Tenderbot"
-    greeting = "Get loved-up!"
+    season_name = "Valentines"
+    bot_name = "TenderBot"
 
-    start_date = "01/02"
-    end_date = "01/03"
+    branding_path = "seasonal/valentines"
 
-    colour = Colours.pink
-    icon = (
-        "/logos/logo_seasonal/valentines/loved_up.png",
-    )
+    months = {Month.february}
