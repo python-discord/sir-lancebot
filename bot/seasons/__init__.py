@@ -1,7 +1,9 @@
 import logging
 import pkgutil
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import List, Set
+
+from bot.constants import Month
 
 __all__ = ("SeasonBase", "get_seasons", "get_extensions")
 
@@ -42,19 +44,21 @@ def get_extensions() -> List[str]:
 
 
 class SeasonBase:
-    """Base for Seasonal classes."""
+    """
+    Base for Seasonal classes.
 
-    name: Optional[str] = "evergreen"
+    This serves as the off-season fallback for when no specific
+    seasons are active.
+
+    Seasons are 'registered' by simply by inheriting from `SeasonBase`,
+    as they are then found by looking at `__subclasses__`.
+    """
+
+    season_name: str = "Evergreen"
     bot_name: str = "SeasonalBot"
 
-    start_date: Optional[str] = None
-    end_date: Optional[str] = None
-    should_announce: bool = False
+    description: str = "The default season!"
 
-    colour: Optional[int] = None
-    icon: Tuple[str, ...] = ("/logos/logo_full/logo_full.png",)
-    bot_icon: Optional[str] = None
+    branding_path: str = "seasonal/evergreen"
 
-    date_format: str = "%d/%m/%Y"
-
-    index: int = 0
+    months: Set[Month] = set(Month)
