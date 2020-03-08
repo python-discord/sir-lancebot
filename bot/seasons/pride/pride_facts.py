@@ -10,8 +10,7 @@ import dateutil.parser
 import discord
 from discord.ext import commands
 
-from bot.constants import Channels
-from bot.constants import Colours
+from bot.constants import Channels, Colours, Month
 
 log = logging.getLogger(__name__)
 
@@ -24,6 +23,8 @@ class PrideFacts(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.facts = self.load_facts()
+
+        self.active_months = {Month.june}
         self.daily_fact_task = self.bot.loop.create_task(self.send_pride_fact_daily())
 
     @staticmethod
@@ -38,7 +39,10 @@ class PrideFacts(commands.Cog):
         channel = self.bot.get_channel(Channels.seasonalbot_commands)
 
         while True:
-            await self.send_select_fact(channel, datetime.utcnow())
+            current_month = Month(datetime.utcnow().month)
+            if current_month in self.active_months:
+                await self.send_select_fact(channel, datetime.utcnow())
+
             await asyncio.sleep(24 * 60 * 60)
 
     async def send_random_fact(self, ctx: commands.Context) -> None:
