@@ -29,10 +29,14 @@ def get_extensions() -> List[str]:
     extensions = []
 
     for package in pkgutil.iter_modules([base_path]):
-        package_path = base_path.joinpath(package.name)
 
-        for module in pkgutil.iter_modules([package_path]):
-            extensions.append(f"bot.seasons.{package.name}.{module.name}")
+        if package.ispkg:
+            package_path = base_path.joinpath(package.name)
+
+            for module in pkgutil.iter_modules([package_path]):
+                extensions.append(f"bot.seasons.{package.name}.{module.name}")
+        else:
+            extensions.append(f"bot.seasons.{package.name}")
 
     return extensions
 
