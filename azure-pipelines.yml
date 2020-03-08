@@ -22,7 +22,7 @@ jobs:
         displayName: 'Set Python version'
         name: PythonVersion
         inputs:
-          versionSpec: '3.7.x'
+          versionSpec: '3.8.x'
           addToPath: true
 
       - script: pip3 install pipenv
