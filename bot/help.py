@@ -418,8 +418,7 @@ class HelpSession:
         else:
             title = self.title
 
-        # Original: embed.set_author(name=title, icon_url=constants.Icons.questionmark)
-        embed.set_author(name=title)
+        embed.set_author(name=title, icon_url=constants.Icons.questionmark)
         embed.description = self._pages[page_number]
 
         # add page counter to footer if paginating
