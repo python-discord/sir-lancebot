@@ -11,11 +11,8 @@ from discord.ext.commands import CheckFailure, Cog as DiscordCog, Command, Conte
 from fuzzywuzzy import fuzz, process
 
 from bot import constants
-# from bot.bot import Bot (Changed to):
 from bot.bot import SeasonalBot
-# Original: from bot.constants import Channels, Emojis, STAFF_ROLES
 from bot.constants import Emojis
-# from bot.decorators import redirect_output (Removed)
 from bot.pagination import (
     FIRST_EMOJI, LAST_EMOJI,
     LEFT_EMOJI, LinePaginator, RIGHT_EMOJI,
@@ -284,7 +281,6 @@ class HelpSession:
         # Use LinePaginator to restrict embed line height
         paginator = LinePaginator(prefix='', suffix='', max_lines=self._max_lines)
 
-        # Original: prefix = constants.Bot.prefix
         prefix = constants.Client.prefix
 
         # show signature if query is a command
@@ -508,7 +504,6 @@ class HelpSession:
 class Help(DiscordCog):
     """Custom Embed Pagination Help feature."""
 
-    # @redirect_output(destination_channel=Channels.bot_commands, bypass_roles=STAFF_ROLES) (Removed)
     @commands.command('help')
     async def new_help(self, ctx: Context, *commands) -> None:
         """Shows Command Help."""
@@ -526,7 +521,6 @@ class Help(DiscordCog):
             await ctx.send(embed=embed)
 
 
-# Original: def unload(bot: Bot) -> None:
 def unload(bot: SeasonalBot) -> None:
     """
     Reinstates the original help command.
@@ -537,7 +531,6 @@ def unload(bot: SeasonalBot) -> None:
     bot.add_command(bot._old_help)
 
 
-# Original: def setup(bot: Bot) -> None:
 def setup(bot: SeasonalBot) -> None:
     """
     The setup for the help extension.
@@ -559,7 +552,6 @@ def setup(bot: SeasonalBot) -> None:
         raise
 
 
-# Original: def teardown(bot: Bot) -> None:
 def teardown(bot: SeasonalBot) -> None:
     """
     The teardown for the help extension.
