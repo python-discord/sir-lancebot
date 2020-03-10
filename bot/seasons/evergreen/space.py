@@ -145,7 +145,7 @@ class Space(Cog):
         """
         Get random Mars image by date. Support both SOL (martian solar day) and earth date and rovers.
 
-        Earth date formatting is YYYY-MM-DD. Current max date is 2019-09-28 and min 2012-08-06.
+        Earth date formatting is YYYY-MM-DD.
         Rovers images dates:
         - Curiosity -> 2012-08-06 until 2019-09-28
         - Opportunity -> 2004-01-25 until 2018-06-11
