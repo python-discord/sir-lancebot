@@ -160,7 +160,7 @@ class Space(Cog):
         """
         Get random Mars image by date. Support both SOL (martian solar day) and earth date and rovers.
 
-        Earth date formatting is YYYY-MM-DD.
+        Earth date formatting is YYYY-MM-DD. Use `.space mars dates` to get all currently available rovers.
         """
         # Check does user provided correct rover
         rover = rover.lower()
