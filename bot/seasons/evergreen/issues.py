@@ -3,11 +3,10 @@ import logging
 import discord
 from discord.ext import commands
 
-from bot.constants import Channels, Colours, Emojis, WHITELISTED_CHANNELS
+from bot.constants import Colours, Emojis, WHITELISTED_CHANNELS
 from bot.decorators import override_in_channel
 
 log = logging.getLogger(__name__)
-ISSUE_WHITELIST = WHITELISTED_CHANNELS + (Channels.seasonalbot_chat,)
 
 BAD_RESPONSE = {
     404: "Issue/pull request not located! Please enter a valid number!",
@@ -22,7 +21,7 @@ class Issues(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=("pr",))
-    @override_in_channel(ISSUE_WHITELIST)
+    @override_in_channel(WHITELISTED_CHANNELS)
     async def issue(
         self, ctx: commands.Context, number: int, repository: str = "seasonalbot", user: str = "python-discord"
     ) -> None:

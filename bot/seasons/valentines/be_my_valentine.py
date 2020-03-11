@@ -96,7 +96,7 @@ class BeMyValentine(commands.Cog):
 
         emoji_1, emoji_2 = self.random_emoji()
         lovefest_role = discord.utils.get(ctx.guild.roles, id=Lovefest.role_id)
-        channel = self.bot.get_channel(Channels.seasonalbot_chat)
+        channel = self.bot.get_channel(Channels.seasonalbot_commands)
         valentine, title = self.valentine_check(valentine_type)
 
         if user is None:
@@ -202,9 +202,9 @@ class BeMyValentine(commands.Cog):
     @staticmethod
     def random_emoji() -> Tuple[str, str]:
         """Return two random emoji from the module-defined constants."""
-        EMOJI_1 = random.choice(HEART_EMOJIS)
-        EMOJI_2 = random.choice(HEART_EMOJIS)
-        return EMOJI_1, EMOJI_2
+        emoji_1 = random.choice(HEART_EMOJIS)
+        emoji_2 = random.choice(HEART_EMOJIS)
+        return emoji_1, emoji_2
 
     def random_valentine(self) -> Tuple[str, str]:
         """Grabs a random poem or a compliment (any message)."""

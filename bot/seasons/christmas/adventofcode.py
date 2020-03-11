@@ -364,7 +364,7 @@ class AdventOfCode(commands.Cog):
             aoc_embed.set_footer(text="Last Updated")
 
         await ctx.send(
-            content=f"Here's the current global Top {number_of_people_to_display}! {Emojis.christmas_tree*3}\n\n{table}",  # noqa
+            f"Here's the current global Top {number_of_people_to_display}! {Emojis.christmas_tree*3}\n\n{table}",
             embed=aoc_embed,
         )
 
