@@ -188,10 +188,11 @@ class Space(Cog):
 
         await ctx.send(embed=embed)
 
-    async def fetch_from_nasa(self, endpoint: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    async def fetch_from_nasa(self, endpoint: str, params: Dict[str, Any], base: Optional[str] = NASA_BASE_URL
+                              ) -> Dict[str, Any]:
         """Fetch information from NASA API, return result."""
         # Generate request URL from base URL, endpoint and parsed params
-        async with self.http_session.get(url=f"{NASA_BASE_URL}/{endpoint}?{urlencode(params)}") as resp:
+        async with self.http_session.get(url=f"{base}/{endpoint}?{urlencode(params)}") as resp:
             return await resp.json()
 
 
