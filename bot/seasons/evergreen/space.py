@@ -64,7 +64,11 @@ class Space(Cog):
 
     @space.command(name="apod")
     async def apod(self, ctx: Context, date: Optional[str] = None) -> None:
-        """Get Astronomy Picture of Day from NASA API. Date is optional parameter, what formatting is YYYY-MM-DD."""
+        """
+        Get Astronomy Picture of Day from NASA API. Date is optional parameter, what formatting is YYYY-MM-DD.
+
+        If date is not specified, this will get today APOD.
+        """
         # Make copy of parameters
         params = APOD_DEFAULT_PARAMS.copy()
         # Parse date to params, when provided. Show error message when invalid formatting
