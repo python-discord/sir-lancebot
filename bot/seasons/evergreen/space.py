@@ -23,10 +23,10 @@ APOD_DEFAULT_PARAMS = {
 
 
 class DateConverter(Converter):
-    """Parse `str` into `datetime` or `int` object."""
+    """Parse SOL or earth date (in format YYYY-MM-DD) into `int` or `datetime`. When invalid input, raise error."""
 
     async def convert(self, ctx: Context, argument: str) -> Union[int, datetime]:
-        """Parse `str` into `datetime` or `int`. When invalid value, raise error."""
+        """Parse date (SOL or earth) into `datetime` or `int`. When invalid value, raise error."""
         if argument.isdigit():
             return int(argument)
         try:
