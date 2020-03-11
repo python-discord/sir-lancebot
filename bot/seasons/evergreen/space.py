@@ -5,6 +5,7 @@ from typing import Any, Dict, Optional, Union
 from urllib.parse import urlencode
 
 from discord import Embed
+from discord.ext import tasks
 from discord.ext.commands import BadArgument, Cog, Context, Converter, group
 
 from bot.bot import SeasonalBot
@@ -41,6 +42,20 @@ class Space(Cog):
     def __init__(self, bot: SeasonalBot):
         self.bot = bot
         self.http_session = bot.http_session
+
+        self.rovers = {}
+        self.get_rovers.start()
+
+    @tasks.loop(hours=24)
+    async def get_rovers(self) -> None:
+        """Get listing of rovers from NASA API and info about their start and end dates."""
+        data = await self.fetch_from_nasa("mars-photos/api/v1/rovers", params={"api_key": Tokens.nasa})
+
+        for rover in data["rovers"]:
+            self.rovers[rover["name"].lower()] = {
+                "min_date": rover["landing_date"],
+                "max_date": rover["max_date"]
+            }
 
     @group(name="space", invoke_without_command=True)
     async def space(self, ctx: Context) -> None:
