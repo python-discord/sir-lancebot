@@ -82,12 +82,11 @@ class Space(Cog):
         # Do request to NASA API
         result = await self.fetch_from_nasa("planetary/apod", params)
 
-        # Create embed from result
-        embed = Embed(title=f"Astronomy Picture of the Day - {result['date']}", description=result["explanation"])
-        embed.set_image(url=result["url"])
-        embed.set_footer(text="Powered by NASA API")
-
-        await ctx.send(embed=embed)
+        await ctx.send(embed=await self.create_nasa_embed(
+            f"Astronomy Picture of the Day - {result['date']}",
+            result["explanation"],
+            result["url"]
+        ))
 
     @space.command(name="nasa")
     async def nasa(self, ctx: Context, *, search_term: Optional[str] = None) -> None:
@@ -110,12 +109,11 @@ class Space(Cog):
         # Get (random) item from result, that will be shown
         item = random.choice(data["collection"]["items"])
 
-        # Create embed and send it
-        embed = Embed(title=item["data"][0]["title"], description=item["data"][0]["description"])
-        embed.set_image(url=item["links"][0]["href"])
-        embed.set_footer(text="Powered by NASA API")
-
-        await ctx.send(embed=embed)
+        await ctx.send(embed=await self.create_nasa_embed(
+            item["data"][0]["title"],
+            item["data"][0]["description"],
+            item["links"][0]["href"]
+        ))
 
     @space.command(name="epic")
     async def epic(self, ctx: Context, date: Optional[str] = None) -> None:
@@ -148,12 +146,9 @@ class Space(Cog):
 
         image_url = f"{NASA_EPIC_BASE_URL}/archive/natural/{year}/{month}/{day}/jpg/{item['image']}.jpg"
 
-        # Create embed, fill and send it
-        embed = Embed(title="Earth Image", description=item["caption"])
-        embed.set_image(url=image_url)
-        embed.set_footer(text=f"Identifier: {item['identifier']} \u2022 Powered by NASA API")
-
-        await ctx.send(embed=embed)
+        await ctx.send(embed=await self.create_nasa_embed(
+            "Earth Image", item["caption"], image_url, f" \u2022 Identifier: {item['identifier']}"
+        ))
 
     @space.group(name="mars", invoke_without_command=True)
     async def mars(self,
@@ -202,11 +197,9 @@ class Space(Cog):
         # Get random item from result, generate embed with it and send
         item = random.choice(result["photos"])
 
-        embed = Embed(title=f"{item['rover']['name']}'s {item['camera']['full_name']} Mars Image")
-        embed.set_image(url=item["img_src"])
-        embed.set_footer(text="Powered by NASA API")
-
-        await ctx.send(embed=embed)
+        await ctx.send(embed=await self.create_nasa_embed(
+            f"{item['rover']['name']}'s {item['camera']['full_name']} Mars Image", "", item["img_src"],
+        ))
 
     @mars.command(name="dates", aliases=["d", "date", "rover", "rovers", "r"])
     async def dates(self, ctx: Context) -> None:
@@ -221,6 +214,13 @@ class Space(Cog):
         # Generate request URL from base URL, endpoint and parsed params
         async with self.http_session.get(url=f"{base}/{endpoint}?{urlencode(params)}") as resp:
             return await resp.json()
+
+    async def create_nasa_embed(self, title: str, description: str, image: str, footer: Optional[str] = "") -> Embed:
+        """Generate NASA commands embeds. Required: title, description and image URL, footer (addition) is optional."""
+        return Embed(
+            title=title,
+            description=description
+        ).set_image(url=image).set_footer(text="Powered by NASA API" + footer)
 
 
 def setup(bot: SeasonalBot) -> None:
