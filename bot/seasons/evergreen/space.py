@@ -161,10 +161,6 @@ class Space(Cog):
         Get random Mars image by date. Support both SOL (martian solar day) and earth date and rovers.
 
         Earth date formatting is YYYY-MM-DD.
-        Rovers images dates:
-        - Curiosity -> 2012-08-06 until 2019-09-28
-        - Opportunity -> 2004-01-25 until 2018-06-11
-        - Spirit -> 2004-01-04 until 2010-03-21
         """
         # Check does user provided correct rover
         rover = rover.lower()
