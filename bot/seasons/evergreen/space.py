@@ -151,7 +151,7 @@ class Space(Cog):
 
         await ctx.send(embed=embed)
 
-    @space.command(name="mars")
+    @space.group(name="mars", invoke_without_command=True)
     async def mars(self,
                    ctx: Context,
                    date: DateConverter,
@@ -188,7 +188,7 @@ class Space(Cog):
             err_msg = (
                 f"We can't find result in date "
                 f"{date.date().isoformat() if isinstance(date, datetime) else f'{date} SOL'}.\n"
-                f"**Note:** Dates must match with rover's working dates. Please use `{ctx.prefix}help space mars` to "
+                f"**Note:** Dates must match with rover's working dates. Please use `{ctx.prefix}space mars dates` to "
                 "see working dates for each rover."
             )
             await ctx.send(err_msg)
@@ -202,6 +202,13 @@ class Space(Cog):
         embed.set_footer(text="Powered by NASA API")
 
         await ctx.send(embed=embed)
+
+    @mars.command(name="dates", aliases=["d", "date"])
+    async def dates(self, ctx: Context) -> None:
+        """Get current available rovers photo date ranges."""
+        await ctx.send("\n".join(
+            f"**{r.capitalize()}:** {i['min_date']} **-** {i['max_date']}" for r, i in self.rovers.items()
+        ))
 
     async def fetch_from_nasa(self, endpoint: str, params: Dict[str, Any], base: Optional[str] = NASA_BASE_URL
                               ) -> Dict[str, Any]:
