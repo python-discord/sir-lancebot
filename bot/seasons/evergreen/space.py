@@ -69,7 +69,6 @@ class Space(Cog):
 
         If date is not specified, this will get today APOD.
         """
-        # Make copy of parameters
         params = APOD_DEFAULT_PARAMS.copy()
         # Parse date to params, when provided. Show error message when invalid formatting
         if date:
@@ -79,7 +78,6 @@ class Space(Cog):
                 await ctx.send(f"Invalid date {date}. Please make sure your date is in format YYYY-MM-DD.")
                 return
 
-        # Do request to NASA API
         result = await self.fetch_from_nasa("planetary/apod", params)
 
         await ctx.send(embed=await self.create_nasa_embed(
@@ -91,7 +89,6 @@ class Space(Cog):
     @space.command(name="nasa")
     async def nasa(self, ctx: Context, *, search_term: Optional[str] = None) -> None:
         """Get random NASA information/facts + image. Support `search_term` parameter for more specific search."""
-        # Create params for request, create URL and do request
         params = {
             "media_type": "image"
         }
@@ -99,13 +96,10 @@ class Space(Cog):
             params["q"] = search_term
 
         data = await self.fetch_from_nasa("search", params, NASA_IMAGES_BASE_URL)
-
-        # Check is there any items returned
         if len(data["collection"]["items"]) == 0:
             await ctx.send(f"Can't find any items with search term `{search_term}`.")
             return
 
-        # Get (random) item from result, that will be shown
         item = random.choice(data["collection"]["items"])
 
         await ctx.send(embed=await self.create_nasa_embed(
@@ -117,7 +111,6 @@ class Space(Cog):
     @space.command(name="epic")
     async def epic(self, ctx: Context, date: Optional[str] = None) -> None:
         """Get one of latest random image of earth from NASA EPIC API. Support date parameter, format is YYYY-MM-DD."""
-        # Parse date if provided
         if date:
             try:
                 show_date = datetime.strptime(date, "%Y-%m-%d").date().isoformat()
@@ -131,17 +124,13 @@ class Space(Cog):
             f"api/natural{f'/date/{show_date}' if show_date else ''}",
             base=NASA_EPIC_BASE_URL
         )
-
         if len(data) < 1:
             await ctx.send("Can't find any images in this date.")
             return
 
-        # Get random item from result that will be shown
         item = random.choice(data)
 
-        # Split date for image URL
         year, month, day = item["date"].split(" ")[0].split("-")
-
         image_url = f"{NASA_EPIC_BASE_URL}/archive/natural/{year}/{month}/{day}/jpg/{item['image']}.jpg"
 
         await ctx.send(embed=await self.create_nasa_embed(
@@ -159,7 +148,6 @@ class Space(Cog):
 
         Earth date formatting is YYYY-MM-DD. Use `.space mars dates` to get all currently available rovers.
         """
-        # Check does user provided correct rover
         rover = rover.lower()
         if rover not in self.rovers:
             await ctx.send(
@@ -170,7 +158,6 @@ class Space(Cog):
             )
             return
 
-        # Create API request parameters, try to parse date
         params = {
             "api_key": Tokens.nasa
         }
@@ -180,8 +167,6 @@ class Space(Cog):
             params["earth_date"] = date.date().isoformat()
 
         result = await self.fetch_from_nasa(f"mars-photos/api/v1/rovers/{rover}/photos", params)
-
-        # Check for empty result
         if len(result["photos"]) < 1:
             err_msg = (
                 f"We can't find result in date "
@@ -192,9 +177,7 @@ class Space(Cog):
             await ctx.send(err_msg)
             return
 
-        # Get random item from result, generate embed with it and send
         item = random.choice(result["photos"])
-
         await ctx.send(embed=await self.create_nasa_embed(
             f"{item['rover']['name']}'s {item['camera']['full_name']} Mars Image", "", item["img_src"],
         ))
@@ -214,7 +197,6 @@ class Space(Cog):
         """Fetch information from NASA API, return result."""
         if params is None:
             params = {}
-        # Generate request URL from base URL, endpoint and parsed params
         async with self.http_session.get(url=f"{base}/{endpoint}?{urlencode(params)}") as resp:
             return await resp.json()
 
@@ -228,7 +210,6 @@ class Space(Cog):
 
 def setup(bot: SeasonalBot) -> None:
     """Load Space Cog."""
-    # Check does bot have NASA API key in .env, when not, don't load Cog and print warning
     if not Tokens.nasa:
         logger.warning("Can't find NASA API key. Not loading Space Cog.")
         return
