@@ -98,8 +98,7 @@ class Space(Cog):
         if search_term:
             params["q"] = search_term
 
-        async with self.http_session.get(url=f"{NASA_IMAGES_BASE_URL}/search?{urlencode(params)}") as resp:
-            data = await resp.json()
+        data = await self.fetch_from_nasa("search", params, NASA_IMAGES_BASE_URL)
 
         # Check is there any items returned
         if len(data["collection"]["items"]) == 0:
@@ -128,11 +127,10 @@ class Space(Cog):
         else:
             show_date = None
 
-        # Generate URL and make request to API
-        async with self.http_session.get(
-                url=f"{NASA_EPIC_BASE_URL}/api/natural{f'/date/{show_date}' if show_date else ''}"
-        ) as resp:
-            data = await resp.json()
+        data = await self.fetch_from_nasa(
+            f"api/natural{f'/date/{show_date}' if show_date else ''}",
+            base=NASA_EPIC_BASE_URL
+        )
 
         if len(data) < 1:
             await ctx.send("Can't find any images in this date.")
@@ -208,9 +206,14 @@ class Space(Cog):
             f"**{r.capitalize()}:** {i['min_date']} **-** {i['max_date']}" for r, i in self.rovers.items()
         ))
 
-    async def fetch_from_nasa(self, endpoint: str, params: Dict[str, Any], base: Optional[str] = NASA_BASE_URL
+    async def fetch_from_nasa(self,
+                              endpoint: str,
+                              params: Optional[Dict[str, Any]] = None,
+                              base: Optional[str] = NASA_BASE_URL
                               ) -> Dict[str, Any]:
         """Fetch information from NASA API, return result."""
+        if params is None:
+            params = {}
         # Generate request URL from base URL, endpoint and parsed params
         async with self.http_session.get(url=f"{base}/{endpoint}?{urlencode(params)}") as resp:
             return await resp.json()
