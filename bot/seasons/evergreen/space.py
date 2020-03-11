@@ -164,8 +164,13 @@ class Space(Cog):
         """
         # Check does user provided correct rover
         rover = rover.lower()
-        if rover not in ["curiosity", "opportunity", "spirit"]:
-            await ctx.send(f"Invalid rover `{rover}`. Rovers: `Curiosity`, `Opportunity`, `Spirit`")
+        if rover not in self.rovers:
+            await ctx.send(
+                (
+                    f"Invalid rover `{rover}`.\n"
+                    f"**Rovers:** `{'`, `'.join(f'{r.capitalize()}' for r in self.rovers)}`"
+                )
+            )
             return
 
         # Create API request parameters, try to parse date
