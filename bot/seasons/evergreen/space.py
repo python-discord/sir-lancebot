@@ -204,7 +204,7 @@ class Space(Cog):
 
         await ctx.send(embed=embed)
 
-    @mars.command(name="dates", aliases=["d", "date"])
+    @mars.command(name="dates", aliases=["d", "date", "rover", "rovers", "r"])
     async def dates(self, ctx: Context) -> None:
         """Get current available rovers photo date ranges."""
         await ctx.send("\n".join(
