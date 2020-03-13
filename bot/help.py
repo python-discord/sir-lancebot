@@ -203,14 +203,11 @@ class HelpSession:
 
     async def prepare(self) -> None:
         """Sets up the help session pages, events, message and reactions."""
-        # create paginated content
         await self.build_pages()
 
-        # setup listeners
         self._bot.add_listener(self.on_reaction_add)
         self._bot.add_listener(self.on_message_delete)
 
-        # Send the help message
         await self.update_page()
         self.add_reactions()
 
@@ -289,7 +286,6 @@ class HelpSession:
             parent = self.query.full_parent_name + ' ' if self.query.parent else ''
             paginator.add_line(f'**```{prefix}{parent}{signature}```**')
 
-            # show command aliases
             aliases = ', '.join(f'`{a}`' for a in self.query.aliases)
             if aliases:
                 paginator.add_line(f'**Can also use:** {aliases}\n')
@@ -297,7 +293,6 @@ class HelpSession:
             if not await self.query.can_run(self._ctx):
                 paginator.add_line('***You cannot run this command.***\n')
 
-        # show name if query is a cog
         if isinstance(self.query, Cog):
             paginator.add_line(f'**{self.query.name}**')
 
@@ -318,11 +313,9 @@ class HelpSession:
                 self._pages = paginator.pages
                 return
 
-            # set category to Commands if cog
             if isinstance(self.query, Cog):
                 grouped = (('**Commands:**', self.query.commands),)
 
-            # set category to Subcommands if command
             elif isinstance(self.query, commands.Command):
                 grouped = (('**Subcommands:**', self.query.commands),)
 
@@ -334,17 +327,14 @@ class HelpSession:
                 cat_sort = sorted(filtered, key=self._category_key)
                 grouped = itertools.groupby(cat_sort, key=self._category_key)
 
-            # process each category
             for category, cmds in grouped:
                 cmds = sorted(cmds, key=lambda c: c.name)
 
-                # if there are no commands, skip category
                 if len(cmds) == 0:
                     continue
 
                 cat_cmds = []
 
-                # format details for each child command
                 for command in cmds:
 
                     # skip if hidden and hide if session is set to
@@ -401,14 +391,12 @@ class HelpSession:
 
                     paginator.add_line(details)
 
-        # save organised pages to session
         self._pages = paginator.pages
 
     def embed_page(self, page_number: int = 0) -> Embed:
         """Returns an Embed with the requested page formatted within."""
         embed = Embed()
 
-        # if command or cog, add query to title for pages other than first
         if isinstance(self.query, (commands.Command, Cog)) and page_number > 0:
             title = f'Command Help | "{self.query.name}"'
         else:
@@ -417,7 +405,6 @@ class HelpSession:
         embed.set_author(name=title, icon_url=constants.Icons.questionmark)
         embed.description = self._pages[page_number]
 
-        # add page counter to footer if paginating
         page_count = len(self._pages)
         if page_count > 1:
             embed.set_footer(text=f'Page {self._current_page+1} / {page_count}')
