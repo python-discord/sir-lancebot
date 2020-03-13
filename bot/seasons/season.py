@@ -383,18 +383,29 @@ class SeasonManager(commands.Cog):
         """Asynchronous timer loop to check for a new season every midnight."""
         await self.bot.wait_until_ready()
         await self.season.load()
+        days_since_icon_change = 0
 
         while True:
             await asyncio.sleep(self.sleep_time)  # Sleep until midnight
-            self.sleep_time = 86400  # Next time, sleep for 24 hours.
+            self.sleep_time = 24 * 3600  # Next time, sleep for 24 hours
+
+            days_since_icon_change += 1
+            log.debug(f"Days since last icon change: {days_since_icon_change}")
 
             # If the season has changed, load it.
             new_season = get_season(date=datetime.datetime.utcnow())
             if new_season.name != self.season.name:
                 self.season = new_season
                 await self.season.load()
+                days_since_icon_change = 0  # Start counting afresh for the new season
+
+            # Otherwise we check whether it's time for an icon cycle within the current season
             else:
-                await self.season.change_server_icon()
+                if days_since_icon_change == Client.icon_cycle_frequency:
+                    await self.season.change_server_icon()
+                    days_since_icon_change = 0
+                else:
+                    log.debug(f"Waiting {Client.icon_cycle_frequency - days_since_icon_change} more days to cycle icon")
 
     @with_role(Roles.moderator, Roles.admin, Roles.owner)
     @commands.command(name="season")

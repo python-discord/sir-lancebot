@@ -16,7 +16,6 @@ services:
     # - SEASONALBOT_ADMIN_ROLE_ID=
     # - CHANNEL_ANNOUNCEMENTS=
     # - CHANNEL_DEVLOG=
-    # - CHANNEL_SEASONALBOT_CHAT=
     # - SEASON_OVERRIDE=
 
     volumes:

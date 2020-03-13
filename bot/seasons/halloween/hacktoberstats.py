@@ -121,8 +121,8 @@ class HacktoberStats(commands.Cog):
         """
         if self.link_json.exists():
             logging.info(f"Loading linked GitHub accounts from '{self.link_json}'")
-            with open(self.link_json, 'r') as fID:
-                linked_accounts = json.load(fID)
+            with open(self.link_json, 'r') as file:
+                linked_accounts = json.load(file)
 
             logging.info(f"Loaded {len(linked_accounts)} linked GitHub accounts from '{self.link_json}'")
             return linked_accounts
@@ -143,8 +143,8 @@ class HacktoberStats(commands.Cog):
             }
         """
         logging.info(f"Saving linked_accounts to '{self.link_json}'")
-        with open(self.link_json, 'w') as fID:
-            json.dump(self.linked_accounts, fID, default=str)
+        with open(self.link_json, 'w') as file:
+            json.dump(self.linked_accounts, file, default=str)
         logging.info(f"linked_accounts saved to '{self.link_json}'")
 
     async def get_stats(self, ctx: commands.Context, github_username: str) -> None:
@@ -309,11 +309,11 @@ class HacktoberStats(commands.Cog):
            n contribution(s) to [shortname](url)
            ...
         """
-        baseURL = "https://www.github.com/"
+        base_url = "https://www.github.com/"
         contributionstrs = []
         for repo in stats['top5']:
             n = repo[1]
-            contributionstrs.append(f"{n} {HacktoberStats._contributionator(n)} to [{repo[0]}]({baseURL}{repo[0]})")
+            contributionstrs.append(f"{n} {HacktoberStats._contributionator(n)} to [{repo[0]}]({base_url}{repo[0]})")
 
         return "\n".join(contributionstrs)
 
@@ -334,7 +334,7 @@ class HacktoberStats(commands.Cog):
         return author_id, author_mention
 
 
-def setup(bot):  # Noqa
+def setup(bot: commands.Bot) -> None:
     """Hacktoberstats Cog load."""
     bot.add_cog(HacktoberStats(bot))
     log.info("HacktoberStats cog loaded")

@@ -35,7 +35,7 @@ class Channels(NamedTuple):
     bot = 267659945086812160
     checkpoint_test = 422077681434099723
     devalerts = 460181980097675264
-    devlog = int(environ.get("CHANNEL_DEVLOG", 548438471685963776))
+    devlog = int(environ.get("CHANNEL_DEVLOG", 622895325144940554))
     devtest = 414574275865870337
     help_0 = 303906576991780866
     help_1 = 303906556754395136
@@ -52,7 +52,6 @@ class Channels(NamedTuple):
     off_topic_2 = 463035268514185226
     python = 267624335836053506
     reddit = 458224812528238616
-    seasonalbot_chat = int(environ.get("CHANNEL_SEASONALBOT_CHAT", 542272993192050698))
     seasonalbot_commands = int(environ.get("CHANNEL_SEASONALBOT_COMMANDS", 607247579608121354))
     seasonalbot_voice = int(environ.get("CHANNEL_SEASONALBOT_VOICE", 606259004230074378))
     staff_lounge = 464905259261755392
@@ -69,6 +68,7 @@ class Client(NamedTuple):
     token = environ.get("SEASONALBOT_TOKEN")
     debug = environ.get("SEASONALBOT_DEBUG", "").lower() == "true"
     season_override = environ.get("SEASON_OVERRIDE")
+    icon_cycle_frequency = 3  # N days to wait between cycling server icons within a single season
 
 
 class Colours:
@@ -138,6 +138,7 @@ class Tokens(NamedTuple):
     omdb = environ.get("OMDB_API_KEY")
     youtube = environ.get("YOUTUBE_API_KEY")
     tmdb = environ.get("TMDB_API_KEY")
+    igdb = environ.get("IGDB_API_KEY")
 
 
 # Default role combinations
