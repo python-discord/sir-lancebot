@@ -92,6 +92,24 @@ class SeasonalBot(commands.Bot):
         log.warning(f"Changing avatar failed: {url}")
         return False
 
+    async def set_banner(self, url: str) -> bool:
+        """Sets the guild's banner based on the provided `url`."""
+        guild = bot.get_guild(Client.guild)
+        old_banner = guild.banner
+
+        image = await self._fetch_image(url)
+        with contextlib.suppress(discord.HTTPException, asyncio.TimeoutError):
+            async with async_timeout.timeout(5):
+                await guild.edit(banner=image)
+
+        new_banner = bot.get_guild(Client.guild).banner
+        if new_banner != old_banner:
+            log.debug(f"Banner changed to {url}")
+            return True
+
+        log.warning(f"Changing banner failed: {url}")
+        return False
+
     async def set_icon(self, url: str) -> bool:
         """Sets the guild's icon based on a URL."""
         guild = bot.get_guild(Client.guild)
