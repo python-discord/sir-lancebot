@@ -1,0 +1,312 @@
+import asyncio
+import itertools
+import logging
+import random
+import typing as t
+from datetime import datetime, time, timedelta
+
+import discord
+from discord.ext import commands
+
+from bot.bot import SeasonalBot
+from bot.constants import Client
+from bot.seasons import SeasonBase, get_current_season, get_season
+
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
+
+BRANDING_URL = "https://api.github.com/repos/python-discord/branding/contents"
+
+HEADERS = {"Accept": "application/vnd.github.v3+json"}  # Ensure we use API v3
+PARAMS = {"ref": "seasonal-structure"}  # Target branch
+
+
+class Record(t.NamedTuple):
+    """
+    Represents a remote file on Github.
+
+    The sha hash is kept so that we can determine that a file has changed,
+    despite its filename remaining unchanged.
+    """
+
+    download_url: str
+    sha: str
+
+
+async def pretty_records(recs: t.Iterable[Record]) -> str:
+    """
+    Provide a human-friendly representation of `recs`.
+
+    In practice, this retrieves the filename from each record's url,
+    and joins them on a comma.
+    """
+    return ", ".join(rec.download_url.split("/")[-1] for rec in recs)
+
+
+async def seconds_until_midnight() -> float:
+    """
+    Give the amount of seconds needed to wait until the next-up UTC midnight.
+
+    The exact `midnight` moment is actually delayed to 5 seconds after, in order
+    to avoid potential problems due to imprecise sleep.
+    """
+    now = datetime.utcnow()
+    tomorrow = now + timedelta(days=1)
+    midnight = datetime.combine(tomorrow, time(second=5))
+
+    return (midnight - now).total_seconds()
+
+
+class BrandingManager(commands.Cog):
+    """
+    Manages the guild's branding.
+
+    The `daemon` task automatically manages branding across seasons. See its docstring
+    for further explanation of the automated behaviour.
+
+    If necessary, or for testing purposes, the Cog can be manually controlled
+    via the `branding` command group.
+    """
+
+    current_season: t.Type[SeasonBase]
+
+    banner: t.Optional[Record]
+    avatar: t.Optional[Record]
+
+    available_icons: t.List[Record]
+    remaining_icons: t.List[Record]
+
+    should_cycle: t.Iterator
+
+    daemon: asyncio.Task
+
+    def __init__(self, bot: SeasonalBot) -> None:
+        """
+        Assign safe default values on init.
+
+        At this point, we don't have information about currently available branding.
+        Most of these attributes will be overwritten once the daemon connects.
+        """
+        self.bot = bot
+        self.current_season = get_current_season()
+
+        self.banner = None
+        self.avatar = None
+
+        self.should_cycle = itertools.cycle([False])
+
+        self.available_icons = []
+        self.remaining_icons = []
+
+        self.daemon = self.bot.loop.create_task(self._daemon_func())
+
+    async def _daemon_func(self) -> None:
+        """
+        Manage all automated behaviour of the BrandingManager cog.
+
+        Once a day, the daemon will perform the following tasks:
+            - Update `current_season`
+            - Poll Github API to see if the available branding for `current_season` has changed
+            - Update assets if changes are detected (banner, guild icon, bot avatar, bot nickname)
+            - Check whether it's time to cycle guild icons
+
+        The daemon awakens on start-up, then periodically at the time given by `seconds_until_midnight`.
+        """
+        await self.bot.wait_until_ready()
+
+        while True:
+            self.current_season = get_current_season()
+            branding_changed = await self.refresh()
+
+            if branding_changed:
+                await self.apply()
+
+            elif next(self.should_cycle):
+                await self.cycle()
+
+            await asyncio.sleep(await seconds_until_midnight())
+
+    async def _info_embed(self) -> discord.Embed:
+        """Make an informative embed representing current state."""
+        info_embed = discord.Embed(
+            title=self.current_season.season_name,
+            description=f"Active in {', '.join(m.name for m in self.current_season.months)}",
+        ).add_field(
+            name="Banner",
+            value=f"{self.banner is not None}",
+        ).add_field(
+            name="Avatar",
+            value=f"{self.avatar is not None}",
+        ).add_field(
+            name="Available icons",
+            value=await pretty_records(self.available_icons) or "Empty",
+            inline=False,
+        )
+
+        # Only add information about next-up icons if we're cycling in this season
+        if len(self.remaining_icons) > 1:
+            info_embed.add_field(
+                name=f"Queue (frequency: {Client.icon_cycle_frequency})",
+                value=await pretty_records(self.remaining_icons) or "Empty",
+                inline=False,
+            )
+
+        return info_embed
+
+    async def _reset_remaining_icons(self) -> None:
+        """Set `remaining_icons` to a shuffled copy of `available_icons`."""
+        self.remaining_icons = random.sample(self.available_icons, k=len(self.available_icons))
+
+    async def _reset_should_cycle(self) -> None:
+        """
+        Reset the `should_cycle` counter based on configured frequency.
+
+        Counter will always yield False if either holds:
+            - Client.icon_cycle_frequency is falsey
+            - There are fewer than 2 available icons for current season
+
+        Cycling can be easily turned off, and we prevent re-uploading the same icon repeatedly.
+        """
+        if len(self.available_icons) > 1 and Client.icon_cycle_frequency:
+            wait_period = [False] * (Client.icon_cycle_frequency - 1)
+            counter = itertools.cycle(wait_period + [True])
+        else:
+            counter = itertools.cycle([False])
+
+        self.should_cycle = counter
+
+    async def _get_files(self, path: str) -> t.Dict[str, Record]:
+        """
+        Poll `path` in branding repo for information about present files.
+
+        Return dict mapping from filename to corresponding `Record` instance.
+        """
+        url = f"{BRANDING_URL}/{path}"
+        async with self.bot.http_session.get(url, headers=HEADERS, params=PARAMS) as resp:
+            directory = await resp.json()
+
+        return {
+            file["name"]: Record(file["download_url"], file["sha"])
+            for file in directory
+        }
+
+    async def refresh(self) -> bool:
+        """
+        Poll Github API to refresh currently available icons.
+
+        Return True if the branding has changed. This will be the case when we enter
+        a new season, or when something changes in the current seasons's directory
+        in the branding repository.
+        """
+        old_branding = (self.banner, self.avatar, self.available_icons)
+
+        seasonal_dir = await self._get_files(self.current_season.branding_path)
+        self.banner = seasonal_dir.get("banner.png")
+        self.avatar = seasonal_dir.get("bot_icon.png")
+
+        if "server_icons" in seasonal_dir:
+            icons_dir = await self._get_files(f"{self.current_season.branding_path}/server_icons")
+            self.available_icons = list(icons_dir.values())
+        else:
+            self.available_icons = []
+
+        branding_changed = old_branding != (self.banner, self.avatar, self.available_icons)
+        log.info(f"New branding detected: {branding_changed}")
+
+        if branding_changed:
+            await self._reset_remaining_icons()
+            await self._reset_should_cycle()
+
+        return branding_changed
+
+    async def cycle(self) -> bool:
+        """Apply the next-up server icon."""
+        if not self.available_icons:
+            log.info("Cannot cycle: no icons for this season")
+            return False
+
+        if not self.remaining_icons:
+            await self._reset_remaining_icons()
+            log.info(f"Set remaining icons: {await pretty_records(self.remaining_icons)}")
+
+        next_up, *self.remaining_icons = self.remaining_icons
+        # await self.bot.set_icon(next_up.download_url)
+        log.info(f"Applying icon: {next_up}")
+
+        return True
+
+    async def apply(self) -> None:
+        """
+        Apply current branding to the guild and bot.
+
+        This delegates to the bot instance to do all the work. We only provide download urls
+        for available assets. Assets unavailable in the branding repo will be ignored.
+        """
+        if self.banner is not None:
+            # await self.bot.set_banner(self.banner.download_url)
+            log.info(f"Applying banner: {self.banner.download_url}")
+
+        if self.avatar is not None:
+            # await self.bot.set_avatar(self.avatar.download_url)
+            log.info(f"Applying avatar: {self.avatar.download_url}")
+
+        # await self.bot.set_nickname(self.current_season.bot_name)
+        log.info(f"Applying nickname: {self.current_season.bot_name}")
+
+        await self.cycle()
+
+    @commands.group(name="branding")
+    async def branding_cmds(self, ctx: commands.Context) -> None:
+        """Group for commands allowing manual control of the `SeasonManager` cog."""
+        if not ctx.invoked_subcommand:
+            await self.branding_info(ctx)
+
+    @branding_cmds.command(name="info", aliases=["status"])
+    async def branding_info(self, ctx: commands.Context) -> None:
+        """Provide an information embed representing current branding situation."""
+        await ctx.send(embed=await self._info_embed())
+
+    @branding_cmds.command(name="refresh")
+    async def branding_refresh(self, ctx: commands.Context) -> None:
+        """Poll Github API to refresh currently available branding, dispatch info embed."""
+        async with ctx.typing():
+            await self.refresh()
+            await self.branding_info(ctx)
+
+    @branding_cmds.command(name="cycle")
+    async def branding_cycle(self, ctx: commands.Context) -> None:
+        """Force cycle guild icon."""
+        async with ctx.typing():
+            success = self.cycle()
+            await ctx.send("Icon cycle successful" if success else "Icon cycle failed")
+
+    @branding_cmds.command(name="apply")
+    async def branding_apply(self, ctx: commands.Context) -> None:
+        """Force apply current branding."""
+        async with ctx.typing():
+            await self.apply()
+            await ctx.send("Branding applied")
+
+    @branding_cmds.command(name="set")
+    async def branding_set(self, ctx: commands.Context, season_name: t.Optional[str] = None) -> None:
+        """Manually set season if `season_name` is provided, otherwise reset to current."""
+        async with ctx.typing():
+            if season_name is None:
+                self.current_season = get_current_season()
+            else:
+                found_season = get_season(season_name)
+
+                if found_season is None:
+                    raise commands.BadArgument("No such season exists")
+
+                self.current_season = found_season
+
+            await self.refresh()
+            await self.apply()
+            await self.branding_info(ctx)
+
+
+def setup(bot: SeasonalBot) -> None:
+    """Load BrandingManager cog."""
+    bot.add_cog(BrandingManager(bot))
+    log.info("BrandingManager cog loaded")
