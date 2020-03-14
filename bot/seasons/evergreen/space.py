@@ -17,10 +17,6 @@ NASA_BASE_URL = "https://api.nasa.gov"
 NASA_IMAGES_BASE_URL = "https://images-api.nasa.gov"
 NASA_EPIC_BASE_URL = "https://epic.gsfc.nasa.gov"
 
-APOD_DEFAULT_PARAMS = {
-    "api_key": Tokens.nasa
-}
-
 
 class DateConverter(Converter):
     """Parse SOL or earth date (in format YYYY-MM-DD) into `int` or `datetime`. When invalid input, raise error."""
@@ -49,7 +45,7 @@ class Space(Cog):
     @tasks.loop(hours=24)
     async def get_rovers(self) -> None:
         """Get listing of rovers from NASA API and info about their start and end dates."""
-        data = await self.fetch_from_nasa("mars-photos/api/v1/rovers", params={"api_key": Tokens.nasa})
+        data = await self.fetch_from_nasa("mars-photos/api/v1/rovers")
 
         for rover in data["rovers"]:
             self.rovers[rover["name"].lower()] = {
@@ -69,7 +65,7 @@ class Space(Cog):
 
         If date is not specified, this will get today APOD.
         """
-        params = APOD_DEFAULT_PARAMS.copy()
+        params = {}
         # Parse date to params, when provided. Show error message when invalid formatting
         if date:
             try:
@@ -97,7 +93,8 @@ class Space(Cog):
         if search_term:
             params["q"] = search_term
 
-        data = await self.fetch_from_nasa("search", params, NASA_IMAGES_BASE_URL)
+        # Don't use API key, no need for this.
+        data = await self.fetch_from_nasa("search", params, NASA_IMAGES_BASE_URL, use_api_key=False)
         if len(data["collection"]["items"]) == 0:
             await ctx.send(f"Can't find any items with search term `{search_term}`.")
             return
@@ -124,9 +121,11 @@ class Space(Cog):
         else:
             show_date = None
 
+        # Don't use API key, no need for this.
         data = await self.fetch_from_nasa(
             f"api/natural{f'/date/{show_date}' if show_date else ''}",
-            base=NASA_EPIC_BASE_URL
+            base=NASA_EPIC_BASE_URL,
+            use_api_key=False
         )
         if len(data) < 1:
             await ctx.send("Can't find any images in this date.")
@@ -165,9 +164,7 @@ class Space(Cog):
             )
             return
 
-        params = {
-            "api_key": Tokens.nasa
-        }
+        params = {}
         if isinstance(date, int):
             params["sol"] = date
         else:
@@ -201,12 +198,19 @@ class Space(Cog):
     async def fetch_from_nasa(
         self,
         endpoint: str,
-        params: Optional[Dict[str, Any]] = None,
-        base: Optional[str] = NASA_BASE_URL
+        additional_params: Optional[Dict[str, Any]] = None,
+        base: Optional[str] = NASA_BASE_URL,
+        use_api_key: bool = True
     ) -> Dict[str, Any]:
         """Fetch information from NASA API, return result."""
-        if params is None:
-            params = {}
+        params = {}
+        if use_api_key:
+            params["api_key"] = Tokens.nasa
+
+        # Add additional parameters to request parameters only when they provided by user
+        if additional_params is not None:
+            params.update(additional_params)
+
         async with self.http_session.get(url=f"{base}/{endpoint}?{urlencode(params)}") as resp:
             return await resp.json()
 
