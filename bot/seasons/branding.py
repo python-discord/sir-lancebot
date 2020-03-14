@@ -290,20 +290,21 @@ class BrandingManager(commands.Cog):
     @branding_cmds.command(name="set")
     async def branding_set(self, ctx: commands.Context, season_name: t.Optional[str] = None) -> None:
         """Manually set season if `season_name` is provided, otherwise reset to current."""
-        async with ctx.typing():
-            if season_name is None:
-                self.current_season = get_current_season()
-            else:
-                found_season = get_season(season_name)
+        if season_name is None:
+            new_season = get_current_season()
+        else:
+            new_season = get_season(season_name)
+            if new_season is None:
+                raise commands.BadArgument("No such season exists")
 
-                if found_season is None:
-                    raise commands.BadArgument("No such season exists")
-
-                self.current_season = found_season
-
-            await self.refresh()
-            await self.apply()
-            await self.branding_info(ctx)
+        if self.current_season is not new_season:
+            async with ctx.typing():
+                self.current_season = new_season
+                await self.refresh()
+                await self.apply()
+                await self.branding_info(ctx)
+        else:
+            await ctx.send(f"Season {self.current_season.season_name} already active")
 
 
 def setup(bot: SeasonalBot) -> None:
