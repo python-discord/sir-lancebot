@@ -50,7 +50,8 @@ class Space(Cog):
         for rover in data["rovers"]:
             self.rovers[rover["name"].lower()] = {
                 "min_date": rover["landing_date"],
-                "max_date": rover["max_date"]
+                "max_date": rover["max_date"],
+                "max_sol": rover["max_sol"]
             }
 
     @group(name="space", invoke_without_command=True)
@@ -146,7 +147,7 @@ class Space(Cog):
     async def mars(
         self,
         ctx: Context,
-        date: DateConverter,
+        date: Optional[DateConverter] = None,
         rover: Optional[str] = "curiosity"
     ) -> None:
         """
@@ -163,6 +164,10 @@ class Space(Cog):
                 )
             )
             return
+
+        # When date not provided, get random SOL date between 0 and rover's max.
+        if date is None:
+            date = random.randint(0, self.rovers[rover]["max_sol"])
 
         params = {}
         if isinstance(date, int):
