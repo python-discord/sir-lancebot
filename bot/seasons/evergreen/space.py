@@ -80,11 +80,13 @@ class Space(Cog):
 
         result = await self.fetch_from_nasa("planetary/apod", params)
 
-        await ctx.send(embed=await self.create_nasa_embed(
-            f"Astronomy Picture of the Day - {result['date']}",
-            result["explanation"],
-            result["url"]
-        ))
+        await ctx.send(
+            embed=await self.create_nasa_embed(
+                f"Astronomy Picture of the Day - {result['date']}",
+                result["explanation"],
+                result["url"]
+            )
+        )
 
     @space.command(name="nasa")
     async def nasa(self, ctx: Context, *, search_term: Optional[str] = None) -> None:
@@ -102,11 +104,13 @@ class Space(Cog):
 
         item = random.choice(data["collection"]["items"])
 
-        await ctx.send(embed=await self.create_nasa_embed(
-            item["data"][0]["title"],
-            item["data"][0]["description"],
-            item["links"][0]["href"]
-        ))
+        await ctx.send(
+            embed=await self.create_nasa_embed(
+                item["data"][0]["title"],
+                item["data"][0]["description"],
+                item["links"][0]["href"]
+            )
+        )
 
     @space.command(name="epic")
     async def epic(self, ctx: Context, date: Optional[str] = None) -> None:
@@ -133,16 +137,19 @@ class Space(Cog):
         year, month, day = item["date"].split(" ")[0].split("-")
         image_url = f"{NASA_EPIC_BASE_URL}/archive/natural/{year}/{month}/{day}/jpg/{item['image']}.jpg"
 
-        await ctx.send(embed=await self.create_nasa_embed(
-            "Earth Image", item["caption"], image_url, f" \u2022 Identifier: {item['identifier']}"
-        ))
+        await ctx.send(
+            embed=await self.create_nasa_embed(
+                "Earth Image", item["caption"], image_url, f" \u2022 Identifier: {item['identifier']}"
+            )
+        )
 
     @space.group(name="mars", invoke_without_command=True)
-    async def mars(self,
-                   ctx: Context,
-                   date: DateConverter,
-                   rover: Optional[str] = "curiosity"
-                   ) -> None:
+    async def mars(
+        self,
+        ctx: Context,
+        date: DateConverter,
+        rover: Optional[str] = "curiosity"
+    ) -> None:
         """
         Get random Mars image by date. Support both SOL (martian solar day) and earth date and rovers.
 
@@ -178,9 +185,11 @@ class Space(Cog):
             return
 
         item = random.choice(result["photos"])
-        await ctx.send(embed=await self.create_nasa_embed(
-            f"{item['rover']['name']}'s {item['camera']['full_name']} Mars Image", "", item["img_src"],
-        ))
+        await ctx.send(
+            embed=await self.create_nasa_embed(
+                f"{item['rover']['name']}'s {item['camera']['full_name']} Mars Image", "", item["img_src"],
+            )
+        )
 
     @mars.command(name="dates", aliases=["d", "date", "rover", "rovers", "r"])
     async def dates(self, ctx: Context) -> None:
@@ -189,11 +198,12 @@ class Space(Cog):
             f"**{r.capitalize()}:** {i['min_date']} **-** {i['max_date']}" for r, i in self.rovers.items()
         ))
 
-    async def fetch_from_nasa(self,
-                              endpoint: str,
-                              params: Optional[Dict[str, Any]] = None,
-                              base: Optional[str] = NASA_BASE_URL
-                              ) -> Dict[str, Any]:
+    async def fetch_from_nasa(
+        self,
+        endpoint: str,
+        params: Optional[Dict[str, Any]] = None,
+        base: Optional[str] = NASA_BASE_URL
+    ) -> Dict[str, Any]:
         """Fetch information from NASA API, return result."""
         if params is None:
             params = {}
