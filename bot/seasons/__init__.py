@@ -2,11 +2,11 @@ import logging
 import pkgutil
 from datetime import datetime
 from pathlib import Path
-from typing import List, Set, Type
+from typing import List, Optional, Set, Type
 
 from bot.constants import Month
 
-__all__ = ("SeasonBase", "get_seasons", "get_extensions", "get_current_season")
+__all__ = ("SeasonBase", "get_seasons", "get_extensions", "get_current_season", "get_season")
 
 log = logging.getLogger(__name__)
 
@@ -82,3 +82,18 @@ def get_current_season() -> Type[SeasonBase]:
         log.warning(f"Multiple active season in month {current_month.name}")
 
     return active_seasons[0]
+
+
+def get_season(name: str) -> Optional[Type[SeasonBase]]:
+    """
+    Give season such that its class name or its `season_name` attr match `name` (caseless).
+
+    If no such season exists, return None.
+    """
+    name = name.casefold()
+
+    for season in [SeasonBase] + SeasonBase.__subclasses__():
+        matches = (season.__name__.casefold(), season.season_name.casefold())
+
+        if name in matches:
+            return season
