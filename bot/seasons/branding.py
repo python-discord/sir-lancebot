@@ -21,7 +21,7 @@ HEADERS = {"Accept": "application/vnd.github.v3+json"}  # Ensure we use API v3
 PARAMS = {"ref": "seasonal-structure"}  # Target branch
 
 
-class Record(t.NamedTuple):
+class GithubFile(t.NamedTuple):
     """
     Represents a remote file on Github.
 
@@ -33,14 +33,14 @@ class Record(t.NamedTuple):
     sha: str
 
 
-async def pretty_records(recs: t.Iterable[Record]) -> str:
+async def pretty_files(files: t.Iterable[GithubFile]) -> str:
     """
-    Provide a human-friendly representation of `recs`.
+    Provide a human-friendly representation of `files`.
 
-    In practice, this retrieves the filename from each record's url,
+    In practice, this retrieves the filename from each file's url,
     and joins them on a comma.
     """
-    return ", ".join(rec.download_url.split("/")[-1] for rec in recs)
+    return ", ".join(file.download_url.split("/")[-1] for file in files)
 
 
 async def seconds_until_midnight() -> float:
@@ -70,11 +70,11 @@ class BrandingManager(commands.Cog):
 
     current_season: t.Type[SeasonBase]
 
-    banner: t.Optional[Record]
-    avatar: t.Optional[Record]
+    banner: t.Optional[GithubFile]
+    avatar: t.Optional[GithubFile]
 
-    available_icons: t.List[Record]
-    remaining_icons: t.List[Record]
+    available_icons: t.List[GithubFile]
+    remaining_icons: t.List[GithubFile]
 
     should_cycle: t.Iterator
 
@@ -139,7 +139,7 @@ class BrandingManager(commands.Cog):
             value=f"{self.avatar is not None}",
         ).add_field(
             name="Available icons",
-            value=await pretty_records(self.available_icons) or "Empty",
+            value=await pretty_files(self.available_icons) or "Empty",
             inline=False,
         )
 
@@ -147,7 +147,7 @@ class BrandingManager(commands.Cog):
         if len(self.remaining_icons) > 1:
             info_embed.add_field(
                 name=f"Queue (frequency: {Client.icon_cycle_frequency})",
-                value=await pretty_records(self.remaining_icons) or "Empty",
+                value=await pretty_files(self.remaining_icons) or "Empty",
                 inline=False,
             )
 
@@ -175,18 +175,18 @@ class BrandingManager(commands.Cog):
 
         self.should_cycle = counter
 
-    async def _get_files(self, path: str) -> t.Dict[str, Record]:
+    async def _get_files(self, path: str) -> t.Dict[str, GithubFile]:
         """
         Poll `path` in branding repo for information about present files.
 
-        Return dict mapping from filename to corresponding `Record` instance.
+        Return dict mapping from filename to corresponding `GithubFile` instance.
         """
         url = f"{BRANDING_URL}/{path}"
         async with self.bot.http_session.get(url, headers=HEADERS, params=PARAMS) as resp:
             directory = await resp.json()
 
         return {
-            file["name"]: Record(file["download_url"], file["sha"])
+            file["name"]: GithubFile(file["download_url"], file["sha"])
             for file in directory
         }
 
@@ -227,7 +227,7 @@ class BrandingManager(commands.Cog):
 
         if not self.remaining_icons:
             await self._reset_remaining_icons()
-            log.info(f"Set remaining icons: {await pretty_records(self.remaining_icons)}")
+            log.info(f"Set remaining icons: {await pretty_files(self.remaining_icons)}")
 
         next_up, *self.remaining_icons = self.remaining_icons
         # await self.bot.set_icon(next_up.download_url)
