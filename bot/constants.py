@@ -69,7 +69,7 @@ class Client(NamedTuple):
     token = environ.get("SEASONALBOT_TOKEN")
     debug = environ.get("SEASONALBOT_DEBUG", "").lower() == "true"
     season_override = environ.get("SEASON_OVERRIDE")
-    icon_cycle_frequency = 3  # N days to wait between cycling server icons within a single season
+    icon_cycle_frequency = 3  # 0: never, 1: every day, 2: every other day, ...
 
 
 class Colours:
