@@ -1,11 +1,12 @@
 import logging
 import pkgutil
+from datetime import datetime
 from pathlib import Path
-from typing import List, Set
+from typing import List, Set, Type
 
 from bot.constants import Month
 
-__all__ = ("SeasonBase", "get_seasons", "get_extensions")
+__all__ = ("SeasonBase", "get_seasons", "get_extensions", "get_current_season")
 
 log = logging.getLogger(__name__)
 
@@ -62,3 +63,22 @@ class SeasonBase:
     branding_path: str = "seasonal/evergreen"
 
     months: Set[Month] = set(Month)
+
+
+def get_current_season() -> Type[SeasonBase]:
+    """Give active season, based on current UTC month."""
+    current_month = Month(datetime.utcnow().month)
+
+    active_seasons = tuple(
+        season
+        for season in SeasonBase.__subclasses__()
+        if current_month in season.months
+    )
+
+    if not active_seasons:
+        return SeasonBase
+
+    if len(active_seasons) > 1:
+        log.warning(f"Multiple active season in month {current_month.name}")
+
+    return active_seasons[0]
