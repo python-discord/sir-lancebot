@@ -21,6 +21,12 @@ class InChannelCheckFailure(CheckFailure):
     pass
 
 
+class InMonthCheckFailure(CheckFailure):
+    """Check failure for when a command is invoked outside of its allowed month."""
+
+    pass
+
+
 def in_month(*allowed_months: Month) -> typing.Callable:
     """
     Check whether the command was invoked in one of `enabled_months`.
@@ -31,11 +37,16 @@ def in_month(*allowed_months: Month) -> typing.Callable:
         current_month = datetime.utcnow().month
         can_run = current_month in allowed_months
 
+        human_months = ", ".join(m.name for m in allowed_months)
         log.debug(
-            f"Command '{ctx.command}' is locked to months {allowed_months}. "
+            f"Command '{ctx.command}' is locked to months {human_months}. "
             f"Invoking it in month {current_month} is {'allowed' if can_run else 'disallowed'}."
         )
-        return can_run
+        if can_run:
+            return True
+        else:
+            raise InMonthCheckFailure(f"Command can only be used in {human_months}")
+
     return commands.check(predicate)
 
 

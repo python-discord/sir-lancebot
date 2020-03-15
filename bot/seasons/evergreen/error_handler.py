@@ -7,7 +7,7 @@ from discord import Embed, Message
 from discord.ext import commands
 
 from bot.constants import Colours, ERROR_REPLIES, NEGATIVE_REPLIES
-from bot.decorators import InChannelCheckFailure
+from bot.decorators import InChannelCheckFailure, InMonthCheckFailure
 
 log = logging.getLogger(__name__)
 
@@ -55,7 +55,7 @@ class CommandErrorHandler(commands.Cog):
         if isinstance(error, commands.CommandNotFound):
             return
 
-        if isinstance(error, InChannelCheckFailure):
+        if isinstance(error, (InChannelCheckFailure, InMonthCheckFailure)):
             await ctx.send(embed=self.error_embed(str(error), NEGATIVE_REPLIES), delete_after=7.5)
             return
 
