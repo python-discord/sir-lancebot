@@ -8,7 +8,8 @@ from typing import List, Union
 import discord
 from discord.ext import commands
 
-from bot.constants import Channels
+from bot.constants import Channels, Month
+from bot.decorators import in_month_listener
 
 log = logging.getLogger(__name__)
 
@@ -35,6 +36,7 @@ class CandyCollection(commands.Cog):
             self.get_candyinfo[userid] = userinfo
 
     @commands.Cog.listener()
+    @in_month_listener(Month.october)
     async def on_message(self, message: discord.Message) -> None:
         """Randomly adds candy or skull reaction to non-bot messages in the Event channel."""
         # make sure its a human message
@@ -56,6 +58,7 @@ class CandyCollection(commands.Cog):
             return await message.add_reaction('\N{CANDY}')
 
     @commands.Cog.listener()
+    @in_month_listener(Month.october)
     async def on_reaction_add(self, reaction: discord.Reaction, user: discord.Member) -> None:
         """Add/remove candies from a person if the reaction satisfies criteria."""
         message = reaction.message

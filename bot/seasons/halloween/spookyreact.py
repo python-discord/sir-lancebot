@@ -4,6 +4,9 @@ import re
 import discord
 from discord.ext.commands import Bot, Cog
 
+from bot.constants import Month
+from bot.decorators import in_month_listener
+
 log = logging.getLogger(__name__)
 
 SPOOKY_TRIGGERS = {
@@ -24,6 +27,7 @@ class SpookyReact(Cog):
         self.bot = bot
 
     @Cog.listener()
+    @in_month_listener(Month.october)
     async def on_message(self, ctx: discord.Message) -> None:
         """
         A command to send the seasonalbot github project.
