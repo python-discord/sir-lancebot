@@ -1,4 +1,3 @@
-import asyncio
 import json
 import logging
 import random
@@ -11,6 +10,7 @@ import discord
 from discord.ext import commands
 
 from bot.constants import Channels, Colours, Month
+from bot.decorators import seasonal_task
 
 log = logging.getLogger(__name__)
 
@@ -24,7 +24,6 @@ class PrideFacts(commands.Cog):
         self.bot = bot
         self.facts = self.load_facts()
 
-        self.active_months = {Month.june}
         self.daily_fact_task = self.bot.loop.create_task(self.send_pride_fact_daily())
 
     @staticmethod
@@ -33,17 +32,11 @@ class PrideFacts(commands.Cog):
         with open(Path("bot/resources/pride/facts.json"), "r", encoding="utf-8") as f:
             return json.load(f)
 
+    @seasonal_task(Month.june)
     async def send_pride_fact_daily(self) -> None:
         """Background task to post the daily pride fact every day."""
-        await self.bot.wait_until_ready()
         channel = self.bot.get_channel(Channels.seasonalbot_commands)
-
-        while True:
-            current_month = Month(datetime.utcnow().month)
-            if current_month in self.active_months:
-                await self.send_select_fact(channel, datetime.utcnow())
-
-            await asyncio.sleep(24 * 60 * 60)
+        await self.send_select_fact(channel, datetime.utcnow())
 
     async def send_random_fact(self, ctx: commands.Context) -> None:
         """Provides a fact from any previous day, or today."""

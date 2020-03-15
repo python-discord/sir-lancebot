@@ -1,7 +1,5 @@
-import asyncio
 import logging
 import random
-from datetime import datetime
 from json import load
 from pathlib import Path
 
@@ -9,6 +7,7 @@ import discord
 from discord.ext import commands
 
 from bot.constants import Channels, Colours, Month
+from bot.decorators import seasonal_task
 
 log = logging.getLogger(__name__)
 
@@ -24,7 +23,6 @@ class EasterFacts(commands.Cog):
         self.bot = bot
         self.facts = self.load_json()
 
-        self.active_months = {Month.april}
         self.daily_fact_task = self.bot.loop.create_task(self.send_egg_fact_daily())
 
     @staticmethod
@@ -34,17 +32,11 @@ class EasterFacts(commands.Cog):
         with p.open(encoding="utf8") as f:
             return load(f)
 
+    @seasonal_task(Month.april)
     async def send_egg_fact_daily(self) -> None:
         """A background task that sends an easter egg fact in the event channel everyday."""
-        await self.bot.wait_until_ready()
         channel = self.bot.get_channel(Channels.seasonalbot_commands)
-
-        while True:
-            current_month = Month(datetime.utcnow().month)
-            if current_month in self.active_months:
-                await channel.send(embed=self.make_embed())
-
-            await asyncio.sleep(24 * 60 * 60)
+        await channel.send(embed=self.make_embed())
 
     @commands.command(name='eggfact', aliases=['fact'])
     async def easter_facts(self, ctx: commands.Context) -> None:
