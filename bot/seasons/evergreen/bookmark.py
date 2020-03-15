@@ -102,7 +102,15 @@ class Bookmark(commands.Cog):
 
             except discord.Forbidden:
                 await ctx.send(f"{user.mention} Please enable your DM to receive the message.", delete_after=7.5)
-                await reaction.remove(user)
+                try:
+                    await reaction.remove(user)
+                except discord.Forbidden:
+                    await ctx.send("I don't have permissions to remove reaction.")
+                except discord.HTTPException:
+                    await ctx.send("Unknown error while removing reaction.")
+                except discord.NotFound:
+                    await ctx.send("Message or reaction author not found, can't remove reaction.")
+
             except discord.HTTPException:
                 pass
             except discord.NotFound:
