@@ -32,7 +32,7 @@ class InMonthCheckFailure(CheckFailure):
     pass
 
 
-def seasonal_task(*allowed_months: Month, sleep_time: float = ONE_DAY) -> typing.Callable:
+def seasonal_task(*allowed_months: Month, sleep_time: typing.Union[float, int] = ONE_DAY) -> typing.Callable:
     """
     Perform the decorated method periodically in `allowed_months`.
 
