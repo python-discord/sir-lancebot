@@ -1,3 +1,4 @@
+import asyncio
 import functools
 import logging
 import random
@@ -13,6 +14,8 @@ from discord.ext.commands import CheckFailure, Context
 
 from bot.constants import ERROR_REPLIES, Month
 
+ONE_DAY = 24 * 60 * 60
+
 log = logging.getLogger(__name__)
 
 
@@ -26,6 +29,42 @@ class InMonthCheckFailure(CheckFailure):
     """Check failure for when a command is invoked outside of its allowed month."""
 
     pass
+
+
+def seasonal_task(*allowed_months: Month, sleep_time: float = ONE_DAY) -> typing.Callable:
+    """
+    Perform the decorated method periodically in `allowed_months`.
+
+    This provides a convenience wrapper to avoid code repetition where some task shall
+    perform an operation repeatedly in a constant interval, but only in specific months.
+
+    The decorated function will be called once every `sleep_time` seconds while
+    the current UTC month is in `allowed_months`. Sleep time defaults to 24 hours.
+    """
+    def decorator(task_body: typing.Callable) -> typing.Callable:
+        @functools.wraps(task_body)
+        async def decorated_task(self: commands.Cog, *args, **kwargs) -> None:
+            """
+            Call `task_body` once every `sleep_time` seconds in `allowed_months`.
+
+            We assume `self` to be a Cog subclass instance carrying a `bot` attr.
+            As some tasks may rely on the client's cache to be ready, we delegate
+            to the bot to wait until it's ready.
+            """
+            await self.bot.wait_until_ready()
+            log.info(f"Starting seasonal task {task_body.__qualname__} ({allowed_months})")
+
+            while True:
+                current_month = Month(datetime.utcnow().month)
+
+                if current_month in allowed_months:
+                    await task_body(self, *args, **kwargs)
+                else:
+                    log.debug(f"Seasonal task {task_body.__qualname__} sleeps in {current_month.name}")
+
+                await asyncio.sleep(sleep_time)
+        return decorated_task
+    return decorator
 
 
 def in_month_listener(*allowed_months: Month) -> typing.Callable:
