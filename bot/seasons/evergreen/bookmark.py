@@ -112,9 +112,8 @@ class Bookmark(commands.Cog):
                     await ctx.send("Message or reaction author not found, can't remove reaction.")
 
             except discord.HTTPException:
-                pass
-            except discord.NotFound:
-                pass
+                await ctx.send("Unknown error while sending bookmark to user.")
+
             else:
                 sent_person.add(user)
 
