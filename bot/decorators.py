@@ -12,6 +12,7 @@ from discord import Colour, Embed
 from discord.ext import commands
 from discord.ext.commands import CheckFailure, Context
 
+from bot.bot import bot
 from bot.constants import ERROR_REPLIES, Month
 
 ONE_DAY = 24 * 60 * 60
@@ -43,22 +44,20 @@ def seasonal_task(*allowed_months: Month, sleep_time: float = ONE_DAY) -> typing
     """
     def decorator(task_body: typing.Callable) -> typing.Callable:
         @functools.wraps(task_body)
-        async def decorated_task(self: commands.Cog, *args, **kwargs) -> None:
+        async def decorated_task(*args, **kwargs) -> None:
             """
             Call `task_body` once every `sleep_time` seconds in `allowed_months`.
 
-            We assume `self` to be a Cog subclass instance carrying a `bot` attr.
-            As some tasks may rely on the client's cache to be ready, we delegate
-            to the bot to wait until it's ready.
+            Wait for bot to be ready before calling `task_body` for the first time.
             """
-            await self.bot.wait_until_ready()
+            await bot.wait_until_ready()
             log.info(f"Starting seasonal task {task_body.__qualname__} ({allowed_months})")
 
             while True:
                 current_month = Month(datetime.utcnow().month)
 
                 if current_month in allowed_months:
-                    await task_body(self, *args, **kwargs)
+                    await task_body(*args, **kwargs)
                 else:
                     log.debug(f"Seasonal task {task_body.__qualname__} sleeps in {current_month.name}")
 
