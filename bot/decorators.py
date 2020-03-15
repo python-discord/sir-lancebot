@@ -1,3 +1,4 @@
+import functools
 import logging
 import random
 import typing
@@ -25,6 +26,27 @@ class InMonthCheckFailure(CheckFailure):
     """Check failure for when a command is invoked outside of its allowed month."""
 
     pass
+
+
+def in_month_listener(*allowed_months: Month) -> typing.Callable:
+    """
+    Shield a listener from being invoked outside of `allowed_months`.
+
+    The check is performed against current UTC month.
+    """
+    def decorator(listener: typing.Callable) -> typing.Callable:
+        @functools.wraps(listener)
+        async def guarded_listener(*args, **kwargs) -> None:
+            """Wrapped listener will abort if not in allowed month."""
+            current_month = Month(datetime.utcnow().month)
+
+            if current_month in allowed_months:
+                # Propagate return value although it should always be None
+                return await listener(*args, **kwargs)
+            else:
+                log.debug(f"Guarded {listener.__qualname__} from invoking in {current_month.name}")
+        return guarded_listener
+    return decorator
 
 
 def in_month(*allowed_months: Month) -> typing.Callable:
