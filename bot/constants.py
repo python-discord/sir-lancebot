@@ -52,7 +52,6 @@ class Channels(NamedTuple):
     off_topic_2 = 463035268514185226
     python = 267624335836053506
     reddit = 458224812528238616
-    seasonalbot_chat = int(environ.get("CHANNEL_SEASONALBOT_CHAT", 542272993192050698))
     seasonalbot_commands = int(environ.get("CHANNEL_SEASONALBOT_COMMANDS", 607247579608121354))
     seasonalbot_voice = int(environ.get("CHANNEL_SEASONALBOT_VOICE", 606259004230074378))
     staff_lounge = 464905259261755392
@@ -106,6 +105,10 @@ class Emojis:
     merge = "<:PRMerged:629695470570176522>"
 
 
+class Icons:
+    questionmark = "https://cdn.discordapp.com/emojis/512367613339369475.png"
+
+
 class Lovefest:
     role_id = int(environ.get("LOVEFEST_ROLE_ID", 542431903886606399))
 
@@ -136,6 +139,7 @@ class Tokens(NamedTuple):
     omdb = environ.get("OMDB_API_KEY")
     youtube = environ.get("YOUTUBE_API_KEY")
     tmdb = environ.get("TMDB_API_KEY")
+    igdb = environ.get("IGDB_API_KEY")
 
 
 # Default role combinations

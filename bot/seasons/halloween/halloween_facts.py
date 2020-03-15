@@ -40,7 +40,7 @@ class HalloweenFacts(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self) -> None:
         """Get event Channel object and initialize fact task loop."""
-        self.channel = self.bot.get_channel(Channels.seasonalbot_chat)
+        self.channel = self.bot.get_channel(Channels.seasonalbot_commands)
         self.bot.loop.create_task(self._fact_publisher_task())
 
     def random_fact(self) -> Tuple[int, str]:

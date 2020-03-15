@@ -28,7 +28,7 @@ class SeasonalBot(commands.Bot):
         # Unload all cogs
         extensions = list(self.extensions.keys())
         for extension in extensions:
-            if extension != "bot.seasons":  # We shouldn't unload the manager.
+            if extension not in ["bot.seasons", "bot.help"]:  # We shouldn't unload the manager and help.
                 self.unload_extension(extension)
 
         # Load in the list of cogs that was passed in here

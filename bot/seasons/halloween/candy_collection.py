@@ -41,7 +41,7 @@ class CandyCollection(commands.Cog):
         if message.author.bot:
             return
         # ensure it's hacktober channel
-        if message.channel.id != Channels.seasonalbot_chat:
+        if message.channel.id != Channels.seasonalbot_commands:
             return
 
         # do random check for skull first as it has the lower chance
@@ -64,7 +64,7 @@ class CandyCollection(commands.Cog):
             return
 
         # check to ensure it is in correct channel
-        if message.channel.id != Channels.seasonalbot_chat:
+        if message.channel.id != Channels.seasonalbot_commands:
             return
 
         # if its not a candy or skull, and it is one of 10 most recent messages,
@@ -124,7 +124,7 @@ class CandyCollection(commands.Cog):
         ten_recent = []
         recent_msg_id = max(
             message.id for message in self.bot._connection._messages
-            if message.channel.id == Channels.seasonalbot_chat
+            if message.channel.id == Channels.seasonalbot_commands
         )
 
         channel = await self.hacktober_channel()
@@ -155,7 +155,7 @@ class CandyCollection(commands.Cog):
 
     async def hacktober_channel(self) -> discord.TextChannel:
         """Get #hacktoberbot channel from its ID."""
-        return self.bot.get_channel(id=Channels.seasonalbot_chat)
+        return self.bot.get_channel(id=Channels.seasonalbot_commands)
 
     async def remove_reactions(self, reaction: discord.Reaction) -> None:
         """Remove all candy/skull reactions."""

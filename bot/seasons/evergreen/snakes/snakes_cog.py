@@ -617,8 +617,8 @@ class Snakes(Cog):
                 text_color=text_color,
                 bg_color=bg_color
             )
-            png_bytesIO = utils.frame_to_png_bytes(image_frame)
-            file = File(png_bytesIO, filename='snek.png')
+            png_bytes = utils.frame_to_png_bytes(image_frame)
+            file = File(png_bytes, filename='snek.png')
             await ctx.send(file=file)
 
     @snakes_group.command(name='get')
