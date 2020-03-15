@@ -9,7 +9,8 @@ import discord
 from discord.ext import commands
 
 from bot.bot import SeasonalBot
-from bot.constants import Client
+from bot.constants import Client, MODERATION_ROLES
+from bot.decorators import with_role
 from bot.seasons import SeasonBase, get_current_season, get_season
 
 log = logging.getLogger(__name__)
@@ -255,6 +256,7 @@ class BrandingManager(commands.Cog):
 
         await self.cycle()
 
+    @with_role(*MODERATION_ROLES)
     @commands.group(name="branding")
     async def branding_cmds(self, ctx: commands.Context) -> None:
         """Group for commands allowing manual control of the `SeasonManager` cog."""
