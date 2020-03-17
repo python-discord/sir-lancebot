@@ -16,6 +16,10 @@ from bot.seasons import SeasonBase, get_current_season, get_season
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
+FILE_BANNER = "banner.png"
+FILE_AVATAR = "bot_icon.png"
+SERVER_ICONS = "server_icons"
+
 BRANDING_URL = "https://api.github.com/repos/python-discord/branding/contents"
 
 HEADERS = {"Accept": "application/vnd.github.v3+json"}  # Ensure we use API v3
@@ -206,22 +210,22 @@ class BrandingManager(commands.Cog):
 
         branding_incomplete = any(
             asset not in seasonal_dir
-            for asset in ("banner.png", "bot_icon.png", "server_icons")
+            for asset in (FILE_BANNER, FILE_AVATAR, SERVER_ICONS)
         )
         if branding_incomplete and self.current_season is not SeasonBase:
             fallback_dir = await self._get_files(SeasonBase.branding_path)
         else:
             fallback_dir = {}
 
-        self.banner = seasonal_dir.get("banner.png") or fallback_dir.get("banner.png")
-        self.avatar = seasonal_dir.get("bot_icon.png") or fallback_dir.get("bot_icon.png")
+        self.banner = seasonal_dir.get(FILE_BANNER) or fallback_dir.get(FILE_BANNER)
+        self.avatar = seasonal_dir.get(FILE_AVATAR) or fallback_dir.get(FILE_AVATAR)
 
-        if "server_icons" in seasonal_dir:
-            icons_dir = await self._get_files(f"{self.current_season.branding_path}/server_icons")
+        if SERVER_ICONS in seasonal_dir:
+            icons_dir = await self._get_files(f"{self.current_season.branding_path}/{SERVER_ICONS}")
             self.available_icons = list(icons_dir.values())
 
-        elif "server_icons" in fallback_dir:
-            icons_dir = await self._get_files(f"{SeasonBase.branding_path}/server_icons")
+        elif SERVER_ICONS in fallback_dir:
+            icons_dir = await self._get_files(f"{SeasonBase.branding_path}/{SERVER_ICONS}")
             self.available_icons = list(icons_dir.values())
 
         else:
