@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
 FILE_BANNER = "banner.png"
-FILE_AVATAR = "bot_icon.png"
+FILE_AVATAR = "avatar.png"
 SERVER_ICONS = "server_icons"
 
 BRANDING_URL = "https://api.github.com/repos/python-discord/branding/contents"
