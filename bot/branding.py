@@ -191,19 +191,39 @@ class BrandingManager(commands.Cog):
         """
         Poll Github API to refresh currently available icons.
 
+        If the current season is not the evergreen, and lacks at least one asset,
+        we also pol the evergreen seasonal dir as fallback for missing assets.
+
+        Finally, if neither the seasonal nor fallback branding directories contain
+        an asset, it will simply be ignored.
+
         Return True if the branding has changed. This will be the case when we enter
         a new season, or when something changes in the current seasons's directory
         in the branding repository.
         """
         old_branding = (self.banner, self.avatar, self.available_icons)
-
         seasonal_dir = await self._get_files(self.current_season.branding_path)
-        self.banner = seasonal_dir.get("banner.png")
-        self.avatar = seasonal_dir.get("bot_icon.png")
+
+        branding_incomplete = any(
+            asset not in seasonal_dir
+            for asset in ("banner.png", "bot_icon.png", "server_icons")
+        )
+        if branding_incomplete and self.current_season is not SeasonBase:
+            fallback_dir = await self._get_files(SeasonBase.branding_path)
+        else:
+            fallback_dir = {}
+
+        self.banner = seasonal_dir.get("banner.png") or fallback_dir.get("banner.png")
+        self.avatar = seasonal_dir.get("bot_icon.png") or fallback_dir.get("bot_icon.png")
 
         if "server_icons" in seasonal_dir:
             icons_dir = await self._get_files(f"{self.current_season.branding_path}/server_icons")
             self.available_icons = list(icons_dir.values())
+
+        elif "server_icons" in fallback_dir:
+            icons_dir = await self._get_files(f"{SeasonBase.branding_path}/server_icons")
+            self.available_icons = list(icons_dir.values())
+
         else:
             self.available_icons = []
 
