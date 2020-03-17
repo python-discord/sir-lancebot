@@ -51,8 +51,8 @@ class SeasonBase:
     This serves as the off-season fallback for when no specific
     seasons are active.
 
-    Seasons are 'registered' by simply by inheriting from `SeasonBase`,
-    as they are then found by looking at `__subclasses__`.
+    Seasons are 'registered' simply by inheriting from `SeasonBase`.
+    We discover them by calling `__subclasses__`.
     """
 
     season_name: str = "Evergreen"
