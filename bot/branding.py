@@ -31,17 +31,13 @@ class GithubFile(t.NamedTuple):
     """
 
     download_url: str
+    path: str
     sha: str
 
 
 async def pretty_files(files: t.Iterable[GithubFile]) -> str:
-    """
-    Provide a human-friendly representation of `files`.
-
-    In practice, this retrieves the filename from each file's url,
-    and joins them on a comma.
-    """
-    return ", ".join(file.download_url.split("/")[-1] for file in files)
+    """Provide a human-friendly representation of `files`."""
+    return ", ".join(file.path for file in files)
 
 
 async def seconds_until_midnight() -> float:
@@ -134,13 +130,13 @@ class BrandingManager(commands.Cog):
             description=f"Active in {', '.join(m.name for m in self.current_season.months)}",
         ).add_field(
             name="Banner",
-            value=f"{self.banner is not None}",
+            value=self.banner.path if self.banner is not None else "Unavailable",
         ).add_field(
             name="Avatar",
-            value=f"{self.avatar is not None}",
+            value=self.avatar.path if self.avatar is not None else "Unavailable",
         ).add_field(
             name="Available icons",
-            value=await pretty_files(self.available_icons) or "Empty",
+            value=await pretty_files(self.available_icons) or "Unavailable",
             inline=False,
         )
 
@@ -187,7 +183,7 @@ class BrandingManager(commands.Cog):
             directory = await resp.json()
 
         return {
-            file["name"]: GithubFile(file["download_url"], file["sha"])
+            file["name"]: GithubFile(file["download_url"], file["path"], file["sha"])
             for file in directory
         }
 
