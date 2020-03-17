@@ -143,14 +143,8 @@ class BrandingManager(commands.Cog):
             value=await pretty_files(self.available_icons) or "Unavailable",
             inline=False,
         )
-
-        # Only add information about next-up icons if we're cycling in this season
-        if len(self.remaining_icons) > 1:
-            info_embed.add_field(
-                name=f"Queue (frequency: {Client.icon_cycle_frequency})",
-                value=await pretty_files(self.remaining_icons) or "Empty",
-                inline=False,
-            )
+        if len(self.available_icons) > 1 and Client.icon_cycle_frequency:
+            info_embed.set_footer(text=f"Icon cycle frequency: {Client.icon_cycle_frequency}")
 
         return info_embed
 
