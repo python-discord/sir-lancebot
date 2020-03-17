@@ -290,7 +290,7 @@ class BrandingManager(commands.Cog):
             await ctx.send("Branding applied")
 
     @branding_cmds.command(name="set")
-    async def branding_set(self, ctx: commands.Context, season_name: t.Optional[str] = None) -> None:
+    async def branding_set(self, ctx: commands.Context, *, season_name: t.Optional[str] = None) -> None:
         """Manually set season if `season_name` is provided, otherwise reset to current."""
         if season_name is None:
             new_season = get_current_season()
