@@ -23,7 +23,7 @@ flag_url = "https://www.countryflags.io/"
 
 class NationDay(Cog):
     """NationDay Cog that contains nationday command."""
-    
+
     def __init__(self, bot: Bot):
         self.bot = Bot
 
@@ -56,7 +56,7 @@ class NationDay(Cog):
     async def country_today(self) -> List[Tuple[str, str]]:
         """
         Get current day [Month & Day].
-        
+
         Return pages of info and flags of countries.
         """
         # Get current date [Month and day]
@@ -82,7 +82,7 @@ class NationDay(Cog):
     async def get_country_info(self, country: str) -> Tuple[str, str]:
         """
         Create country information page using RESTCountries API.
-        
+
         Return page and flag image.
         """
         try:
@@ -108,7 +108,7 @@ class NationDay(Cog):
     async def nationday(self, ctx: Context, param: str = "") -> None:
         """
         \U0001F30F NationDay Help.
-        
+
         Enter a country name to get independence day of that country along with some basic information on the country.
         Enter "today" to get all countries whose independence day is the current day, along with information.
         Usage:
