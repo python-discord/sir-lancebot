@@ -64,6 +64,7 @@ class NationDay(Cog):
         month = date.strftime("%B")
         day = date.day
         today_date = f'{month} {day}'
+        today_date = today_date.lower()
         try:
             # Get list of countries
             countries = self.by_day[today_date]
@@ -115,11 +116,11 @@ class NationDay(Cog):
         -> .nationday today
         -> .nationday [country]
         Examples:
-        -> .nationday india
-        -> .nationday colombia
+        -> .nationday "india"
+        -> .nationday "South Sudan"
         -> .nationday today
         """
-        param = param.capitalize()
+        param = param.lower()
 
         if param == 'Today':
             pages = await self.country_today()
