@@ -9,7 +9,7 @@ import discord
 from discord.ext import commands
 
 from bot.bot import SeasonalBot
-from bot.constants import Client, MODERATION_ROLES
+from bot.constants import Client, MODERATION_ROLES, Tokens
 from bot.decorators import with_role
 from bot.seasons import SeasonBase, get_current_season, get_season
 
@@ -22,8 +22,11 @@ SERVER_ICONS = "server_icons"
 
 BRANDING_URL = "https://api.github.com/repos/python-discord/branding/contents"
 
-HEADERS = {"Accept": "application/vnd.github.v3+json"}  # Ensure we use API v3
 PARAMS = {"ref": "seasonal-structure"}  # Target branch
+HEADERS = {"Accept": "application/vnd.github.v3+json"}  # Ensure we use API v3
+
+if Tokens.github:
+    HEADERS["Authorization"] = f"token {Tokens.github}"
 
 
 class GithubFile(t.NamedTuple):
