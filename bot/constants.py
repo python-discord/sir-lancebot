@@ -155,6 +155,7 @@ class Tokens(NamedTuple):
     youtube = environ.get("YOUTUBE_API_KEY")
     tmdb = environ.get("TMDB_API_KEY")
     igdb = environ.get("IGDB_API_KEY")
+    github = environ.get("GITHUB_TOKEN")
 
 
 # Default role combinations
