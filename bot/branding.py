@@ -41,7 +41,7 @@ class GithubFile(t.NamedTuple):
 
 async def pretty_files(files: t.Iterable[GithubFile]) -> str:
     """Provide a human-friendly representation of `files`."""
-    return ", ".join(file.path for file in files)
+    return "\n".join(file.path for file in files)
 
 
 async def seconds_until_midnight() -> float:
