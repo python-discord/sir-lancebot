@@ -125,7 +125,7 @@ class NationDay(Cog):
             pages = await self.country_today()
             embed = discord.Embed(
                 title='Countries that have their independence days today')\
-                    .set_footer(text='Powered by the RESTCountries API.')
+                .set_footer(text='Powered by the RESTCountries API.')
             await ImagePaginator.paginate(pages, ctx, embed)
 
         # Check if country is present
