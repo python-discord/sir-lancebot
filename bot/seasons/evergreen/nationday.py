@@ -43,7 +43,7 @@ class NationDay(Cog):
     async def get_specific_country(self, country: str) -> Tuple[List[Tuple[str, str]], str]:
         """
         Get Indepedence Day of given country.
-        
+
         Return Indepedence Day and page of information on country.
         """
         # Get Indepedence Day of specified country
