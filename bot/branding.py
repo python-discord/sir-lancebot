@@ -202,6 +202,7 @@ class BrandingManager(commands.Cog):
         old_branding = (self.banner, self.avatar, self.available_icons)
         seasonal_dir = await self._get_files(self.current_season.branding_path)
 
+        # Only make a call to the fallback directory if there is something to be gained
         branding_incomplete = any(
             asset not in seasonal_dir
             for asset in (FILE_BANNER, FILE_AVATAR, SERVER_ICONS)
@@ -211,9 +212,11 @@ class BrandingManager(commands.Cog):
         else:
             fallback_dir = {}
 
+        # Resolve assets in this directory, None is a safe value
         self.banner = seasonal_dir.get(FILE_BANNER) or fallback_dir.get(FILE_BANNER)
         self.avatar = seasonal_dir.get(FILE_AVATAR) or fallback_dir.get(FILE_AVATAR)
 
+        # Now resolve server icons by making a call to the proper sub-directory
         if SERVER_ICONS in seasonal_dir:
             icons_dir = await self._get_files(f"{self.current_season.branding_path}/{SERVER_ICONS}")
             self.available_icons = list(icons_dir.values())
@@ -223,8 +226,9 @@ class BrandingManager(commands.Cog):
             self.available_icons = list(icons_dir.values())
 
         else:
-            self.available_icons = []
+            self.available_icons = []  # This should never be the case, but an empty list is a safe value
 
+        # GithubFile instances carry a `sha` attr so this will pick up if a file changes
         branding_changed = old_branding != (self.banner, self.avatar, self.available_icons)
         log.info(f"New branding detected: {branding_changed}")
 
