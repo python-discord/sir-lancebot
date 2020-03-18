@@ -114,7 +114,7 @@ class NationDay(Cog):
             await ImagePaginator.paginate(pages, ctx, embed)
 
         # Check if country is present
-    elif param in self.iso_codes.keys():
+        elif param in self.iso_codes.keys():
             page, date = await self.get_specific_country(param)
             if page[0][0] is not None:
                 embed = discord.Embed(
