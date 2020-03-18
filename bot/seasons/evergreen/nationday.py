@@ -1,14 +1,13 @@
-import discord
-import requests
-from pathlib import Path
-
-from discord.ext.commands import Bot, Cog, Context, command
-from bot.pagination import ImagePaginator
-
 import datetime
 import json
-from typing import List, Tuple
 import logging
+from typing import List, Tuple
+
+import requests
+from discord.ext.commands import Bot, Cog, Context, command
+from pathlib import Path
+
+from bot.pagination import ImagePaginator
 
 
 logger = logging.getLogger(__name__)
@@ -22,7 +21,8 @@ flag_url = "https://www.countryflags.io/"
 
 
 class NationDay(Cog):
-    """NationDay Cog that contains nationday command"""
+    """NationDay Cog that contains nationday command."""
+    
     def __init__(self, bot: Bot):
         self.bot = Bot
 
@@ -33,7 +33,7 @@ class NationDay(Cog):
         iso_codes = json.load(file)
 
     async def get_key(self, val: str) -> str:
-        """Get date for particular country, if present"""
+        """Get date for particular country, if present."""
         for key, value in self.by_day.items():
             if val in value:
                 return key
@@ -54,9 +54,9 @@ class NationDay(Cog):
 
     async def country_today(self) -> List[Tuple[str, str]]:
         """
-        Get current day [Month & Day]. Return pages of info and flags
+        Get current day [Month & Day].
         
-        of countries.
+        Return pages of info and flags of countries.
         """
         # Get current date [Month and day]
         date = datetime.datetime.today()
@@ -107,12 +107,12 @@ class NationDay(Cog):
     async def nationday(self, ctx: Context, param: str = "") -> None:
         """
         \U0001F30F NationDay Help.
+        
         Enter a country name to get independence day of that country along with some basic information on the country.
         Enter "today" to get all countries whose independence day is the current day, along with information.
         Usage:
         -> .nationday today
         -> .nationday [country]
-
         Examples:
         -> .nationday india
         -> .nationday colombia
@@ -124,7 +124,7 @@ class NationDay(Cog):
             pages = await self.country_today()
             embed = discord.Embed(
                 title='Countries that have their independence days today')\
-            .set_footer(text='Powered by the RESTCountries API.')
+                       .set_footer(text='Powered by the RESTCountries API.')
             await ImagePaginator.paginate(pages, ctx, embed)
 
         # Check if country is present
@@ -133,7 +133,7 @@ class NationDay(Cog):
             if page[0][0] is not None:
                 embed = discord.Embed(
                     title=f'{param} -> {date}')\
-                .set_footer(text='Powered by the RESTCountries API.')
+                           .set_footer(text='Powered by the RESTCountries API.')
                 await ImagePaginator.paginate(page, ctx, embed)
 
         else:
