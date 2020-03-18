@@ -2,10 +2,11 @@ import datetime
 import json
 import logging
 from typing import List, Tuple
+from pathlib import Path
 
 import requests
+import discord
 from discord.ext.commands import Bot, Cog, Context, command
-from pathlib import Path
 
 from bot.pagination import ImagePaginator
 
@@ -124,7 +125,7 @@ class NationDay(Cog):
             pages = await self.country_today()
             embed = discord.Embed(
                 title='Countries that have their independence days today')\
-                       .set_footer(text='Powered by the RESTCountries API.')
+                    .set_footer(text='Powered by the RESTCountries API.')
             await ImagePaginator.paginate(pages, ctx, embed)
 
         # Check if country is present
@@ -133,7 +134,7 @@ class NationDay(Cog):
             if page[0][0] is not None:
                 embed = discord.Embed(
                     title=f'{param} -> {date}')\
-                           .set_footer(text='Powered by the RESTCountries API.')
+                    .set_footer(text='Powered by the RESTCountries API.')
                 await ImagePaginator.paginate(page, ctx, embed)
 
         else:
