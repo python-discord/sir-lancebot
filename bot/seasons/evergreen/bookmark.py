@@ -114,7 +114,6 @@ class Bookmark(commands.Cog):
             except discord.HTTPException:
                 await ctx.send("Unknown error while sending bookmark to user.", delete_after=7.5)
 
-
             else:
                 sent_person.add(user)
 
