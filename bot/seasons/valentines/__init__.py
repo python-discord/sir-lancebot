@@ -1,4 +1,4 @@
-from bot.constants import Month
+from bot.constants import Colours, Month
 from bot.seasons import SeasonBase
 
 
@@ -11,6 +11,8 @@ class Valentines(SeasonBase):
 
     season_name = "Valentines"
     bot_name = "TenderBot"
+
+    colour = Colours.pink
 
     branding_path = "seasonal/valentines"
 

@@ -1,4 +1,4 @@
-from bot.constants import Month
+from bot.constants import Colours, Month
 from bot.seasons import SeasonBase
 
 
@@ -23,6 +23,8 @@ class Pride(SeasonBase):
 
     season_name = "Pride"
     bot_name = "ProudBot"
+
+    colour = Colours.pink
 
     branding_path = "seasonal/pride"
 

@@ -1,4 +1,4 @@
-from bot.constants import Month
+from bot.constants import Colours, Month
 from bot.seasons import SeasonBase
 
 
@@ -15,6 +15,8 @@ class Christmas(SeasonBase):
 
     season_name = "Festive season"
     bot_name = "Merrybot"
+
+    colour = Colours.soft_red
 
     branding_path = "seasonal/christmas"
 

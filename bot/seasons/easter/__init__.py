@@ -1,4 +1,4 @@
-from bot.constants import Month
+from bot.constants import Colours, Month
 from bot.seasons import SeasonBase
 
 
@@ -24,6 +24,7 @@ class Easter(SeasonBase):
     season_name = "Easter"
     bot_name = "BunnyBot"
 
+    colour = Colours.bright_green
     description = "Bunny here, bunny there, bunny everywhere!"
 
     branding_path = "seasonal/easter"

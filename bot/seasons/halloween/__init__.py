@@ -1,4 +1,4 @@
-from bot.constants import Month
+from bot.constants import Colours, Month
 from bot.seasons import SeasonBase
 
 
@@ -13,6 +13,8 @@ class Halloween(SeasonBase):
 
     season_name = "Halloween"
     bot_name = "NeonBot"
+
+    colour = Colours.orange
 
     branding_path = "seasonal/halloween"
 

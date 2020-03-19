@@ -1,4 +1,4 @@
-from bot.constants import Month
+from bot.constants import Colours, Month
 from bot.seasons import SeasonBase
 
 
@@ -20,5 +20,7 @@ class Wildcard(SeasonBase):
 
     season_name = "Wildcard"
     bot_name = "RetroBot"
+
+    colour = Colours.purple
 
     months = {Month.august}

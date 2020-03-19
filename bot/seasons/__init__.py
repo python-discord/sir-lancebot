@@ -4,7 +4,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import List, Optional, Set, Type
 
-from bot.constants import Month
+from bot.constants import Colours, Month
 
 __all__ = ("SeasonBase", "get_seasons", "get_extensions", "get_current_season", "get_season")
 
@@ -58,6 +58,7 @@ class SeasonBase:
     season_name: str = "Evergreen"
     bot_name: str = "SeasonalBot"
 
+    colour: str = Colours.soft_green
     description: str = "The default season!"
 
     branding_path: str = "seasonal/evergreen"
