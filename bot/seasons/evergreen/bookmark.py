@@ -105,14 +105,15 @@ class Bookmark(commands.Cog):
                 try:
                     await reaction.remove(user)
                 except discord.Forbidden:
-                    await ctx.send("I don't have permissions to remove reaction.")
+                    await ctx.send("I don't have permissions to remove reaction.", delete_after=7.5)
                 except discord.HTTPException:
-                    await ctx.send("Unknown error while removing reaction.")
+                    await ctx.send("Unknown error while removing reaction.", delete_after=7.5)
                 except discord.NotFound:
-                    await ctx.send("Message or reaction author not found, can't remove reaction.")
+                    await ctx.send("Message or reaction author not found, can't remove reaction.", delete_after=7.5)
 
             except discord.HTTPException:
-                await ctx.send("Unknown error while sending bookmark to user.")
+                await ctx.send("Unknown error while sending bookmark to user.", delete_after=7.5)
+
 
             else:
                 sent_person.add(user)
