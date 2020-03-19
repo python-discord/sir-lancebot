@@ -3,18 +3,13 @@ from bot.seasons import SeasonBase
 
 
 class Halloween(SeasonBase):
-    """
-    Halloween Seasonal event attributes.
-
-    Announcement for this cog temporarily disabled, since we're doing a custom
-    Hacktoberfest announcement. If you're enabling the announcement again,
-    make sure to update this docstring accordingly.
-    """
+    """Branding for october."""
 
     season_name = "Halloween"
     bot_name = "NeonBot"
 
     colour = Colours.orange
+    description = "Trick or treat?!"
 
     branding_path = "seasonal/halloween"
 

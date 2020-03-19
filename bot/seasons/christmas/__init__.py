@@ -3,20 +3,16 @@ from bot.seasons import SeasonBase
 
 
 class Christmas(SeasonBase):
-    """
-    Christmas seasonal event attributes.
-
-    We are getting into the festive spirit with a new server icon, new bot name and avatar, and some
-    new commands for you to check out!
-
-    No matter who you are, where you are or what beliefs you may follow, we hope every one of you
-    enjoy this festive season!
-    """
+    """Branding for december."""
 
     season_name = "Festive season"
     bot_name = "Merrybot"
 
     colour = Colours.soft_red
+    description = (
+        "The time is here to get into the festive spirit! No matter who you are, where you are, "
+        "or what beliefs you may follow, we hope every one of you enjoy this festive season!"
+    )
 
     branding_path = "seasonal/christmas"
 
