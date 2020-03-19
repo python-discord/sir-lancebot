@@ -6,6 +6,7 @@ import typing as t
 from datetime import datetime, time, timedelta
 
 import discord
+from discord.embeds import EmptyEmbed
 from discord.ext import commands
 
 from bot.bot import SeasonalBot
@@ -131,21 +132,29 @@ class BrandingManager(commands.Cog):
             await asyncio.sleep(await seconds_until_midnight())
 
     async def _info_embed(self) -> discord.Embed:
-        """Make an informative embed representing current state."""
-        info_embed = discord.Embed(
-            title=self.current_season.season_name,
-            description=f"Active in {', '.join(m.name for m in self.current_season.months)}",
-        ).add_field(
-            name="Banner",
-            value=self.banner.path if self.banner is not None else "Unavailable",
-        ).add_field(
-            name="Avatar",
-            value=self.avatar.path if self.avatar is not None else "Unavailable",
-        ).add_field(
-            name="Available icons",
-            value=await pretty_files(self.available_icons) or "Unavailable",
-            inline=False,
-        )
+        """Make an informative embed representing current season."""
+        info_embed = discord.Embed(description=self.current_season.description, colour=self.current_season.colour)
+
+        # If we're in a non-evergreen season, also show active months
+        if self.current_season is not SeasonBase:
+            active_months = ", ".join(m.name for m in self.current_season.months)
+            title = f"{self.current_season.season_name} ({active_months})"
+        else:
+            title = self.current_season.season_name
+
+        # Use the author field to show the season's name and avatar if available
+        info_embed.set_author(name=title, icon_url=self.avatar.download_url if self.avatar else EmptyEmbed)
+
+        banner = self.banner.path if self.banner is not None else "Unavailable"
+        info_embed.add_field(name="Banner", value=banner, inline=False)
+
+        avatar = self.avatar.path if self.avatar is not None else "Unavailable"
+        info_embed.add_field(name="Avatar", value=avatar, inline=False)
+
+        icons = await pretty_files(self.available_icons) or "Unavailable"
+        info_embed.add_field(name="Available icons", value=icons, inline=False)
+
+        # Only display cycle frequency if we're actually cycling
         if len(self.available_icons) > 1 and Client.icon_cycle_frequency:
             info_embed.set_footer(text=f"Icon cycle frequency: {Client.icon_cycle_frequency}")
 
