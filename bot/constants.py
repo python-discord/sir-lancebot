@@ -104,6 +104,10 @@ class Emojis:
     merge = "<:PRMerged:629695470570176522>"
 
 
+class Icons:
+    questionmark = "https://cdn.discordapp.com/emojis/512367613339369475.png"
+
+
 class Lovefest:
     role_id = int(environ.get("LOVEFEST_ROLE_ID", 542431903886606399))
 
