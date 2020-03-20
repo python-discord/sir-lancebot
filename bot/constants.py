@@ -35,7 +35,7 @@ class Channels(NamedTuple):
     bot = 267659945086812160
     checkpoint_test = 422077681434099723
     devalerts = 460181980097675264
-    devlog = int(environ.get("CHANNEL_DEVLOG", 548438471685963776))
+    devlog = int(environ.get("CHANNEL_DEVLOG", 622895325144940554))
     devtest = 414574275865870337
     help_0 = 303906576991780866
     help_1 = 303906556754395136
@@ -52,7 +52,6 @@ class Channels(NamedTuple):
     off_topic_2 = 463035268514185226
     python = 267624335836053506
     reddit = 458224812528238616
-    seasonalbot_chat = int(environ.get("CHANNEL_SEASONALBOT_CHAT", 542272993192050698))
     seasonalbot_commands = int(environ.get("CHANNEL_SEASONALBOT_COMMANDS", 607247579608121354))
     seasonalbot_voice = int(environ.get("CHANNEL_SEASONALBOT_VOICE", 606259004230074378))
     staff_lounge = 464905259261755392
@@ -69,6 +68,7 @@ class Client(NamedTuple):
     token = environ.get("SEASONALBOT_TOKEN")
     debug = environ.get("SEASONALBOT_DEBUG", "").lower() == "true"
     season_override = environ.get("SEASON_OVERRIDE")
+    icon_cycle_frequency = 3  # N days to wait between cycling server icons within a single season
 
 
 class Colours:
@@ -88,6 +88,7 @@ class Emojis:
     christmas_tree = "\U0001F384"
     check = "\u2611"
     envelope = "\U0001F4E8"
+    trashcan = "<:trashcan:637136429717389331>"
 
     terning1 = "<:terning1:431249668983488527>"
     terning2 = "<:terning2:462339216987127808>"
@@ -101,6 +102,10 @@ class Emojis:
     pull_request = "<:PROpen:629695470175780875>"
     pull_request_closed = "<:PRClosed:629695470519713818>"
     merge = "<:PRMerged:629695470570176522>"
+
+
+class Icons:
+    questionmark = "https://cdn.discordapp.com/emojis/512367613339369475.png"
 
 
 class Lovefest:
@@ -132,6 +137,8 @@ class Tokens(NamedTuple):
     aoc_session_cookie = environ.get("AOC_SESSION_COOKIE")
     omdb = environ.get("OMDB_API_KEY")
     youtube = environ.get("YOUTUBE_API_KEY")
+    tmdb = environ.get("TMDB_API_KEY")
+    igdb = environ.get("IGDB_API_KEY")
 
 
 # Default role combinations
