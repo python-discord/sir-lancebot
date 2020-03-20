@@ -121,4 +121,4 @@ class Bookmark(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Load the Bookmark cog."""
     bot.add_cog(Bookmark(bot))
-    log.info("Bookmark cog loaded")
+    log.info("Bookmark cog loaded.")
