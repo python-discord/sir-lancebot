@@ -433,8 +433,8 @@ class Battleship(commands.Cog):
     async def battleship_ships(self, ctx: commands.Context) -> None:
         """Lists the ships that are found on the battleship grid."""
         embed = discord.Embed(colour=Colours.blue)
-        embed.add_field(name="Name", value="Carrier\nBattleship\nCruiser\nSubmarine\nDestroyer")
-        embed.add_field(name="Size", value="5\n4\n3\n3\n2")
+        embed.add_field(name="Name", value="\n".join(SHIPS))
+        embed.add_field(name="Size", value="\n".join(str(size) for size in SHIPS.values()))
         await ctx.send(embed=embed)
 
 
