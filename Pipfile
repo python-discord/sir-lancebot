@@ -25,7 +25,7 @@ pep8-naming = "~=0.9"
 pre-commit = "~=2.1"
 
 [requires]
-python_version = "3.7"
+python_version = "3.8"
 
 [scripts]
 start = "python -m bot"
