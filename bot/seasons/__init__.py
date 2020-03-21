@@ -14,7 +14,7 @@ __all__ = (
     "Pride",
     "Valentines",
     "Wildcard",
-    "get_seasons",
+    "get_season_names",
     "get_extensions",
     "get_current_season",
     "get_season",
@@ -139,13 +139,14 @@ class Wildcard(SeasonBase):
     months = {Month.august}
 
 
-def get_seasons() -> List[str]:
-    """Returns all the Season objects located in /bot/seasons/."""
-    seasons = []
+def get_season_names() -> List[str]:
+    """Return names of all packages located in /bot/seasons/."""
+    seasons = [
+        package.name
+        for package in pkgutil.iter_modules(__path__)
+        if package.ispkg
+    ]
 
-    for module in pkgutil.iter_modules([Path("bot/seasons")]):
-        if module.ispkg:
-            seasons.append(module.name)
     return seasons
 
 
