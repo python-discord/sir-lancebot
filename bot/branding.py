@@ -10,7 +10,7 @@ from discord.embeds import EmptyEmbed
 from discord.ext import commands
 
 from bot.bot import SeasonalBot
-from bot.constants import Client, MODERATION_ROLES, Tokens
+from bot.constants import Branding, MODERATION_ROLES, Tokens
 from bot.decorators import with_role
 from bot.seasons import SeasonBase, get_current_season, get_season
 
@@ -155,8 +155,8 @@ class BrandingManager(commands.Cog):
         info_embed.add_field(name="Available icons", value=icons, inline=False)
 
         # Only display cycle frequency if we're actually cycling
-        if len(self.available_icons) > 1 and Client.icon_cycle_frequency:
-            info_embed.set_footer(text=f"Icon cycle frequency: {Client.icon_cycle_frequency}")
+        if len(self.available_icons) > 1 and Branding.cycle_frequency:
+            info_embed.set_footer(text=f"Icon cycle frequency: {Branding.cycle_frequency}")
 
         return info_embed
 
@@ -169,13 +169,13 @@ class BrandingManager(commands.Cog):
         Reset the `should_cycle` counter based on configured frequency.
 
         Counter will always yield False if either holds:
-            - Client.icon_cycle_frequency is falsey
+            - Branding.cycle_frequency is falsey
             - There are fewer than 2 available icons for current season
 
         Cycling can be easily turned off, and we prevent re-uploading the same icon repeatedly.
         """
-        if len(self.available_icons) > 1 and Client.icon_cycle_frequency:
-            wait_period = [False] * (Client.icon_cycle_frequency - 1)
+        if len(self.available_icons) > 1 and Branding.cycle_frequency:
+            wait_period = [False] * (Branding.cycle_frequency - 1)
             counter = itertools.cycle(wait_period + [True])
         else:
             counter = itertools.cycle([False])

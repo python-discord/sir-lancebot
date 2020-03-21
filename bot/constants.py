@@ -6,7 +6,7 @@ from typing import NamedTuple
 
 __all__ = (
     "bookmark_icon_url",
-    "AdventOfCode", "Channels", "Client", "Colours", "Emojis", "Hacktoberfest", "Month", "Roles", "Tokens",
+    "AdventOfCode", "Branding", "Channels", "Client", "Colours", "Emojis", "Hacktoberfest", "Month", "Roles", "Tokens",
     "WHITELISTED_CHANNELS", "STAFF_ROLES", "MODERATION_ROLES",
     "POSITIVE_REPLIES", "NEGATIVE_REPLIES", "ERROR_REPLIES",
 )
@@ -63,12 +63,15 @@ class Channels(NamedTuple):
     hacktoberfest_2019 = 628184417646411776
 
 
+class Branding:
+    cycle_frequency = int(environ.get("CYCLE_FREQUENCY", 3))  # 0: never, 1: every day, 2: every other day, ...
+
+
 class Client(NamedTuple):
     guild = int(environ.get("SEASONALBOT_GUILD", 267624335836053506))
     prefix = environ.get("PREFIX", ".")
     token = environ.get("SEASONALBOT_TOKEN")
     debug = environ.get("SEASONALBOT_DEBUG", "").lower() == "true"
-    icon_cycle_frequency = 3  # 0: never, 1: every day, 2: every other day, ...
 
 
 class Colours:
