@@ -157,18 +157,12 @@ def get_extensions() -> List[str]:
     The strings are formatted in a way such that the bot's `load_extension`
     method can take them. Use this to load all available extensions.
     """
-    base_path = Path("bot", "seasons")
+    base_path = Path(__path__[0])
     extensions = []
 
-    for package in pkgutil.iter_modules([base_path]):
-
-        if package.ispkg:
-            package_path = base_path.joinpath(package.name)
-
-            for module in pkgutil.iter_modules([package_path]):
-                extensions.append(f"bot.seasons.{package.name}.{module.name}")
-        else:
-            extensions.append(f"bot.seasons.{package.name}")
+    for season in get_season_names():
+        for module in pkgutil.iter_modules([base_path.joinpath(season)]):
+            extensions.append(f"bot.seasons.{season}.{module.name}")
 
     return extensions
 
