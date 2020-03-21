@@ -68,7 +68,6 @@ class Client(NamedTuple):
     prefix = environ.get("PREFIX", ".")
     token = environ.get("SEASONALBOT_TOKEN")
     debug = environ.get("SEASONALBOT_DEBUG", "").lower() == "true"
-    season_override = environ.get("SEASON_OVERRIDE")
     icon_cycle_frequency = 3  # 0: never, 1: every day, 2: every other day, ...
 
 

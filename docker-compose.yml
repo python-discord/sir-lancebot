@@ -16,7 +16,6 @@ services:
     # - SEASONALBOT_ADMIN_ROLE_ID=
     # - CHANNEL_ANNOUNCEMENTS=
     # - CHANNEL_DEVLOG=
-    # - SEASON_OVERRIDE=
 
     volumes:
       - /opt/pythondiscord/seasonalbot/log:/bot/bot/log
