@@ -262,7 +262,11 @@ class BrandingManager(commands.Cog):
         return branding_changed
 
     async def cycle(self) -> bool:
-        """Apply the next-up server icon."""
+        """
+        Apply the next-up server icon.
+
+        Returns True if an icon is available and successfully gets applied, False otherwise.
+        """
         if not self.available_icons:
             log.info("Cannot cycle: no icons for this season")
             return False
@@ -272,10 +276,11 @@ class BrandingManager(commands.Cog):
             log.info(f"Set remaining icons: {await pretty_files(self.remaining_icons)}")
 
         next_up, *self.remaining_icons = self.remaining_icons
-        # await self.bot.set_icon(next_up.download_url)
+        # success = await self.bot.set_icon(next_up.download_url)
         log.info(f"Applying icon: {next_up}")
+        success = True  # Default value during development
 
-        return True
+        return success
 
     async def apply(self) -> None:
         """
