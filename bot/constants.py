@@ -65,6 +65,7 @@ class Channels(NamedTuple):
 
 class Branding:
     cycle_frequency = int(environ.get("CYCLE_FREQUENCY", 3))  # 0: never, 1: every day, 2: every other day, ...
+    autostart = bool(environ.get("BRANDING_AUTOSTART", True))  # Launch the branding daemon automatically on start-up
 
 
 class Client(NamedTuple):
