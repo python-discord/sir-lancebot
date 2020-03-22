@@ -253,9 +253,9 @@ class BrandingManager(commands.Cog):
 
         # GithubFile instances carry a `sha` attr so this will pick up if a file changes
         branding_changed = old_branding != (self.banner, self.avatar, self.available_icons)
-        log.info(f"New branding detected: {branding_changed}")
 
         if branding_changed:
+            log.info(f"New branding detected (season: {self.current_season.season_name})")
             await self._reset_remaining_icons()
             await self._reset_should_cycle()
 
@@ -276,9 +276,7 @@ class BrandingManager(commands.Cog):
             log.info(f"Set remaining icons: {await pretty_files(self.remaining_icons)}")
 
         next_up, *self.remaining_icons = self.remaining_icons
-        # success = await self.bot.set_icon(next_up.download_url)
-        log.info(f"Applying icon: {next_up}")
-        success = True  # Default value during development
+        success = await self.bot.set_icon(next_up.download_url)
 
         return success
 
@@ -290,16 +288,13 @@ class BrandingManager(commands.Cog):
         for available assets. Assets unavailable in the branding repo will be ignored.
         """
         if self.banner is not None:
-            # await self.bot.set_banner(self.banner.download_url)
-            log.info(f"Applying banner: {self.banner.download_url}")
+            await self.bot.set_banner(self.banner.download_url)
 
         if self.avatar is not None:
-            # await self.bot.set_avatar(self.avatar.download_url)
-            log.info(f"Applying avatar: {self.avatar.download_url}")
+            await self.bot.set_avatar(self.avatar.download_url)
 
         if self.current_season.bot_name:
-            # await self.bot.set_nickname(self.current_season.bot_name)
-            log.info(f"Applying nickname: {self.current_season.bot_name}")
+            await self.bot.set_nickname(self.current_season.bot_name)
 
         await self.cycle()
 
