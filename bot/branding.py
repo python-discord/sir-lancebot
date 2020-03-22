@@ -108,6 +108,11 @@ class BrandingManager(commands.Cog):
         else:
             self.daemon = None
 
+    @property
+    def _daemon_running(self) -> bool:
+        """True if the daemon is currently active, False otherwise."""
+        return self.daemon is not None and not self.daemon.done()
+
     async def _daemon_func(self) -> None:
         """
         Manage all automated behaviour of the BrandingManager cog.
