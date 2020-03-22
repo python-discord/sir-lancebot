@@ -93,6 +93,7 @@ class Emojis:
     check = "\u2611"
     envelope = "\U0001F4E8"
     trashcan = "<:trashcan:637136429717389331>"
+    ok_hand = ":ok_hand:"
 
     terning1 = "<:terning1:431249668983488527>"
     terning2 = "<:terning2:462339216987127808>"
