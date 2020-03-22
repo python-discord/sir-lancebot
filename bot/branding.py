@@ -18,6 +18,8 @@ from bot.seasons import SeasonBase, get_current_season, get_season
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
+STATUS_OK = 200  # HTTP status code
+
 FILE_BANNER = "banner.png"
 FILE_AVATAR = "avatar.png"
 SERVER_ICONS = "server_icons"
@@ -198,10 +200,16 @@ class BrandingManager(commands.Cog):
         Poll `path` in branding repo for information about present files.
 
         Return dict mapping from filename to corresponding `GithubFile` instance.
+        This may return an empty dict if the response status is non-200,
+        or if the target directory is empty.
         """
         url = f"{BRANDING_URL}/{path}"
         async with self.bot.http_session.get(url, headers=HEADERS, params=PARAMS) as resp:
-            directory = await resp.json()
+            # Short-circuit if we get non-200 response
+            if resp.status != STATUS_OK:
+                log.error(f"Github API returned non-200 response: {resp}")
+                return {}
+            directory = await resp.json()  # Directory at `path`
 
         return {
             file["name"]: GithubFile(file["download_url"], file["path"], file["sha"])
