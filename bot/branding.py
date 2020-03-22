@@ -5,12 +5,13 @@ import random
 import typing as t
 from datetime import datetime, time, timedelta
 
+import arrow
 import discord
 from discord.embeds import EmptyEmbed
 from discord.ext import commands
 
 from bot.bot import SeasonalBot
-from bot.constants import Branding, MODERATION_ROLES, Tokens
+from bot.constants import Branding, Colours, Emojis, MODERATION_ROLES, Tokens
 from bot.decorators import with_role
 from bot.seasons import SeasonBase, get_current_season, get_season
 
@@ -347,6 +348,43 @@ class BrandingManager(commands.Cog):
                 await self.branding_info(ctx)
         else:
             await ctx.send(f"Season {self.current_season.season_name} already active")
+
+    @branding_cmds.group(name="daemon", aliases=["d"])
+    async def daemon_group(self, ctx: commands.Context) -> None:
+        """
+        Check whether the daemon is currently active.
+
+        Sub-commands allow starting and stopping the daemon.
+        """
+        if not ctx.invoked_subcommand:
+            if self._daemon_running:
+                remaining_time = (arrow.utcnow() + await time_until_midnight()).humanize()
+                response = discord.Embed(description=f"Daemon running {Emojis.ok_hand}", colour=Colours.soft_green)
+                response.set_footer(text=f"Next refresh {remaining_time}")
+            else:
+                response = discord.Embed(description="Daemon not running", colour=Colours.soft_red)
+
+            await ctx.send(embed=response)
+
+    @daemon_group.command(name="start")
+    async def daemon_start(self, ctx: commands.Context) -> None:
+        """If the daemon isn't running, start it."""
+        if self._daemon_running:
+            raise commands.BadArgument("Daemon already running")
+
+        self.daemon = self.bot.loop.create_task(self._daemon_func())
+        response = discord.Embed(description=f"Daemon started {Emojis.ok_hand}", colour=Colours.soft_green)
+        await ctx.send(embed=response)
+
+    @daemon_group.command(name="stop")
+    async def daemon_stop(self, ctx: commands.Context) -> None:
+        """If the daemon is running, stop it."""
+        if not self._daemon_running:
+            raise commands.BadArgument("Daemon not running")
+
+        self.daemon.cancel()
+        response = discord.Embed(description=f"Daemon stopped {Emojis.ok_hand}", colour=Colours.soft_green)
+        await ctx.send(embed=response)
 
 
 def setup(bot: SeasonalBot) -> None:
