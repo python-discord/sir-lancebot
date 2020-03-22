@@ -332,7 +332,20 @@ class BrandingManager(commands.Cog):
 
     @branding_cmds.command(name="set")
     async def branding_set(self, ctx: commands.Context, *, season_name: t.Optional[str] = None) -> None:
-        """Manually set season if `season_name` is provided, otherwise reset to current."""
+        """
+        Manually set season if `season_name` is provided, otherwise reset to current.
+
+        This only pre-loads the cog's internal state to the chosen season, but does not
+        automatically apply the branding. As that is an expensive operation, the `apply`
+        command must be called explicitly after this command finishes.
+
+        This means that this command can be used to 'preview' a season gathering info
+        about its available assets, without applying them to the guild.
+
+        If the daemon is running, it will automatically reset the season to current when
+        it wakes up. The season set via this command can therefore remain 'detached' from
+        what it should be - the daemon will make sure that it's set back properly.
+        """
         if season_name is None:
             new_season = get_current_season()
         else:
@@ -344,7 +357,6 @@ class BrandingManager(commands.Cog):
             async with ctx.typing():
                 self.current_season = new_season
                 await self.refresh()
-                await self.apply()
                 await self.branding_info(ctx)
         else:
             await ctx.send(f"Season {self.current_season.season_name} already active")
