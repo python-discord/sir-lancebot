@@ -333,14 +333,27 @@ class BrandingManager(commands.Cog):
         """Force cycle guild icon."""
         async with ctx.typing():
             success = await self.cycle()
-            await ctx.send("Icon cycle successful" if success else "Icon cycle failed")
+            if success:
+                response = discord.Embed(description=f"Success {Emojis.ok_hand}", colour=Colours.soft_green)
+            else:
+                response = discord.Embed(description=f"Failed", colour=Colours.soft_red)
+            await ctx.send(embed=response)
 
     @branding_cmds.command(name="apply")
     async def branding_apply(self, ctx: commands.Context) -> None:
         """Force apply current branding."""
         async with ctx.typing():
-            await self.apply()
-            await ctx.send("Branding applied")
+            failed_assets = await self.apply()
+            if failed_assets:
+                response = discord.Embed(
+                    description=f"Failed to apply following assets: {', '.join(failed_assets)}",
+                    colour=Colours.soft_red,
+                )
+            else:
+                response = discord.Embed(
+                    description=f"All assets applied successfully {Emojis.ok_hand}", colour=Colours.soft_green
+                )
+            await ctx.send(embed=response)
 
     @branding_cmds.command(name="set")
     async def branding_set(self, ctx: commands.Context, *, season_name: t.Optional[str] = None) -> None:
