@@ -8,6 +8,7 @@ from discord.ext import commands
 
 from bot.constants import Colours, ERROR_REPLIES, NEGATIVE_REPLIES
 from bot.decorators import InChannelCheckFailure, InMonthCheckFailure
+from bot.exceptions import BrandingError
 
 log = logging.getLogger(__name__)
 
@@ -53,6 +54,10 @@ class CommandErrorHandler(commands.Cog):
         )
 
         if isinstance(error, commands.CommandNotFound):
+            return
+
+        if isinstance(error, BrandingError):
+            await ctx.send(embed=self.error_embed(str(error)))
             return
 
         if isinstance(error, (InChannelCheckFailure, InMonthCheckFailure)):
