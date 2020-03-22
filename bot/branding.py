@@ -13,6 +13,7 @@ from discord.ext import commands
 from bot.bot import SeasonalBot
 from bot.constants import Branding, Colours, Emojis, MODERATION_ROLES, Tokens
 from bot.decorators import with_role
+from bot.exceptions import BrandingError
 from bot.seasons import SeasonBase, get_current_season, get_season
 
 log = logging.getLogger(__name__)
@@ -341,10 +342,10 @@ class BrandingManager(commands.Cog):
         """Force cycle guild icon."""
         async with ctx.typing():
             success = await self.cycle()
-            if success:
-                response = discord.Embed(description=f"Success {Emojis.ok_hand}", colour=Colours.soft_green)
-            else:
-                response = discord.Embed(description=f"Failed", colour=Colours.soft_red)
+            if not success:
+                raise BrandingError("Failed to cycle icon")
+
+            response = discord.Embed(description=f"Success {Emojis.ok_hand}", colour=Colours.soft_green)
             await ctx.send(embed=response)
 
     @branding_cmds.command(name="apply")
@@ -353,14 +354,9 @@ class BrandingManager(commands.Cog):
         async with ctx.typing():
             failed_assets = await self.apply()
             if failed_assets:
-                response = discord.Embed(
-                    description=f"Failed to apply following assets: {', '.join(failed_assets)}",
-                    colour=Colours.soft_red,
-                )
-            else:
-                response = discord.Embed(
-                    description=f"All assets applied successfully {Emojis.ok_hand}", colour=Colours.soft_green
-                )
+                raise BrandingError(f"Failed to apply following assets: {', '.join(failed_assets)}")
+
+            response = discord.Embed(description=f"All assets applied {Emojis.ok_hand}", colour=Colours.soft_green)
             await ctx.send(embed=response)
 
     @branding_cmds.command(name="set")
@@ -384,15 +380,15 @@ class BrandingManager(commands.Cog):
         else:
             new_season = get_season(season_name)
             if new_season is None:
-                raise commands.BadArgument("No such season exists")
+                raise BrandingError("No such season exists")
 
-        if self.current_season is not new_season:
-            async with ctx.typing():
-                self.current_season = new_season
-                await self.refresh()
-                await self.branding_info(ctx)
-        else:
-            await ctx.send(f"Season {self.current_season.season_name} already active")
+        if self.current_season is new_season:
+            raise BrandingError(f"Season {self.current_season.season_name} already active")
+
+        self.current_season = new_season
+        async with ctx.typing():
+            await self.refresh()
+            await self.branding_info(ctx)
 
     @branding_cmds.group(name="daemon", aliases=["d"])
     async def daemon_group(self, ctx: commands.Context) -> None:
@@ -415,7 +411,7 @@ class BrandingManager(commands.Cog):
     async def daemon_start(self, ctx: commands.Context) -> None:
         """If the daemon isn't running, start it."""
         if self._daemon_running:
-            raise commands.BadArgument("Daemon already running")
+            raise BrandingError("Daemon already running!")
 
         self.daemon = self.bot.loop.create_task(self._daemon_func())
         response = discord.Embed(description=f"Daemon started {Emojis.ok_hand}", colour=Colours.soft_green)
@@ -425,7 +421,7 @@ class BrandingManager(commands.Cog):
     async def daemon_stop(self, ctx: commands.Context) -> None:
         """If the daemon is running, stop it."""
         if not self._daemon_running:
-            raise commands.BadArgument("Daemon not running")
+            raise BrandingError("Daemon not running!")
 
         self.daemon.cancel()
         response = discord.Embed(description=f"Daemon stopped {Emojis.ok_hand}", colour=Colours.soft_green)
