@@ -292,8 +292,9 @@ class BrandingManager(commands.Cog):
             # await self.bot.set_avatar(self.avatar.download_url)
             log.info(f"Applying avatar: {self.avatar.download_url}")
 
-        # await self.bot.set_nickname(self.current_season.bot_name)
-        log.info(f"Applying nickname: {self.current_season.bot_name}")
+        if self.current_season.bot_name:
+            # await self.bot.set_nickname(self.current_season.bot_name)
+            log.info(f"Applying nickname: {self.current_season.bot_name}")
 
         await self.cycle()
 
