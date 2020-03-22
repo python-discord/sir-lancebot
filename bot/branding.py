@@ -83,7 +83,7 @@ class BrandingManager(commands.Cog):
 
     should_cycle: t.Iterator
 
-    daemon: asyncio.Task
+    daemon: t.Optional[asyncio.Task]
 
     def __init__(self, bot: SeasonalBot) -> None:
         """
@@ -103,7 +103,10 @@ class BrandingManager(commands.Cog):
         self.available_icons = []
         self.remaining_icons = []
 
-        self.daemon = self.bot.loop.create_task(self._daemon_func())
+        if Branding.autostart:
+            self.daemon = self.bot.loop.create_task(self._daemon_func())
+        else:
+            self.daemon = None
 
     async def _daemon_func(self) -> None:
         """
@@ -115,7 +118,8 @@ class BrandingManager(commands.Cog):
             - Update assets if changes are detected (banner, guild icon, bot avatar, bot nickname)
             - Check whether it's time to cycle guild icons
 
-        The daemon awakens on start-up, then periodically at the time given by `seconds_until_midnight`.
+        If the `Branding.autostart` constant is True, The daemon awakens on start-up,
+        then periodically at the time given by `seconds_until_midnight`.
         """
         await self.bot.wait_until_ready()
 
