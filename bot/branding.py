@@ -332,7 +332,7 @@ class BrandingManager(commands.Cog):
     async def branding_cycle(self, ctx: commands.Context) -> None:
         """Force cycle guild icon."""
         async with ctx.typing():
-            success = self.cycle()
+            success = await self.cycle()
             await ctx.send("Icon cycle successful" if success else "Icon cycle failed")
 
     @branding_cmds.command(name="apply")
