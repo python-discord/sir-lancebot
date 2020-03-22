@@ -280,23 +280,34 @@ class BrandingManager(commands.Cog):
 
         return success
 
-    async def apply(self) -> None:
+    async def apply(self) -> t.List[str]:
         """
         Apply current branding to the guild and bot.
 
         This delegates to the bot instance to do all the work. We only provide download urls
         for available assets. Assets unavailable in the branding repo will be ignored.
+
+        Returns a list of names of all failed assets. An asset is considered failed
+        if it isn't found in the branding repo, or if something goes wrong while the
+        bot is trying to apply it.
+
+        An empty list denotes that all assets have been applied successfully.
         """
+        report = {asset: False for asset in ("banner", "avatar", "nickname", "icon")}
+
         if self.banner is not None:
-            await self.bot.set_banner(self.banner.download_url)
+            report["banner"] = await self.bot.set_banner(self.banner.download_url)
 
         if self.avatar is not None:
-            await self.bot.set_avatar(self.avatar.download_url)
+            report["avatar"] = await self.bot.set_avatar(self.avatar.download_url)
 
         if self.current_season.bot_name:
-            await self.bot.set_nickname(self.current_season.bot_name)
+            report["nickname"] = await self.bot.set_nickname(self.current_season.bot_name)
 
-        await self.cycle()
+        report["icon"] = await self.cycle()
+
+        failed_assets = [asset for asset, succeeded in report.items() if not succeeded]
+        return failed_assets
 
     @with_role(*MODERATION_ROLES)
     @commands.group(name="branding")
