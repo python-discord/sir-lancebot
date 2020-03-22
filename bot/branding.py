@@ -48,9 +48,9 @@ async def pretty_files(files: t.Iterable[GithubFile]) -> str:
     return "\n".join(file.path for file in files)
 
 
-async def seconds_until_midnight() -> float:
+async def time_until_midnight() -> timedelta:
     """
-    Give the amount of seconds needed to wait until the next-up UTC midnight.
+    Determine amount of time until the next-up UTC midnight.
 
     The exact `midnight` moment is actually delayed to 5 seconds after, in order
     to avoid potential problems due to imprecise sleep.
@@ -59,7 +59,7 @@ async def seconds_until_midnight() -> float:
     tomorrow = now + timedelta(days=1)
     midnight = datetime.combine(tomorrow, time(second=5))
 
-    return (midnight - now).total_seconds()
+    return midnight - now
 
 
 class BrandingManager(commands.Cog):
@@ -138,7 +138,8 @@ class BrandingManager(commands.Cog):
             elif next(self.should_cycle):
                 await self.cycle()
 
-            await asyncio.sleep(await seconds_until_midnight())
+            until_midnight = await time_until_midnight()
+            await asyncio.sleep(until_midnight.total_seconds())
 
     async def _info_embed(self) -> discord.Embed:
         """Make an informative embed representing current season."""
