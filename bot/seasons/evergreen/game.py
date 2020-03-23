@@ -400,7 +400,7 @@ class Games(Cog):
 
         return page, url
 
-    async def get_best_results(self, query: str, nr: int = 4) -> List[Tuple[float, str]]:
+    async def get_best_results(self, query: str) -> List[Tuple[float, str]]:
         """Get best match result of genre when original genre is invalid."""
         results = []
         for genre in self.genres:
@@ -408,7 +408,7 @@ class Games(Cog):
             for word in REGEX_NON_ALPHABET.split(genre):
                 ratios.append(difflib.SequenceMatcher(None, query, word).ratio())
             results.append((round(max(ratios), 2), genre))
-        return sorted(results, reverse=True)[:nr]
+        return sorted(results, reverse=True)[:4]
 
 
 def setup(bot: SeasonalBot) -> None:
