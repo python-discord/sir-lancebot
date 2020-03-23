@@ -197,9 +197,21 @@ class Games(Cog):
         try:
             games = await self.get_games_list(amount, self.genres[genre], offset=random.randint(0, 150))
         except KeyError:
-            possibilities = "`, `".join(difflib.get_close_matches(genre, self.genres))
-            await ctx.send(f"Invalid genre `{genre}`. {f'Maybe you meant `{possibilities}`?' if possibilities else ''}")
-            return
+            possibilities = await self.get_best_results(genre)
+            possibility = None
+            # Check is there any possibility that ratio is higher than 0.60
+            for p in possibilities:
+                if p[0] >= 0.60:
+                    possibility = await self.get_games_list(amount, self.genres[p[1]], offset=random.randint(0, 150))
+                    genre = p[1]
+                    break
+            if possibility:
+                games = possibility
+            else:
+                await ctx.send(
+                    f"Invalid genre `{genre}`. {f'Maybe you meant `{possibilities}`?' if possibilities else ''}"
+                )
+                return
 
         # Create pages and paginate
         pages = [await self.create_page(game) for game in games]
