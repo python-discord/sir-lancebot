@@ -83,7 +83,7 @@ def in_month_listener(*allowed_months: Month) -> typing.Callable:
     return decorator
 
 
-def in_month(*allowed_months: Month) -> typing.Callable:
+def in_month_command(*allowed_months: Month) -> typing.Callable:
     """
     Check whether the command was invoked in one of `enabled_months`.
 
