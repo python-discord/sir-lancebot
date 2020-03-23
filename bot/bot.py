@@ -2,8 +2,7 @@ import asyncio
 import contextlib
 import logging
 import socket
-from traceback import format_exc
-from typing import List, Optional
+from typing import Optional
 
 import async_timeout
 import discord
@@ -26,23 +25,6 @@ class SeasonalBot(commands.Bot):
         self.http_session = ClientSession(
             connector=TCPConnector(resolver=AsyncResolver(), family=socket.AF_INET)
         )
-
-    def load_extensions(self, exts: List[str]) -> None:
-        """Unload all current extensions, then load the given extensions."""
-        # Unload all cogs
-        extensions = list(self.extensions.keys())
-        for extension in extensions:
-            if extension not in ["bot.branding", "bot.help"]:  # We shouldn't unload the manager and help.
-                self.unload_extension(extension)
-
-        # Load in the list of cogs that was passed in here
-        for extension in exts:
-            cog = extension.split(".")[-1]
-            try:
-                self.load_extension(extension)
-                log.info(f'Successfully loaded extension: {cog}')
-            except Exception as e:
-                log.error(f'Failed to load extension {cog}: {repr(e)} {format_exc()}')
 
     async def send_log(self, title: str, details: str = None, *, icon: str = None) -> None:
         """Send an embed message to the devlog channel."""
