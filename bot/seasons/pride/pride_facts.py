@@ -35,6 +35,8 @@ class PrideFacts(commands.Cog):
     @seasonal_task(Month.june)
     async def send_pride_fact_daily(self) -> None:
         """Background task to post the daily pride fact every day."""
+        await self.bot.wait_until_ready()
+
         channel = self.bot.get_channel(Channels.seasonalbot_commands)
         await self.send_select_fact(channel, datetime.utcnow())
 

@@ -12,7 +12,6 @@ from discord import Colour, Embed
 from discord.ext import commands
 from discord.ext.commands import CheckFailure, Context
 
-from bot.bot import bot
 from bot.constants import ERROR_REPLIES, Month
 
 ONE_DAY = 24 * 60 * 60
@@ -41,16 +40,13 @@ def seasonal_task(*allowed_months: Month, sleep_time: typing.Union[float, int] =
 
     The decorated function will be called once every `sleep_time` seconds while
     the current UTC month is in `allowed_months`. Sleep time defaults to 24 hours.
+
+    The wrapped task is responsible for waiting for the bot to be ready, if necessary.
     """
     def decorator(task_body: typing.Callable) -> typing.Callable:
         @functools.wraps(task_body)
         async def decorated_task(*args, **kwargs) -> None:
-            """
-            Call `task_body` once every `sleep_time` seconds in `allowed_months`.
-
-            Wait for bot to be ready before calling `task_body` for the first time.
-            """
-            await bot.wait_until_ready()
+            """Call `task_body` once every `sleep_time` seconds in `allowed_months`."""
             log.info(f"Starting seasonal task {task_body.__qualname__} ({allowed_months})")
 
             while True:
