@@ -30,6 +30,8 @@ BRANDING_URL = "https://api.github.com/repos/python-discord/branding/contents"
 PARAMS = {"ref": "seasonal-structure"}  # Target branch
 HEADERS = {"Accept": "application/vnd.github.v3+json"}  # Ensure we use API v3
 
+# A Github token is not necessary for the cog to operate,
+# unauthorized requests are however limited to 60 per hour
 if Tokens.github:
     HEADERS["Authorization"] = f"token {Tokens.github}"
 
@@ -70,11 +72,44 @@ class BrandingManager(commands.Cog):
     """
     Manages the guild's branding.
 
-    The `daemon` task automatically manages branding across seasons. See its docstring
-    for further explanation of the automated behaviour.
+    The purpose of this cog is to help automate the synchronization of the branding
+    repository with the guild. It is capable of discovering assets in the repository
+    via Github's API, resolving download urls for them, and delegating
+    to the `bot` instance to upload them to the guild.
 
-    If necessary, or for testing purposes, the Cog can be manually controlled
-    via the `branding` command group.
+    The cog is designed to be entirely autonomous. The `daemon` background task awakens once
+    a day (see `time_until_midnight`) to detect new seasons, or to cycle icons within a single
+    season. If the `Branding.autostart` constant is True, the `daemon` will launch on start-up,
+    otherwise it can be controlled via the `daemon` cmd group.
+
+    All supported operations, e.g. setting seasons, applying the branding, or cycling icons, can
+    also be invoked manually, via the following API:
+
+        branding set <season_name>
+            - Set the cog's internal state to represent `season_name`, if it exists.
+            - If no `season_name` is given, set chronologically current season.
+            - This will not automatically apply the season's branding to the guild,
+              the cog's state can be detached from the guild.
+            - Seasons can therefore be 'previewed' using this command.
+
+        branding info
+            - View detailed information about resolved assets for current season.
+
+        branding refresh
+            - Refresh internal state, i.e. synchronize with branding repository.
+
+        branding apply
+            - Apply the current internal state to the guild, i.e. upload the assets.
+
+        branding cycle
+            - If there are multiple available icons for current season, randomly pick
+              and apply the next one.
+
+    The daemon calls these methods autonomously as appropriate. The use of this cog
+    is locked to moderation roles. As it performs media asset uploads, it is prone to
+    rate-limits - the `apply` command should be used with caution. The `set` command can,
+    however, be used freely to 'preview' seasonal branding and check whether paths have been
+    resolved as appropriate.
     """
 
     current_season: t.Type[SeasonBase]
@@ -94,7 +129,8 @@ class BrandingManager(commands.Cog):
         Assign safe default values on init.
 
         At this point, we don't have information about currently available branding.
-        Most of these attributes will be overwritten once the daemon connects.
+        Most of these attributes will be overwritten once the daemon connects, or once
+        the `refresh` command is used.
         """
         self.bot = bot
         self.current_season = get_current_season()
@@ -127,8 +163,11 @@ class BrandingManager(commands.Cog):
             - Update assets if changes are detected (banner, guild icon, bot avatar, bot nickname)
             - Check whether it's time to cycle guild icons
 
-        If the `Branding.autostart` constant is True, The daemon awakens on start-up,
-        then periodically at the time given by `seconds_until_midnight`.
+        The internal loop runs once when activated, then periodically at the time
+        given by `time_until_midnight`.
+
+        All method calls in the internal loop are considered safe, i.e. no errors propagate
+        to the daemon's loop. The daemon itself does not perform any error handling on its own.
         """
         await self.bot.wait_until_ready()
 
@@ -222,7 +261,7 @@ class BrandingManager(commands.Cog):
         Poll Github API to refresh currently available icons.
 
         If the current season is not the evergreen, and lacks at least one asset,
-        we also pol the evergreen seasonal dir as fallback for missing assets.
+        we also poll the evergreen seasonal dir as fallback for missing assets.
 
         Finally, if neither the seasonal nor fallback branding directories contain
         an asset, it will simply be ignored.
@@ -321,7 +360,7 @@ class BrandingManager(commands.Cog):
     @with_role(*MODERATION_ROLES)
     @commands.group(name="branding")
     async def branding_cmds(self, ctx: commands.Context) -> None:
-        """Group for commands allowing manual control of the `SeasonManager` cog."""
+        """Group for commands allowing manual control of the cog."""
         if not ctx.invoked_subcommand:
             await self.branding_info(ctx)
 
@@ -339,7 +378,7 @@ class BrandingManager(commands.Cog):
 
     @branding_cmds.command(name="cycle")
     async def branding_cycle(self, ctx: commands.Context) -> None:
-        """Force cycle guild icon."""
+        """Apply the next-up guild icon, if multiple are available."""
         async with ctx.typing():
             success = await self.cycle()
             if not success:
@@ -350,7 +389,7 @@ class BrandingManager(commands.Cog):
 
     @branding_cmds.command(name="apply")
     async def branding_apply(self, ctx: commands.Context) -> None:
-        """Force apply current branding."""
+        """Apply current branding (i.e. internal state) to the guild."""
         async with ctx.typing():
             failed_assets = await self.apply()
             if failed_assets:
