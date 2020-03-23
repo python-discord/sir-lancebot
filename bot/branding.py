@@ -110,6 +110,10 @@ class BrandingManager(commands.Cog):
     rate-limits - the `apply` command should be used with caution. The `set` command can,
     however, be used freely to 'preview' seasonal branding and check whether paths have been
     resolved as appropriate.
+
+    While the bot is in debug mode, it will 'mock' asset uploads by logging the passed
+    download urls and pretending that the upload was successful. Make use of this
+    to test this cog's behaviour.
     """
 
     current_season: t.Type[SeasonBase]

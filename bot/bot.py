@@ -11,6 +11,7 @@ from discord import DiscordException, Embed
 from discord.ext import commands
 
 from bot.constants import Channels, Client
+from bot.decorators import mock_in_debug
 
 log = logging.getLogger(__name__)
 
@@ -18,7 +19,13 @@ __all__ = ('SeasonalBot', 'bot')
 
 
 class SeasonalBot(commands.Bot):
-    """Base bot instance."""
+    """
+    Base bot instance.
+
+    While in debug mode, the asset upload methods (avatar, banner, ...) will not
+    perform the upload, and will instead only log the passed download urls and pretend
+    that the upload was successful. See the `mock_in_debug` decorator for further details.
+    """
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -57,6 +64,7 @@ class SeasonalBot(commands.Bot):
             return None
         return guild.me
 
+    @mock_in_debug(return_value=True)
     async def set_avatar(self, url: str) -> bool:
         """Sets the bot's avatar based on a URL."""
         # Track old avatar hash for later comparison
@@ -74,6 +82,7 @@ class SeasonalBot(commands.Bot):
         log.warning(f"Changing avatar failed: {url}")
         return False
 
+    @mock_in_debug(return_value=True)
     async def set_banner(self, url: str) -> bool:
         """Sets the guild's banner based on the provided `url`."""
         guild = bot.get_guild(Client.guild)
@@ -92,6 +101,7 @@ class SeasonalBot(commands.Bot):
         log.warning(f"Changing banner failed: {url}")
         return False
 
+    @mock_in_debug(return_value=True)
     async def set_icon(self, url: str) -> bool:
         """Sets the guild's icon based on a URL."""
         guild = bot.get_guild(Client.guild)
@@ -117,6 +127,7 @@ class SeasonalBot(commands.Bot):
         async with self.http_session.get(url) as resp:
             return await resp.read()
 
+    @mock_in_debug(return_value=True)
     async def set_username(self, new_name: str, nick_only: bool = False) -> Optional[bool]:
         """
         Set the bot username and/or nickname to given new name.
@@ -146,6 +157,7 @@ class SeasonalBot(commands.Bot):
 
         return True
 
+    @mock_in_debug(return_value=True)
     async def set_nickname(self, new_name: str = None) -> bool:
         """Set the bot nickname in the main guild."""
         old_display_name = self.member.display_name
