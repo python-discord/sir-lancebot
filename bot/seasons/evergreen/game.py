@@ -1,6 +1,7 @@
 import difflib
 import logging
 import random
+import re
 from datetime import datetime as dt
 from enum import IntEnum
 from typing import Any, Dict, List, Optional, Tuple
@@ -24,6 +25,8 @@ HEADERS = {
 }
 
 logger = logging.getLogger(__name__)
+
+REGEX_NON_ALPHABET = re.compile(r"[^a-z0-9]", re.IGNORECASE)
 
 # ---------
 # TEMPLATES
@@ -384,6 +387,16 @@ class Games(Cog):
         page = COMPANY_PAGE.format(**formatting)
 
         return page, url
+
+    async def get_best_results(self, query: str, nr: int = 4) -> List[Tuple[float, str]]:
+        """Get best match result of genre when original genre is invalid."""
+        results = []
+        for genre in self.genres:
+            ratios = [difflib.SequenceMatcher(None, query, genre).ratio()]
+            for word in REGEX_NON_ALPHABET.split(genre):
+                ratios.append(difflib.SequenceMatcher(None, query, word).ratio())
+            results.append((round(max(ratios), 2), genre))
+        return sorted(results, reverse=True)[:nr]
 
 
 def setup(bot: SeasonalBot) -> None:
