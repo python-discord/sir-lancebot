@@ -5,9 +5,24 @@ from os import environ
 from typing import NamedTuple
 
 __all__ = (
-    "AdventOfCode", "Branding", "Channels", "Client", "Colours", "Emojis", "Hacktoberfest", "Month", "Roles", "Tokens",
-    "WHITELISTED_CHANNELS", "STAFF_ROLES", "MODERATION_ROLES",
-    "POSITIVE_REPLIES", "NEGATIVE_REPLIES", "ERROR_REPLIES",
+    "AdventOfCode",
+    "Branding",
+    "Channels",
+    "Client",
+    "Colours",
+    "Emojis",
+    "Hacktoberfest",
+    "Icons",
+    "Lovefest",
+    "Month",
+    "Roles",
+    "Tokens",
+    "MODERATION_ROLES",
+    "STAFF_ROLES",
+    "WHITELISTED_CHANNELS",
+    "ERROR_REPLIES",
+    "NEGATIVE_REPLIES",
+    "POSITIVE_REPLIES",
 )
 
 log = logging.getLogger(__name__)
@@ -20,6 +35,11 @@ class AdventOfCode:
     leaderboard_max_displayed_members = 10
     year = int(environ.get("AOC_YEAR", datetime.utcnow().year))
     role_id = int(environ.get("AOC_ROLE_ID", 518565788744024082))
+
+
+class Branding:
+    cycle_frequency = int(environ.get("CYCLE_FREQUENCY", 3))  # 0: never, 1: every day, 2: every other day, ...
+    autostart = environ.get("BRANDING_AUTOSTART", "").lower() == "true"  # Launch the branding daemon on start-up
 
 
 class Channels(NamedTuple):
@@ -55,11 +75,6 @@ class Channels(NamedTuple):
     show_your_projects = int(environ.get("CHANNEL_SHOW_YOUR_PROJECTS", 303934982764625920))
     show_your_projects_discussion = 360148304664723466
     hacktoberfest_2019 = 628184417646411776
-
-
-class Branding:
-    cycle_frequency = int(environ.get("CYCLE_FREQUENCY", 3))  # 0: never, 1: every day, 2: every other day, ...
-    autostart = environ.get("BRANDING_AUTOSTART", "").lower() == "true"  # Launch the branding daemon on start-up
 
 
 class Client(NamedTuple):
@@ -103,6 +118,10 @@ class Emojis:
     merge = "<:PRMerged:629695470570176522>"
 
 
+class Hacktoberfest(NamedTuple):
+    voice_id = 514420006474219521
+
+
 class Icons:
     questionmark = "https://cdn.discordapp.com/emojis/512367613339369475.png"
     bookmark = (
@@ -113,10 +132,6 @@ class Icons:
 
 class Lovefest:
     role_id = int(environ.get("LOVEFEST_ROLE_ID", 542431903886606399))
-
-
-class Hacktoberfest(NamedTuple):
-    voice_id = 514420006474219521
 
 
 class Month(enum.IntEnum):
@@ -166,12 +181,28 @@ STAFF_ROLES = Roles.helpers, Roles.moderator, Roles.admin, Roles.owner
 
 # Whitelisted channels
 WHITELISTED_CHANNELS = (
-    Channels.bot, Channels.seasonalbot_commands,
-    Channels.off_topic_0, Channels.off_topic_1, Channels.off_topic_2,
+    Channels.bot,
+    Channels.seasonalbot_commands,
+    Channels.off_topic_0,
+    Channels.off_topic_1,
+    Channels.off_topic_2,
     Channels.devtest,
 )
 
 # Bot replies
+ERROR_REPLIES = [
+    "Please don't do that.",
+    "You have to stop.",
+    "Do you mind?",
+    "In the future, don't do that.",
+    "That was a mistake.",
+    "You blew it.",
+    "You're bad at computers.",
+    "Are you trying to kill me?",
+    "Noooooo!!",
+    "I can't believe you've done this",
+]
+
 NEGATIVE_REPLIES = [
     "Noooooo!!",
     "Nope.",
@@ -210,17 +241,4 @@ POSITIVE_REPLIES = [
     "Of course!",
     "Aye aye, cap'n!",
     "I'll allow it.",
-]
-
-ERROR_REPLIES = [
-    "Please don't do that.",
-    "You have to stop.",
-    "Do you mind?",
-    "In the future, don't do that.",
-    "That was a mistake.",
-    "You blew it.",
-    "You're bad at computers.",
-    "Are you trying to kill me?",
-    "Noooooo!!",
-    "I can't believe you've done this",
 ]
