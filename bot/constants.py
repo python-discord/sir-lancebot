@@ -5,18 +5,12 @@ from os import environ
 from typing import NamedTuple
 
 __all__ = (
-    "bookmark_icon_url",
     "AdventOfCode", "Branding", "Channels", "Client", "Colours", "Emojis", "Hacktoberfest", "Month", "Roles", "Tokens",
     "WHITELISTED_CHANNELS", "STAFF_ROLES", "MODERATION_ROLES",
     "POSITIVE_REPLIES", "NEGATIVE_REPLIES", "ERROR_REPLIES",
 )
 
 log = logging.getLogger(__name__)
-
-bookmark_icon_url = (
-    "https://images-ext-2.discordapp.net/external/zl4oDwcmxUILY7sD9ZWE2fU5R7n6QcxEmPYSE5eddbg/"
-    "%3Fv%3D1/https/cdn.discordapp.com/emojis/654080405988966419.png?width=20&height=20"
-)
 
 
 class AdventOfCode:
@@ -111,6 +105,10 @@ class Emojis:
 
 class Icons:
     questionmark = "https://cdn.discordapp.com/emojis/512367613339369475.png"
+    bookmark = (
+        "https://images-ext-2.discordapp.net/external/zl4oDwcmxUILY7sD9ZWE2fU5R7n6QcxEmPYSE5eddbg/"
+        "%3Fv%3D1/https/cdn.discordapp.com/emojis/654080405988966419.png?width=20&height=20"
+    )
 
 
 class Lovefest:

@@ -4,7 +4,7 @@ import random
 import discord
 from discord.ext import commands
 
-from bot.constants import Colours, ERROR_REPLIES, Emojis, bookmark_icon_url
+from bot.constants import Colours, ERROR_REPLIES, Emojis, Icons
 
 log = logging.getLogger(__name__)
 
@@ -43,7 +43,7 @@ class Bookmark(commands.Cog):
         )
         embed.add_field(name="Wanna give it a visit?", value=f"[Visit original message]({target_message.jump_url})")
         embed.set_author(name=target_message.author, icon_url=target_message.author.avatar_url)
-        embed.set_thumbnail(url=bookmark_icon_url)
+        embed.set_thumbnail(url=Icons.bookmark)
 
         try:
             await ctx.author.send(embed=embed)
