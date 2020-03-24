@@ -2,7 +2,7 @@ import asyncio
 import functools
 import logging
 import random
-import typing
+import typing as t
 from asyncio import Lock
 from datetime import datetime
 from functools import wraps
@@ -31,7 +31,7 @@ class InMonthCheckFailure(CheckFailure):
     pass
 
 
-def seasonal_task(*allowed_months: Month, sleep_time: typing.Union[float, int] = ONE_DAY) -> typing.Callable:
+def seasonal_task(*allowed_months: Month, sleep_time: t.Union[float, int] = ONE_DAY) -> t.Callable:
     """
     Perform the decorated method periodically in `allowed_months`.
 
@@ -43,7 +43,7 @@ def seasonal_task(*allowed_months: Month, sleep_time: typing.Union[float, int] =
 
     The wrapped task is responsible for waiting for the bot to be ready, if necessary.
     """
-    def decorator(task_body: typing.Callable) -> typing.Callable:
+    def decorator(task_body: t.Callable) -> t.Callable:
         @functools.wraps(task_body)
         async def decorated_task(*args, **kwargs) -> None:
             """Call `task_body` once every `sleep_time` seconds in `allowed_months`."""
@@ -62,13 +62,13 @@ def seasonal_task(*allowed_months: Month, sleep_time: typing.Union[float, int] =
     return decorator
 
 
-def in_month_listener(*allowed_months: Month) -> typing.Callable:
+def in_month_listener(*allowed_months: Month) -> t.Callable:
     """
     Shield a listener from being invoked outside of `allowed_months`.
 
     The check is performed against current UTC month.
     """
-    def decorator(listener: typing.Callable) -> typing.Callable:
+    def decorator(listener: t.Callable) -> t.Callable:
         @functools.wraps(listener)
         async def guarded_listener(*args, **kwargs) -> None:
             """Wrapped listener will abort if not in allowed month."""
@@ -83,7 +83,7 @@ def in_month_listener(*allowed_months: Month) -> typing.Callable:
     return decorator
 
 
-def in_month_command(*allowed_months: Month) -> typing.Callable:
+def in_month_command(*allowed_months: Month) -> t.Callable:
     """
     Check whether the command was invoked in one of `enabled_months`.
 
@@ -106,7 +106,7 @@ def in_month_command(*allowed_months: Month) -> typing.Callable:
     return commands.check(predicate)
 
 
-def in_month(*allowed_months: Month) -> typing.Callable:
+def in_month(*allowed_months: Month) -> t.Callable:
     """
     Universal decorator for season-locking commands and listeners alike.
 
@@ -119,7 +119,7 @@ def in_month(*allowed_months: Month) -> typing.Callable:
     into one. This means that this decorator should always be placed **above**
     the d.py one that registers it as either.
     """
-    def decorator(callable_: typing.Callable) -> typing.Callable:
+    def decorator(callable_: t.Callable) -> t.Callable:
         # Functions decorated as commands are turned into instances of `Command`
         if isinstance(callable_, Command):
             logging.debug(f"Command {callable_.qualified_name} will be locked to {allowed_months}")
@@ -139,7 +139,7 @@ def in_month(*allowed_months: Month) -> typing.Callable:
     return decorator
 
 
-def with_role(*role_ids: int) -> typing.Callable:
+def with_role(*role_ids: int) -> t.Callable:
     """Check to see whether the invoking user has any of the roles specified in role_ids."""
     async def predicate(ctx: Context) -> bool:
         if not ctx.guild:  # Return False in a DM
@@ -162,7 +162,7 @@ def with_role(*role_ids: int) -> typing.Callable:
     return commands.check(predicate)
 
 
-def without_role(*role_ids: int) -> typing.Callable:
+def without_role(*role_ids: int) -> t.Callable:
     """Check whether the invoking user does not have all of the roles specified in role_ids."""
     async def predicate(ctx: Context) -> bool:
         if not ctx.guild:  # Return False in a DM
@@ -182,7 +182,7 @@ def without_role(*role_ids: int) -> typing.Callable:
     return commands.check(predicate)
 
 
-def in_channel_check(*channels: int, bypass_roles: typing.Container[int] = None) -> typing.Callable[[Context], bool]:
+def in_channel_check(*channels: int, bypass_roles: t.Container[int] = None) -> t.Callable[[Context], bool]:
     """
     Checks that the message is in a whitelisted channel or optionally has a bypass role.
 
@@ -248,7 +248,7 @@ def in_channel_check(*channels: int, bypass_roles: typing.Container[int] = None)
 in_channel = commands.check(in_channel_check)
 
 
-def override_in_channel(channels: typing.Tuple[int] = None) -> typing.Callable:
+def override_in_channel(channels: t.Tuple[int] = None) -> t.Callable:
     """
     Set command callback attribute for detection in `in_channel_check`.
 
@@ -256,14 +256,14 @@ def override_in_channel(channels: typing.Tuple[int] = None) -> typing.Callable:
 
     This decorator has to go before (below) below the `command` decorator.
     """
-    def inner(func: typing.Callable) -> typing.Callable:
+    def inner(func: t.Callable) -> t.Callable:
         func.in_channel_override = channels
         return func
 
     return inner
 
 
-def locked() -> typing.Union[typing.Callable, None]:
+def locked() -> t.Union[t.Callable, None]:
     """
     Allows the user to only run one instance of the decorated command at a time.
 
@@ -271,11 +271,11 @@ def locked() -> typing.Union[typing.Callable, None]:
 
     This decorator has to go before (below) the `command` decorator.
     """
-    def wrap(func: typing.Callable) -> typing.Union[typing.Callable, None]:
+    def wrap(func: t.Callable) -> t.Union[t.Callable, None]:
         func.__locks = WeakValueDictionary()
 
         @wraps(func)
-        async def inner(self: typing.Callable, ctx: Context, *args, **kwargs) -> typing.Union[typing.Callable, None]:
+        async def inner(self: t.Callable, ctx: Context, *args, **kwargs) -> t.Union[t.Callable, None]:
             lock = func.__locks.setdefault(ctx.author.id, Lock())
             if lock.locked():
                 embed = Embed()
@@ -296,7 +296,7 @@ def locked() -> typing.Union[typing.Callable, None]:
     return wrap
 
 
-def mock_in_debug(return_value: typing.Any) -> typing.Callable:
+def mock_in_debug(return_value: t.Any) -> t.Callable:
     """
     Short-circuit function execution if in debug mode and return `return_value`.
 
@@ -304,9 +304,9 @@ def mock_in_debug(return_value: typing.Any) -> typing.Callable:
     upon each call. This is useful for expensive operations, i.e. media asset uploads
     that are prone to rate-limits but need to be tested extensively.
     """
-    def decorator(func: typing.Callable) -> typing.Callable:
+    def decorator(func: t.Callable) -> t.Callable:
         @functools.wraps(func)
-        async def wrapped(*args, **kwargs) -> typing.Any:
+        async def wrapped(*args, **kwargs) -> t.Any:
             """Short-circuit and log if in debug mode."""
             if Client.debug:
                 log.debug(f"Function {func.__name__} called with args: {args}, kwargs: {kwargs}")
