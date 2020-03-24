@@ -208,8 +208,10 @@ class Games(Cog):
             if possibility:
                 games = possibility
             else:
+                display_possibilities = ", ".join(p[1] for p in possibilities if p[0] >= 0.40)
                 await ctx.send(
-                    f"Invalid genre `{genre}`. {f'Maybe you meant `{possibilities}`?' if possibilities else ''}"
+                    f"Invalid genre `{genre}`. "
+                    f"{f'Maybe you meant `{display_possibilities}`?' if display_possibilities else ''}"
                 )
                 return
 
