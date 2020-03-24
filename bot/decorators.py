@@ -10,7 +10,7 @@ from weakref import WeakValueDictionary
 
 from discord import Colour, Embed
 from discord.ext import commands
-from discord.ext.commands import CheckFailure, Context
+from discord.ext.commands import CheckFailure, Command, Context
 
 from bot.constants import Client, ERROR_REPLIES, Month
 
@@ -104,6 +104,39 @@ def in_month_command(*allowed_months: Month) -> typing.Callable:
             raise InMonthCheckFailure(f"Command can only be used in {human_months}")
 
     return commands.check(predicate)
+
+
+def in_month(*allowed_months: Month) -> typing.Callable:
+    """
+    Universal decorator for season-locking commands and listeners alike.
+
+    This only serves to determine whether the decorated callable is a command,
+    a listener, or neither. It then delegates to either `in_month_command`,
+    or `in_month_listener`, or raises TypeError, respectively.
+
+    Please note that in order for this decorator to correctly determine whether
+    the decorated callable is a cmd or listener, it **has** to first be turned
+    into one. This means that this decorator should always be placed **above**
+    the d.py one that registers it as either.
+    """
+    def decorator(callable_: typing.Callable) -> typing.Callable:
+        # Functions decorated as commands are turned into instances of `Command`
+        if isinstance(callable_, Command):
+            logging.debug(f"Command {callable_.qualified_name} will be locked to {allowed_months}")
+            actual_deco = in_month_command(*allowed_months)
+
+        # D.py will assign this attribute when `callable_` is registered as a listener
+        elif hasattr(callable_, "__cog_listener__"):
+            logging.debug(f"Listener {callable_.__qualname__} will be locked to {allowed_months}")
+            actual_deco = in_month_listener(*allowed_months)
+
+        # Otherwise we're unsure exactly what has been decorated
+        # This happens before the bot starts, so let's just raise
+        else:
+            raise TypeError(f"Decorated object {callable_} is neither a command nor a listener")
+
+        return actual_deco(callable_)
+    return decorator
 
 
 def with_role(*role_ids: int) -> typing.Callable:
