@@ -433,7 +433,7 @@ class BrandingManager(commands.Cog):
             await self.refresh()
             await self.branding_info(ctx)
 
-    @branding_cmds.group(name="daemon", aliases=["d"])
+    @branding_cmds.group(name="daemon", aliases=["d", "task"])
     async def daemon_group(self, ctx: commands.Context) -> None:
         """
         Check whether the daemon is currently active.
