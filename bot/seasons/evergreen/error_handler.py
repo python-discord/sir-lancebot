@@ -5,6 +5,7 @@ from typing import Iterable, Union
 
 from discord import Embed, Message
 from discord.ext import commands
+from sentry_sdk import push_scope
 
 from bot.constants import Colours, ERROR_REPLIES, NEGATIVE_REPLIES
 from bot.decorators import InChannelCheckFailure
@@ -97,7 +98,25 @@ class CommandErrorHandler(commands.Cog):
             await ctx.send(embed=self.error_embed("You are not authorized to use this command.", NEGATIVE_REPLIES))
             return
 
-        log.exception(f"Unhandled command error: {str(error)}", exc_info=error)
+        with push_scope() as scope:
+            scope.user = {
+                "id": ctx.author.id,
+                "username": str(ctx.author)
+            }
+
+            scope.set_tag("command", ctx.command.qualified_name)
+            scope.set_tag("message_id", ctx.message.id)
+            scope.set_tag("channel_id", ctx.channel.id)
+
+            scope.set_extra("full_message", ctx.message.content)
+
+            if ctx.guild is not None:
+                scope.set_extra(
+                    "jump_to",
+                    f"https://discordapp.com/channels/{ctx.guild.id}/{ctx.channel.id}/{ctx.message.id}"
+                )
+
+            log.exception(f"Unhandled command error: {str(error)}", exc_info=error)
 
 
 def setup(bot: commands.Bot) -> None:
