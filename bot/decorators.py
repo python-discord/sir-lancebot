@@ -118,6 +118,11 @@ def in_month(*allowed_months: Month) -> t.Callable:
     the decorated callable is a cmd or listener, it **has** to first be turned
     into one. This means that this decorator should always be placed **above**
     the d.py one that registers it as either.
+
+    This will decorate groups as well, as those subclass Command. In order to lock
+    all subcommands of a group, its `invoke_without_command` param must **not** be
+    manually set to True - this causes a circumvention of the group's callback
+    and the seasonal check applied to it.
     """
     def decorator(callable_: t.Callable) -> t.Callable:
         # Functions decorated as commands are turned into instances of `Command`
