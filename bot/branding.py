@@ -364,25 +364,38 @@ class BrandingManager(commands.Cog):
     @with_role(*MODERATION_ROLES)
     @commands.group(name="branding")
     async def branding_cmds(self, ctx: commands.Context) -> None:
-        """Group for commands allowing manual control of the cog."""
+        """Manual branding control."""
         if not ctx.invoked_subcommand:
             await ctx.send_help(ctx.command)
 
     @branding_cmds.command(name="info", aliases=["status"])
     async def branding_info(self, ctx: commands.Context) -> None:
-        """Provide an information embed representing current branding situation."""
+        """
+        Show assets for current season.
+
+        This can be used to confirm that assets have been resolved properly.
+        When `apply` is used, it attempts to upload exactly the assets listed here.
+        """
         await ctx.send(embed=await self._info_embed())
 
     @branding_cmds.command(name="refresh")
     async def branding_refresh(self, ctx: commands.Context) -> None:
-        """Poll Github API to refresh currently available branding, dispatch info embed."""
+        """
+        Refresh current season from branding repository.
+
+        Polls Github API to refresh assets available for current season.
+        """
         async with ctx.typing():
             await self.refresh()
             await self.branding_info(ctx)
 
     @branding_cmds.command(name="cycle")
     async def branding_cycle(self, ctx: commands.Context) -> None:
-        """Apply the next-up guild icon, if multiple are available."""
+        """
+        Apply the next-up guild icon, if multiple are available.
+
+        The order is random.
+        """
         async with ctx.typing():
             success = await self.cycle()
             if not success:
@@ -393,7 +406,12 @@ class BrandingManager(commands.Cog):
 
     @branding_cmds.command(name="apply")
     async def branding_apply(self, ctx: commands.Context) -> None:
-        """Apply current branding (i.e. internal state) to the guild."""
+        """
+        Apply current season's branding to the guild.
+
+        Use `info` to check which assets will be applied. Shows which assets have
+        failed to be applied, if any.
+        """
         async with ctx.typing():
             failed_assets = await self.apply()
             if failed_assets:
@@ -405,7 +423,10 @@ class BrandingManager(commands.Cog):
     @branding_cmds.command(name="set")
     async def branding_set(self, ctx: commands.Context, *, season_name: t.Optional[str] = None) -> None:
         """
-        Manually set season if `season_name` is provided, otherwise reset to current.
+        Manually set season, or reset to current if none given.
+
+        Season search is a case-less comparison against both seasonal class name,
+        and its `season_name` attr.
 
         This only pre-loads the cog's internal state to the chosen season, but does not
         automatically apply the branding. As that is an expensive operation, the `apply`
@@ -435,13 +456,13 @@ class BrandingManager(commands.Cog):
 
     @branding_cmds.group(name="daemon", aliases=["d", "task"])
     async def daemon_group(self, ctx: commands.Context) -> None:
-        """Group for controlling the background task."""
+        """Control the background daemon."""
         if not ctx.invoked_subcommand:
             await ctx.send_help(ctx.command)
 
     @daemon_group.command(name="status")
     async def daemon_status(self, ctx: commands.Context) -> None:
-        """Check whether the daemon is currently active."""
+        """Check whether daemon is currently active."""
         if self._daemon_running:
             remaining_time = (arrow.utcnow() + await time_until_midnight()).humanize()
             response = discord.Embed(description=f"Daemon running {Emojis.ok_hand}", colour=Colours.soft_green)
