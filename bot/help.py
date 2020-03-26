@@ -13,7 +13,7 @@ from fuzzywuzzy import fuzz, process
 from bot import constants
 from bot.bot import SeasonalBot
 from bot.constants import Emojis
-from bot.pagination import (
+from bot.utils.pagination import (
     FIRST_EMOJI, LAST_EMOJI,
     LEFT_EMOJI, LinePaginator, RIGHT_EMOJI,
 )

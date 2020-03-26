@@ -7,7 +7,7 @@ from typing import List
 import discord
 from discord.ext.commands import BadArgument, Context
 
-from bot.pagination import LinePaginator
+from bot.utils.pagination import LinePaginator
 
 
 async def disambiguate(
