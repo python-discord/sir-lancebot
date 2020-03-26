@@ -366,7 +366,7 @@ class BrandingManager(commands.Cog):
     async def branding_cmds(self, ctx: commands.Context) -> None:
         """Group for commands allowing manual control of the cog."""
         if not ctx.invoked_subcommand:
-            await self.branding_info(ctx)
+            await ctx.send_help(ctx.command)
 
     @branding_cmds.command(name="info", aliases=["status"])
     async def branding_info(self, ctx: commands.Context) -> None:
@@ -435,20 +435,21 @@ class BrandingManager(commands.Cog):
 
     @branding_cmds.group(name="daemon", aliases=["d", "task"])
     async def daemon_group(self, ctx: commands.Context) -> None:
-        """
-        Check whether the daemon is currently active.
-
-        Sub-commands allow starting and stopping the daemon.
-        """
+        """Group for controlling the background task."""
         if not ctx.invoked_subcommand:
-            if self._daemon_running:
-                remaining_time = (arrow.utcnow() + await time_until_midnight()).humanize()
-                response = discord.Embed(description=f"Daemon running {Emojis.ok_hand}", colour=Colours.soft_green)
-                response.set_footer(text=f"Next refresh {remaining_time}")
-            else:
-                response = discord.Embed(description="Daemon not running", colour=Colours.soft_red)
+            await ctx.send_help(ctx.command)
 
-            await ctx.send(embed=response)
+    @daemon_group.command(name="status")
+    async def daemon_status(self, ctx: commands.Context) -> None:
+        """Check whether the daemon is currently active."""
+        if self._daemon_running:
+            remaining_time = (arrow.utcnow() + await time_until_midnight()).humanize()
+            response = discord.Embed(description=f"Daemon running {Emojis.ok_hand}", colour=Colours.soft_green)
+            response.set_footer(text=f"Next refresh {remaining_time}")
+        else:
+            response = discord.Embed(description="Daemon not running", colour=Colours.soft_red)
+
+        await ctx.send(embed=response)
 
     @daemon_group.command(name="start")
     async def daemon_start(self, ctx: commands.Context) -> None:
