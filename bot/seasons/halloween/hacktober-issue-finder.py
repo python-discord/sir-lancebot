@@ -7,6 +7,9 @@ import aiohttp
 import discord
 from discord.ext import commands
 
+from bot.constants import Month
+from bot.decorators import in_month
+
 log = logging.getLogger(__name__)
 
 URL = "https://api.github.com/search/issues?per_page=100&q=is:issue+label:hacktoberfest+language:python+state:open"
@@ -23,6 +26,7 @@ class HacktoberIssues(commands.Cog):
         self.cache_beginner = None
         self.cache_timer_beginner = datetime.datetime(1, 1, 1)
 
+    @in_month(Month.october)
     @commands.command()
     async def hacktoberissues(self, ctx: commands.Context, option: str = "") -> None:
         """

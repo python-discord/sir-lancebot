@@ -13,8 +13,8 @@ from bs4 import BeautifulSoup
 from discord.ext import commands
 from pytz import timezone
 
-from bot.constants import AdventOfCode as AocConfig, Channels, Colours, Emojis, Tokens, WHITELISTED_CHANNELS
-from bot.decorators import override_in_channel
+from bot.constants import AdventOfCode as AocConfig, Channels, Colours, Emojis, Month, Tokens, WHITELISTED_CHANNELS
+from bot.decorators import in_month, override_in_channel
 from bot.utils import unlocked_role
 
 log = logging.getLogger(__name__)
@@ -153,11 +153,13 @@ class AdventOfCode(commands.Cog):
         status_coro = countdown_status(self.bot)
         self.status_task = self.bot.loop.create_task(status_coro)
 
-    @commands.group(name="adventofcode", aliases=("aoc",), invoke_without_command=True)
+    @in_month(Month.december)
+    @commands.group(name="adventofcode", aliases=("aoc",))
     @override_in_channel(AOC_WHITELIST)
     async def adventofcode_group(self, ctx: commands.Context) -> None:
         """All of the Advent of Code commands."""
-        await ctx.send_help(ctx.command)
+        if not ctx.invoked_subcommand:
+            await ctx.send_help(ctx.command)
 
     @adventofcode_group.command(
         name="subscribe",

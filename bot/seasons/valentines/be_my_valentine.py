@@ -8,7 +8,8 @@ import discord
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
 
-from bot.constants import Channels, Client, Colours, Lovefest
+from bot.constants import Channels, Client, Colours, Lovefest, Month
+from bot.decorators import in_month
 
 log = logging.getLogger(__name__)
 
@@ -30,7 +31,8 @@ class BeMyValentine(commands.Cog):
             valentines = load(json_data)
             return valentines
 
-    @commands.group(name="lovefest", invoke_without_command=True)
+    @in_month(Month.february)
+    @commands.group(name="lovefest")
     async def lovefest_role(self, ctx: commands.Context) -> None:
         """
         Subscribe or unsubscribe from the lovefest role.
@@ -40,7 +42,8 @@ class BeMyValentine(commands.Cog):
         1) use the command \".lovefest sub\" to get the lovefest role.
         2) use the command \".lovefest unsub\" to get rid of the lovefest role.
         """
-        await ctx.send_help(ctx.command)
+        if not ctx.invoked_subcommand:
+            await ctx.send_help(ctx.command)
 
     @lovefest_role.command(name="sub")
     async def add_role(self, ctx: commands.Context) -> None:

@@ -181,6 +181,7 @@ class CandyCollection(commands.Cog):
         with open(json_location, 'w') as outfile:
             json.dump(self.candy_json, outfile)
 
+    @in_month(Month.october)
     @commands.command()
     async def candy(self, ctx: commands.Context) -> None:
         """Get the candy leaderboard and save to JSON."""

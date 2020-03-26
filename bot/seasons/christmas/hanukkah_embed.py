@@ -5,8 +5,8 @@ from typing import List
 from discord import Embed
 from discord.ext import commands
 
-from bot.constants import Colours
-
+from bot.constants import Colours, Month
+from bot.decorators import in_month
 
 log = logging.getLogger(__name__)
 
@@ -34,6 +34,7 @@ class HanukkahEmbed(commands.Cog):
                 hanukkah_dates.append(date)
         return hanukkah_dates
 
+    @in_month(Month.december)
     @commands.command(name='hanukkah', aliases=['chanukah'])
     async def hanukkah_festival(self, ctx: commands.Context) -> None:
         """Tells you about the Hanukkah Festivaltime of festival, festival day, etc)."""
