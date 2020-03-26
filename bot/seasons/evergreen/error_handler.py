@@ -8,7 +8,7 @@ from discord.ext import commands
 
 from bot.constants import Colours, ERROR_REPLIES, NEGATIVE_REPLIES
 from bot.decorators import InChannelCheckFailure, InMonthCheckFailure
-from bot.exceptions import BrandingError
+from bot.utils.exceptions import BrandingError
 
 log = logging.getLogger(__name__)
 

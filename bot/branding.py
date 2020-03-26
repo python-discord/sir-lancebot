@@ -13,8 +13,8 @@ from discord.ext import commands
 from bot.bot import SeasonalBot
 from bot.constants import Branding, Colours, Emojis, MODERATION_ROLES, Tokens
 from bot.decorators import with_role
-from bot.exceptions import BrandingError
 from bot.seasons import SeasonBase, get_current_season, get_season
+from bot.utils.exceptions import BrandingError
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
