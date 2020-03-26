@@ -239,9 +239,12 @@ class BrandingManager(commands.Cog):
 
         self.should_cycle = counter
 
-    async def _get_files(self, path: str) -> t.Dict[str, GithubFile]:
+    async def _get_files(self, path: str, include_dirs: bool = False) -> t.Dict[str, GithubFile]:
         """
         Poll `path` in branding repo for information about present files.
+
+        If `include_dirs` is False (default), only returns files at `path`.
+        Otherwise, will return both files and directories. Never returns symlinks.
 
         Return dict mapping from filename to corresponding `GithubFile` instance.
         This may return an empty dict if the response status is non-200,
@@ -255,9 +258,11 @@ class BrandingManager(commands.Cog):
                 return {}
             directory = await resp.json()  # Directory at `path`
 
+        allowed_types = {"file", "dir"} if include_dirs else {"file"}
         return {
             file["name"]: GithubFile(file["download_url"], file["path"], file["sha"])
             for file in directory
+            if file["type"] in allowed_types
         }
 
     async def refresh(self) -> bool:
@@ -275,7 +280,7 @@ class BrandingManager(commands.Cog):
         in the branding repository.
         """
         old_branding = (self.banner, self.avatar, self.available_icons)
-        seasonal_dir = await self._get_files(self.current_season.branding_path)
+        seasonal_dir = await self._get_files(self.current_season.branding_path, include_dirs=True)
 
         # Only make a call to the fallback directory if there is something to be gained
         branding_incomplete = any(
@@ -283,7 +288,7 @@ class BrandingManager(commands.Cog):
             for asset in (FILE_BANNER, FILE_AVATAR, SERVER_ICONS)
         )
         if branding_incomplete and self.current_season is not SeasonBase:
-            fallback_dir = await self._get_files(SeasonBase.branding_path)
+            fallback_dir = await self._get_files(SeasonBase.branding_path, include_dirs=True)
         else:
             fallback_dir = {}
 
