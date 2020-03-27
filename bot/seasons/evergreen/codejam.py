@@ -8,14 +8,15 @@ from discord.ext import commands
 
 
 class MatchMakingAlgo(commands.Cog):
-    """Defines the matchmaking algorithm"""
+    """Defines the matchmaking algorithm."""
+
     def __init__(self, bot: commands.Bot) -> None:
-        """Creates matchmaking pool"""
+        """Creates matchmaking pool."""
         self.bot = bot
         self.matchmaking_pool = []
 
     async def search_teammate(self) -> Union[User, None]:
-        """Looks for a teammate in the matchmaking pool"""
+        """Looks for a teammate in the matchmaking pool."""
         if self.matchmaking_pool == []:
             await asyncio.sleep(5)
             return await self.search_teammate()
@@ -24,7 +25,7 @@ class MatchMakingAlgo(commands.Cog):
 
     @commands.command()
     async def find_teammate(self, ctx: commands.Context) -> None:
-        """Direct command to look for a teammate"""
+        """Direct command to look for a teammate."""
         self.matchmaking_pool.append(ctx.author)
         embed = discord.Embed(title="Searcing for a teammate...",
                               color=0xFF0000)
@@ -38,5 +39,5 @@ class MatchMakingAlgo(commands.Cog):
 
 
 def setup(bot: commands.Bot) -> None:
-    """Setups the bot"""
+    """Setups the bot."""
     bot.add_cog(MatchMakingAlgo(bot))
