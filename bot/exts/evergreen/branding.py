@@ -12,7 +12,7 @@ from discord.ext import commands
 
 from bot.bot import SeasonalBot
 from bot.constants import Branding, Colours, Emojis, MODERATION_ROLES, Tokens
-from bot.seasons import SeasonBase, get_current_season, get_season
+from bot.seasons import SeasonBase, get_all_seasons, get_current_season, get_season
 from bot.utils.decorators import with_role
 from bot.utils.exceptions import BrandingError
 
@@ -84,6 +84,9 @@ class BrandingManager(commands.Cog):
 
     All supported operations, e.g. setting seasons, applying the branding, or cycling icons, can
     also be invoked manually, via the following API:
+
+        branding list
+            - Show all available seasons
 
         branding set <season_name>
             - Set the cog's internal state to represent `season_name`, if it exists.
@@ -382,6 +385,26 @@ class BrandingManager(commands.Cog):
         When `apply` is used, it attempts to upload exactly the assets listed here.
         """
         await ctx.send(embed=await self._info_embed())
+
+    @branding_cmds.command(name="list", aliases=["ls"])
+    async def branding_list(self, ctx: commands.Context) -> None:
+        """List all available seasons and branding sources."""
+        embed = discord.Embed(title="Available seasons", colour=Colours.soft_green)
+
+        for season in get_all_seasons():
+            if season is SeasonBase:
+                active_when = "always"
+            else:
+                months = ", ".join(m.name for m in season.months)
+                active_when = f"in {months}"
+
+            description = (
+                f"Active {active_when}\n"
+                f"Branding: {season.branding_path}"
+            )
+            embed.add_field(name=season.season_name, value=description, inline=False)
+
+        await ctx.send(embed=embed)
 
     @branding_cmds.command(name="refresh")
     async def branding_refresh(self, ctx: commands.Context) -> None:
