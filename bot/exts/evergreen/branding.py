@@ -376,16 +376,6 @@ class BrandingManager(commands.Cog):
         if not ctx.invoked_subcommand:
             await ctx.send_help(ctx.command)
 
-    @branding_cmds.command(name="info", aliases=["status"])
-    async def branding_info(self, ctx: commands.Context) -> None:
-        """
-        Show assets for current season.
-
-        This can be used to confirm that assets have been resolved properly.
-        When `apply` is used, it attempts to upload exactly the assets listed here.
-        """
-        await ctx.send(embed=await self._info_embed())
-
     @branding_cmds.command(name="list", aliases=["ls"])
     async def branding_list(self, ctx: commands.Context) -> None:
         """List all available seasons and branding sources."""
@@ -405,48 +395,6 @@ class BrandingManager(commands.Cog):
             embed.add_field(name=season.season_name, value=description, inline=False)
 
         await ctx.send(embed=embed)
-
-    @branding_cmds.command(name="refresh")
-    async def branding_refresh(self, ctx: commands.Context) -> None:
-        """
-        Refresh current season from branding repository.
-
-        Polls Github API to refresh assets available for current season.
-        """
-        async with ctx.typing():
-            await self.refresh()
-            await self.branding_info(ctx)
-
-    @branding_cmds.command(name="cycle")
-    async def branding_cycle(self, ctx: commands.Context) -> None:
-        """
-        Apply the next-up guild icon, if multiple are available.
-
-        The order is random.
-        """
-        async with ctx.typing():
-            success = await self.cycle()
-            if not success:
-                raise BrandingError("Failed to cycle icon")
-
-            response = discord.Embed(description=f"Success {Emojis.ok_hand}", colour=Colours.soft_green)
-            await ctx.send(embed=response)
-
-    @branding_cmds.command(name="apply")
-    async def branding_apply(self, ctx: commands.Context) -> None:
-        """
-        Apply current season's branding to the guild.
-
-        Use `info` to check which assets will be applied. Shows which assets have
-        failed to be applied, if any.
-        """
-        async with ctx.typing():
-            failed_assets = await self.apply()
-            if failed_assets:
-                raise BrandingError(f"Failed to apply following assets: {', '.join(failed_assets)}")
-
-            response = discord.Embed(description=f"All assets applied {Emojis.ok_hand}", colour=Colours.soft_green)
-            await ctx.send(embed=response)
 
     @branding_cmds.command(name="set")
     async def branding_set(self, ctx: commands.Context, *, season_name: t.Optional[str] = None) -> None:
@@ -481,6 +429,58 @@ class BrandingManager(commands.Cog):
         async with ctx.typing():
             await self.refresh()
             await self.branding_info(ctx)
+
+    @branding_cmds.command(name="info", aliases=["status"])
+    async def branding_info(self, ctx: commands.Context) -> None:
+        """
+        Show assets for current season.
+
+        This can be used to confirm that assets have been resolved properly.
+        When `apply` is used, it attempts to upload exactly the assets listed here.
+        """
+        await ctx.send(embed=await self._info_embed())
+
+    @branding_cmds.command(name="refresh")
+    async def branding_refresh(self, ctx: commands.Context) -> None:
+        """
+        Refresh current season from branding repository.
+
+        Polls Github API to refresh assets available for current season.
+        """
+        async with ctx.typing():
+            await self.refresh()
+            await self.branding_info(ctx)
+
+    @branding_cmds.command(name="apply")
+    async def branding_apply(self, ctx: commands.Context) -> None:
+        """
+        Apply current season's branding to the guild.
+
+        Use `info` to check which assets will be applied. Shows which assets have
+        failed to be applied, if any.
+        """
+        async with ctx.typing():
+            failed_assets = await self.apply()
+            if failed_assets:
+                raise BrandingError(f"Failed to apply following assets: {', '.join(failed_assets)}")
+
+            response = discord.Embed(description=f"All assets applied {Emojis.ok_hand}", colour=Colours.soft_green)
+            await ctx.send(embed=response)
+
+    @branding_cmds.command(name="cycle")
+    async def branding_cycle(self, ctx: commands.Context) -> None:
+        """
+        Apply the next-up guild icon, if multiple are available.
+
+        The order is random.
+        """
+        async with ctx.typing():
+            success = await self.cycle()
+            if not success:
+                raise BrandingError("Failed to cycle icon")
+
+            response = discord.Embed(description=f"Success {Emojis.ok_hand}", colour=Colours.soft_green)
+            await ctx.send(embed=response)
 
     @branding_cmds.group(name="daemon", aliases=["d", "task"])
     async def daemon_group(self, ctx: commands.Context) -> None:
