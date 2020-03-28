@@ -1,22 +1,18 @@
 import logging
 import pkgutil
 from pathlib import Path
-from typing import List
+from typing import Iterator, List
 
 __all__ = ("get_package_names", "get_extensions")
 
 log = logging.getLogger(__name__)
 
 
-def get_package_names() -> List[str]:
-    """Return names of all packages located in /bot/exts/."""
-    seasons = [
-        package.name
-        for package in pkgutil.iter_modules(__path__)
-        if package.ispkg
-    ]
-
-    return seasons
+def get_package_names() -> Iterator[str]:
+    """Iterate names of all packages located in /bot/exts/."""
+    for package in pkgutil.iter_modules(__path__):
+        if package.ispkg:
+            yield package.name
 
 
 def get_extensions() -> List[str]:
