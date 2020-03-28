@@ -80,6 +80,7 @@ class Client(NamedTuple):
     guild = int(environ.get("SEASONALBOT_GUILD", 267624335836053506))
     prefix = environ.get("PREFIX", ".")
     token = environ.get("SEASONALBOT_TOKEN")
+    sentry_dsn = environ.get("SEASONALBOT_SENTRY_DSN")
     debug = environ.get("SEASONALBOT_DEBUG", "").lower() == "true"
 
 
