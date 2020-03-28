@@ -3,12 +3,12 @@ import pkgutil
 from pathlib import Path
 from typing import List
 
-__all__ = ("get_season_names", "get_extensions")
+__all__ = ("get_package_names", "get_extensions")
 
 log = logging.getLogger(__name__)
 
 
-def get_season_names() -> List[str]:
+def get_package_names() -> List[str]:
     """Return names of all packages located in /bot/exts/."""
     seasons = [
         package.name
@@ -29,7 +29,7 @@ def get_extensions() -> List[str]:
     base_path = Path(__path__[0])
     extensions = []
 
-    for season in get_season_names():
+    for season in get_package_names():
         for module in pkgutil.iter_modules([base_path.joinpath(season)]):
             extensions.append(f"bot.exts.{season}.{module.name}")
 

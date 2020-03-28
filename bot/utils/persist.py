@@ -2,7 +2,7 @@ import sqlite3
 from pathlib import Path
 from shutil import copyfile
 
-from bot.exts import get_season_names
+from bot.exts import get_package_names
 
 DIRECTORY = Path("data")  # directory that has a persistent volume mapped to it
 
@@ -41,7 +41,7 @@ def make_persistent(file_path: Path) -> Path:
         raise OSError(f"File not found at {file_path}.")
 
     # detect season in datafile path for assigning to subdirectory
-    season = next((s for s in get_season_names() if s in file_path.parts), None)
+    season = next((s for s in get_package_names() if s in file_path.parts), None)
 
     if season:
         # make sure subdirectory exists first
