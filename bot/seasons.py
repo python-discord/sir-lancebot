@@ -123,6 +123,11 @@ class Wildcard(SeasonBase):
     months = {Month.august}
 
 
+def get_all_seasons() -> t.List[t.Type[SeasonBase]]:
+    """Give all available season classes."""
+    return [SeasonBase] + SeasonBase.__subclasses__()
+
+
 def get_current_season() -> t.Type[SeasonBase]:
     """Give active season, based on current UTC month."""
     current_month = Month(datetime.utcnow().month)
@@ -150,7 +155,7 @@ def get_season(name: str) -> t.Optional[t.Type[SeasonBase]]:
     """
     name = name.casefold()
 
-    for season in [SeasonBase] + SeasonBase.__subclasses__():
+    for season in get_all_seasons():
         matches = (season.__name__.casefold(), season.season_name.casefold())
 
         if name in matches:
