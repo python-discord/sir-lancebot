@@ -126,4 +126,3 @@ class AvatarEasterifier(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Avatar Easterifier Cog load."""
     bot.add_cog(AvatarEasterifier(bot))
-    log.info("AvatarEasterifier cog loaded")

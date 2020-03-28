@@ -55,4 +55,3 @@ class PrideAnthem(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Cog loader for pride anthem."""
     bot.add_cog(PrideAnthem(bot))
-    log.info("Pride anthems cog loaded!")

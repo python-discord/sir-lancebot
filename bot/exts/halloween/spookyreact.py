@@ -73,4 +73,3 @@ class SpookyReact(Cog):
 def setup(bot: Bot) -> None:
     """Spooky reaction Cog load."""
     bot.add_cog(SpookyReact(bot))
-    log.info("SpookyReact cog loaded")

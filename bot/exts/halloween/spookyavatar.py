@@ -50,4 +50,3 @@ class SpookyAvatar(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Spooky avatar Cog load."""
     bot.add_cog(SpookyAvatar(bot))
-    log.info("SpookyAvatar cog loaded")

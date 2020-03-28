@@ -74,4 +74,3 @@ class Issues(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Cog Retrieves Issues From Github."""
     bot.add_cog(Issues(bot))
-    log.info("Issues cog loaded")

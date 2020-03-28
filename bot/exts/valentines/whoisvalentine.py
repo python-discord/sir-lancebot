@@ -50,4 +50,3 @@ class ValentineFacts(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Who is Valentine Cog load."""
     bot.add_cog(ValentineFacts(bot))
-    log.info("ValentineFacts cog loaded")

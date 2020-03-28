@@ -31,4 +31,3 @@ class Uptime(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Uptime Cog load."""
     bot.add_cog(Uptime(bot))
-    log.info("Uptime cog loaded")

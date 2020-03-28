@@ -45,4 +45,3 @@ class SpookySound(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Spooky sound Cog load."""
     bot.add_cog(SpookySound(bot))
-    log.info("SpookySound cog loaded")

@@ -108,4 +108,3 @@ class HacktoberIssues(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Hacktober issue finder Cog Load."""
     bot.add_cog(HacktoberIssues(bot))
-    log.info("hacktober-issue-finder cog loaded")

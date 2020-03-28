@@ -56,4 +56,3 @@ class HalloweenFacts(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Halloween facts Cog load."""
     bot.add_cog(HalloweenFacts(bot))
-    log.info("HalloweenFacts cog loaded")

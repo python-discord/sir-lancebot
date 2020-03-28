@@ -101,4 +101,3 @@ class LoveCalculator(Cog):
 def setup(bot: commands.Bot) -> None:
     """Love calculator Cog load."""
     bot.add_cog(LoveCalculator(bot))
-    log.info("LoveCalculator cog loaded")

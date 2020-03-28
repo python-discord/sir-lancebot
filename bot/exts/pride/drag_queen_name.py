@@ -30,4 +30,3 @@ class DragNames(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Cog loader for drag queen name generator."""
     bot.add_cog(DragNames(bot))
-    log.info("Drag queen name generator cog loaded!")

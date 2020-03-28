@@ -117,4 +117,3 @@ class EggheadQuiz(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Egghead Quiz Cog load."""
     bot.add_cog(EggheadQuiz(bot))
-    log.info("EggheadQuiz bot loaded")

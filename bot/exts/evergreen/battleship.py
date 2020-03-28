@@ -441,4 +441,3 @@ class Battleship(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Cog load."""
     bot.add_cog(Battleship(bot))
-    log.info("Battleship cog loaded")

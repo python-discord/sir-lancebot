@@ -339,4 +339,3 @@ class HacktoberStats(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Hacktoberstats Cog load."""
     bot.add_cog(HacktoberStats(bot))
-    log.info("HacktoberStats cog loaded")

@@ -28,4 +28,3 @@ class Traditions(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Traditions Cog load."""
     bot.add_cog(Traditions(bot))
-    log.info("Traditions cog loaded")

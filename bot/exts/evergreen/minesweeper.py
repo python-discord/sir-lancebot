@@ -282,4 +282,3 @@ class Minesweeper(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Load the Minesweeper cog."""
     bot.add_cog(Minesweeper(bot))
-    log.info("Minesweeper cog loaded")

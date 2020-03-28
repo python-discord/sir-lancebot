@@ -234,4 +234,3 @@ class BeMyValentine(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Be my Valentine Cog load."""
     bot.add_cog(BeMyValentine(bot))
-    log.info("BeMyValentine cog loaded")

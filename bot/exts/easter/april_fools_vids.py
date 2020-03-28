@@ -36,4 +36,3 @@ class AprilFoolVideos(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """April Fools' Cog load."""
     bot.add_cog(AprilFoolVideos(bot))
-    log.info('April Fools videos cog loaded!')

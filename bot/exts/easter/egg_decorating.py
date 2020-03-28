@@ -116,4 +116,3 @@ class EggDecorating(commands.Cog):
 def setup(bot: commands.bot) -> None:
     """Egg decorating Cog load."""
     bot.add_cog(EggDecorating(bot))
-    log.info("EggDecorating cog loaded.")

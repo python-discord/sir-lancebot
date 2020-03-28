@@ -31,4 +31,3 @@ class ShowProjects(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Show Projects Reaction Cog."""
     bot.add_cog(ShowProjects(bot))
-    log.info("ShowProjects cog loaded")

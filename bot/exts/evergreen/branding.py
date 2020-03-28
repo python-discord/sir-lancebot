@@ -501,4 +501,3 @@ class BrandingManager(commands.Cog):
 def setup(bot: SeasonalBot) -> None:
     """Load BrandingManager cog."""
     bot.add_cog(BrandingManager(bot))
-    log.info("BrandingManager cog loaded")

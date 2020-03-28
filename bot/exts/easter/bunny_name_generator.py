@@ -90,4 +90,3 @@ class BunnyNameGenerator(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Bunny Name Generator Cog load."""
     bot.add_cog(BunnyNameGenerator(bot))
-    log.info("BunnyNameGenerator cog loaded.")

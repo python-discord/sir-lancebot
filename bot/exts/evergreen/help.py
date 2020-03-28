@@ -540,8 +540,6 @@ def setup(bot: SeasonalBot) -> None:
     except Exception:
         unload(bot)
         raise
-    else:
-        log.info("Help cog loaded")
 
 
 def teardown(bot: SeasonalBot) -> None:

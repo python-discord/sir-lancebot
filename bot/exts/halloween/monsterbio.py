@@ -53,4 +53,3 @@ class MonsterBio(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Monster bio Cog load."""
     bot.add_cog(MonsterBio(bot))
-    log.info("MonsterBio cog loaded.")

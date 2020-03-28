@@ -48,4 +48,3 @@ class RecommendGame(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Loads the RecommendGame cog."""
     bot.add_cog(RecommendGame(bot))
-    log.info("RecommendGame cog loaded")

@@ -98,4 +98,3 @@ class EasterRiddle(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Easter Riddle Cog load."""
     bot.add_cog(EasterRiddle(bot))
-    log.info("Easter Riddle bot loaded")

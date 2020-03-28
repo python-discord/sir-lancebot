@@ -36,4 +36,3 @@ class SpookyGif(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Spooky GIF Cog load."""
     bot.add_cog(SpookyGif(bot))
-    log.info("SpookyGif cog loaded")

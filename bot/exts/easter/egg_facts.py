@@ -58,4 +58,3 @@ class EasterFacts(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Easter Egg facts cog load."""
     bot.add_cog(EasterFacts(bot))
-    log.info("EasterFacts cog loaded")

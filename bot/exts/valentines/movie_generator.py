@@ -60,4 +60,3 @@ class RomanceMovieFinder(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Romance movie Cog load."""
     bot.add_cog(RomanceMovieFinder(bot))
-    log.info("RomanceMovieFinder cog loaded")

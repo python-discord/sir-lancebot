@@ -129,4 +129,3 @@ class ScaryMovie(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Scary movie Cog load."""
     bot.add_cog(ScaryMovie(bot))
-    log.info("ScaryMovie cog loaded")

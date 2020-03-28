@@ -126,4 +126,3 @@ class Reddit(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Load the Cog."""
     bot.add_cog(Reddit(bot))
-    log.debug('Loaded')

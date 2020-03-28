@@ -142,4 +142,3 @@ class PrideAvatar(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Cog load."""
     bot.add_cog(PrideAvatar(bot))
-    log.info("PrideAvatar cog loaded")

@@ -127,4 +127,3 @@ class CommandErrorHandler(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Error handler Cog load."""
     bot.add_cog(CommandErrorHandler(bot))
-    log.info("CommandErrorHandler cog loaded")

@@ -64,4 +64,3 @@ class SpookyRating(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Spooky Rating Cog load."""
     bot.add_cog(SpookyRating(bot))
-    log.info("SpookyRating cog loaded")
