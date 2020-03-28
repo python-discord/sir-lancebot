@@ -7,7 +7,7 @@ from discord import Embed, Message
 from discord.ext import commands
 
 from bot.constants import Colours, ERROR_REPLIES, NEGATIVE_REPLIES
-from bot.decorators import InChannelCheckFailure, InMonthCheckFailure
+from bot.utils.decorators import InChannelCheckFailure, InMonthCheckFailure
 from bot.utils.exceptions import BrandingError
 
 log = logging.getLogger(__name__)

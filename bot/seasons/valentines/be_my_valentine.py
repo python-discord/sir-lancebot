@@ -9,7 +9,7 @@ from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
 
 from bot.constants import Channels, Client, Colours, Lovefest, Month
-from bot.decorators import in_month
+from bot.utils.decorators import in_month
 
 log = logging.getLogger(__name__)
 

@@ -11,7 +11,7 @@ from discord import DiscordException, Embed
 from discord.ext import commands
 
 from bot.constants import Channels, Client
-from bot.decorators import mock_in_debug
+from bot.utils.decorators import mock_in_debug
 
 log = logging.getLogger(__name__)
 

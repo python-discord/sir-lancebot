@@ -5,7 +5,7 @@ import discord
 from discord.ext.commands import Bot, Cog
 
 from bot.constants import Month
-from bot.decorators import in_month
+from bot.utils.decorators import in_month
 
 log = logging.getLogger(__name__)
 

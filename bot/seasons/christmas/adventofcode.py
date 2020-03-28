@@ -14,8 +14,8 @@ from discord.ext import commands
 from pytz import timezone
 
 from bot.constants import AdventOfCode as AocConfig, Channels, Colours, Emojis, Month, Tokens, WHITELISTED_CHANNELS
-from bot.decorators import in_month, override_in_channel
 from bot.utils import unlocked_role
+from bot.utils.decorators import in_month, override_in_channel
 
 log = logging.getLogger(__name__)
 

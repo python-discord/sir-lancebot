@@ -6,7 +6,7 @@ from discord import Embed
 from discord.ext import commands
 
 from bot.constants import Colours, Month
-from bot.decorators import in_month
+from bot.utils.decorators import in_month
 
 log = logging.getLogger(__name__)
 

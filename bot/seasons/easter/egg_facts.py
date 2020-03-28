@@ -7,7 +7,7 @@ import discord
 from discord.ext import commands
 
 from bot.constants import Channels, Colours, Month
-from bot.decorators import seasonal_task
+from bot.utils.decorators import seasonal_task
 
 log = logging.getLogger(__name__)
 

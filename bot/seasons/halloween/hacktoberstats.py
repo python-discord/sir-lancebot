@@ -11,7 +11,7 @@ import discord
 from discord.ext import commands
 
 from bot.constants import Channels, Month, WHITELISTED_CHANNELS
-from bot.decorators import in_month, override_in_channel
+from bot.utils.decorators import in_month, override_in_channel
 from bot.utils.persist import make_persistent
 
 log = logging.getLogger(__name__)

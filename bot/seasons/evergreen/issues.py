@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 
 from bot.constants import Colours, Emojis, WHITELISTED_CHANNELS
-from bot.decorators import override_in_channel
+from bot.utils.decorators import override_in_channel
 
 log = logging.getLogger(__name__)
 
