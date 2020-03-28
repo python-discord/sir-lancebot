@@ -1,6 +1,7 @@
 # Help command from Python bot. All commands that will be added to there in futures should be added to here too.
 import asyncio
 import itertools
+import logging
 from collections import namedtuple
 from contextlib import suppress
 from typing import Union
@@ -29,6 +30,8 @@ REACTIONS = {
 }
 
 Cog = namedtuple('Cog', ['name', 'description', 'commands'])
+
+log = logging.getLogger(__name__)
 
 
 class HelpQueryNotFound(ValueError):
@@ -537,6 +540,8 @@ def setup(bot: SeasonalBot) -> None:
     except Exception:
         unload(bot)
         raise
+    else:
+        log.info("Help cog loaded")
 
 
 def teardown(bot: SeasonalBot) -> None:
