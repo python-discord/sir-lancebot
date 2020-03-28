@@ -13,6 +13,5 @@ for ext in get_extensions():
     bot.load_extension(ext)
 
 bot.load_extension("bot.branding")
-bot.load_extension("bot.help")
 
 bot.run(Client.token)
