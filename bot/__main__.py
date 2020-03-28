@@ -12,6 +12,4 @@ bot.add_check(in_channel_check(*WHITELISTED_CHANNELS, bypass_roles=STAFF_ROLES))
 for ext in get_extensions():
     bot.load_extension(ext)
 
-bot.load_extension("bot.branding")
-
 bot.run(Client.token)
