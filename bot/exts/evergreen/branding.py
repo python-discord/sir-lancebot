@@ -12,7 +12,7 @@ from discord.ext import commands
 
 from bot.bot import SeasonalBot
 from bot.constants import Branding, Colours, Emojis, MODERATION_ROLES, Tokens
-from bot.seasons import SeasonBase, get_current_season, get_season
+from bot.exts import SeasonBase, get_current_season, get_season
 from bot.utils.decorators import with_role
 from bot.utils.exceptions import BrandingError
 

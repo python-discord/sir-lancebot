@@ -2,7 +2,7 @@ import sqlite3
 from pathlib import Path
 from shutil import copyfile
 
-from bot.seasons import get_season_names
+from bot.exts import get_season_names
 
 DIRECTORY = Path("data")  # directory that has a persistent volume mapped to it
 

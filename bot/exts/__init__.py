@@ -140,7 +140,7 @@ class Wildcard(SeasonBase):
 
 
 def get_season_names() -> List[str]:
-    """Return names of all packages located in /bot/seasons/."""
+    """Return names of all packages located in /bot/exts/."""
     seasons = [
         package.name
         for package in pkgutil.iter_modules(__path__)
@@ -162,7 +162,7 @@ def get_extensions() -> List[str]:
 
     for season in get_season_names():
         for module in pkgutil.iter_modules([base_path.joinpath(season)]):
-            extensions.append(f"bot.seasons.{season}.{module.name}")
+            extensions.append(f"bot.exts.{season}.{module.name}")
 
     return extensions
 

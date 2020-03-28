@@ -18,8 +18,8 @@ from discord import Colour, Embed, File, Member, Message, Reaction
 from discord.ext.commands import BadArgument, Bot, Cog, CommandError, Context, bot_has_permissions, group
 
 from bot.constants import ERROR_REPLIES, Tokens
-from bot.seasons.evergreen.snakes import utils
-from bot.seasons.evergreen.snakes.converter import Snake
+from bot.exts.evergreen.snakes import utils
+from bot.exts.evergreen.snakes.converter import Snake
 from bot.utils.decorators import locked
 
 log = logging.getLogger(__name__)

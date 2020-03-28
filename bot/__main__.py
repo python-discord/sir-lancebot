@@ -2,7 +2,7 @@ import logging
 
 from bot.bot import bot
 from bot.constants import Client, STAFF_ROLES, WHITELISTED_CHANNELS
-from bot.seasons import get_extensions
+from bot.exts import get_extensions
 from bot.utils.decorators import in_channel_check
 
 log = logging.getLogger(__name__)
