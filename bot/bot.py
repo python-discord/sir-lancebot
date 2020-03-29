@@ -45,6 +45,14 @@ class SeasonalBot(commands.Bot):
             connector=TCPConnector(resolver=AsyncResolver(), family=socket.AF_INET)
         )
 
+    @property
+    def member(self) -> Optional[discord.Member]:
+        """Retrieves the guild member object for the bot."""
+        guild = bot.get_guild(Client.guild)
+        if not guild:
+            return None
+        return guild.me
+
     def add_cog(self, cog: commands.Cog) -> None:
         """
         Delegate to super to register `cog`.
@@ -54,22 +62,6 @@ class SeasonalBot(commands.Bot):
         super().add_cog(cog)
         log.info(f"Cog loaded: {cog.qualified_name}")
 
-    async def send_log(self, title: str, details: str = None, *, icon: str = None) -> None:
-        """Send an embed message to the devlog channel."""
-        devlog = self.get_channel(Channels.devlog)
-
-        if not devlog:
-            log.warning("Log failed to send. Devlog channel not found.")
-            return
-
-        if not icon:
-            icon = self.user.avatar_url_as(format="png")
-
-        embed = Embed(description=details)
-        embed.set_author(name=title, icon_url=icon)
-
-        await devlog.send(embed=embed)
-
     async def on_command_error(self, context: commands.Context, exception: DiscordException) -> None:
         """Check command errors for UserInputError and reset the cooldown if thrown."""
         if isinstance(exception, commands.UserInputError):
@@ -77,13 +69,11 @@ class SeasonalBot(commands.Bot):
         else:
             await super().on_command_error(context, exception)
 
-    @property
-    def member(self) -> Optional[discord.Member]:
-        """Retrieves the guild member object for the bot."""
-        guild = bot.get_guild(Client.guild)
-        if not guild:
-            return None
-        return guild.me
+    async def _fetch_image(self, url: str) -> bytes:
+        """Retrieve and read image from `url`."""
+        log.debug(f"Getting image from: {url}")
+        async with self.http_session.get(url) as resp:
+            return await resp.read()
 
     async def _apply_asset(self, target: Union[Guild, User], asset: AssetType, url: str) -> bool:
         """
@@ -114,11 +104,6 @@ class SeasonalBot(commands.Bot):
             return True
 
     @mock_in_debug(return_value=True)
-    async def set_avatar(self, url: str) -> bool:
-        """Set the bot's avatar to image at `url`."""
-        return await self._apply_asset(self.user, AssetType.avatar, url)
-
-    @mock_in_debug(return_value=True)
     async def set_banner(self, url: str) -> bool:
         """Set the guild's banner to image at `url`."""
         guild = bot.get_guild(Client.guild)
@@ -138,11 +123,10 @@ class SeasonalBot(commands.Bot):
 
         return await self._apply_asset(guild, AssetType.server_icon, url)
 
-    async def _fetch_image(self, url: str) -> bytes:
-        """Retrieve an image based on a URL."""
-        log.debug(f"Getting image from: {url}")
-        async with self.http_session.get(url) as resp:
-            return await resp.read()
+    @mock_in_debug(return_value=True)
+    async def set_avatar(self, url: str) -> bool:
+        """Set the bot's avatar to image at `url`."""
+        return await self._apply_asset(self.user, AssetType.avatar, url)
 
     @mock_in_debug(return_value=True)
     async def set_nickname(self, new_name: str) -> bool:
@@ -161,6 +145,22 @@ class SeasonalBot(commands.Bot):
         else:
             log.info("Nickname set successfully")
             return True
+
+    async def send_log(self, title: str, details: str = None, *, icon: str = None) -> None:
+        """Send an embed message to the devlog channel."""
+        devlog = self.get_channel(Channels.devlog)
+
+        if not devlog:
+            log.warning("Log failed to send. Devlog channel not found.")
+            return
+
+        if not icon:
+            icon = self.user.avatar_url_as(format="png")
+
+        embed = Embed(description=details)
+        embed.set_author(name=title, icon_url=icon)
+
+        await devlog.send(embed=embed)
 
 
 bot = SeasonalBot(command_prefix=Client.prefix)
