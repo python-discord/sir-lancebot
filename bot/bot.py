@@ -115,60 +115,28 @@ class SeasonalBot(commands.Bot):
 
     @mock_in_debug(return_value=True)
     async def set_avatar(self, url: str) -> bool:
-        """Sets the bot's avatar based on a URL."""
-        # Track old avatar hash for later comparison
-        old_avatar = bot.user.avatar
-
-        image = await self._fetch_image(url)
-        with contextlib.suppress(discord.HTTPException, asyncio.TimeoutError):
-            async with async_timeout.timeout(5):
-                await bot.user.edit(avatar=image)
-
-        if bot.user.avatar != old_avatar:
-            log.debug(f"Avatar changed to {url}")
-            return True
-
-        log.warning(f"Changing avatar failed: {url}")
-        return False
+        """Set the bot's avatar to image at `url`."""
+        return await self._apply_asset(self.user, AssetType.avatar, url)
 
     @mock_in_debug(return_value=True)
     async def set_banner(self, url: str) -> bool:
-        """Sets the guild's banner based on the provided `url`."""
+        """Set the guild's banner to image at `url`."""
         guild = bot.get_guild(Client.guild)
-        old_banner = guild.banner
+        if guild is None:
+            log.info("Failed to get guild instance, aborting asset upload")
+            return False
 
-        image = await self._fetch_image(url)
-        with contextlib.suppress(discord.HTTPException, asyncio.TimeoutError):
-            async with async_timeout.timeout(5):
-                await guild.edit(banner=image)
-
-        new_banner = bot.get_guild(Client.guild).banner
-        if new_banner != old_banner:
-            log.debug(f"Banner changed to {url}")
-            return True
-
-        log.warning(f"Changing banner failed: {url}")
-        return False
+        return await self._apply_asset(guild, AssetType.banner, url)
 
     @mock_in_debug(return_value=True)
     async def set_icon(self, url: str) -> bool:
-        """Sets the guild's icon based on a URL."""
+        """Sets the guild's icon to image at `url`."""
         guild = bot.get_guild(Client.guild)
-        # Track old icon hash for later comparison
-        old_icon = guild.icon
+        if guild is None:
+            log.info("Failed to get guild instance, aborting asset upload")
+            return False
 
-        image = await self._fetch_image(url)
-        with contextlib.suppress(discord.HTTPException, asyncio.TimeoutError):
-            async with async_timeout.timeout(5):
-                await guild.edit(icon=image)
-
-        new_icon = bot.get_guild(Client.guild).icon
-        if new_icon != old_icon:
-            log.debug(f"Icon changed to {url}")
-            return True
-
-        log.warning(f"Changing icon failed: {url}")
-        return False
+        return await self._apply_asset(guild, AssetType.server_icon, url)
 
     async def _fetch_image(self, url: str) -> bytes:
         """Retrieve an image based on a URL."""
@@ -177,18 +145,22 @@ class SeasonalBot(commands.Bot):
             return await resp.read()
 
     @mock_in_debug(return_value=True)
-    async def set_nickname(self, new_name: str = None) -> bool:
-        """Set the bot nickname in the main guild."""
-        old_display_name = self.member.display_name
-
-        if old_display_name == new_name:
+    async def set_nickname(self, new_name: str) -> bool:
+        """Set the bot nickname in the main guild to `new_name`."""
+        member = self.member
+        if member is None:
+            log.info("Failed to get bot member instance, aborting asset upload")
             return False
 
-        log.debug(f"Changing nickname to {new_name}")
-        with contextlib.suppress(discord.HTTPException):
-            await self.member.edit(nick=new_name)
-
-        return not old_display_name == self.member.display_name
+        log.info(f"Attempting to set nickname to {new_name}")
+        try:
+            await member.edit(nick=new_name)
+        except discord.HTTPException as discord_error:
+            log.exception("Setting nickname failed", exc_info=discord_error)
+            return False
+        else:
+            log.info("Nickname set successfully")
+            return True
 
 
 bot = SeasonalBot(command_prefix=Client.prefix)
