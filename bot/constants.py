@@ -151,6 +151,12 @@ class Month(enum.IntEnum):
     december = 12
 
 
+# If a month override was configured, check that it's a valid Month
+# Prevents delaying an exception after the bot starts
+if Client.month_override is not None:
+    Month(Client.month_override)
+
+
 class Roles(NamedTuple):
     admin = int(environ.get("SEASONALBOT_ADMIN_ROLE_ID", 267628507062992896))
     announcements = 463658397560995840
