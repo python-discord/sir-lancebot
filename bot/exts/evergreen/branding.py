@@ -332,8 +332,8 @@ class BrandingManager(commands.Cog):
             return False
 
         if not self.remaining_icons:
+            log.info("Reset & shuffle remaining icons")
             await self._reset_remaining_icons()
-            log.info(f"Set remaining icons: {await pretty_files(self.remaining_icons)}")
 
         next_up, *self.remaining_icons = self.remaining_icons
         success = await self.bot.set_icon(next_up.download_url)
