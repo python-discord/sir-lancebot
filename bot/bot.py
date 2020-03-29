@@ -137,36 +137,6 @@ class SeasonalBot(commands.Bot):
             return await resp.read()
 
     @mock_in_debug(return_value=True)
-    async def set_username(self, new_name: str, nick_only: bool = False) -> Optional[bool]:
-        """
-        Set the bot username and/or nickname to given new name.
-
-        Returns True/False based on success, or None if nickname fallback also failed.
-        """
-        old_username = self.user.name
-
-        if nick_only:
-            return await self.set_nickname(new_name)
-
-        if old_username == new_name:
-            # since the username is correct, make sure nickname is removed
-            return await self.set_nickname()
-
-        log.debug(f"Changing username to {new_name}")
-        with contextlib.suppress(discord.HTTPException):
-            await bot.user.edit(username=new_name, nick=None)
-
-        if not new_name == self.member.display_name:
-            # name didn't change, try to changing nickname as fallback
-            if await self.set_nickname(new_name):
-                log.warning(f"Changing username failed, changed nickname instead.")
-                return False
-            log.warning(f"Changing username and nickname failed.")
-            return None
-
-        return True
-
-    @mock_in_debug(return_value=True)
     async def set_nickname(self, new_name: str = None) -> bool:
         """Set the bot nickname in the main guild."""
         old_display_name = self.member.display_name
