@@ -89,6 +89,7 @@ class Emojis:
     christmas_tree = "\U0001F384"
     check = "\u2611"
     envelope = "\U0001F4E8"
+    pin = "\U0001f4cc"
     trashcan = "<:trashcan:637136429717389331>"
 
     terning1 = "<:terning1:431249668983488527>"
