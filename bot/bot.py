@@ -2,12 +2,12 @@ import asyncio
 import enum
 import logging
 import socket
-from typing import Optional
+from typing import Optional, Union
 
 import async_timeout
 import discord
 from aiohttp import AsyncResolver, ClientSession, TCPConnector
-from discord import DiscordException, Embed
+from discord import DiscordException, Embed, Guild, User
 from discord.ext import commands
 
 from bot.constants import Channels, Client
@@ -84,6 +84,34 @@ class SeasonalBot(commands.Bot):
         if not guild:
             return None
         return guild.me
+
+    async def _apply_asset(self, target: Union[Guild, User], asset: AssetType, url: str) -> bool:
+        """
+        Internal method for applying media assets to the guild or the bot.
+
+        This shouldn't be called directly. The purpose of this method is mainly generic
+        error handling to reduce needless code repetition.
+
+        Return True if upload was successful, False otherwise.
+        """
+        log.info(f"Attempting to set {asset.name}: {url}")
+
+        kwargs = {asset.value: await self._fetch_image(url)}
+        try:
+            async with async_timeout.timeout(5):
+                await target.edit(**kwargs)
+
+        except asyncio.TimeoutError:
+            log.info("Asset upload timed out")
+            return False
+
+        except discord.HTTPException as discord_error:
+            log.exception("Asset upload failed", exc_info=discord_error)
+            return False
+
+        else:
+            log.info(f"Asset successfully applied")
+            return True
 
     @mock_in_debug(return_value=True)
     async def set_avatar(self, url: str) -> bool:
