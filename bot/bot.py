@@ -48,7 +48,7 @@ class SeasonalBot(commands.Bot):
     @property
     def member(self) -> Optional[discord.Member]:
         """Retrieves the guild member object for the bot."""
-        guild = bot.get_guild(Client.guild)
+        guild = self.get_guild(Client.guild)
         if not guild:
             return None
         return guild.me
@@ -106,7 +106,7 @@ class SeasonalBot(commands.Bot):
     @mock_in_debug(return_value=True)
     async def set_banner(self, url: str) -> bool:
         """Set the guild's banner to image at `url`."""
-        guild = bot.get_guild(Client.guild)
+        guild = self.get_guild(Client.guild)
         if guild is None:
             log.info("Failed to get guild instance, aborting asset upload")
             return False
@@ -116,7 +116,7 @@ class SeasonalBot(commands.Bot):
     @mock_in_debug(return_value=True)
     async def set_icon(self, url: str) -> bool:
         """Sets the guild's icon to image at `url`."""
-        guild = bot.get_guild(Client.guild)
+        guild = self.get_guild(Client.guild)
         if guild is None:
             log.info("Failed to get guild instance, aborting asset upload")
             return False
