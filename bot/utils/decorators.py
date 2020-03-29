@@ -31,6 +31,20 @@ class InMonthCheckFailure(CheckFailure):
     pass
 
 
+def _resolve_current_month() -> Month:
+    """
+    Helper for local decorators to determine the correct Month value.
+
+    This interfaces with the `MONTH_OVERRIDE` env var. If tha variable was set,
+    current month always resolves to this value. Otherwise, the current utc month
+    is given.
+    """
+    if Client.month_override is not None:
+        return Month(Client.month_override)
+    else:
+        return Month(datetime.utcnow().month)
+
+
 def seasonal_task(*allowed_months: Month, sleep_time: t.Union[float, int] = ONE_DAY) -> t.Callable:
     """
     Perform the decorated method periodically in `allowed_months`.
@@ -50,7 +64,7 @@ def seasonal_task(*allowed_months: Month, sleep_time: t.Union[float, int] = ONE_
             log.info(f"Starting seasonal task {task_body.__qualname__} ({allowed_months})")
 
             while True:
-                current_month = Month(datetime.utcnow().month)
+                current_month = _resolve_current_month()
 
                 if current_month in allowed_months:
                     await task_body(*args, **kwargs)
@@ -72,7 +86,7 @@ def in_month_listener(*allowed_months: Month) -> t.Callable:
         @functools.wraps(listener)
         async def guarded_listener(*args, **kwargs) -> None:
             """Wrapped listener will abort if not in allowed month."""
-            current_month = Month(datetime.utcnow().month)
+            current_month = _resolve_current_month()
 
             if current_month in allowed_months:
                 # Propagate return value although it should always be None
@@ -90,7 +104,7 @@ def in_month_command(*allowed_months: Month) -> t.Callable:
     Uses the current UTC month at the time of running the predicate.
     """
     async def predicate(ctx: Context) -> bool:
-        current_month = datetime.utcnow().month
+        current_month = _resolve_current_month()
         can_run = current_month in allowed_months
 
         human_months = ", ".join(m.name for m in allowed_months)
