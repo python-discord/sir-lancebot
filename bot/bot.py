@@ -1,5 +1,5 @@
 import asyncio
-import contextlib
+import enum
 import logging
 import socket
 from typing import Optional
@@ -15,7 +15,19 @@ from bot.utils.decorators import mock_in_debug
 
 log = logging.getLogger(__name__)
 
-__all__ = ('SeasonalBot', 'bot')
+__all__ = ("AssetType", "SeasonalBot", "bot")
+
+
+class AssetType(enum.Enum):
+    """
+    Discord media assets.
+
+    The values match exactly the kwarg keys that can be passed to `Guild.edit` or `User.edit`.
+    """
+
+    banner = "banner"
+    avatar = "avatar"
+    server_icon = "icon"
 
 
 class SeasonalBot(commands.Bot):
