@@ -2,12 +2,27 @@ import asyncio
 import contextlib
 import re
 import string
+from datetime import datetime
 from typing import List
 
 import discord
 from discord.ext.commands import BadArgument, Context
 
+from bot.constants import Client, Month
 from bot.utils.pagination import LinePaginator
+
+
+def resolve_current_month() -> Month:
+    """
+    Determine current month w.r.t. `Client.month_override` env var.
+
+    If the env variable was set, current month always resolves to the configured value.
+    Otherwise, the current UTC month is given.
+    """
+    if Client.month_override is not None:
+        return Month(Client.month_override)
+    else:
+        return Month(datetime.utcnow().month)
 
 
 async def disambiguate(
