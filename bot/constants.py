@@ -39,7 +39,6 @@ class AdventOfCode:
 
 class Branding:
     cycle_frequency = int(environ.get("CYCLE_FREQUENCY", 3))  # 0: never, 1: every day, 2: every other day, ...
-    autostart = environ.get("BRANDING_AUTOSTART", "").lower() == "true"  # Launch the branding daemon on start-up
 
 
 class Channels(NamedTuple):
