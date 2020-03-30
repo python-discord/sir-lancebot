@@ -1,9 +1,11 @@
 import asyncio
 import itertools
+import json
 import logging
 import random
 import typing as t
 from datetime import datetime, time, timedelta
+from pathlib import Path
 
 import arrow
 import discord
@@ -15,6 +17,7 @@ from bot.constants import Branding, Colours, Emojis, MODERATION_ROLES, Tokens
 from bot.seasons import SeasonBase, get_all_seasons, get_current_season, get_season
 from bot.utils.decorators import with_role
 from bot.utils.exceptions import BrandingError
+from bot.utils.persist import make_persistent
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -77,10 +80,11 @@ class BrandingManager(commands.Cog):
     via Github's API, resolving download urls for them, and delegating
     to the `bot` instance to upload them to the guild.
 
-    The cog is designed to be entirely autonomous. The `daemon` background task awakens once
-    a day (see `time_until_midnight`) to detect new seasons, or to cycle icons within a single
-    season. If the `Branding.autostart` constant is True, the `daemon` will launch on start-up,
-    otherwise it can be controlled via the `daemon` cmd group.
+    BrandingManager is designed to be entirely autonomous. Its `daemon` background task awakens
+    once a day (see `time_until_midnight`) to detect new seasons, or to cycle icons within a single
+    season. The daemon can be turned on and off via the `daemon` cmd group. The value set via
+    its `start` and `stop` commands is persisted across sessions. If turned on, the daemon will
+    automatically start on the next bot start-up. Otherwise, it will wait to be started manually.
 
     All supported operations, e.g. setting seasons, applying the branding, or cycling icons, can
     also be invoked manually, via the following API:
@@ -129,6 +133,8 @@ class BrandingManager(commands.Cog):
 
     should_cycle: t.Iterator
 
+    config_file: Path
+
     daemon: t.Optional[asyncio.Task]
 
     def __init__(self, bot: SeasonalBot) -> None:
@@ -150,7 +156,10 @@ class BrandingManager(commands.Cog):
         self.available_icons = []
         self.remaining_icons = []
 
-        if Branding.autostart:
+        self.config_file = make_persistent(Path("bot", "resources", "evergreen", "branding.json"))
+        should_run = self._read_config()["daemon_active"]
+
+        if should_run:
             self.daemon = self.bot.loop.create_task(self._daemon_func())
         else:
             self.daemon = None
@@ -159,6 +168,19 @@ class BrandingManager(commands.Cog):
     def _daemon_running(self) -> bool:
         """True if the daemon is currently active, False otherwise."""
         return self.daemon is not None and not self.daemon.done()
+
+    def _read_config(self) -> t.Dict[str, bool]:
+        """Read and return persistent config file."""
+        with self.config_file.open("r") as persistent_file:
+            return json.load(persistent_file)
+
+    def _write_config(self, key: str, value: bool) -> None:
+        """Write a `key`, `value` pair to persistent config file."""
+        current_config = self._read_config()
+        current_config[key] = value
+
+        with self.config_file.open("w") as persistent_file:
+            json.dump(current_config, persistent_file)
 
     async def _daemon_func(self) -> None:
         """
@@ -507,6 +529,8 @@ class BrandingManager(commands.Cog):
             raise BrandingError("Daemon already running!")
 
         self.daemon = self.bot.loop.create_task(self._daemon_func())
+        self._write_config("daemon_active", True)
+
         response = discord.Embed(description=f"Daemon started {Emojis.ok_hand}", colour=Colours.soft_green)
         await ctx.send(embed=response)
 
@@ -517,6 +541,8 @@ class BrandingManager(commands.Cog):
             raise BrandingError("Daemon not running!")
 
         self.daemon.cancel()
+        self._write_config("daemon_active", False)
+
         response = discord.Embed(description=f"Daemon stopped {Emojis.ok_hand}", colour=Colours.soft_green)
         await ctx.send(embed=response)
 
