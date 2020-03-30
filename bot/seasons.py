@@ -1,8 +1,8 @@
 import logging
 import typing as t
-from datetime import datetime
 
 from bot.constants import Colours, Month
+from bot.utils import resolve_current_month
 
 log = logging.getLogger(__name__)
 
@@ -130,7 +130,7 @@ def get_all_seasons() -> t.List[t.Type[SeasonBase]]:
 
 def get_current_season() -> t.Type[SeasonBase]:
     """Give active season, based on current UTC month."""
-    current_month = Month(datetime.utcnow().month)
+    current_month = resolve_current_month()
 
     active_seasons = tuple(
         season
