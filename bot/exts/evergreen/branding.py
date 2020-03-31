@@ -33,15 +33,15 @@ BRANDING_URL = "https://api.github.com/repos/python-discord/branding/contents"
 PARAMS = {"ref": "seasonal-structure"}  # Target branch
 HEADERS = {"Accept": "application/vnd.github.v3+json"}  # Ensure we use API v3
 
-# A Github token is not necessary for the cog to operate,
+# A GitHub token is not necessary for the cog to operate,
 # unauthorized requests are however limited to 60 per hour
 if Tokens.github:
     HEADERS["Authorization"] = f"token {Tokens.github}"
 
 
-class GithubFile(t.NamedTuple):
+class GitHubFile(t.NamedTuple):
     """
-    Represents a remote file on Github.
+    Represents a remote file on GitHub.
 
     The `sha` hash is kept so that we can determine that a file has changed,
     despite its filename remaining unchanged.
@@ -52,7 +52,7 @@ class GithubFile(t.NamedTuple):
     sha: str
 
 
-async def pretty_files(files: t.Iterable[GithubFile]) -> str:
+async def pretty_files(files: t.Iterable[GitHubFile]) -> str:
     """Provide a human-friendly representation of `files`."""
     return "\n".join(file.path for file in files)
 
@@ -77,7 +77,7 @@ class BrandingManager(commands.Cog):
 
     The purpose of this cog is to help automate the synchronization of the branding
     repository with the guild. It is capable of discovering assets in the repository
-    via Github's API, resolving download urls for them, and delegating
+    via GitHub's API, resolving download urls for them, and delegating
     to the `bot` instance to upload them to the guild.
 
     BrandingManager is designed to be entirely autonomous. Its `daemon` background task awakens
@@ -125,11 +125,11 @@ class BrandingManager(commands.Cog):
 
     current_season: t.Type[SeasonBase]
 
-    banner: t.Optional[GithubFile]
-    avatar: t.Optional[GithubFile]
+    banner: t.Optional[GitHubFile]
+    avatar: t.Optional[GitHubFile]
 
-    available_icons: t.List[GithubFile]
-    remaining_icons: t.List[GithubFile]
+    available_icons: t.List[GitHubFile]
+    remaining_icons: t.List[GitHubFile]
 
     should_cycle: t.Iterator
 
@@ -188,7 +188,7 @@ class BrandingManager(commands.Cog):
 
         Once a day, the daemon will perform the following tasks:
             - Update `current_season`
-            - Poll Github API to see if the available branding for `current_season` has changed
+            - Poll GitHub API to see if the available branding for `current_season` has changed
             - Update assets if changes are detected (banner, guild icon, bot avatar, bot nickname)
             - Check whether it's time to cycle guild icons
 
@@ -264,14 +264,14 @@ class BrandingManager(commands.Cog):
 
         self.should_cycle = counter
 
-    async def _get_files(self, path: str, include_dirs: bool = False) -> t.Dict[str, GithubFile]:
+    async def _get_files(self, path: str, include_dirs: bool = False) -> t.Dict[str, GitHubFile]:
         """
         Get files at `path` in the branding repository.
 
         If `include_dirs` is False (default), only returns files at `path`.
         Otherwise, will return both files and directories. Never returns symlinks.
 
-        Return dict mapping from filename to corresponding `GithubFile` instance.
+        Return dict mapping from filename to corresponding `GitHubFile` instance.
         This may return an empty dict if the response status is non-200,
         or if the target directory is empty.
         """
@@ -279,13 +279,13 @@ class BrandingManager(commands.Cog):
         async with self.bot.http_session.get(url, headers=HEADERS, params=PARAMS) as resp:
             # Short-circuit if we get non-200 response
             if resp.status != STATUS_OK:
-                log.error(f"Github API returned non-200 response: {resp}")
+                log.error(f"GitHub API returned non-200 response: {resp}")
                 return {}
             directory = await resp.json()  # Directory at `path`
 
         allowed_types = {"file", "dir"} if include_dirs else {"file"}
         return {
-            file["name"]: GithubFile(file["download_url"], file["path"], file["sha"])
+            file["name"]: GitHubFile(file["download_url"], file["path"], file["sha"])
             for file in directory
             if file["type"] in allowed_types
         }
@@ -333,7 +333,7 @@ class BrandingManager(commands.Cog):
         else:
             self.available_icons = []  # This should never be the case, but an empty list is a safe value
 
-        # GithubFile instances carry a `sha` attr so this will pick up if a file changes
+        # GitHubFile instances carry a `sha` attr so this will pick up if a file changes
         branding_changed = old_branding != (self.banner, self.avatar, self.available_icons)
 
         if branding_changed:
