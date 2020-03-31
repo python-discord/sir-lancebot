@@ -5,8 +5,8 @@ from discord.ext import commands
 
 log = logging.getLogger(__name__)
 
-SEARCH_API = "https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch={0}&format=json"
-WIKIPEDIA_URL = "https://en.wikipedia.org/wiki/{0}"
+SEARCH_API = "https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch={search_term}&format=json"
+WIKIPEDIA_URL = "https://en.wikipedia.org/wiki/{title}"
 
 
 class WikipediaCog(commands.Cog):
@@ -18,7 +18,7 @@ class WikipediaCog(commands.Cog):
 
     async def search_wikipedia(self, search_term: str) -> Optional[str]:
         """Search wikipedia and return the first page found."""
-        async with self.http_session.get(SEARCH_API.format(search_term)) as response:
+        async with self.http_session.get(SEARCH_API.format(search_term=search_term)) as response:
             data = await response.json()
 
         search_result = data["query"]["search"]
@@ -39,7 +39,7 @@ class WikipediaCog(commands.Cog):
         """Search for something on wikipedia."""
         title = await self.search_wikipedia(search)
         title = title.replace(" ", "_")  # wikipedia uses "_" as spaces
-        await ctx.send(WIKIPEDIA_URL.format(title))
+        await ctx.send(WIKIPEDIA_URL.format(title=title))
 
 
 def setup(bot: commands.Bot) -> None:
