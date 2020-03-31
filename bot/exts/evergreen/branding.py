@@ -219,7 +219,7 @@ class BrandingManager(commands.Cog):
 
         # If we're in a non-evergreen season, also show active months
         if self.current_season is not SeasonBase:
-            active_months = ", ".join(m.name for m in self.current_season.months)
+            active_months = ", ".join(m.name.title() for m in self.current_season.months)
             title = f"{self.current_season.season_name} ({active_months})"
         else:
             title = self.current_season.season_name
@@ -407,7 +407,7 @@ class BrandingManager(commands.Cog):
             if season is SeasonBase:
                 active_when = "always"
             else:
-                months = ", ".join(m.name for m in season.months)
+                months = ", ".join(m.name.title() for m in season.months)
                 active_when = f"in {months}"
 
             description = (
