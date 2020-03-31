@@ -26,7 +26,7 @@ class HacktoberIssues(commands.Cog):
         self.cache_beginner = None
         self.cache_timer_beginner = datetime.datetime(1, 1, 1)
 
-    @in_month(Month.october)
+    @in_month(Month.OCTOBER)
     @commands.command()
     async def hacktoberissues(self, ctx: commands.Context, option: str = "") -> None:
         """

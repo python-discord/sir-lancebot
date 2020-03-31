@@ -153,7 +153,7 @@ class AdventOfCode(commands.Cog):
         status_coro = countdown_status(self.bot)
         self.status_task = self.bot.loop.create_task(status_coro)
 
-    @in_month(Month.december)
+    @in_month(Month.DECEMBER)
     @commands.group(name="adventofcode", aliases=("aoc",))
     @override_in_channel(AOC_WHITELIST)
     async def adventofcode_group(self, ctx: commands.Context) -> None:

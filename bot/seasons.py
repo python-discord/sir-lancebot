@@ -43,7 +43,7 @@ class Christmas(SeasonBase):
 
     branding_path = "seasonal/christmas"
 
-    months = {Month.december}
+    months = {Month.DECEMBER}
 
 
 class Easter(SeasonBase):
@@ -60,7 +60,7 @@ class Easter(SeasonBase):
 
     branding_path = "seasonal/easter"
 
-    months = {Month.april}
+    months = {Month.APRIL}
 
 
 class Halloween(SeasonBase):
@@ -74,7 +74,7 @@ class Halloween(SeasonBase):
 
     branding_path = "seasonal/halloween"
 
-    months = {Month.october}
+    months = {Month.OCTOBER}
 
 
 class Pride(SeasonBase):
@@ -94,7 +94,7 @@ class Pride(SeasonBase):
 
     branding_path = "seasonal/pride"
 
-    months = {Month.june}
+    months = {Month.JUNE}
 
 
 class Valentines(SeasonBase):
@@ -108,7 +108,7 @@ class Valentines(SeasonBase):
 
     branding_path = "seasonal/valentines"
 
-    months = {Month.february}
+    months = {Month.FEBRUARY}
 
 
 class Wildcard(SeasonBase):
@@ -120,7 +120,7 @@ class Wildcard(SeasonBase):
     colour = Colours.purple
     description = "A season full of surprises!"
 
-    months = {Month.august}
+    months = {Month.AUGUST}
 
 
 def get_all_seasons() -> t.List[t.Type[SeasonBase]]:

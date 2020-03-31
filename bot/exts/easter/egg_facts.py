@@ -32,7 +32,7 @@ class EasterFacts(commands.Cog):
         with p.open(encoding="utf8") as f:
             return load(f)
 
-    @seasonal_task(Month.april)
+    @seasonal_task(Month.APRIL)
     async def send_egg_fact_daily(self) -> None:
         """A background task that sends an easter egg fact in the event channel everyday."""
         await self.bot.wait_until_ready()

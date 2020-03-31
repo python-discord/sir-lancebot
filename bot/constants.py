@@ -136,18 +136,18 @@ class Lovefest:
 
 
 class Month(enum.IntEnum):
-    january = 1
-    february = 2
-    march = 3
-    april = 4
-    may = 5
-    june = 6
-    july = 7
-    august = 8
-    september = 9
-    october = 10
-    november = 11
-    december = 12
+    JANUARY = 1
+    FEBRUARY = 2
+    MARCH = 3
+    APRIL = 4
+    MAY = 5
+    JUNE = 6
+    JULY = 7
+    AUGUST = 8
+    SEPTEMBER = 9
+    OCTOBER = 10
+    NOVEMBER = 11
+    DECEMBER = 12
 
 
 # If a month override was configured, check that it's a valid Month

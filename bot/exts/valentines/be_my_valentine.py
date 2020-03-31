@@ -31,7 +31,7 @@ class BeMyValentine(commands.Cog):
             valentines = load(json_data)
             return valentines
 
-    @in_month(Month.february)
+    @in_month(Month.FEBRUARY)
     @commands.group(name="lovefest")
     async def lovefest_role(self, ctx: commands.Context) -> None:
         """

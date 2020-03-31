@@ -35,7 +35,7 @@ class CandyCollection(commands.Cog):
             userid = userinfo['userid']
             self.get_candyinfo[userid] = userinfo
 
-    @in_month(Month.october)
+    @in_month(Month.OCTOBER)
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message) -> None:
         """Randomly adds candy or skull reaction to non-bot messages in the Event channel."""
@@ -57,7 +57,7 @@ class CandyCollection(commands.Cog):
             self.msg_reacted.append(d)
             return await message.add_reaction('\N{CANDY}')
 
-    @in_month(Month.october)
+    @in_month(Month.OCTOBER)
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction: discord.Reaction, user: discord.Member) -> None:
         """Add/remove candies from a person if the reaction satisfies criteria."""
@@ -181,7 +181,7 @@ class CandyCollection(commands.Cog):
         with open(json_location, 'w') as outfile:
             json.dump(self.candy_json, outfile)
 
-    @in_month(Month.october)
+    @in_month(Month.OCTOBER)
     @commands.command()
     async def candy(self, ctx: commands.Context) -> None:
         """Get the candy leaderboard and save to JSON."""

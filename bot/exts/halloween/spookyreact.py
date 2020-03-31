@@ -26,7 +26,7 @@ class SpookyReact(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @in_month(Month.october)
+    @in_month(Month.OCTOBER)
     @Cog.listener()
     async def on_message(self, ctx: discord.Message) -> None:
         """

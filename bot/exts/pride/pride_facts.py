@@ -32,7 +32,7 @@ class PrideFacts(commands.Cog):
         with open(Path("bot/resources/pride/facts.json"), "r", encoding="utf-8") as f:
             return json.load(f)
 
-    @seasonal_task(Month.june)
+    @seasonal_task(Month.JUNE)
     async def send_pride_fact_daily(self) -> None:
         """Background task to post the daily pride fact every day."""
         await self.bot.wait_until_ready()
