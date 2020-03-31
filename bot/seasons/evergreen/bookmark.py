@@ -26,7 +26,11 @@ class Bookmark(commands.Cog):
             *,
             title: str = "Bookmark"
     ) -> None:
-        """Send the author a link to `target_message` via DMs. If Nothing is provided it take the commanding message."""
+        """
+        Send the author a link to `target_message` via DMs.
+
+        A user mention can also be passed to get the user's last message in channel where the command is invoked.
+        """
         if type(target) == discord.User:
             async for message in ctx.channel.history(limit=20):  # Takes last 2 messages from the channel.
                 if message.author == target:
