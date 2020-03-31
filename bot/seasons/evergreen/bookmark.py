@@ -2,6 +2,7 @@ import asyncio
 import logging
 import random
 from copy import deepcopy
+from typing import Union
 
 import discord
 from discord.ext import commands
@@ -19,20 +20,23 @@ class Bookmark(commands.Cog):
 
     @commands.command(name="bookmark", aliases=("bm", "pin"))
     async def bookmark(
-        self,
-        ctx: commands.Context,
-        target_message: discord.Message = None,
-        *,
-        title: str = "Bookmark"
+            self,
+            ctx: commands.Context,
+            target: Union[discord.Message, discord.User],
+            *,
+            title: str = "Bookmark"
     ) -> None:
         """Send the author a link to `target_message` via DMs. If Nothing is provided it take the commanding message."""
-        if target_message is None:
-            target_message = ctx.message
+        if type(target) == discord.User:
+            async for message in ctx.channel.history(limit=20):  # Takes last 2 messages from the channel.
+                if message.author == target:
+                    target = message
+                    break
 
         # Prevent users from bookmarking a message in a channel they don't have access to
-        permissions = ctx.author.permissions_in(target_message.channel)
+        permissions = ctx.author.permissions_in(target.channel)
         if not permissions.read_messages:
-            log.info(f"{ctx.author} tried to bookmark a message in #{target_message.channel} but has no permissions.")
+            log.info(f"{ctx.author} tried to bookmark a message in #{target.channel} but has no permissions.")
             embed = discord.Embed(
                 title=random.choice(ERROR_REPLIES),
                 color=Colours.soft_red,
@@ -44,10 +48,10 @@ class Bookmark(commands.Cog):
         embed = discord.Embed(
             title=title,
             colour=Colours.soft_green,
-            description=target_message.content
+            description=target.content
         )
-        embed.add_field(name="Wanna give it a visit?", value=f"[Visit original message]({target_message.jump_url})")
-        embed.set_author(name=target_message.author, icon_url=target_message.author.avatar_url)
+        embed.add_field(name="Wanna give it a visit?", value=f"[Visit original message]({target.jump_url})")
+        embed.set_author(name=target.author, icon_url=target.author.avatar_url)
         embed.set_thumbnail(url=bookmark_icon_url)
 
         error_embed = discord.Embed(
@@ -66,7 +70,7 @@ class Bookmark(commands.Cog):
             await ctx.message.add_reaction(Emojis.envelope)
             sent_person = {ctx.author}  # set of id who got the message
 
-        log.info(f"{ctx.author} bookmarked {target_message.jump_url} with title '{title}'.")
+        log.info(f"{ctx.author} bookmarked {target.jump_url} with title '{title}'.")
         await ctx.message.add_reaction(Emojis.pin)
 
         copied_embed = deepcopy(embed)
@@ -92,7 +96,7 @@ class Bookmark(commands.Cog):
                 await ctx.message.clear_reactions()
                 return
 
-            log.info(f"{user.name} tried bookmarking {target_message.jump_url} with title '{title}' from "
+            log.info(f"{user.name} tried bookmarking {target.jump_url} with title '{title}' from "
                      f"'{ctx.author}'.")
 
             try:
@@ -111,6 +115,7 @@ class Bookmark(commands.Cog):
 
             except discord.HTTPException:
                 await ctx.send("Unknown error while sending bookmark to user.", delete_after=7.5)
+                await reaction.remove(user)
 
             else:
                 sent_person.add(user)
