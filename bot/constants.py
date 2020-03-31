@@ -66,6 +66,7 @@ class Client(NamedTuple):
     guild = int(environ.get("SEASONALBOT_GUILD", 267624335836053506))
     prefix = environ.get("PREFIX", ".")
     token = environ.get("SEASONALBOT_TOKEN")
+    sentry_dsn = environ.get("SEASONALBOT_SENTRY_DSN")
     debug = environ.get("SEASONALBOT_DEBUG", "").lower() == "true"
     season_override = environ.get("SEASON_OVERRIDE")
     icon_cycle_frequency = 3  # N days to wait between cycling server icons within a single season
@@ -138,6 +139,7 @@ class Tokens(NamedTuple):
     omdb = environ.get("OMDB_API_KEY")
     youtube = environ.get("YOUTUBE_API_KEY")
     tmdb = environ.get("TMDB_API_KEY")
+    nasa = environ.get("NASA_API_KEY")
     igdb = environ.get("IGDB_API_KEY")
 
 
