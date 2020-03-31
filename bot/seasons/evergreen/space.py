@@ -42,6 +42,10 @@ class Space(Cog):
         self.rovers = {}
         self.get_rovers.start()
 
+    def cog_unload(self) -> None:
+        """Cancel `get_rovers` task when Cog will unload."""
+        self.get_rovers.cancel()
+
     @tasks.loop(hours=24)
     async def get_rovers(self) -> None:
         """Get listing of rovers from NASA API and info about their start and end dates."""
