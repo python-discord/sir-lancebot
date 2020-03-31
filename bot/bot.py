@@ -25,9 +25,9 @@ class AssetType(enum.Enum):
     The values match exactly the kwarg keys that can be passed to `Guild.edit` or `User.edit`.
     """
 
-    banner = "banner"
-    avatar = "avatar"
-    server_icon = "icon"
+    BANNER = "banner"
+    AVATAR = "avatar"
+    SERVER_ICON = "icon"
 
 
 class SeasonalBot(commands.Bot):
@@ -111,7 +111,7 @@ class SeasonalBot(commands.Bot):
             log.info("Failed to get guild instance, aborting asset upload")
             return False
 
-        return await self._apply_asset(guild, AssetType.banner, url)
+        return await self._apply_asset(guild, AssetType.BANNER, url)
 
     @mock_in_debug(return_value=True)
     async def set_icon(self, url: str) -> bool:
@@ -121,12 +121,12 @@ class SeasonalBot(commands.Bot):
             log.info("Failed to get guild instance, aborting asset upload")
             return False
 
-        return await self._apply_asset(guild, AssetType.server_icon, url)
+        return await self._apply_asset(guild, AssetType.SERVER_ICON, url)
 
     @mock_in_debug(return_value=True)
     async def set_avatar(self, url: str) -> bool:
         """Set the bot's avatar to image at `url`."""
-        return await self._apply_asset(self.user, AssetType.avatar, url)
+        return await self._apply_asset(self.user, AssetType.AVATAR, url)
 
     @mock_in_debug(return_value=True)
     async def set_nickname(self, new_name: str) -> bool:
