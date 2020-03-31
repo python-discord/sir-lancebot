@@ -33,7 +33,7 @@ class Christmas(SeasonBase):
     """Branding for December."""
 
     season_name = "Festive season"
-    bot_name = "Merrybot"
+    bot_name = "MerryBot"
 
     colour = Colours.soft_red
     description = (
