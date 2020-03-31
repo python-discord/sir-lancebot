@@ -201,6 +201,9 @@ class Games(Cog):
             possibility = None
             # Check is there any possibility that ratio is higher than 0.60
             for p in possibilities:
+                # If there is more than 1 genre that have higher than 0.60 ratio, then show list of possibilities
+                if sum(1 for po in possibilities if po[0] >= 0.60) > 1:
+                    break
                 if p[0] >= 0.60:
                     possibility = await self.get_games_list(amount, self.genres[p[1]], offset=random.randint(0, 150))
                     genre = p[1]
