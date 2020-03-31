@@ -138,7 +138,7 @@ class Games(Cog):
 
         self.refresh_genres_task.start()
 
-    @tasks.loop(hours=1.0)
+    @tasks.loop(hours=24.0)
     async def refresh_genres_task(self) -> None:
         """Refresh genres in every hour."""
         try:
