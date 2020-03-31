@@ -92,7 +92,8 @@ class Bookmark(commands.Cog):
                 await ctx.message.clear_reactions()
                 return
 
-            log.info(f"{user.name} bookmarked {target_message.jump_url} with title '{title}' from '{ctx.author}'.")
+            log.info(f"{user.name} tried bookmarking {target_message.jump_url} with title '{title}' from "
+                     f"'{ctx.author}'.")
 
             try:
                 if user == ctx.author:
