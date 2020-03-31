@@ -52,12 +52,12 @@ class GitHubFile(t.NamedTuple):
     sha: str
 
 
-async def pretty_files(files: t.Iterable[GitHubFile]) -> str:
+def pretty_files(files: t.Iterable[GitHubFile]) -> str:
     """Provide a human-friendly representation of `files`."""
     return "\n".join(file.path for file in files)
 
 
-async def time_until_midnight() -> timedelta:
+def time_until_midnight() -> timedelta:
     """
     Determine amount of time until the next-up UTC midnight.
 
@@ -210,7 +210,7 @@ class BrandingManager(commands.Cog):
             elif next(self.should_cycle):
                 await self.cycle()
 
-            until_midnight = await time_until_midnight()
+            until_midnight = time_until_midnight()
             await asyncio.sleep(until_midnight.total_seconds())
 
     async def _info_embed(self) -> discord.Embed:
@@ -233,7 +233,7 @@ class BrandingManager(commands.Cog):
         avatar = self.avatar.path if self.avatar is not None else "Unavailable"
         info_embed.add_field(name="Avatar", value=avatar, inline=False)
 
-        icons = await pretty_files(self.available_icons) or "Unavailable"
+        icons = pretty_files(self.available_icons) or "Unavailable"
         info_embed.add_field(name="Available icons", value=icons, inline=False)
 
         # Only display cycle frequency if we're actually cycling
@@ -508,7 +508,7 @@ class BrandingManager(commands.Cog):
     async def daemon_status(self, ctx: commands.Context) -> None:
         """Check whether daemon is currently active."""
         if self._daemon_running:
-            remaining_time = (arrow.utcnow() + await time_until_midnight()).humanize()
+            remaining_time = (arrow.utcnow() + time_until_midnight()).humanize()
             response = discord.Embed(description=f"Daemon running {Emojis.ok_hand}", colour=Colours.soft_green)
             response.set_footer(text=f"Next refresh {remaining_time}")
         else:
