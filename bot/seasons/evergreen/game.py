@@ -198,24 +198,23 @@ class Games(Cog):
             games = await self.get_games_list(amount, self.genres[genre], offset=random.randint(0, 150))
         except KeyError:
             possibilities = await self.get_best_results(genre)
-            possibility = None
-            # Check is there any possibility that ratio is higher than 0.60
-            for p in possibilities:
-                # If there is more than 1 genre that have higher than 0.60 ratio, then show list of possibilities
-                if sum(1 for po in possibilities if po[0] >= 0.60) > 1:
-                    break
-                if p[0] >= 0.60:
-                    possibility = await self.get_games_list(amount, self.genres[p[1]], offset=random.randint(0, 150))
-                    genre = p[1]
-                    break
-            if possibility:
-                games = possibility
-            else:
-                display_possibilities = ", ".join(p[1] for p in possibilities if p[0] >= 0.40)
+            # If there is more than 1 possibilities, show these.
+            # If there is only 1 possibility, use it as genre.
+            # Otherwise send message about invalid genre.
+            if len(possibilities) > 1:
+                display_possibilities = "`, `".join(p[1] for p in possibilities if p[0] >= 0.40)
                 await ctx.send(
                     f"Invalid genre `{genre}`. "
                     f"{f'Maybe you meant `{display_possibilities}`?' if display_possibilities else ''}"
                 )
+                return
+            elif len(possibilities) == 1:
+                games = await self.get_games_list(
+                    amount, self.genres[possibilities[0][1]], offset=random.randint(0, 150)
+                )
+                genre = possibilities[0][1]
+            else:
+                await ctx.send(f"Invalid genre `{genre}`.")
                 return
 
         # Create pages and paginate
@@ -413,7 +412,7 @@ class Games(Cog):
             for word in REGEX_NON_ALPHABET.split(genre):
                 ratios.append(difflib.SequenceMatcher(None, query, word).ratio())
             results.append((round(max(ratios), 2), genre))
-        return sorted(results, reverse=True)[:4]
+        return sorted((item for item in results if item[0] >= 0.60), reverse=True)[:4]
 
 
 def setup(bot: SeasonalBot) -> None:
