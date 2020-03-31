@@ -82,7 +82,7 @@ class Space(Cog):
         result = await self.fetch_from_nasa("planetary/apod", params)
 
         await ctx.send(
-            embed=await self.create_nasa_embed(
+            embed=self.create_nasa_embed(
                 f"Astronomy Picture of the Day - {result['date']}",
                 result["explanation"],
                 result["url"]
@@ -107,7 +107,7 @@ class Space(Cog):
         item = random.choice(data["collection"]["items"])
 
         await ctx.send(
-            embed=await self.create_nasa_embed(
+            embed=self.create_nasa_embed(
                 item["data"][0]["title"],
                 item["data"][0]["description"],
                 item["links"][0]["href"]
@@ -142,7 +142,7 @@ class Space(Cog):
         image_url = f"{NASA_EPIC_BASE_URL}/archive/natural/{year}/{month}/{day}/jpg/{item['image']}.jpg"
 
         await ctx.send(
-            embed=await self.create_nasa_embed(
+            embed=self.create_nasa_embed(
                 "Earth Image", item["caption"], image_url, f" \u2022 Identifier: {item['identifier']}"
             )
         )
@@ -192,7 +192,7 @@ class Space(Cog):
 
         item = random.choice(result["photos"])
         await ctx.send(
-            embed=await self.create_nasa_embed(
+            embed=self.create_nasa_embed(
                 f"{item['rover']['name']}'s {item['camera']['full_name']} Mars Image", "", item["img_src"],
             )
         )
@@ -223,7 +223,7 @@ class Space(Cog):
         async with self.http_session.get(url=f"{base}/{endpoint}?{urlencode(params)}") as resp:
             return await resp.json()
 
-    async def create_nasa_embed(self, title: str, description: str, image: str, footer: Optional[str] = "") -> Embed:
+    def create_nasa_embed(self, title: str, description: str, image: str, footer: Optional[str] = "") -> Embed:
         """Generate NASA commands embeds. Required: title, description and image URL, footer (addition) is optional."""
         return Embed(
             title=title,
