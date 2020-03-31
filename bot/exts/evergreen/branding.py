@@ -448,9 +448,7 @@ class BrandingManager(commands.Cog):
             raise BrandingError(f"Season {self.current_season.season_name} already active")
 
         self.current_season = new_season
-        async with ctx.typing():
-            await self.refresh()
-            await self.branding_info(ctx)
+        await self.branding_refresh(ctx)
 
     @branding_cmds.command(name="info", aliases=["status"])
     async def branding_info(self, ctx: commands.Context) -> None:
