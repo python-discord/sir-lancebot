@@ -3,6 +3,7 @@ import typing as t
 
 from bot.constants import Colours, Month
 from bot.utils import resolve_current_month
+from bot.utils.exceptions import BrandingError
 
 log = logging.getLogger(__name__)
 
@@ -141,9 +142,6 @@ def get_current_season() -> t.Type[SeasonBase]:
     if not active_seasons:
         return SeasonBase
 
-    if len(active_seasons) > 1:
-        log.warning(f"Multiple active season in month {current_month.name}")
-
     return active_seasons[0]
 
 
@@ -160,3 +158,24 @@ def get_season(name: str) -> t.Optional[t.Type[SeasonBase]]:
 
         if name in matches:
             return season
+
+
+def _validate_season_overlap() -> None:
+    """
+    Raise BrandingError if there are any colliding seasons.
+
+    This serves as a local test to ensure that seasons haven't been misconfigured.
+    """
+    month_to_season = {}
+
+    for season in SeasonBase.__subclasses__():
+        for month in season.months:
+            colliding_season = month_to_season.get(month)
+
+            if colliding_season:
+                raise BrandingError(f"Season {season} collides with {colliding_season} in {month.name}")
+            else:
+                month_to_season[month] = season
+
+
+_validate_season_overlap()
