@@ -38,6 +38,10 @@ class WikipediaCog(commands.Cog):
     async def wikipedia(self, ctx: commands.Context, *, search: str) -> None:
         """Search for something on wikipedia."""
         title = await self.search_wikipedia(search)
+        if title is None:
+            await ctx.send(f"Sorry, we could not find a wikipedia article using that search term")
+            return
+
         title = title.replace(" ", "_")  # wikipedia uses "_" as spaces
         await ctx.send(WIKIPEDIA_URL.format(title=title))
 
