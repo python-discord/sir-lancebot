@@ -131,7 +131,7 @@ class BrandingManager(commands.Cog):
     available_icons: t.List[GitHubFile]
     remaining_icons: t.List[GitHubFile]
 
-    should_cycle: t.Iterator
+    days_since_cycle: t.Iterator
 
     config_file: Path
 
@@ -151,10 +151,10 @@ class BrandingManager(commands.Cog):
         self.banner = None
         self.avatar = None
 
-        self.should_cycle = itertools.cycle([False])
-
         self.available_icons = []
         self.remaining_icons = []
+
+        self.days_since_cycle = itertools.cycle([None])
 
         self.config_file = make_persistent(Path("bot", "resources", "evergreen", "branding.json"))
         should_run = self._read_config()["daemon_active"]
@@ -207,7 +207,7 @@ class BrandingManager(commands.Cog):
             if branding_changed:
                 await self.apply()
 
-            elif next(self.should_cycle):
+            elif next(self.days_since_cycle) == Branding.cycle_frequency:
                 await self.cycle()
 
             until_midnight = time_until_midnight()
@@ -246,23 +246,22 @@ class BrandingManager(commands.Cog):
         """Set `remaining_icons` to a shuffled copy of `available_icons`."""
         self.remaining_icons = random.sample(self.available_icons, k=len(self.available_icons))
 
-    async def _reset_should_cycle(self) -> None:
+    async def _reset_days_since_cycle(self) -> None:
         """
-        Reset the `should_cycle` counter based on configured frequency.
+        Reset the `days_since_cycle` iterator based on configured frequency.
 
-        Counter will always yield False if either holds:
-            - Branding.cycle_frequency is falsey
-            - There are fewer than 2 available icons for current season
+        If the current season only has 1 icon, or if `Branding.cycle_frequency` is falsey,
+        the iterator will always yield None. This signals that the icon shouldn't be cycled.
 
-        Cycling can be easily turned off, and we prevent re-uploading the same icon repeatedly.
+        Otherwise, it will yield ints in range [1, `Branding.cycle_frequency`] indefinitely.
+        When the iterator yields a value equal to `Branding.cycle_frequency`, it is time to cycle.
         """
         if len(self.available_icons) > 1 and Branding.cycle_frequency:
-            wait_period = [False] * (Branding.cycle_frequency - 1)
-            counter = itertools.cycle(wait_period + [True])
+            sequence = range(1, Branding.cycle_frequency + 1)
         else:
-            counter = itertools.cycle([False])
+            sequence = [None]
 
-        self.should_cycle = counter
+        self.days_since_cycle = itertools.cycle(sequence)
 
     async def _get_files(self, path: str, include_dirs: bool = False) -> t.Dict[str, GitHubFile]:
         """
@@ -339,7 +338,7 @@ class BrandingManager(commands.Cog):
         if branding_changed:
             log.info(f"New branding detected (season: {self.current_season.season_name})")
             await self._reset_remaining_icons()
-            await self._reset_should_cycle()
+            await self._reset_days_since_cycle()
 
         return branding_changed
 
