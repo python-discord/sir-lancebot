@@ -202,7 +202,7 @@ class Games(Cog):
             # If there is only 1 possibility, use it as genre.
             # Otherwise send message about invalid genre.
             if len(possibilities) > 1:
-                display_possibilities = "`, `".join(p[1] for p in possibilities if p[0] >= 0.40)
+                display_possibilities = "`, `".join(p[1] for p in possibilities)
                 await ctx.send(
                     f"Invalid genre `{genre}`. "
                     f"{f'Maybe you meant `{display_possibilities}`?' if display_possibilities else ''}"
