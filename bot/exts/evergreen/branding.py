@@ -357,7 +357,7 @@ class BrandingManager(commands.Cog):
             log.info("Reset & shuffle remaining icons")
             await self._reset_remaining_icons()
 
-        next_up, *self.remaining_icons = self.remaining_icons
+        next_up = self.remaining_icons.pop(0)
         success = await self.bot.set_icon(next_up.download_url)
 
         return success
