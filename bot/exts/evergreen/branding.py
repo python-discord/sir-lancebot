@@ -43,7 +43,7 @@ class GithubFile(t.NamedTuple):
     """
     Represents a remote file on Github.
 
-    The sha hash is kept so that we can determine that a file has changed,
+    The `sha` hash is kept so that we can determine that a file has changed,
     despite its filename remaining unchanged.
     """
 
@@ -266,7 +266,7 @@ class BrandingManager(commands.Cog):
 
     async def _get_files(self, path: str, include_dirs: bool = False) -> t.Dict[str, GithubFile]:
         """
-        Poll `path` in branding repo for information about present files.
+        Get files at `path` in the branding repository.
 
         If `include_dirs` is False (default), only returns files at `path`.
         Otherwise, will return both files and directories. Never returns symlinks.
@@ -292,10 +292,10 @@ class BrandingManager(commands.Cog):
 
     async def refresh(self) -> bool:
         """
-        Poll Github API to refresh currently available icons.
+        Synchronize available assets with branding repository.
 
         If the current season is not the evergreen, and lacks at least one asset,
-        we also poll the evergreen seasonal dir as fallback for missing assets.
+        we use the evergreen seasonal dir as fallback for missing assets.
 
         Finally, if neither the seasonal nor fallback branding directories contain
         an asset, it will simply be ignored.
@@ -455,7 +455,7 @@ class BrandingManager(commands.Cog):
     @branding_cmds.command(name="info", aliases=["status"])
     async def branding_info(self, ctx: commands.Context) -> None:
         """
-        Show assets for current season.
+        Show available assets for current season.
 
         This can be used to confirm that assets have been resolved properly.
         When `apply` is used, it attempts to upload exactly the assets listed here.
@@ -464,11 +464,7 @@ class BrandingManager(commands.Cog):
 
     @branding_cmds.command(name="refresh")
     async def branding_refresh(self, ctx: commands.Context) -> None:
-        """
-        Refresh current season from branding repository.
-
-        Polls Github API to refresh assets available for current season.
-        """
+        """Sync currently available assets with branding repository."""
         async with ctx.typing():
             await self.refresh()
             await self.branding_info(ctx)

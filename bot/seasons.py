@@ -30,7 +30,7 @@ class SeasonBase:
 
 
 class Christmas(SeasonBase):
-    """Branding for december."""
+    """Branding for December."""
 
     season_name = "Festive season"
     bot_name = "Merrybot"
@@ -47,7 +47,7 @@ class Christmas(SeasonBase):
 
 
 class Easter(SeasonBase):
-    """Branding for april."""
+    """Branding for April."""
 
     season_name = "Easter"
     bot_name = "BunnyBot"
@@ -64,7 +64,7 @@ class Easter(SeasonBase):
 
 
 class Halloween(SeasonBase):
-    """Branding for october."""
+    """Branding for October."""
 
     season_name = "Halloween"
     bot_name = "NeonBot"
@@ -78,7 +78,7 @@ class Halloween(SeasonBase):
 
 
 class Pride(SeasonBase):
-    """Branding for june."""
+    """Branding for June."""
 
     season_name = "Pride"
     bot_name = "ProudBot"
@@ -98,7 +98,7 @@ class Pride(SeasonBase):
 
 
 class Valentines(SeasonBase):
-    """Branding for february."""
+    """Branding for February."""
 
     season_name = "Valentines"
     bot_name = "TenderBot"
@@ -112,7 +112,7 @@ class Valentines(SeasonBase):
 
 
 class Wildcard(SeasonBase):
-    """Branding for august."""
+    """Branding for August."""
 
     season_name = "Wildcard"
     bot_name = "RetroBot"

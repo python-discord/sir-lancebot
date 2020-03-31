@@ -81,7 +81,7 @@ class Client(NamedTuple):
     token = environ.get("SEASONALBOT_TOKEN")
     sentry_dsn = environ.get("SEASONALBOT_SENTRY_DSN")
     debug = environ.get("SEASONALBOT_DEBUG", "").lower() == "true"
-    # Override seasonal locks: 1 (january) to 12 (december)
+    # Override seasonal locks: 1 (January) to 12 (December)
     month_override = int(environ["MONTH_OVERRIDE"]) if "MONTH_OVERRIDE" in environ else None
 
 
