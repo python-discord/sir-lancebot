@@ -21,7 +21,6 @@ from bot.utils.exceptions import BrandingError
 from bot.utils.persist import make_persistent
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
 
 STATUS_OK = 200  # HTTP status code
 
