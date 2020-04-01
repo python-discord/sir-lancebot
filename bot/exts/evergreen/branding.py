@@ -93,24 +93,24 @@ class BrandingManager(commands.Cog):
             - Show all available seasons
 
         branding set <season_name>
-            - Set the cog's internal state to represent `season_name`, if it exists.
-            - If no `season_name` is given, set chronologically current season.
+            - Set the cog's internal state to represent `season_name`, if it exists
+            - If no `season_name` is given, set chronologically current season
             - This will not automatically apply the season's branding to the guild,
-              the cog's state can be detached from the guild.
-            - Seasons can therefore be 'previewed' using this command.
+              the cog's state can be detached from the guild
+            - Seasons can therefore be 'previewed' using this command
 
         branding info
-            - View detailed information about resolved assets for current season.
+            - View detailed information about resolved assets for current season
 
         branding refresh
-            - Refresh internal state, i.e. synchronize with branding repository.
+            - Refresh internal state, i.e. synchronize with branding repository
 
         branding apply
-            - Apply the current internal state to the guild, i.e. upload the assets.
+            - Apply the current internal state to the guild, i.e. upload the assets
 
         branding cycle
             - If there are multiple available icons for current season, randomly pick
-              and apply the next one.
+              and apply the next one
 
     The daemon calls these methods autonomously as appropriate. The use of this cog
     is locked to moderation roles. As it performs media asset uploads, it is prone to
