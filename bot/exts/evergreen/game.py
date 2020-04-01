@@ -1,6 +1,7 @@
 import difflib
 import logging
 import random
+import re
 from datetime import datetime as dt
 from enum import IntEnum
 from typing import Any, Dict, List, Optional, Tuple
@@ -24,6 +25,8 @@ HEADERS = {
 }
 
 logger = logging.getLogger(__name__)
+
+REGEX_NON_ALPHABET = re.compile(r"[^a-z0-9]", re.IGNORECASE)
 
 # ---------
 # TEMPLATES
@@ -135,7 +138,7 @@ class Games(Cog):
 
         self.refresh_genres_task.start()
 
-    @tasks.loop(hours=1.0)
+    @tasks.loop(hours=24.0)
     async def refresh_genres_task(self) -> None:
         """Refresh genres in every hour."""
         try:
@@ -194,9 +197,25 @@ class Games(Cog):
         try:
             games = await self.get_games_list(amount, self.genres[genre], offset=random.randint(0, 150))
         except KeyError:
-            possibilities = "`, `".join(difflib.get_close_matches(genre, self.genres))
-            await ctx.send(f"Invalid genre `{genre}`. {f'Maybe you meant `{possibilities}`?' if possibilities else ''}")
-            return
+            possibilities = await self.get_best_results(genre)
+            # If there is more than 1 possibilities, show these.
+            # If there is only 1 possibility, use it as genre.
+            # Otherwise send message about invalid genre.
+            if len(possibilities) > 1:
+                display_possibilities = "`, `".join(p[1] for p in possibilities)
+                await ctx.send(
+                    f"Invalid genre `{genre}`. "
+                    f"{f'Maybe you meant `{display_possibilities}`?' if display_possibilities else ''}"
+                )
+                return
+            elif len(possibilities) == 1:
+                games = await self.get_games_list(
+                    amount, self.genres[possibilities[0][1]], offset=random.randint(0, 150)
+                )
+                genre = possibilities[0][1]
+            else:
+                await ctx.send(f"Invalid genre `{genre}`.")
+                return
 
         # Create pages and paginate
         pages = [await self.create_page(game) for game in games]
@@ -384,6 +403,16 @@ class Games(Cog):
         page = COMPANY_PAGE.format(**formatting)
 
         return page, url
+
+    async def get_best_results(self, query: str) -> List[Tuple[float, str]]:
+        """Get best match result of genre when original genre is invalid."""
+        results = []
+        for genre in self.genres:
+            ratios = [difflib.SequenceMatcher(None, query, genre).ratio()]
+            for word in REGEX_NON_ALPHABET.split(genre):
+                ratios.append(difflib.SequenceMatcher(None, query, word).ratio())
+            results.append((round(max(ratios), 2), genre))
+        return sorted((item for item in results if item[0] >= 0.60), reverse=True)[:4]
 
 
 def setup(bot: SeasonalBot) -> None:
