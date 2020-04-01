@@ -12,7 +12,7 @@ from discord.ext import commands
 from discord.ext.commands import CheckFailure, Command, Context
 
 from bot.constants import Client, ERROR_REPLIES, Month
-from bot.utils import resolve_current_month
+from bot.utils import human_months, resolve_current_month
 
 ONE_DAY = 24 * 60 * 60
 
@@ -47,7 +47,7 @@ def seasonal_task(*allowed_months: Month, sleep_time: t.Union[float, int] = ONE_
         @functools.wraps(task_body)
         async def decorated_task(*args, **kwargs) -> None:
             """Call `task_body` once every `sleep_time` seconds in `allowed_months`."""
-            log.info(f"Starting seasonal task {task_body.__qualname__} ({allowed_months})")
+            log.info(f"Starting seasonal task {task_body.__qualname__} ({human_months(allowed_months)})")
 
             while True:
                 current_month = resolve_current_month()
@@ -55,7 +55,7 @@ def seasonal_task(*allowed_months: Month, sleep_time: t.Union[float, int] = ONE_
                 if current_month in allowed_months:
                     await task_body(*args, **kwargs)
                 else:
-                    log.debug(f"Seasonal task {task_body.__qualname__} sleeps in {current_month.name}")
+                    log.debug(f"Seasonal task {task_body.__qualname__} sleeps in {current_month!s}")
 
                 await asyncio.sleep(sleep_time)
         return decorated_task
@@ -78,7 +78,7 @@ def in_month_listener(*allowed_months: Month) -> t.Callable:
                 # Propagate return value although it should always be None
                 return await listener(*args, **kwargs)
             else:
-                log.debug(f"Guarded {listener.__qualname__} from invoking in {current_month.name}")
+                log.debug(f"Guarded {listener.__qualname__} from invoking in {current_month!s}")
         return guarded_listener
     return decorator
 
@@ -93,15 +93,14 @@ def in_month_command(*allowed_months: Month) -> t.Callable:
         current_month = resolve_current_month()
         can_run = current_month in allowed_months
 
-        human_months = ", ".join(m.name for m in allowed_months)
         log.debug(
-            f"Command '{ctx.command}' is locked to months {human_months}. "
-            f"Invoking it in month {current_month} is {'allowed' if can_run else 'disallowed'}."
+            f"Command '{ctx.command}' is locked to months {human_months(allowed_months)}. "
+            f"Invoking it in month {current_month!s} is {'allowed' if can_run else 'disallowed'}."
         )
         if can_run:
             return True
         else:
-            raise InMonthCheckFailure(f"Command can only be used in {human_months}")
+            raise InMonthCheckFailure(f"Command can only be used in {human_months(allowed_months)}")
 
     return commands.check(predicate)
 
@@ -127,12 +126,12 @@ def in_month(*allowed_months: Month) -> t.Callable:
     def decorator(callable_: t.Callable) -> t.Callable:
         # Functions decorated as commands are turned into instances of `Command`
         if isinstance(callable_, Command):
-            logging.debug(f"Command {callable_.qualified_name} will be locked to {allowed_months}")
+            logging.debug(f"Command {callable_.qualified_name} will be locked to {human_months(allowed_months)}")
             actual_deco = in_month_command(*allowed_months)
 
         # D.py will assign this attribute when `callable_` is registered as a listener
         elif hasattr(callable_, "__cog_listener__"):
-            logging.debug(f"Listener {callable_.__qualname__} will be locked to {allowed_months}")
+            logging.debug(f"Listener {callable_.__qualname__} will be locked to {human_months(allowed_months)}")
             actual_deco = in_month_listener(*allowed_months)
 
         # Otherwise we're unsure exactly what has been decorated

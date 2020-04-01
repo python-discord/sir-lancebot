@@ -15,6 +15,7 @@ from discord.ext import commands
 from bot.bot import SeasonalBot
 from bot.constants import Branding, Colours, Emojis, MODERATION_ROLES, Tokens
 from bot.seasons import SeasonBase, get_all_seasons, get_current_season, get_season
+from bot.utils import human_months
 from bot.utils.decorators import with_role
 from bot.utils.exceptions import BrandingError
 from bot.utils.persist import make_persistent
@@ -219,8 +220,7 @@ class BrandingManager(commands.Cog):
 
         # If we're in a non-evergreen season, also show active months
         if self.current_season is not SeasonBase:
-            active_months = ", ".join(m.name.title() for m in self.current_season.months)
-            title = f"{self.current_season.season_name} ({active_months})"
+            title = f"{self.current_season.season_name} ({human_months(self.current_season.months)})"
         else:
             title = self.current_season.season_name
 
@@ -406,8 +406,7 @@ class BrandingManager(commands.Cog):
             if season is SeasonBase:
                 active_when = "always"
             else:
-                months = ", ".join(m.name.title() for m in season.months)
-                active_when = f"in {months}"
+                active_when = f"in {human_months(season.months)}"
 
             description = (
                 f"Active {active_when}\n"

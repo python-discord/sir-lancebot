@@ -3,13 +3,18 @@ import contextlib
 import re
 import string
 from datetime import datetime
-from typing import List
+from typing import Iterable, List
 
 import discord
 from discord.ext.commands import BadArgument, Context
 
 from bot.constants import Client, Month
 from bot.utils.pagination import LinePaginator
+
+
+def human_months(months: Iterable[Month]) -> str:
+    """Build a comma separated list of `months`."""
+    return ", ".join(str(m) for m in months)
 
 
 def resolve_current_month() -> Month:

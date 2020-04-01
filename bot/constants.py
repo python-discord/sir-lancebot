@@ -149,6 +149,9 @@ class Month(enum.IntEnum):
     NOVEMBER = 11
     DECEMBER = 12
 
+    def __str__(self) -> str:
+        return self.name.title()
+
 
 # If a month override was configured, check that it's a valid Month
 # Prevents delaying an exception after the bot starts
