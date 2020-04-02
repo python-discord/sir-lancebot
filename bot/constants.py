@@ -1,21 +1,31 @@
+import enum
 import logging
+from datetime import datetime
 from os import environ
 from typing import NamedTuple
-from datetime import datetime
 
 __all__ = (
-    "bookmark_icon_url",
-    "AdventOfCode", "Channels", "Client", "Colours", "Emojis", "Hacktoberfest", "Roles", "Tokens",
-    "WHITELISTED_CHANNELS", "STAFF_ROLES", "MODERATION_ROLES",
-    "POSITIVE_REPLIES", "NEGATIVE_REPLIES", "ERROR_REPLIES",
+    "AdventOfCode",
+    "Branding",
+    "Channels",
+    "Client",
+    "Colours",
+    "Emojis",
+    "Hacktoberfest",
+    "Icons",
+    "Lovefest",
+    "Month",
+    "Roles",
+    "Tokens",
+    "MODERATION_ROLES",
+    "STAFF_ROLES",
+    "WHITELISTED_CHANNELS",
+    "ERROR_REPLIES",
+    "NEGATIVE_REPLIES",
+    "POSITIVE_REPLIES",
 )
 
 log = logging.getLogger(__name__)
-
-bookmark_icon_url = (
-    "https://images-ext-2.discordapp.net/external/zl4oDwcmxUILY7sD9ZWE2fU5R7n6QcxEmPYSE5eddbg/"
-    "%3Fv%3D1/https/cdn.discordapp.com/emojis/654080405988966419.png?width=20&height=20"
-)
 
 
 class AdventOfCode:
@@ -27,6 +37,10 @@ class AdventOfCode:
     role_id = int(environ.get("AOC_ROLE_ID", 518565788744024082))
 
 
+class Branding:
+    cycle_frequency = int(environ.get("CYCLE_FREQUENCY", 3))  # 0: never, 1: every day, 2: every other day, ...
+
+
 class Channels(NamedTuple):
     admins = 365960823622991872
     advent_of_code = int(environ.get("AOC_CHANNEL_ID", 517745814039166986))
@@ -36,7 +50,6 @@ class Channels(NamedTuple):
     checkpoint_test = 422077681434099723
     devalerts = 460181980097675264
     devlog = int(environ.get("CHANNEL_DEVLOG", 622895325144940554))
-    devtest = 414574275865870337
     help_0 = 303906576991780866
     help_1 = 303906556754395136
     help_2 = 303906514266226689
@@ -68,8 +81,8 @@ class Client(NamedTuple):
     token = environ.get("SEASONALBOT_TOKEN")
     sentry_dsn = environ.get("SEASONALBOT_SENTRY_DSN")
     debug = environ.get("SEASONALBOT_DEBUG", "").lower() == "true"
-    season_override = environ.get("SEASON_OVERRIDE")
-    icon_cycle_frequency = 3  # N days to wait between cycling server icons within a single season
+    # Override seasonal locks: 1 (January) to 12 (December)
+    month_override = int(environ["MONTH_OVERRIDE"]) if "MONTH_OVERRIDE" in environ else None
 
 
 class Colours:
@@ -90,6 +103,7 @@ class Emojis:
     check = "\u2611"
     envelope = "\U0001F4E8"
     trashcan = "<:trashcan:637136429717389331>"
+    ok_hand = ":ok_hand:"
 
     terning1 = "<:terning1:431249668983488527>"
     terning2 = "<:terning2:462339216987127808>"
@@ -105,16 +119,44 @@ class Emojis:
     merge = "<:PRMerged:629695470570176522>"
 
 
+class Hacktoberfest(NamedTuple):
+    voice_id = 514420006474219521
+
+
 class Icons:
     questionmark = "https://cdn.discordapp.com/emojis/512367613339369475.png"
+    bookmark = (
+        "https://images-ext-2.discordapp.net/external/zl4oDwcmxUILY7sD9ZWE2fU5R7n6QcxEmPYSE5eddbg/"
+        "%3Fv%3D1/https/cdn.discordapp.com/emojis/654080405988966419.png?width=20&height=20"
+    )
 
 
 class Lovefest:
     role_id = int(environ.get("LOVEFEST_ROLE_ID", 542431903886606399))
 
 
-class Hacktoberfest(NamedTuple):
-    voice_id = 514420006474219521
+class Month(enum.IntEnum):
+    JANUARY = 1
+    FEBRUARY = 2
+    MARCH = 3
+    APRIL = 4
+    MAY = 5
+    JUNE = 6
+    JULY = 7
+    AUGUST = 8
+    SEPTEMBER = 9
+    OCTOBER = 10
+    NOVEMBER = 11
+    DECEMBER = 12
+
+    def __str__(self) -> str:
+        return self.name.title()
+
+
+# If a month override was configured, check that it's a valid Month
+# Prevents delaying an exception after the bot starts
+if Client.month_override is not None:
+    Month(Client.month_override)
 
 
 class Roles(NamedTuple):
@@ -141,6 +183,7 @@ class Tokens(NamedTuple):
     tmdb = environ.get("TMDB_API_KEY")
     nasa = environ.get("NASA_API_KEY")
     igdb = environ.get("IGDB_API_KEY")
+    github = environ.get("GITHUB_TOKEN")
 
 
 # Default role combinations
@@ -149,12 +192,27 @@ STAFF_ROLES = Roles.helpers, Roles.moderator, Roles.admin, Roles.owner
 
 # Whitelisted channels
 WHITELISTED_CHANNELS = (
-    Channels.bot, Channels.seasonalbot_commands,
-    Channels.off_topic_0, Channels.off_topic_1, Channels.off_topic_2,
-    Channels.devtest,
+    Channels.bot,
+    Channels.seasonalbot_commands,
+    Channels.off_topic_0,
+    Channels.off_topic_1,
+    Channels.off_topic_2,
 )
 
 # Bot replies
+ERROR_REPLIES = [
+    "Please don't do that.",
+    "You have to stop.",
+    "Do you mind?",
+    "In the future, don't do that.",
+    "That was a mistake.",
+    "You blew it.",
+    "You're bad at computers.",
+    "Are you trying to kill me?",
+    "Noooooo!!",
+    "I can't believe you've done this",
+]
+
 NEGATIVE_REPLIES = [
     "Noooooo!!",
     "Nope.",
@@ -193,17 +251,4 @@ POSITIVE_REPLIES = [
     "Of course!",
     "Aye aye, cap'n!",
     "I'll allow it.",
-]
-
-ERROR_REPLIES = [
-    "Please don't do that.",
-    "You have to stop.",
-    "Do you mind?",
-    "In the future, don't do that.",
-    "That was a mistake.",
-    "You blew it.",
-    "You're bad at computers.",
-    "Are you trying to kill me?",
-    "Noooooo!!",
-    "I can't believe you've done this",
 ]

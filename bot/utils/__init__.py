@@ -2,12 +2,32 @@ import asyncio
 import contextlib
 import re
 import string
-from typing import List
+from datetime import datetime
+from typing import Iterable, List
 
 import discord
 from discord.ext.commands import BadArgument, Context
 
-from bot.pagination import LinePaginator
+from bot.constants import Client, Month
+from bot.utils.pagination import LinePaginator
+
+
+def human_months(months: Iterable[Month]) -> str:
+    """Build a comma separated list of `months`."""
+    return ", ".join(str(m) for m in months)
+
+
+def resolve_current_month() -> Month:
+    """
+    Determine current month w.r.t. `Client.month_override` env var.
+
+    If the env variable was set, current month always resolves to the configured value.
+    Otherwise, the current UTC month is given.
+    """
+    if Client.month_override is not None:
+        return Month(Client.month_override)
+    else:
+        return Month(datetime.utcnow().month)
 
 
 async def disambiguate(
