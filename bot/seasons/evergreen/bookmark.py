@@ -33,7 +33,7 @@ class Bookmark(commands.Cog):
         """
         if type(target) == discord.User:
             async for message in ctx.channel.history(limit=20):  # Takes last 2 messages from the channel.
-                if message.author == target:
+                if message.author == target and message != ctx.message:
                     target = message
                     break
 
