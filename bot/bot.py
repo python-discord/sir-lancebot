@@ -153,8 +153,12 @@ class SeasonalBot(commands.Bot):
         devlog = self.get_channel(Channels.devlog)
 
         if not devlog:
-            log.warning("Log failed to send. Devlog channel not found.")
-            return
+            log.info(f"Fetching devlog channel as it wasn't found in the cache (ID: {Channels.devlog})")
+            try:
+                devlog = await self.fetch_channel(Channels.devlog)
+            except discord.HTTPException as discord_exc:
+                log.exception("Fetch failed", exc_info=discord_exc)
+                return
 
         if not icon:
             icon = self.user.avatar_url_as(format="png")
