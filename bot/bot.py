@@ -44,6 +44,7 @@ class SeasonalBot(commands.Bot):
         self.http_session = ClientSession(
             connector=TCPConnector(resolver=AsyncResolver(), family=socket.AF_INET)
         )
+        self.greeting_task = self.loop.create_task(self.send_log("SeasonalBot", "Connected!"))
 
     @property
     def member(self) -> Optional[discord.Member]:
