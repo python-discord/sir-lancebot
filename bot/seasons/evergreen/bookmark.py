@@ -37,6 +37,11 @@ class Bookmark(commands.Cog):
                     target = message
                     break
 
+        if type(target) == discord.User:  # target is still User that means message not found
+            log.info(f'{ctx.author.name} Tried to bookmark {target} message but no message was found.')
+            await ctx.send(f'None of the previous 20 message is from {target.name}.', delete_after=7)
+            return
+
         # Prevent users from bookmarking a message in a channel they don't have access to
         permissions = ctx.author.permissions_in(target.channel)
         if not permissions.read_messages:
