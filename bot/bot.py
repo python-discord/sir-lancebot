@@ -44,6 +44,7 @@ class SeasonalBot(commands.Bot):
         self.http_session = ClientSession(
             connector=TCPConnector(resolver=AsyncResolver(), family=socket.AF_INET)
         )
+        self.loop.create_task(self.send_log("SeasonalBot", "Connected!"))
 
     @property
     def member(self) -> Optional[discord.Member]:
@@ -148,6 +149,7 @@ class SeasonalBot(commands.Bot):
 
     async def send_log(self, title: str, details: str = None, *, icon: str = None) -> None:
         """Send an embed message to the devlog channel."""
+        await self.wait_until_ready()
         devlog = self.get_channel(Channels.devlog)
 
         if not devlog:
