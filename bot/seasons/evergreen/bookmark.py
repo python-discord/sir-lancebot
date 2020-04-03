@@ -33,7 +33,7 @@ class Bookmark(commands.Cog):
         """
         if type(target) == discord.User:
             async for message in ctx.channel.history(limit=20):  # Takes last 2 messages from the channel.
-                if message.author == target and message != ctx.message:
+                if message.author == target and message.id != ctx.message.id:
                     target = message
                     break
 
@@ -54,8 +54,10 @@ class Bookmark(commands.Cog):
             await ctx.send(embed=embed)
             return
 
+        ctx.message.content = title  # tricking discord.py to use clean_content
+
         embed = discord.Embed(
-            title=title,
+            title=ctx.message.clean_content,
             colour=Colours.soft_green,
             description=target.content
         )
