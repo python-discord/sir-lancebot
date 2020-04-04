@@ -9,6 +9,7 @@ import dateutil.parser
 import discord
 from discord.ext import commands
 
+from bot.bot import SeasonalBot
 from bot.constants import Channels, Colours, Month
 from bot.utils.decorators import seasonal_task
 
@@ -20,7 +21,7 @@ Sendable = Union[commands.Context, discord.TextChannel]
 class PrideFacts(commands.Cog):
     """Provides a new fact every day during the Pride season!"""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: SeasonalBot):
         self.bot = bot
         self.facts = self.load_facts()
 
@@ -35,7 +36,7 @@ class PrideFacts(commands.Cog):
     @seasonal_task(Month.JUNE)
     async def send_pride_fact_daily(self) -> None:
         """Background task to post the daily pride fact every day."""
-        await self.bot.wait_until_ready()
+        await self.bot.wait_until_guild_available()
 
         channel = self.bot.get_channel(Channels.seasonalbot_commands)
         await self.send_select_fact(channel, datetime.utcnow())
@@ -101,6 +102,6 @@ class PrideFacts(commands.Cog):
         )
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: SeasonalBot) -> None:
     """Cog loader for pride facts."""
     bot.add_cog(PrideFacts(bot))

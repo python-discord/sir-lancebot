@@ -151,7 +151,7 @@ class SeasonalBot(commands.Bot):
 
     async def send_log(self, title: str, details: str = None, *, icon: str = None) -> None:
         """Send an embed message to the devlog channel."""
-        await self.wait_until_ready()
+        await self.wait_until_guild_available()
         devlog = self.get_channel(Channels.devlog)
 
         if not devlog:

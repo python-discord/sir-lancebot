@@ -198,7 +198,7 @@ class BrandingManager(commands.Cog):
         All method calls in the internal loop are considered safe, i.e. no errors propagate
         to the daemon's loop. The daemon itself does not perform any error handling on its own.
         """
-        await self.bot.wait_until_ready()
+        await self.bot.wait_until_guild_available()
 
         while True:
             self.current_season = get_current_season()

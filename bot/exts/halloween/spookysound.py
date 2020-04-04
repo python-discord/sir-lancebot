@@ -5,6 +5,7 @@ from pathlib import Path
 import discord
 from discord.ext import commands
 
+from bot.bot import SeasonalBot
 from bot.constants import Hacktoberfest
 
 log = logging.getLogger(__name__)
@@ -13,7 +14,7 @@ log = logging.getLogger(__name__)
 class SpookySound(commands.Cog):
     """A cog that plays a spooky sound in a voice channel on command."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: SeasonalBot):
         self.bot = bot
         self.sound_files = list(Path("bot/resources/halloween/spookysounds").glob("*.mp3"))
         self.channel = None
@@ -27,7 +28,7 @@ class SpookySound(commands.Cog):
         Cannot be used more than once in 2 minutes.
         """
         if not self.channel:
-            await self.bot.wait_until_ready()
+            await self.bot.wait_until_guild_available()
             self.channel = self.bot.get_channel(Hacktoberfest.voice_id)
 
         await ctx.send("Initiating spooky sound...")
@@ -42,6 +43,6 @@ class SpookySound(commands.Cog):
         await voice.disconnect()
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: SeasonalBot) -> None:
     """Spooky sound Cog load."""
     bot.add_cog(SpookySound(bot))
