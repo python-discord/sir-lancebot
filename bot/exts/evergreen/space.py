@@ -74,7 +74,12 @@ class Space(Cog):
         # Parse date to params, when provided. Show error message when invalid formatting
         if date:
             try:
-                params["date"] = datetime.strptime(date, "%Y-%m-%d").date().isoformat()
+                now = datetime.now().date()
+                apod_date = datetime.strptime(date, "%Y-%m-%d").date()
+                if datetime(1995, 6, 16).date() > apod_date or now < apod_date:
+                    await ctx.send(f"Date must be in range 16th June 1995 and {now.strftime('%dth %B %Y')}.")
+                    return
+                params["date"] = apod_date.isoformat()
             except ValueError:
                 await ctx.send(f"Invalid date {date}. Please make sure your date is in format YYYY-MM-DD.")
                 return
