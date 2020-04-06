@@ -253,7 +253,11 @@ class Minesweeper(commands.Cog):
     @minesweeper_group.command(name="reveal")
     async def reveal_command(self, ctx: commands.Context, *coordinates: CoordinateConverter) -> None:
         """Reveal multiple cells."""
-        game = self.games[ctx.author.id]
+        try:
+            game = self.games[ctx.author.id]
+        except KeyError:
+            await ctx.author.send("Game don't exist. Can't reveal.")
+            return
         revealed: GameBoard = game.revealed
         board: GameBoard = game.board
 
