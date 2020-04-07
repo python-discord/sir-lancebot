@@ -69,6 +69,11 @@ class Game:
         else:
             return False, "User declined"
 
+    async def add_reactions(self, msg: discord.Message) -> None:
+        """Add number emojis to message."""
+        for nr in Emojis.number_emojis:
+            await msg.add_reaction(nr)
+
 
 class TicTacToe(Cog):
     """TicTacToe cog contains tic-tac-toe game commands."""
