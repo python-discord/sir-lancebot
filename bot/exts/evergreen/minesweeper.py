@@ -253,11 +253,7 @@ class Minesweeper(commands.Cog):
     @minesweeper_group.command(name="reveal")
     async def reveal_command(self, ctx: commands.Context, *coordinates: CoordinateConverter) -> None:
         """Reveal multiple cells."""
-        try:
-            game = self.games[ctx.author.id]
-        except KeyError:
-            await ctx.author.send("Game don't exist. Can't reveal.")
-            return
+        game = self.games[ctx.author.id]
         revealed: GameBoard = game.revealed
         board: GameBoard = game.board
 
@@ -281,6 +277,13 @@ class Minesweeper(commands.Cog):
         if game.activated_on_server:
             await game.chat_msg.edit(content=new_msg)
         del self.games[ctx.author.id]
+
+    @reveal_command.error
+    @end_command.error
+    async def keyerror_handler(self, ctx: commands.Context, error: typing.Any) -> None:
+        """Handle `KeyError` that is raised in reveal or end command when getting game."""
+        if isinstance(error, KeyError):
+            await ctx.send("Game don't exist.")
 
 
 def setup(bot: commands.Bot) -> None:
