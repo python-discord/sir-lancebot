@@ -2,7 +2,7 @@ import asyncio
 import typing as t
 
 import discord
-from discord.ext.commands import Cog, Context
+from discord.ext.commands import Cog, Context, check
 
 from bot.bot import SeasonalBot
 from bot.constants import Emojis
@@ -81,6 +81,13 @@ class TicTacToe(Cog):
     def __init__(self, bot: SeasonalBot):
         self.bot = bot
         self.games: t.List[Game] = []
+
+    @staticmethod
+    def is_channel_free() -> t.Callable:
+        """Check is channel where command will be invoked free."""
+        async def predicate(ctx: Context) -> bool:
+            return all(game.channel != ctx.channel for game in ctx.cog.games)
+        return check(predicate)
 
 
 def setup(bot: SeasonalBot) -> None:
