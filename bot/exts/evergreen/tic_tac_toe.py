@@ -22,6 +22,12 @@ class Game:
         self.players = players
         self.ctx = ctx
 
+        self.current = self.players[0]
+        self.next = self.players[1]
+
+        self.winner: t.Optional[Player] = None
+        self.loser: t.Optional[Player] = None
+
 
 class TicTacToe(Cog):
     """TicTacToe cog contains tic-tac-toe game commands."""
