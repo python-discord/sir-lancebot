@@ -17,7 +17,7 @@ class Player:
 class Game:
     """Class that contains information and functions about Tic Tac Toe game."""
 
-    def __init__(self, channel: discord.TextChannel, players: t.List[discord.User], ctx: Context):
+    def __init__(self, channel: discord.TextChannel, players: t.List[Player], ctx: Context):
         self.channel = channel
         self.players = players
         self.ctx = ctx
