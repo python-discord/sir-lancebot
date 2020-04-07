@@ -1,6 +1,6 @@
 import logging
 import random
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any, Dict, Optional, Union
 from urllib.parse import urlencode
 
@@ -16,6 +16,8 @@ logger = logging.getLogger(__name__)
 NASA_BASE_URL = "https://api.nasa.gov"
 NASA_IMAGES_BASE_URL = "https://images-api.nasa.gov"
 NASA_EPIC_BASE_URL = "https://epic.gsfc.nasa.gov"
+
+APOD_MIN_DATE = date(1995, 6, 16)
 
 
 class DateConverter(Converter):
@@ -80,8 +82,8 @@ class Space(Cog):
                 return
 
             now = datetime.now().date()
-            if datetime(1995, 6, 16).date() > apod_date or now < apod_date:
-                await ctx.send(f"Date must be in range 16th June 1995 and {now.strftime('%dth %B %Y')}.")
+            if APOD_MIN_DATE > apod_date or now < apod_date:
+                await ctx.send(f"Date must be between {APOD_MIN_DATE.isoformat()} and {now.isoformat()} (today).")
                 return
 
             params["date"] = apod_date.isoformat()
