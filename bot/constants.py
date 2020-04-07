@@ -130,6 +130,8 @@ class Emojis:
         8: "\u0038",
         9: "\u0039"
     }
+    confirmation = "\u2705"
+    decline = "\u274c"
 
 
 class Hacktoberfest(NamedTuple):
