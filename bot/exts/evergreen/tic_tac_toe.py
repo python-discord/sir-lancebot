@@ -89,6 +89,13 @@ class TicTacToe(Cog):
             return all(game.channel != ctx.channel for game in ctx.cog.games)
         return check(predicate)
 
+    @staticmethod
+    def is_requester_free() -> t.Callable:
+        """Check is requester not already in any game."""
+        async def predicate(ctx: Context) -> bool:
+            return all(ctx.author not in (player.user for player in game.players) for game in ctx.cog.games)
+        return check(predicate)
+
 
 def setup(bot: SeasonalBot) -> None:
     """Load TicTacToe Cog."""
