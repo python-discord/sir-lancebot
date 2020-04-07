@@ -9,8 +9,9 @@ from bot.bot import SeasonalBot
 class Player:
     """Class that contains information about player and functions that interact with player."""
 
-    def __init__(self, user: discord.User):
+    def __init__(self, user: discord.User, ctx: Context):
         self.user = user
+        self.ctx = ctx
 
 
 class Game:
