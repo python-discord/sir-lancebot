@@ -16,9 +16,10 @@ CONFIRMATION_MESSAGE = (
 class Player:
     """Class that contains information about player and functions that interact with player."""
 
-    def __init__(self, user: discord.User, ctx: Context):
+    def __init__(self, user: discord.User, ctx: Context, symbol: str):
         self.user = user
         self.ctx = ctx
+        self.symbol = symbol
 
 
 class Game:
