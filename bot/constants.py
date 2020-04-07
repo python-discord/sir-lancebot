@@ -120,15 +120,15 @@ class Emojis:
 
     # TicTacToe Emojis
     number_emojis = {
-        1: "\u0031",
-        2: "\u0032",
-        3: "\u0033",
-        4: "\u0034",
-        5: "\u0035",
-        6: "\u0036",
-        7: "\u0037",
-        8: "\u0038",
-        9: "\u0039"
+        1: "\u0031\ufe0f\u20e3",
+        2: "\u0032\ufe0f\u20e3",
+        3: "\u0033\ufe0f\u20e3",
+        4: "\u0034\ufe0f\u20e3",
+        5: "\u0035\ufe0f\u20e3",
+        6: "\u0036\ufe0f\u20e3",
+        7: "\u0037\ufe0f\u20e3",
+        8: "\u0038\ufe0f\u20e3",
+        9: "\u0039\ufe0f\u20e3"
     }
     confirmation = "\u2705"
     decline = "\u274c"

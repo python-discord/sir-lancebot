@@ -28,6 +28,11 @@ class Game:
         self.channel = channel
         self.players = players
         self.ctx = ctx
+        self.board = [
+            [Emojis.number_emojis[1], Emojis.number_emojis[2], Emojis.number_emojis[3]],
+            [Emojis.number_emojis[4], Emojis.number_emojis[5], Emojis.number_emojis[6]],
+            [Emojis.number_emojis[7], Emojis.number_emojis[8], Emojis.number_emojis[9]]
+        ]
 
         self.current = self.players[0]
         self.next = self.players[1]
@@ -74,8 +79,17 @@ class Game:
 
     async def add_reactions(self, msg: discord.Message) -> None:
         """Add number emojis to message."""
-        for nr in Emojis.number_emojis:
+        for nr in Emojis.number_emojis.values():
             await msg.add_reaction(nr)
+
+    async def send_board(self) -> discord.Message:
+        """Send board and return it's message."""
+        msg = ""
+        for line in self.board:
+            msg += " ".join(line)
+            msg += "\n"
+        message = await self.ctx.send(msg)
+        return message
 
 
 def is_channel_free() -> t.Callable:
@@ -113,7 +127,12 @@ class TicTacToe(Cog):
             ctx
         )
         self.games.append(game)
-        await game.get_confirmation()
+        confirmed, msg = await game.get_confirmation()
+
+        if not confirmed:
+            if msg:
+                await ctx.send(msg)
+            return
 
 
 def setup(bot: SeasonalBot) -> None:
