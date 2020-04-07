@@ -80,6 +80,7 @@ class TicTacToe(Cog):
 
     def __init__(self, bot: SeasonalBot):
         self.bot = bot
+        self.games: t.List[Game] = []
 
 
 def setup(bot: SeasonalBot) -> None:
