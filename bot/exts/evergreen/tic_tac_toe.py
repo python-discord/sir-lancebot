@@ -129,7 +129,7 @@ class TicTacToe(Cog):
             return
         game = Game(
             ctx.channel,
-            [Player(ctx.author, ctx), Player(opponent, ctx)],
+            [Player(ctx.author, ctx, Emojis.x), Player(opponent, ctx, Emojis.o)],
             ctx
         )
         self.games.append(game)
