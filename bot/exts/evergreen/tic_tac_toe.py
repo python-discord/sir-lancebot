@@ -34,6 +34,7 @@ class Game:
 
         self.winner: t.Optional[Player] = None
         self.loser: t.Optional[Player] = None
+        self.over = False
 
     async def get_confirmation(self) -> t.Tuple[bool, t.Optional[str]]:
         """Ask does user want to play TicTacToe against requester. First player is always requester."""
@@ -60,6 +61,7 @@ class Game:
                 check=confirm_check
             )
         except asyncio.TimeoutError:
+            self.over = True
             await confirm_message.delete()
             return False, "Running out of time... Cancelled game."
 
@@ -67,6 +69,7 @@ class Game:
         if reaction.emoji == Emojis.confirmation:
             return True, None
         else:
+            self.over = True
             return False, "User declined"
 
     async def add_reactions(self, msg: discord.Message) -> None:
@@ -86,14 +89,16 @@ class TicTacToe(Cog):
     def is_channel_free() -> t.Callable:
         """Check is channel where command will be invoked free."""
         async def predicate(ctx: Context) -> bool:
-            return all(game.channel != ctx.channel for game in ctx.cog.games)
+            return all(game.channel != ctx.channel for game in ctx.cog.games if not game.over)
         return check(predicate)
 
     @staticmethod
     def is_requester_free() -> t.Callable:
         """Check is requester not already in any game."""
         async def predicate(ctx: Context) -> bool:
-            return all(ctx.author not in (player.user for player in game.players) for game in ctx.cog.games)
+            return all(
+                ctx.author not in (player.user for player in game.players) for game in ctx.cog.games if not game.over
+            )
         return check(predicate)
 
 
