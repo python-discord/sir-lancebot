@@ -2,7 +2,7 @@ import asyncio
 import typing as t
 
 import discord
-from discord.ext.commands import Cog, Context, check
+from discord.ext.commands import Cog, Context, check, command, guild_only
 
 from bot.bot import SeasonalBot
 from bot.constants import Emojis
@@ -78,6 +78,22 @@ class Game:
             await msg.add_reaction(nr)
 
 
+def is_channel_free() -> t.Callable:
+    """Check is channel where command will be invoked free."""
+    async def predicate(ctx: Context) -> bool:
+        return all(game.channel != ctx.channel for game in ctx.cog.games if not game.over)
+    return check(predicate)
+
+
+def is_requester_free() -> t.Callable:
+    """Check is requester not already in any game."""
+    async def predicate(ctx: Context) -> bool:
+        return all(
+            ctx.author not in (player.user for player in game.players) for game in ctx.cog.games if not game.over
+        )
+    return check(predicate)
+
+
 class TicTacToe(Cog):
     """TicTacToe cog contains tic-tac-toe game commands."""
 
@@ -85,21 +101,19 @@ class TicTacToe(Cog):
         self.bot = bot
         self.games: t.List[Game] = []
 
-    @staticmethod
-    def is_channel_free() -> t.Callable:
-        """Check is channel where command will be invoked free."""
-        async def predicate(ctx: Context) -> bool:
-            return all(game.channel != ctx.channel for game in ctx.cog.games if not game.over)
-        return check(predicate)
-
-    @staticmethod
-    def is_requester_free() -> t.Callable:
-        """Check is requester not already in any game."""
-        async def predicate(ctx: Context) -> bool:
-            return all(
-                ctx.author not in (player.user for player in game.players) for game in ctx.cog.games if not game.over
-            )
-        return check(predicate)
+    @guild_only()
+    @is_channel_free()
+    @is_requester_free()
+    @command(name="tictactoe", aliases=("ttt",))
+    async def tic_tac_toe(self, ctx: Context, opponent: discord.User) -> None:
+        """Tic Tac Toe game. Play agains friends. Use reactions to add your mark to field."""
+        game = Game(
+            ctx.channel,
+            [Player(ctx.author, ctx), Player(opponent, ctx)],
+            ctx
+        )
+        self.games.append(game)
+        await game.get_confirmation()
 
 
 def setup(bot: SeasonalBot) -> None:
