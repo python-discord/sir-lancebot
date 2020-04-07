@@ -1,5 +1,7 @@
+import typing as t
+
 import discord
-from discord.ext.commands import Cog
+from discord.ext.commands import Cog, Context
 
 from bot.bot import SeasonalBot
 
@@ -9,6 +11,15 @@ class Player:
 
     def __init__(self, user: discord.User):
         self.user = user
+
+
+class Game:
+    """Class that contains information and functions about Tic Tac Toe game."""
+
+    def __init__(self, channel: discord.TextChannel, players: t.List[discord.User], ctx: Context):
+        self.channel = channel
+        self.players = players
+        self.ctx = ctx
 
 
 class TicTacToe(Cog):
