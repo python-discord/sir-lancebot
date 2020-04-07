@@ -118,6 +118,19 @@ class Emojis:
     pull_request_closed = "<:PRClosed:629695470519713818>"
     merge = "<:PRMerged:629695470570176522>"
 
+    # TicTacToe Emojis
+    number_emojis = {
+        1: "\u0031",
+        2: "\u0032",
+        3: "\u0033",
+        4: "\u0034",
+        5: "\u0035",
+        6: "\u0036",
+        7: "\u0037",
+        8: "\u0038",
+        9: "\u0039"
+    }
+
 
 class Hacktoberfest(NamedTuple):
     voice_id = 514420006474219521
