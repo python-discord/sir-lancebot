@@ -7,6 +7,7 @@ import discord
 from discord.ext import commands
 
 from bot.constants import Client
+from bot.utils.exceptions import UserNotPlayingError
 
 MESSAGE_MAPPING = {
     0: ":stop_button:",
@@ -27,12 +28,6 @@ MESSAGE_MAPPING = {
 }
 
 log = logging.getLogger(__name__)
-
-
-class UserNotPlayingError(Exception):
-    """Will raised when user try to use game commands when not playing."""
-
-    pass
 
 
 class CoordinateConverter(commands.Converter):
@@ -289,14 +284,6 @@ class Minesweeper(commands.Cog):
         if game.activated_on_server:
             await game.chat_msg.edit(content=new_msg)
         del self.games[ctx.author.id]
-
-    @reveal_command.error
-    @end_command.error
-    @flag_command.error
-    async def user_not_playing_handler(self, ctx: commands.Context, error: Exception) -> None:
-        """Handle `KeyError` that is raised in reveal or end command when getting game."""
-        if isinstance(error, UserNotPlayingError):
-            await ctx.send("Game don't exist.")
 
 
 def setup(bot: commands.Bot) -> None:
