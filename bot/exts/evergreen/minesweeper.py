@@ -286,9 +286,9 @@ class Minesweeper(commands.Cog):
 
     @reveal_command.error
     @end_command.error
-    async def keyerror_handler(self, ctx: commands.Context, error: typing.Any) -> None:
+    async def user_not_playing_handler(self, ctx: commands.Context, error: Exception) -> None:
         """Handle `KeyError` that is raised in reveal or end command when getting game."""
-        if isinstance(error, KeyError):
+        if isinstance(error, UserNotPlayingError):
             await ctx.send("Game don't exist.")
 
 
