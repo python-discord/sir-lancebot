@@ -169,7 +169,12 @@ class Game:
             self.board[pos] = self.current.symbol
             await self.edit_board(board)
             await board.clear_reaction(Emojis.number_emojis[pos])
+            if await self.check_for_win():
+                await self.ctx.send(f":tada: {self.current.user.mention} is won this game! :tada:")
+                await board.clear_reactions()
+                break
             self.current, self.next = self.next, self.current
+
         self.over = True
 
 
