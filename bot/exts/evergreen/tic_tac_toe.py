@@ -113,7 +113,7 @@ class Game:
         for nr in Emojis.number_emojis.values():
             await msg.add_reaction(nr)
 
-    async def send_board(self) -> discord.Message:
+    async def send_board(self, channel: t.Optional[discord.TextChannel] = None) -> discord.Message:
         """Send board and return it's message."""
         msg = ""
         c = 0
@@ -123,6 +123,8 @@ class Game:
             if c == 3:
                 msg += "\n"
                 c = 0
+        if channel:
+            return await channel.send(msg)
         return await self.ctx.send(msg)
 
     async def edit_board(self, message: discord.Message) -> None:
