@@ -169,6 +169,8 @@ class Game:
             await self.edit_board(board)
             await board.clear_reaction(Emojis.number_emojis[pos])
             if await self.check_for_win():
+                self.winner = self.current
+                self.loser = self.next
                 await self.ctx.send(f":tada: {self.current.user.mention} is won this game! :tada:")
                 await board.clear_reactions()
                 break
