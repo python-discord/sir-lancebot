@@ -89,8 +89,7 @@ class Game:
         for line in self.board:
             msg += " ".join(line)
             msg += "\n"
-        message = await self.ctx.send(msg)
-        return message
+        return await self.ctx.send(msg)
 
 
 def is_channel_free() -> t.Callable:
