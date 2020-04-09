@@ -21,6 +21,27 @@ class Player:
         self.ctx = ctx
         self.symbol = symbol
 
+    async def get_move(self, board: t.Dict[int, str], msg: discord.Message) -> t.Tuple[bool, t.Optional[int]]:
+        """
+        Get move from user.
+
+        Return is timeout reached and position of field what user will fill when timeout don't reach.
+        """
+        def check_for_move(r: discord.Reaction, u: discord.User) -> bool:
+            return (
+                u.id == self.user.id
+                and msg.id == r.message.id
+                and r.emoji in board.values()
+                and r.emoji in Emojis.number_emojis.values()
+            )
+
+        try:
+            react, = await self.ctx.bot.wait_for('reaction_add', timeout=120.0, check=check_for_move)
+        except asyncio.TimeoutError:
+            return True, None
+        else:
+            return False, Emojis.number_emojis.keys()[Emojis.number_emojis.values().index(react.emoji)]
+
 
 class Game:
     """Class that contains information and functions about Tic Tac Toe game."""
@@ -29,11 +50,17 @@ class Game:
         self.channel = channel
         self.players = players
         self.ctx = ctx
-        self.board = [
-            [Emojis.number_emojis[1], Emojis.number_emojis[2], Emojis.number_emojis[3]],
-            [Emojis.number_emojis[4], Emojis.number_emojis[5], Emojis.number_emojis[6]],
-            [Emojis.number_emojis[7], Emojis.number_emojis[8], Emojis.number_emojis[9]]
-        ]
+        self.board = {
+            1: Emojis.number_emojis[1],
+            2: Emojis.number_emojis[2],
+            3: Emojis.number_emojis[3],
+            4: Emojis.number_emojis[4],
+            5: Emojis.number_emojis[5],
+            6: Emojis.number_emojis[6],
+            7: Emojis.number_emojis[7],
+            8: Emojis.number_emojis[8],
+            9: Emojis.number_emojis[9]
+        }
 
         self.current = self.players[0]
         self.next = self.players[1]
@@ -86,9 +113,13 @@ class Game:
     async def send_board(self) -> discord.Message:
         """Send board and return it's message."""
         msg = ""
-        for line in self.board:
-            msg += " ".join(line)
-            msg += "\n"
+        c = 0
+        for line in self.board.values():
+            msg += f"{line} "
+            c += 1
+            if c == 3:
+                msg += "\n"
+                c = 0
         return await self.ctx.send(msg)
 
     async def play(self) -> None:
