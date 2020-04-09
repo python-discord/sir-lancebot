@@ -36,11 +36,11 @@ class Player:
             )
 
         try:
-            react, = await self.ctx.bot.wait_for('reaction_add', timeout=120.0, check=check_for_move)
+            react, _ = await self.ctx.bot.wait_for('reaction_add', timeout=120.0, check=check_for_move)
         except asyncio.TimeoutError:
             return True, None
         else:
-            return False, Emojis.number_emojis.keys()[Emojis.number_emojis.values().index(react.emoji)]
+            return False, list(Emojis.number_emojis.keys())[list(Emojis.number_emojis.values()).index(react.emoji)]
 
 
 class Game:
@@ -122,11 +122,37 @@ class Game:
                 c = 0
         return await self.ctx.send(msg)
 
+    async def edit_board(self, message: discord.Message) -> None:
+        """Edit Tic Tac Toe game board in message."""
+        msg = ""
+        c = 0
+        for line in self.board.values():
+            msg += f"{line} "
+            c += 1
+            if c == 3:
+                msg += "\n"
+                c = 0
+        await message.edit(content=msg)
+
     async def play(self) -> None:
         """Start and handle game."""
         await self.ctx.send("It's time for game! Let's begin.")
         board = await self.send_board()
         await self.add_reactions(board)
+
+        for _ in range(9):
+            announce = await self.ctx.send(f"{self.current.user.mention}, your turn! React to emoji to mark field.")
+            timeout, pos = await self.current.get_move(self.board, board)
+            await announce.delete()
+            if timeout:
+                await self.ctx.send(f"{self.current.user.mention} ran out of time. Canceling game.")
+                self.over = True
+                return
+            self.board[pos] = self.current.symbol
+            await self.edit_board(board)
+            await board.clear_reaction(Emojis.number_emojis[pos])
+            self.current, self.next = self.next, self.current
+        self.over = True
 
 
 def is_channel_free() -> t.Callable:
@@ -175,6 +201,7 @@ class TicTacToe(Cog):
             if msg:
                 await ctx.send(msg)
             return
+        await game.play()
 
 
 def setup(bot: SeasonalBot) -> None:
