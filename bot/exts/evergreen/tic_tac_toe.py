@@ -134,6 +134,24 @@ class Game:
                 c = 0
         await message.edit(content=msg)
 
+    async def check_for_win(self) -> bool:
+        """Check from board, is any player won game."""
+        if (
+            # Horizontal
+            self.board[1] == self.board[2] == self.board[3]
+            or self.board[4] == self.board[5] == self.board[6]
+            or self.board[7] == self.board[8] == self.board[9]
+            # Vertical
+            or self.board[1] == self.board[4] == self.board[7]
+            or self.board[2] == self.board[5] == self.board[8]
+            or self.board[3] == self.board[6] == self.board[9]
+            # Diagonal
+            or self.board[1] == self.board[5] == self.board[9]
+            or self.board[3] == self.board[5] == self.board[7]
+        ):
+            return True
+        return False
+
     async def play(self) -> None:
         """Start and handle game."""
         await self.ctx.send("It's time for game! Let's begin.")
