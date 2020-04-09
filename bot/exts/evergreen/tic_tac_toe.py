@@ -2,10 +2,11 @@ import asyncio
 import typing as t
 
 import discord
-from discord.ext.commands import Cog, Context, check, command, guild_only
+from discord.ext.commands import Cog, Context, check, group, guild_only
 
 from bot.bot import SeasonalBot
 from bot.constants import Emojis
+from bot.utils.pagination import LinePaginator
 
 CONFIRMATION_MESSAGE = (
     "{opponent}, {requester} want to play Tic-Tac-Toe against you. React to this message with "
@@ -67,6 +68,7 @@ class Game:
         self.winner: t.Optional[Player] = None
         self.loser: t.Optional[Player] = None
         self.over = False
+        self.canceled = False
 
     async def get_confirmation(self) -> t.Tuple[bool, t.Optional[str]]:
         """Ask does user want to play TicTacToe against requester. First player is always requester."""
@@ -94,6 +96,7 @@ class Game:
             )
         except asyncio.TimeoutError:
             self.over = True
+            self.canceled = True
             await confirm_message.delete()
             return False, "Running out of time... Cancelled game."
 
@@ -102,6 +105,7 @@ class Game:
             return True, None
         else:
             self.over = True
+            self.canceled = True
             return False, "User declined"
 
     async def add_reactions(self, msg: discord.Message) -> None:
@@ -164,6 +168,7 @@ class Game:
             if timeout:
                 await self.ctx.send(f"{self.current.user.mention} ran out of time. Canceling game.")
                 self.over = True
+                self.canceled = True
                 return
             self.board[pos] = self.current.symbol
             await self.edit_board(board)
@@ -205,7 +210,7 @@ class TicTacToe(Cog):
     @guild_only()
     @is_channel_free()
     @is_requester_free()
-    @command(name="tictactoe", aliases=("ttt",))
+    @group(name="tictactoe", aliases=("ttt",), invoke_without_command=True)
     async def tic_tac_toe(self, ctx: Context, opponent: discord.User) -> None:
         """Tic Tac Toe game. Play agains friends. Use reactions to add your mark to field."""
         if opponent == ctx.author:
@@ -228,6 +233,23 @@ class TicTacToe(Cog):
                 await ctx.send(msg)
             return
         await game.play()
+
+    @tic_tac_toe.group(name="history", aliases=("log",), invoke_without_command=True)
+    async def tic_tac_toe_logs(self, ctx: Context) -> None:
+        """Show most recent tic-tac-toe games."""
+        if len(self.games) < 1:
+            await ctx.send("No recent games.")
+            return
+        await LinePaginator.paginate(
+            (
+                f"**#{i+1}**: {game.winner.user.mention} :trophy: vs {game.loser.user.mention}"
+                for i, game in enumerate(self.games)
+                if game.over
+                and not game.canceled
+            ),
+            ctx,
+            discord.Embed(title="Most recent Tic Tac Toe games")
+        )
 
 
 def setup(bot: SeasonalBot) -> None:
