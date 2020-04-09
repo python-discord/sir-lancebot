@@ -46,8 +46,7 @@ class Player:
 class Game:
     """Class that contains information and functions about Tic Tac Toe game."""
 
-    def __init__(self, channel: discord.TextChannel, players: t.List[Player], ctx: Context):
-        self.channel = channel
+    def __init__(self, players: t.List[Player], ctx: Context):
         self.players = players
         self.ctx = ctx
         self.board = {
@@ -213,7 +212,6 @@ class TicTacToe(Cog):
             await ctx.send("Opponent is already in game.")
             return
         game = Game(
-            ctx.channel,
             [Player(ctx.author, ctx, Emojis.x), Player(opponent, ctx, Emojis.o)],
             ctx
         )
