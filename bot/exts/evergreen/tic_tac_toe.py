@@ -253,6 +253,16 @@ class TicTacToe(Cog):
             discord.Embed(title="Most recent Tic Tac Toe games")
         )
 
+    @tic_tac_toe_logs.command(name="show", aliases=("s",))
+    async def show_tic_tac_toe_board(self, ctx: Context, game_id: int) -> None:
+        """View game board by ID (ID is possible to get by `.tictactoe history`)."""
+        if len(self.games) < game_id:
+            await ctx.send("Game don't exist.")
+            return
+        game = self.games[game_id - 1]
+        await ctx.send(f"{game.winner.user} :trophy: vs {game.loser.user}")
+        await game.send_board(ctx.channel)
+
 
 def setup(bot: SeasonalBot) -> None:
     """Load TicTacToe Cog."""
