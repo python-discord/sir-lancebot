@@ -206,6 +206,9 @@ class TicTacToe(Cog):
     @command(name="tictactoe", aliases=("ttt",))
     async def tic_tac_toe(self, ctx: Context, opponent: discord.User) -> None:
         """Tic Tac Toe game. Play agains friends. Use reactions to add your mark to field."""
+        if opponent == ctx.author:
+            await ctx.send("You can't play against yourself.")
+            return
         if not all(
             opponent not in (player.user for player in g.players) for g in ctx.cog.games if not g.over
         ):
