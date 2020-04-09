@@ -91,6 +91,12 @@ class Game:
             msg += "\n"
         return await self.ctx.send(msg)
 
+    async def play(self) -> None:
+        """Start and handle game."""
+        await self.ctx.send("It's time for game! Let's begin.")
+        board = await self.send_board()
+        await self.add_reactions(board)
+
 
 def is_channel_free() -> t.Callable:
     """Check is channel where command will be invoked free."""
