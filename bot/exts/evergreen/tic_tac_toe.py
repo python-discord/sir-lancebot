@@ -73,7 +73,7 @@ class AI:
         """Get move from AI. AI use Minimax strategy."""
         possible_moves = [i for i, emoji in board.items() if emoji in list(Emojis.number_emojis.values())]
 
-        for symbol in (Emojis.x, Emojis.o):
+        for symbol in (Emojis.o, Emojis.x):
             for move in possible_moves:
                 board_copy = board.copy()
                 board_copy[move] = symbol
