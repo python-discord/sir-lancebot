@@ -71,13 +71,13 @@ class AI:
 
     async def get_move(self, board: t.Dict[int, str], _: discord.Message) -> t.Tuple[bool, int]:
         """Get move from AI. AI use Minimax strategy."""
-        possible_moves = [i for i, emoji in board.items() if emoji in Emojis.number_emojis]
+        possible_moves = [i for i, emoji in board.items() if emoji in list(Emojis.number_emojis.values())]
 
         for symbol in (Emojis.x, Emojis.o):
             for move in possible_moves:
                 board_copy = board.copy()
                 board_copy[move] = symbol
-                if self.check_win(board_copy):
+                if await self.check_win(board_copy):
                     return False, move
 
         open_corners = [i for i in possible_moves if i in (1, 3, 7, 9)]
@@ -94,7 +94,7 @@ class AI:
 class Game:
     """Class that contains information and functions about Tic Tac Toe game."""
 
-    def __init__(self, players: t.List[Player], ctx: Context):
+    def __init__(self, players: t.List[t.Union[Player, AI]], ctx: Context):
         self.players = players
         self.ctx = ctx
         self.board = {
@@ -112,10 +112,11 @@ class Game:
         self.current = self.players[0]
         self.next = self.players[1]
 
-        self.winner: t.Optional[Player] = None
-        self.loser: t.Optional[Player] = None
+        self.winner: t.Optional[t.Union[Player, AI]] = None
+        self.loser: t.Optional[t.Union[Player, AI]] = None
         self.over = False
         self.canceled = False
+        self.draw = False
 
     async def get_confirmation(self) -> t.Tuple[bool, t.Optional[str]]:
         """Ask does user want to play TicTacToe against requester. First player is always requester."""
@@ -211,9 +212,11 @@ class Game:
         await self.add_reactions(board)
 
         for _ in range(9):
-            announce = await self.ctx.send(f"{self.current.user.mention}, your turn! React to emoji to mark field.")
+            if isinstance(self.current, Player):
+                announce = await self.ctx.send(f"{self.current.user.mention}, your turn! React to emoji to mark field.")
             timeout, pos = await self.current.get_move(self.board, board)
-            await announce.delete()
+            if isinstance(self.current, Player):
+                await announce.delete()
             if timeout:
                 await self.ctx.send(f"{self.current.user.mention} ran out of time. Canceling game.")
                 self.over = True
@@ -225,11 +228,16 @@ class Game:
             if await self.check_for_win():
                 self.winner = self.current
                 self.loser = self.next
-                await self.ctx.send(f":tada: {self.current.user.mention} is won this game! :tada:")
+                await self.ctx.send(
+                    f":tada: {self.current.user.mention if isinstance(self.current, Player) else 'AI'} "
+                    f"is won this game! :tada:"
+                )
                 await board.clear_reactions()
                 break
             self.current, self.next = self.next, self.current
-
+        if not self.winner:
+            self.draw = True
+            await self.ctx.send("It's DRAW!")
         self.over = True
 
 
@@ -260,27 +268,34 @@ class TicTacToe(Cog):
     @is_channel_free()
     @is_requester_free()
     @group(name="tictactoe", aliases=("ttt",), invoke_without_command=True)
-    async def tic_tac_toe(self, ctx: Context, opponent: discord.User) -> None:
-        """Tic Tac Toe game. Play agains friends. Use reactions to add your mark to field."""
+    async def tic_tac_toe(self, ctx: Context, opponent: t.Optional[discord.User]) -> None:
+        """Tic Tac Toe game. Play agains friends or AI. Use reactions to add your mark to field."""
         if opponent == ctx.author:
             await ctx.send("You can't play against yourself.")
             return
-        if not all(
+        if opponent is not None and not all(
             opponent not in (player.user for player in g.players) for g in ctx.cog.games if not g.over
         ):
             await ctx.send("Opponent is already in game.")
             return
-        game = Game(
-            [Player(ctx.author, ctx, Emojis.x), Player(opponent, ctx, Emojis.o)],
-            ctx
-        )
+        if opponent is None:
+            game = Game(
+                [Player(ctx.author, ctx, Emojis.x), AI(Emojis.o)],
+                ctx
+            )
+        else:
+            game = Game(
+                [Player(ctx.author, ctx, Emojis.x), Player(opponent, ctx, Emojis.o)],
+                ctx
+            )
         self.games.append(game)
-        confirmed, msg = await game.get_confirmation()
+        if opponent is not None:
+            confirmed, msg = await game.get_confirmation()
 
-        if not confirmed:
-            if msg:
-                await ctx.send(msg)
-            return
+            if not confirmed:
+                if msg:
+                    await ctx.send(msg)
+                return
         await game.play()
 
     @tic_tac_toe.group(name="history", aliases=("log",), invoke_without_command=True)
@@ -289,13 +304,21 @@ class TicTacToe(Cog):
         if len(self.games) < 1:
             await ctx.send("No recent games.")
             return
+        log_games = []
+        for i, game in enumerate(self.games):
+            if game.over and not game.canceled:
+                if game.draw:
+                    log_games.append(
+                        f"**#{i+1}**: {game.players[0].user.mention} vs "
+                        f"{game.players[1].user.mention if isinstance(game.players[1], Player) else 'AI'} (draw)"
+                    )
+                else:
+                    log_games.append(
+                        f"**#{i+1}**: {game.winner.user.mention if isinstance(game.winner, Player) else 'AI'} :trophy: "
+                        f"vs {game.loser.user.mention if isinstance(game.loser, Player) else 'AI'}"
+                    )
         await LinePaginator.paginate(
-            (
-                f"**#{i+1}**: {game.winner.user.mention} :trophy: vs {game.loser.user.mention}"
-                for i, game in enumerate(self.games)
-                if game.over
-                and not game.canceled
-            ),
+            log_games,
             ctx,
             discord.Embed(title="Most recent Tic Tac Toe games")
         )
@@ -307,7 +330,10 @@ class TicTacToe(Cog):
             await ctx.send("Game don't exist.")
             return
         game = self.games[game_id - 1]
-        await ctx.send(f"{game.winner.user} :trophy: vs {game.loser.user}")
+        await ctx.send(
+            f"{game.winner.user if isinstance(game.winner, Player) else 'AI'} "
+            f":trophy: vs {game.loser.user if isinstance(game.winner, Player) else 'AI'}"
+        )
         await game.send_board(ctx.channel)
 
 
