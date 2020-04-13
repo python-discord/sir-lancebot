@@ -7,6 +7,7 @@ import discord
 from discord.ext import commands
 
 from bot.constants import Client
+from bot.utils.exceptions import UserNotPlayingError
 
 MESSAGE_MAPPING = {
     0: ":stop_button:",
@@ -176,6 +177,8 @@ class Minesweeper(commands.Cog):
     @minesweeper_group.command(name="flag")
     async def flag_command(self, ctx: commands.Context, *coordinates: CoordinateConverter) -> None:
         """Place multiple flags on the board."""
+        if ctx.author.id not in self.games:
+            raise UserNotPlayingError
         board: GameBoard = self.games[ctx.author.id].revealed
         for x, y in coordinates:
             if board[y][x] == "hidden":
@@ -253,6 +256,8 @@ class Minesweeper(commands.Cog):
     @minesweeper_group.command(name="reveal")
     async def reveal_command(self, ctx: commands.Context, *coordinates: CoordinateConverter) -> None:
         """Reveal multiple cells."""
+        if ctx.author.id not in self.games:
+            raise UserNotPlayingError
         game = self.games[ctx.author.id]
         revealed: GameBoard = game.revealed
         board: GameBoard = game.board
@@ -269,6 +274,8 @@ class Minesweeper(commands.Cog):
     @minesweeper_group.command(name="end")
     async def end_command(self, ctx: commands.Context) -> None:
         """End your current game."""
+        if ctx.author.id not in self.games:
+            raise UserNotPlayingError
         game = self.games[ctx.author.id]
         game.revealed = game.board
         await self.update_boards(ctx)
