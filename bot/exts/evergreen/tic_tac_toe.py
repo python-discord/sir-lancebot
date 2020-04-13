@@ -44,6 +44,10 @@ class Player:
         else:
             return False, list(Emojis.number_emojis.keys())[list(Emojis.number_emojis.values()).index(react.emoji)]
 
+    async def display(self) -> str:
+        """Return mention of user."""
+        return self.user.mention
+
 
 class AI:
     """Tic Tac Toe AI class for against computer gaming."""
@@ -89,6 +93,10 @@ class AI:
 
         open_edges = [i for i in possible_moves if i in (2, 4, 6, 8)]
         return False, random.choice(open_edges)
+
+    def display(self) -> str:
+        """Return `AI` as user name."""
+        return "AI"
 
 
 class Game:
