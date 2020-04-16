@@ -6,6 +6,7 @@ from pathlib import Path
 import discord
 from discord.ext import commands
 
+from bot.bot import SeasonalBot
 from bot.constants import Channels, Colours, Month
 from bot.utils.decorators import seasonal_task
 
@@ -19,7 +20,7 @@ class EasterFacts(commands.Cog):
     It also contains a background task which sends an easter egg fact in the event channel everyday.
     """
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: SeasonalBot):
         self.bot = bot
         self.facts = self.load_json()
 
@@ -35,7 +36,7 @@ class EasterFacts(commands.Cog):
     @seasonal_task(Month.APRIL)
     async def send_egg_fact_daily(self) -> None:
         """A background task that sends an easter egg fact in the event channel everyday."""
-        await self.bot.wait_until_ready()
+        await self.bot.wait_until_guild_available()
 
         channel = self.bot.get_channel(Channels.seasonalbot_commands)
         await channel.send(embed=self.make_embed())
@@ -55,6 +56,6 @@ class EasterFacts(commands.Cog):
         )
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: SeasonalBot) -> None:
     """Easter Egg facts cog load."""
     bot.add_cog(EasterFacts(bot))
