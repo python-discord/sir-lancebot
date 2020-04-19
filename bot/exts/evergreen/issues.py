@@ -3,7 +3,7 @@ import logging
 import discord
 from discord.ext import commands
 
-from bot.constants import Colours, Emojis, WHITELISTED_CHANNELS
+from bot.constants import Colours, Emojis, WHITELISTED_CHANNELS, Channels
 from bot.utils.decorators import override_in_channel
 
 log = logging.getLogger(__name__)
@@ -21,7 +21,7 @@ class Issues(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=("pr",))
-    @override_in_channel(WHITELISTED_CHANNELS)
+    @override_in_channel(WHITELISTED_CHANNELS + (Channels.dev_contrib,))
     async def issue(
         self, ctx: commands.Context, number: int, repository: str = "seasonalbot", user: str = "python-discord"
     ) -> None:
