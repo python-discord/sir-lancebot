@@ -151,11 +151,16 @@ class Minesweeper(commands.Cog):
         else:
             chat_msg = None
 
-        await ctx.author.send(
-            f"Play by typing: `{Client.prefix}ms reveal xy [xy]` or `{Client.prefix}ms flag xy [xy]` \n"
-            f"Close the game with `{Client.prefix}ms end`\n"
-        )
-        dm_msg = await ctx.author.send(f"Here's your board!\n{self.format_for_discord(revealed_board)}")
+        try:
+            await ctx.author.send(
+                f"Play by typing: `{Client.prefix}ms reveal xy [xy]` or `{Client.prefix}ms flag xy [xy]` \n"
+                f"Close the game with `{Client.prefix}ms end`\n"
+            )
+        except discord.errors.Forbidden:
+            log.debug(f"{ctx.author.name} ({ctx.author.id}) has disabled DMs from server members")
+            await ctx.send(f":x: {ctx.author.mention}, please (temporarily) enable DMs to receive the join code")
+        else:
+            dm_msg = await ctx.author.send(f"Here's your board!\n{self.format_for_discord(revealed_board)}")
 
         self.games[ctx.author.id] = Game(
             board=board,
