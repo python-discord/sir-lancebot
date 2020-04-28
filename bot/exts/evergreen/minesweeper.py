@@ -158,7 +158,7 @@ class Minesweeper(commands.Cog):
             )
         except discord.errors.Forbidden:
             log.debug(f"{ctx.author.name} ({ctx.author.id}) has disabled DMs from server members")
-            await ctx.send(f":x: {ctx.author.mention}, please (temporarily) enable DMs to receive the join code")
+            await ctx.send(f":x: {ctx.author.mention}, please enable DMs to play minesweeper.")
         else:
             dm_msg = await ctx.author.send(f"Here's your board!\n{self.format_for_discord(revealed_board)}")
 
