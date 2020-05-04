@@ -4,6 +4,7 @@ from pathlib import Path
 from random import choice
 
 import discord
+from discord.errors import Forbidden
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
 
@@ -37,11 +38,25 @@ class Halloweenify(commands.Cog):
                 f"**{ctx.author.display_name}** wasn\'t spooky enough for you? That\'s understandable, "
                 f"{ctx.author.display_name} isn\'t scary at all! "
                 "Let me think of something better. Hmm... I got it!\n\n "
-                f"Your new nickname will be: \n :ghost: **{nickname}** :jack_o_lantern:"
             )
             embed.set_image(url=image)
 
-            await ctx.author.edit(nick=nickname)
+            try:
+                if isinstance(ctx.author, discord.Member):
+                    await ctx.author.edit(nick=nickname)
+                    embed.description += f"Your new nickname will be: \n:ghost: **{nickname}** :jack_o_lantern:"
+
+                else:   # The command has been invoked in DM
+                    embed.description += (
+                        f"Your new nickname should be: \n :ghost: **{nickname}** :jack_o_lantern: \n\n"
+                        f"Feel free to change it yourself, or invoke the command again inside the server."
+                    )
+
+            except Forbidden:   # The bot doesn't have enough permission
+                embed.description += (
+                    f"Your new nickname should be: \n :ghost: **{nickname}** :jack_o_lantern: \n\n"
+                    f"Although it looks like I can't change it myself, but feel free to change it yourself."
+                )
 
         await ctx.send(embed=embed)
 
