@@ -951,7 +951,7 @@ class Snakes(Cog):
                 "48 hours. The staff then selected the best features from all the best teams, and made modifications "
                 "to ensure they would all work together before integrating them into the community bot.\n\n"
                 "It was a tight race, but in the end, <@!104749643715387392> and <@!303940835005825024> "
-                f"walked away as grand champions. Make sure you check out `{ctx.prefix}snakes sal` ,"
+                f"walked away as grand champions. Make sure you check out `{ctx.prefix}snakes sal`,"
                 f"`{ctx.prefix}snakes draw` and `{ctx.prefix}snakes hatch` "
                 "to see what they came up with."
             )
