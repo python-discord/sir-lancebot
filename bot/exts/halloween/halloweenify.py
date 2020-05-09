@@ -41,21 +41,21 @@ class Halloweenify(commands.Cog):
             )
             embed.set_image(url=image)
 
-            try:
-                if isinstance(ctx.author, discord.Member):
+            if isinstance(ctx.author, discord.Member):
+                try:
                     await ctx.author.edit(nick=nickname)
                     embed.description += f"Your new nickname will be: \n:ghost: **{nickname}** :jack_o_lantern:"
 
-                else:   # The command has been invoked in DM
+                except Forbidden:   # The bot doesn't have enough permission
                     embed.description += (
                         f"Your new nickname should be: \n :ghost: **{nickname}** :jack_o_lantern: \n\n"
-                        f"Feel free to change it yourself, or invoke the command again inside the server."
+                        f"It looks like I cannot change your name, but feel free to change it yourself."
                     )
 
-            except Forbidden:   # The bot doesn't have enough permission
+            else:   # The command has been invoked in DM
                 embed.description += (
                     f"Your new nickname should be: \n :ghost: **{nickname}** :jack_o_lantern: \n\n"
-                    f"Although it looks like I can't change it myself, but feel free to change it yourself."
+                    f"Feel free to change it yourself, or invoke the command again inside the server."
                 )
 
         await ctx.send(embed=embed)
