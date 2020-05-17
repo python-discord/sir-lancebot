@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import logging.handlers
 import os
@@ -63,3 +64,8 @@ logging.basicConfig(
     handlers=[console_handler, file_handler]
 )
 logging.getLogger().info('Logging initialization complete')
+
+
+# On Windows, the selector event loop is required for aiodns.
+if os.name == "nt":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
