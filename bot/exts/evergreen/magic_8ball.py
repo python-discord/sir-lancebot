@@ -1,6 +1,6 @@
 import json
 import logging
-import random
+from hashlib import sha1
 from pathlib import Path
 
 from discord.ext import commands
@@ -16,11 +16,15 @@ class Magic8ball(commands.Cog):
         with open(Path("bot/resources/evergreen/magic8ball.json"), "r") as file:
             self.answers = json.load(file)
 
+    def hash_input(self, inp: str, max_: int) -> int:
+        """Hash the input and return a constant number between 0 and max_."""
+        return int(sha1(bytes(inp, encoding='utf-8')).hexdigest(), base=16) % max_
+
     @commands.command(name="8ball")
     async def output_answer(self, ctx: commands.Context, *, question: str) -> None:
         """Return a Magic 8ball answer from answers list."""
         if len(question.split()) >= 3:
-            answer = random.choice(self.answers)
+            answer = self.answers[self.hash_input(f"{ctx.author.id}-{question.strip()}", len(self.answers))]
             await ctx.send(answer)
         else:
             await ctx.send("Usage: .8ball <question> (minimum length of 3 eg: `will I win?`)")
