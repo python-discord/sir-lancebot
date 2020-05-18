@@ -203,4 +203,7 @@ class SeasonalBot(commands.Bot):
         await self._guild_available.wait()
 
 
-bot = SeasonalBot(command_prefix=Client.prefix)
+bot = SeasonalBot(
+    command_prefix=Client.prefix,
+    activity=discord.Game(name=f"Commands: {Client.prefix}help"),
+)
