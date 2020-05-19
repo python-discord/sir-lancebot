@@ -20,7 +20,7 @@ class AprilFoolVideos(commands.Cog):
     def load_json() -> dict:
         """A function to load JSON data."""
         p = Path('bot/resources/easter/april_fools_vids.json')
-        with p.open() as json_file:
+        with p.open(encoding="utf-8") as json_file:
             all_vids = load(json_file)
         return all_vids
 

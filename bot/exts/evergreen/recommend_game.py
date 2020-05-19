@@ -11,7 +11,7 @@ game_recs = []
 
 # Populate the list `game_recs` with resource files
 for rec_path in Path("bot/resources/evergreen/game_recs").glob("*.json"):
-    with rec_path.open(encoding='utf-8') as file:
+    with rec_path.open(encoding='utf8') as file:
         data = json.load(file)
     game_recs.append(data)
 shuffle(game_recs)

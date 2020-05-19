@@ -40,7 +40,7 @@ class TriviaQuiz(commands.Cog):
     def load_questions() -> dict:
         """Load the questions from the JSON file."""
         p = Path("bot", "resources", "evergreen", "trivia_quiz.json")
-        with p.open(encoding="utf-8") as json_data:
+        with p.open(encoding="utf8") as json_data:
             questions = json.load(json_data)
             return questions
 
