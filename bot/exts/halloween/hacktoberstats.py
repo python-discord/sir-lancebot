@@ -123,7 +123,7 @@ class HacktoberStats(commands.Cog):
         """
         if self.link_json.exists():
             logging.info(f"Loading linked GitHub accounts from '{self.link_json}'")
-            with open(self.link_json, 'r') as file:
+            with open(self.link_json, 'r', encoding="utf8") as file:
                 linked_accounts = json.load(file)
 
             logging.info(f"Loaded {len(linked_accounts)} linked GitHub accounts from '{self.link_json}'")

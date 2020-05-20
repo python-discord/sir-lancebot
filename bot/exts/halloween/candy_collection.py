@@ -27,7 +27,7 @@ class CandyCollection(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        with open(json_location) as candy:
+        with open(json_location, encoding="utf8") as candy:
             self.candy_json = json.load(candy)
             self.msg_reacted = self.candy_json['msg_reacted']
         self.get_candyinfo = dict()
