@@ -141,21 +141,26 @@ class Minesweeper(commands.Cog):
             await ctx.message.delete(delay=2)
             return
 
+        try:
+            await ctx.author.send(
+                f"Play by typing: `{Client.prefix}ms reveal xy [xy]` or `{Client.prefix}ms flag xy [xy]` \n"
+                f"Close the game with `{Client.prefix}ms end`\n"
+            )
+        except discord.errors.Forbidden:
+            log.debug(f"{ctx.author.name} ({ctx.author.id}) has disabled DMs from server members")
+            await ctx.send(f":x: {ctx.author.mention}, please enable DMs to play minesweeper.")
+            return
+
         # Add game to list
         board: GameBoard = self.generate_board(bomb_chance)
         revealed_board: GameBoard = [["hidden"] * 10 for _ in range(10)]
+        dm_msg = await ctx.author.send(f"Here's your board!\n{self.format_for_discord(revealed_board)}")
 
         if ctx.guild:
             await ctx.send(f"{ctx.author.mention} is playing Minesweeper")
             chat_msg = await ctx.send(f"Here's there board!\n{self.format_for_discord(revealed_board)}")
         else:
             chat_msg = None
-
-        await ctx.author.send(
-            f"Play by typing: `{Client.prefix}ms reveal xy [xy]` or `{Client.prefix}ms flag xy [xy]` \n"
-            f"Close the game with `{Client.prefix}ms end`\n"
-        )
-        dm_msg = await ctx.author.send(f"Here's your board!\n{self.format_for_discord(revealed_board)}")
 
         self.games[ctx.author.id] = Game(
             board=board,
