@@ -25,7 +25,7 @@ def make_persistent(file_path: Path) -> Path:
     as otherwise only one datafile can be persistent and will be returned for
     both cases.
 
-    Ensure that all open files are using explicit appropriate encoding to avoid encod
+    Ensure that all open files are using explicit appropriate encoding to avoid
     encoding errors from diffent OS systems.
 
     Example Usage:
