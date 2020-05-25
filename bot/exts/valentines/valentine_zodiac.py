@@ -25,7 +25,7 @@ class ValentineZodiac(commands.Cog):
     def load_json() -> dict:
         """Load zodiac compatibility from static JSON resource."""
         p = Path("bot/resources/valentines/zodiac_compatibility.json")
-        with p.open() as json_data:
+        with p.open(encoding="utf8") as json_data:
             zodiacs = load(json_data)
             return zodiacs
 

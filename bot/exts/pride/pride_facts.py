@@ -30,7 +30,7 @@ class PrideFacts(commands.Cog):
     @staticmethod
     def load_facts() -> dict:
         """Loads a dictionary of years mapping to lists of facts."""
-        with open(Path("bot/resources/pride/facts.json"), "r", encoding="utf-8") as f:
+        with open(Path("bot/resources/pride/facts.json"), "r", encoding="utf8") as f:
             return json.load(f)
 
     @seasonal_task(Month.JUNE)

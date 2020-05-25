@@ -27,7 +27,7 @@ class CandyCollection(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        with open(json_location) as candy:
+        with open(json_location, encoding="utf8") as candy:
             self.candy_json = json.load(candy)
             self.msg_reacted = self.candy_json['msg_reacted']
         self.get_candyinfo = dict()
@@ -178,7 +178,7 @@ class CandyCollection(commands.Cog):
 
     def save_to_json(self) -> None:
         """Save JSON to a local file."""
-        with open(json_location, 'w') as outfile:
+        with open(json_location, 'w', encoding="utf8") as outfile:
             json.dump(self.candy_json, outfile)
 
     @in_month(Month.OCTOBER)

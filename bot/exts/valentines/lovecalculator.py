@@ -15,7 +15,7 @@ from bot.constants import Roles
 
 log = logging.getLogger(__name__)
 
-with Path("bot/resources/valentines/love_matches.json").open() as file:
+with Path("bot/resources/valentines/love_matches.json").open(encoding="utf8") as file:
     LOVE_DATA = json.load(file)
     LOVE_DATA = sorted((int(key), value) for key, value in LOVE_DATA.items())
 

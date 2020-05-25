@@ -13,7 +13,7 @@ class Magic8ball(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        with open(Path("bot/resources/evergreen/magic8ball.json"), "r") as file:
+        with open(Path("bot/resources/evergreen/magic8ball.json"), "r", encoding="utf8") as file:
             self.answers = json.load(file)
 
     @commands.command(name="8ball")
