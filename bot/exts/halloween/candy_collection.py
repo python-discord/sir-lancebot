@@ -178,7 +178,7 @@ class CandyCollection(commands.Cog):
 
     def save_to_json(self) -> None:
         """Save JSON to a local file."""
-        with open(json_location, 'w') as outfile:
+        with open(json_location, 'w', encoding="utf8") as outfile:
             json.dump(self.candy_json, outfile)
 
     @in_month(Month.OCTOBER)

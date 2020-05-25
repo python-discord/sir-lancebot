@@ -145,7 +145,7 @@ class HacktoberStats(commands.Cog):
             }
         """
         logging.info(f"Saving linked_accounts to '{self.link_json}'")
-        with open(self.link_json, 'w') as file:
+        with open(self.link_json, 'w', encoding="utf8") as file:
             json.dump(self.linked_accounts, file, default=str)
         logging.info(f"linked_accounts saved to '{self.link_json}'")
 

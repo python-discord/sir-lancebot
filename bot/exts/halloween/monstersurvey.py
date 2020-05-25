@@ -33,7 +33,7 @@ class MonsterSurvey(Cog):
     def json_write(self) -> None:
         """Write voting results to a local JSON file."""
         log.info("Saved Monster Survey Results")
-        with open(self.registry_location, 'w') as jason:
+        with open(self.registry_location, 'w', encoding="utf8") as jason:
             json.dump(self.voter_registry, jason, indent=2)
 
     def cast_vote(self, id: int, monster: str) -> None:
