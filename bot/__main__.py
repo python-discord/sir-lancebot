@@ -1,6 +1,7 @@
 import logging
 
 import sentry_sdk
+from sentry_sdk.integrations.aiohttp import AioHttpIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
 
 from bot.bot import bot
@@ -15,7 +16,10 @@ sentry_logging = LoggingIntegration(
 
 sentry_sdk.init(
     dsn=Client.sentry_dsn,
-    integrations=[sentry_logging]
+    integrations=[
+        sentry_logging,
+        AioHttpIntegration(),
+    ]
 )
 
 log = logging.getLogger(__name__)
