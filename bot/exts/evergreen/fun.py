@@ -87,6 +87,40 @@ class Fun(Cog):
             converted_text = f">>> {converted_text.lstrip('> ')}"
         await ctx.send(content=converted_text, embed=embed)
 
+    @commands.command(name="caesarcipher", aliases=("caesar",))
+    async def caesarcipher_command(self, ctx: Context, offset: int, *, text: str) -> None:
+        """
+        Given an integer `offset`, encrypt the given `text`.
+
+        A positive `offset` will cause the letters to shift right,
+        while a negative `offset` will cause the letters to shift left.
+
+        Also accepts a valid discord Message ID or link.
+        """
+
+        def cipher_func(text: str) -> str:
+            """Implements a lazy Caesar cipher algorithm."""
+            for char in text:
+                if not char.isascii() or not char.isalpha() or char.isspace():
+                    yield char
+                    continue
+                case_start = 65 if char.isupper() else 97
+                yield chr((ord(char) - case_start + offset) % 26 + case_start)
+
+        def conversion_func(text: str) -> str:
+            """Encrypts the given string using the Caesar cipher."""
+            return "".join(cipher_func(text))
+
+        text, embed = await Fun._get_text_and_embed(ctx, text)
+        # Convert embed if it exists
+        if embed is not None:
+            embed = Fun._convert_embed(conversion_func, embed)
+        converted_text = conversion_func(text)
+        # Don't put >>> if only embed present
+        if converted_text:
+            converted_text = f">>> {converted_text.lstrip('> ')}"
+        await ctx.send(content=converted_text, embed=embed)
+
     @staticmethod
     async def _get_text_and_embed(ctx: Context, text: str) -> Tuple[str, Union[Embed, None]]:
         """
