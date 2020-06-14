@@ -1,4 +1,5 @@
 import functools
+import json
 import logging
 import random
 from typing import Callable, Tuple, Union
@@ -8,7 +9,7 @@ from discord.ext import commands
 from discord.ext.commands import Bot, Cog, Context, MessageConverter
 
 from bot import utils
-from bot.constants import Emojis
+from bot.constants import Colours, Emojis
 
 log = logging.getLogger(__name__)
 
@@ -100,6 +101,16 @@ class Fun(Cog):
     @caesarcipher_group.command(name="info")
     async def caesarcipher_info(self, ctx: Context) -> None:
         """Information about the Caesar Cipher."""
+        with open("bot\\resources\\evergreen\\caesar_info.json", "r") as f:
+            data = json.load(f)
+
+        embed = Embed(
+            title=data["title"],
+            description="".join(data["description"]),
+            colour=Colours.dark_green,
+        )
+
+        await ctx.send(embed=embed)
 
     @caesarcipher_group.command(name="translate")
     async def caesarcipher_translate(self, ctx: Context, offset: int, *, text: str) -> None:
