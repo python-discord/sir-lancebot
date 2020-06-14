@@ -87,19 +87,32 @@ class Fun(Cog):
             converted_text = f">>> {converted_text.lstrip('> ')}"
         await ctx.send(content=converted_text, embed=embed)
 
-    @commands.command(name="caesarcipher", aliases=("caesar",))
-    async def caesarcipher_command(self, ctx: Context, offset: int, *, text: str) -> None:
+    @commands.group(name="caesarcipher", aliases=("caesar",))
+    async def caesarcipher_group(self, ctx: Context) -> None:
         """
-        Given an integer `offset`, encrypt the given `text`.
+        Translates a message using the Caesar Cipher.
+
+        See `info` and `translate` subcommands.
+        """
+        if ctx.invoked_subcommand is None:
+            await self.bot.get_cog("Help").new_help(ctx, "caesarcipher")
+
+    @caesarcipher_group.command(name="info")
+    async def caesarcipher_info(self, ctx: Context) -> None:
+        """Information about the Caesar Cipher."""
+
+    @caesarcipher_group.command(name="translate")
+    async def caesarcipher_translate(self, ctx: Context, offset: int, *, text: str) -> None:
+        """
+        Given an integer `offset`, translate the given `text`.
 
         A positive `offset` will cause the letters to shift right,
         while a negative `offset` will cause the letters to shift left.
 
         Also accepts a valid discord Message ID or link.
         """
-
         def cipher_func(text: str) -> str:
-            """Implements a lazy Caesar cipher algorithm."""
+            """Implements a lazy Caesar Cipher algorithm."""
             for char in text:
                 if not char.isascii() or not char.isalpha() or char.isspace():
                     yield char
@@ -108,7 +121,7 @@ class Fun(Cog):
                 yield chr((ord(char) - case_start + offset) % 26 + case_start)
 
         def conversion_func(text: str) -> str:
-            """Encrypts the given string using the Caesar cipher."""
+            """Encrypts the given string using the Caesar Cipher."""
             return "".join(cipher_func(text))
 
         text, embed = await Fun._get_text_and_embed(ctx, text)
