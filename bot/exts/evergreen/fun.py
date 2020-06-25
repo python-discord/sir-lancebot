@@ -154,7 +154,10 @@ class Fun(Cog):
 
         Also accepts a valid Discord Message ID or link.
         """
-        await self._caesar_cipher(ctx, offset, text)
+        if offset < 0:
+            await ctx.send(":no_entry: Cannot use a negative offset.")
+        else:
+            await self._caesar_cipher(ctx, offset, text)
 
     @caesarcipher_group.command(name="decrypt", aliases=("leftshift", "lshift"))
     async def caesarcipher_decrypt(self, ctx: Context, offset: int, *, text: str) -> None:
@@ -165,7 +168,10 @@ class Fun(Cog):
 
         Also accepts a valid Discord Message ID or link.
         """
-        await self._caesar_cipher(ctx, -offset, text)
+        if offset < 0:
+            await ctx.send(":no_entry: Cannot use a negative offset.")
+        else:
+            await self._caesar_cipher(ctx, -offset, text)
 
     @staticmethod
     async def _get_text_and_embed(ctx: Context, text: str) -> Tuple[str, Union[Embed, None]]:
