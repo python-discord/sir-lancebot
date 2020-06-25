@@ -93,7 +93,7 @@ class Fun(Cog):
         """
         Translates a message using the Caesar Cipher.
 
-        See `info` and `translate` subcommands.
+        See `decrpyt`, `encrypt`, and `info` subcommands.
         """
         if ctx.invoked_subcommand is None:
             await self.bot.get_cog("Help").new_help(ctx, "caesarcipher")
@@ -112,17 +112,17 @@ class Fun(Cog):
 
         await ctx.send(embed=embed)
 
-    @caesarcipher_group.command(name="translate")
-    async def caesarcipher_translate(self, ctx: Context, offset: int, *, text: str) -> None:
+    @staticmethod
+    async def _caesar_cipher(ctx: Context, offset: int, text: str) -> None:
         """
-        Given an integer `offset`, translate the given `text`.
+        Given an integer `offset`, translates and sends the given `text`.
 
-        A positive `offset` will cause the letters to shift right,
-        while a negative `offset` will cause the letters to shift left.
+        A positive `offset` will cause the letters to shift right, while
+        a negative `offset` will cause the letters to shift left.
 
-        Also accepts a valid discord Message ID or link.
+        Also accepts a valid Discord Message ID or link.
         """
-        def cipher_func(text: str) -> str:
+        def caesar_func(text: str) -> str:
             """Implements a lazy Caesar Cipher algorithm."""
             for char in text:
                 if not char.isascii() or not char.isalpha() or char.isspace():
@@ -133,7 +133,7 @@ class Fun(Cog):
 
         def conversion_func(text: str) -> str:
             """Encrypts the given string using the Caesar Cipher."""
-            return "".join(cipher_func(text))
+            return "".join(caesar_func(text))
 
         text, embed = await Fun._get_text_and_embed(ctx, text)
         # Convert embed if it exists
@@ -144,6 +144,28 @@ class Fun(Cog):
         if converted_text:
             converted_text = f">>> {converted_text.lstrip('> ')}"
         await ctx.send(content=converted_text, embed=embed)
+
+    @caesarcipher_group.command(name="encrypt", aliases=("rightshift", "rshift"))
+    async def caesarcipher_encrypt(self, ctx: Context, offset: int, *, text: str) -> None:
+        """
+        Given a positive integer `offset`, encrypt the given `text`.
+
+        Performs a right shift of the letters in the message.
+
+        Also accepts a valid Discord Message ID or link.
+        """
+        await self._caesar_cipher(ctx, offset, text)
+
+    @caesarcipher_group.command(name="decrypt", aliases=("leftshift", "lshift"))
+    async def caesarcipher_decrypt(self, ctx: Context, offset: int, *, text: str) -> None:
+        """
+        Given a positive integer `offset`, decrypt the given `text`.
+
+        Performs a left shift of the letters in the message.
+
+        Also accepts a valid Discord Message ID or link.
+        """
+        await self._caesar_cipher(ctx, -offset, text)
 
     @staticmethod
     async def _get_text_and_embed(ctx: Context, text: str) -> Tuple[str, Union[Embed, None]]:
