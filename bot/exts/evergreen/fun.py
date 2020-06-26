@@ -99,7 +99,7 @@ class Fun(Cog):
         See `decrpyt`, `encrypt`, and `info` subcommands.
         """
         if ctx.invoked_subcommand is None:
-            await self.bot.get_cog("Help").new_help(ctx, "caesarcipher")
+            await ctx.invoke(self.bot.get_command("help"), "caesarcipher")
 
     @caesarcipher_group.command(name="info")
     async def caesarcipher_info(self, ctx: Context) -> None:
