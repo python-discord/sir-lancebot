@@ -33,6 +33,9 @@ class Fun(Cog):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
+        with open("bot\\resources\\evergreen\\caesar_info.json", "r") as f:
+            self._caesar_cipher_embed = json.load(f)
+
     @commands.command()
     async def roll(self, ctx: Context, num_rolls: int = 1) -> None:
         """Outputs a number of random dice emotes (up to 6)."""
@@ -101,14 +104,8 @@ class Fun(Cog):
     @caesarcipher_group.command(name="info")
     async def caesarcipher_info(self, ctx: Context) -> None:
         """Information about the Caesar Cipher."""
-        with open("bot\\resources\\evergreen\\caesar_info.json", "r") as f:
-            data = json.load(f)
-
-        embed = Embed(
-            title=data["title"],
-            description="".join(data["description"]),
-            colour=Colours.dark_green,
-        )
+        embed = Embed.from_dict(self._caesar_cipher_embed)
+        embed.colour = Colours.dark_green
 
         await ctx.send(embed=embed)
 
