@@ -110,7 +110,7 @@ class Fun(Cog):
         await ctx.send(embed=embed)
 
     @staticmethod
-    async def _caesar_cipher(ctx: Context, offset: int, text: str) -> None:
+    async def _caesar_cipher(ctx: Context, offset: int, msg: Union[Message, str]) -> None:
         """
         Given an integer `offset`, translates and sends the given `text`.
 
@@ -132,18 +132,23 @@ class Fun(Cog):
             """Encrypts the given string using the Caesar Cipher."""
             return "".join(caesar_func(text))
 
-        text, embed = await Fun._get_text_and_embed(ctx, text)
-        # Convert embed if it exists
+        is_message = isinstance(msg, Message)
+
+        text = msg.content if is_message else msg
+        embed = msg.embeds[0] if is_message and msg.embeds else None
+
         if embed is not None:
             embed = Fun._convert_embed(conversion_func, embed)
+
         converted_text = conversion_func(text)
-        # Don't put >>> if only embed present
+
         if converted_text:
             converted_text = f">>> {converted_text.lstrip('> ')}"
+
         await ctx.send(content=converted_text, embed=embed)
 
     @caesarcipher_group.command(name="encrypt", aliases=("rightshift", "rshift"))
-    async def caesarcipher_encrypt(self, ctx: Context, offset: int, *, text: str) -> None:
+    async def caesarcipher_encrypt(self, ctx: Context, offset: int, *, msg: Union[Message, str]) -> None:
         """
         Given a positive integer `offset`, encrypt the given `text`.
 
@@ -154,10 +159,10 @@ class Fun(Cog):
         if offset < 0:
             await ctx.send(":no_entry: Cannot use a negative offset.")
         else:
-            await self._caesar_cipher(ctx, offset, text)
+            await self._caesar_cipher(ctx, offset, msg)
 
     @caesarcipher_group.command(name="decrypt", aliases=("leftshift", "lshift"))
-    async def caesarcipher_decrypt(self, ctx: Context, offset: int, *, text: str) -> None:
+    async def caesarcipher_decrypt(self, ctx: Context, offset: int, *, msg: Union[Message, str]) -> None:
         """
         Given a positive integer `offset`, decrypt the given `text`.
 
@@ -168,7 +173,7 @@ class Fun(Cog):
         if offset < 0:
             await ctx.send(":no_entry: Cannot use a negative offset.")
         else:
-            await self._caesar_cipher(ctx, -offset, text)
+            await self._caesar_cipher(ctx, -offset, msg)
 
     @staticmethod
     async def _get_text_and_embed(ctx: Context, text: str) -> Tuple[str, Union[Embed, None]]:
