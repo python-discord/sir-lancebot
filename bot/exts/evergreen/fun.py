@@ -34,7 +34,7 @@ class Fun(Cog):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
-        with Path("bot/resources/evergreen/caesar_info.json").open("r") as f:
+        with Path("bot/resources/evergreen/caesar_info.json").open("r", encoding="UTF-8") as f:
             self._caesar_cipher_embed = json.load(f)
 
     @commands.command()
