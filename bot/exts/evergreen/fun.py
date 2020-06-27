@@ -2,6 +2,7 @@ import functools
 import json
 import logging
 import random
+from pathlib import Path
 from typing import Callable, Tuple, Union
 
 from discord import Embed, Message
@@ -33,7 +34,7 @@ class Fun(Cog):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
-        with open("bot\\resources\\evergreen\\caesar_info.json", "r") as f:
+        with Path("bot/resources/evergreen/caesar_info.json").open("r") as f:
             self._caesar_cipher_embed = json.load(f)
 
     @commands.command()
