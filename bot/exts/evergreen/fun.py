@@ -92,7 +92,7 @@ class Fun(Cog):
             converted_text = f">>> {converted_text.lstrip('> ')}"
         await ctx.send(content=converted_text, embed=embed)
 
-    @commands.group(name="caesarcipher", aliases=("caesar",))
+    @commands.group(name="caesarcipher", aliases=("caesar", "cc",))
     async def caesarcipher_group(self, ctx: Context) -> None:
         """
         Translates a message using the Caesar Cipher.
