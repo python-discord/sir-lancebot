@@ -3,7 +3,7 @@ import json
 import logging
 import random
 from pathlib import Path
-from typing import Callable, Tuple, Union
+from typing import Callable, Iterable, Tuple, Union
 
 from discord import Embed, Message
 from discord.ext import commands
@@ -120,7 +120,7 @@ class Fun(Cog):
 
         Also accepts a valid Discord Message ID or link.
         """
-        def caesar_func(text: str) -> str:
+        def caesar_func(text: str) -> Iterable[str]:
             """Implements a lazy Caesar Cipher algorithm."""
             for char in text:
                 if not char.isascii() or not char.isalpha() or char.isspace():
