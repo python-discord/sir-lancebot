@@ -113,7 +113,7 @@ class Fun(Cog):
     @staticmethod
     async def _caesar_cipher(ctx: Context, offset: int, msg: Union[Message, str]) -> None:
         """
-        Given an integer `offset`, translates and sends the given `text`.
+        Given an integer `offset`, translates and sends the given `msg`.
 
         A positive `offset` will cause the letters to shift right, while
         a negative `offset` will cause the letters to shift left.
@@ -151,7 +151,7 @@ class Fun(Cog):
     @caesarcipher_group.command(name="encrypt", aliases=("rightshift", "rshift"))
     async def caesarcipher_encrypt(self, ctx: Context, offset: int, *, msg: Union[Message, str]) -> None:
         """
-        Given a positive integer `offset`, encrypt the given `text`.
+        Given a positive integer `offset`, encrypt the given `msg`.
 
         Performs a right shift of the letters in the message.
 
@@ -165,7 +165,7 @@ class Fun(Cog):
     @caesarcipher_group.command(name="decrypt", aliases=("leftshift", "lshift"))
     async def caesarcipher_decrypt(self, ctx: Context, offset: int, *, msg: Union[Message, str]) -> None:
         """
-        Given a positive integer `offset`, decrypt the given `text`.
+        Given a positive integer `offset`, decrypt the given `msg`.
 
         Performs a left shift of the letters in the message.
 
