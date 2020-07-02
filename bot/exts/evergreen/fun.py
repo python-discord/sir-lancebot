@@ -126,8 +126,11 @@ class Fun(Cog):
                 if not char.isascii() or not char.isalpha() or char.isspace():
                     yield char
                     continue
+
                 case_start = 65 if char.isupper() else 97
-                yield chr((ord(char) - case_start + offset) % 26 + case_start)
+                true_offset = (ord(char) - case_start + offset) % 26
+
+                yield chr(case_start + true_offset)
 
         def conversion_func(text: str) -> str:
             """Encrypts the given string using the Caesar Cipher."""
