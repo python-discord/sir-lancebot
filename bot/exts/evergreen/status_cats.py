@@ -1,10 +1,7 @@
-import logging
 from http import HTTPStatus
 
 import discord
 from discord.ext import commands
-
-log = logging.getLogger(__name__)
 
 
 class StatusCats(commands.Cog):
@@ -20,12 +17,15 @@ class StatusCats(commands.Cog):
 
         try:
             HTTPStatus(code)
-            embed.set_image(url=f'https://http.cat/{code}.jpg')
 
         except ValueError:
             embed.set_footer(text='Inputted status code does not exist.')
 
-        await ctx.send(embed=embed)
+        else:
+            embed.set_image(url=f'https://http.cat/{code}.jpg')
+
+        finally:
+            await ctx.send(embed=embed)
 
 
 def setup(bot: commands.Bot) -> None:
