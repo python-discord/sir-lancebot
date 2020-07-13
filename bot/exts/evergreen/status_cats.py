@@ -8,7 +8,7 @@ log = logging.getLogger(__name__)
 
 
 class StatusCats(commands.Cog):
-    """Commands that give statuses described and visualized by cats."""
+    """Commands that give HTTP statuses described and visualized by cats."""
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
