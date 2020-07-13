@@ -18,7 +18,6 @@ class StatusCats(commands.Cog):
         """Sends an embed with an image of a cat, potraying the status code."""
         embed = discord.Embed(title=f'**Status: {code}**')
 
-
         try:
             HTTPStatus(code)
             embed.set_image(url=f'https://http.cat/{code}.jpg')
