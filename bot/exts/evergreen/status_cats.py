@@ -17,10 +17,11 @@ class StatusCats(commands.Cog):
     async def http_cat(self, ctx: commands.Context, code: int) -> None:
         """Sends an embed with an image of a cat, potraying the status code."""
         embed = discord.Embed(title=f'**Status: {code}**')
-        embed.set_image(url=f'https://http.cat/{code}.jpg')
+
 
         try:
             HTTPStatus(code)
+            embed.set_image(url=f'https://http.cat/{code}.jpg')
 
         except ValueError:
             embed.set_footer(text='Inputted status code does not exist.')
