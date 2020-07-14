@@ -567,7 +567,7 @@ class Snakes(Cog):
             antidote_embed = Embed(color=SNAKE_COLOR, title="Antidote")
             antidote_embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
             antidote_embed.set_image(url="https://i.makeagif.com/media/7-12-2015/Cj1pts.gif")
-            antidote_embed.add_field(name=f"You have created the snake antidote!",
+            antidote_embed.add_field(name="You have created the snake antidote!",
                                      value=f"The solution was: {' '.join(antidote_answer)}\n"
                                            f"You had {10 - antidote_tries} tries remaining.")
             await board_id.edit(embed=antidote_embed)
@@ -1078,7 +1078,7 @@ class Snakes(Cog):
             query = snake['name']
 
         # Build the URL and make the request
-        url = f'https://www.googleapis.com/youtube/v3/search'
+        url = 'https://www.googleapis.com/youtube/v3/search'
         response = await self.bot.http_session.get(
             url,
             params={
