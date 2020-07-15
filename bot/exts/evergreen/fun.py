@@ -111,15 +111,21 @@ class Fun(Cog):
         await ctx.send(embed=embed)
 
     @staticmethod
-    async def _caesar_cipher(ctx: Context, offset: int, msg: Union[Message, str]) -> None:
+    async def _caesar_cipher(ctx: Context, offset: int, msg: Union[Message, str], left_shift: bool = False) -> None:
         """
-        Given an integer `offset`, translates and sends the given `msg`.
+        Given a positive integer `offset`, translates and sends the given `msg`.
 
-        A positive `offset` will cause the letters to shift right, while
-        a negative `offset` will cause the letters to shift left.
+        Performs a right shift by default unless `left_shift` is specified as `True`.
 
         Also accepts a valid Discord Message ID or link.
         """
+        if offset < 0:
+            await ctx.send(":no_entry: Cannot use a negative offset.")
+            return
+
+        if left_shift:
+            offset = -offset
+
         def caesar_func(text: str) -> Iterable[str]:
             """Implements a lazy Caesar Cipher algorithm."""
             for char in text:
@@ -160,10 +166,7 @@ class Fun(Cog):
 
         Also accepts a valid Discord Message ID or link.
         """
-        if offset < 0:
-            await ctx.send(":no_entry: Cannot use a negative offset.")
-        else:
-            await self._caesar_cipher(ctx, offset, msg)
+        await self._caesar_cipher(ctx, offset, msg, False)
 
     @caesarcipher_group.command(name="decrypt", aliases=("leftshift", "lshift", "dec",))
     async def caesarcipher_decrypt(self, ctx: Context, offset: int, *, msg: Union[Message, str]) -> None:
@@ -174,10 +177,7 @@ class Fun(Cog):
 
         Also accepts a valid Discord Message ID or link.
         """
-        if offset < 0:
-            await ctx.send(":no_entry: Cannot use a negative offset.")
-        else:
-            await self._caesar_cipher(ctx, -offset, msg)
+        await self._caesar_cipher(ctx, offset, msg, True)
 
     @staticmethod
     async def _get_text_and_embed(ctx: Context, text: str) -> Tuple[str, Union[Embed, None]]:
