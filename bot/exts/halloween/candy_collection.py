@@ -212,9 +212,9 @@ class CandyCollection(commands.Cog):
         e = discord.Embed(colour=discord.Colour.blurple())
         e.add_field(name="Top Candy Records", value=value, inline=False)
         e.add_field(name='\u200b',
-                    value=f"Candies will randomly appear on messages sent. "
-                          f"\nHit the candy when it appears as fast as possible to get the candy! "
-                          f"\nBut beware the ghosts...",
+                    value="Candies will randomly appear on messages sent. "
+                          "\nHit the candy when it appears as fast as possible to get the candy! "
+                          "\nBut beware the ghosts...",
                     inline=False)
         await ctx.send(embed=e)
 

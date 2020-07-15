@@ -58,7 +58,7 @@ async def countdown_status(bot: commands.Bot) -> None:
         hours, minutes = aligned_seconds // 3600, aligned_seconds // 60 % 60
 
         if aligned_seconds == 0:
-            playing = f"right now!"
+            playing = "right now!"
         elif aligned_seconds == COUNTDOWN_STEP:
             playing = f"in less than {minutes} minutes"
         elif hours == 0:
