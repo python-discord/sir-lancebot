@@ -166,7 +166,7 @@ class Fun(Cog):
 
         Also accepts a valid Discord Message ID or link.
         """
-        await self._caesar_cipher(ctx, offset, msg, False)
+        await self._caesar_cipher(ctx, offset, msg, left_shift=False)
 
     @caesarcipher_group.command(name="decrypt", aliases=("leftshift", "lshift", "dec",))
     async def caesarcipher_decrypt(self, ctx: Context, offset: int, *, msg: Union[Message, str]) -> None:
@@ -177,7 +177,7 @@ class Fun(Cog):
 
         Also accepts a valid Discord Message ID or link.
         """
-        await self._caesar_cipher(ctx, offset, msg, True)
+        await self._caesar_cipher(ctx, offset, msg, left_shift=True)
 
     @staticmethod
     async def _get_text_and_embed(ctx: Context, text: str) -> Tuple[str, Union[Embed, None]]:
