@@ -6,28 +6,36 @@ from discord import Embed
 from discord.ext import commands
 
 from bot.utils.decorators import override_in_channel
+from bot.constants import WHITELISTED_CHANNELS
 
 
-with Path("bot/resources/easter/starter.json").open("r", encoding="utf8") as f:
+with Path("bot/resources/evergreen/starter.json").open("r", encoding="utf8") as f:
     STARTERS = json.load(f)["starters"]
 
 
-with Path("bot/resources/easter/py_topics.json").open("r", encoding="utf8") as f:
+with Path("bot/resources/evergreen/py_topics.json").open("r", encoding="utf8") as f:
     # First ID is #python-general and the rest are top to bottom categories of Topical Chat/Help.
     PY_TOPICS = json.load(f)["python-channels"]
-    ALL_PYTHON_CHANNELS = [int(channel_id) for channel_id in PY_TOPICS.keys()]
+
+    # All the allowed channels that the ".topic" command is allowed to be executed in.
+    ALL_ALLOWED_CHANNELS = [int(channel_id) for channel_id in PY_TOPICS.keys()].extend(WHITELISTED_CHANNELS)
 
 
 class ConvoStarters(commands.Cog):
-    """Easter conversation topics."""
+    """Evergreen conversation topics."""
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.command()
-    @override_in_channel(ALL_PYTHON_CHANNELS)
+    @override_in_channel(ALL_ALLOWED_CHANNELS)
     async def topic(self, ctx: commands.Context) -> None:
-        """Responds with a random topic to start a conversation, changing depending on channel."""
+        """Responds with a random topic to start a conversation
+        
+        If in a Python channel, a python-related topic will be given.
+
+        Otherwise, a random conversation topic will be recieved by the user.
+        """
         try:
             # Fetching topics.
             channel_topics = PY_TOPICS[str(ctx.channel.id)]
