@@ -56,7 +56,7 @@ class ConvoStarters(commands.Cog):
                         "No topics found for this Python channel. You can suggest new ideas for topics "
                         "[here](https://github.com/python-discord/seasonalbot/issues/426)!"
                     ),
-                    color=Color.blurple
+                    color=Color.blurple()
                 )
 
                 await ctx.send(embed=embed)
