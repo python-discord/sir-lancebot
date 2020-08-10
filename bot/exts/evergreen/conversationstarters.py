@@ -5,8 +5,8 @@ from pathlib import Path
 from discord import Embed
 from discord.ext import commands
 
-from bot.utils.decorators import override_in_channel
 from bot.constants import WHITELISTED_CHANNELS
+from bot.utils.decorators import override_in_channel
 
 
 with Path("bot/resources/evergreen/starter.json").open("r", encoding="utf8") as f:
@@ -30,8 +30,9 @@ class ConvoStarters(commands.Cog):
     @commands.command()
     @override_in_channel(ALL_ALLOWED_CHANNELS)
     async def topic(self, ctx: commands.Context) -> None:
-        """Responds with a random topic to start a conversation
-        
+        """
+        Responds with a random topic to start a conversation.
+
         If in a Python channel, a python-related topic will be given.
 
         Otherwise, a random conversation topic will be recieved by the user.
