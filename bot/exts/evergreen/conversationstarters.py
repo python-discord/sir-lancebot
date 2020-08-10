@@ -2,7 +2,7 @@ import json
 import random
 from pathlib import Path
 
-from discord import Embed
+from discord import Color, Embed
 from discord.ext import commands
 
 from bot.constants import WHITELISTED_CHANNELS
@@ -55,7 +55,9 @@ class ConvoStarters(commands.Cog):
                     description=(
                         "No topics found for this Python channel. You can suggest new ideas for topics "
                         "[here](https://github.com/python-discord/seasonalbot/issues/426)!"
-                    ))
+                    ),
+                    color=Color.blurple
+                )
 
                 await ctx.send(embed=embed)
 
