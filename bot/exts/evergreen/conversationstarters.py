@@ -18,7 +18,7 @@ with Path("bot/resources/evergreen/py_topics.json").open("r", encoding="utf8") a
     PY_TOPICS = json.load(f)["python-channels"]
 
     # All the allowed channels that the ".topic" command is allowed to be executed in.
-    ALL_ALLOWED_CHANNELS = [int(channel_id) for channel_id in PY_TOPICS.keys()].extend(WHITELISTED_CHANNELS)
+    ALL_ALLOWED_CHANNELS = [int(channel_id) for channel_id in PY_TOPICS.keys()] + list(WHITELISTED_CHANNELS)
 
 
 class ConvoStarters(commands.Cog):
