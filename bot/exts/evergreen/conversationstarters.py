@@ -1,5 +1,4 @@
 import json
-import logging
 import random
 from pathlib import Path
 
@@ -35,13 +34,13 @@ class ConvoStarters(commands.Cog):
 
         # If the channel isn't Python-related.
         except KeyError:
-            await ctx.send(random.choice(starters['starters']))
+            await ctx.send(random.choice(STARTERS))
 
         # If the channel ID doesn't have any topics.
         else:
             if channel_topics:
                 await ctx.send(random.choice(channel_topics))
-            
+
             else:
                 embed = Embed(
                     description=(
