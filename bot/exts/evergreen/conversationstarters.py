@@ -1,4 +1,5 @@
 import json
+import yaml
 import random
 from pathlib import Path
 
@@ -13,12 +14,15 @@ with Path("bot/resources/evergreen/starter.json").open("r", encoding="utf8") as 
     STARTERS = json.load(f)["starters"]
 
 
-with Path("bot/resources/evergreen/py_topics.json").open("r", encoding="utf8") as f:
+with Path("bot/resources/evergreen/py_topics.yaml").open("r", encoding="utf8") as f:
     # First ID is #python-general and the rest are top to bottom categories of Topical Chat/Help.
-    PY_TOPICS = json.load(f)["python-channels"]
+    PY_TOPICS = yaml.load(f, Loader=yaml.FullLoader)
+
+    # Removing `None` from lists of topics, if not a list, it is changed to an empty one.
+    PY_TOPICS = {k: [i for i in v if i] if isinstance(v, list) else [] for k, v in PY_TOPICS.items()}
 
     # All the allowed channels that the ".topic" command is allowed to be executed in.
-    ALL_ALLOWED_CHANNELS = [int(channel_id) for channel_id in PY_TOPICS.keys()] + list(WHITELISTED_CHANNELS)
+    ALL_ALLOWED_CHANNELS = [channel_id for channel_id in PY_TOPICS.keys()] + list(WHITELISTED_CHANNELS)
 
 
 class ConvoStarters(commands.Cog):
@@ -39,7 +43,7 @@ class ConvoStarters(commands.Cog):
         """
         try:
             # Fetching topics.
-            channel_topics = PY_TOPICS[str(ctx.channel.id)]
+            channel_topics = PY_TOPICS[ctx.channel.id]
 
         # If the channel isn't Python-related.
         except KeyError:
