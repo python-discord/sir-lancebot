@@ -1,8 +1,8 @@
 import json
-import yaml
 import random
 from pathlib import Path
 
+import yaml
 from discord import Color, Embed
 from discord.ext import commands
 
