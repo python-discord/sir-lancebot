@@ -47,9 +47,7 @@ class Fun(Cog):
 
     @commands.command(name="uwu", aliases=("uwuwize", "uwuify",))
     async def uwu_command(self, ctx: Context, *, text: str) -> None:
-        """
-        Converts a given `text` into it's uwu equivalent.
-        """
+        """Converts a given `text` into it's uwu equivalent."""
         conversion_func = functools.partial(
             utils.replace_many, replacements=UWU_WORDS, ignore_case=True, match_case=True
         )
@@ -65,9 +63,7 @@ class Fun(Cog):
 
     @commands.command(name="randomcase", aliases=("rcase", "randomcaps", "rcaps",))
     async def randomcase_command(self, ctx: Context, *, text: str) -> None:
-        """
-        Randomly converts the casing of a given `text`.
-        """
+        """Randomly converts the casing of a given `text`."""
         def conversion_func(text: str) -> str:
             """Randomly converts the casing of a given string."""
             return "".join(
