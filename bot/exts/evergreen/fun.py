@@ -89,7 +89,7 @@ class Fun(Cog):
             Union[Embed, None]: The embed if found in the valid Message, else None
         """
         embed = None
- 
+
         # message = await Fun._get_discord_message(ctx, text)
         # if isinstance(message, Message):
         #     text = message.content
