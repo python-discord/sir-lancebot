@@ -47,11 +47,7 @@ class Fun(Cog):
 
     @commands.command(name="uwu", aliases=("uwuwize", "uwuify",))
     async def uwu_command(self, ctx: Context, *, text: str) -> None:
-        """
-        Converts a given `text` into it's uwu equivalent.
-
-        Also accepts a valid discord Message ID or link.
-        """
+        """Converts a given `text` into it's uwu equivalent."""
         conversion_func = functools.partial(
             utils.replace_many, replacements=UWU_WORDS, ignore_case=True, match_case=True
         )
@@ -67,11 +63,7 @@ class Fun(Cog):
 
     @commands.command(name="randomcase", aliases=("rcase", "randomcaps", "rcaps",))
     async def randomcase_command(self, ctx: Context, *, text: str) -> None:
-        """
-        Randomly converts the casing of a given `text`.
-
-        Also accepts a valid discord Message ID or link.
-        """
+        """Randomly converts the casing of a given `text`."""
         def conversion_func(text: str) -> str:
             """Randomly converts the casing of a given string."""
             return "".join(
@@ -97,12 +89,14 @@ class Fun(Cog):
             Union[Embed, None]: The embed if found in the valid Message, else None
         """
         embed = None
-        message = await Fun._get_discord_message(ctx, text)
-        if isinstance(message, Message):
-            text = message.content
-            # Take first embed because we can't send multiple embeds
-            if message.embeds:
-                embed = message.embeds[0]
+
+        # message = await Fun._get_discord_message(ctx, text)
+        # if isinstance(message, Message):
+        #     text = message.content
+        #     # Take first embed because we can't send multiple embeds
+        #     if message.embeds:
+        #         embed = message.embeds[0]
+
         return (text, embed)
 
     @staticmethod
