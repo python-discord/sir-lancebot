@@ -17,6 +17,7 @@ __all__ = (
     "Month",
     "Roles",
     "Tokens",
+    "Wolfram",
     "MODERATION_ROLES",
     "STAFF_ROLES",
     "WHITELISTED_CHANNELS",
@@ -96,6 +97,7 @@ class Colours:
     soft_red = 0xcd6d6d
     yellow = 0xf9f586
     purple = 0xb734eb
+    soft_orange = 0xf9cb54
 
 
 class Emojis:
@@ -185,6 +187,12 @@ class Tokens(NamedTuple):
     nasa = environ.get("NASA_API_KEY")
     igdb = environ.get("IGDB_API_KEY")
     github = environ.get("GITHUB_TOKEN")
+
+
+class Wolfram(NamedTuple):
+    user_limit_day = environ.get("WOLFRAM_USER_LIMIT_DAY", 10)
+    guild_limit_day = environ.get("WOLFRAM_GUILD_LIMIT_DAY", 67)
+    key = environ.get("WOLFRAM_API_KEY", None)
 
 
 # Default role combinations
