@@ -10,13 +10,12 @@ services:
     restart: always
 
     environment:
-      - SEASONALBOT_TOKEN=NzQyMTI3NjUwMjM5NDE0MzUy.XzBmOw.F4UiLeZ1wH0yALV4_aov1Ol_kpg
+      - SEASONALBOT_TOKEN=yourtokenhere
       - SEASONALBOT_DEBUG=true
     # - SEASONALBOT_GUILD=
     # - SEASONALBOT_ADMIN_ROLE_ID=
     # - CHANNEL_ANNOUNCEMENTS=
     # - CHANNEL_DEVLOG=
-      - WOLFRAM_API_KEY=5WKXAG-W9X9TUG3J5
 
     volumes:
       - /opt/pythondiscord/seasonalbot/log:/bot/bot/log
