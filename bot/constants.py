@@ -67,7 +67,7 @@ class Channels(NamedTuple):
     off_topic_2 = 463035268514185226
     python = 267624335836053506
     reddit = 458224812528238616
-    seasonalbot_commands = int(environ.get("CHANNEL_SEASONALBOT_COMMANDS", 607247579608121354))
+    seasonalbot_commands = int(environ.get("CHANNEL_SEASONALBOT_COMMANDS", 704362727778418798))
     seasonalbot_voice = int(environ.get("CHANNEL_SEASONALBOT_VOICE", 606259004230074378))
     staff_lounge = 464905259261755392
     verification = 352442727016693763
@@ -93,11 +93,11 @@ class Colours:
     dark_green = 0x1f8b4c
     orange = 0xe67e22
     pink = 0xcf84e0
+    purple = 0xb734eb
     soft_green = 0x68c290
+    soft_orange = 0xf9cb54
     soft_red = 0xcd6d6d
     yellow = 0xf9f586
-    purple = 0xb734eb
-    soft_orange = 0xf9cb54
 
 
 class Emojis:
@@ -190,8 +190,8 @@ class Tokens(NamedTuple):
 
 
 class Wolfram(NamedTuple):
-    user_limit_day = environ.get("WOLFRAM_USER_LIMIT_DAY", 10)
-    guild_limit_day = environ.get("WOLFRAM_GUILD_LIMIT_DAY", 67)
+    user_limit_day = int(environ.get("WOLFRAM_USER_LIMIT_DAY", 10))
+    guild_limit_day = int(environ.get("WOLFRAM_GUILD_LIMIT_DAY", 67))
     key = environ.get("WOLFRAM_API_KEY", None)
 
 

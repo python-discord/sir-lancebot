@@ -3,15 +3,14 @@ from io import BytesIO
 from typing import Callable, List, Optional, Tuple
 from urllib import parse
 
+import arrow
 import discord
-from dateutil.relativedelta import relativedelta
 from discord import Embed
 from discord.ext import commands
 from discord.ext.commands import BucketType, Cog, Context, check, group
 
 from bot.constants import Colours, STAFF_ROLES, Wolfram
 from bot.utils.pagination import ImagePaginator
-from bot.utils.time import humanize_delta
 
 log = logging.getLogger(__name__)
 
