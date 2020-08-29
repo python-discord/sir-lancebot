@@ -74,8 +74,7 @@ def custom_cooldown(*ignore: List[int]) -> Callable:
 
             if user_rate:
                 # Can't use api; cause: member limit
-                delta = relativedelta(seconds=int(user_rate))
-                cooldown = humanize_delta(delta)
+                cooldown = arrow.utcnow().shift(seconds=int(user_rate)).humanize(only_distance=True)
                 message = (
                     "You've used up your limit for Wolfram|Alpha requests.\n"
                     f"Cooldown: {cooldown}"
