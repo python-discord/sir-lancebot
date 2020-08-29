@@ -192,7 +192,7 @@ class Tokens(NamedTuple):
 class Wolfram(NamedTuple):
     user_limit_day = int(environ.get("WOLFRAM_USER_LIMIT_DAY", 10))
     guild_limit_day = int(environ.get("WOLFRAM_GUILD_LIMIT_DAY", 67))
-    key = environ.get("WOLFRAM_API_KEY", None)
+    key = environ.get("WOLFRAM_API_KEY")
 
 
 # Default role combinations
