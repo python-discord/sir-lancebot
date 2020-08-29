@@ -67,7 +67,7 @@ class Channels(NamedTuple):
     off_topic_2 = 463035268514185226
     python = 267624335836053506
     reddit = 458224812528238616
-    seasonalbot_commands = int(environ.get("CHANNEL_SEASONALBOT_COMMANDS", 704362727778418798))
+    seasonalbot_commands = int(environ.get("CHANNEL_SEASONALBOT_COMMANDS", 607247579608121354))
     seasonalbot_voice = int(environ.get("CHANNEL_SEASONALBOT_VOICE", 606259004230074378))
     staff_lounge = 464905259261755392
     verification = 352442727016693763
