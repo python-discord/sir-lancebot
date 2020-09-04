@@ -25,16 +25,16 @@ class WikipediaCog(commands.Cog):
             data = await response.json()
         page = []
 
-        search_result = data["query"]["search"]
-        if len(search_result) == 0:
+        search_results = data["query"]["search"]
+        if len(search_results) == 0:
             return None
 
         # we dont like "may refere to" pages.
-        for a in search_result:
-            if "may refer to" in a["snippet"]:
+        for search_result in search_results:
+            if "may refer to" in search_result["snippet"]:
                 pass
             else:
-                page.append(a["title"])
+                page.append(search_result["title"])
         log.info("appening titles")
         return page
 
@@ -42,25 +42,25 @@ class WikipediaCog(commands.Cog):
     async def w_pedia(self, ctx: commands.Context, *, search: str) -> None:
         """Gives list of item."""
         final = []
-        s = ''
+        s_desc = ''
 
-        title = await self.search_wikipedia(search)
+        titles = await self.search_wikipedia(search)
 
         def check(user: Member) -> bool:
             return user.author.id == ctx.author.id
 
-        if title is None:
+        if titles is None:
             await ctx.send("Sorry, we could not find a wikipedia article using that search term")
             return
 
-        for i in title:
+        for i in titles:
             t = i.replace(" ", "_")  # wikipedia uses "_" as spaces
             final.append(t)
 
         async with ctx.typing():
-            for index, (a, j) in enumerate(zip(title, final), start=1):
-                s = s + f'`{index}` [{a}]({WIKIPEDIA_URL.format(title=j)})\n'
-            embed = Embed(colour=Color.blue(), title=f"Wikipedia results for `{search}`", description=s)
+            for index, title in enumerate(titles, start=1):
+                s_desc += f'`{index}` [{title}]({WIKIPEDIA_URL.format(title=title.replace(" ", "_"))})\n'
+            embed = Embed(colour=Color.blue(), title=f"Wikipedia results for `{search}`", description=s_desc)
             embed.timestamp = datetime.datetime.utcnow()
             await ctx.send(embed=embed)
 
