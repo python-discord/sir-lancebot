@@ -1,9 +1,9 @@
 import asyncio
 import datetime
 import logging
-import discord
-from typing import Optional
 
+from typing import Optional
+from discord import Color, Embed
 from discord.ext import commands
 
 log = logging.getLogger(__name__)
@@ -35,7 +35,7 @@ class WikipediaCog(commands.Cog):
                 pass
             else:
                 page.append(a["title"])
-            log.info("hit a 'may refer to' page, taking result 2 (index 1)")
+        log.info("appening titles")
         return page
 
     @commands.command(name="wikipedia", aliases=["wiki"])
@@ -60,11 +60,11 @@ class WikipediaCog(commands.Cog):
         async with ctx.typing():
             for index, (a, j) in enumerate(zip(title, final), start=1):
                 s = s + f'`{index}` [{a}]({WIKIPEDIA_URL.format(title=j)})\n'
-            embed = discord.Embed(colour=discord.Color.blue(), title=f"Wikipedia results for `{search}`", description=s)
+            embed = Embed(colour=Color.blue(), title=f"Wikipedia results for `{search}`", description=s)
             embed.timestamp = datetime.datetime.utcnow()
             await ctx.send(embed=embed)
 
-        embed = discord.Embed(colour=discord.Color.green(), description="Enter number to choose")
+        embed = Embed(colour=Color.green(), description="Enter number to choose")
         msg = await ctx.send(embed=embed)
 
         try:
@@ -72,8 +72,11 @@ class WikipediaCog(commands.Cog):
             await ctx.send(WIKIPEDIA_URL.format(title=final[int(user.content) - 1]))
 
         except asyncio.TimeoutError:
-            embed = discord.Embed(colour=discord.Color.red(), description=f"Time's up {ctx.author.mention}")
+            embed = Embed(colour=Color.red(), description=f"Time's up {ctx.author.mention}")
             await msg.edit(embed=embed)
+
+        except ValueError:
+            await ctx.send("I am sorry but that isn't int value")
 
 
 def setup(bot: commands.Bot) -> None:
