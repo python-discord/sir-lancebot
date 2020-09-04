@@ -1,9 +1,9 @@
 import asyncio
 import datetime
 import logging
-
 from typing import Optional
-from discord import Color, Embed
+
+from discord import Color, Embed, Member
 from discord.ext import commands
 
 log = logging.getLogger(__name__)
@@ -46,7 +46,7 @@ class WikipediaCog(commands.Cog):
 
         title = await self.search_wikipedia(search)
 
-        def check(user) -> bool:
+        def check(user: Member) -> bool:
             return user.author.id == ctx.author.id
 
         if title is None:
