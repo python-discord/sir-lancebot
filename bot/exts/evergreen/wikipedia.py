@@ -41,7 +41,7 @@ class WikipediaCog(commands.Cog):
     @commands.command(name="wikipedia", aliases=["wiki"])
     async def w_pedia(self, ctx: commands.Context, *, search: str) -> None:
         """Gives list of item."""
-        final = []
+        titles_no_underscore: List[str] = []
         s_desc = ''
 
         titles = await self.search_wikipedia(search)
