@@ -87,7 +87,7 @@ class WikipediaCog(commands.Cog):
             await msg.edit(embed=embed)
 
         except ValueError:
-            await ctx.send("sorry u cant do that I will only accept int")
+            await ctx.send("Sorry, but you cannot do that, I will only accept an integer.")
 
         except IndexError:
             await ctx.send("sorry but you are exceeding the limit please select the range from above given list")
