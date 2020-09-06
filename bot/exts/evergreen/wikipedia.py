@@ -90,7 +90,7 @@ class WikipediaCog(commands.Cog):
             await ctx.send("sorry u cant do that I will only accept int")
 
         except IndexError:
-            await ctx.send("sorry but you are exceeding the limit please select from above list")
+            await ctx.send("sorry but you are exceeding the limit please select the range from above given list")
 
 
 def setup(bot: commands.Bot) -> None:
