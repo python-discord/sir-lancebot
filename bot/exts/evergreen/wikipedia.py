@@ -69,7 +69,11 @@ class WikipediaCog(commands.Cog):
 
         try:
             user = await ctx.bot.wait_for('message', timeout=60.0, check=check)
-            await ctx.send(WIKIPEDIA_URL.format(title=final[int(user.content) - 1]))
+            response = int(user.content)
+            if response <= 0:
+                await ctx.send("Please enter a valid response")
+            else:
+                await ctx.send(WIKIPEDIA_URL.format(title=final[response - 1]))
 
         except asyncio.TimeoutError:
             embed = Embed(colour=Color.red(), description=f"Time's up {ctx.author.mention}")
