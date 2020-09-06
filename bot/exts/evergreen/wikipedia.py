@@ -1,7 +1,7 @@
 import asyncio
 import datetime
 import logging
-from typing import Optional
+from typing import Optional, List
 
 from discord import Color, Embed, Member
 from discord.ext import commands
@@ -38,10 +38,11 @@ class WikipediaCog(commands.Cog):
         log.info("appening titles")
         return page
 
+    @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(name="wikipedia", aliases=["wiki"])
     async def w_pedia(self, ctx: commands.Context, *, search: str) -> None:
-        """Gives list of item."""
-        final = []
+        """Returns list of your search query from wikipedia."""
+        titles_no_underscore: List[str] = []
         s_desc = ''
 
         titles = await self.search_wikipedia(search)
@@ -53,9 +54,9 @@ class WikipediaCog(commands.Cog):
             await ctx.send("Sorry, we could not find a wikipedia article using that search term")
             return
 
-        for i in titles:
-            t = i.replace(" ", "_")  # wikipedia uses "_" as spaces
-            final.append(t)
+        for title in titles:
+            title_for_creating_link = title.replace(" ", "_")  # wikipedia uses "_" as spaces
+            titles_no_underscore.append(title_for_creating_link)
 
         async with ctx.typing():
             for index, title in enumerate(titles, start=1):
@@ -69,18 +70,27 @@ class WikipediaCog(commands.Cog):
 
         try:
             user = await ctx.bot.wait_for('message', timeout=60.0, check=check)
+            response = await self.bot.get_context(user)
+
+            if response.command:
+                return
+
             response = int(user.content)
+
             if response <= 0:
-                await ctx.send("Please enter a valid response")
+                await ctx.send("You cant send negative Index buddy")
             else:
-                await ctx.send(WIKIPEDIA_URL.format(title=final[response - 1]))
+                await ctx.send(WIKIPEDIA_URL.format(title=titles_no_underscore[response - 1]))
 
         except asyncio.TimeoutError:
             embed = Embed(colour=Color.red(), description=f"Time's up {ctx.author.mention}")
             await msg.edit(embed=embed)
 
         except ValueError:
-            await ctx.send("I am sorry but that isn't int value")
+            await ctx.send("sorry u cant do that I will only accept int")
+
+        except IndexError:
+            await ctx.send("sorry but you are exceeding the limit please select from above list")
 
 
 def setup(bot: commands.Bot) -> None:
