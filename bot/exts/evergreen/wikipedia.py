@@ -1,7 +1,7 @@
 import asyncio
 import datetime
 import logging
-from typing import Optional, List
+from typing import List, Optional
 
 from discord import Color, Embed, Member
 from discord.ext import commands
@@ -19,7 +19,7 @@ class WikipediaCog(commands.Cog):
         self.bot = bot
         self.http_session = bot.http_session
 
-    async def search_wikipedia(self, search_term: str) -> Optional[str]:
+    async def search_wikipedia(self, search_term: str) -> Optional[list]:
         """Search wikipedia and return the first page found."""
         async with self.http_session.get(SEARCH_API.format(search_term=search_term)) as response:
             data = await response.json()
