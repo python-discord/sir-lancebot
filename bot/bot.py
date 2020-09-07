@@ -69,7 +69,6 @@ class SeasonalBot(commands.Bot):
         """Check command errors for UserInputError and reset the cooldown if thrown."""
         if isinstance(exception, commands.UserInputError):
             context.command.reset_cooldown(context)
-
         else:
             await super().on_command_error(context, exception)
 
