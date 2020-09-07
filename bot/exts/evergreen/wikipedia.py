@@ -19,7 +19,7 @@ class WikipediaCog(commands.Cog):
         self.bot = bot
         self.http_session = bot.http_session
 
-    async def search_wikipedia(self, search_term: str) -> Optional[list]:
+    async def search_wikipedia(self, search_term: str) -> Optional[List[str]]:
         """Search wikipedia and return the first page found."""
         async with self.http_session.get(SEARCH_API.format(search_term=search_term)) as response:
             data = await response.json()
@@ -31,11 +31,12 @@ class WikipediaCog(commands.Cog):
 
         # we dont like "may refere to" pages.
         for search_result in search_results:
+            log.info("trying to appening titles")
             if "may refer to" in search_result["snippet"]:
                 pass
             else:
                 page.append(search_result["title"])
-        log.info("appening titles")
+        log.info("Finished appening titles")
         return page
 
     @commands.cooldown(1, 10, commands.BucketType.user)
@@ -57,6 +58,7 @@ class WikipediaCog(commands.Cog):
         for title in titles:
             title_for_creating_link = title.replace(" ", "_")  # wikipedia uses "_" as spaces
             titles_no_underscore.append(title_for_creating_link)
+        log.info("Finished appening titles with no underscore")
 
         async with ctx.typing():
             for index, title in enumerate(titles, start=1):
@@ -64,33 +66,41 @@ class WikipediaCog(commands.Cog):
             embed = Embed(colour=Color.blue(), title=f"Wikipedia results for `{search}`", description=s_desc)
             embed.timestamp = datetime.datetime.utcnow()
             await ctx.send(embed=embed)
-
         embed = Embed(colour=Color.green(), description="Enter number to choose")
         msg = await ctx.send(embed=embed)
+        chances = 0
+        l_of_list = len(titles_no_underscore)  # getting length of list
 
-        try:
-            user = await ctx.bot.wait_for('message', timeout=60.0, check=check)
-            response = await self.bot.get_context(user)
-
-            if response.command:
-                return
-
-            response = int(user.content)
-
-            if response <= 0:
-                await ctx.send("You cant send negative Index buddy")
+        while chances <= 3:
+            chances += 1
+            if chances < 3:
+                error_msg = f'You have `{3 - chances}/3` chances left'
             else:
-                await ctx.send(WIKIPEDIA_URL.format(title=titles_no_underscore[response - 1]))
+                error_msg = 'Please try again by using `.wiki` command'
+            try:
+                user = await ctx.bot.wait_for('message', timeout=60.0, check=check)
+                response = await self.bot.get_context(user)
+                if response.command:
+                    return
+                response = int(user.content)
+                if response < 0:
+                    await ctx.send(f"Sorry, but you can't give negative index, {error_msg}")
+                elif response == 0:
+                    await ctx.send(f"Sorry, please give the range between `1` to `{len(l_of_list)}`, {error_msg}")
+                else:
+                    await ctx.send(WIKIPEDIA_URL.format(title=titles_no_underscore[response - 1]))
+                    break
 
-        except asyncio.TimeoutError:
-            embed = Embed(colour=Color.red(), description=f"Time's up {ctx.author.mention}")
-            await msg.edit(embed=embed)
+            except asyncio.TimeoutError:
+                embed = Embed(colour=Color.red(), description=f"Time's up {ctx.author.mention}")
+                await msg.edit(embed=embed)
+                break
 
-        except ValueError:
-            await ctx.send("Sorry, but you cannot do that, I will only accept an integer.")
+            except ValueError:
+                await ctx.send(f"Sorry, but you cannot do that, I will only accept an integer, {error_msg}")
 
-        except IndexError:
-            await ctx.send("sorry but you are exceeding the limit please select the range from above given list")
+            except IndexError:
+                await ctx.send(f"Sorry, please give the range between `1` to {l_of_list}, {error_msg}")
 
 
 def setup(bot: commands.Bot) -> None:
