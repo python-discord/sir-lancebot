@@ -3,8 +3,10 @@ import datetime
 import logging
 from typing import List, Optional
 
-from discord import Color, Embed, Member
+from discord import Color, Embed, Message
 from discord.ext import commands
+
+from bot.constants import Wikipedia
 
 log = logging.getLogger(__name__)
 
@@ -36,20 +38,20 @@ class WikipediaCog(commands.Cog):
                 pass
             else:
                 page.append(search_result["title"])
-        log.info("Finished appening titles")
+        log.info("Finished appending titles")
         return page
 
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(name="wikipedia", aliases=["wiki"])
-    async def w_pedia(self, ctx: commands.Context, *, search: str) -> None:
+    async def wikipedia_search_command(self, ctx: commands.Context, *, search: str) -> None:
         """Returns list of your search query from wikipedia."""
         titles_no_underscore: List[str] = []
         s_desc = ''
 
         titles = await self.search_wikipedia(search)
 
-        def check(user: Member) -> bool:
-            return user.author.id == ctx.author.id
+        def check(message: Message) -> bool:
+            return message.author.id == ctx.author.id
 
         if titles is None:
             await ctx.send("Sorry, we could not find a wikipedia article using that search term")
@@ -69,24 +71,25 @@ class WikipediaCog(commands.Cog):
         embed = Embed(colour=Color.green(), description="Enter number to choose")
         msg = await ctx.send(embed=embed)
         chances = 0
+        total_chances = Wikipedia.total_chance
         l_of_list = len(titles_no_underscore)  # getting length of list
 
-        while chances <= 3:
+        while chances <= total_chances:
             chances += 1
-            if chances < 3:
-                error_msg = f'You have `{3 - chances}/3` chances left'
+            if chances < total_chances:
+                error_msg = f'You have `{total_chances - chances}/{total_chances}` chances left'
             else:
                 error_msg = 'Please try again by using `.wiki` command'
             try:
-                user = await ctx.bot.wait_for('message', timeout=60.0, check=check)
-                response_from_user = await self.bot.get_context(user)
+                message: Message = await ctx.bot.wait_for('message', timeout=60.0, check=check)
+                response_from_user = await self.bot.get_context(message)
                 if response_from_user.command:
                     return
-                response = int(user.content)
+                response = int(message.content)
                 if response < 0:
                     await ctx.send(f"Sorry, but you can't give negative index, {error_msg}")
                 elif response == 0:
-                    await ctx.send(f"Sorry, please give the range between `1` to `{len(l_of_list)}`, {error_msg}")
+                    await ctx.send(f"Sorry, please give the range between `1` to `{l_of_list}`, {error_msg}")
                 else:
                     await ctx.send(WIKIPEDIA_URL.format(title=titles_no_underscore[response - 1]))
                     break
