@@ -89,7 +89,7 @@ class WikipediaCog(commands.Cog):
                 if response < 0:
                     await ctx.send(f"Sorry, but you can't give negative index, {error_msg}")
                 elif response == 0:
-                    await ctx.send(f"Sorry, please give the range between `1` to `{l_of_list}`, {error_msg}")
+                    await ctx.send(f"Sorry, please give an integer between `1` and `{l_of_list}`, {error_msg}")
                 else:
                     await ctx.send(WIKIPEDIA_URL.format(title=titles_no_underscore[response - 1]))
                     break
