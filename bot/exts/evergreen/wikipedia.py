@@ -60,7 +60,7 @@ class WikipediaCog(commands.Cog):
         for title in titles:
             title_for_creating_link = title.replace(" ", "_")  # wikipedia uses "_" as spaces
             titles_no_underscore.append(title_for_creating_link)
-        log.info("Finished appending titles_no_underscore")
+        log.info("Finished appending titles to titles_no_underscore list")
 
         async with ctx.typing():
             for index, title in enumerate(titles, start=1):
