@@ -60,7 +60,7 @@ class WikipediaCog(commands.Cog):
         for title in titles:
             title_for_creating_link = title.replace(" ", "_")  # wikipedia uses "_" as spaces
             titles_no_underscore.append(title_for_creating_link)
-        log.info("Finished appening titles with no underscore")
+        log.info("Finished appening titles_no_underscore")
 
         async with ctx.typing():
             for index, title in enumerate(titles, start=1):
@@ -89,7 +89,7 @@ class WikipediaCog(commands.Cog):
                 if response < 0:
                     await ctx.send(f"Sorry, but you can't give negative index, {error_msg}")
                 elif response == 0:
-                    await ctx.send(f"Sorry, please give an integer between `1` and `{l_of_list}`, {error_msg}")
+                    await ctx.send(f"Sorry, please give an integer between `1` to `{l_of_list}`, {error_msg}")
                 else:
                     await ctx.send(WIKIPEDIA_URL.format(title=titles_no_underscore[response - 1]))
                     break
@@ -103,7 +103,7 @@ class WikipediaCog(commands.Cog):
                 await ctx.send(f"Sorry, but you cannot do that, I will only accept an integer, {error_msg}")
 
             except IndexError:
-                await ctx.send(f"Sorry, please give the range between `1` to {l_of_list}, {error_msg}")
+                await ctx.send(f"Sorry, please give an integer between `1` to `{l_of_list}`, {error_msg}")
 
 
 def setup(bot: commands.Bot) -> None:
