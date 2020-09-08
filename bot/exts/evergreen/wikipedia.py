@@ -79,8 +79,8 @@ class WikipediaCog(commands.Cog):
                 error_msg = 'Please try again by using `.wiki` command'
             try:
                 user = await ctx.bot.wait_for('message', timeout=60.0, check=check)
-                response = await self.bot.get_context(user)
-                if response.command:
+                response_from_user = await self.bot.get_context(user)
+                if response_from_user.command:
                     return
                 response = int(user.content)
                 if response < 0:
