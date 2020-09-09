@@ -1,5 +1,3 @@
-import itertools
-import random
 from pathlib import Path
 
 import yaml
@@ -8,6 +6,7 @@ from discord.ext import commands
 
 from bot.constants import WHITELISTED_CHANNELS
 from bot.utils.decorators import override_in_channel
+from bot.utils.randomization import RandomCycle
 
 SUGGESTION_FORM = 'https://forms.gle/zw6kkJqv8U43Nfjg9'
 
@@ -25,14 +24,8 @@ with Path("bot/resources/evergreen/py_topics.yaml").open("r", encoding="utf8") a
     ALL_ALLOWED_CHANNELS = [channel_id for channel_id in PY_TOPICS.keys()] + list(WHITELISTED_CHANNELS)
 
 # Putting all topics into one dictionary and shuffling lists to reduce same-topic repetitions.
-TOPICS = {}
-for k, v in {**{'default': STARTERS}, **PY_TOPICS}.items():
-    if len(v):
-        random.shuffle(v)
-        TOPICS[k] = itertools.cycle(v)
-
-    else:
-        TOPICS[k] = False
+all_topics = {'default': STARTERS, **PY_TOPICS}
+TOPICS = {channel: RandomCycle(topics) if len(topics) else False for channel, topics in all_topics.items()}
 
 
 class ConvoStarters(commands.Cog):
