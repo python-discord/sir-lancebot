@@ -1,5 +1,4 @@
 import itertools
-import logging
 import random
 from pathlib import Path
 
@@ -9,8 +8,6 @@ from discord.ext import commands
 
 from bot.constants import WHITELISTED_CHANNELS
 from bot.utils.decorators import override_in_channel
-
-log = logging.getLogger(__name__)
 
 SUGGESTION_FORM = 'https://forms.gle/zw6kkJqv8U43Nfjg9'
 
