@@ -21,7 +21,7 @@ with Path("bot/resources/evergreen/py_topics.yaml").open("r", encoding="utf8") a
     PY_TOPICS = {k: [i for i in v if i] if isinstance(v, list) else [] for k, v in PY_TOPICS.items()}
 
     # All the allowed channels that the ".topic" command is allowed to be executed in.
-    ALL_ALLOWED_CHANNELS = [channel_id for channel_id in PY_TOPICS.keys()] + list(WHITELISTED_CHANNELS)
+    ALL_ALLOWED_CHANNELS = list(PY_TOPICS.keys()) + list(WHITELISTED_CHANNELS)
 
 # Putting all topics into one dictionary and shuffling lists to reduce same-topic repetitions.
 ALL_TOPICS = {'default': STARTERS, **PY_TOPICS}
