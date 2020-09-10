@@ -27,7 +27,7 @@ with Path("bot/resources/evergreen/py_topics.yaml").open("r", encoding="utf8") a
 ALL_TOPICS = {'default': STARTERS, **PY_TOPICS}
 TOPICS = {
     channel: RandomCycle(topics or ['No topics found for this channel.'])
-    for channel, topics in all_topics.items()
+    for channel, topics in ALL_TOPICS.items()
 }
 
 
@@ -60,13 +60,10 @@ class ConvoStarters(commands.Cog):
 
         # If the channel ID doesn't have any topics.
         else:
-            if channel_topics:
-                embed.title = f'**{next(channel_topics)}**'
+            embed.title = f'**{next(channel_topics)}**'
 
-            else:
-                embed.title = 'No topics found for this channel.'
-
-        await ctx.send(embed=embed)
+        finally:
+            await ctx.send(embed=embed)
 
 
 def setup(bot: commands.Bot) -> None:
