@@ -4,7 +4,11 @@ import typing as t
 
 
 class RandomCycle:
-    """Cycling through jumping to random indexes in an iterable."""
+    """
+    Cycles through elements from a randomly shuffled iterable, repeating indefinitely.
+
+    The iterable is reshuffled after each full cycle.
+    """
 
     def __init__(self, iterable: t.Iterable) -> None:
         self.iterable = list(iterable)
