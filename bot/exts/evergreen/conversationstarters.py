@@ -24,7 +24,7 @@ with Path("bot/resources/evergreen/py_topics.yaml").open("r", encoding="utf8") a
     ALL_ALLOWED_CHANNELS = [channel_id for channel_id in PY_TOPICS.keys()] + list(WHITELISTED_CHANNELS)
 
 # Putting all topics into one dictionary and shuffling lists to reduce same-topic repetitions.
-all_topics = {'default': STARTERS, **PY_TOPICS}
+ALL_TOPICS = {'default': STARTERS, **PY_TOPICS}
 TOPICS = {channel: RandomCycle(topics) if len(topics) else False for channel, topics in all_topics.items()}
 
 
