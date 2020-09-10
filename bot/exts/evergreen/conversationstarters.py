@@ -25,7 +25,10 @@ with Path("bot/resources/evergreen/py_topics.yaml").open("r", encoding="utf8") a
 
 # Putting all topics into one dictionary and shuffling lists to reduce same-topic repetitions.
 ALL_TOPICS = {'default': STARTERS, **PY_TOPICS}
-TOPICS = {channel: RandomCycle(topics) if len(topics) else False for channel, topics in all_topics.items()}
+TOPICS = {
+    channel: RandomCycle(topics or ['No topics found for this channel.'])
+    for channel, topics in all_topics.items()
+}
 
 
 class ConvoStarters(commands.Cog):
