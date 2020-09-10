@@ -1,7 +1,7 @@
 # Conversation starters for Python-related channels.
 
-# Python-general
-267624335836053506:
+# python-general
+704362672644423840:
     - What's your favorite PEP?
     - What's your current text editor/IDE, and what functionality do you like about it the most when programming in Python?
     - What functionality is your text editor/IDE missing for programming Python?
@@ -23,7 +23,7 @@
     - How have coroutines changed the way you write Python?
 
 # computer-science
-650401909852864553:
+704406535509639209:
     -
 
 # databases
@@ -59,7 +59,7 @@
 716325106619777044:
     - If you could wish for a library involving networking, what would it be?
 
-# Python-extensions
+# python-extensions
 728390945384431688:
     -
 
