@@ -22,6 +22,10 @@
     - Are there any frameworks you wish were async?
     - How have coroutines changed the way you write Python?
 
+# c-extensions
+728390945384431688:
+    -
+
 # computer-science
 650401909852864553:
     -
@@ -58,10 +62,6 @@
 # networking
 716325106619777044:
     - If you could wish for a library involving networking, what would it be?
-
-# python-extensions
-728390945384431688:
-    -
 
 # security
 366674035876167691:
