@@ -1,5 +1,3 @@
-import json
-import random
 from pathlib import Path
 
 import yaml
@@ -8,11 +6,12 @@ from discord.ext import commands
 
 from bot.constants import WHITELISTED_CHANNELS
 from bot.utils.decorators import override_in_channel
+from bot.utils.randomization import RandomCycle
 
+SUGGESTION_FORM = 'https://forms.gle/zw6kkJqv8U43Nfjg9'
 
-with Path("bot/resources/evergreen/starter.json").open("r", encoding="utf8") as f:
-    STARTERS = json.load(f)["starters"]
-
+with Path("bot/resources/evergreen/starter.yaml").open("r", encoding="utf8") as f:
+    STARTERS = yaml.load(f, Loader=yaml.FullLoader)
 
 with Path("bot/resources/evergreen/py_topics.yaml").open("r", encoding="utf8") as f:
     # First ID is #python-general and the rest are top to bottom categories of Topical Chat/Help.
@@ -22,7 +21,14 @@ with Path("bot/resources/evergreen/py_topics.yaml").open("r", encoding="utf8") a
     PY_TOPICS = {k: [i for i in v if i] if isinstance(v, list) else [] for k, v in PY_TOPICS.items()}
 
     # All the allowed channels that the ".topic" command is allowed to be executed in.
-    ALL_ALLOWED_CHANNELS = [channel_id for channel_id in PY_TOPICS.keys()] + list(WHITELISTED_CHANNELS)
+    ALL_ALLOWED_CHANNELS = list(PY_TOPICS.keys()) + list(WHITELISTED_CHANNELS)
+
+# Putting all topics into one dictionary and shuffling lists to reduce same-topic repetitions.
+ALL_TOPICS = {'default': STARTERS, **PY_TOPICS}
+TOPICS = {
+    channel: RandomCycle(topics or ['No topics found for this channel.'])
+    for channel, topics in ALL_TOPICS.items()
+}
 
 
 class ConvoStarters(commands.Cog):
@@ -39,31 +45,25 @@ class ConvoStarters(commands.Cog):
 
         If in a Python channel, a python-related topic will be given.
 
-        Otherwise, a random conversation topic will be recieved by the user.
+        Otherwise, a random conversation topic will be received by the user.
         """
+        # No matter what, the form will be shown.
+        embed = Embed(description=f'Suggest more topics [here]({SUGGESTION_FORM})!', color=Color.blurple())
+
         try:
             # Fetching topics.
-            channel_topics = PY_TOPICS[ctx.channel.id]
+            channel_topics = TOPICS[ctx.channel.id]
 
         # If the channel isn't Python-related.
         except KeyError:
-            await ctx.send(random.choice(STARTERS))
+            embed.title = f'**{next(TOPICS["default"])}**'
 
         # If the channel ID doesn't have any topics.
         else:
-            if channel_topics:
-                await ctx.send(random.choice(channel_topics))
+            embed.title = f'**{next(channel_topics)}**'
 
-            else:
-                embed = Embed(
-                    description=(
-                        "No topics found for this Python channel. You can suggest new ideas for topics "
-                        "[here](https://github.com/python-discord/seasonalbot/issues/426)!"
-                    ),
-                    color=Color.blurple()
-                )
-
-                await ctx.send(embed=embed)
+        finally:
+            await ctx.send(embed=embed)
 
 
 def setup(bot: commands.Bot) -> None:
