@@ -20,6 +20,7 @@ zodiac_signs = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra",
 with open(Path("bot/resources/valentines/zodiac_explanation.json"), "r", encoding="utf8") as file:
     """Load zodiac zodiac explanation from static JSON resource."""
     zodiac_fact = load(file)
+    log.info("zodiac explantion json loaded")
 
 
 class ValentineZodiac(commands.Cog):
