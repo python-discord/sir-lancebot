@@ -108,12 +108,12 @@ class Emojis:
     trashcan = "<:trashcan:637136429717389331>"
     ok_hand = ":ok_hand:"
 
-    terning1 = "<:terning1:431249668983488527>"
-    terning2 = "<:terning2:462339216987127808>"
-    terning3 = "<:terning3:431249694467948544>"
-    terning4 = "<:terning4:579980271475228682>"
-    terning5 = "<:terning5:431249716328792064>"
-    terning6 = "<:terning6:431249726705369098>"
+    dice_1 = "<:dice_1:755891608859443290>"
+    dice_2 = "<:dice_2:755891608741740635>"
+    dice_3 = "<:dice_3:755891608251138158>"
+    dice_4 = "<:dice_4:755891607882039327>"
+    dice_5 = "<:dice_5:755891608091885627>"
+    dice_6 = "<:dice_6:755891607680843838>"
 
     issue = "<:IssueOpen:629695470327037963>"
     issue_closed = "<:IssueClosed:629695470570307614>"

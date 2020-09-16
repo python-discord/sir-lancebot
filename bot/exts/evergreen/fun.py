@@ -41,7 +41,7 @@ class Fun(Cog):
         elif num_rolls < 1:
             output = ":no_entry: You must roll at least once."
         for _ in range(num_rolls):
-            terning = f"terning{random.randint(1, 6)}"
+            terning = f"dice_{random.randint(1, 6)}"
             output += getattr(Emojis, terning, '')
         await ctx.send(output)
 
