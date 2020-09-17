@@ -53,7 +53,7 @@ class WikipediaCog(commands.Cog):
         def check(message: Message) -> bool:
             return message.author.id == ctx.author.id
 
-        if titles is None:
+        if not titles:
             await ctx.send("Sorry, we could not find a wikipedia article using that search term")
             return
 
