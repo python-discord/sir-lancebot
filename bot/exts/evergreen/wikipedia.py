@@ -42,7 +42,7 @@ class WikipediaCog(commands.Cog):
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(name="wikipedia", aliases=["wiki"])
     async def wikipedia_search_command(self, ctx: commands.Context, *, search: str) -> None:
-        """Returns  list of results containing your search query from wikipedia."""
+        """Return list of results containing your search query from wikipedia."""
         titles_no_underscore: List[str] = []
         s_desc = ''
 
