@@ -44,14 +44,14 @@ class WikipediaCog(commands.Cog):
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(name="wikipedia", aliases=["wiki"])
     async def wikipedia_search_command(self, ctx: commands.Context, *, search: str) -> None:
-        """Returns list of your search query from wikipedia."""
+        """Returns  list of results containing your search query from wikipedia."""
         titles_no_underscore: List[str] = []
         s_desc = ''
 
         titles = await self.search_wikipedia(search)
 
         def check(message: Message) -> bool:
-            return message.author.id == ctx.author.id
+            return message.author.id == ctx.author.id and message.channel == ctx.channel
 
         if titles is None:
             await ctx.send("Sorry, we could not find a wikipedia article using that search term")
@@ -72,7 +72,7 @@ class WikipediaCog(commands.Cog):
         msg = await ctx.send(embed=embed)
         chances = 0
         total_chances = Wikipedia.total_chance
-        l_of_list = len(titles_no_underscore)  # getting length of list
+        titles_len = len(titles_no_underscore)  # getting length of list
 
         while chances <= total_chances:
             chances += 1
@@ -89,7 +89,7 @@ class WikipediaCog(commands.Cog):
                 if response < 0:
                     await ctx.send(f"Sorry, but you can't give negative index, {error_msg}")
                 elif response == 0:
-                    await ctx.send(f"Sorry, please give an integer between `1` to `{l_of_list}`, {error_msg}")
+                    await ctx.send(f"Sorry, please give an integer between `1` to `{titles_len}`, {error_msg}")
                 else:
                     await ctx.send(WIKIPEDIA_URL.format(title=titles_no_underscore[response - 1]))
                     break
@@ -103,9 +103,9 @@ class WikipediaCog(commands.Cog):
                 await ctx.send(f"Sorry, but you cannot do that, I will only accept an integer, {error_msg}")
 
             except IndexError:
-                await ctx.send(f"Sorry, please give an integer between `1` to `{l_of_list}`, {error_msg}")
+                await ctx.send(f"Sorry, please give an integer between `1` to `{titles_len}`, {error_msg}")
 
 
 def setup(bot: commands.Bot) -> None:
-    """Uptime Cog load."""
+    """Wikipedia Cog load."""
     bot.add_cog(WikipediaCog(bot))
