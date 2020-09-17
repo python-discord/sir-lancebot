@@ -28,15 +28,13 @@ class WikipediaCog(commands.Cog):
         page = []
 
         search_results = data["query"]["search"]
-        if len(search_results) == 0:
+        if not search_results:
             return None
 
-        # we dont like "may refere to" pages.
+        # Ignore pages with "may refer to"
         for search_result in search_results:
             log.info("trying to append titles")
-            if "may refer to" in search_result["snippet"]:
-                pass
-            else:
+            if "may refer to" not in search_result["snippet"]:
                 page.append(search_result["title"])
         log.info("Finished appending titles")
         return page
@@ -53,7 +51,7 @@ class WikipediaCog(commands.Cog):
         def check(message: Message) -> bool:
             return message.author.id == ctx.author.id and message.channel == ctx.channel
 
-        if titles is None:
+        if not titles:
             await ctx.send("Sorry, we could not find a wikipedia article using that search term")
             return
 
