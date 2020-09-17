@@ -31,7 +31,7 @@ class WikipediaCog(commands.Cog):
         if not search_results:
             return None
 
-        # we dont like "may refere to" pages.
+        # Ignore pages with "may refer to"
         for search_result in search_results:
             log.info("trying to append titles")
             if "may refer to" in search_result["snippet"]:
