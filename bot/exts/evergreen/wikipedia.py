@@ -28,7 +28,7 @@ class WikipediaCog(commands.Cog):
         page = []
 
         search_results = data["query"]["search"]
-        if len(search_results) == 0:
+        if not search_results:
             return None
 
         # we dont like "may refere to" pages.
