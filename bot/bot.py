@@ -10,7 +10,7 @@ from aiohttp import AsyncResolver, ClientSession, TCPConnector
 from discord import DiscordException, Embed, Guild, User
 from discord.ext import commands
 
-from bot.constants import Channels, Client
+from bot.constants import Channels, Client, MODERATION_ROLES
 from bot.utils.decorators import mock_in_debug
 
 log = logging.getLogger(__name__)
@@ -103,7 +103,7 @@ class SeasonalBot(commands.Bot):
             return False
 
         else:
-            log.info(f"Asset successfully applied")
+            log.info("Asset successfully applied")
             return True
 
     @mock_in_debug(return_value=True)
@@ -203,7 +203,9 @@ class SeasonalBot(commands.Bot):
         await self._guild_available.wait()
 
 
+_allowed_roles = [discord.Object(id_) for id_ in MODERATION_ROLES]
 bot = SeasonalBot(
     command_prefix=Client.prefix,
     activity=discord.Game(name=f"Commands: {Client.prefix}help"),
+    allowed_mentions=discord.AllowedMentions(everyone=False, roles=_allowed_roles),
 )
