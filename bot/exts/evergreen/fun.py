@@ -28,6 +28,26 @@ UWU_WORDS = {
 }
 
 
+def caesar_cipher(text: str, offset: int) -> Iterable[str]:
+    """
+    Implements a lazy Caesar Cipher algorithm.
+
+    Encrypts a `text` given a specific integer `offset`. The sign
+    of the `offset` dictates the direction in which it shifts to,
+    with a negative value shifting to the left, and a positive
+    value shifting to the right.
+    """
+    for char in text:
+        if not char.isascii() or not char.isalpha() or char.isspace():
+            yield char
+            continue
+
+        case_start = 65 if char.isupper() else 97
+        true_offset = (ord(char) - case_start + offset) % 26
+
+        yield chr(case_start + true_offset)
+
+
 class Fun(Cog):
     """A collection of general commands for fun."""
 
@@ -126,21 +146,9 @@ class Fun(Cog):
         if left_shift:
             offset = -offset
 
-        def caesar_func(text: str) -> Iterable[str]:
-            """Implements a lazy Caesar Cipher algorithm."""
-            for char in text:
-                if not char.isascii() or not char.isalpha() or char.isspace():
-                    yield char
-                    continue
-
-                case_start = 65 if char.isupper() else 97
-                true_offset = (ord(char) - case_start + offset) % 26
-
-                yield chr(case_start + true_offset)
-
         def conversion_func(text: str) -> str:
             """Encrypts the given string using the Caesar Cipher."""
-            return "".join(caesar_func(text))
+            return "".join(caesar_cipher(text, offset))
 
         is_message = isinstance(msg, Message)
 
