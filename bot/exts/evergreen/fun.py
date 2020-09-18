@@ -117,7 +117,7 @@ class Fun(Cog):
         """
         Translates a message using the Caesar Cipher.
 
-        See `decrpyt`, `encrypt`, and `info` subcommands.
+        See `decrypt`, `encrypt`, and `info` subcommands.
         """
         if ctx.invoked_subcommand is None:
             await ctx.invoke(self.bot.get_command("help"), "caesarcipher")
