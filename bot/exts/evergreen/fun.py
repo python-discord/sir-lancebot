@@ -131,7 +131,7 @@ class Fun(Cog):
         await ctx.send(embed=embed)
 
     @staticmethod
-    async def _caesar_cipher(ctx: Context, offset: int, msg: Union[Message, str], left_shift: bool = False) -> None:
+    async def _caesar_cipher(ctx: Context, offset: int, msg: str, left_shift: bool = False) -> None:
         """
         Given a positive integer `offset`, translates and sends the given `msg`.
 
@@ -150,10 +150,7 @@ class Fun(Cog):
             """Encrypts the given string using the Caesar Cipher."""
             return "".join(caesar_cipher(text, offset))
 
-        is_message = isinstance(msg, Message)
-
-        text = msg.content if is_message else msg
-        embed = msg.embeds[0] if is_message and msg.embeds else None
+        text, embed = await Fun._get_text_and_embed(ctx, msg)
 
         if embed is not None:
             embed = Fun._convert_embed(conversion_func, embed)
@@ -166,7 +163,7 @@ class Fun(Cog):
         await ctx.send(content=converted_text, embed=embed)
 
     @caesarcipher_group.command(name="encrypt", aliases=("rightshift", "rshift", "enc",))
-    async def caesarcipher_encrypt(self, ctx: Context, offset: int, *, msg: Union[Message, str]) -> None:
+    async def caesarcipher_encrypt(self, ctx: Context, offset: int, *, msg: str) -> None:
         """
         Given a positive integer `offset`, encrypt the given `msg`.
 
@@ -177,7 +174,7 @@ class Fun(Cog):
         await self._caesar_cipher(ctx, offset, msg, left_shift=False)
 
     @caesarcipher_group.command(name="decrypt", aliases=("leftshift", "lshift", "dec",))
-    async def caesarcipher_decrypt(self, ctx: Context, offset: int, *, msg: Union[Message, str]) -> None:
+    async def caesarcipher_decrypt(self, ctx: Context, offset: int, *, msg: str) -> None:
         """
         Given a positive integer `offset`, decrypt the given `msg`.
 
