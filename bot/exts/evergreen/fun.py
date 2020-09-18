@@ -181,18 +181,22 @@ class Fun(Cog):
         """
         Attempts to extract the text and embed from a possible link to a discord Message.
 
+        Does not retrieve the text and embed from the Message if it is in a channel the user does
+        not have read permissions in.
+
         Returns a tuple of:
             str: If `text` is a valid discord Message, the contents of the message, else `text`.
             Union[Embed, None]: The embed if found in the valid Message, else None
         """
         embed = None
 
-        # message = await Fun._get_discord_message(ctx, text)
-        # if isinstance(message, Message):
-        #     text = message.content
-        #     # Take first embed because we can't send multiple embeds
-        #     if message.embeds:
-        #         embed = message.embeds[0]
+        msg = await Fun._get_discord_message(ctx, text)
+        # Ensure the user has read permissions for the channel the message is in
+        if isinstance(msg, Message) and ctx.author.permissions_in(msg.channel).read_messages:
+            text = msg.content
+            # Take first embed because we can't send multiple embeds
+            if msg.embeds:
+                embed = msg.embeds[0]
 
         return (text, embed)
 
