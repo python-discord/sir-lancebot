@@ -69,13 +69,13 @@ class Issues(commands.Cog):
             issue_url = json_data.get("html_url")
             links.append([icon_url, f"[{repository}] #{number} {json_data.get('title')}", issue_url])
 
-        description_list = ['{0} [{1}]({2})'.format(*link) for link in links]
+        description_list = ["{0} [{1}]({2})".format(*link) for link in links]
         resp = discord.Embed(
             colour=Colours.bright_green,
             description='\n'.join(description_list)
         )
 
-        resp.set_author(name="GitHub", url=f"https://github.com/python-discord/{repository}")
+        resp.set_author(name="GitHub", url=f"https://github.com/{user}/{repository}")
         await ctx.send(embed=resp)
 
 
