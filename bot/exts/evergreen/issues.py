@@ -69,6 +69,7 @@ class Issues(commands.Cog):
             issue_url = json_data.get("html_url")
             links.append([icon_url, f"[{repository}] #{number} {json_data.get('title')}", issue_url])
 
+        # Issue/PR format: emoji to show if open/closed/merged, number and the title as a singular link.
         description_list = ["{0} [{1}]({2})".format(*link) for link in links]
         resp = discord.Embed(
             colour=Colours.bright_green,
