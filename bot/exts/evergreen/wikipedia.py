@@ -21,6 +21,12 @@ class WikipediaCog(commands.Cog):
         self.bot = bot
         self.http_session = bot.http_session
 
+    @staticmethod
+    def formatted_wiki_urls(index: int, titles: str) -> List[str]:
+        """Making formatted wikipedia links list."""
+        titles = f'`{index}` [{titles}]({WIKIPEDIA_URL.format(title=titles.replace(" ", "_"))})'
+        return titles
+
     async def search_wikipedia(self, search_term: str) -> Optional[List[str]]:
         """Search wikipedia and return the first page found."""
         async with self.http_session.get(SEARCH_API.format(search_term=search_term)) as response:
@@ -43,9 +49,6 @@ class WikipediaCog(commands.Cog):
     @commands.command(name="wikipedia", aliases=["wiki"])
     async def wikipedia_search_command(self, ctx: commands.Context, *, search: str) -> None:
         """Return list of results containing your search query from wikipedia."""
-        titles_no_underscore: List[str] = []
-        s_desc = ''
-
         titles = await self.search_wikipedia(search)
 
         def check(message: Message) -> bool:
@@ -55,14 +58,11 @@ class WikipediaCog(commands.Cog):
             await ctx.send("Sorry, we could not find a wikipedia article using that search term")
             return
 
-        for title in titles:
-            title_for_creating_link = title.replace(" ", "_")  # wikipedia uses "_" as spaces
-            titles_no_underscore.append(title_for_creating_link)
-        log.info("Finished appending titles to titles_no_underscore list")
-
         async with ctx.typing():
-            for index, title in enumerate(titles, start=1):
-                s_desc += f'`{index}` [{title}]({WIKIPEDIA_URL.format(title=title.replace(" ", "_"))})\n'
+            titles_no_underscore = [title.replace(" ", "_") for title in titles]  # wikipedia uses "_" as spaces
+            log.info("Finished appending titles to titles_no_underscore list")
+
+            s_desc = "\n".join(self.formatted_wiki_urls(index, title)for index, title in enumerate(titles, start=1))
             embed = Embed(colour=Color.blue(), title=f"Wikipedia results for `{search}`", description=s_desc)
             embed.timestamp = datetime.datetime.utcnow()
             await ctx.send(embed=embed)
@@ -79,7 +79,7 @@ class WikipediaCog(commands.Cog):
             else:
                 error_msg = 'Please try again by using `.wiki` command'
             try:
-                message: Message = await ctx.bot.wait_for('message', timeout=60.0, check=check)
+                message = await ctx.bot.wait_for('message', timeout=60.0, check=check)
                 response_from_user = await self.bot.get_context(message)
                 if response_from_user.command:
                     return
