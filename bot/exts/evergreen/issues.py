@@ -4,7 +4,7 @@ import random
 import discord
 from discord.ext import commands
 
-from bot.constants import Channels, Colours, Emojis, ERROR_REPLIES, WHITELISTED_CHANNELS
+from bot.constants import Channels, Colours, Emojis, ERROR_REPLIES, Tokens, WHITELISTED_CHANNELS
 from bot.utils.decorators import override_in_channel
 
 log = logging.getLogger(__name__)
@@ -15,6 +15,10 @@ BAD_RESPONSE = {
 }
 
 MAX_REQUESTS = 10
+
+REQUEST_HEADERS = dict()
+if GITHUB_TOKEN := Tokens.github:
+    REQUEST_HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
 
 
 class Issues(commands.Cog):
@@ -30,7 +34,7 @@ class Issues(commands.Cog):
         ctx: commands.Context,
         numbers: commands.Greedy[int],
         repository: str = "seasonalbot",
-            user: str = "python-discord"
+        user: str = "python-discord"
     ) -> None:
         """Command to retrieve issue(s) from a GitHub repository."""
         links = []
@@ -55,7 +59,7 @@ class Issues(commands.Cog):
             merge_url = f"https://api.github.com/repos/{user}/{repository}/pulls/{number}/merge"
 
             log.trace(f"Querying GH issues API: {url}")
-            async with self.bot.http_session.get(url) as r:
+            async with self.bot.http_session.get(url, headers=REQUEST_HEADERS) as r:
                 json_data = await r.json()
 
             if r.status in BAD_RESPONSE:
