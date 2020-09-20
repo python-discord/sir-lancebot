@@ -36,6 +36,10 @@ class Issues(commands.Cog):
         links = []
         numbers = set(numbers)
 
+        if not numbers:
+            await ctx.invoke(self.bot.get_command('help'), 'issue')
+            return
+
         if len(numbers) > MAX_REQUESTS:
             embed = discord.Embed(
                 title=random.choice(ERROR_REPLIES),
