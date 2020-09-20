@@ -4,7 +4,7 @@ import random
 import discord
 from discord.ext import commands
 
-from bot.constants import Channels, Colours, Emojis, ERROR_REPLIES, Tokens, WHITELISTED_CHANNELS
+from bot.constants import Channels, Colours, ERROR_REPLIES, Emojis, Tokens, WHITELISTED_CHANNELS
 from bot.utils.decorators import override_in_channel
 
 log = logging.getLogger(__name__)
