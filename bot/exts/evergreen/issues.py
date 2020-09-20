@@ -1,9 +1,10 @@
 import logging
+import random
 
 import discord
 from discord.ext import commands
 
-from bot.constants import Channels, Colours, Emojis, WHITELISTED_CHANNELS
+from bot.constants import Channels, Colours, Emojis, ERROR_REPLIES, WHITELISTED_CHANNELS
 from bot.utils.decorators import override_in_channel
 
 log = logging.getLogger(__name__)
@@ -12,6 +13,8 @@ BAD_RESPONSE = {
     404: "Issue/pull request not located! Please enter a valid number!",
     403: "Rate limit has been hit! Please try again later!"
 }
+
+MAX_REQUESTS = 10
 
 
 class Issues(commands.Cog):
@@ -31,6 +34,16 @@ class Issues(commands.Cog):
     ) -> None:
         """Command to retrieve issue(s) from a GitHub repository."""
         links = []
+        numbers = set(numbers)
+
+        if len(numbers) > MAX_REQUESTS:
+            embed = discord.Embed(
+                title=random.choice(ERROR_REPLIES),
+                color=Colours.soft_red,
+                description=f"Too many issues/PRs! (maximum of {MAX_REQUESTS})"
+            )
+            await ctx.send(embed=embed)
+            return
 
         for number in set(numbers):
             # Convert from list to set to remove duplicates, if any.
