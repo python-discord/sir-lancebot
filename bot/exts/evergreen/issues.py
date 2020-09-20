@@ -1,9 +1,10 @@
 import logging
+import random
 
 import discord
 from discord.ext import commands
 
-from bot.constants import Channels, Colours, Emojis, WHITELISTED_CHANNELS
+from bot.constants import Channels, Colours, ERROR_REPLIES, Emojis, Tokens, WHITELISTED_CHANNELS
 from bot.utils.decorators import override_in_channel
 
 log = logging.getLogger(__name__)
@@ -13,6 +14,12 @@ BAD_RESPONSE = {
     403: "Rate limit has been hit! Please try again later!"
 }
 
+MAX_REQUESTS = 10
+
+REQUEST_HEADERS = dict()
+if GITHUB_TOKEN := Tokens.github:
+    REQUEST_HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
+
 
 class Issues(commands.Cog):
     """Cog that allows users to retrieve issues from GitHub."""
@@ -21,13 +28,30 @@ class Issues(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=("pr",))
-    @override_in_channel(WHITELISTED_CHANNELS + (Channels.dev_contrib,))
+    @override_in_channel(WHITELISTED_CHANNELS + (Channels.dev_contrib, Channels.dev_branding))
     async def issue(
-            self, ctx: commands.Context, numbers: commands.Greedy[int], repository: str = "seasonalbot",
-            user: str = "python-discord"
+        self,
+        ctx: commands.Context,
+        numbers: commands.Greedy[int],
+        repository: str = "seasonalbot",
+        user: str = "python-discord"
     ) -> None:
         """Command to retrieve issue(s) from a GitHub repository."""
         links = []
+        numbers = set(numbers)
+
+        if not numbers:
+            await ctx.invoke(self.bot.get_command('help'), 'issue')
+            return
+
+        if len(numbers) > MAX_REQUESTS:
+            embed = discord.Embed(
+                title=random.choice(ERROR_REPLIES),
+                color=Colours.soft_red,
+                description=f"Too many issues/PRs! (maximum of {MAX_REQUESTS})"
+            )
+            await ctx.send(embed=embed)
+            return
 
         for number in set(numbers):
             # Convert from list to set to remove duplicates, if any.
@@ -35,7 +59,7 @@ class Issues(commands.Cog):
             merge_url = f"https://api.github.com/repos/{user}/{repository}/pulls/{number}/merge"
 
             log.trace(f"Querying GH issues API: {url}")
-            async with self.bot.http_session.get(url) as r:
+            async with self.bot.http_session.get(url, headers=REQUEST_HEADERS) as r:
                 json_data = await r.json()
 
             if r.status in BAD_RESPONSE:

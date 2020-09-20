@@ -52,6 +52,7 @@ class Channels(NamedTuple):
     devalerts = 460181980097675264
     devlog = int(environ.get("CHANNEL_DEVLOG", 622895325144940554))
     dev_contrib = 635950537262759947
+    dev_branding = 753252897059373066
     help_0 = 303906576991780866
     help_1 = 303906556754395136
     help_2 = 303906514266226689
