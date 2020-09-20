@@ -21,9 +21,12 @@ class Issues(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=("pr",))
-    @override_in_channel(WHITELISTED_CHANNELS + (Channels.dev_contrib,))
+    @override_in_channel(WHITELISTED_CHANNELS + (Channels.dev_contrib, Channels.dev_branding))
     async def issue(
-            self, ctx: commands.Context, numbers: commands.Greedy[int], repository: str = "seasonalbot",
+        self,
+        ctx: commands.Context,
+        numbers: commands.Greedy[int],
+        repository: str = "seasonalbot",
             user: str = "python-discord"
     ) -> None:
         """Command to retrieve issue(s) from a GitHub repository."""
