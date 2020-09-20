@@ -68,45 +68,42 @@ class WikipediaCog(commands.Cog):
             await ctx.send(embed=embed)
         embed = Embed(colour=Color.green(), description="Enter number to choose")
         msg = await ctx.send(embed=embed)
-        chances = 0
-        total_chances = Wikipedia.total_chance
         titles_len = len(titles_no_underscore)  # getting length of list
 
-        for _ in range(Wikipedia.total_chance):
-            if chances <= total_chances:
-                chances += 1
-                if chances < total_chances:
-                    error_msg = f'You have `{total_chances - chances}/{total_chances}` chances left'
-                else:
-                    error_msg = 'Please try again by using `.wiki` command'
-                try:
-                    message = await ctx.bot.wait_for('message', timeout=60.0, check=check)
-                    response_from_user = await self.bot.get_context(message)
-                    if response_from_user.command:
-                        return
-                    response = int(message.content)
-                    if response < 0:
-                        await ctx.send(f"Sorry, but you can't give negative index, {error_msg}")
-                    elif response == 0:
-                        await ctx.send(f"Sorry, please give an integer between `1` to `{titles_len}`, {error_msg}")
-                    else:
-                        await ctx.send(WIKIPEDIA_URL.format(title=titles_no_underscore[response - 1]))
-                        break
-
-                except asyncio.TimeoutError:
-                    embed = Embed(colour=Color.red(), description=f"Time's up {ctx.author.mention}")
-                    await msg.edit(embed=embed)
-                    break
-
-                except ValueError:
-                    await ctx.send(f"Sorry, but you cannot do that, I will only accept an integer, {error_msg}")
-
-                except IndexError:
+        for retry_count in range(1, Wikipedia.total_chance + 1):
+            retries_left = Wikipedia.total_chance - retry_count
+            if retry_count < Wikipedia.total_chance:
+                error_msg = f"You have `{retries_left}/{Wikipedia.total_chance}` chances left"
+            else:
+                error_msg = 'Please try again by using `.wiki` command'
+            try:
+                message = await ctx.bot.wait_for('message', timeout=60.0, check=check)
+                response_from_user = await self.bot.get_context(message)
+                if response_from_user.command:
+                    return
+                response = int(message.content)
+                if response < 0:
+                    await ctx.send(f"Sorry, but you can't give negative index, {error_msg}")
+                elif response == 0:
                     await ctx.send(f"Sorry, please give an integer between `1` to `{titles_len}`, {error_msg}")
-
-                except Exception as e:
-                    log.info(e)
+                else:
+                    await ctx.send(WIKIPEDIA_URL.format(title=titles_no_underscore[response - 1]))
                     break
+
+            except asyncio.TimeoutError:
+                embed = Embed(colour=Color.red(), description=f"Time's up {ctx.author.mention}")
+                await msg.edit(embed=embed)
+                break
+
+            except ValueError:
+                await ctx.send(f"Sorry, but you cannot do that, I will only accept an integer, {error_msg}")
+
+            except IndexError:
+                await ctx.send(f"Sorry, please give an integer between `1` to `{titles_len}`, {error_msg}")
+
+            except Exception as e:
+                log.info(e)
+                break
 
 
 def setup(bot: commands.Bot) -> None:
