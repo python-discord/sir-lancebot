@@ -9,7 +9,7 @@ from discord.ext.commands import Context, group
 
 from bot import exts
 from bot.bot import SeasonalBot as Bot
-from bot.constants import Emojis, MODERATION_ROLES, Roles, URLs
+from bot.constants import Client, Emojis, MODERATION_ROLES, Roles
 from bot.utils.checks import with_role_check
 from bot.utils.extensions import EXTENSIONS, unqualify
 from bot.utils.pagination import LinePaginator
@@ -154,8 +154,8 @@ class Extensions(commands.Cog):
         embed = Embed(colour=Colour.blurple())
         embed.set_author(
             name="Extensions List",
-            url=URLs.github_bot_repo,
-            icon_url=URLs.bot_avatar
+            url=Client.github_bot_repo,
+            icon_url=str(Bot.user.avatar_url)
         )
 
         lines = []

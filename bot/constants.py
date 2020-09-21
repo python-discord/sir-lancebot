@@ -85,6 +85,7 @@ class Client(NamedTuple):
     token = environ.get("SEASONALBOT_TOKEN")
     sentry_dsn = environ.get("SEASONALBOT_SENTRY_DSN")
     debug = environ.get("SEASONALBOT_DEBUG", "").lower() == "true"
+    github_bot_repo = "https://github.com/python-discord/bot"
     # Override seasonal locks: 1 (January) to 12 (December)
     month_override = int(environ["MONTH_OVERRIDE"]) if "MONTH_OVERRIDE" in environ else None
 
@@ -184,11 +185,6 @@ class Roles(NamedTuple):
     helpers = 267630620367257601
     rockstars = 458226413825294336
     core_developers = 587606783669829632
-
-
-class URLs:
-    bot_avatar = "https://raw.githubusercontent.com/discord-python/branding/master/logos/logo_circle/logo_circle.png"
-    github_bot_repo = "https://github.com/python-discord/bot"
 
 
 class Tokens(NamedTuple):
