@@ -60,7 +60,7 @@ class WikipediaCog(commands.Cog):
             titles_no_underscore = [title.replace(" ", "_") for title in titles]  # wikipedia uses "_" as spaces
             log.info("Finished appending titles to titles_no_underscore list")
 
-            s_desc = "\n".join(self.formatted_wiki_urls(index, title)for index, title in enumerate(titles, start=1))
+            s_desc = "\n".join(self.formatted_wiki_url(index, title) for index, title in enumerate(titles, start=1))
             embed = Embed(colour=Color.blue(), title=f"Wikipedia results for `{search}`", description=s_desc)
             embed.timestamp = datetime.datetime.utcnow()
             await ctx.send(embed=embed)
