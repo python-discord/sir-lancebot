@@ -24,6 +24,7 @@ __all__ = (
     "ERROR_REPLIES",
     "NEGATIVE_REPLIES",
     "POSITIVE_REPLIES",
+    "URLs"
 )
 
 log = logging.getLogger(__name__)
@@ -177,6 +178,12 @@ class Roles(NamedTuple):
     verified = 352427296948486144
     helpers = 267630620367257601
     rockstars = 458226413825294336
+    core_developers = 757650781385261197  # Change this value for local test servers.
+
+
+class URLs:
+    bot_avatar = "https://raw.githubusercontent.com/discord-python/branding/master/logos/logo_circle/logo_circle.png"
+    github_bot_repo = "https://github.com/python-discord/bot"
 
 
 class Tokens(NamedTuple):
