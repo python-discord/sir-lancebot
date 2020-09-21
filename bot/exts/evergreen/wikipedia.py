@@ -24,7 +24,7 @@ class WikipediaCog(commands.Cog):
     @staticmethod
     def formatted_wiki_url(index: int, titles: str) -> str:
         """Making formatted wikipedia link.."""
-        return  f'`{index}` [{title}]({WIKIPEDIA_URL.format(title=title.replace(" ", "_"))})'
+        return f'`{index}` [{titles}]({WIKIPEDIA_URL.format(title=titles.replace(" ", "_"))})'
 
     async def search_wikipedia(self, search_term: str) -> Optional[List[str]]:
         """Search wikipedia and return the first page found."""
@@ -56,7 +56,6 @@ class WikipediaCog(commands.Cog):
             return
 
         async with ctx.typing():
-            titles_no_underscore = [title.replace(" ", "_") for title in titles]  # wikipedia uses "_" as spaces
             log.info("Finished appending titles to titles_no_underscore list")
 
             s_desc = "\n".join(self.formatted_wiki_url(index, title) for index, title in enumerate(titles, start=1))
@@ -76,10 +75,10 @@ class WikipediaCog(commands.Cog):
             try:
                 message = await ctx.bot.wait_for('message', timeout=60.0, check=check)
                 response_from_user = await self.bot.get_context(message)
-                
+
                 if response_from_user.command:
                     return
-                    
+
                 response = int(message.content)
                 if response < 0:
                     await ctx.send(f"Sorry, but you can't give negative index, {error_msg}")
