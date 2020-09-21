@@ -100,7 +100,7 @@ class WikipediaCog(commands.Cog):
                 await ctx.send(f"Sorry, please give an integer between `1` to `{titles_len}`, {error_msg}")
 
             except Exception as e:
-                log.info(e)
+                log.info(f"Caught exception {e}, breaking out of retry loop")
                 break
 
 
