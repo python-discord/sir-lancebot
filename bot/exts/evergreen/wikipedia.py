@@ -66,7 +66,7 @@ class WikipediaCog(commands.Cog):
             await ctx.send(embed=embed)
         embed = Embed(colour=Color.green(), description="Enter number to choose")
         msg = await ctx.send(embed=embed)
-        titles_len = len(titles_no_underscore)  # getting length of list
+        titles_len = len(titles)  # getting length of list
 
         for retry_count in range(1, Wikipedia.total_chance + 1):
             retries_left = Wikipedia.total_chance - retry_count
