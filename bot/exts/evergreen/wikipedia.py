@@ -77,8 +77,10 @@ class WikipediaCog(commands.Cog):
             try:
                 message = await ctx.bot.wait_for('message', timeout=60.0, check=check)
                 response_from_user = await self.bot.get_context(message)
+                
                 if response_from_user.command:
                     return
+                    
                 response = int(message.content)
                 if response < 0:
                     await ctx.send(f"Sorry, but you can't give negative index, {error_msg}")
