@@ -22,10 +22,9 @@ class WikipediaCog(commands.Cog):
         self.http_session = bot.http_session
 
     @staticmethod
-    def formatted_wiki_urls(index: int, titles: str) -> List[str]:
-        """Making formatted wikipedia links list."""
-        titles = f'`{index}` [{titles}]({WIKIPEDIA_URL.format(title=titles.replace(" ", "_"))})'
-        return titles
+    def formatted_wiki_url(index: int, titles: str) -> str:
+        """Making formatted wikipedia link.."""
+        return  f'`{index}` [{title}]({WIKIPEDIA_URL.format(title=title.replace(" ", "_"))})'
 
     async def search_wikipedia(self, search_term: str) -> Optional[List[str]]:
         """Search wikipedia and return the first page found."""
@@ -60,13 +59,13 @@ class WikipediaCog(commands.Cog):
             titles_no_underscore = [title.replace(" ", "_") for title in titles]  # wikipedia uses "_" as spaces
             log.info("Finished appending titles to titles_no_underscore list")
 
-            s_desc = "\n".join(self.formatted_wiki_urls(index, title)for index, title in enumerate(titles, start=1))
+            s_desc = "\n".join(self.formatted_wiki_url(index, title) for index, title in enumerate(titles, start=1))
             embed = Embed(colour=Color.blue(), title=f"Wikipedia results for `{search}`", description=s_desc)
             embed.timestamp = datetime.datetime.utcnow()
             await ctx.send(embed=embed)
         embed = Embed(colour=Color.green(), description="Enter number to choose")
         msg = await ctx.send(embed=embed)
-        titles_len = len(titles_no_underscore)  # getting length of list
+        titles_len = len(titles)  # getting length of list
 
         for retry_count in range(1, Wikipedia.total_chance + 1):
             retries_left = Wikipedia.total_chance - retry_count
@@ -77,15 +76,17 @@ class WikipediaCog(commands.Cog):
             try:
                 message = await ctx.bot.wait_for('message', timeout=60.0, check=check)
                 response_from_user = await self.bot.get_context(message)
+                
                 if response_from_user.command:
                     return
+                    
                 response = int(message.content)
                 if response < 0:
                     await ctx.send(f"Sorry, but you can't give negative index, {error_msg}")
                 elif response == 0:
                     await ctx.send(f"Sorry, please give an integer between `1` to `{titles_len}`, {error_msg}")
                 else:
-                    await ctx.send(WIKIPEDIA_URL.format(title=titles_no_underscore[response - 1]))
+                    await ctx.send(WIKIPEDIA_URL.format(title=titles[response - 1].replace(" ", "_")))
                     break
 
             except asyncio.TimeoutError:
