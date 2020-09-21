@@ -96,7 +96,7 @@ class WikipediaCog(commands.Cog):
                 break
 
             except ValueError:
-                await ctx.send(f"Sorry, but you cannot do that, I will only accept an integer, {error_msg}")
+                await ctx.send(f"Sorry, but you cannot do that, I will only accept an positive integer, {error_msg}")
 
             except IndexError:
                 await ctx.send(f"Sorry, please give an integer between `1` to `{titles_len}`, {error_msg}")
