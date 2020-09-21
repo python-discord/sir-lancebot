@@ -5,7 +5,7 @@ from typing import Callable, Tuple, Union
 
 from discord import Embed, Message
 from discord.ext import commands
-from discord.ext.commands import Bot, Cog, Context, MessageConverter
+from discord.ext.commands import Bot, Cog, Context, MessageConverter, clean_content
 
 from bot import utils
 from bot.constants import Emojis
@@ -46,7 +46,7 @@ class Fun(Cog):
         await ctx.send(output)
 
     @commands.command(name="uwu", aliases=("uwuwize", "uwuify",))
-    async def uwu_command(self, ctx: Context, *, text: str) -> None:
+    async def uwu_command(self, ctx: Context, *, text: clean_content(fix_channel_mentions=True)) -> None:
         """Converts a given `text` into it's uwu equivalent."""
         conversion_func = functools.partial(
             utils.replace_many, replacements=UWU_WORDS, ignore_case=True, match_case=True
