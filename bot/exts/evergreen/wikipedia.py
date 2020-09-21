@@ -26,11 +26,12 @@ class WikipediaCog(commands.Cog):
         """Making formatted wikipedia link.."""
         return f'`{index}` [{titles}]({WIKIPEDIA_URL.format(title=titles.replace(" ", "_"))})'
 
-    async def search_wikipedia(self, search_term: str) -> Optional[List[str]]:
-        """Search wikipedia and return the first page found."""
+    async def search_wikipedia(self, search_term: str) -> List[str]:
+        """Search wikipedia and return the first 10 pages found."""
         async with self.http_session.get(SEARCH_API.format(search_term=search_term)) as response:
             data = await response.json()
-        page = []
+
+        pages = []
 
         search_results = data["query"]["search"]
 
@@ -38,9 +39,10 @@ class WikipediaCog(commands.Cog):
         for search_result in search_results:
             log.info("trying to append titles")
             if "may refer to" not in search_result["snippet"]:
-                page.append(search_result["title"])
+                pages.append(search_result["title"])
+
         log.info("Finished appending titles")
-        return page
+        return pages
 
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(name="wikipedia", aliases=["wiki"])
