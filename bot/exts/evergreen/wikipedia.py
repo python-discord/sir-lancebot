@@ -23,7 +23,7 @@ class WikipediaCog(commands.Cog):
 
     @staticmethod
     def formatted_wiki_url(index: int, titles: str) -> str:
-        """Making formatted wikipedia link.."""
+        """Making formatted wikipedia link."""
         return f'`{index}` [{titles}]({WIKIPEDIA_URL.format(title=titles.replace(" ", "_"))})'
 
     async def search_wikipedia(self, search_term: str) -> List[str]:
