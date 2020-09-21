@@ -22,12 +22,12 @@ class WikipediaCog(commands.Cog):
         self.http_session = bot.http_session
 
     @staticmethod
-    def formatted_wiki_urls(index: int, titles: str) -> Optional[List[str]]:
+    def formatted_wiki_urls(index: int, titles: str) -> List[str]:
         """Making formatted wikipedia links list."""
         titles = f'`{index}` [{titles}]({WIKIPEDIA_URL.format(title=titles.replace(" ", "_"))})'
         return titles
 
-    async def search_wikipedia(self, search_term: str) -> List[str]:
+    async def search_wikipedia(self, search_term: str) -> Optional[List[str]]:
         """Search wikipedia and return the first page found."""
         async with self.http_session.get(SEARCH_API.format(search_term=search_term)) as response:
             data = await response.json()
