@@ -123,6 +123,11 @@ class Emojis:
     pull_request_closed = "<:PRClosed:629695470519713818>"
     merge = "<:PRMerged:629695470570176522>"
 
+    status_online = "<:status_online:470326272351010816>"
+    status_idle = "<:status_idle:470326266625785866>"
+    status_dnd = "<:status_dnd:470326272082313216>"
+    status_offline = "<:status_offline:470326266537705472>"
+
 
 class Hacktoberfest(NamedTuple):
     voice_id = 514420006474219521
