@@ -183,7 +183,7 @@ class Roles(NamedTuple):
     verified = 352427296948486144
     helpers = 267630620367257601
     rockstars = 458226413825294336
-    core_developers = 757650781385261197  # Change this value for local test servers.
+    core_developers = 587606783669829632
 
 
 class URLs:
