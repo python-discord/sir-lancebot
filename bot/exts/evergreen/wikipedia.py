@@ -26,7 +26,7 @@ class WikipediaCog(commands.Cog):
         """Making formatted wikipedia link."""
         return f'`{index}` [{titles}]({WIKIPEDIA_URL.format(title=titles.replace(" ", "_"))})'
 
-    async def search_wikipedia(self, search_term: str) -> List[str]:
+    async def search_wikipedia(self, search_term: str) -> Optional[List[str]]:
         """Search wikipedia and return the first 10 pages found."""
         async with self.http_session.get(SEARCH_API.format(search_term=search_term)) as response:
             data = await response.json()
@@ -60,7 +60,7 @@ class WikipediaCog(commands.Cog):
         async with ctx.typing():
             log.info("Finished appending titles to titles_no_underscore list")
 
-            s_desc = "\n".join(self.formatted_wiki_url(index, title) for index, title in enumerate(titles, start=1))
+            s_desc = "\n".join(self.formatted_wiki_url(index, titles) for index, title in enumerate(titles, start=1))
             embed = Embed(colour=Color.blue(), title=f"Wikipedia results for `{search}`", description=s_desc)
             embed.timestamp = datetime.datetime.utcnow()
             await ctx.send(embed=embed)
