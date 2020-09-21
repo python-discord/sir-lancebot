@@ -168,7 +168,7 @@ class Extensions(commands.Cog):
             lines.append(f"**{category}**\n{extensions}\n")
 
         log.debug(f"{ctx.author} requested a list of all cogs. Returning a paginated list.")
-        await LinePaginator.paginate(lines, ctx, embed, max_size=700, empty=False)
+        await LinePaginator.paginate(lines, ctx, embed, max_size=1200, empty=False)
 
     def group_extension_statuses(self) -> t.Mapping[str, str]:
         """Return a mapping of extension names and statuses to their categories."""
