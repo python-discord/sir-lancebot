@@ -22,7 +22,7 @@ class WikipediaCog(commands.Cog):
         self.http_session = bot.http_session
 
     @staticmethod
-    def formatted_wiki_urls(index: int, titles: str) -> List[str]:
+    def formatted_wiki_urls(index: int, titles: str) -> Optional[List[str]]:
         """Making formatted wikipedia links list."""
         titles = f'`{index}` [{titles}]({WIKIPEDIA_URL.format(title=titles.replace(" ", "_"))})'
         return titles
