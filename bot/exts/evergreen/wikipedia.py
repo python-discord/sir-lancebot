@@ -85,7 +85,7 @@ class WikipediaCog(commands.Cog):
                 elif response == 0:
                     await ctx.send(f"Sorry, please give an integer between `1` to `{titles_len}`, {error_msg}")
                 else:
-                    await ctx.send(WIKIPEDIA_URL.format(title=titles_no_underscore[response - 1]))
+                    await ctx.send(WIKIPEDIA_URL.format(title=titles[response - 1].replace(" ", "_")))
                     break
 
             except asyncio.TimeoutError:
