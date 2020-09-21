@@ -22,10 +22,9 @@ class WikipediaCog(commands.Cog):
         self.http_session = bot.http_session
 
     @staticmethod
-    def formatted_wiki_urls(index: int, titles: str) -> List[str]:
-        """Making formatted wikipedia links list."""
-        titles = f'`{index}` [{titles}]({WIKIPEDIA_URL.format(title=titles.replace(" ", "_"))})'
-        return titles
+    def formatted_wiki_url(index: int, titles: str) -> str:
+        """Making formatted wikipedia link.."""
+        return  f'`{index}` [{title}]({WIKIPEDIA_URL.format(title=title.replace(" ", "_"))})'
 
     async def search_wikipedia(self, search_term: str) -> List[str]:
         """Search wikipedia and return the first page found."""
