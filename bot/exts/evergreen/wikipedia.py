@@ -27,15 +27,13 @@ class WikipediaCog(commands.Cog):
         titles = f'`{index}` [{titles}]({WIKIPEDIA_URL.format(title=titles.replace(" ", "_"))})'
         return titles
 
-    async def search_wikipedia(self, search_term: str) -> Optional[List[str]]:
+    async def search_wikipedia(self, search_term: str) -> List[str]:
         """Search wikipedia and return the first page found."""
         async with self.http_session.get(SEARCH_API.format(search_term=search_term)) as response:
             data = await response.json()
         page = []
 
         search_results = data["query"]["search"]
-        if not search_results:
-            return None
 
         # Ignore pages with "may refer to"
         for search_result in search_results:
