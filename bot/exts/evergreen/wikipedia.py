@@ -1,7 +1,7 @@
 import asyncio
 import datetime
 import logging
-from typing import List
+from typing import List, Optional
 
 from aiohttp import client_exceptions
 from discord import Color, Embed, Message
@@ -27,7 +27,7 @@ class WikipediaCog(commands.Cog):
         """Formating wikipedia link with index and title."""
         return f'`{index}` [{title}]({WIKIPEDIA_URL.format(title=title.replace(" ", "_"))})'
 
-    async def search_wikipedia(self, search_term: str) -> List[str]:
+    async def search_wikipedia(self, search_term: str) -> Optional[List[str]]:
         """Search wikipedia and return the first 10 pages found."""
         pages = []
         async with self.http_session.get(SEARCH_API.format(search_term=search_term)) as response:
