@@ -24,7 +24,6 @@ __all__ = (
     "ERROR_REPLIES",
     "NEGATIVE_REPLIES",
     "POSITIVE_REPLIES",
-    "URLs"
 )
 
 log = logging.getLogger(__name__)
