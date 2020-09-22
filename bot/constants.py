@@ -262,3 +262,6 @@ POSITIVE_REPLIES = [
     "Aye aye, cap'n!",
     "I'll allow it.",
 ]
+
+class Wikipedia:
+    total_chance = 3

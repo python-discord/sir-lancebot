@@ -37,7 +37,7 @@ os.makedirs(log_dir, exist_ok=True)
 
 # File handler rotates logs every 5 MB
 file_handler = logging.handlers.RotatingFileHandler(
-    log_file, maxBytes=5*(2**20), backupCount=10)
+    log_file, maxBytes=5 * (2**20), backupCount=10)
 file_handler.setLevel(logging.TRACE if Client.debug else logging.DEBUG)
 
 # Console handler prints to terminal
