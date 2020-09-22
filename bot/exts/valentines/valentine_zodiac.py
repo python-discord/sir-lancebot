@@ -13,6 +13,9 @@ log = logging.getLogger(__name__)
 LETTER_EMOJI = ':love_letter:'
 HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_heart:", ":two_hearts:"]
 
+zodiac_signs = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra",
+                "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"]
+
 
 class ValentineZodiac(commands.Cog):
     """A Cog that returns a counter compatible zodiac sign to the given user's zodiac sign."""
