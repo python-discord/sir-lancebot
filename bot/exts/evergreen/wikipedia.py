@@ -1,8 +1,9 @@
 import asyncio
 import datetime
 import logging
-from typing import List
+from typing import List, Optional
 
+from aiohttp import client_exceptions
 from discord import Color, Embed, Message
 from discord.ext import commands
 
@@ -14,7 +15,7 @@ SEARCH_API = "https://en.wikipedia.org/w/api.php?action=query&list=search&srsear
 WIKIPEDIA_URL = "https://en.wikipedia.org/wiki/{title}"
 
 
-class WikipediaCog(commands.Cog):
+class WikipediaSearch(commands.Cog):
     """Get info from wikipedia."""
 
     def __init__(self, bot: commands.Bot):
@@ -26,20 +27,22 @@ class WikipediaCog(commands.Cog):
         """Formating wikipedia link with index and title."""
         return f'`{index}` [{title}]({WIKIPEDIA_URL.format(title=title.replace(" ", "_"))})'
 
-    async def search_wikipedia(self, search_term: str) -> List[str]:
+    async def search_wikipedia(self, search_term: str) -> Optional[List[str]]:
         """Search wikipedia and return the first 10 pages found."""
-        async with self.http_session.get(SEARCH_API.format(search_term=search_term)) as response:
-            data = await response.json()
-
         pages = []
+        async with self.http_session.get(SEARCH_API.format(search_term=search_term)) as response:
+            try:
+                data = await response.json()
 
-        search_results = data["query"]["search"]
+                search_results = data["query"]["search"]
 
-        # Ignore pages with "may refer to"
-        for search_result in search_results:
-            log.info("trying to append titles")
-            if "may refer to" not in search_result["snippet"]:
-                pages.append(search_result["title"])
+                # Ignore pages with "may refer to"
+                for search_result in search_results:
+                    log.info("trying to append titles")
+                    if "may refer to" not in search_result["snippet"]:
+                        pages.append(search_result["title"])
+            except client_exceptions.ContentTypeError:
+                pages = None
 
         log.info("Finished appending titles")
         return pages
@@ -108,4 +111,4 @@ class WikipediaCog(commands.Cog):
 
 def setup(bot: commands.Bot) -> None:
     """Wikipedia Cog load."""
-    bot.add_cog(WikipediaCog(bot))
+    bot.add_cog(WikipediaSearch(bot))
