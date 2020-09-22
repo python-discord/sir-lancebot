@@ -15,7 +15,7 @@ SEARCH_API = "https://en.wikipedia.org/w/api.php?action=query&list=search&srsear
 WIKIPEDIA_URL = "https://en.wikipedia.org/wiki/{title}"
 
 
-class WikipediaCog(commands.Cog):
+class Wikipedia(commands.Cog):
     """Get info from wikipedia."""
 
     def __init__(self, bot: commands.Bot):
@@ -111,4 +111,4 @@ class WikipediaCog(commands.Cog):
 
 def setup(bot: commands.Bot) -> None:
     """Wikipedia Cog load."""
-    bot.add_cog(WikipediaCog(bot))
+    bot.add_cog(Wikipedia(bot))
