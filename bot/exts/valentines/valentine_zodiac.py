@@ -1,5 +1,6 @@
 import logging
 import random
+from datetime import datetime
 from json import load
 from pathlib import Path
 
@@ -20,6 +21,8 @@ zodiac_signs = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra",
 with open(Path("bot/resources/valentines/zodiac_explanation.json"), "r", encoding="utf8") as file:
     """Load zodiac zodiac explanation from static JSON resource."""
     zodiac_fact = load(file)
+year = datetime.now().year
+zodiac_date = {"Aries": (datetime(year, 1, 20), datetime(year, 2, 18))}
 
 
 class ValentineZodiac(commands.Cog):
@@ -57,96 +60,11 @@ class ValentineZodiac(commands.Cog):
         return embed
         log.info("Zodiac embed ready")
 
-    def zodiac_date_verifer(self, month: str, date: int) -> str:
+    def zodiac_date_verifer(self, query_datetime: datetime) -> str:
         """Returns zodiac sign by checking month and date."""
-        month = month.capitalize()
-        log.info("started searching zodaic sign based on month and date")
-        if month == "January" or month == "Jan":
-            if date >= 1 and date <= 19:
-                zodiac = "Capricorn"
-            elif date >= 20 and date <= 31:
-                zodiac = "Aquarius"
-            else:
-                zodiac = None
-        elif month == "Feburary" or month == "Feb":
-            if date >= 1 and date <= 18:
-                zodiac = "Aquarius"
-            elif date >= 19 and date <= 29:
-                zodiac = "Pisces"
-            else:
-                zodiac = None
-        elif month == "March" or month == "Mar":
-            if date >= 1 and date <= 20:
-                zodiac = "Pisces"
-            elif date >= 21 and date <= 31:
-                zodiac = "Aries"
-            else:
-                zodiac = None
-        elif month == "April" or month == "Apr":
-            if date >= 1 and date <= 19:
-                zodiac = "Aries"
-            elif date >= 20 and date <= 30:
-                zodiac = "Taurus"
-            else:
-                zodiac = None
-        elif month == "May":
-            if date >= 1 and date <= 20:
-                zodiac = "Taurus"
-            elif date >= 21 and date <= 31:
-                zodiac = "Gemini"
-            else:
-                zodiac = None
-        elif month == "June" or month == "Jun":
-            if date >= 1 and date <= 20:
-                zodiac = "Gemini"
-            elif date >= 21 and date <= 30:
-                zodiac = "Cancer"
-            else:
-                zodiac = None
-        elif month == "July" or month == "Jul":
-            if date >= 1 and date <= 22:
-                zodiac = "Cancer"
-            elif date >= 23 and date <= 31:
-                zodiac = "Leo"
-            else:
-                zodiac = None
-        elif month == "August" or month == "Aug":
-            if date >= 1 and date <= 22:
-                zodiac = "Leo"
-            elif date >= 23 and date <= 31:
-                zodiac = "Virgo"
-            else:
-                zodiac = None
-        elif month == "September" or month == "Sept":
-            if date >= 1 and date <= 22:
-                zodiac = "Virgo"
-            elif date >= 23 and date <= 30:
-                zodiac = "Libra"
-            else:
-                zodiac = None
-        elif month == "October" or month == "Oct":
-            if date >= 1 and date <= 22:
-                zodiac = "Libra"
-            elif date >= 23 and date <= 31:
-                zodiac = "Scorpio"
-            else:
-                zodiac = None
-        elif month == "November" or month == "Nov":
-            if date >= 1 and date <= 21:
-                zodiac = "Scorpio"
-            elif date >= 22 and date <= 30:
-                zodiac = "Sagittarius"
-            else:
-                zodiac = None
-        elif month == "December" or month == "Dec":
-            if date >= 1 and date <= 21:
-                zodiac = "Sagittarius"
-            elif date >= 22 and date <= 31:
-                zodiac = "Capricorn"
-            else:
-                zodiac = None
-        else:
-            zodiac = None
+        for zodiac_name, date_range in zodiac_date.items():
+            if (date_range[0] <= query_datetime <= date_range[1]):
+                zodiac = zodiac_name
             log.info("Wrong Zodiac date or month provided")
         return zodiac
         log.info("Zodiac name sent")
@@ -181,9 +99,9 @@ class ValentineZodiac(commands.Cog):
         await ctx.send(embed=final_embed)
 
     @partner_zodiac.command(name="date")
-    async def date_and_month(self, ctx: commands.Context, month: str, date: int) -> None:
+    async def date_and_month(self, ctx: commands.Context, month: int, date: int) -> None:
         """Provides information about zodiac sign by taking month and date as input."""
-        zodiac_sign_based_on_month_and_date = self.zodiac_date_verifer(month, date)
+        zodiac_sign_based_on_month_and_date = self.zodiac_date_verifer(datetime(year, month, date))
         log.info("zodiac sign based on month and date received")
         if zodiac_sign_based_on_month_and_date is None:
             log.info("zodiac sign based on month and date returned None")
