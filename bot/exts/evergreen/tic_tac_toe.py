@@ -44,7 +44,7 @@ class Player:
         else:
             return False, list(Emojis.number_emojis.keys())[list(Emojis.number_emojis.values()).index(react.emoji)]
 
-    async def display(self) -> str:
+    def __str__(self) -> str:
         """Return mention of user."""
         return self.user.mention
 
@@ -94,7 +94,7 @@ class AI:
         open_edges = [i for i in possible_moves if i in (2, 4, 6, 8)]
         return False, random.choice(open_edges)
 
-    def display(self) -> str:
+    def __str__(self) -> str:
         """Return `AI` as user name."""
         return "AI"
 
@@ -237,7 +237,7 @@ class Game:
                 self.winner = self.current
                 self.loser = self.next
                 await self.ctx.send(
-                    f":tada: {self.current.display()} is won this game! :tada:"
+                    f":tada: {self.current} is won this game! :tada:"
                 )
                 await board.clear_reactions()
                 break
@@ -316,11 +316,11 @@ class TicTacToe(Cog):
             if game.over and not game.canceled:
                 if game.draw:
                     log_games.append(
-                        f"**#{i+1}**: {game.players[0].display()} vs {game.players[1].display()} (draw)"
+                        f"**#{i+1}**: {game.players[0]} vs {game.players[1]} (draw)"
                     )
                 else:
                     log_games.append(
-                        f"**#{i+1}**: {game.winner.display()} :trophy: vs {game.loser.display()}"
+                        f"**#{i+1}**: {game.winner} :trophy: vs {game.loser}"
                     )
         await LinePaginator.paginate(
             log_games,
@@ -336,7 +336,7 @@ class TicTacToe(Cog):
             return
         game = self.games[game_id - 1]
         await ctx.send(
-            f"{game.winner.display()} :trophy: vs {game.loser.display()}"
+            f"{game.winner} :trophy: vs {game.loser}"
         )
         await game.send_board(ctx.channel)
 
