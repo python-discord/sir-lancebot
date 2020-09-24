@@ -71,7 +71,32 @@ class ValentineZodiac(commands.Cog):
         log.info("Zodiac name sent")
         return zodiac
 
-    @commands.group(name="partnerzodiac", invoke_without_command=True)
+    @commands.group(name='zodiac', invoke_without_command=True)
+    async def zodiac(self, ctx: commands.Context, zodiac_sign: str) -> None:
+        """Provides information about zodiac sign by taking zodiac sign name as input."""
+        final_embed = self.zodiac_sign_verify(zodiac_sign)
+        log.info("Embed successfully sent")
+        await ctx.send(embed=final_embed)
+
+    @zodiac.command(name="date")
+    async def date_and_month(self, ctx: commands.Context, month: int, date: int) -> None:
+        """Provides information about zodiac sign by taking month and date as input."""
+        try:
+            zodiac_sign_based_on_month_and_date = self.zodiac_date_verifer(datetime(2020, month, date))
+            log.info("zodiac sign based on month and date received")
+        except ValueError as e:
+            await ctx.send(f'You cannot do that, {e}')
+        if zodiac_sign_based_on_month_and_date is None:
+            log.info("zodiac sign based on month and date returned None")
+            final_embed = discord.Embed()
+            final_embed.color = Colours.pink
+            final_embed.description = "You provided wrong date or month so i aren't able to find any zodiac sign"
+        else:
+            final_embed = self.zodiac_sign_verify(zodiac_sign_based_on_month_and_date)
+            log.info("zodiac sign embed based on month and date is now sent")
+        await ctx.send(embed=final_embed)
+
+    @zodiac.command(name="partnerzodiac")
     async def partner_zodiac(self, ctx: commands.Context, zodiac_sign: str) -> None:
         """Provides a counter compatible zodiac sign to the given user's zodiac sign."""
         try:
@@ -93,31 +118,6 @@ class ValentineZodiac(commands.Cog):
             value=compatible_zodiac['description']
         )
         await ctx.send(embed=embed)
-
-    @partner_zodiac.command(name='zodiac')
-    async def zodiac(self, ctx: commands.Context, zodiac_sign: str) -> None:
-        """Provides information about zodiac sign by taking zodiac sign name as input."""
-        final_embed = self.zodiac_sign_verify(zodiac_sign)
-        log.info("Embed successfully sent")
-        await ctx.send(embed=final_embed)
-
-    @partner_zodiac.command(name="date")
-    async def date_and_month(self, ctx: commands.Context, month: int, date: int) -> None:
-        """Provides information about zodiac sign by taking month and date as input."""
-        try:
-            zodiac_sign_based_on_month_and_date = self.zodiac_date_verifer(datetime(2020, month, date))
-            log.info("zodiac sign based on month and date received")
-        except ValueError as e:
-            await ctx.send(f'You cannot do that, {e}')
-        if zodiac_sign_based_on_month_and_date is None:
-            log.info("zodiac sign based on month and date returned None")
-            final_embed = discord.Embed()
-            final_embed.color = Colours.pink
-            final_embed.description = "You provided wrong date or month so i aren't able to find any zodiac sign"
-        else:
-            final_embed = self.zodiac_sign_verify(zodiac_sign_based_on_month_and_date)
-            log.info("zodiac sign embed based on month and date is now sent")
-        await ctx.send(embed=final_embed)
 
 
 def setup(bot: commands.Bot) -> None:
