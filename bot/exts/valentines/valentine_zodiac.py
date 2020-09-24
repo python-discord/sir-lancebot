@@ -67,9 +67,9 @@ class ValentineZodiac(commands.Cog):
                 break
             else:
                 zodiac = None
-        log.info("Wrong Zodiac date or month provided")
-        return zodiac
+                log.info("Wrong Zodiac date or month provided")
         log.info("Zodiac name sent")
+        return zodiac
 
     @commands.group(name="partnerzodiac", invoke_without_command=True)
     async def partner_zodiac(self, ctx: commands.Context, zodiac_sign: str) -> None:
