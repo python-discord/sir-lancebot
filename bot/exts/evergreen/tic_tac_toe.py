@@ -15,6 +15,25 @@ CONFIRMATION_MESSAGE = (
 )
 
 
+def check_win(board: t.Dict[int, str]) -> bool:
+    """Check from board, is any player won game."""
+    if (
+            # Horizontal
+            board[1] == board[2] == board[3]
+            or board[4] == board[5] == board[6]
+            or board[7] == board[8] == board[9]
+            # Vertical
+            or board[1] == board[4] == board[7]
+            or board[2] == board[5] == board[8]
+            or board[3] == board[6] == board[9]
+            # Diagonal
+            or board[1] == board[5] == board[9]
+            or board[3] == board[5] == board[7]
+    ):
+        return True
+    return False
+
+
 class Player:
     """Class that contains information about player and functions that interact with player."""
 
@@ -55,24 +74,6 @@ class AI:
     def __init__(self, symbol: str):
         self.symbol = symbol
 
-    async def check_win(self, board: t.Dict[int, str]) -> bool:
-        """Check does this move will result game end."""
-        if (
-            # Horizontal
-            board[1] == board[2] == board[3]
-            or board[4] == board[5] == board[6]
-            or board[7] == board[8] == board[9]
-            # Vertical
-            or board[1] == board[4] == board[7]
-            or board[2] == board[5] == board[8]
-            or board[3] == board[6] == board[9]
-            # Diagonal
-            or board[1] == board[5] == board[9]
-            or board[3] == board[5] == board[7]
-        ):
-            return True
-        return False
-
     async def get_move(self, board: t.Dict[int, str], _: discord.Message) -> t.Tuple[bool, int]:
         """Get move from AI. AI use Minimax strategy."""
         possible_moves = [i for i, emoji in board.items() if emoji in list(Emojis.number_emojis.values())]
@@ -81,7 +82,7 @@ class AI:
             for move in possible_moves:
                 board_copy = board.copy()
                 board_copy[move] = symbol
-                if await self.check_win(board_copy):
+                if check_win(board_copy):
                     return False, move
 
         open_corners = [i for i in possible_moves if i in (1, 3, 7, 9)]
@@ -144,6 +145,9 @@ class Game:
         await confirm_message.add_reaction(Emojis.decline)
 
         def confirm_check(reaction: discord.Reaction, user: discord.User) -> bool:
+            """
+            Check is user who reacted user from who this was requested, message is confirm message and emoji is valid.
+            """
             return (
                 reaction.emoji in (Emojis.confirmation, Emojis.decline)
                 and reaction.message.id == confirm_message.id
@@ -182,24 +186,6 @@ class Game:
             (f"{board[line]} {board[line + 1]} {board[line + 2]}" for line in range(0, len(board), 3))
         )
 
-    async def check_for_win(self) -> bool:
-        """Check from board, is any player won game."""
-        if (
-            # Horizontal
-            self.board[1] == self.board[2] == self.board[3]
-            or self.board[4] == self.board[5] == self.board[6]
-            or self.board[7] == self.board[8] == self.board[9]
-            # Vertical
-            or self.board[1] == self.board[4] == self.board[7]
-            or self.board[2] == self.board[5] == self.board[8]
-            or self.board[3] == self.board[6] == self.board[9]
-            # Diagonal
-            or self.board[1] == self.board[5] == self.board[9]
-            or self.board[3] == self.board[5] == self.board[7]
-        ):
-            return True
-        return False
-
     async def play(self) -> None:
         """Start and handle game."""
         await self.ctx.send("It's time for game! Let's begin.")
@@ -220,7 +206,7 @@ class Game:
             self.board[pos] = self.current.symbol
             await board.edit(content=self.format_board())
             await board.clear_reaction(Emojis.number_emojis[pos])
-            if await self.check_for_win():
+            if check_win(self.board):
                 self.winner = self.current
                 self.loser = self.next
                 await self.ctx.send(
