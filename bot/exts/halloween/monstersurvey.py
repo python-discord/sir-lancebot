@@ -27,13 +27,13 @@ class MonsterSurvey(Cog):
         """Initializes values for the bot to use within the voting commands."""
         self.bot = bot
         self.registry_location = os.path.join(os.getcwd(), 'bot', 'resources', 'halloween', 'monstersurvey.json')
-        with open(self.registry_location, 'r') as jason:
+        with open(self.registry_location, 'r', encoding="utf8") as jason:
             self.voter_registry = json.load(jason)
 
     def json_write(self) -> None:
         """Write voting results to a local JSON file."""
         log.info("Saved Monster Survey Results")
-        with open(self.registry_location, 'w') as jason:
+        with open(self.registry_location, 'w', encoding="utf8") as jason:
             json.dump(self.voter_registry, jason, indent=2)
 
     def cast_vote(self, id: int, monster: str) -> None:

@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import logging.handlers
 import os
@@ -36,7 +37,7 @@ os.makedirs(log_dir, exist_ok=True)
 
 # File handler rotates logs every 5 MB
 file_handler = logging.handlers.RotatingFileHandler(
-    log_file, maxBytes=5*(2**20), backupCount=10)
+    log_file, maxBytes=5 * (2**20), backupCount=10)
 file_handler.setLevel(logging.TRACE if Client.debug else logging.DEBUG)
 
 # Console handler prints to terminal
@@ -63,3 +64,8 @@ logging.basicConfig(
     handlers=[console_handler, file_handler]
 )
 logging.getLogger().info('Logging initialization complete')
+
+
+# On Windows, the selector event loop is required for aiodns.
+if os.name == "nt":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())

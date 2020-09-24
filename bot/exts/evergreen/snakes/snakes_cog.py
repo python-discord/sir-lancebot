@@ -567,7 +567,7 @@ class Snakes(Cog):
             antidote_embed = Embed(color=SNAKE_COLOR, title="Antidote")
             antidote_embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
             antidote_embed.set_image(url="https://i.makeagif.com/media/7-12-2015/Cj1pts.gif")
-            antidote_embed.add_field(name=f"You have created the snake antidote!",
+            antidote_embed.add_field(name="You have created the snake antidote!",
                                      value=f"The solution was: {' '.join(antidote_answer)}\n"
                                            f"You had {10 - antidote_tries} tries remaining.")
             await board_id.edit(embed=antidote_embed)
@@ -945,13 +945,15 @@ class Snakes(Cog):
             title="About the snake cog",
             description=(
                 "The features in this cog were created by members of the community "
-                "during our first ever [code jam event](https://gitlab.com/discord-python/code-jams/code-jam-1). \n\n"
+                "during our first ever "
+                "[code jam event](https://pythondiscord.com/pages/code-jams/code-jam-1-snakes-bot/). \n\n"
                 "The event saw over 50 participants, who competed to write a discord bot cog with a snake theme over "
                 "48 hours. The staff then selected the best features from all the best teams, and made modifications "
                 "to ensure they would all work together before integrating them into the community bot.\n\n"
                 "It was a tight race, but in the end, <@!104749643715387392> and <@!303940835005825024> "
-                "walked away as grand champions. Make sure you check out `!snakes sal`, `!snakes draw` "
-                "and `!snakes hatch` to see what they came up with."
+                f"walked away as grand champions. Make sure you check out `{ctx.prefix}snakes sal`,"
+                f"`{ctx.prefix}snakes draw` and `{ctx.prefix}snakes hatch` "
+                "to see what they came up with."
             )
         )
 
@@ -1076,7 +1078,7 @@ class Snakes(Cog):
             query = snake['name']
 
         # Build the URL and make the request
-        url = f'https://www.googleapis.com/youtube/v3/search'
+        url = 'https://www.googleapis.com/youtube/v3/search'
         response = await self.bot.http_session.get(
             url,
             params={

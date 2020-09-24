@@ -58,7 +58,7 @@ async def countdown_status(bot: commands.Bot) -> None:
         hours, minutes = aligned_seconds // 3600, aligned_seconds // 60 % 60
 
         if aligned_seconds == 0:
-            playing = f"right now!"
+            playing = "right now!"
         elif aligned_seconds == COUNTDOWN_STEP:
             playing = f"in less than {minutes} minutes"
         elif hours == 0:
@@ -429,7 +429,7 @@ class AdventOfCode(commands.Cog):
 
     def _build_about_embed(self) -> discord.Embed:
         """Build and return the informational "About AoC" embed from the resources file."""
-        with self.about_aoc_filepath.open("r") as f:
+        with self.about_aoc_filepath.open("r", encoding="utf8") as f:
             embed_fields = json.load(f)
 
         about_embed = discord.Embed(title=self._base_url, colour=Colours.soft_green, url=self._base_url)

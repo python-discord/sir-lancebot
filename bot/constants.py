@@ -17,6 +17,7 @@ __all__ = (
     "Month",
     "Roles",
     "Tokens",
+    "Wolfram",
     "MODERATION_ROLES",
     "STAFF_ROLES",
     "WHITELISTED_CHANNELS",
@@ -50,6 +51,8 @@ class Channels(NamedTuple):
     checkpoint_test = 422077681434099723
     devalerts = 460181980097675264
     devlog = int(environ.get("CHANNEL_DEVLOG", 622895325144940554))
+    dev_contrib = 635950537262759947
+    dev_branding = 753252897059373066
     help_0 = 303906576991780866
     help_1 = 303906556754395136
     help_2 = 303906514266226689
@@ -91,10 +94,11 @@ class Colours:
     dark_green = 0x1f8b4c
     orange = 0xe67e22
     pink = 0xcf84e0
+    purple = 0xb734eb
     soft_green = 0x68c290
+    soft_orange = 0xf9cb54
     soft_red = 0xcd6d6d
     yellow = 0xf9f586
-    purple = 0xb734eb
 
 
 class Emojis:
@@ -105,12 +109,12 @@ class Emojis:
     trashcan = "<:trashcan:637136429717389331>"
     ok_hand = ":ok_hand:"
 
-    terning1 = "<:terning1:431249668983488527>"
-    terning2 = "<:terning2:462339216987127808>"
-    terning3 = "<:terning3:431249694467948544>"
-    terning4 = "<:terning4:579980271475228682>"
-    terning5 = "<:terning5:431249716328792064>"
-    terning6 = "<:terning6:431249726705369098>"
+    dice_1 = "<:dice_1:755891608859443290>"
+    dice_2 = "<:dice_2:755891608741740635>"
+    dice_3 = "<:dice_3:755891608251138158>"
+    dice_4 = "<:dice_4:755891607882039327>"
+    dice_5 = "<:dice_5:755891608091885627>"
+    dice_6 = "<:dice_6:755891607680843838>"
 
     issue = "<:IssueOpen:629695470327037963>"
     issue_closed = "<:IssueClosed:629695470570307614>"
@@ -203,6 +207,12 @@ class Tokens(NamedTuple):
     github = environ.get("GITHUB_TOKEN")
 
 
+class Wolfram(NamedTuple):
+    user_limit_day = int(environ.get("WOLFRAM_USER_LIMIT_DAY", 10))
+    guild_limit_day = int(environ.get("WOLFRAM_GUILD_LIMIT_DAY", 67))
+    key = environ.get("WOLFRAM_API_KEY")
+
+
 # Default role combinations
 MODERATION_ROLES = Roles.moderator, Roles.admin, Roles.owner
 STAFF_ROLES = Roles.helpers, Roles.moderator, Roles.admin, Roles.owner
@@ -269,3 +279,6 @@ POSITIVE_REPLIES = [
     "Aye aye, cap'n!",
     "I'll allow it.",
 ]
+
+class Wikipedia:
+    total_chance = 3

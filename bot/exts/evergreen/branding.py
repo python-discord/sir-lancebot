@@ -171,7 +171,7 @@ class BrandingManager(commands.Cog):
 
     def _read_config(self) -> t.Dict[str, bool]:
         """Read and return persistent config file."""
-        with self.config_file.open("r") as persistent_file:
+        with self.config_file.open("r", encoding="utf8") as persistent_file:
             return json.load(persistent_file)
 
     def _write_config(self, key: str, value: bool) -> None:
@@ -179,7 +179,7 @@ class BrandingManager(commands.Cog):
         current_config = self._read_config()
         current_config[key] = value
 
-        with self.config_file.open("w") as persistent_file:
+        with self.config_file.open("w", encoding="utf8") as persistent_file:
             json.dump(current_config, persistent_file)
 
     async def _daemon_func(self) -> None:
@@ -198,7 +198,7 @@ class BrandingManager(commands.Cog):
         All method calls in the internal loop are considered safe, i.e. no errors propagate
         to the daemon's loop. The daemon itself does not perform any error handling on its own.
         """
-        await self.bot.wait_until_ready()
+        await self.bot.wait_until_guild_available()
 
         while True:
             self.current_season = get_current_season()

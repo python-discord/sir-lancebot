@@ -12,10 +12,10 @@ from discord.ext import commands
 
 log = logging.getLogger(__name__)
 
-with open(Path("bot/resources/evergreen/html_colours.json")) as f:
+with open(Path("bot/resources/evergreen/html_colours.json"), encoding="utf8") as f:
     HTML_COLOURS = json.load(f)
 
-with open(Path("bot/resources/evergreen/xkcd_colours.json")) as f:
+with open(Path("bot/resources/evergreen/xkcd_colours.json"), encoding="utf8") as f:
     XKCD_COLOURS = json.load(f)
 
 COLOURS = [

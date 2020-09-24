@@ -10,7 +10,7 @@ from aiohttp import AsyncResolver, ClientSession, TCPConnector
 from discord import DiscordException, Embed, Guild, User
 from discord.ext import commands
 
-from bot.constants import Channels, Client
+from bot.constants import Channels, Client, MODERATION_ROLES
 from bot.utils.decorators import mock_in_debug
 
 log = logging.getLogger(__name__)
@@ -44,6 +44,8 @@ class SeasonalBot(commands.Bot):
         self.http_session = ClientSession(
             connector=TCPConnector(resolver=AsyncResolver(), family=socket.AF_INET)
         )
+        self._guild_available = asyncio.Event()
+
         self.loop.create_task(self.send_log("SeasonalBot", "Connected!"))
 
     @property
@@ -101,7 +103,7 @@ class SeasonalBot(commands.Bot):
             return False
 
         else:
-            log.info(f"Asset successfully applied")
+            log.info("Asset successfully applied")
             return True
 
     @mock_in_debug(return_value=True)
@@ -149,7 +151,7 @@ class SeasonalBot(commands.Bot):
 
     async def send_log(self, title: str, details: str = None, *, icon: str = None) -> None:
         """Send an embed message to the devlog channel."""
-        await self.wait_until_ready()
+        await self.wait_until_guild_available()
         devlog = self.get_channel(Channels.devlog)
 
         if not devlog:
@@ -168,5 +170,42 @@ class SeasonalBot(commands.Bot):
 
         await devlog.send(embed=embed)
 
+    async def on_guild_available(self, guild: discord.Guild) -> None:
+        """
+        Set the internal `_guild_available` event when PyDis guild becomes available.
 
-bot = SeasonalBot(command_prefix=Client.prefix)
+        If the cache appears to still be empty (no members, no channels, or no roles), the event
+        will not be set.
+        """
+        if guild.id != Client.guild:
+            return
+
+        if not guild.roles or not guild.members or not guild.channels:
+            log.warning("Guild available event was dispatched but the cache appears to still be empty!")
+            return
+
+        self._guild_available.set()
+
+    async def on_guild_unavailable(self, guild: discord.Guild) -> None:
+        """Clear the internal `_guild_available` event when PyDis guild becomes unavailable."""
+        if guild.id != Client.guild:
+            return
+
+        self._guild_available.clear()
+
+    async def wait_until_guild_available(self) -> None:
+        """
+        Wait until the PyDis guild becomes available (and the cache is ready).
+
+        The on_ready event is inadequate because it only waits 2 seconds for a GUILD_CREATE
+        gateway event before giving up and thus not populating the cache for unavailable guilds.
+        """
+        await self._guild_available.wait()
+
+
+_allowed_roles = [discord.Object(id_) for id_ in MODERATION_ROLES]
+bot = SeasonalBot(
+    command_prefix=Client.prefix,
+    activity=discord.Game(name=f"Commands: {Client.prefix}help"),
+    allowed_mentions=discord.AllowedMentions(everyone=False, roles=_allowed_roles),
+)

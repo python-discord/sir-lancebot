@@ -25,13 +25,16 @@ def make_persistent(file_path: Path) -> Path:
     as otherwise only one datafile can be persistent and will be returned for
     both cases.
 
+    Ensure that all open files are using explicit appropriate encoding to avoid
+    encoding errors from diffent OS systems.
+
     Example Usage:
     >>> import json
     >>> template_datafile = Path("bot", "resources", "evergreen", "myfile.json")
     >>> path_to_persistent_file = make_persistent(template_datafile)
     >>> print(path_to_persistent_file)
     data/evergreen/myfile.json
-    >>> with path_to_persistent_file.open("w+") as f:
+    >>> with path_to_persistent_file.open("w+", encoding="utf8") as f:
     >>>     data = json.load(f)
     """
     # ensure the persistent data directory exists
