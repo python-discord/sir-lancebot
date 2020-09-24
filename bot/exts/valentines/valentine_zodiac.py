@@ -38,19 +38,19 @@ class ValentineZodiac(commands.Cog):
 
     def zodiac_sign_verify(self, zodiac: str) -> discord.Embed:
         """Gives informative zodiac embed."""
-        c_zodiac = zodiac.capitalize()
+        zodiac = zodiac.capitalize()
         zodiac_fact = self.zodiac_fact
         embed = discord.Embed()
         embed.color = Colours.pink
-        if c_zodiac in ZODIAC_SIGNS:
+        if zodiac in ZODIAC_SIGNS:
             log.info("Making zodiac embed")
-            embed.title = f"__{c_zodiac}__"
-            embed.description = zodiac_fact[f"{c_zodiac}"]["About"]
-            embed.add_field(name='__Full form__', value=zodiac_fact[f"{c_zodiac}"]["full_form"], inline=False)
-            embed.add_field(name='__Motto__', value=zodiac_fact[f"{c_zodiac}"]["Motto"], inline=False)
-            embed.add_field(name='__Strengths__', value=zodiac_fact[f"{c_zodiac}"]["Strengths"], inline=False)
-            embed.add_field(name='__Weaknesses__', value=zodiac_fact[f"{c_zodiac}"]["Weaknesses"], inline=False)
-            embed.set_thumbnail(url=zodiac_fact[f"{c_zodiac}"]["url"])
+            embed.title = f"__{zodiac}__"
+            embed.description = zodiac_fact[f"{zodiac}"]["About"]
+            embed.add_field(name='__Full form__', value=zodiac_fact[f"{zodiac}"]["full_form"], inline=False)
+            embed.add_field(name='__Motto__', value=zodiac_fact[f"{zodiac}"]["Motto"], inline=False)
+            embed.add_field(name='__Strengths__', value=zodiac_fact[f"{zodiac}"]["Strengths"], inline=False)
+            embed.add_field(name='__Weaknesses__', value=zodiac_fact[f"{zodiac}"]["Weaknesses"], inline=False)
+            embed.set_thumbnail(url=zodiac_fact[f"{zodiac}"]["url"])
         else:
             embed.description = "Umm you gave wrong zodiac name so i aren't able to find any :sweat_smile:"
             log.info("Wrong Zodiac name provided")
@@ -77,7 +77,8 @@ class ValentineZodiac(commands.Cog):
         try:
             compatible_zodiac = random.choice(self.zodiacs[zodiac_sign.lower()])
         except KeyError:
-            return await ctx.send(f"`{zodiac_sign.capitalize()}` zodiac sign does not exist.")
+            await ctx.send(f"`{zodiac_sign.capitalize()}` zodiac sign does not exist.")
+            return
 
         emoji1 = random.choice(HEART_EMOJIS)
         emoji2 = random.choice(HEART_EMOJIS)
