@@ -169,31 +169,12 @@ class Game:
         for nr in Emojis.number_emojis.values():
             await msg.add_reaction(nr)
 
-    async def send_board(self, channel: t.Optional[discord.TextChannel] = None) -> discord.Message:
-        """Send board and return it's message."""
-        msg = ""
-        c = 0
-        for line in self.board.values():
-            msg += f"{line} "
-            c += 1
-            if c == 3:
-                msg += "\n"
-                c = 0
-        if channel:
-            return await channel.send(msg)
-        return await self.ctx.send(msg)
-
-    async def edit_board(self, message: discord.Message) -> None:
-        """Edit Tic Tac Toe game board in message."""
-        msg = ""
-        c = 0
-        for line in self.board.values():
-            msg += f"{line} "
-            c += 1
-            if c == 3:
-                msg += "\n"
-                c = 0
-        await message.edit(content=msg)
+    def format_board(self) -> str:
+        """Get formatted tic-tac-toe board for message."""
+        board = list(self.board.values())
+        return "\n".join(
+            (f"{board[line]} {board[line + 1]} {board[line + 2]}" for line in range(0, len(board), 3))
+        )
 
     async def check_for_win(self) -> bool:
         """Check from board, is any player won game."""
@@ -216,7 +197,7 @@ class Game:
     async def play(self) -> None:
         """Start and handle game."""
         await self.ctx.send("It's time for game! Let's begin.")
-        board = await self.send_board()
+        board = await self.ctx.send(self.format_board())
         await self.add_reactions(board)
 
         for _ in range(9):
@@ -231,7 +212,7 @@ class Game:
                 self.canceled = True
                 return
             self.board[pos] = self.current.symbol
-            await self.edit_board(board)
+            await board.edit(content=self.format_board())
             await board.clear_reaction(Emojis.number_emojis[pos])
             if await self.check_for_win():
                 self.winner = self.current
@@ -338,7 +319,7 @@ class TicTacToe(Cog):
         await ctx.send(
             f"{game.winner} :trophy: vs {game.loser}"
         )
-        await game.send_board(ctx.channel)
+        await ctx.send(game.format_board())
 
 
 def setup(bot: SeasonalBot) -> None:
