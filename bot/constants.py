@@ -84,6 +84,7 @@ class Client(NamedTuple):
     token = environ.get("SEASONALBOT_TOKEN")
     sentry_dsn = environ.get("SEASONALBOT_SENTRY_DSN")
     debug = environ.get("SEASONALBOT_DEBUG", "").lower() == "true"
+    github_bot_repo = "https://github.com/python-discord/seasonalbot"
     # Override seasonal locks: 1 (January) to 12 (December)
     month_override = int(environ["MONTH_OVERRIDE"]) if "MONTH_OVERRIDE" in environ else None
 
@@ -121,6 +122,11 @@ class Emojis:
     pull_request = "<:PROpen:629695470175780875>"
     pull_request_closed = "<:PRClosed:629695470519713818>"
     merge = "<:PRMerged:629695470570176522>"
+
+    status_online = "<:status_online:470326272351010816>"
+    status_idle = "<:status_idle:470326266625785866>"
+    status_dnd = "<:status_dnd:470326272082313216>"
+    status_offline = "<:status_offline:470326266537705472>"
 
 
 class Hacktoberfest(NamedTuple):
@@ -177,6 +183,7 @@ class Roles(NamedTuple):
     verified = 352427296948486144
     helpers = 267630620367257601
     rockstars = 458226413825294336
+    core_developers = 587606783669829632
 
 
 class Tokens(NamedTuple):
