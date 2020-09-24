@@ -3,6 +3,7 @@ import random
 from datetime import datetime
 from json import load
 from pathlib import Path
+from typing import Union
 
 import discord
 from discord.ext import commands
@@ -16,6 +17,12 @@ HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_hea
 
 ZODIAC_SIGNS = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra",
                 "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"]
+
+MONTH_NAME = {"January": 1, "Jan": 1, "Feburary": 2, "Feb": 2, "March": 3, "Mar": 3,
+              "April": 4, "Apr": 4, "May": 5, "June": 6, "Jun": 6, "July": 7, "Jul": 7,
+              "August": 8, "Aug": 8, "September": 9, "Sept": 9, "October": 10, "Oct": 10,
+              "November": 11, "Nove": 11, "December": 12, "December": 12
+              }
 
 
 class ValentineZodiac(commands.Cog):
@@ -79,8 +86,15 @@ class ValentineZodiac(commands.Cog):
         await ctx.send(embed=final_embed)
 
     @zodiac.command(name="date")
-    async def date_and_month(self, ctx: commands.Context, month: int, date: int) -> None:
+    async def date_and_month(self, ctx: commands.Context, date: int, month: Union[int, str]) -> None:
         """Provides information about zodiac sign by taking month and date as input."""
+        if isinstance(month, str):
+            month = month.capitalize()
+            if month in MONTH_NAME.keys():
+                month = MONTH_NAME[month]
+            else:
+                await ctx.send("Sorry, but you have given wrong Month name")
+                return
         try:
             zodiac_sign_based_on_month_and_date = self.zodiac_date_verifer(datetime(2020, month, date))
             log.info("zodiac sign based on month and date received")
