@@ -1,0 +1,4 @@
+{
+    "title": "Caesar Cipher",
+    "description": "**Information**\nThe Caesar Cipher, named after the Roman General Julius Caesar, is one of the simplest and most widely known encryption techniques. It is a type of substitution cipher in which each letter in the plaintext is replaced by a letter given a specific position offset in the alphabet, with the letters wrapping around both sides.\n\n**Examples**\n1) `Hello World` <=> `Khoor Zruog` where letters are shifted forwards by `3`.\n2) `Julius Caesar` <=> `Yjaxjh Rpthpg` where letters are shifted backwards by `11`."
+}

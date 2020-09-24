@@ -11,7 +11,7 @@ from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
-with Path("bot/resources/halloween/spooky_rating.json").open() as file:
+with Path("bot/resources/halloween/spooky_rating.json").open(encoding="utf8") as file:
     SPOOKY_DATA = json.load(file)
     SPOOKY_DATA = sorted((int(key), value) for key, value in SPOOKY_DATA.items())
 

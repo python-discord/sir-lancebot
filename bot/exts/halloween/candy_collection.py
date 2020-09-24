@@ -27,7 +27,7 @@ class CandyCollection(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        with open(json_location) as candy:
+        with open(json_location, encoding="utf8") as candy:
             self.candy_json = json.load(candy)
             self.msg_reacted = self.candy_json['msg_reacted']
         self.get_candyinfo = dict()
@@ -178,7 +178,7 @@ class CandyCollection(commands.Cog):
 
     def save_to_json(self) -> None:
         """Save JSON to a local file."""
-        with open(json_location, 'w') as outfile:
+        with open(json_location, 'w', encoding="utf8") as outfile:
             json.dump(self.candy_json, outfile)
 
     @in_month(Month.OCTOBER)
@@ -212,9 +212,9 @@ class CandyCollection(commands.Cog):
         e = discord.Embed(colour=discord.Colour.blurple())
         e.add_field(name="Top Candy Records", value=value, inline=False)
         e.add_field(name='\u200b',
-                    value=f"Candies will randomly appear on messages sent. "
-                          f"\nHit the candy when it appears as fast as possible to get the candy! "
-                          f"\nBut beware the ghosts...",
+                    value="Candies will randomly appear on messages sent. "
+                          "\nHit the candy when it appears as fast as possible to get the candy! "
+                          "\nBut beware the ghosts...",
                     inline=False)
         await ctx.send(embed=e)
 
