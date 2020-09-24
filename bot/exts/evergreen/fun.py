@@ -7,7 +7,7 @@ from typing import Callable, Iterable, Tuple, Union
 
 from discord import Embed, Message
 from discord.ext import commands
-from discord.ext.commands import Bot, Cog, Context, MessageConverter
+from discord.ext.commands import Bot, Cog, Context, MessageConverter, clean_content
 
 from bot import utils
 from bot.constants import Colours, Emojis
@@ -71,7 +71,7 @@ class Fun(Cog):
         await ctx.send(output)
 
     @commands.command(name="uwu", aliases=("uwuwize", "uwuify",))
-    async def uwu_command(self, ctx: Context, *, text: str) -> None:
+    async def uwu_command(self, ctx: Context, *, text: clean_content(fix_channel_mentions=True)) -> None:
         """Converts a given `text` into it's uwu equivalent."""
         conversion_func = functools.partial(
             utils.replace_many, replacements=UWU_WORDS, ignore_case=True, match_case=True
@@ -87,7 +87,7 @@ class Fun(Cog):
         await ctx.send(content=converted_text, embed=embed)
 
     @commands.command(name="randomcase", aliases=("rcase", "randomcaps", "rcaps",))
-    async def randomcase_command(self, ctx: Context, *, text: str) -> None:
+    async def randomcase_command(self, ctx: Context, *, text: clean_content(fix_channel_mentions=True)) -> None:
         """Randomly converts the casing of a given `text`."""
         def conversion_func(text: str) -> str:
             """Randomly converts the casing of a given string."""
@@ -193,7 +193,7 @@ class Fun(Cog):
         msg = await Fun._get_discord_message(ctx, text)
         # Ensure the user has read permissions for the channel the message is in
         if isinstance(msg, Message) and ctx.author.permissions_in(msg.channel).read_messages:
-            text = msg.content
+            text = msg.clean_content
             # Take first embed because we can't send multiple embeds
             if msg.embeds:
                 embed = msg.embeds[0]
