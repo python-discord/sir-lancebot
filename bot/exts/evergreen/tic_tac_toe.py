@@ -49,9 +49,7 @@ class Player:
         Return is timeout reached and position of field what user will fill when timeout don't reach.
         """
         def check_for_move(r: discord.Reaction, u: discord.User) -> bool:
-            """
-            Check does user who reacted is user who we want, message is board message and emoji is in board values.
-            """
+            """Check does user who reacted is user who we want, message is board and emoji is in board values."""
             return (
                 u.id == self.user.id
                 and msg.id == r.message.id
@@ -148,9 +146,7 @@ class Game:
         await confirm_message.add_reaction(Emojis.decline)
 
         def confirm_check(reaction: discord.Reaction, user: discord.User) -> bool:
-            """
-            Check is user who reacted user from who this was requested, message is confirm message and emoji is valid.
-            """
+            """Check is user who reacted from who this was requested, message is confirmation and emoji is valid."""
             return (
                 reaction.emoji in (Emojis.confirmation, Emojis.decline)
                 and reaction.message.id == confirm_message.id
