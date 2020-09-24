@@ -95,6 +95,12 @@ class ValentineZodiac(commands.Cog):
             else:
                 await ctx.send("Sorry, but you have given wrong Month name")
                 return
+        if month == 1 or month == 12:
+            if date >= 1 and date <= 19 or date >= 22 and date <= 31:
+                zodiac = "Capricorn"
+                final_embed = self.zodiac_sign_verify(zodiac)
+                await ctx.send(embed=final_embed)
+                return
         try:
             zodiac_sign_based_on_month_and_date = self.zodiac_date_verifer(datetime(2020, month, date))
             log.info("zodiac sign based on month and date received")
