@@ -1,12 +1,12 @@
 {
-    "Aries":{
+    "Aries": {
             "start_at":[3, 21],
             "end_at": [4, 19],
             "About":"Amazing people born between **March 21** to **April 19**. Aries loves to be number one, so it’s no surprise that these audacious rams are the first sign of the zodiac. Bold and ambitious, Aries dives headfirst into even the most challenging situations.",
             "Motto":"***“When you know yourself, you're empowered. When you accept yourself, you're invincible.”***",
             "Strengths":"courageous, determined, confident, enthusiastic, optimistic, honest, passionate.",
             "Weaknesses":"impatient, moody, short-tempered, impulsive, aggressive.",
-            "full_form":"**A** for assertive\n**R** for refreshing\n **I** for independent\n**E** for energetic\n**S** for sexy",
+            "full_form":"__**A**__ssertive\n__**R**__efreshing\n__**I**__ndependent\n__**E**__nergetic\n__**S**__exy",
             "url":"https://www.horoscope.com/images-US/signs/profile-aries.png"
         },
     "Taurus": {
@@ -16,107 +16,107 @@
             "Motto": "***“Nothing worth having comes easy.”***",
             "Strengths": "reliable, patient, practical, devoted, responsible, stable.",
             "Weaknesses": "stubborn, possessive, uncompromising.",
-            "full_form": "***T*** for trailblazing\n***A*** for ambitious\n***U*** for unwavering\n***R*** for reliable\n***U*** for understanding\n***S*** for stable",
+            "full_form": "__**T**__railblazing\n__**A**__mbitious\n__**U**__nwavering\n__**R**__eliable\n__**U**__nderstanding\n__**S**__table",
             "url": "https://www.horoscope.com/images-US/signs/profile-taurus.png"
         },
-    "Gemini":{
+    "Gemini": {
             "start_at": [5, 21],
             "end_at": [6, 20],
             "About": "Amazing people born between **May 21** to **June 20**. Have you ever been so busy that you wished you could clone yourself just to get everything done? That’s the Gemini experience in a nutshell. Appropriately symbolized by the celestial twins, this air sign was interested in so many pursuits that it had to double itself.",
             "Motto": "***“I manifest my reality.”***",
             "Strengths": "gentle, affectionate, curious, adaptable, ability to learn quickly and exchange ideas.",
             "Weaknesses": "nervous, inconsistent, indecisive.",
-            "full_form": "***G*** for generous\n***E*** for emotionally in tune\n***M*** for motivated\n***I*** for imaginative\n***N*** for nice\n***I*** for intelligent",
+            "full_form": "__**G**__enerous\n__**E**__motionally in tune\n__**M**__otivated\n__**I**__maginative\n__**N**__ice\n__**I**__ntelligent",
             "url": "https://www.horoscope.com/images-US/signs/profile-gemini.png"
         },
-    "Cancer":{
-        "start_at": [6, 21],
-        "end_at": [7, 22],
-        "About": "Amazing people born between **June 21 ** to **July 22**. Cancer is a cardinal water sign. Represented by the crab, this crustacean seamlessly weaves between the sea and shore representing Cancer’s ability to exist in both emotional and material realms. Cancers are highly intuitive and their psychic abilities manifest in tangible spaces: For instance, Cancers can effortlessly pick up the energies in a room.",
-        "Motto": "***“I feel, therefore I am.”***",
-        "Strengths": "tenacious, highly imaginative, loyal, emotional, sympathetic, persuasive.",
-        "Weaknesses": "moody, pessimistic, suspicious, manipulative, insecuremoody, pessimistic, suspicious, manipulative, insecure.",
-        "full_form": "***C*** for caring\n***A*** for ambitious\n***N*** for nourishing\n***C*** for creative\n***E*** for emotionally intelligent\n***R*** for resilient",
-        "url": "https://www.horoscope.com/images-US/signs/profile-cancer.png"
+    "Cancer": {
+            "start_at": [6, 21],
+            "end_at": [7, 22],
+            "About": "Amazing people born between **June 21 ** to **July 22**. Cancer is a cardinal water sign. Represented by the crab, this crustacean seamlessly weaves between the sea and shore representing Cancer’s ability to exist in both emotional and material realms. Cancers are highly intuitive and their psychic abilities manifest in tangible spaces: For instance, Cancers can effortlessly pick up the energies in a room.",
+            "Motto": "***“I feel, therefore I am.”***",
+            "Strengths": "tenacious, highly imaginative, loyal, emotional, sympathetic, persuasive.",
+            "Weaknesses": "moody, pessimistic, suspicious, manipulative, insecuremoody, pessimistic, suspicious, manipulative, insecure.",
+            "full_form": "__**C**__aring\n__**A**__mbitious\n__**N**__ourishing\n__**C**__reative\n__**E**__motionally intelligent\n__**R**__esilient",
+            "url": "https://www.horoscope.com/images-US/signs/profile-cancer.png"
         },
-    "Leo":{
-        "start_at": [7, 23],
-        "end_at": [8, 22],
-        "About": "Amazing people born between **July 23** to **August 22**. Roll out the red carpet because Leo has arrived. Leo is represented by the lion and these spirited fire signs are the kings and queens of the celestial jungle. They’re delighted to embrace their royal status: Vivacious, theatrical, and passionate, Leos love to bask in the spotlight and celebrate themselves.",
-        "Motto": "***“If you know the way, go the way and show the way—you're a leader.”***",
-        "Strengths": "creative, passionate, generous, warm-hearted, cheerful, humorous.",
-        "Weaknesses": "arrogant, stubborn, self-centered, lazy, inflexible.",
-        "full_form": "***L*** for leaders\n***E*** for energetic\n***O*** for optimistic",
-        "url": "https://www.horoscope.com/images-US/signs/profile-leo.png"
+    "Leo": {
+            "start_at": [7, 23],
+            "end_at": [8, 22],
+            "About": "Amazing people born between **July 23** to **August 22**. Roll out the red carpet because Leo has arrived. Leo is represented by the lion and these spirited fire signs are the kings and queens of the celestial jungle. They’re delighted to embrace their royal status: Vivacious, theatrical, and passionate, Leos love to bask in the spotlight and celebrate themselves.",
+            "Motto": "***“If you know the way, go the way and show the way—you're a leader.”***",
+            "Strengths": "creative, passionate, generous, warm-hearted, cheerful, humorous.",
+            "Weaknesses": "arrogant, stubborn, self-centered, lazy, inflexible.",
+            "full_form": "__**L**__eaders\n__**E**__nergetic\n__**O**__ptimistic",
+            "url": "https://www.horoscope.com/images-US/signs/profile-leo.png"
         },
-    "Virgo":{
-        "start_at": [8, 23],
-        "end_at": [9, 22],
-        "About": "Amazing people born between **August 23** to **September 22**. Virgo is an earth sign historically represented by the goddess of wheat and agriculture, an association that speaks to Virgo’s deep-rooted presence in the material world. Virgos are logical, practical, and systematic in their approach to life. This earth sign is a perfectionist at heart and isn’t afraid to improve skills through diligent and consistent practice.",
-        "Motto": "***“My best can always be better.”***",
-        "Strengths": "loyal, analytical, kind, hardworking, practical.",
-        "Weaknesses": "shyness, worry, overly critical of self and others, all work and no play.",
-        "full_form": "***V*** for virtuous\n***I*** for intelligent\n***R*** for responsible\n***G*** for generous\n***O*** for optimistic",
-        "url": "https://www.horoscope.com/images-US/signs/profile-virgo.png"
+    "Virgo": {
+            "start_at": [8, 23],
+            "end_at": [9, 22],
+            "About": "Amazing people born between **August 23** to **September 22**. Virgo is an earth sign historically represented by the goddess of wheat and agriculture, an association that speaks to Virgo’s deep-rooted presence in the material world. Virgos are logical, practical, and systematic in their approach to life. This earth sign is a perfectionist at heart and isn’t afraid to improve skills through diligent and consistent practice.",
+            "Motto": "***“My best can always be better.”***",
+            "Strengths": "loyal, analytical, kind, hardworking, practical.",
+            "Weaknesses": "shyness, worry, overly critical of self and others, all work and no play.",
+            "full_form": "__**V**__irtuous\n__**I**__ntelligent\n__**R**__esponsible\n__**G**__enerous\n__**O**__ptimistic",
+            "url": "https://www.horoscope.com/images-US/signs/profile-virgo.png"
         },
-    "Libra":{
-        "start_at": [9, 23],
-        "end_at": [10, 22],
-        "About": "Amazing people born between **September 23** to **October 22**. Libra is an air sign represented by the scales (interestingly, the only inanimate object of the zodiac), an association that reflects Libra's fixation on balance and harmony. Libra is obsessed with symmetry and strives to create equilibrium in all areas of life.",
-        "Motto": "***“No person is an island.”***",
-        "Strengths": "cooperative, diplomatic, gracious, fair-minded, social.",
-        "Weaknesses": "indecisive, avoids confrontations, will carry a grudge, self-pity.",
-        "full_form": "***L*** for loyal\n***I*** for inquisitive\n***B*** for balanced\n***R*** for responsible\n***A*** for altruistic",
-        "url": "https://www.horoscope.com/images-US/signs/profile-libra.png"
+    "Libra": {
+            "start_at": [9, 23],
+            "end_at": [10, 22],
+            "About": "Amazing people born between **September 23** to **October 22**. Libra is an air sign represented by the scales (interestingly, the only inanimate object of the zodiac), an association that reflects Libra's fixation on balance and harmony. Libra is obsessed with symmetry and strives to create equilibrium in all areas of life.",
+            "Motto": "***“No person is an island.”***",
+            "Strengths": "cooperative, diplomatic, gracious, fair-minded, social.",
+            "Weaknesses": "indecisive, avoids confrontations, will carry a grudge, self-pity.",
+            "full_form": "__**L**__oyal\n__**I**__nquisitive\n__**B**__alanced\n__**R**__esponsible\n__**A**__ltruistic",
+            "url": "https://www.horoscope.com/images-US/signs/profile-libra.png"
+            },
+    "Scorpio": {
+            "start_at": [10, 23],
+            "end_at": [11, 21],
+            "About": "Amazing people born between **October 23** to **November 21**. Scorpio is one of the most misunderstood signs of the zodiac. Because of its incredible passion and power, Scorpio is often mistaken for a fire sign. In fact, Scorpio is a water sign that derives its strength from the psychic, emotional realm.",
+            "Motto": "***“You never know what you are capable of until you try.”***",
+            "Strengths": "resourceful, brave, passionate, stubborn, a true friend.",
+            "Weaknesses": "distrusting, jealous, secretive, violent.",
+            "full_form": "__**S**__eductive\n__**C**__erebral\n__**O**__riginal\n__**R**__eactive\n__**P**__assionate\n__**I**__ntuitive\n__**O**__utstanding",
+            "url": "https://www.horoscope.com/images-US/signs/profile-scorpio.png"
         },
-    "Scorpio":{
-        "start_at": [10, 23],
-        "end_at": [11, 21],
-        "About": "Amazing people born between **October 23** to **November 21**. Scorpio is one of the most misunderstood signs of the zodiac. Because of its incredible passion and power, Scorpio is often mistaken for a fire sign. In fact, Scorpio is a water sign that derives its strength from the psychic, emotional realm.",
-        "Motto": "***“You never know what you are capable of until you try.”***",
-        "Strengths": "resourceful, brave, passionate, stubborn, a true friend.",
-        "Weaknesses": "distrusting, jealous, secretive, violent.",
-        "full_form": "***S*** for seductive\n***C*** for cerebral\n***O*** for original\n***R*** for reactive\n***P*** for passionate\n***I*** for intuitive\n***O*** for outstanding",
-        "url": "https://www.horoscope.com/images-US/signs/profile-scorpio.png"
+    "Sagittarius": {
+            "start_at": [11, 22],
+            "end_at": [12, 21],
+            "About": "Amazing people born between **November 22** to **December 21**. Represented by the archer, Sagittarians are always on a quest for knowledge. The last fire sign of the zodiac, Sagittarius launches its many pursuits like blazing arrows, chasing after geographical, intellectual, and spiritual adventures.",
+            "Motto": "***“Towering genius disdains a beaten path.”***",
+            "Strengths": "generous, idealistic, great sense of humor.",
+            "Weaknesses": "promises more than can deliver, very impatient, will say anything no matter how undiplomatic.",
+            "full_form": "__**S**__eductive\n__**A**__dventurous\n__**G**__rateful\n__**I**__ntelligent\n__**T**__railblazing\n__**T**__enacious adept\n__**A**__dept\n__**R**__esponsible\n__**I**__dealistic\n__**U**__nparalled\n__**S**__ophisticated",
+            "url": "https://www.horoscope.com/images-US/signs/profile-sagittarius.png"
         },
-    "Sagittarius":{
-        "start_at": [11, 22],
-        "end_at": [12, 21],
-        "About": "Amazing people born between **November 22** to **December 21**. Represented by the archer, Sagittarians are always on a quest for knowledge. The last fire sign of the zodiac, Sagittarius launches its many pursuits like blazing arrows, chasing after geographical, intellectual, and spiritual adventures.",
-        "Motto": "***“Towering genius disdains a beaten path.”***",
-        "Strengths": "generous, idealistic, great sense of humor.",
-        "Weaknesses": "promises more than can deliver, very impatient, will say anything no matter how undiplomatic.",
-        "full_form": "***S*** for seductive\n***A*** for adventurous\n***G*** for grateful\n***I*** for intelligent\n***T*** for trailblazing\n***T*** for tenacious adept\n***A*** for adept\n***R*** for responsible\n***I*** for idealistic\n***U*** for unparalled\n***S*** for sophisticated",
-        "url": "https://www.horoscope.com/images-US/signs/profile-sagittarius.png"
+    "Capricorn": {
+            "start_at": [12, 22],
+            "end_at": [1, 19],
+            "About": "Amazing people born between **December 22** to **January 19**. The last earth sign of the zodiac, Capricorn is represented by the sea goat, a mythological creature with the body of a goat and tail of a fish. Accordingly, Capricorns are skilled at navigating both the material and emotional realms.",
+            "Motto": "***“I can succeed at anything I put my mind to.”***",
+            "Strengths": "responsible, disciplined, self-control, good managers.",
+            "Weaknesses": "know-it-all, unforgiving, condescending, expecting the worst.",
+            "full_form": "__**C**__onfident\n__**A**__nalytical\n__**P**__ractical\n__**R**__esponsible\n__**I**__ntelligent\n__**C**__aring\n__**O**__rganized\n__**R**__ealistic\n__**N**__eat",
+            "url": "https://www.horoscope.com/images-US/signs/profile-capricorn.png"
         },
-    "Capricorn":{
-        "start_at": [12, 22],
-        "end_at": [1, 19],
-        "About": "Amazing people born between **December 22** to **January 19**. The last earth sign of the zodiac, Capricorn is represented by the sea goat, a mythological creature with the body of a goat and tail of a fish. Accordingly, Capricorns are skilled at navigating both the material and emotional realms.",
-        "Motto": "***“I can succeed at anything I put my mind to.”***",
-        "Strengths": "responsible, disciplined, self-control, good managers.",
-        "Weaknesses": "know-it-all, unforgiving, condescending, expecting the worst.",
-        "full_form": "***C*** for confident\n***A*** for analytical\n***P*** for practical\n***R*** for responsible\n***I*** for intelligent\n***C*** for caring\n***O*** for organized\n***R*** for realistic\n***N*** for neat",
-        "url": "https://www.horoscope.com/images-US/signs/profile-capricorn.png"
+    "Aquarius": {
+            "start_at": [1, 20],
+            "end_at": [2,18],
+            "About": "Amazing people born between **January 20** to **February 18**. Despite the “aqua” in its name, Aquarius is actually the last air sign of the zodiac. Aquarius is represented by the water bearer, the mystical healer who bestows water, or life, upon the land. Accordingly, Aquarius is the most humanitarian astrological sign.",
+            "Motto": "***“There is no me, there is only we.”***",
+            "Strengths": "Progressive, original, independent, humanitarian.",
+            "Weaknesses": "Runs from emotional expression, temperamental, uncompromising, aloof.",
+            "full_form": "__**A**__nalytical\n__**Q**__uirky\n__**U**__ncompromising\n__**A**__ction-focused\n__**R**__espectful\n__**I**__ntelligent\n__**U**__nique\n__**S**__incere",
+            "url": "https://www.horoscope.com/images-US/signs/profile-aquarius.png"
         },
-    "Aquarius":{
-        "start_at": [1, 20],
-        "end_at": [2,18],
-        "About": "Amazing people born between **January 20** to **February 18**. Despite the “aqua” in its name, Aquarius is actually the last air sign of the zodiac. Aquarius is represented by the water bearer, the mystical healer who bestows water, or life, upon the land. Accordingly, Aquarius is the most humanitarian astrological sign.",
-        "Motto": "***“There is no me, there is only we.”***",
-        "Strengths": "Progressive, original, independent, humanitarian.",
-        "Weaknesses": "Runs from emotional expression, temperamental, uncompromising, aloof.",
-        "full_form": "***A*** for analytical\n***Q*** for quirky\n***U*** for uncompromising\n***A*** for action-focused\n***R*** for respectful\n***I*** for intelligent\n***U*** for unique\n***S*** for sincere",
-        "url": "https://www.horoscope.com/images-US/signs/profile-aquarius.png"
-        },
-    "Pisces":{
-        "start_at": [2, 19],
-        "end_at": [3, 20],
-        "About": "Amazing people born between **February 19** to **March 20**. Pisces, a water sign, is the last constellation of the zodiac. It's symbolized by two fish swimming in opposite directions, representing the constant division of Pisces' attention between fantasy and reality. As the final sign, Pisces has absorbed every lesson — the joys and the pain, the hopes and the fears — learned by all of the other signs.",
-        "Motto": "***“I have a lot of love to give, it only takes a little patience and those worth giving it all to.”***",
-        "Strengths": "Compassionate, artistic, intuitive, gentle, wise, musical.",
-        "Weaknesses": "Fearful, overly trusting, sad, desire to escape reality, can be a victim or a martyr.",
-        "full_form": "***P*** for psychic\n***I*** for intelligent\n***S*** for surprising\n***C*** for creative\n***E*** for emotionally-driven\n***S*** for sensitive",
-        "url": "https://www.horoscope.com/images-US/signs/profile-pisces.png"
-    }
+    "Pisces": {
+            "start_at": [2, 19],
+            "end_at": [3, 20],
+            "About": "Amazing people born between **February 19** to **March 20**. Pisces, a water sign, is the last constellation of the zodiac. It's symbolized by two fish swimming in opposite directions, representing the constant division of Pisces' attention between fantasy and reality. As the final sign, Pisces has absorbed every lesson — the joys and the pain, the hopes and the fears — learned by all of the other signs.",
+            "Motto": "***“I have a lot of love to give, it only takes a little patience and those worth giving it all to.”***",
+            "Strengths": "Compassionate, artistic, intuitive, gentle, wise, musical.",
+            "Weaknesses": "Fearful, overly trusting, sad, desire to escape reality, can be a victim or a martyr.",
+            "full_form": "__**P**__sychic\n__**I**__ntelligent\n__**S**__urprising\n__**C**__reative\n__**E**__motionally-driven\n__**S**__ensitive",
+            "url": "https://www.horoscope.com/images-US/signs/profile-pisces.png"
+        }
 }
