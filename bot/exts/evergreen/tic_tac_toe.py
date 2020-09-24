@@ -127,7 +127,13 @@ class Game:
         self.draw = False
 
     async def get_confirmation(self) -> t.Tuple[bool, t.Optional[str]]:
-        """Ask does user want to play TicTacToe against requester. First player is always requester."""
+        """
+        Ask does user want to play TicTacToe against requester. First player is always requester.
+
+        This return tuple that have:
+        - first element boolean (is game accepted?)
+        - (optional, only when first element is False, otherwise None) reason for declining.
+        """
         confirm_message = await self.ctx.send(
             CONFIRMATION_MESSAGE.format(
                 opponent=self.players[1].user.mention,
