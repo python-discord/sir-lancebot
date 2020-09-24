@@ -49,6 +49,9 @@ class Player:
         Return is timeout reached and position of field what user will fill when timeout don't reach.
         """
         def check_for_move(r: discord.Reaction, u: discord.User) -> bool:
+            """
+            Check does user who reacted is user who we want, message is board message and emoji is in board values.
+            """
             return (
                 u.id == self.user.id
                 and msg.id == r.message.id
