@@ -54,8 +54,8 @@ class ValentineZodiac(commands.Cog):
         else:
             embed.description = "Umm you gave wrong zodiac name so i aren't able to find any :sweat_smile:"
             log.info("Wrong Zodiac name provided")
-        return embed
         log.info("Zodiac embed ready")
+        return embed
 
     def zodiac_date_verifer(self, query_datetime: datetime) -> str:
         """Returns zodiac sign by checking month and date."""
