@@ -66,10 +66,8 @@ class ValentineZodiac(commands.Cog):
 
     def zodiac_date_verifer(self, query_datetime: datetime) -> str:
         """Returns zodiac sign by checking month and date."""
-        for zodiac_name, date_range in self.zodiac_fact.items():
-            value_start = datetime(2020, date_range["start_at"][0], date_range["start_at"][1]).date()
-            value_end = datetime(2020, date_range["end_at"][0], date_range["end_at"][1]).date()
-            if value_start <= query_datetime.date() <= value_end:
+        for zodiac_name, zodiac_data in self.zodiac_fact.items():
+            if zodiac_data["start_at"] <= query_datetime.date() <= zodiac_data["end_at"]:
                 zodiac = zodiac_name
                 break
             else:
