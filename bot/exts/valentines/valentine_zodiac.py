@@ -18,10 +18,10 @@ HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_hea
 ZODIAC_SIGNS = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra",
                 "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"]
 
-MONTH_NAME = {"January": 1, "Jan": 1, "Feburary": 2, "Feb": 2, "March": 3, "Mar": 3,
+MONTH_NAME = {"January": 1, "Jan": 1, "February": 2, "Feb": 2, "March": 3, "Mar": 3,
               "April": 4, "Apr": 4, "May": 5, "June": 6, "Jun": 6, "July": 7, "Jul": 7,
               "August": 8, "Aug": 8, "September": 9, "Sept": 9, "October": 10, "Oct": 10,
-              "November": 11, "Nove": 11, "December": 12, "December": 12
+              "November": 11, "Nov": 11, "December": 12, "Dec": 12
               }
 
 
