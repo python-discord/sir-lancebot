@@ -35,11 +35,11 @@ class ValentineZodiac(commands.Cog):
     @staticmethod
     def load_comp_json() -> dict:
         """Load zodiac compatibility from static JSON resource."""
-        p1 = Path("bot/resources/valentines/zodiac_explanation.json")
-        p = Path("bot/resources/valentines/zodiac_compatibility.json")
-        with p1.open(encoding="utf8") as json_data:
+        explanation_file = Path("bot/resources/valentines/zodiac_explanation.json")
+        compatibility_file = Path("bot/resources/valentines/zodiac_compatibility.json")
+        with explanation_file.open(encoding="utf8") as json_data:
             zodiac_fact = load(json_data)
-        with p.open(encoding="utf8") as json_data:
+        with compatibility_file.open(encoding="utf8") as json_data:
             zodiacs = load(json_data)
             return zodiacs, zodiac_fact
 
@@ -49,7 +49,7 @@ class ValentineZodiac(commands.Cog):
         zodiac_fact = self.zodiac_fact
         embed = discord.Embed()
         embed.color = Colours.pink
-        if zodiac in ZODIAC_SIGNS:
+        if zodiac in self.zodiac_fact:
             log.info("Making zodiac embed")
             embed.title = f"__{zodiac}__"
             embed.description = zodiac_fact[f"{zodiac}"]["About"]
@@ -66,10 +66,8 @@ class ValentineZodiac(commands.Cog):
 
     def zodiac_date_verifer(self, query_datetime: datetime) -> str:
         """Returns zodiac sign by checking month and date."""
-        for zodiac_name, date_range in self.zodiac_fact.items():
-            value_start = datetime(2020, date_range["start_at"][0], date_range["start_at"][1]).date()
-            value_end = datetime(2020, date_range["end_at"][0], date_range["end_at"][1]).date()
-            if value_start <= query_datetime.date() <= value_end:
+        for zodiac_name, zodiac_data in self.zodiac_fact.items():
+            if zodiac_data["start_at"] <= query_datetime.date() <= zodiac_data["end_at"]:
                 zodiac = zodiac_name
                 break
             else:
@@ -90,30 +88,27 @@ class ValentineZodiac(commands.Cog):
         """Provides information about zodiac sign by taking month and date as input."""
         if isinstance(month, str):
             month = month.capitalize()
-            if month in MONTH_NAME.keys():
-                month = MONTH_NAME[month]
-            else:
-                await ctx.send("Sorry, but you have given wrong Month name")
+            try:
+                month = list(calendar.month_abbr).index(month[:3])
+            except ValueError:
+                await ctx.send("Sorry, but you have given wrong month name.")
                 return
-        if month == 1 or month == 12:
-            if date >= 1 and date <= 19 or date >= 22 and date <= 31:
-                zodiac = "Capricorn"
-                final_embed = self.zodiac_sign_verify(zodiac)
-                await ctx.send(embed=final_embed)
-                return
-        try:
-            zodiac_sign_based_on_month_and_date = self.zodiac_date_verifer(datetime(2020, month, date))
-            log.info("zodiac sign based on month and date received")
-        except ValueError as e:
-            await ctx.send(f'You cannot do that, {e}')
-        if zodiac_sign_based_on_month_and_date is None:
-            log.info("zodiac sign based on month and date returned None")
-            final_embed = discord.Embed()
-            final_embed.color = Colours.pink
-            final_embed.description = "You provided wrong date or month so i aren't able to find any zodiac sign"
+        if (month == 1 and (1 <= date <= 19)) or (month == 12 and (22 <= date <= 31)):
+            zodiac = "capricorn"
+            final_embed = self.zodiac_sign_verify(zodiac)
         else:
-            final_embed = self.zodiac_sign_verify(zodiac_sign_based_on_month_and_date)
-            log.info("zodiac sign embed based on month and date is now sent")
+            try:
+                zodiac_sign_based_on_month_and_date = self.zodiac_date_verifer(datetime(2020, month, date))
+                log.info("zodiac sign based on month and date received")
+            except ValueError as e:
+                log.info("zodiac sign based on month and date returned None")
+                final_embed = discord.Embed()
+                final_embed.color = Colours.pink
+                final_embed.description = f"{e}, cannot find zodiac sign."
+            else:
+                final_embed = self.zodiac_sign_verify(zodiac_sign_based_on_month_and_date)
+                log.info("zodiac sign embed based on month and date is now sent.")
+
         await ctx.send(embed=final_embed)
 
     @zodiac.command(name="partnerzodiac")
