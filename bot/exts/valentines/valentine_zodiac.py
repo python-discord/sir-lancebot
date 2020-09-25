@@ -68,7 +68,7 @@ class ValentineZodiac(commands.Cog):
         log.info("Zodiac embed ready")
         return embed
 
-    def zodiac_date_verifer(self, query_datetime: datetime) -> str:
+    def zodiac_date_verifier(self, query_datetime: datetime) -> str:
         """Returns zodiac sign by checking month and date."""
         for zodiac_name, zodiac_data in self.zodiac_fact.items():
             if zodiac_data["start_at"].date() <= query_datetime.date() <= zodiac_data["end_at"].date():
@@ -102,7 +102,7 @@ class ValentineZodiac(commands.Cog):
             final_embed = self.zodiac_sign_verify(zodiac)
         else:
             try:
-                zodiac_sign_based_on_month_and_date = self.zodiac_date_verifer(datetime(2020, month, date))
+                zodiac_sign_based_on_month_and_date = self.zodiac_date_verifier(datetime(2020, month, date))
                 log.info("zodiac sign based on month and date received")
             except ValueError as e:
                 log.info("zodiac sign based on month and date returned None")
@@ -127,7 +127,7 @@ class ValentineZodiac(commands.Cog):
         emoji1 = random.choice(HEART_EMOJIS)
         emoji2 = random.choice(HEART_EMOJIS)
         embed = discord.Embed(
-            title="Zodic Compatibility",
+            title="Zodiac Compatibility",
             description=f'{zodiac_sign.capitalize()}{emoji1}{compatible_zodiac["Zodiac"]}\n'
                         f'{emoji2}Compatibility meter : {compatible_zodiac["compatibility_score"]}{emoji2}',
             color=Colours.pink
