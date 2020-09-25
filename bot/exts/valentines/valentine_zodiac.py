@@ -93,25 +93,22 @@ class ValentineZodiac(commands.Cog):
             except ValueError:
                 await ctx.send("Sorry, but you have given wrong month name.")
                 return
-        if month == 1 or month == 12:
-            if date >= 1 and date <= 19 or date >= 22 and date <= 31:
-                zodiac = "Capricorn"
-                final_embed = self.zodiac_sign_verify(zodiac)
-                await ctx.send(embed=final_embed)
-                return
-        try:
-            zodiac_sign_based_on_month_and_date = self.zodiac_date_verifer(datetime(2020, month, date))
-            log.info("zodiac sign based on month and date received")
-        except ValueError as e:
-            await ctx.send(f'You cannot do that, {e}')
-        if zodiac_sign_based_on_month_and_date is None:
-            log.info("zodiac sign based on month and date returned None")
-            final_embed = discord.Embed()
-            final_embed.color = Colours.pink
-            final_embed.description = "You provided wrong date or month so i aren't able to find any zodiac sign"
+        if (month == 1 and (1 <= date <= 19)) or (month == 12 and (22 <= date <= 31)):
+            zodiac = "capricorn"
+            final_embed = self.zodiac_sign_verify(zodiac)
         else:
-            final_embed = self.zodiac_sign_verify(zodiac_sign_based_on_month_and_date)
-            log.info("zodiac sign embed based on month and date is now sent")
+            try:
+                zodiac_sign_based_on_month_and_date = self.zodiac_date_verifer(datetime(2020, month, date))
+                log.info("zodiac sign based on month and date received")
+            except ValueError as e:
+                log.info("zodiac sign based on month and date returned None")
+                final_embed = discord.Embed()
+                final_embed.color = Colours.pink
+                final_embed.description = f"{e}, cannot find zodiac sign."
+            else:
+                final_embed = self.zodiac_sign_verify(zodiac_sign_based_on_month_and_date)
+                log.info("zodiac sign embed based on month and date is now sent.")
+
         await ctx.send(embed=final_embed)
 
     @zodiac.command(name="partnerzodiac")
