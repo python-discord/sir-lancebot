@@ -5,7 +5,6 @@ import discord
 from discord.ext import commands
 
 from bot.constants import Colours, ERROR_REPLIES, Emojis, Icons
-
 from bot.utils.converters import BetterMessageConverter
 
 log = logging.getLogger(__name__)
