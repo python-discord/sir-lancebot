@@ -88,10 +88,10 @@ class ValentineZodiac(commands.Cog):
         """Provides information about zodiac sign by taking month and date as input."""
         if isinstance(month, str):
             month = month.capitalize()
-            if month in MONTH_NAME.keys():
-                month = MONTH_NAME[month]
-            else:
-                await ctx.send("Sorry, but you have given wrong Month name")
+            try:
+                month = list(calendar.month_abbr).index(month[:3])
+            except ValueError:
+                await ctx.send("Sorry, but you have given wrong month name.")
                 return
         if month == 1 or month == 12:
             if date >= 1 and date <= 19 or date >= 22 and date <= 31:
