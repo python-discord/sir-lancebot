@@ -1,9 +1,10 @@
+import calendar
 import logging
 import random
 from datetime import datetime
 from json import load
 from pathlib import Path
-from typing import Union
+from typing import Tuple, Union
 
 import discord
 from discord.ext import commands
@@ -33,12 +34,15 @@ class ValentineZodiac(commands.Cog):
         self.zodiacs, self.zodiac_fact = self.load_comp_json()
 
     @staticmethod
-    def load_comp_json() -> dict:
+    def load_comp_json() -> Tuple[dict, dict]:
         """Load zodiac compatibility from static JSON resource."""
         explanation_file = Path("bot/resources/valentines/zodiac_explanation.json")
         compatibility_file = Path("bot/resources/valentines/zodiac_compatibility.json")
         with explanation_file.open(encoding="utf8") as json_data:
             zodiac_fact = load(json_data)
+            for _, zodiac_data in zodiac_fact.items():
+                zodiac_data['start_at'] = datetime.fromisoformat(zodiac_data['start_at'])
+                zodiac_data['end_at'] = datetime.fromisoformat(zodiac_data['end_at'])
         with compatibility_file.open(encoding="utf8") as json_data:
             zodiacs = load(json_data)
             return zodiacs, zodiac_fact
@@ -67,7 +71,7 @@ class ValentineZodiac(commands.Cog):
     def zodiac_date_verifer(self, query_datetime: datetime) -> str:
         """Returns zodiac sign by checking month and date."""
         for zodiac_name, zodiac_data in self.zodiac_fact.items():
-            if zodiac_data["start_at"] <= query_datetime.date() <= zodiac_data["end_at"]:
+            if zodiac_data["start_at"].date() <= query_datetime.date() <= zodiac_data["end_at"].date():
                 zodiac = zodiac_name
                 break
             else:
@@ -87,8 +91,8 @@ class ValentineZodiac(commands.Cog):
     async def date_and_month(self, ctx: commands.Context, date: int, month: Union[int, str]) -> None:
         """Provides information about zodiac sign by taking month and date as input."""
         if isinstance(month, str):
-            month = month.capitalize()
             try:
+                month = month.capitalize()
                 month = list(calendar.month_abbr).index(month[:3])
             except ValueError:
                 await ctx.send("Sorry, but you have given wrong month name.")
