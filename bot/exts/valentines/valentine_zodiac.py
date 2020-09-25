@@ -49,7 +49,7 @@ class ValentineZodiac(commands.Cog):
         zodiac_fact = self.zodiac_fact
         embed = discord.Embed()
         embed.color = Colours.pink
-        if zodiac in ZODIAC_SIGNS:
+        if zodiac in self.zodiac_fact:
             log.info("Making zodiac embed")
             embed.title = f"__{zodiac}__"
             embed.description = zodiac_fact[f"{zodiac}"]["About"]
