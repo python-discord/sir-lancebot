@@ -86,7 +86,7 @@ class ValentineZodiac(commands.Cog):
             except ValueError:
                 await ctx.send(f"Sorry, but `{month}` is wrong month name.")
                 return
-        if (month == 1 and (1 <= date <= 19)) or (month == 12 and (22 <= date <= 31)):
+        if (month == 1 and (1 <= query_date <= 19)) or (month == 12 and (22 <= query_date <= 31)):
             zodiac = "capricorn"
             final_embed = self.zodiac_sign_verify(zodiac)
         else:
