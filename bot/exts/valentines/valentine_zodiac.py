@@ -31,7 +31,7 @@ class ValentineZodiac(commands.Cog):
         compatibility_file = Path("bot/resources/valentines/zodiac_compatibility.json")
         with explanation_file.open(encoding="utf8") as json_data:
             zodiac_fact = load(json_data)
-            for _, zodiac_data in zodiac_fact.items():
+            for zodiac_data in zodiac_fact.values():
                 zodiac_data['start_at'] = datetime.fromisoformat(zodiac_data['start_at'])
                 zodiac_data['end_at'] = datetime.fromisoformat(zodiac_data['end_at'])
         with compatibility_file.open(encoding="utf8") as json_data:
