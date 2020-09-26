@@ -1,7 +1,7 @@
 import calendar
 import logging
 import random
-from datetime import datetime
+from datetime import date
 from json import load
 from pathlib import Path
 from typing import Tuple, Union
@@ -32,8 +32,8 @@ class ValentineZodiac(commands.Cog):
         with explanation_file.open(encoding="utf8") as json_data:
             zodiac_fact = load(json_data)
             for _, zodiac_data in zodiac_fact.items():
-                zodiac_data['start_at'] = datetime.fromisoformat(zodiac_data['start_at'])
-                zodiac_data['end_at'] = datetime.fromisoformat(zodiac_data['end_at'])
+                zodiac_data['start_at'] = date.fromisoformat(zodiac_data['start_at'])
+                zodiac_data['end_at'] = date.fromisoformat(zodiac_data['end_at'])
         with compatibility_file.open(encoding="utf8") as json_data:
             zodiacs = load(json_data)
         return zodiacs, zodiac_fact
@@ -55,16 +55,16 @@ class ValentineZodiac(commands.Cog):
         else:
             err_comp = [f"`{i}` {zod_name}" for i, zod_name in enumerate(self.zodiac_fact.keys(), start=1)]
             error = ("\n").join(err_comp)
-            error_msg = f"`{zodiac}` is not a valid zodiac sign, here is the list of valid zodiac signs."
+            error_msg = f"**{zodiac}** is not a valid zodiac sign, here is the list of valid zodiac signs."
             embed.description = f"{error_msg}\n{error}"
             log.info("Wrong Zodiac name provided")
         log.info("Zodiac embed ready")
         return embed
 
-    def zodiac_date_verifier(self, query_datetime: datetime) -> str:
+    def zodiac_date_verifier(self, query_datetime: date) -> str:
         """Returns zodiac sign by checking month and date."""
         for zodiac_name, zodiac_data in self.zodiac_fact.items():
-            if zodiac_data["start_at"].date() <= query_datetime.date() <= zodiac_data["end_at"].date():
+            if zodiac_data["start_at"] <= query_datetime <= zodiac_data["end_at"]:
                 zodiac = zodiac_name
         log.info("Zodiac name sent")
         return zodiac
@@ -72,15 +72,12 @@ class ValentineZodiac(commands.Cog):
     @commands.group(name='zodiac', invoke_without_command=True)
     async def zodiac(self, ctx: commands.Context, zodiac_sign: str) -> None:
         """Provides information about zodiac sign by taking zodiac sign name as input."""
-        if zodiac_sign.startswith("`"):
-            await ctx.send("Please don't include `")
-            return
         final_embed = self.zodiac_sign_verify(zodiac_sign)
         log.info("Embed successfully sent")
         await ctx.send(embed=final_embed)
 
     @zodiac.command(name="date")
-    async def date_and_month(self, ctx: commands.Context, date: int, month: Union[int, str]) -> None:
+    async def date_and_month(self, ctx: commands.Context, query_date: int, month: Union[int, str]) -> None:
         """Provides information about zodiac sign by taking month and date as input."""
         if isinstance(month, str):
             try:
@@ -94,10 +91,10 @@ class ValentineZodiac(commands.Cog):
             final_embed = self.zodiac_sign_verify(zodiac)
         else:
             try:
-                zodiac_sign_based_on_month_and_date = self.zodiac_date_verifier(datetime(2020, month, date))
+                zodiac_sign_based_on_month_and_date = self.zodiac_date_verifier(date(2020, month, query_date))
                 log.info("zodiac sign based on month and date received")
             except ValueError as e:
-                log.info("zodiac sign based on month and date returned None")
+                log.info("invalid date or month given")
                 final_embed = discord.Embed()
                 final_embed.color = Colours.pink
                 final_embed.description = f"Zodiac sign is not found because, {e}"
@@ -113,9 +110,6 @@ class ValentineZodiac(commands.Cog):
         """Provides a counter compatible zodiac sign to the given user's zodiac sign."""
         embed = discord.Embed()
         embed.color = Colours.pink
-        if zodiac_sign.startswith("`"):
-            await ctx.send("Please don't include `")
-            return
         try:
             compatible_zodiac = random.choice(self.zodiacs[zodiac_sign.lower()])
             emoji1 = random.choice(HEART_EMOJIS)
@@ -130,7 +124,7 @@ class ValentineZodiac(commands.Cog):
         except KeyError:
             err_comp = [f"`{i}` {zod_name}" for i, zod_name in enumerate(self.zodiac_fact.keys(), start=1)]
             error = ("\n").join(err_comp)
-            error_msg = f"`{zodiac_sign}` is not a valid zodiac sign, here is the list of valid zodiac signs."
+            error_msg = f"**{zodiac_sign}** is not a valid zodiac sign, here is the list of valid zodiac signs."
             embed.description = f"{error_msg}\n{error}"
         await ctx.send(embed=embed)
 
