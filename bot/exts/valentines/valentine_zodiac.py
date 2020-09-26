@@ -38,6 +38,17 @@ class ValentineZodiac(commands.Cog):
             zodiacs = load(json_data)
         return zodiacs, zodiac_fact
 
+    def error(self, zodiac: str) -> discord.Embed:
+        """Returns error embed."""
+        embed = discord.Embed()
+        embed.color = Colours.pink
+        err_comp = [f"`{i}` {zod_name}" for i, zod_name in enumerate(self.zodiac_fact.keys(), start=1)]
+        err = ("\n").join(err_comp)
+        error_msg = f"**{zodiac}** is not a valid zodiac sign, here is the list of valid zodiac signs."
+        embed.description = f"{error_msg}\n{err}"
+        log.info("Wrong Zodiac name provided")
+        return embed
+
     def zodiac_sign_verify(self, zodiac: str) -> discord.Embed:
         """Gives informative zodiac embed."""
         zodiac = zodiac.capitalize()
@@ -53,11 +64,7 @@ class ValentineZodiac(commands.Cog):
             embed.add_field(name='__Weaknesses__', value=self.zodiac_fact[zodiac]["Weaknesses"], inline=False)
             embed.set_thumbnail(url=self.zodiac_fact[zodiac]["url"])
         else:
-            err_comp = [f"`{i}` {zod_name}" for i, zod_name in enumerate(self.zodiac_fact.keys(), start=1)]
-            error = ("\n").join(err_comp)
-            error_msg = f"**{zodiac}** is not a valid zodiac sign, here is the list of valid zodiac signs."
-            embed.description = f"{error_msg}\n{error}"
-            log.info("Wrong Zodiac name provided")
+            embed = self.error(zodiac)
         log.info("Zodiac embed ready")
         return embed
 
@@ -66,6 +73,7 @@ class ValentineZodiac(commands.Cog):
         for zodiac_name, zodiac_data in self.zodiac_fact.items():
             if zodiac_data["start_at"] <= query_datetime <= zodiac_data["end_at"]:
                 zodiac = zodiac_name
+                break
         log.info("Zodiac name sent")
         return zodiac
 
@@ -122,10 +130,7 @@ class ValentineZodiac(commands.Cog):
                 value=compatible_zodiac['description']
             )
         except KeyError:
-            err_comp = [f"`{i}` {zod_name}" for i, zod_name in enumerate(self.zodiac_fact.keys(), start=1)]
-            error = ("\n").join(err_comp)
-            error_msg = f"**{zodiac_sign}** is not a valid zodiac sign, here is the list of valid zodiac signs."
-            embed.description = f"{error_msg}\n{error}"
+            embed = self.error(zodiac_sign)
         await ctx.send(embed=embed)
 
 
