@@ -49,7 +49,7 @@ class ValentineZodiac(commands.Cog):
         log.info("Wrong Zodiac name provided")
         return embed
 
-    def zodiac_sign_verify(self, zodiac: str) -> discord.Embed:
+    def zodiac_build_embed(self, zodiac: str) -> discord.Embed:
         """Gives informative zodiac embed."""
         zodiac = zodiac.capitalize()
         embed = discord.Embed()
