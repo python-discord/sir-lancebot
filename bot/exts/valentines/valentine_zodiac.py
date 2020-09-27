@@ -43,13 +43,13 @@ class ValentineZodiac(commands.Cog):
         embed = discord.Embed()
         embed.color = Colours.pink
         error_comp = "\n".join(
-            [f"`{i}` {zod_name}"for i, zod_name in enumerate(self.zodiac_fact.keys(), start=1)]
+            f"`{i}` {zod_name}"for i, zod_name in enumerate(self.zodiac_fact.keys(), start=1)
         )
         embed.description = (
             f"**{zodiac}** is not a valid zodiac sign, here is the list of valid zodiac signs.\n"
             f"{error_comp}"
         )
-        log.info("Wrong Zodiac name provided")
+        log.info("Wrong Zodiac name provided.")
         return embed
 
     def zodiac_build_embed(self, zodiac: str) -> discord.Embed:
@@ -58,7 +58,7 @@ class ValentineZodiac(commands.Cog):
         embed = discord.Embed()
         embed.color = Colours.pink
         if zodiac.capitalize() in self.zodiac_fact:
-            log.info("Making zodiac embed")
+            log.info("Making zodiac embed.")
             embed.title = f"__{zodiac}__"
             embed.description = self.zodiac_fact[zodiac]["About"]
             embed.add_field(name='__Full form__', value=self.zodiac_fact[zodiac]["full_form"], inline=False)
@@ -68,7 +68,7 @@ class ValentineZodiac(commands.Cog):
             embed.set_thumbnail(url=self.zodiac_fact[zodiac]["url"])
         else:
             embed = self.error(zodiac)
-        log.info("Zodiac embed ready")
+        log.info("Zodiac embed ready.")
         return embed
 
     def zodiac_date_verifier(self, query_datetime: date) -> str:
@@ -77,14 +77,14 @@ class ValentineZodiac(commands.Cog):
             if zodiac_data["start_at"] <= query_datetime <= zodiac_data["end_at"]:
                 zodiac = zodiac_name
                 break
-        log.info("Zodiac name sent")
+        log.info("Zodiac name sent.")
         return zodiac
 
     @commands.group(name='zodiac', invoke_without_command=True)
     async def zodiac(self, ctx: commands.Context, zodiac_sign: str) -> None:
         """Provides information about zodiac sign by taking zodiac sign name as input."""
         final_embed = self.zodiac_build_embed(zodiac_sign)
-        log.info("Embed successfully sent")
+        log.info("Embed successfully sent.")
         await ctx.send(embed=final_embed)
 
     @zodiac.command(name="date")
@@ -103,13 +103,13 @@ class ValentineZodiac(commands.Cog):
         else:
             try:
                 zodiac_sign_based_on_month_and_date = self.zodiac_date_verifier(date(2020, month, query_date))
-                log.info("zodiac sign based on month and date received")
+                log.info("zodiac sign based on month and date received.")
             except ValueError as e:
-                log.info("invalid date or month given")
+                log.info("invalid date or month given.")
                 final_embed = discord.Embed()
                 final_embed.color = Colours.pink
                 final_embed.description = f"Zodiac sign is not found because, {e}"
-                log.info(e)
+                log.info(f"error caused due to: {e}.")
             else:
                 final_embed = self.zodiac_build_embed(zodiac_sign_based_on_month_and_date)
                 log.info("zodiac sign embed based on month and date is now sent.")
