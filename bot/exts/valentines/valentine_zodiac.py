@@ -1,8 +1,8 @@
 import calendar
+import json
 import logging
 import random
 from datetime import date
-from json import load
 from pathlib import Path
 from typing import Tuple, Union
 
@@ -30,12 +30,12 @@ class ValentineZodiac(commands.Cog):
         explanation_file = Path("bot/resources/valentines/zodiac_explanation.json")
         compatibility_file = Path("bot/resources/valentines/zodiac_compatibility.json")
         with explanation_file.open(encoding="utf8") as json_data:
-            zodiac_fact = load(json_data)
+            zodiac_fact = json.load(json_data)
             for zodiac_data in zodiac_fact.values():
                 zodiac_data['start_at'] = date.fromisoformat(zodiac_data['start_at'])
                 zodiac_data['end_at'] = date.fromisoformat(zodiac_data['end_at'])
         with compatibility_file.open(encoding="utf8") as json_data:
-            zodiacs = load(json_data)
+            zodiacs = json.load(json_data)
         return zodiacs, zodiac_fact
 
     def error(self, zodiac: str) -> discord.Embed:
@@ -43,13 +43,13 @@ class ValentineZodiac(commands.Cog):
         embed = discord.Embed()
         embed.color = Colours.pink
         error_comp = "\n".join(
-            f"`{i}` {zod_name}"for i, zod_name in enumerate(self.zodiac_fact.keys(), start=1)
+            [f"`{i}` {zod_name}" for i, zod_name in enumerate(self.zodiac_fact.keys(), start=1)]
         )
         embed.description = (
             f"**{zodiac}** is not a valid zodiac sign, here is the list of valid zodiac signs.\n"
             f"{error_comp}"
         )
-        log.info("Wrong Zodiac name provided.")
+        log.info("Invalid zodiac name provided.")
         return embed
 
     def zodiac_build_embed(self, zodiac: str) -> discord.Embed:
@@ -57,7 +57,7 @@ class ValentineZodiac(commands.Cog):
         zodiac = zodiac.capitalize()
         embed = discord.Embed()
         embed.color = Colours.pink
-        if zodiac.capitalize() in self.zodiac_fact:
+        if zodiac in self.zodiac_fact:
             log.info("Making zodiac embed.")
             embed.title = f"__{zodiac}__"
             embed.description = self.zodiac_fact[zodiac]["About"]
@@ -75,27 +75,25 @@ class ValentineZodiac(commands.Cog):
         """Returns zodiac sign by checking month and date."""
         for zodiac_name, zodiac_data in self.zodiac_fact.items():
             if zodiac_data["start_at"] <= query_datetime <= zodiac_data["end_at"]:
-                zodiac = zodiac_name
-                break
-        log.info("Zodiac name sent.")
-        return zodiac
+                log.info("Zodiac name sent.")
+                return zodiac_name
 
     @commands.group(name='zodiac', invoke_without_command=True)
     async def zodiac(self, ctx: commands.Context, zodiac_sign: str) -> None:
         """Provides information about zodiac sign by taking zodiac sign name as input."""
         final_embed = self.zodiac_build_embed(zodiac_sign)
-        log.info("Embed successfully sent.")
         await ctx.send(embed=final_embed)
+        log.info("Embed successfully sent.")
 
     @zodiac.command(name="date")
     async def date_and_month(self, ctx: commands.Context, query_date: int, month: Union[int, str]) -> None:
         """Provides information about zodiac sign by taking month and date as input."""
         if isinstance(month, str):
+            month = month.capitalize()
             try:
-                month = month.capitalize()
                 month = list(calendar.month_abbr).index(month[:3])
             except ValueError:
-                await ctx.send(f"Sorry, but `{month}` is wrong month name.")
+                await ctx.send(f"Sorry, but `{month}` is not a valid month name.")
                 return
         if (month == 1 and (1 <= query_date <= 19)) or (month == 12 and (22 <= query_date <= 31)):
             zodiac = "capricorn"
@@ -105,16 +103,15 @@ class ValentineZodiac(commands.Cog):
                 zodiac_sign_based_on_month_and_date = self.zodiac_date_verifier(date(2020, month, query_date))
                 log.info("zodiac sign based on month and date received.")
             except ValueError as e:
-                log.info("invalid date or month given.")
                 final_embed = discord.Embed()
                 final_embed.color = Colours.pink
                 final_embed.description = f"Zodiac sign is not found because, {e}"
                 log.info(f"error caused due to: {e}.")
             else:
                 final_embed = self.zodiac_build_embed(zodiac_sign_based_on_month_and_date)
-                log.info("zodiac sign embed based on month and date is now sent.")
 
         await ctx.send(embed=final_embed)
+        log.info("Zodiac sign embed based on month and date is now sent.")
 
     @zodiac.command(name="partnerzodiac")
     async def partner_zodiac(self, ctx: commands.Context, zodiac_sign: str) -> None:
