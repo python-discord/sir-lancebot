@@ -42,10 +42,10 @@ class ValentineZodiac(commands.Cog):
         """Returns error embed."""
         embed = discord.Embed()
         embed.color = Colours.pink
-        err_comp = [f"`{i}` {zod_name}" for i, zod_name in enumerate(self.zodiac_fact.keys(), start=1)]
-        err = ("\n").join(err_comp)
-        error_msg = f"**{zodiac}** is not a valid zodiac sign, here is the list of valid zodiac signs."
-        embed.description = f"{error_msg}\n{err}"
+        error_comp = ("\n").join([f"`{i}` {zod_name}"
+                                  for i, zod_name in enumerate(self.zodiac_fact.keys(), start=1)])
+        embed.description = f"""**{zodiac}** is not a valid zodiac sign, here is the list of valid zodiac signs.
+                            {error_comp}"""
         log.info("Wrong Zodiac name provided")
         return embed
 
@@ -80,7 +80,7 @@ class ValentineZodiac(commands.Cog):
     @commands.group(name='zodiac', invoke_without_command=True)
     async def zodiac(self, ctx: commands.Context, zodiac_sign: str) -> None:
         """Provides information about zodiac sign by taking zodiac sign name as input."""
-        final_embed = self.zodiac_sign_verify(zodiac_sign)
+        final_embed = self.zodiac_build_embed(zodiac_sign)
         log.info("Embed successfully sent")
         await ctx.send(embed=final_embed)
 
@@ -96,7 +96,7 @@ class ValentineZodiac(commands.Cog):
                 return
         if (month == 1 and (1 <= query_date <= 19)) or (month == 12 and (22 <= query_date <= 31)):
             zodiac = "capricorn"
-            final_embed = self.zodiac_sign_verify(zodiac)
+            final_embed = self.zodiac_build_embed(zodiac)
         else:
             try:
                 zodiac_sign_based_on_month_and_date = self.zodiac_date_verifier(date(2020, month, query_date))
@@ -108,7 +108,7 @@ class ValentineZodiac(commands.Cog):
                 final_embed.description = f"Zodiac sign is not found because, {e}"
                 log.info(e)
             else:
-                final_embed = self.zodiac_sign_verify(zodiac_sign_based_on_month_and_date)
+                final_embed = self.zodiac_build_embed(zodiac_sign_based_on_month_and_date)
                 log.info("zodiac sign embed based on month and date is now sent.")
 
         await ctx.send(embed=final_embed)
