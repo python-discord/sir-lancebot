@@ -43,7 +43,7 @@ class ValentineZodiac(commands.Cog):
         embed = discord.Embed()
         embed.color = Colours.pink
         error_comp = "\n".join(
-            [f"`{i}` {zod_name}" for i, zod_name in enumerate(self.zodiac_fact.keys(), start=1)]
+            f"`{i}` {zod_name}" for i, zod_name in enumerate(self.zodiac_fact.keys(), start=1)
         )
         embed.description = (
             f"**{zodiac}** is not a valid zodiac sign, here is the list of valid zodiac signs.\n"
