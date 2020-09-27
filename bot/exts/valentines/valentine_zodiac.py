@@ -127,7 +127,7 @@ class ValentineZodiac(commands.Cog):
             emoji2 = random.choice(HEART_EMOJIS)
             embed.title = "Zodiac Compatibility"
             embed.description = (
-                f'{zodiac_sign.capitalize()}{emoji1}{compatible_zodiac["Zodiac"]}'
+                f'{zodiac_sign.capitalize()}{emoji1}{compatible_zodiac["Zodiac"]}\n'
                 f'{emoji2}Compatibility meter : {compatible_zodiac["compatibility_score"]}{emoji2}'
             )
             embed.add_field(
