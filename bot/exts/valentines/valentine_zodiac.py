@@ -106,7 +106,7 @@ class ValentineZodiac(commands.Cog):
                 final_embed = discord.Embed()
                 final_embed.color = Colours.pink
                 final_embed.description = f"Zodiac sign is not found because, {e}"
-                log.info(f"error caused due to: {e}.")
+                log.info(f"Error in "zodiac date" command:\n{e}.")
             else:
                 final_embed = self.zodiac_build_embed(zodiac_sign_based_on_month_and_date)
 
