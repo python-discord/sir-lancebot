@@ -29,7 +29,7 @@ class Emojis(commands.Cog):
             color=Color.blurple()
         )
         emoji_information.set_thumbnail(
-            url=str(emoji.url)
+            url=emoji.url
         )
         await ctx.send(embed=emoji_information)
 
