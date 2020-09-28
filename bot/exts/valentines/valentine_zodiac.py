@@ -111,7 +111,7 @@ class ValentineZodiac(commands.Cog):
                 final_embed = self.zodiac_build_embed(zodiac_sign_based_on_month_and_date)
 
         await ctx.send(embed=final_embed)
-        log.info("Zodiac sign embed based on month and date is now sent.")
+        log.info("Zodiac sign embed based on date is now sent.")
 
     @zodiac.command(name="partnerzodiac", aliases=['partner'])
     async def partner_zodiac(self, ctx: commands.Context, zodiac_sign: str) -> None:
