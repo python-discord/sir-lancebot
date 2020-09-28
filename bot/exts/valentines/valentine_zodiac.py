@@ -2,7 +2,7 @@ import calendar
 import json
 import logging
 import random
-from datetime import date
+from datetime import datetime
 from pathlib import Path
 from typing import Tuple, Union
 
@@ -32,8 +32,8 @@ class ValentineZodiac(commands.Cog):
         with explanation_file.open(encoding="utf8") as json_data:
             zodiac_fact = json.load(json_data)
             for zodiac_data in zodiac_fact.values():
-                zodiac_data['start_at'] = date.fromisoformat(zodiac_data['start_at'])
-                zodiac_data['end_at'] = date.fromisoformat(zodiac_data['end_at'])
+                zodiac_data['start_at'] = datetime.fromisoformat(zodiac_data['start_at'])
+                zodiac_data['end_at'] = datetime.fromisoformat(zodiac_data['end_at'])
         with compatibility_file.open(encoding="utf8") as json_data:
             zodiacs = json.load(json_data)
         return zodiacs, zodiac_fact
@@ -71,10 +71,10 @@ class ValentineZodiac(commands.Cog):
         log.info("Zodiac embed ready.")
         return embed
 
-    def zodiac_date_verifier(self, query_datetime: date) -> str:
+    def zodiac_date_verifier(self, query_datetime: datetime) -> str:
         """Returns zodiac sign by checking month and date."""
         for zodiac_name, zodiac_data in self.zodiac_fact.items():
-            if zodiac_data["start_at"] <= query_datetime <= zodiac_data["end_at"]:
+            if zodiac_data["start_at"].date() <= query_datetime.date() <= zodiac_data["end_at"].date():
                 log.info("Zodiac name sent.")
                 return zodiac_name
 
@@ -86,7 +86,7 @@ class ValentineZodiac(commands.Cog):
         log.info("Embed successfully sent.")
 
     @zodiac.command(name="date")
-    async def date_and_month(self, ctx: commands.Context, query_date: int, month: Union[int, str]) -> None:
+    async def date_and_month(self, ctx: commands.Context, date: int, month: Union[int, str]) -> None:
         """Provides information about zodiac sign by taking month and date as input."""
         if isinstance(month, str):
             month = month.capitalize()
@@ -95,12 +95,12 @@ class ValentineZodiac(commands.Cog):
             except ValueError:
                 await ctx.send(f"Sorry, but `{month}` is not a valid month name.")
                 return
-        if (month == 1 and (1 <= query_date <= 19)) or (month == 12 and (22 <= query_date <= 31)):
+        if (month == 1 and (1 <= date <= 19)) or (month == 12 and (22 <= date <= 31)):
             zodiac = "capricorn"
             final_embed = self.zodiac_build_embed(zodiac)
         else:
             try:
-                zodiac_sign_based_on_month_and_date = self.zodiac_date_verifier(date(2020, month, query_date))
+                zodiac_sign_based_on_month_and_date = self.zodiac_date_verifier(datetime(2020, month, date))
                 log.info("zodiac sign based on month and date received.")
             except ValueError as e:
                 final_embed = discord.Embed()
@@ -113,7 +113,7 @@ class ValentineZodiac(commands.Cog):
         await ctx.send(embed=final_embed)
         log.info("Zodiac sign embed based on month and date is now sent.")
 
-    @zodiac.command(name="partnerzodiac")
+    @zodiac.command(name="partnerzodiac", aliases=['partner'])
     async def partner_zodiac(self, ctx: commands.Context, zodiac_sign: str) -> None:
         """Provides a counter compatible zodiac sign to the given user's zodiac sign."""
         embed = discord.Embed()
