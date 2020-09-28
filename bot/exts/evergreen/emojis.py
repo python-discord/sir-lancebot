@@ -24,7 +24,7 @@ class Emojis(commands.Cog):
                 Name: {emoji.name}
                 Created: {time_since(emoji.created_at)}
                 ID: {emoji.id}
-                Emote source: [Link]({emoji.url})
+                [Emoji source image]({emoji.url})
             """),
             color=Color.blurple()
         )
