@@ -22,7 +22,7 @@ class Emojis(commands.Cog):
             title=f'Information about "{emoji.name}"',
             description=textwrap.dedent(f"""
                 Name: {emoji.name}
-                Created: {time_since(emoji.created_at)}
+                Created: {time_since(emoji.created_at, precision="hours")}
                 ID: {emoji.id}
                 [Emoji source image]({emoji.url})
             """),
