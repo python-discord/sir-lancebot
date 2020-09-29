@@ -265,3 +265,6 @@ POSITIVE_REPLIES = [
 
 class Wikipedia:
     total_chance = 3
+
+class Source:
+    github = "https://github.com/python-discord/seasonalbot"
