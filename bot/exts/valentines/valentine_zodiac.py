@@ -38,10 +38,10 @@ class ValentineZodiac(commands.Cog):
             zodiacs = json.load(json_data)
         return zodiacs, zodiac_fact
 
-    def error(self, zodiac: str) -> discord.Embed:
+    def generate_invalidname_embed(self, zodiac: str) -> discord.Embed:
         """Returns error embed."""
         embed = discord.Embed()
-        embed.color = Colours.pink
+        embed.color = Colours.soft_red
         error_comp = "\n".join(
             f"`{i}` {zod_name}" for i, zod_name in enumerate(self.zodiac_fact.keys(), start=1)
         )
@@ -67,7 +67,7 @@ class ValentineZodiac(commands.Cog):
             embed.add_field(name='__Weaknesses__', value=self.zodiac_fact[zodiac]["Weaknesses"], inline=False)
             embed.set_thumbnail(url=self.zodiac_fact[zodiac]["url"])
         else:
-            embed = self.error(zodiac)
+            embed = self.generate_invalidname_embed(zodiac)
         log.info("Zodiac embed ready.")
         return embed
 
@@ -95,12 +95,12 @@ class ValentineZodiac(commands.Cog):
             except ValueError:
                 await ctx.send(f"Sorry, but `{month}` is not a valid month name.")
                 return
-        if (month == 1 and (1 <= date <= 19)) or (month == 12 and (22 <= date <= 31)):
+        if (month == 1 and 1 <= date <= 19) or (month == 12 and 22 <= date <= 31):
             zodiac = "capricorn"
             final_embed = self.zodiac_build_embed(zodiac)
         else:
             try:
-                zodiac_sign_based_on_month_and_date = self.zodiac_date_verifier(datetime(2020, month, date))
+                zodiac_sign_based_on_date = self.zodiac_date_verifier(datetime(2020, month, date))
                 log.info("zodiac sign based on month and date received.")
             except ValueError as e:
                 final_embed = discord.Embed()
@@ -108,7 +108,7 @@ class ValentineZodiac(commands.Cog):
                 final_embed.description = f"Zodiac sign is not found because, {e}"
                 log.info(f'Error in "zodiac date" command:\n{e}.')
             else:
-                final_embed = self.zodiac_build_embed(zodiac_sign_based_on_month_and_date)
+                final_embed = self.zodiac_build_embed(zodiac_sign_based_on_date)
 
         await ctx.send(embed=final_embed)
         log.info("Zodiac sign embed based on date is now sent.")
@@ -132,7 +132,7 @@ class ValentineZodiac(commands.Cog):
                 value=compatible_zodiac['description']
             )
         except KeyError:
-            embed = self.error(zodiac_sign)
+            embed = self.generate_invalidname_embed(zodiac_sign)
         await ctx.send(embed=embed)
 
 
