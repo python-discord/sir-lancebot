@@ -104,7 +104,7 @@ class ValentineZodiac(commands.Cog):
                 log.info("zodiac sign based on month and date received.")
             except ValueError as e:
                 final_embed = discord.Embed()
-                final_embed.color = Colours.pink
+                final_embed.color = Colours.soft_red
                 final_embed.description = f"Zodiac sign is not found because, {e}"
                 log.info(f'Error in "zodiac date" command:\n{e}.')
             else:
