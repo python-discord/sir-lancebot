@@ -50,8 +50,11 @@ class TimeLeft(commands.Cog):
         if self.in_hacktober():
             minutes = seconds // 60
             hours, minutes = divmod(minutes, 60)
-            await ctx.send(f"There are {days} days, {hours} hours and {minutes}"
-                           " minutes left until the end of Hacktober.")
+
+            await ctx.send(
+                f"There are {days} days, {hours} hours and {minutes}"
+                f" minutes left until the end of Hacktober."
+            )
         else:
             start_diff = start - now
             start_days = start_diff.days
