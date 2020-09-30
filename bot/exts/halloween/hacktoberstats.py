@@ -175,11 +175,11 @@ class HacktoberStats(commands.Cog):
 
         n = pr_stats['n_prs']
         if n >= PRS_FOR_SHIRT:
-            shirtstr = f"**{github_username} has earned a tshirt!**"
+            shirtstr = f"**{github_username} has earned a T-shirt or a tree!**"
         elif n == PRS_FOR_SHIRT - 1:
-            shirtstr = f"**{github_username} is 1 PR away from a tshirt!**"
+            shirtstr = f"**{github_username} is 1 PR away from a T-shirt or a tree!**"
         else:
-            shirtstr = f"**{github_username} is {PRS_FOR_SHIRT - n} PRs away from a tshirt!**"
+            shirtstr = f"**{github_username} is {PRS_FOR_SHIRT - n} PRs away from a T-shirt or a tree!**"
 
         stats_embed = discord.Embed(
             title=f"{github_username}'s Hacktoberfest",
