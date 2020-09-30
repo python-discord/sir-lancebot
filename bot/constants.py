@@ -74,7 +74,7 @@ class Channels(NamedTuple):
     python_discussion = 267624335836053506
     show_your_projects = int(environ.get("CHANNEL_SHOW_YOUR_PROJECTS", 303934982764625920))
     show_your_projects_discussion = 360148304664723466
-    hacktoberfest_2019 = 628184417646411776
+    hacktoberfest_2020 = 760857070781071431
 
 
 class Client(NamedTuple):
