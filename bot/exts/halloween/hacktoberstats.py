@@ -29,7 +29,7 @@ class HacktoberStats(commands.Cog):
         self.link_json = make_persistent(Path("bot", "resources", "halloween", "github_links.json"))
         self.linked_accounts = self.load_linked_users()
 
-    @in_month(Month.OCTOBER)
+    @in_month(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)
     @commands.group(name="hacktoberstats", aliases=("hackstats",), invoke_without_command=True)
     @override_in_channel(HACKTOBER_WHITELIST)
     async def hacktoberstats_group(self, ctx: commands.Context, github_username: str = None) -> None:
@@ -57,7 +57,7 @@ class HacktoberStats(commands.Cog):
 
         await self.get_stats(ctx, github_username)
 
-    @in_month(Month.OCTOBER)
+    @in_month(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)
     @hacktoberstats_group.command(name="link")
     @override_in_channel(HACKTOBER_WHITELIST)
     async def link_user(self, ctx: commands.Context, github_username: str = None) -> None:
@@ -92,7 +92,7 @@ class HacktoberStats(commands.Cog):
             logging.info(f"{author_id} tried to link a GitHub account but didn't provide a username")
             await ctx.send(f"{author_mention}, a GitHub username is required to link your account")
 
-    @in_month(Month.OCTOBER)
+    @in_month(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)
     @hacktoberstats_group.command(name="unlink")
     @override_in_channel(HACKTOBER_WHITELIST)
     async def unlink_user(self, ctx: commands.Context) -> None:
@@ -175,11 +175,11 @@ class HacktoberStats(commands.Cog):
 
         n = pr_stats['n_prs']
         if n >= PRS_FOR_SHIRT:
-            shirtstr = f"**{github_username} has earned a tshirt!**"
+            shirtstr = f"**{github_username} has earned a T-shirt or a tree!**"
         elif n == PRS_FOR_SHIRT - 1:
-            shirtstr = f"**{github_username} is 1 PR away from a tshirt!**"
+            shirtstr = f"**{github_username} is 1 PR away from a T-shirt or a tree!**"
         else:
-            shirtstr = f"**{github_username} is {PRS_FOR_SHIRT - n} PRs away from a tshirt!**"
+            shirtstr = f"**{github_username} is {PRS_FOR_SHIRT - n} PRs away from a T-shirt or a tree!**"
 
         stats_embed = discord.Embed(
             title=f"{github_username}'s Hacktoberfest",
@@ -196,7 +196,7 @@ class HacktoberStats(commands.Cog):
         stats_embed.set_author(
             name="Hacktoberfest",
             url="https://hacktoberfest.digitalocean.com",
-            icon_url="https://hacktoberfest.digitalocean.com/pretty_logo.png"
+            icon_url="https://avatars1.githubusercontent.com/u/35706162?s=200&v=4"
         )
         stats_embed.add_field(
             name="Top 5 Repositories:",
