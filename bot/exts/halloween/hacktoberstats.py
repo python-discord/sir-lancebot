@@ -196,7 +196,7 @@ class HacktoberStats(commands.Cog):
         stats_embed.set_author(
             name="Hacktoberfest",
             url="https://hacktoberfest.digitalocean.com",
-            icon_url="https://hacktoberfest.digitalocean.com/pretty_logo.png"
+            icon_url="https://avatars1.githubusercontent.com/u/35706162?s=200&v=4"
         )
         stats_embed.add_field(
             name="Top 5 Repositories:",
