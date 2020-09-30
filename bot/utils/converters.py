@@ -2,7 +2,7 @@ import discord
 from discord.ext.commands.converter import MessageConverter
 
 
-class BetterMessageConverter(MessageConverter):
+class WrappedMessageConverter(MessageConverter):
     """A converter that handles embed-suppressed links like <http://example.com>."""
 
     async def convert(self, ctx: discord.ext.commands.Context, argument: str) -> discord.Message:
