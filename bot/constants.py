@@ -11,7 +11,6 @@ __all__ = (
     "Client",
     "Colours",
     "Emojis",
-    "Hacktoberfest",
     "Icons",
     "Lovefest",
     "Month",
@@ -127,10 +126,6 @@ class Emojis:
     status_idle = "<:status_idle:470326266625785866>"
     status_dnd = "<:status_dnd:470326272082313216>"
     status_offline = "<:status_offline:470326266537705472>"
-
-
-class Hacktoberfest(NamedTuple):
-    voice_id = 514420006474219521
 
 
 class Icons:
