@@ -29,7 +29,7 @@ class HacktoberStats(commands.Cog):
         self.link_json = make_persistent(Path("bot", "resources", "halloween", "github_links.json"))
         self.linked_accounts = self.load_linked_users()
 
-    @in_month(Month.OCTOBER)
+    @in_month(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)
     @commands.group(name="hacktoberstats", aliases=("hackstats",), invoke_without_command=True)
     @override_in_channel(HACKTOBER_WHITELIST)
     async def hacktoberstats_group(self, ctx: commands.Context, github_username: str = None) -> None:
@@ -57,7 +57,7 @@ class HacktoberStats(commands.Cog):
 
         await self.get_stats(ctx, github_username)
 
-    @in_month(Month.OCTOBER)
+    @in_month(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)
     @hacktoberstats_group.command(name="link")
     @override_in_channel(HACKTOBER_WHITELIST)
     async def link_user(self, ctx: commands.Context, github_username: str = None) -> None:
@@ -92,7 +92,7 @@ class HacktoberStats(commands.Cog):
             logging.info(f"{author_id} tried to link a GitHub account but didn't provide a username")
             await ctx.send(f"{author_mention}, a GitHub username is required to link your account")
 
-    @in_month(Month.OCTOBER)
+    @in_month(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)
     @hacktoberstats_group.command(name="unlink")
     @override_in_channel(HACKTOBER_WHITELIST)
     async def unlink_user(self, ctx: commands.Context) -> None:
