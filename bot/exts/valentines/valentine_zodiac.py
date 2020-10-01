@@ -68,14 +68,14 @@ class ValentineZodiac(commands.Cog):
             embed.set_thumbnail(url=self.zodiac_fact[zodiac]["url"])
         else:
             embed = self.generate_invalidname_embed(zodiac)
-        log.info("Zodiac embed ready.")
+        log.trace("Successfully created zodiac information embed.")
         return embed
 
-    def zodiac_date_verifier(self, query_datetime: datetime) -> str:
+    def zodiac_date_verifier(self, date: datetime) -> str:
         """Returns zodiac sign by checking month and date."""
         for zodiac_name, zodiac_data in self.zodiac_fact.items():
-            if zodiac_data["start_at"].date() <= query_datetime.date() <= zodiac_data["end_at"].date():
-                log.info("Zodiac name sent.")
+            if zodiac_data["start_at"].date() <= date.date() <= zodiac_data["end_at"].date():
+                log.trace("Zodiac name sent.")
                 return zodiac_name
 
     @commands.group(name='zodiac', invoke_without_command=True)
@@ -83,7 +83,7 @@ class ValentineZodiac(commands.Cog):
         """Provides information about zodiac sign by taking zodiac sign name as input."""
         final_embed = self.zodiac_build_embed(zodiac_sign)
         await ctx.send(embed=final_embed)
-        log.info("Embed successfully sent.")
+        log.trace("Embed successfully sent.")
 
     @zodiac.command(name="date")
     async def date_and_month(self, ctx: commands.Context, date: int, month: Union[int, str]) -> None:
@@ -92,7 +92,9 @@ class ValentineZodiac(commands.Cog):
             month = month.capitalize()
             try:
                 month = list(calendar.month_abbr).index(month[:3])
+                log.info('Valid month name entered by user')
             except ValueError:
+                log.info('Invalid month name entered by user')
                 await ctx.send(f"Sorry, but `{month}` is not a valid month name.")
                 return
         if (month == 1 and 1 <= date <= 19) or (month == 12 and 22 <= date <= 31):
@@ -105,35 +107,33 @@ class ValentineZodiac(commands.Cog):
             except ValueError as e:
                 final_embed = discord.Embed()
                 final_embed.color = Colours.soft_red
-                final_embed.description = f"Zodiac sign is not found because, {e}"
+                final_embed.description = f"Zodiac sign could not be found because.\n`{e}`"
                 log.info(f'Error in "zodiac date" command:\n{e}.')
             else:
                 final_embed = self.zodiac_build_embed(zodiac_sign_based_on_date)
 
         await ctx.send(embed=final_embed)
-        log.info("Zodiac sign embed based on date is now sent.")
+        log.trace("Embed from date successfully sent.")
 
     @zodiac.command(name="partnerzodiac", aliases=['partner'])
     async def partner_zodiac(self, ctx: commands.Context, zodiac_sign: str) -> None:
-        """Provides a counter compatible zodiac sign to the given user's zodiac sign."""
+        """Provides a random counter compatible zodiac sign to the given user's zodiac sign."""
         embed = discord.Embed()
         embed.color = Colours.pink
-        try:
-            compatible_zodiac = random.choice(self.zodiacs[zodiac_sign.lower()])
-            emoji1 = random.choice(HEART_EMOJIS)
-            emoji2 = random.choice(HEART_EMOJIS)
-            embed.title = "Zodiac Compatibility"
-            embed.description = (
-                f'{zodiac_sign.capitalize()}{emoji1}{compatible_zodiac["Zodiac"]}\n'
-                f'{emoji2}Compatibility meter : {compatible_zodiac["compatibility_score"]}{emoji2}'
-            )
-            embed.add_field(
-                name=f'A letter from Dr.Zodiac {LETTER_EMOJI}',
-                value=compatible_zodiac['description']
-            )
-        except KeyError:
-            embed = self.generate_invalidname_embed(zodiac_sign)
+        compatible_zodiac = random.choice(self.zodiacs[zodiac_sign.capitalize()])
+        emoji1 = random.choice(HEART_EMOJIS)
+        emoji2 = random.choice(HEART_EMOJIS)
+        embed.title = "Zodiac Compatibility"
+        embed.description = (
+            f'{zodiac_sign.capitalize()}{emoji1}{compatible_zodiac["Zodiac"]}\n'
+            f'{emoji2}Compatibility meter : {compatible_zodiac["compatibility_score"]}{emoji2}'
+        )
+        embed.add_field(
+            name=f'A letter from Dr.Zodiac {LETTER_EMOJI}',
+            value=compatible_zodiac['description']
+        )
         await ctx.send(embed=embed)
+        log.trace("Embed from date successfully sent.")
 
 
 def setup(bot: commands.Bot) -> None:
