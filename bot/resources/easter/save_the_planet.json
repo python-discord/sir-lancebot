@@ -1,0 +1,17 @@
+{
+    "embeds": [
+        {
+            "topic": "Choose Reneweable Energy",
+            "image_url": "https://cdn.dnaindia.com/sites/default/files/styles/full/public/2019/07/23/851602-renewable-energy-istock-072419.jpg",
+            "problem": "Getting energy from oil or fossil fuels isn't a good idea, because there is only so much of it.",
+            "solution": "Use renewable energy, such as wind, solar, and hydro, because it is healthier and is not a finite resource!"
+        },
+
+        {
+            "topic": "Save the Trees!",
+            "image_url": "https://www.thecollegesolution.com/wp-content/uploads/2014/07/crumpled-paper-1.jpg",
+            "problem": "We often waste trees on making paper, and just getting rid of them for no good reason.",
+            "solution": "Make sure you only use paper when absolutely neccesary. Find ways to plant trees (participate in Hacktober!) to combat losing them."
+        }
+    ]
+}
