@@ -45,7 +45,8 @@ class ValentineZodiac(commands.Cog):
         embed = discord.Embed()
         embed.color = Colours.soft_red
         error_comp = "\n".join(
-            f"`{i}` {zod_name}" for i, zod_name in enumerate(self.zodiac_fact.keys(), start=1)
+            f"`{i}` {name}: {zodiac['start_at'].date()} - {zodiac['end_at'].date()}"
+            for i, (name, zodiac) in enumerate(sorted(self.zodiac_fact.items()), start=1)
         )
         embed.description = (
             f"**{zodiac}** is not a valid zodiac sign, here is the list of valid zodiac signs.\n"
@@ -60,7 +61,7 @@ class ValentineZodiac(commands.Cog):
         embed = discord.Embed()
         embed.color = Colours.pink
         if zodiac in self.zodiac_fact:
-            log.info("Making zodiac embed.")
+            log.trace("Making zodiac embed.")
             embed.title = f"__{zodiac}__"
             embed.description = self.zodiac_fact[zodiac]["About"]
             embed.add_field(name='__Motto__', value=self.zodiac_fact[zodiac]["Motto"], inline=False)
