@@ -10,7 +10,7 @@ import aiohttp
 import discord
 from discord.ext import commands
 
-from bot.constants import Channels, Month, WHITELISTED_CHANNELS
+from bot.constants import Channels, Month, Tokens, WHITELISTED_CHANNELS
 from bot.utils.decorators import in_month, override_in_channel
 from bot.utils.persist import make_persistent
 
@@ -19,6 +19,10 @@ log = logging.getLogger(__name__)
 CURRENT_YEAR = datetime.now().year  # Used to construct GH API query
 PRS_FOR_SHIRT = 4  # Minimum number of PRs before a shirt is awarded
 HACKTOBER_WHITELIST = WHITELISTED_CHANNELS + (Channels.hacktoberfest_2020,)
+
+REQUEST_HEADERS = {"User-Agent": "Python Discord Hacktoberbot"}
+if GITHUB_TOKEN := Tokens.github:
+    REQUEST_HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
 
 
 class HacktoberStats(commands.Cog):
@@ -242,9 +246,8 @@ class HacktoberStats(commands.Cog):
             f"&per_page={per_page}"
         )
 
-        headers = {"user-agent": "Discord Python Hacktoberbot"}
         async with aiohttp.ClientSession() as session:
-            async with session.get(query_url, headers=headers) as resp:
+            async with session.get(query_url, headers=REQUEST_HEADERS) as resp:
                 jsonresp = await resp.json()
 
         if "message" in jsonresp.keys():
