@@ -63,10 +63,10 @@ class ValentineZodiac(commands.Cog):
             log.info("Making zodiac embed.")
             embed.title = f"__{zodiac}__"
             embed.description = self.zodiac_fact[zodiac]["About"]
-            embed.add_field(name='__Full form__', value=self.zodiac_fact[zodiac]["full_form"], inline=False)
             embed.add_field(name='__Motto__', value=self.zodiac_fact[zodiac]["Motto"], inline=False)
             embed.add_field(name='__Strengths__', value=self.zodiac_fact[zodiac]["Strengths"], inline=False)
             embed.add_field(name='__Weaknesses__', value=self.zodiac_fact[zodiac]["Weaknesses"], inline=False)
+            embed.add_field(name='__Full form__', value=self.zodiac_fact[zodiac]["full_form"], inline=False)
             embed.set_thumbnail(url=self.zodiac_fact[zodiac]["url"])
         else:
             embed = self.generate_invalidname_embed(zodiac)
