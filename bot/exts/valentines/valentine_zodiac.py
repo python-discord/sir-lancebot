@@ -44,14 +44,16 @@ class ValentineZodiac(commands.Cog):
         """Returns error embed."""
         embed = discord.Embed()
         embed.color = Colours.soft_red
-        error_comp = "\n".join(
-            f"`{i}` {name}: {zodiac['start_at'].strftime('%B `%d`')} - {zodiac['end_at'].strftime('%B `%d`')}"
-            for i, (name, zodiac) in enumerate(sorted(self.zodiac_fact.items()), start=1)
-        )
-        embed.description = (
-            f"**{zodiac}** is not a valid zodiac sign, here is the list of valid zodiac signs.\n"
-            f"{error_comp}"
-        )
+        error_msg = f"**{zodiac}** is not a valid zodiac sign, here is the list of valid zodiac signs.\n"
+        valid_zodiac_name = ''
+        for name in sorted(self.zodiac_fact.keys()):
+            if name == "Leo":
+                valid_zodiac_name += f'{name}\n '
+            elif name == 'Virgo':
+                valid_zodiac_name += name
+            else:
+                valid_zodiac_name += f'{name}, '
+        embed.description = error_msg + valid_zodiac_name
         log.info("Invalid zodiac name provided.")
         return embed
 
