@@ -45,8 +45,9 @@ class ValentineZodiac(commands.Cog):
         embed = discord.Embed()
         embed.color = Colours.soft_red
         error_msg = f"**{zodiac}** is not a valid zodiac sign, here is the list of valid zodiac signs.\n"
-        valid_zodiac_name = ", ".join(self.zodiac_fact).replace("Leo, ", "Leo,\n")
-        embed.description = error_msg + valid_zodiac_name
+        first_part_of_valid_name_list = ", ".join(name for name in list(self.zodiac_fact.keys())[:7])
+        end_part_of_valid_name_list = ", ".join(name for name in list(self.zodiac_fact.keys())[7:])
+        embed.description = error_msg + first_part_of_valid_name_list + ",\n" + end_part_of_valid_name_list
         log.info("Invalid zodiac name provided.")
         return embed
 
