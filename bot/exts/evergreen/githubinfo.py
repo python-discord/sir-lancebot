@@ -1,7 +1,7 @@
 import logging
-import aiohttp
 from datetime import datetime
 
+import aiohttp
 import discord
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
@@ -10,13 +10,13 @@ log = logging.getLogger(__name__)
 
 
 class GithubInfo(commands.Cog):
+    """Fetches GitHub."""
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     async def fetch_data(self, url: str) -> dict:
-        """Retrieve data as a dictionary"""
-
+        """Retrieve data as a dictionary."""
         async with aiohttp.ClientSession() as cs:
             async with cs.get(url) as r:
                 return await r.json()
@@ -24,13 +24,13 @@ class GithubInfo(commands.Cog):
     @commands.command(name='github', aliases=['gh'])
     @commands.cooldown(1, 5, BucketType.user)
     async def get_github_info(self, ctx: commands.Context, username: str = 'python-discord') -> None:
-        """Fetches a user's GitHub information
+        """
+        Fetches a user's GitHub information.
 
-        User defaults to python-discord
+        User defaults to python-discord.
 
         Usage: .gh [username]
         """
-
         # fetch user data
         user_data = await self.fetch_data(f"https://api.github.com/users/{username}")
 
@@ -84,5 +84,5 @@ class GithubInfo(commands.Cog):
 
 
 def setup(bot: commands.Bot) -> None:
-    """Adding the cog to the bot"""
+    """Adding the cog to the bot."""
     bot.add_cog(GithubInfo(bot))
