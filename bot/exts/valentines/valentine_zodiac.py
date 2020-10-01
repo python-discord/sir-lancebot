@@ -94,7 +94,7 @@ class ValentineZodiac(commands.Cog):
             month = month.capitalize()
             try:
                 month = list(calendar.month_abbr).index(month[:3])
-                log.info('Valid month name entered by user')
+                log.trace('Valid month name entered by user')
             except ValueError:
                 log.info('Invalid month name entered by user')
                 await ctx.send(f"Sorry, but `{month}` is not a valid month name.")
@@ -105,7 +105,7 @@ class ValentineZodiac(commands.Cog):
         else:
             try:
                 zodiac_sign_based_on_date = self.zodiac_date_verifier(datetime(2020, month, date))
-                log.info("zodiac sign based on month and date received.")
+                log.trace("zodiac sign based on month and date received.")
             except ValueError as e:
                 final_embed = discord.Embed()
                 final_embed.color = Colours.soft_red
