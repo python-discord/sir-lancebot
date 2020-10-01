@@ -24,6 +24,11 @@ REQUEST_HEADERS = {"User-Agent": "Python Discord Hacktoberbot"}
 if GITHUB_TOKEN := Tokens.github:
     REQUEST_HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
 
+GITHUB_NONEXISTENT_USER_MESSAGE = (
+    "The listed users cannot be searched either because the users do not exist "
+    "or you do not have permission to view the users."
+)
+
 
 class HacktoberStats(commands.Cog):
     """Hacktoberfest statistics Cog."""
@@ -247,19 +252,21 @@ class HacktoberStats(commands.Cog):
         )
 
         async with aiohttp.ClientSession() as session:
-            async with session.get(f"https://api.github.com/users/{github_username}", headers=REQUEST_HEADERS) as resp:
-                if resp.status == 404:
-                    logging.debug(f"No GitHub user found named '{github_username}'")
-                    return
-
             async with session.get(query_url, headers=REQUEST_HEADERS) as resp:
                 jsonresp = await resp.json()
 
         if "message" in jsonresp.keys():
             # One of the parameters is invalid, short circuit for now
             api_message = jsonresp["errors"][0]["message"]
-            logging.error(f"GitHub API request for '{github_username}' failed with message: {api_message}")
+
+            # Ignore logging non-existent users or users we do not have permission to see
+            if api_message == GITHUB_NONEXISTENT_USER_MESSAGE:
+                logging.debug(f"No GitHub user found named '{github_username}'")
+            else:
+                logging.error(f"GitHub API request for '{github_username}' failed with message: {api_message}")
+
             return
+
         else:
             if jsonresp["total_count"] == 0:
                 # Short circuit if there aren't any PRs
