@@ -109,7 +109,7 @@ class ValentineZodiac(commands.Cog):
             except ValueError as e:
                 final_embed = discord.Embed()
                 final_embed.color = Colours.soft_red
-                final_embed.description = f"Zodiac sign could not be found because.\n`{e}`"
+                final_embed.description = f"Zodiac sign could not be found because.\n```{e}```"
                 log.info(f'Error in "zodiac date" command:\n{e}.')
             else:
                 final_embed = self.zodiac_build_embed(zodiac_sign_based_on_date)
