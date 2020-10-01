@@ -247,6 +247,11 @@ class HacktoberStats(commands.Cog):
         )
 
         async with aiohttp.ClientSession() as session:
+            async with session.get(f"https://api.github.com/users/{github_username}", headers=REQUEST_HEADERS) as resp:
+                if resp.status == 404:
+                    logging.debug(f"No GitHub user found named '{github_username}'")
+                    return
+
             async with session.get(query_url, headers=REQUEST_HEADERS) as resp:
                 jsonresp = await resp.json()
 
