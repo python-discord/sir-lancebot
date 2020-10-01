@@ -45,7 +45,7 @@ class ValentineZodiac(commands.Cog):
         embed = discord.Embed()
         embed.color = Colours.soft_red
         error_comp = "\n".join(
-            f"`{i}` {name}: {zodiac['start_at'].date()} - {zodiac['end_at'].date()}"
+            f"`{i}` {name}: {zodiac['start_at'].strftime('%B `%d`')} - {zodiac['end_at'].strftime('%B `%d`')}"
             for i, (name, zodiac) in enumerate(sorted(self.zodiac_fact.items()), start=1)
         )
         embed.description = (
