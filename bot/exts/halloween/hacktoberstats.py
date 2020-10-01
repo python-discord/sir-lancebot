@@ -10,7 +10,7 @@ import aiohttp
 import discord
 from discord.ext import commands
 
-from bot.constants import Channels, Month, WHITELISTED_CHANNELS
+from bot.constants import Channels, Month, Tokens, WHITELISTED_CHANNELS
 from bot.utils.decorators import in_month, override_in_channel
 from bot.utils.persist import make_persistent
 
@@ -19,6 +19,15 @@ log = logging.getLogger(__name__)
 CURRENT_YEAR = datetime.now().year  # Used to construct GH API query
 PRS_FOR_SHIRT = 4  # Minimum number of PRs before a shirt is awarded
 HACKTOBER_WHITELIST = WHITELISTED_CHANNELS + (Channels.hacktoberfest_2020,)
+
+REQUEST_HEADERS = {"User-Agent": "Python Discord Hacktoberbot"}
+if GITHUB_TOKEN := Tokens.github:
+    REQUEST_HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
+
+GITHUB_NONEXISTENT_USER_MESSAGE = (
+    "The listed users cannot be searched either because the users do not exist "
+    "or you do not have permission to view the users."
+)
 
 
 class HacktoberStats(commands.Cog):
@@ -242,16 +251,22 @@ class HacktoberStats(commands.Cog):
             f"&per_page={per_page}"
         )
 
-        headers = {"user-agent": "Discord Python Hacktoberbot"}
         async with aiohttp.ClientSession() as session:
-            async with session.get(query_url, headers=headers) as resp:
+            async with session.get(query_url, headers=REQUEST_HEADERS) as resp:
                 jsonresp = await resp.json()
 
         if "message" in jsonresp.keys():
             # One of the parameters is invalid, short circuit for now
             api_message = jsonresp["errors"][0]["message"]
-            logging.error(f"GitHub API request for '{github_username}' failed with message: {api_message}")
+
+            # Ignore logging non-existent users or users we do not have permission to see
+            if api_message == GITHUB_NONEXISTENT_USER_MESSAGE:
+                logging.debug(f"No GitHub user found named '{github_username}'")
+            else:
+                logging.error(f"GitHub API request for '{github_username}' failed with message: {api_message}")
+
             return
+
         else:
             if jsonresp["total_count"] == 0:
                 # Short circuit if there aren't any PRs
