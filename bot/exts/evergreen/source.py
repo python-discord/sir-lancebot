@@ -15,6 +15,9 @@ class SourceConverter(commands.Converter):
 
     async def convert(self, ctx: commands.Context, argument: str) -> SourceType:
         """Convert argument into source object."""
+        if argument.lower().startswith("help"):
+            return ctx.bot.help_command
+
         cog = ctx.bot.get_cog(argument)
         if cog:
             return cog
@@ -38,9 +41,9 @@ class BotSource(commands.Cog):
     async def source_command(self, ctx: commands.Context, *, source_item: SourceConverter = None) -> None:
         """Display information and a GitHub link to the source code of a command, tag, or cog."""
         if not source_item:
-            embed = Embed(title="Bot's GitHub Repository")
+            embed = Embed(title="Seasonal Bot's GitHub Repository")
             embed.add_field(name="Repository", value=f"[Go to GitHub]({Source.github})")
-            embed.set_thumbnail(url="https://avatars1.githubusercontent.com/u/9919")
+            embed.set_thumbnail(url="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png")
             await ctx.send(embed=embed)
             return
 
@@ -114,6 +117,7 @@ class BotSource(commands.Cog):
             description = source_object.description.splitlines()[0]
 
         embed = Embed(title=title, description=description)
+        embed.set_thumbnail(url="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png")
         embed.add_field(name="Source Code", value=f"[Go to GitHub]({url})")
         line_text = f":{first_line}" if first_line else ""
         embed.set_footer(text=f"{location}{line_text}")
