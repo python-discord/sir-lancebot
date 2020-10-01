@@ -34,8 +34,10 @@ class ValentineZodiac(commands.Cog):
             for zodiac_data in zodiac_fact.values():
                 zodiac_data['start_at'] = datetime.fromisoformat(zodiac_data['start_at'])
                 zodiac_data['end_at'] = datetime.fromisoformat(zodiac_data['end_at'])
+
         with compatibility_file.open(encoding="utf8") as json_data:
             zodiacs = json.load(json_data)
+
         return zodiacs, zodiac_fact
 
     def generate_invalidname_embed(self, zodiac: str) -> discord.Embed:
