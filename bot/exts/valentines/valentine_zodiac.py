@@ -73,10 +73,10 @@ class ValentineZodiac(commands.Cog):
         log.trace("Successfully created zodiac information embed.")
         return embed
 
-    def zodiac_date_verifier(self, date: datetime) -> str:
-        """Returns zodiac sign by checking month and date."""
+    def zodiac_date_verifier(self, query_date: datetime) -> str:
+        """Returns zodiac sign by checking date."""
         for zodiac_name, zodiac_data in self.zodiac_fact.items():
-            if zodiac_data["start_at"].date() <= date.date() <= zodiac_data["end_at"].date():
+            if zodiac_data["start_at"].date() <= query_date.date() <= zodiac_data["end_at"].date():
                 log.trace("Zodiac name sent.")
                 return zodiac_name
 
