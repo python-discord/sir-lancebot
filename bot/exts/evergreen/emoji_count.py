@@ -32,8 +32,8 @@ class EmojiCount(commands.Cog):
             msg = ''
             for key, value in emoji.items():
                 emoji_choice = random.choice(value)
-                error_msg = f'There are **{len(value)}** emojis in the **{key}** category\n'
-                msg += f'<:{emoji_choice.name}:{emoji_choice.id}> {error_msg}'
+                emoji_info = f'There are **{len(value)}** emojis in the **{key}** category\n'
+                msg += f'<:{emoji_choice.name}:{emoji_choice.id}> {emoji_info}'
             embed.description = msg
         log.trace('Emoji embed sent')
         return embed
@@ -61,7 +61,7 @@ class EmojiCount(commands.Cog):
         log.trace("Emoji dict sent")
         return emojis
 
-    @commands.command(name="ec")
+    @commands.command(name="emoji_count", aliases=["ec"])
     async def ec(self, ctx: commands.Context, *, emoji: str = None) -> Optional[str]:
         """Returns embed with emoji category and info given by user."""
         emoji_dict = {}
