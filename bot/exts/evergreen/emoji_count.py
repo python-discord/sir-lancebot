@@ -67,7 +67,7 @@ class EmojiCount(commands.Cog):
         emoji_dict = {}
         for a in ctx.guild.emojis:
             if emoji is None:
-                log.trace("Emoji Category doesn't provided by the user")
+                log.trace("Emoji Category not provided by the user")
                 emoji_dict.update({a.name.split("_")[0]: []})
             elif a.name.split("_")[0] in emoji:
                 log.trace("Emoji Category provided by the user")
