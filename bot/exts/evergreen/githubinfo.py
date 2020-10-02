@@ -41,7 +41,7 @@ class GithubInfo(commands.Cog):
 
             user_data = await self.fetch_data(f"https://api.github.com/users/{username}")
 
-            # user_data will not have a message key if the user exists
+            # User_data will not have a message key if the user exists
             if user_data.get('message') is not None:
                 await ctx.send(embed=discord.Embed(title=f"The profile for `{username}` was not found.",
                                                    colour=0xff0022))
@@ -54,9 +54,9 @@ class GithubInfo(commands.Cog):
             starred_data = await self.fetch_data(user_data['starred_url'])
 
             # Forming blog link
-            if user_data['blog'].startswith("http"):  # Blog link is clickable
+            if user_data['blog'].startswith("http"):  # Blog link is complete
                 blog = f"[Direct link]({user_data['blog']})"
-            elif user_data['blog']:  # Blog exists but the link is not clickable
+            elif user_data['blog']:  # Blog exists but the link is not complete
                 blog = f"[Direct link](https://{user_data['blog']})"
             else:
                 blog = "No blog link available"
