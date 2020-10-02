@@ -6,7 +6,6 @@ import json
 
 embeds = []
 
-# cog
 class SaveThePlanet(commands.Cog):
     """A cog that teaches users how they can help our planet."""
 
