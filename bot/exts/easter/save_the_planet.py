@@ -14,8 +14,8 @@ class SaveThePlanet(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         with open(Path("bot/resources/save_the_planet.json"), 'r', encoding='utf8') as f:
-            for key, embed in json.load(f).items():
-                self.json_embeds[key] = embed
+            for embed in json.load(f):
+                self.json_embeds.append(embed)
 
     @commands.command(aliases=('savetheearth', 'saveplanet', 'saveearth'))
     async def savetheplanet(self, ctx: commands.Context) -> None:

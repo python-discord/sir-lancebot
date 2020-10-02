@@ -2,6 +2,7 @@
     {
         "title": "Save the Planet: Choose Reneweable Energy",
         "image": {"url": "https://cdn.dnaindia.com/sites/default/files/styles/full/public/2019/07/23/851602-renewable-energy-istock-072419.jpg"},
+        "footer": {"text": "The best thing you can do is sharing this information!"},
         "fields": [
             {
                 "name": "The Problem",
@@ -20,6 +21,7 @@
     {
         "title": "Save the Planet: Save the Trees!",
         "image": {"url": "https://www.thecollegesolution.com/wp-content/uploads/2014/07/crumpled-paper-1.jpg"},
+        "footer": {"text": "The best thing you can do is sharing this information!"},
         "fields": [
             {
                 "name": "The Problem",
@@ -29,7 +31,39 @@
 
             {
                 "name": "What you can do",
-                "value": "Make sure you only use paper when absolutely neccesary. Find ways to plant trees (Hacktober Fest!) to combat losing them.",
+                "value": "Make sure you only use paper when absolutely neccesary. When you do, make sure to use recycled paper because making new paper causes pollution. Find ways to plant trees (Hacktober Fest!) to combat losing them.",
+                "inline": false
+            }
+        ]
+    },
+
+    {
+        "title": "Save the Planet: Less time in the Car!",
+        "image": {"url": "https://www.careeraddict.com/uploads/article/55294/businessman-riding-bike.jpg"},
+        "footer": {"text": "The best thing you can do is sharing this information!"},
+        "fields": [
+            {
+                "name": "The Problem",
+                "value": "Every mile you drive to work produces about a pound of C0₂. That's crazy! What's crazier is how clean the planet could be if we spent less time in the car!",
+                "inline": false
+            },
+
+            {
+                "name": "What you can do",
+                "value": "Instead of using your car, ride your bike if possible! Not only does it save that pound of C0₂, it is also great excercise and is cheaper!",
+                "inline": false
+            }
+        ]
+    },
+
+    {
+        "title":"Save the Planet: Paint your roof white!",
+        "image": {"url": "https://modernize.com/wp-content/uploads/2016/10/Cool-roof.jpg"},
+        "footer": {"text":"The best thing you can do is sharing this information!"},
+        "fields": [
+            {
+                "name": "But why?!",
+                "value": "Having a light-colored roof will reduce the heat coming into your house, which will save your energy bill. Also, Researchers at the Lawrence Berkeley National Laboratory estimated that if 80 percent of roofs in tropical and temperate climate areas were painted white, it could offset the greenhouse gas emissions of 300 million automobiles around the world.",
                 "inline": false
             }
         ]
