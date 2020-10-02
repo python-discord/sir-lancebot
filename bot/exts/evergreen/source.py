@@ -7,7 +7,7 @@ from discord.ext import commands
 
 from bot.constants import Source
 
-SourceType = Union[commands.HelpCommand, commands.Command, commands.Cog, str, commands.ExtensionNotLoaded]
+SourceType = Union[commands.Command, commands.Cog, str, commands.ExtensionNotLoaded]
 
 
 class SourceConverter(commands.Converter):
@@ -15,9 +15,6 @@ class SourceConverter(commands.Converter):
 
     async def convert(self, ctx: commands.Context, argument: str) -> SourceType:
         """Convert argument into source object."""
-        if argument.lower().startswith("help"):
-            return ctx.bot.help_command
-
         cog = ctx.bot.get_cog(argument)
         if cog:
             return cog
@@ -43,7 +40,7 @@ class BotSource(commands.Cog):
         if not source_item:
             embed = Embed(title="Seasonal Bot's GitHub Repository")
             embed.add_field(name="Repository", value=f"[Go to GitHub]({Source.github})")
-            embed.set_thumbnail(url="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png")
+            embed.set_thumbnail(url=Source.github_avatar_url)
             await ctx.send(embed=embed)
             return
 
@@ -57,14 +54,8 @@ class BotSource(commands.Cog):
         Raise BadArgument if `source_item` is a dynamically-created object (e.g. via internal eval).
         """
         if isinstance(source_item, commands.Command):
-            if source_item.cog_name == "Alias":
-                cmd_name = source_item.callback.__name__.replace("_alias", "")
-                cmd = self.bot.get_command(cmd_name.replace("_", " "))
-                src = cmd.callback.__code__
-                filename = src.co_filename
-            else:
-                src = source_item.callback.__code__
-                filename = src.co_filename
+            src = source_item.callback.__code__
+            filename = src.co_filename
         else:
             src = type(source_item)
             try:
@@ -97,27 +88,19 @@ class BotSource(commands.Cog):
         """Build embed based on source object."""
         url, location, first_line = self.get_source_link(source_object)
 
-        if isinstance(source_object, commands.HelpCommand):
-            title = "Help Command"
-            description = source_object.__doc__.splitlines()[1]
-        elif isinstance(source_object, commands.Command):
-            if source_object.cog_name == "Alias":
-                cmd_name = source_object.callback.__name__.replace("_alias", "")
-                cmd = self.bot.get_command(cmd_name.replace("_", " "))
-                description = cmd.short_doc
+        if isinstance(source_object, commands.Command):
+            if source_object.cog_name == 'Help':
+                title = "Help Command"
+                description = source_object.__doc__.splitlines()[1]
             else:
                 description = source_object.short_doc
-
-            title = f"Command: {source_object.qualified_name}"
-        elif isinstance(source_object, str):
-            title = f"Tag: {source_object}"
-            description = ""
+                title = f"Command: {source_object.qualified_name}"
         else:
             title = f"Cog: {source_object.qualified_name}"
             description = source_object.description.splitlines()[0]
 
         embed = Embed(title=title, description=description)
-        embed.set_thumbnail(url="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png")
+        embed.set_thumbnail(url=Source.github_avatar_url)
         embed.add_field(name="Source Code", value=f"[Go to GitHub]({url})")
         line_text = f":{first_line}" if first_line else ""
         embed.set_footer(text=f"{location}{line_text}")
