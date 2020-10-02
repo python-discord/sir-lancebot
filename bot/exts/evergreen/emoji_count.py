@@ -1,0 +1,80 @@
+import datetime
+import logging
+import random
+from typing import Dict, Optional
+
+import discord
+from discord.ext import commands
+
+from bot.constants import Colours
+
+log = logging.getLogger(__name__)
+
+
+class EmojiCount(commands.Cog):
+    """Command that give random emoji based on category."""
+
+    def __init__(self, bot: commands.Bot):
+        self.bot = bot
+
+    def embed_builder(self, emoji: dict) -> discord.Embed:
+        """Genrates embed with emoji name and count."""
+        embed = discord.Embed()
+        embed.color = Colours.orange
+        embed.title = "Emoji Count"
+        embed.timestamp = datetime.datetime.utcnow()
+        if len(emoji) == 1:
+            for key, value in emoji.items():
+                print(key)
+                embed.description = f"There are **{len(value)}** emojis in the **{key}** category"
+                embed.set_thumbnail(url=random.choice(value).url)
+        else:
+            msg = ''
+            for key, value in emoji.items():
+                emoji_choice = random.choice(value)
+                error_msg = f'There are **{len(value)}** emojis in the **{key}** category\n'
+                msg += f'<:{emoji_choice.name}:{emoji_choice.id}> {error_msg}'
+            embed.description = msg
+        return embed
+
+    @staticmethod
+    def generate_invalid_embed(ctx) -> discord.Embed:
+        """Genrates error embed."""
+        embed = discord.Embed()
+        embed.color = Colours.soft_red
+        embed.title = "Invalid Input"
+        emoji_dict = {}
+        for emoji in ctx.guild.emojis:
+            emoji_dict.update({emoji.name.split("_")[0]: []})
+        error_comp = ', '.join(key for key in emoji_dict.keys())
+        embed.description = f"These are the valid categories\n```{error_comp}```"
+        return embed
+
+    def emoji_list(self, ctx, emojis: dict) -> Dict:
+        """Genrates dictionary of emojis given by the user."""
+        for emoji in ctx.guild.emojis:
+            for key, value in emojis.items():
+                if emoji.name.split("_")[0] == key:
+                    value.append(emoji)
+        return emojis
+
+    @commands.command(name="ec")
+    async def ec(self, ctx, *, emoji: str = None) -> Optional[str]:
+        """Returns embed with emoji category and info given by user."""
+        emoji_dict = {}
+        for a in ctx.guild.emojis:
+            if emoji is None:
+                emoji_dict.update({a.name.split("_")[0]: []})
+            elif a.name.split("_")[0] in emoji:
+                emoji_dict.update({a.name.split("_")[0]: []})
+        emoji_dict = self.emoji_list(ctx, emoji_dict)
+        if len(emoji_dict) == 0:
+            embed = self.generate_invalid_embed(ctx)
+        else:
+            embed = self.embed_builder(emoji_dict)
+        await ctx.send(embed=embed)
+
+
+def setup(bot: commands.Bot) -> None:
+    """Emoji Count Cog load."""
+    bot.add_cog(EmojiCount(bot))
