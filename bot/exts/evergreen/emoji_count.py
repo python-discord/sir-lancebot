@@ -51,7 +51,7 @@ class EmojiCount(commands.Cog):
         log.trace("Error embed built")
         return embed
 
-    def emoji_list(self, ctx, categories) -> Dict:
+    def emoji_list(self, ctx: commands.Context, categories: dict) -> Dict:
         """Generates an embed with the emoji names and count."""
         out = {category: [] for category in categories}
 
@@ -64,7 +64,7 @@ class EmojiCount(commands.Cog):
 
     @commands.command(name="emoji_count", aliases=["ec"])
     async def ec(self, ctx: commands.Context, *, emoji: str = None) -> Optional[str]:
-        """Returns embed with emoji category and info given by user."""
+        """Returns embed with emoji category and info given by the user."""
         emoji_dict = {}
         for a in ctx.guild.emojis:
             if emoji is None:
