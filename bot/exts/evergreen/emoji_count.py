@@ -39,7 +39,7 @@ class EmojiCount(commands.Cog):
         return embed
 
     @staticmethod
-    def generate_invalid_embed(ctx) -> discord.Embed:
+    def generate_invalid_embed(ctx: commands.Context) -> discord.Embed:
         """Genrates error embed."""
         embed = discord.Embed()
         embed.color = Colours.soft_red
@@ -52,7 +52,7 @@ class EmojiCount(commands.Cog):
         log.trace("Error embed sent")
         return embed
 
-    def emoji_list(self, ctx, emojis: dict) -> Dict:
+    def emoji_list(self, ctx: commands.Context, emojis: dict) -> Dict:
         """Genrates dictionary of emojis given by the user."""
         for emoji in ctx.guild.emojis:
             for key, value in emojis.items():
@@ -62,7 +62,7 @@ class EmojiCount(commands.Cog):
         return emojis
 
     @commands.command(name="ec")
-    async def ec(self, ctx, *, emoji: str = None) -> Optional[str]:
+    async def ec(self, ctx: commands.Context, *, emoji: str = None) -> Optional[str]:
         """Returns embed with emoji category and info given by user."""
         emoji_dict = {}
         for a in ctx.guild.emojis:
