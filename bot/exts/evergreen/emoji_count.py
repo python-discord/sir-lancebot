@@ -46,7 +46,7 @@ class EmojiCount(commands.Cog):
         embed.title = "Invalid Input"
         emoji_dict = {}
         for emoji in ctx.guild.emojis:
-            emoji_dict.update({emoji.name.split("_")[0]: []})
+            emoji_dict[emoji.name.split("_")[0]] = []
         error_comp = ', '.join(key for key in emoji_dict.keys())
         embed.description = f"These are the valid categories\n```{error_comp}```"
         log.trace("Error embed sent")
