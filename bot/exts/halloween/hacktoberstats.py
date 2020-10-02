@@ -10,7 +10,7 @@ import aiohttp
 import discord
 from discord.ext import commands
 
-from bot.constants import Channels, Month, WHITELISTED_CHANNELS
+from bot.constants import Channels, Month, Tokens, WHITELISTED_CHANNELS
 from bot.utils.decorators import in_month, override_in_channel
 from bot.utils.persist import make_persistent
 
@@ -18,7 +18,16 @@ log = logging.getLogger(__name__)
 
 CURRENT_YEAR = datetime.now().year  # Used to construct GH API query
 PRS_FOR_SHIRT = 4  # Minimum number of PRs before a shirt is awarded
-HACKTOBER_WHITELIST = WHITELISTED_CHANNELS + (Channels.hacktoberfest_2019,)
+HACKTOBER_WHITELIST = WHITELISTED_CHANNELS + (Channels.hacktoberfest_2020,)
+
+REQUEST_HEADERS = {"User-Agent": "Python Discord Hacktoberbot"}
+if GITHUB_TOKEN := Tokens.github:
+    REQUEST_HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
+
+GITHUB_NONEXISTENT_USER_MESSAGE = (
+    "The listed users cannot be searched either because the users do not exist "
+    "or you do not have permission to view the users."
+)
 
 
 class HacktoberStats(commands.Cog):
@@ -29,7 +38,7 @@ class HacktoberStats(commands.Cog):
         self.link_json = make_persistent(Path("bot", "resources", "halloween", "github_links.json"))
         self.linked_accounts = self.load_linked_users()
 
-    @in_month(Month.OCTOBER)
+    @in_month(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)
     @commands.group(name="hacktoberstats", aliases=("hackstats",), invoke_without_command=True)
     @override_in_channel(HACKTOBER_WHITELIST)
     async def hacktoberstats_group(self, ctx: commands.Context, github_username: str = None) -> None:
@@ -57,7 +66,7 @@ class HacktoberStats(commands.Cog):
 
         await self.get_stats(ctx, github_username)
 
-    @in_month(Month.OCTOBER)
+    @in_month(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)
     @hacktoberstats_group.command(name="link")
     @override_in_channel(HACKTOBER_WHITELIST)
     async def link_user(self, ctx: commands.Context, github_username: str = None) -> None:
@@ -92,7 +101,7 @@ class HacktoberStats(commands.Cog):
             logging.info(f"{author_id} tried to link a GitHub account but didn't provide a username")
             await ctx.send(f"{author_mention}, a GitHub username is required to link your account")
 
-    @in_month(Month.OCTOBER)
+    @in_month(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)
     @hacktoberstats_group.command(name="unlink")
     @override_in_channel(HACKTOBER_WHITELIST)
     async def unlink_user(self, ctx: commands.Context) -> None:
@@ -175,11 +184,11 @@ class HacktoberStats(commands.Cog):
 
         n = pr_stats['n_prs']
         if n >= PRS_FOR_SHIRT:
-            shirtstr = f"**{github_username} has earned a tshirt!**"
+            shirtstr = f"**{github_username} has earned a T-shirt or a tree!**"
         elif n == PRS_FOR_SHIRT - 1:
-            shirtstr = f"**{github_username} is 1 PR away from a tshirt!**"
+            shirtstr = f"**{github_username} is 1 PR away from a T-shirt or a tree!**"
         else:
-            shirtstr = f"**{github_username} is {PRS_FOR_SHIRT - n} PRs away from a tshirt!**"
+            shirtstr = f"**{github_username} is {PRS_FOR_SHIRT - n} PRs away from a T-shirt or a tree!**"
 
         stats_embed = discord.Embed(
             title=f"{github_username}'s Hacktoberfest",
@@ -196,7 +205,7 @@ class HacktoberStats(commands.Cog):
         stats_embed.set_author(
             name="Hacktoberfest",
             url="https://hacktoberfest.digitalocean.com",
-            icon_url="https://hacktoberfest.digitalocean.com/pretty_logo.png"
+            icon_url="https://avatars1.githubusercontent.com/u/35706162?s=200&v=4"
         )
         stats_embed.add_field(
             name="Top 5 Repositories:",
@@ -242,16 +251,22 @@ class HacktoberStats(commands.Cog):
             f"&per_page={per_page}"
         )
 
-        headers = {"user-agent": "Discord Python Hacktoberbot"}
         async with aiohttp.ClientSession() as session:
-            async with session.get(query_url, headers=headers) as resp:
+            async with session.get(query_url, headers=REQUEST_HEADERS) as resp:
                 jsonresp = await resp.json()
 
         if "message" in jsonresp.keys():
             # One of the parameters is invalid, short circuit for now
             api_message = jsonresp["errors"][0]["message"]
-            logging.error(f"GitHub API request for '{github_username}' failed with message: {api_message}")
+
+            # Ignore logging non-existent users or users we do not have permission to see
+            if api_message == GITHUB_NONEXISTENT_USER_MESSAGE:
+                logging.debug(f"No GitHub user found named '{github_username}'")
+            else:
+                logging.error(f"GitHub API request for '{github_username}' failed with message: {api_message}")
+
             return
+
         else:
             if jsonresp["total_count"] == 0:
                 # Short circuit if there aren't any PRs
