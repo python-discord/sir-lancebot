@@ -29,11 +29,10 @@ class GithubInfo(commands.Cog):
         """
         Fetches a user's GitHub information.
 
-        User defaults to python-discord.
+        Username is optional and sends the help command if not specified.
 
         Usage: .gh [username]
         """
-
         if username is None:
             await ctx.invoke(self.bot.get_command('help'), 'github')
             return
