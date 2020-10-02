@@ -18,7 +18,7 @@ class EmojiCount(commands.Cog):
         self.bot = bot
 
     def embed_builder(self, emoji: dict) -> discord.Embed:
-        """Genrates embed with emoji name and count."""
+        """Generates an embed with the emoji names and count."""
         embed = discord.Embed()
         embed.color = Colours.orange
         embed.title = "Emoji Count"
