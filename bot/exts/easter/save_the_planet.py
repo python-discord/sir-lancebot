@@ -1,10 +1,13 @@
-from discord.ext import commands
-from pathlib import Path
-from discord import Embed
-import random
 import json
+import random
+from pathlib import Path
+
+from discord import Embed
+from discord.ext import commands
+
 
 embeds = []
+
 
 # cog
 class SaveThePlanet(commands.Cog):
@@ -14,6 +17,7 @@ class SaveThePlanet(commands.Cog):
         self.bot = bot
 
     def get_response(self) -> Embed:
+        """Return a random Embed from the list of embeds."""
         return random.choice(embeds)
 
     @commands.command(aliases=('save_the_earth',))
@@ -21,13 +25,13 @@ class SaveThePlanet(commands.Cog):
         """Responds with a random tip on how to be ecofriendly and help our planet."""
         await ctx.send(embed=self.get_response())
 
+
 def setup(bot: commands.Bot) -> None:
     """save_the_planet Cog load."""
-        
     with open(Path("bot/resources/easter/save_the_planet.json"), 'r', encoding="utf8") as f:
         responses = json.load(f)
 
-    # convert what's in the json to discord embed objects https://discord.com/developers/docs/resources/channel#embed-object
+    # convert what's in the json to discord embed objects
     for response in responses["embeds"]:
         response["title"] = f"Save the Planet: {response['topic']}"
         response["footer"] = {"text": "The best thing you can do is sharing this information!"}
