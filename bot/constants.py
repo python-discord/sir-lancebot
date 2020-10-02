@@ -268,3 +268,4 @@ class Wikipedia:
 
 class Source:
     github = "https://github.com/python-discord/seasonalbot"
+    github_avatar_url = "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
