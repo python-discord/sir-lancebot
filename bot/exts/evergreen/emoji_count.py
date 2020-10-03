@@ -19,10 +19,11 @@ class EmojiCount(commands.Cog):
 
     def embed_builder(self, emoji: dict) -> discord.Embed:
         """Generates an embed with the emoji names and count."""
-        embed = discord.Embed()
-        embed.color = Colours.orange
-        embed.title = "Emoji Count"
-        embed.timestamp = datetime.datetime.utcnow()
+        embed = discord.Embed(
+            color=Colours.orange,
+            title="Emoji Count",
+            timestamp=datetime.datetime.utcnow()
+        )
         if len(emoji) == 1:
             for key, value in emoji.items():
                 embed.description = f"There are **{len(value)}** emojis in the **{key}** category"
