@@ -162,7 +162,7 @@ class HacktoberStats(commands.Cog):
         """
         Query GitHub's API for PRs created by a GitHub user during the month of October.
 
-        PRs with the 'invalid' tag are ignored
+        PRs with an 'invalid' or 'spam' label are ignored
 
         If a valid github_username is provided, an embed is generated and posted to the channel
 
@@ -220,7 +220,7 @@ class HacktoberStats(commands.Cog):
         """
         Query GitHub's API for PRs created during the month of October by github_username.
 
-        PRs with an 'invalid' tag are ignored
+        PRs with an 'invalid' or 'spam' label are ignored
 
         If PRs are found, return a list of dicts with basic PR information
 
@@ -235,7 +235,7 @@ class HacktoberStats(commands.Cog):
         """
         logging.info(f"Generating Hacktoberfest PR query for GitHub user: '{github_username}'")
         base_url = "https://api.github.com/search/issues?q="
-        not_label = "invalid"
+        not_labels = ("invalid", "spam")
         action_type = "pr"
         is_query = f"public+author:{github_username}"
         not_query = "draft"
@@ -243,7 +243,8 @@ class HacktoberStats(commands.Cog):
         per_page = "300"
         query_url = (
             f"{base_url}"
-            f"-label:{not_label}"
+            f"-label:{not_labels[0]}"
+            f"-label:{not_labels[1]}"
             f"+type:{action_type}"
             f"+is:{is_query}"
             f"+-is:{not_query}"
