@@ -35,7 +35,6 @@ class EmojiCount(commands.Cog):
                 emoji_info = f'There are **{len(value)}** emojis in the **{key}** category\n'
                 msg += f'<:{emoji_choice.name}:{emoji_choice.id}> {emoji_info}'
             embed.description = msg
-        log.trace('Emoji embed built')
         return embed
 
     @staticmethod
@@ -45,12 +44,13 @@ class EmojiCount(commands.Cog):
             color=Colours.soft_red,
             title=random.choice(ERROR_REPLIES)
         )
+
         emoji_dict = {}
         for emoji in ctx.guild.emojis:
             emoji_dict[emoji.name.split("_")[0]] = []
+
         error_comp = ', '.join(key for key in emoji_dict.keys())
         embed.description = f"These are the valid categories\n```{error_comp}```"
-        log.trace("Error embed built")
         return embed
 
     def emoji_list(self, ctx: commands.Context, categories: dict) -> Dict:
@@ -61,7 +61,6 @@ class EmojiCount(commands.Cog):
             category = emoji.name.split('_')[0]
             if category in out:
                 out[category].append(emoji)
-        log.trace("Emoji dict built")
         return out
 
     @commands.command(name="emoji_count", aliases=["ec"])
@@ -78,12 +77,9 @@ class EmojiCount(commands.Cog):
         emoji_dict = self.emoji_list(ctx, emoji_dict)
         if len(emoji_dict) == 0:
             embed = self.generate_invalid_embed(ctx)
-            log.trace("Error embed received")
         else:
             embed = self.embed_builder(emoji_dict)
-            log.trace("Emoji embed received")
         await ctx.send(embed=embed)
-        log.trace("Embed sent")
 
 
 def setup(bot: commands.Bot) -> None:
