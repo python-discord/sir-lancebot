@@ -1,4 +1,5 @@
 import logging
+import random
 from datetime import datetime
 from typing import Optional
 
@@ -6,6 +7,8 @@ import aiohttp
 import discord
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
+
+from bot.constants import NEGATIVE_REPLIES
 
 log = logging.getLogger(__name__)
 
@@ -38,13 +41,12 @@ class GithubInfo(commands.Cog):
             return
 
         async with ctx.typing():
-
             user_data = await self.fetch_data(f"https://api.github.com/users/{username}")
 
             # User_data will not have a message key if the user exists
             if user_data.get('message') is not None:
-                await ctx.send(embed=discord.Embed(title=f"The profile for `{username}` was not found.",
-                                                   colour=0xff0022))
+                await ctx.send(embed=discord.Embed(title=random.choice(NEGATIVE_REPLIES),
+                                                   colour=discord.Colour.red()))
                 return
 
             org_data = await self.fetch_data(user_data['organizations_url'])
@@ -64,7 +66,7 @@ class GithubInfo(commands.Cog):
             embed = discord.Embed(
                 title=f"`{user_data['login']}`'s GitHub profile info",
                 description=f"```{user_data['bio']}```\n" if user_data['bio'] is not None else "",
-                colour=0xf5faf6,
+                colour=0x7289da,
                 url=user_data['html_url'],
                 timestamp=datetime.strptime(user_data['created_at'], "%Y-%m-%dT%H:%M:%SZ")
             )
