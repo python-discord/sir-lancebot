@@ -40,9 +40,10 @@ class EmojiCount(commands.Cog):
     @staticmethod
     def generate_invalid_embed(ctx: commands.Context) -> discord.Embed:
         """Genrates error embed."""
-        embed = discord.Embed()
-        embed.color = Colours.soft_red
-        embed.title = random.choice(ERROR_REPLIES)
+        embed = discord.Embed(
+            color=Colours.soft_red,
+            title=random.choice(ERROR_REPLIES)
+        )
         emoji_dict = {}
         for emoji in ctx.guild.emojis:
             emoji_dict[emoji.name.split("_")[0]] = []
