@@ -2,7 +2,7 @@ import logging
 
 from discord.ext import commands
 
-from bot.exts.evergreen.snakes.snakes_cog import Snakes
+from bot.exts.evergreen.snakes._snakes_cog import Snakes
 
 log = logging.getLogger(__name__)
 

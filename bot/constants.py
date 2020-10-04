@@ -11,7 +11,6 @@ __all__ = (
     "Client",
     "Colours",
     "Emojis",
-    "Hacktoberfest",
     "Icons",
     "Lovefest",
     "Month",
@@ -75,7 +74,7 @@ class Channels(NamedTuple):
     python_discussion = 267624335836053506
     show_your_projects = int(environ.get("CHANNEL_SHOW_YOUR_PROJECTS", 303934982764625920))
     show_your_projects_discussion = 360148304664723466
-    hacktoberfest_2019 = 628184417646411776
+    hacktoberfest_2020 = 760857070781071431
 
 
 class Client(NamedTuple):
@@ -84,6 +83,7 @@ class Client(NamedTuple):
     token = environ.get("SEASONALBOT_TOKEN")
     sentry_dsn = environ.get("SEASONALBOT_SENTRY_DSN")
     debug = environ.get("SEASONALBOT_DEBUG", "").lower() == "true"
+    github_bot_repo = "https://github.com/python-discord/seasonalbot"
     # Override seasonal locks: 1 (January) to 12 (December)
     month_override = int(environ["MONTH_OVERRIDE"]) if "MONTH_OVERRIDE" in environ else None
 
@@ -122,9 +122,10 @@ class Emojis:
     pull_request_closed = "<:PRClosed:629695470519713818>"
     merge = "<:PRMerged:629695470570176522>"
 
-
-class Hacktoberfest(NamedTuple):
-    voice_id = 514420006474219521
+    status_online = "<:status_online:470326272351010816>"
+    status_idle = "<:status_idle:470326266625785866>"
+    status_dnd = "<:status_dnd:470326272082313216>"
+    status_offline = "<:status_offline:470326266537705472>"
 
 
 class Icons:
@@ -177,6 +178,7 @@ class Roles(NamedTuple):
     verified = 352427296948486144
     helpers = 267630620367257601
     rockstars = 458226413825294336
+    core_developers = 587606783669829632
 
 
 class Tokens(NamedTuple):

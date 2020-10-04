@@ -14,7 +14,7 @@ class EightBitify(commands.Cog):
     @staticmethod
     def pixelate(image: Image) -> Image:
         """Takes an image and pixelates it."""
-        return image.resize((32, 32)).resize((1024, 1024))
+        return image.resize((32, 32), resample=Image.NEAREST).resize((1024, 1024), resample=Image.NEAREST)
 
     @staticmethod
     def quantize(image: Image) -> Image:

@@ -9,7 +9,7 @@ ENV PIP_NO_CACHE_DIR=false \
 # Install git to be able to dowload git dependencies in the Pipfile
 RUN apt-get -y update \
     && apt-get install -y \
-        git \
+        ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
 # Install pipenv
