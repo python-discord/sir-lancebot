@@ -74,11 +74,7 @@ class BotSource(commands.Cog):
             first_line_no = None
             lines_extension = ""
 
-        # Handle tag file location differently than others to avoid errors in some cases
-        if not first_line_no:
-            file_location = Path(filename).relative_to("/bot/")
-        else:
-            file_location = Path(filename).relative_to(Path.cwd()).as_posix()
+        file_location = Path(filename).relative_to(Path.cwd()).as_posix()
 
         url = f"{Source.github}/blob/master/{file_location}{lines_extension}"
 
