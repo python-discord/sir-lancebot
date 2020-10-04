@@ -7,6 +7,7 @@ import discord
 from discord.ext import commands
 
 from bot.constants import Colours, ERROR_REPLIES
+from bot.utils.pagination import LinePaginator
 
 log = logging.getLogger(__name__)
 
@@ -27,8 +28,9 @@ class EmojiCount(commands.Cog):
 
         if len(emoji) == 1:
             for key, value in emoji.items():
-                embed.description = f"There are **{len(value)}** emojis in the **{key}** category"
+                msg = f"There are **{len(value)}** emojis in the **{key}** category"
                 embed.set_thumbnail(url=random.choice(value).url)
+                embed.description = msg
         else:
             msg = ''
             for key, value in emoji.items():
@@ -39,7 +41,7 @@ class EmojiCount(commands.Cog):
                 else:
                     msg += f'<:{emoji_choice.name}:{emoji_choice.id}> {emoji_info}'
             embed.description = msg
-        return embed
+        return embed, msg
 
     @staticmethod
     def generate_invalid_embed(ctx: commands.Context) -> discord.Embed:
@@ -54,8 +56,8 @@ class EmojiCount(commands.Cog):
             emoji_dict[emoji.name.split("_")[0]] = []
 
         error_comp = ', '.join(key for key in emoji_dict.keys())
-        embed.description = f"These are the valid categories\n```{error_comp}```"
-        return embed
+        msg = f"These are the valid categories\n```{error_comp}```"
+        return embed, msg
 
     def emoji_list(self, ctx: commands.Context, categories: dict) -> Dict:
         """Generates an embed with the emoji names and count."""
@@ -83,10 +85,11 @@ class EmojiCount(commands.Cog):
         emoji_dict = self.emoji_list(ctx, emoji_dict)
 
         if len(emoji_dict) == 0:
-            embed = self.generate_invalid_embed(ctx)
+            embed, msg = self.generate_invalid_embed(ctx)
         else:
-            embed = self.embed_builder(emoji_dict)
-        await ctx.send(embed=embed)
+            embed, msg = self.embed_builder(emoji_dict)
+        msg = msg.split("\n")
+        await LinePaginator.paginate([line for line in msg], ctx=ctx, embed=embed)
 
 
 def setup(bot: commands.Bot) -> None:
