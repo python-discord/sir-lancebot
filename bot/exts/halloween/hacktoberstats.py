@@ -244,7 +244,7 @@ class HacktoberStats(commands.Cog):
         query_url = (
             f"{base_url}"
             f"-label:{not_labels[0]}"
-            f"-label:{not_labels[1]}"
+            f"+-label:{not_labels[1]}"
             f"+type:{action_type}"
             f"+is:{is_query}"
             f"+-is:{not_query}"
