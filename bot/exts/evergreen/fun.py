@@ -60,15 +60,13 @@ class Fun(Cog):
     @commands.command()
     async def roll(self, ctx: Context, num_rolls: int = 1) -> None:
         """Outputs a number of random dice emotes (up to 6)."""
-        output = ""
         if num_rolls > 6:
             num_rolls = 6
-        elif num_rolls < 1:
-            output = ":no_entry: You must roll at least once."
-        for _ in range(num_rolls):
-            dice = f"dice_{random.randint(1, 6)}"
-            output += getattr(Emojis, dice, '')
-        await ctx.send(output)
+
+        dice = (f"dice_{random.randint(1, 6)}" for _ in range(num_rolls))
+        output = " ".join(getattr(Emojis, die, '') for die in dice)
+
+        await ctx.send(output or ":no_entry: You must roll at least once.")
 
     @commands.command(name="uwu", aliases=("uwuwize", "uwuify",))
     async def uwu_command(self, ctx: Context, *, text: clean_content(fix_channel_mentions=True)) -> None:
