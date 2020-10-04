@@ -9,13 +9,12 @@ from discord.ext import commands
 class SaveThePlanet(commands.Cog):
     """A cog that teaches users how they can help our planet."""
 
-    embed_data = []
-
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
+        self.embed_data = []
+
         with open(Path("bot/resources/easter/save_the_planet.json"), 'r', encoding='utf8') as f:
-            for embed in json.load(f):
-                self.embed_data.append(embed)
+            self.embed_data = [embed for embed in json.load(f)]
 
     @commands.command(aliases=('savetheearth', 'saveplanet', 'saveearth'))
     async def savetheplanet(self, ctx: commands.Context) -> None:

@@ -1,6 +1,6 @@
 [
     {
-        "title": "Choose reneweable energy",
+        "title": "Choose renewable energy",
         "image": {"url": "https://cdn.dnaindia.com/sites/default/files/styles/full/public/2019/07/23/851602-renewable-energy-istock-072419.jpg"},
         "footer": {"text": "Help out by sharing this information!"},
         "fields": [
@@ -31,7 +31,7 @@
 
             {
                 "name": "What you can do",
-                "value": "Make sure you only use paper when absolutely neccesary. When you do, make sure to use recycled paper because making new paper causes pollution. Find ways to plant trees (Hacktober Fest!) to combat losing them.",
+                "value": "Make sure you only use paper when absolutely necessary. When you do, make sure to use recycled paper because making new paper causes pollution. Find ways to plant trees (Hacktober Fest!) to combat losing them.",
                 "inline": false
             }
         ]
@@ -50,7 +50,7 @@
 
             {
                 "name": "What you can do",
-                "value": "Instead of using your car, ride your bike if possible! Not only does it save that pound of C0₂, it is also great excercise and is cheaper!",
+                "value": "Instead of using your car, ride your bike if possible! Not only does it save that pound of C0₂, it is also great exercise and is cheaper!",
                 "inline": false
             }
         ]
