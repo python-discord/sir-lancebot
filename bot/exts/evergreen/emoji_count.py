@@ -34,7 +34,10 @@ class EmojiCount(commands.Cog):
             for key, value in emoji.items():
                 emoji_choice = random.choice(value)
                 emoji_info = f'There are **{len(value)}** emojis in the **{key}** category\n'
-                msg += f'<:{emoji_choice.name}:{emoji_choice.id}> {emoji_info}'
+                if emoji_choice.animated:
+                    msg += f'<a:{emoji_choice.name}:{emoji_choice.id}> {emoji_info}'
+                else:
+                    msg += f'<:{emoji_choice.name}:{emoji_choice.id}> {emoji_info}'
             embed.description = msg
         return embed
 
