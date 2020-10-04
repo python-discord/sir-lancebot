@@ -24,6 +24,7 @@ class EmojiCount(commands.Cog):
             title="Emoji Count",
             timestamp=datetime.datetime.utcnow()
         )
+
         if len(emoji) == 1:
             for key, value in emoji.items():
                 embed.description = f"There are **{len(value)}** emojis in the **{key}** category"
@@ -67,6 +68,7 @@ class EmojiCount(commands.Cog):
     async def ec(self, ctx: commands.Context, *, emoji: str = None) -> Optional[str]:
         """Returns embed with emoji category and info given by the user."""
         emoji_dict = {}
+
         for a in ctx.guild.emojis:
             if emoji is None:
                 log.trace("Emoji Category not provided by the user")
@@ -74,7 +76,9 @@ class EmojiCount(commands.Cog):
             elif a.name.split("_")[0] in emoji:
                 log.trace("Emoji Category provided by the user")
                 emoji_dict.update({a.name.split("_")[0]: []})
+
         emoji_dict = self.emoji_list(ctx, emoji_dict)
+
         if len(emoji_dict) == 0:
             embed = self.generate_invalid_embed(ctx)
         else:
