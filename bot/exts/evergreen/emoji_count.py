@@ -60,19 +60,21 @@ class EmojiCount(commands.Cog):
         return embed, msg
 
     @commands.command(name="emoji_count", aliases=["ec"])
-    async def emoji_count(self, ctx: commands.Context, *, emoji_category: str = None) -> None:
+    async def emoji_count(self, ctx: commands.Context, *, category_query: str = None) -> None:
         """Returns embed with emoji category and info given by the user."""
         emoji_dict = defaultdict(list)
 
+        log.trace(f"Emoji Category {'' if category_query else 'not '}provided by the user")
         for emoji in ctx.guild.emojis:
-            if emoji_category is None:
-                log.trace("Emoji Category not provided by the user")
-                emoji_dict[emoji.name.split("_")[0]].append(emoji)
-            elif emoji.name.split("_")[0] in emoji_category:
-                log.trace("Emoji Category provided by the user")
-                emoji_dict[emoji.name.split("_")[0]].append(emoji)
+            emoji_category = emoji.name.split("_")[0]
+
+            if category_query is not None and emoji_category not in category_query:
+                continue
+
+            emoji_dict[emoji_category].append(emoji)
 
         if len(emoji_dict) == 0:
+            log.trace("Invalid name provided by the user")
             embed, msg = self.generate_invalid_embed(ctx)
         else:
             embed, msg = self.embed_builder(emoji_dict)
