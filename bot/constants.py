@@ -184,7 +184,6 @@ class Roles(NamedTuple):
 class Tokens(NamedTuple):
     giphy = environ.get("GIPHY_TOKEN")
     aoc_session_cookie = environ.get("AOC_SESSION_COOKIE")
-    omdb = environ.get("OMDB_API_KEY")
     youtube = environ.get("YOUTUBE_API_KEY")
     tmdb = environ.get("TMDB_API_KEY")
     nasa = environ.get("NASA_API_KEY")
