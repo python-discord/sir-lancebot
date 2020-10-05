@@ -157,7 +157,7 @@ class SeasonalBot(commands.Bot):
             if name.startswith('_'):
                 continue
             if channel_id not in all_channels:
-                log.error(f'Channel "{name}" with id {channel_id} missing')
+                log.error(f'Channel "{name}" with ID {channel_id} missing')
 
     async def send_log(self, title: str, details: str = None, *, icon: str = None) -> None:
         """Send an embed message to the devlog channel."""
