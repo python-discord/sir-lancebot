@@ -5,6 +5,7 @@ import discord
 from discord.ext import commands
 
 from bot.constants import Colours, ERROR_REPLIES, Emojis, Icons
+from bot.utils.converters import WrappedMessageConverter
 
 log = logging.getLogger(__name__)
 
@@ -19,7 +20,7 @@ class Bookmark(commands.Cog):
     async def bookmark(
         self,
         ctx: commands.Context,
-        target_message: discord.Message,
+        target_message: WrappedMessageConverter,
         *,
         title: str = "Bookmark"
     ) -> None:
