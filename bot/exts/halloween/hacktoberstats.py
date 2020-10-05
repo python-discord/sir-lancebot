@@ -237,7 +237,7 @@ class HacktoberStats(commands.Cog):
         base_url = "https://api.github.com/search/issues?q="
         not_labels = ("invalid", "spam")
         action_type = "pr"
-        is_query = f"public"
+        is_query = "public"
         not_query = "draft"
         date_range = f"{CURRENT_YEAR}-10-01T00:00:00%2B14:00..{CURRENT_YEAR}-10-31T23:59:59-11:00"
         per_page = "300"
