@@ -251,7 +251,7 @@ class HacktoberStats(commands.Cog):
             f"+created:{date_range}"
             f"&per_page={per_page}"
         )
-        logging.info(f"Query URL generated: {query_url}")
+        logging.debug(f"GitHub query URL generated: {query_url}")
 
         async with aiohttp.ClientSession() as session:
             async with session.get(query_url, headers=REQUEST_HEADERS) as resp:
