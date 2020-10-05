@@ -45,7 +45,7 @@ class SeasonalBot(commands.Bot):
             connector=TCPConnector(resolver=AsyncResolver(), family=socket.AF_INET)
         )
         self._guild_available = asyncio.Event()
-
+        self.loop.create_task(self.check_channels())
         self.loop.create_task(self.send_log("SeasonalBot", "Connected!"))
 
     @property
@@ -148,6 +148,15 @@ class SeasonalBot(commands.Bot):
         else:
             log.info("Nickname set successfully")
             return True
+
+    async def check_channels(self) -> None:
+        await self.wait_until_guild_available()
+        all_channels = set(self.get_all_channels())
+        for name, channel_id in vars(Channels).items():
+            if name.startswith('_'):
+                continue
+            if channel_id not in all_channels:
+                log.error(f'Channel "{name}" with id {channel_id} missing')
 
     async def send_log(self, title: str, details: str = None, *, icon: str = None) -> None:
         """Send an embed message to the devlog channel."""
