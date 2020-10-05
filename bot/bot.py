@@ -205,7 +205,7 @@ class SeasonalBot(commands.Bot):
 
 _allowed_roles = [discord.Object(id_) for id_ in MODERATION_ROLES]
 
-_intents = discord.Intents().all()
+_intents = discord.Intents.all()
 _intents.bans = False
 _intents.integrations = False
 _intents.invites = False
