@@ -4,9 +4,11 @@ from pathlib import Path
 from discord import Embed
 from discord.ext import commands
 
-from bot.utils import RandomCycle
+from bot.utils.randomization import RandomCycle
 
-EMBED_DATA = []
+
+with Path("bot/resources/easter/save_the_planet.json").open('r', encoding='utf8') as f:
+    EMBED_DATA = RandomCycle(json.load(f))
 
 
 class SaveThePlanet(commands.Cog):
@@ -14,10 +16,6 @@ class SaveThePlanet(commands.Cog):
 
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
-
-        with Path("bot/resources/easter/save_the_planet.json").open('r', encoding='utf8') as f:
-            global EMBED_DATA
-            EMBED_DATA = RandomCycle(json.load(f))
 
     @commands.command(aliases=('savetheearth', 'saveplanet', 'saveearth'))
     async def savetheplanet(self, ctx: commands.Context) -> None:
