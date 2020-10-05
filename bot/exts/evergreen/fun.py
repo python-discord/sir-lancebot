@@ -57,17 +57,17 @@ class Fun(Cog):
         with Path("bot/resources/evergreen/caesar_info.json").open("r", encoding="UTF-8") as f:
             self._caesar_cipher_embed = json.load(f)
 
+    @staticmethod
+    def _get_random_die() -> str:
+        """Generate a random die emoji, ready to be sent on Discord."""
+        die_name = f"dice_{random.randint(1, 6)}"
+        return getattr(Emojis, die_name)
+
     @commands.command()
     async def roll(self, ctx: Context, num_rolls: int = 1) -> None:
         """Outputs a number of random dice emotes (up to 6)."""
-        def _get_random_die() -> str:
-            """Generate a random die emoji, ready to be sent on Discord."""
-            die_name = f"dice_{random.randint(1, 6)}"
-            return getattr(Emojis, die_name)
-
-        # Only support between 1 and 6 rolls
         if 1 <= num_rolls <= 6:
-            dice = " ".join(_get_random_die() for _ in range(num_rolls))
+            dice = " ".join(Fun._get_random_die() for _ in range(num_rolls))
             await ctx.send(dice)
         else:
             raise BadArgument("`!roll` only supports between 1 and 6 rolls.")
