@@ -18,7 +18,7 @@ class PrideLeader(commands.Cog):
         self.pride = self.load_json()
 
     @staticmethod
-    def load_json() -> Dict[str]:
+    def load_json() -> Dict:
         """Loads pride leader information from static json resource."""
         explanation_file = Path("bot/resources/pride/prideleader.json")
         with explanation_file.open(encoding="utf8") as json_data:
@@ -36,7 +36,7 @@ class PrideLeader(commands.Cog):
         if pl in self.pride:
             embed.title = f'__{pl}__'
             embed.description = self.pride[pl]["About"]
-            embed.add_field(name="__Know for__", value=self.pride[pl]["Known for"], inline=False)
+            embed.add_field(name="__Known for__", value=self.pride[pl]["Known for"], inline=False)
             embed.add_field(name="__D.O.B and Birth place__", value=self.pride[pl]["Born"], inline=False)
             embed.add_field(name="__Awards and honors__", value=self.pride[pl]["Awards"], inline=False)
             embed.set_thumbnail(url=self.pride[pl]["url"])
