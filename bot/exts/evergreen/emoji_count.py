@@ -1,7 +1,8 @@
 import datetime
 import logging
 import random
-from typing import Dict, Optional
+from typing import Optional
+from collections import defaultdict
 
 import discord
 from discord.ext import commands
@@ -59,30 +60,18 @@ class EmojiCount(commands.Cog):
         msg = f"These are the valid categories\n```{error_comp}```"
         return embed, msg
 
-    def emoji_list(self, ctx: commands.Context, categories: dict) -> Dict:
-        """Generates an embed with the emoji names and count."""
-        out = {category: [] for category in categories}
+    @commands.command(name="emoji_count", aliases=["ec"])
+    async def ec(self, ctx: commands.Context, *, emoji_category: str = None) -> Optional[str]:
+        """Returns embed with emoji category and info given by the user."""
+        emoji_dict = defaultdict(list)
 
         for emoji in ctx.guild.emojis:
-            category = emoji.name.split('_')[0]
-            if category in out:
-                out[category].append(emoji)
-        return out
-
-    @commands.command(name="emoji_count", aliases=["ec"])
-    async def ec(self, ctx: commands.Context, *, emoji: str = None) -> Optional[str]:
-        """Returns embed with emoji category and info given by the user."""
-        emoji_dict = {}
-
-        for a in ctx.guild.emojis:
-            if emoji is None:
+            if emoji_category is None:
                 log.trace("Emoji Category not provided by the user")
-                emoji_dict.update({a.name.split("_")[0]: []})
-            elif a.name.split("_")[0] in emoji:
+                emoji_dict[emoji.name.split("_")[0]].append(emoji)
+            elif emoji.name.split("_")[0] in emoji_category:
                 log.trace("Emoji Category provided by the user")
-                emoji_dict.update({a.name.split("_")[0]: []})
-
-        emoji_dict = self.emoji_list(ctx, emoji_dict)
+                emoji_dict[emoji.name.split("_")[0]].append(emoji)
 
         if len(emoji_dict) == 0:
             embed, msg = self.generate_invalid_embed(ctx)
