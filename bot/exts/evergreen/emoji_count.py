@@ -55,7 +55,7 @@ class EmojiCount(commands.Cog):
         for emoji in ctx.guild.emojis:
             emoji_dict[emoji.name.split("_")[0]].append(emoji)
 
-        error_comp = ', '.join(key for key in emoji_dict.keys())
+        error_comp = ', '.join(key for key in emoji_dict)
         msg.append(f"These are the valid categories\n```{error_comp}```")
         return embed, msg
 
