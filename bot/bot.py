@@ -150,6 +150,7 @@ class SeasonalBot(commands.Bot):
             return True
 
     async def check_channels(self) -> None:
+        """Verifies that all channel constants refer to channels which exist."""
         await self.wait_until_guild_available()
         all_channels = set(self.get_all_channels())
         for name, channel_id in vars(Channels).items():
