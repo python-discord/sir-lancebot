@@ -1,16 +1,23 @@
 {
-    "Tim Cook":{
+    "Tim Cook": {
         "Known for": "CEO at Apple",
         "About": "**Timothy Donald Cook** popularly known as Tim Cook. Despite being a notably private person, Tim Cook became the first CEO of a 500 fortune company, coming out as gay in 2014. He revealed his sexual orientation through an open letter published in Bloomberg BusinessWeek. He strongly believes that business leaders need to do their part to make the world a better place. An excerpt from his open letter is as follows: “Part of social progress is understanding that a person is not defined only by one's sexuality, race, or gender.",
         "url": "https://image.cnbcfm.com/api/v1/image/105608434-1543945658496rts28qzc.jpg?v=1554921416&w=1400&h=950",
         "Born": "November 1, 1960 at Mobile, Alabama, U.S.",
-        "Awards": "Financial Times Person of the Year (2014), Ripple of Change Award (2015), Fortune Magazine's: World's Greatest Leader. (2015), Alabama Academy of Honor: Inductee. (2015), Human Rights Campaign's Visibility Award (2015), Honorary Doctor of Science from University of Glasgow in Glasgow, Scotland (2017), Courage Against Hate award from Anti-Defamation League (2018)"
+        "Awards": "• Financial Times Person of the Year (2014)\n• Ripple of Change Award (2015)\n• Fortune Magazine's: World's Greatest Leader. (2015)\n• Alabama Academy of Honor: Inductee. (2015)\n• Human Rights Campaign's Visibility Award (2015)\n• Honorary Doctor of Science from University of Glasgow in Glasgow, Scotland (2017)\n• Courage Against Hate award from Anti-Defamation League (2018)"
     },
-    "Alan Joyce":{
+    "Alan Joyce": {
         "Known for": "CEO at Qantas Airlines",
         "About": "**Alan Joseph Joyce, AC** popularly known as Alan Joyce. Alan Joyce has been named as one of the world’s most influential business executives. He has always been very open about his orientation and has been in a committed gay relationship for over 20 years now. He supports same-sex marriage and believes that it is critical to make people recognize that they know LGBT people\n\nAlan likes to frequently talk about equality at the workplace and said, “It has become more important for leaders who are LGBT to be open about their sexuality. I am passionate about it. There should be more people like Apple’s Tim Cook and Paul Zahra, the former CEO of Australia’s David Jones [store chain].”",
         "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Alan_Joyce_%28cropped%29.jpg/220px-Alan_Joyce_%28cropped%29.jpg",
         "Born": "30 June, 1966 at Tallaght, Dublin, Republic of Ireland",
         "Awards": "The Australian named Joyce the most influential business leader in 2011, Joyce is an Ambassador of the Australian Indigenous Education Foundation, Joyce named a Companion of the Order of Australia, Australia's highest civil honour, in the 2017 Queen's birthday honours list"
+    },
+    "Peter Thiel": {
+        "Known for": "Co-Founder and Former CEO of paypal",
+        "About": "**Peter Andreas Thiel** popularly known as Peter Thiel. Peter Thiel served as the CEO of PayPal from its inception to its sale to eBay in October 2002. Thiel’s sexuality came out in 2007 when Gawker Media outed him in a blog post. He became the first openly gay speaker at Republican National Convention and delivered a speech on sexuality.\n\n“Of course every American has a unique identity,” he said. “I am proud to be gay. I am proud to be a Republican. But most of all I am proud to be an American.”",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Peter_Thiel_2014_by_Heisenberg_Media.jpg/220px-Peter_Thiel_2014_by_Heisenberg_Media.jpg",
+        "Born": "11 October, 1967 at Frankfurt, West Germany",
+        "Awards": "Thiel received a co-producer credit for Thank You for Smoking, a 2005 feature film based on Christopher Buckley's 1994 novel of the same name, In 2006, Thiel won the Herman Lay Award for Entrepreneurship, In 2007, he was honored as a Young Global leader by the World Economic Forum as one of the 250 most distinguished leaders age 40 and under, On 7 November 2009, Thiel was awarded an honorary degree from Universidad Francisco Marroquin, In 2012, Students For Liberty, an organization dedicated to spreading libertarian ideals on college campuses, awarded Thiel its “Alumnus of the Year” award, In February 2013, Thiel received a TechCrunch Crunchie Award for Venture Capitalist of the Year."
     }
 }
