@@ -48,7 +48,7 @@ class PrideLeader(commands.Cog):
 
         if len(valid_name) == 0:
             valid_name = ", ".join([name for name in self.pride.keys()])
-            error_msg = "Sorry your input didn't match any name which i know,here is the list whom i know"
+            error_msg = "Sorry your input didn't match any stored name, here is a list of available names"
         else:
             valid_name = "\n".join([name for name in valid_name])
             error_msg = "Did you mean?"
