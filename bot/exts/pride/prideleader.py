@@ -45,6 +45,7 @@ class PrideLeader(commands.Cog):
         for name in self.pride.keys():
             if fuzz.ratio(pride_leader, name) >= 40:
                 valid_name.append(name)
+
         if len(valid_name) == 0:
             valid_name = ", ".join([name for name in self.pride.keys()])
             error_msg = "Sorry your input didn't match any name which i know,here is the list whom i know"
