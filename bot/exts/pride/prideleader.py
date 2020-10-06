@@ -52,6 +52,7 @@ class PrideLeader(commands.Cog):
         else:
             valid_name = "\n".join([name for name in valid_name])
             error_msg = "Did you mean?"
+
         embed.description = f"{error_msg}\n```{valid_name}```"
         return embed
 
