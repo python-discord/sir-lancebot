@@ -42,7 +42,7 @@ class PrideLeader(commands.Cog):
         valid_name = []
         pride_leader = pride_leader.split(" ")
         pride_leader = ' '.join(name.capitalize() for name in pride_leader)
-        for name in self.pride.keys():
+        for name in self.pride:
             if fuzz.ratio(pride_leader, name) >= 40:
                 valid_name.append(name)
 
