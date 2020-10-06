@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 
 
 class PrideLeader(commands.Cog):
-    """Gives a Pride Leader Info."""
+    """Gives information about Pride Leaders."""
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
