@@ -29,7 +29,7 @@ class EmojiCount(commands.Cog):
 
         if len(emoji) == 1:
             for key, value in emoji.items():
-                msg.append(f"There are **{len(value)}** emojis in the **{key}** category")
+                msg.append(f"There is **{len(value)}** emoji in the **{key}** category")
                 embed.set_thumbnail(url=random.choice(value).url)
 
         else:
