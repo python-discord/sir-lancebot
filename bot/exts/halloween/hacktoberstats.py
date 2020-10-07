@@ -29,6 +29,8 @@ GITHUB_NONEXISTENT_USER_MESSAGE = (
     "or you do not have permission to view the users."
 )
 
+GITHUB_TOPICS_ACCEPT_HEADER = {"Accept": "application/vnd.github.mercy-preview+json"}
+
 
 class HacktoberStats(commands.Cog):
     """Hacktoberfest statistics Cog."""
@@ -239,7 +241,7 @@ class HacktoberStats(commands.Cog):
         action_type = "pr"
         is_query = "public"
         not_query = "draft"
-        date_range = f"{CURRENT_YEAR}-10-01T00:00:00%2B14:00..{CURRENT_YEAR}-10-03T23:59:59-11:00"
+        date_range = f"{CURRENT_YEAR}-10-01T00:00:00%2B14:00..{CURRENT_YEAR}-11-01T00:00:00-11:00"
         per_page = "300"
         query_url = (
             f"{base_url}"
@@ -252,87 +254,12 @@ class HacktoberStats(commands.Cog):
             f"+created:{date_range}"
             f"&per_page={per_page}"
         )
-        logging.debug(f"First GitHub query URL generated: {query_url}")
+        logging.debug(f"GitHub query URL generated: {query_url}")
 
         async with aiohttp.ClientSession() as session:
             async with session.get(query_url, headers=REQUEST_HEADERS) as resp:
                 jsonresp = await resp.json()
 
-        if not _valid_github_response(jsonresp, github_username):
-            return
-
-        else:
-            if jsonresp["total_count"] == 0:
-                # Short circuit if there aren't any PRs
-                logging.info(f"No Hacktoberfest PRs found for GitHub user: '{github_username}'")
-                return
-            else:
-                # logging.info(f"Found {len(jsonresp['items'])} Hacktoberfest PRs for GitHub user: '{github_username}'")
-                outlist = []
-                for item in jsonresp["items"]:
-                    shortname = HacktoberStats._get_shortname(item["repository_url"])
-                    itemdict = {
-                        "repo_url": f"https://www.github.com/{shortname}",
-                        "repo_shortname": shortname,
-                        "created_at": datetime.strptime(
-                            item["created_at"], r"%Y-%m-%dT%H:%M:%SZ"
-                        ),
-                    }
-                    outlist.append(itemdict)
-                # return outlist
-        
-        date_range = f"{CURRENT_YEAR}-10-01T00:00:00%2B14:00..{CURRENT_YEAR}-11-01T23:59:59-11:00"
-        query_url = (
-            f"{base_url}"
-            f"-label:{not_labels[0]}"
-            f"+-label:{not_labels[1]}"
-            f"+type:{action_type}"
-            f"+is:{is_query}"
-            f"+author:{github_username}"
-            f"+-is:{not_query}"
-            f"+created:{date_range}"
-            f"&per_page={per_page}"
-        )
-        logging.debug(f"Second GitHub query URL generated: {query_url}")
-
-        async with aiohttp.ClientSession() as session:
-            async with session.get(query_url, headers=REQUEST_HEADERS) as resp:
-                jsonresp = await resp.json()
-
-        if not _valid_github_response(jsonresp, github_username):
-            return
-
-        else:
-            if jsonresp["total_count"] == 0:
-                # Short circuit if there aren't any PRs
-                logging.info(f"No Hacktoberfest PRs found for GitHub user: '{github_username}'")
-                return
-            else:
-                for item in jsonresp["items"]:
-                    shortname = HacktoberStats._get_shortname(item["repository_url"])
-                    itemdict = {
-                        "repo_url": f"https://www.github.com/{shortname}",
-                        "repo_shortname": shortname,
-                        "created_at": datetime.strptime(
-                            item["created_at"], r"%Y-%m-%dT%H:%M:%SZ"
-                        ),
-                    }
-                    query_url = f"https://api.github.com/repos/{shortname}/topics"
-                    accept_header = {"Accept": "application/vnd.github.mercy-preview+json"}
-
-                    async with aiohttp.ClientSession() as session:
-                        async with session.get(query_url, headers=accept_header) as resp:
-                            jsonresp2 = await resp.json()
-                    
-                    if not _valid_github_response(jsonresp2, github_username):
-                        return
-
-                    if ("hacktoberfest" in jsonresp2["names"]) or ("hacktoberfest-accpeted" in jsonresp["labels"]):
-                        outlist.append(itemdict)
-                return outlist
-
-    @staticmethod
-    def _valid_github_response(jsonresp: str, username: str):
         if "message" in jsonresp.keys():
             # One of the parameters is invalid, short circuit for now
             api_message = jsonresp["errors"][0]["message"]
@@ -347,6 +274,44 @@ class HacktoberStats(commands.Cog):
             
             return True
 
+        
+        if jsonresp["total_count"] == 0:
+            # Short circuit if there aren't any PRs
+            logging.info(f"No Hacktoberfest PRs found for GitHub user: '{github_username}'")
+            return
+        else:
+            # logging.info(f"Found {len(jsonresp['items'])} Hacktoberfest PRs for GitHub user: '{github_username}'")
+            outlist = []
+            oct3 = datetime(int(CURRENT_YEAR), 10, 3, 0, 0, 0)
+            topics_query_url = f"https://api.github.com/repos/{shortname}/topics"
+            for item in jsonresp["items"]:
+                shortname = HacktoberStats._get_shortname(item["repository_url"])
+                itemdict = {
+                    "repo_url": f"https://www.github.com/{shortname}",
+                    "repo_shortname": shortname,
+                    "created_at": datetime.strptime(
+                        item["created_at"], r"%Y-%m-%dT%H:%M:%SZ"
+                    ),
+                }
+                # outlist.append(itemdict)
+        
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(topics_query_url, headers=GITHUB_TOPICS_ACCEPT_HEADER) as resp:
+                        jsonresp2 = await resp.json()
+                
+                if not _valid_github_response(jsonresp2, github_username):
+                    return
+
+                # PRs before oct 3 without invalid/spam willl count
+                if itemdict["created_at"] < oct3:
+                    outlist.append(itemdict)
+                    continue
+                # PRs after must be in repo with 'hacktoberfest' topic
+                # unless it has 'hacktoberfest-accepted' label
+                if ("hacktoberfest" in jsonresp2["names"]) or ("hacktoberfest-accpeted" in jsonresp["labels"]):
+                    outlist.append(itemdict)
+            return outlist
+        
     @staticmethod
     def _get_shortname(in_url: str) -> str:
         """
