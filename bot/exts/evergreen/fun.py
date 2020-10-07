@@ -67,7 +67,7 @@ class Fun(Cog):
     async def roll(self, ctx: Context, num_rolls: int = 1) -> None:
         """Outputs a number of random dice emotes (up to 6)."""
         if 1 <= num_rolls <= 6:
-            dice = " ".join(Fun._get_random_die() for _ in range(num_rolls))
+            dice = " ".join(self._get_random_die() for _ in range(num_rolls))
             await ctx.send(dice)
         else:
             raise BadArgument("`!roll` only supports between 1 and 6 rolls.")
