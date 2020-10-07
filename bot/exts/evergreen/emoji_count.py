@@ -44,7 +44,7 @@ class EmojiCount(commands.Cog):
 
     @staticmethod
     def generate_invalid_embed(ctx: commands.Context) -> [discord.Embed, str]:
-        """Genrates error embed."""
+        """Generates error embed."""
         embed = discord.Embed(
             color=Colours.soft_red,
             title=random.choice(ERROR_REPLIES)
