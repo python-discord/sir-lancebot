@@ -78,7 +78,7 @@ class PrideLeader(commands.Cog):
         await ctx.send(embed=final_embed)
 
     @pride_leader.error
-    async def pride_leader_error(self, ctx: commands.Context, error: commands.CommandError):
+    async def pride_leader_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
         """Error handler of pride leader command."""
         if isinstance(error, commands.MissingRequiredArgument):
             log.trace("Name not provided by the user so selecting random from json.")
