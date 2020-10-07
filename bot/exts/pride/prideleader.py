@@ -68,7 +68,7 @@ class PrideLeader(commands.Cog):
 
     @commands.command(name="prideleader", aliases=['pl'])
     async def pride_leader(self, ctx: commands.Context, *, pride_leader_name: str) -> None:
-        """Provides info about pride leader randomly by taking name as input or randomly without input."""
+        """Provides info about pride leader by taking name as input or randomly without input."""
         leader = self.name_verifier(pride_leader_name)
         if leader is None:
             log.trace("Got invalid name.")
