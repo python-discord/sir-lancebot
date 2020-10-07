@@ -1083,7 +1083,7 @@ class Snakes(Cog):
             url,
             params={
                 "part": "snippet",
-                "q": urllib.parse.quote(query),
+                "q": urllib.parse.quote_plus(query),
                 "type": "video",
                 "key": Tokens.youtube
             }
