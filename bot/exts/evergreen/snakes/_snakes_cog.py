@@ -1089,7 +1089,7 @@ class Snakes(Cog):
             }
         )
         response = await response.json()
-        data = response['items']
+        data = response.get("items", [])
 
         # Send the user a video
         if len(data) > 0:
