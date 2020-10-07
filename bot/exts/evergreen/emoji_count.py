@@ -2,6 +2,7 @@ import datetime
 import logging
 import random
 from collections import defaultdict
+from typing import Tuple
 
 import discord
 from discord.ext import commands
@@ -19,7 +20,7 @@ class EmojiCount(commands.Cog):
         self.bot = bot
 
     @staticmethod
-    def embed_builder(emoji: dict) -> [discord.Embed, str]:
+    def embed_builder(emoji: dict) -> Tuple[discord.Embed, str]:
         """Generates an embed with the emoji names and count."""
         embed = discord.Embed(
             color=Colours.orange,
@@ -44,7 +45,7 @@ class EmojiCount(commands.Cog):
         return embed, msg
 
     @staticmethod
-    def generate_invalid_embed(ctx: commands.Context) -> [discord.Embed, str]:
+    def generate_invalid_embed(ctx: commands.Context) -> Tuple[discord.Embed, str]:
         """Generates error embed."""
         embed = discord.Embed(
             color=Colours.soft_red,
@@ -56,7 +57,7 @@ class EmojiCount(commands.Cog):
         for emoji in ctx.guild.emojis:
             emoji_dict[emoji.name.split("_")[0]].append(emoji)
 
-        error_comp = ', '.join(emoji_category for emoji_category in emoji_dict)
+        error_comp = ', '.join(emoji_dict)
         msg.append(f"These are the valid categories\n```{error_comp}```")
         return embed, msg
 
