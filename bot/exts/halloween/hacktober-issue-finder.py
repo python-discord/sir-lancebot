@@ -103,7 +103,7 @@ class HacktoberIssues(commands.Cog):
         labels = [label["name"] for label in issue["labels"]]
 
         embed = discord.Embed(title=title)
-        embed.description = body
+        embed.description = body[:500] + '...' if len(body) > 500 else body
         embed.add_field(name="labels", value="\n".join(labels))
         embed.url = issue_url
         embed.set_footer(text=issue_url)
