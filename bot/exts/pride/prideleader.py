@@ -16,10 +16,10 @@ class PrideLeader(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.pride = self.load_json()
+        self.pride = self.load_pride_leader_json()
 
     @staticmethod
-    def load_json() -> dict:
+    def load_pride_leader_json() -> dict:
         """Loads pride leader information from static json resource."""
         explanation_file = Path("bot/resources/pride/prideleader.json")
         with explanation_file.open(encoding="utf8") as json_data:
@@ -67,12 +67,8 @@ class PrideLeader(commands.Cog):
         return embed
 
     @commands.command(name="prideleader", aliases=['pl'])
-    async def pl(self, ctx: commands.Context, *, pride_leader_name: str = None) -> None:
-        """Provides info about pride leader randomly without taking any args or by taking name."""
-        if pride_leader_name is None:
-            log.trace("Name not provided by the user so selecting random from json.")
-            name_list = [name for name in self.pride.keys()]
-            pride_leader_name = random.choice(name_list)
+    async def pride_leader(self, ctx: commands.Context, *, pride_leader_name: str) -> None:
+        """Provides info about pride leader randomly by taking name as input or randomly without input."""
         leader = self.name_verifier(pride_leader_name)
         if leader is None:
             log.trace("Got invalid name.")
@@ -81,7 +77,19 @@ class PrideLeader(commands.Cog):
             final_embed = self.embed_builder(leader)
         await ctx.send(embed=final_embed)
 
+    @pride_leader.error
+    async def pride_leader_error(self, ctx: commands.Context, error: commands.CommandError):
+        """Error handler of pride leader command."""
+        if isinstance(error, commands.MissingRequiredArgument):
+            log.trace("Name not provided by the user so selecting random from json.")
+            name_list = [name for name in self.pride]
+            leader = random.choice(name_list)
+            final_embed = self.embed_builder(leader)
+            await ctx.send(embed=final_embed)
+        else:
+            raise error
+
 
 def setup(bot: commands.Bot) -> None:
-    """Cog loader for drag queen name generator."""
+    """Loads Pride leader cog."""
     bot.add_cog(PrideLeader(bot))
