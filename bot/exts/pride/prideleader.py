@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 
 
 class PrideLeader(commands.Cog):
-    """Gives a Pride Leader Info."""
+    """Gives information about Pride Leaders."""
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -29,8 +29,7 @@ class PrideLeader(commands.Cog):
 
     def name_verifier(self, leader_name: str) -> str:
         """Verify leader name wether it is present in json or not."""
-        leader_name = leader_name.split(" ")
-        leader_name = ' '.join(name.capitalize() for name in leader_name)
+        leader_name = leader_name.title()
         if leader_name in self.pride:
             log.trace("Got Valid name.")
             return leader_name
@@ -40,17 +39,18 @@ class PrideLeader(commands.Cog):
         embed = discord.Embed()
         embed.color = Colours.soft_red
         valid_name = []
-        pride_leader = pride_leader.split(" ")
-        pride_leader = ' '.join(name.capitalize() for name in pride_leader)
-        for name in self.pride.keys():
+        pride_leader = pride_leader.title()
+        for name in self.pride:
             if fuzz.ratio(pride_leader, name) >= 40:
                 valid_name.append(name)
+
         if len(valid_name) == 0:
             valid_name = ", ".join([name for name in self.pride.keys()])
-            error_msg = "Sorry your input didn't match any name which i know,here is the list whom i know"
+            error_msg = "Sorry your input didn't match any stored name, here is a list of available names"
         else:
             valid_name = "\n".join([name for name in valid_name])
             error_msg = "Did you mean?"
+
         embed.description = f"{error_msg}\n```{valid_name}```"
         return embed
 
