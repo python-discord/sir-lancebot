@@ -18,7 +18,8 @@ class EmojiCount(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    def embed_builder(self, emoji: dict) -> [discord.Embed, str]:
+    @staticmethod
+    def embed_builder(emoji: dict) -> [discord.Embed, str]:
         """Generates an embed with the emoji names and count."""
         embed = discord.Embed(
             color=Colours.orange,
@@ -28,14 +29,14 @@ class EmojiCount(commands.Cog):
         msg = []
 
         if len(emoji) == 1:
-            for key, value in emoji.items():
-                msg.append(f"There is **{len(value)}** emoji in the **{key}** category")
-                embed.set_thumbnail(url=random.choice(value).url)
+            for category_name, category_emojis in emoji.items():
+                msg.append(f"There is **{len(category_emojis)}** emoji in the **{category_name}** category")
+                embed.set_thumbnail(url=random.choice(category_emojis).url)
 
         else:
-            for key, value in emoji.items():
-                emoji_choice = random.choice(value)
-                emoji_info = f'There are **{len(value)}** emojis in the **{key}** category\n'
+            for category_name, category_emojis in emoji.items():
+                emoji_choice = random.choice(category_emojis)
+                emoji_info = f'There are **{len(category_emojis)}** emojis in the **{category_name}** category\n'
                 if emoji_choice.animated:
                     msg.append(f'<a:{emoji_choice.name}:{emoji_choice.id}> {emoji_info}')
                 else:
@@ -55,7 +56,7 @@ class EmojiCount(commands.Cog):
         for emoji in ctx.guild.emojis:
             emoji_dict[emoji.name.split("_")[0]].append(emoji)
 
-        error_comp = ', '.join(key for key in emoji_dict)
+        error_comp = ', '.join(emoji_category for emoji_category in emoji_dict)
         msg.append(f"These are the valid categories\n```{error_comp}```")
         return embed, msg
 
@@ -64,6 +65,9 @@ class EmojiCount(commands.Cog):
         """Returns embed with emoji category and info given by the user."""
         emoji_dict = defaultdict(list)
 
+        if not ctx.guild.emojis:
+            await ctx.send("No emojis found.")
+            return
         log.trace(f"Emoji Category {'' if category_query else 'not '}provided by the user")
         for emoji in ctx.guild.emojis:
             emoji_category = emoji.name.split("_")[0]
