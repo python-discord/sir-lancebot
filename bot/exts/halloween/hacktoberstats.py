@@ -266,15 +266,14 @@ class HacktoberStats(commands.Cog):
 
             # Ignore logging non-existent users or users we do not have permission to see
             if api_message == GITHUB_NONEXISTENT_USER_MESSAGE:
-                logging.debug(f"No GitHub user found named '{username}'")
+                logging.debug(f"No GitHub user found named '{github_username}'")
                 return False
             else:
-                logging.error(f"GitHub API request for '{username}' failed with message: {api_message}")
+                logging.error(f"GitHub API request for '{github_username}' failed with message: {api_message}")
                 return False
-            
+
             return True
 
-        
         if jsonresp["total_count"] == 0:
             # Short circuit if there aren't any PRs
             logging.info(f"No Hacktoberfest PRs found for GitHub user: '{github_username}'")
@@ -283,7 +282,7 @@ class HacktoberStats(commands.Cog):
             # logging.info(f"Found {len(jsonresp['items'])} Hacktoberfest PRs for GitHub user: '{github_username}'")
             outlist = []
             oct3 = datetime(int(CURRENT_YEAR), 10, 3, 0, 0, 0)
-            topics_query_url = f"https://api.github.com/repos/{shortname}/topics"
+
             for item in jsonresp["items"]:
                 shortname = HacktoberStats._get_shortname(item["repository_url"])
                 itemdict = {
@@ -293,25 +292,26 @@ class HacktoberStats(commands.Cog):
                         item["created_at"], r"%Y-%m-%dT%H:%M:%SZ"
                     ),
                 }
-                # outlist.append(itemdict)
-        
-                async with aiohttp.ClientSession() as session:
-                    async with session.get(topics_query_url, headers=GITHUB_TOPICS_ACCEPT_HEADER) as resp:
-                        jsonresp2 = await resp.json()
-                
-                if not _valid_github_response(jsonresp2, github_username):
-                    return
 
-                # PRs before oct 3 without invalid/spam willl count
+                # PRs before oct 3 without invalid/spam will count
                 if itemdict["created_at"] < oct3:
                     outlist.append(itemdict)
                     continue
+
+                topics_query_url = f"https://api.github.com/repos/{shortname}/topics"
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(topics_query_url, headers=GITHUB_TOPICS_ACCEPT_HEADER) as resp:
+                        jsonresp2 = await resp.json()
+
+                if not ("names" in jsonresp2.keys()):
+                    log.error("Error fetching topics for " + shortname + ": " + jsonresp2["message"])
+
                 # PRs after must be in repo with 'hacktoberfest' topic
                 # unless it has 'hacktoberfest-accepted' label
                 if ("hacktoberfest" in jsonresp2["names"]) or ("hacktoberfest-accpeted" in jsonresp["labels"]):
                     outlist.append(itemdict)
             return outlist
-        
+
     @staticmethod
     def _get_shortname(in_url: str) -> str:
         """
