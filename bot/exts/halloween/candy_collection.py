@@ -1,4 +1,3 @@
-import functools
 import json
 import logging
 import os
@@ -94,7 +93,7 @@ class CandyCollection(commands.Cog):
                 else:
                     await self.send_spook_msg(message.author, message.channel, lost)
         else:
-            return # Skip saving
+            return  # Skip saving
 
         await self.remove_reactions(reaction)
         await self.bot.loop.run_in_executor(None, self.save_to_json)
@@ -177,7 +176,6 @@ class CandyCollection(commands.Cog):
     @commands.command()
     async def candy(self, ctx: commands.Context) -> None:
         """Get the candy leaderboard and save to JSON."""
-
         emoji = (
             '\N{FIRST PLACE MEDAL}',
             '\N{SECOND PLACE MEDAL}',
@@ -186,12 +184,12 @@ class CandyCollection(commands.Cog):
             '\N{SPORTS MEDAL}'
         )
 
-        top_sorted = sorted(((user_id, score) for user_id, score in self.candy_records.items()), \
-            key=lambda x: x[1], reverse=True)
+        top_sorted = sorted(((user_id, score) for user_id, score in self.candy_records.items()),
+                            key=lambda x: x[1], reverse=True)
         top_five = top_sorted[:5]
 
         leaderboard = '\n'.join(f"{emoji[index]} <@{record[0]}>: {record[1]}"
-            for index, record in enumerate(top_five)) or 'No Candies'
+                                for index, record in enumerate(top_five)) or 'No Candies'
 
         e = discord.Embed(colour=discord.Colour.blurple())
         e.add_field(name="Top Candy Records", value=leaderboard, inline=False)
