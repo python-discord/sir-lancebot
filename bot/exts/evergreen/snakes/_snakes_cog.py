@@ -773,7 +773,7 @@ class Snakes(Cog):
         embed = Embed(title=data["title"], color=SNAKE_COLOR)
 
         if data["poster_path"] is not None:
-            embed.set_image(url=f"https://images.tmdb.org/t/p/original{data['poster_path']}?api_key={Tokens.tmdb}")
+            embed.set_image(url=f"https://images.tmdb.org/t/p/original{data['poster_path']}")
 
         embed.add_field(name="Overview", value=data["overview"])
 
