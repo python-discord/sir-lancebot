@@ -275,42 +275,42 @@ class HacktoberStats(commands.Cog):
             # Short circuit if there aren't any PRs
             logging.info(f"No Hacktoberfest PRs found for GitHub user: '{github_username}'")
             return
-        else:
-            logging.info(f"Found {len(jsonresp['items'])} Hacktoberfest PRs for GitHub user: '{github_username}'")
-            outlist = []
-            oct3 = datetime(int(CURRENT_YEAR), 10, 3, 0, 0, 0)
-            for item in jsonresp["items"]:
-                shortname = HacktoberStats._get_shortname(item["repository_url"])
-                itemdict = {
-                    "repo_url": f"https://www.github.com/{shortname}",
-                    "repo_shortname": shortname,
-                    "created_at": datetime.strptime(
-                        item["created_at"], r"%Y-%m-%dT%H:%M:%SZ"
-                    ),
-                }
 
-                # PRs before oct 3 no need to check for topics
-                if itemdict["created_at"] < oct3:
-                    outlist.append(itemdict)
-                    continue
+        logging.info(f"Found {len(jsonresp['items'])} Hacktoberfest PRs for GitHub user: '{github_username}'")
+        outlist = []
+        oct3 = datetime(int(CURRENT_YEAR), 10, 3, 0, 0, 0)
+        for item in jsonresp["items"]:
+            shortname = HacktoberStats._get_shortname(item["repository_url"])
+            itemdict = {
+                "repo_url": f"https://www.github.com/{shortname}",
+                "repo_shortname": shortname,
+                "created_at": datetime.strptime(
+                    item["created_at"], r"%Y-%m-%dT%H:%M:%SZ"
+                ),
+            }
 
-                # fetch topics for the pr repo
-                topics_query_url = f"https://api.github.com/repos/{shortname}/topics"
-                logging.debug("Fetching repo topics for " + shortname + " with url: " + topics_query_url)
-                async with aiohttp.ClientSession() as session:
-                    async with session.get(topics_query_url, headers=GITHUB_TOPICS_ACCEPT_HEADER) as resp:
-                        jsonresp2 = await resp.json()
+            # PRs before oct 3 no need to check for topics
+            if itemdict["created_at"] < oct3:
+                outlist.append(itemdict)
+                continue
 
-                if not ("names" in jsonresp2.keys()):
-                    logging.error("Error fetching topics for " + shortname + ": " + jsonresp2["message"])
+            # fetch topics for the pr repo
+            topics_query_url = f"https://api.github.com/repos/{shortname}/topics"
+            logging.debug("Fetching repo topics for " + shortname + " with url: " + topics_query_url)
+            async with aiohttp.ClientSession() as session:
+                async with session.get(topics_query_url, headers=GITHUB_TOPICS_ACCEPT_HEADER) as resp:
+                    jsonresp2 = await resp.json()
 
-                # PRs after oct 3 must be in repo with 'hacktoberfest' topic
-                # unless it has 'hacktoberfest-accepted' label
-                if not ("labels" in jsonresp.keys()):
-                    continue
-                if ("hacktoberfest" in jsonresp2["names"]) or ("hacktoberfest-accpeted" in jsonresp["labels"]):
-                    outlist.append(itemdict)
-            return outlist
+            if not ("names" in jsonresp2.keys()):
+                logging.error("Error fetching topics for " + shortname + ": " + jsonresp2["message"])
+
+            # PRs after oct 3 must be in repo with 'hacktoberfest' topic
+            # unless it has 'hacktoberfest-accepted' label
+            if not ("labels" in jsonresp.keys()):
+                continue
+            if ("hacktoberfest" in jsonresp2["names"]) or ("hacktoberfest-accpeted" in jsonresp["labels"]):
+                outlist.append(itemdict)
+        return outlist
 
     @staticmethod
     def _get_shortname(in_url: str) -> str:
