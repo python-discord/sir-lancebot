@@ -282,7 +282,6 @@ class HacktoberStats(commands.Cog):
             # logging.info(f"Found {len(jsonresp['items'])} Hacktoberfest PRs for GitHub user: '{github_username}'")
             outlist = []
             oct3 = datetime(int(CURRENT_YEAR), 10, 3, 0, 0, 0)
-
             for item in jsonresp["items"]:
                 shortname = HacktoberStats._get_shortname(item["repository_url"])
                 itemdict = {
