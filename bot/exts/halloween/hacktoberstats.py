@@ -276,7 +276,7 @@ class HacktoberStats(commands.Cog):
             logging.info(f"No Hacktoberfest PRs found for GitHub user: '{github_username}'")
             return
         else:
-            # logging.info(f"Found {len(jsonresp['items'])} Hacktoberfest PRs for GitHub user: '{github_username}'")
+            logging.info(f"Found {len(jsonresp['items'])} Hacktoberfest PRs for GitHub user: '{github_username}'")
             outlist = []
             oct3 = datetime(int(CURRENT_YEAR), 10, 3, 0, 0, 0)
             for item in jsonresp["items"]:
@@ -295,13 +295,13 @@ class HacktoberStats(commands.Cog):
                     continue
 
                 topics_query_url = f"https://api.github.com/repos/{shortname}/topics"
-                log.debug("Fetching repo topics for " + shortname + " with url: " + topics_query_url)
+                logging.debug("Fetching repo topics for " + shortname + " with url: " + topics_query_url)
                 async with aiohttp.ClientSession() as session:
                     async with session.get(topics_query_url, headers=GITHUB_TOPICS_ACCEPT_HEADER) as resp:
                         jsonresp2 = await resp.json()
 
                 if not ("names" in jsonresp2.keys()):
-                    log.error("Error fetching topics for " + shortname + ": " + jsonresp2["message"])
+                    logging.error("Error fetching topics for " + shortname + ": " + jsonresp2["message"])
 
                 # PRs after must be in repo with 'hacktoberfest' topic
                 # unless it has 'hacktoberfest-accepted' label
