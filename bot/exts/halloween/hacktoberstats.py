@@ -29,6 +29,7 @@ GITHUB_NONEXISTENT_USER_MESSAGE = (
     "or you do not have permission to view the users."
 )
 
+# using repo topics API during preview period requires an accept header
 GITHUB_TOPICS_ACCEPT_HEADER = {"Accept": "application/vnd.github.mercy-preview+json"}
 
 
@@ -166,6 +167,10 @@ class HacktoberStats(commands.Cog):
 
         PRs with an 'invalid' or 'spam' label are ignored
 
+        For PRs created after October 3rd, they have to be in a repository that has a
+        'hacktoberfest' topic, unless the PR is labelled 'hacktoberfest-accepted' for it
+        to count.
+
         If a valid github_username is provided, an embed is generated and posted to the channel
 
         Otherwise, post a helpful error message
@@ -224,6 +229,10 @@ class HacktoberStats(commands.Cog):
 
         PRs with an 'invalid' or 'spam' label are ignored
 
+        For PRs created after October 3rd, they have to be in a repository that has a
+        'hacktoberfest' topic, unless the PR is labelled 'hacktoberfest-accepted' for it
+        to count.
+
         If PRs are found, return a list of dicts with basic PR information
 
         For each PR:
@@ -277,7 +286,7 @@ class HacktoberStats(commands.Cog):
             return
 
         logging.info(f"Found {len(jsonresp['items'])} Hacktoberfest PRs for GitHub user: '{github_username}'")
-        outlist = []
+        outlist = []  # list of pr information dicts that will get returned
         oct3 = datetime(int(CURRENT_YEAR), 10, 3, 0, 0, 0)
         for item in jsonresp["items"]:
             shortname = HacktoberStats._get_shortname(item["repository_url"])
@@ -296,17 +305,17 @@ class HacktoberStats(commands.Cog):
 
             # fetch topics for the pr repo
             topics_query_url = f"https://api.github.com/repos/{shortname}/topics"
-            logging.debug("Fetching repo topics for " + shortname + " with url: " + topics_query_url)
+            logging.debug(f"Fetching repo topics for {shortname} with url: {topics_query_url}")
             async with aiohttp.ClientSession() as session:
                 async with session.get(topics_query_url, headers=GITHUB_TOPICS_ACCEPT_HEADER) as resp:
                     jsonresp2 = await resp.json()
 
             if not ("names" in jsonresp2.keys()):
-                logging.error("Error fetching topics for " + shortname + ": " + jsonresp2["message"])
+                logging.error(f"Error fetching topics for {shortname}: {jsonresp2['message']}")
 
             # PRs after oct 3 must be in repo with 'hacktoberfest' topic
             # unless it has 'hacktoberfest-accepted' label
-            if not ("labels" in jsonresp.keys()):
+            if not ("labels" in jsonresp.keys()):  # if PR has no labels
                 continue
             if ("hacktoberfest" in jsonresp2["names"]) or ("hacktoberfest-accpeted" in jsonresp["labels"]):
                 outlist.append(itemdict)
