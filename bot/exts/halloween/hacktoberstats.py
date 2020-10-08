@@ -267,10 +267,9 @@ class HacktoberStats(commands.Cog):
             # Ignore logging non-existent users or users we do not have permission to see
             if api_message == GITHUB_NONEXISTENT_USER_MESSAGE:
                 logging.debug(f"No GitHub user found named '{github_username}'")
-                return
             else:
                 logging.error(f"GitHub API request for '{github_username}' failed with message: {api_message}")
-                return
+            return
 
         if jsonresp["total_count"] == 0:
             # Short circuit if there aren't any PRs
