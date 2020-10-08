@@ -298,6 +298,7 @@ class HacktoberStats(commands.Cog):
                     continue
 
                 topics_query_url = f"https://api.github.com/repos/{shortname}/topics"
+                log.debug("Fetching repo topics for " + shortname + " with url: " + topics_query_url)
                 async with aiohttp.ClientSession() as session:
                     async with session.get(topics_query_url, headers=GITHUB_TOPICS_ACCEPT_HEADER) as resp:
                         jsonresp2 = await resp.json()
@@ -307,6 +308,8 @@ class HacktoberStats(commands.Cog):
 
                 # PRs after must be in repo with 'hacktoberfest' topic
                 # unless it has 'hacktoberfest-accepted' label
+                if not ("labels" in jsonresp.keys()):
+                    continue
                 if ("hacktoberfest" in jsonresp2["names"]) or ("hacktoberfest-accpeted" in jsonresp["labels"]):
                     outlist.append(itemdict)
             return outlist
