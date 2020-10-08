@@ -289,11 +289,12 @@ class HacktoberStats(commands.Cog):
                     ),
                 }
 
-                # PRs before oct 3 without invalid/spam will count
+                # PRs before oct 3 no need to check for topics
                 if itemdict["created_at"] < oct3:
                     outlist.append(itemdict)
                     continue
 
+                # fetch topics for the pr repo
                 topics_query_url = f"https://api.github.com/repos/{shortname}/topics"
                 logging.debug("Fetching repo topics for " + shortname + " with url: " + topics_query_url)
                 async with aiohttp.ClientSession() as session:
@@ -303,7 +304,7 @@ class HacktoberStats(commands.Cog):
                 if not ("names" in jsonresp2.keys()):
                     logging.error("Error fetching topics for " + shortname + ": " + jsonresp2["message"])
 
-                # PRs after must be in repo with 'hacktoberfest' topic
+                # PRs after oct 3 must be in repo with 'hacktoberfest' topic
                 # unless it has 'hacktoberfest-accepted' label
                 if not ("labels" in jsonresp.keys()):
                     continue
