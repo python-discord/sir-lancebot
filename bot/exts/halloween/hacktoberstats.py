@@ -299,7 +299,15 @@ class HacktoberStats(commands.Cog):
             }
 
             # PRs before oct 3 no need to check for topics
-            if itemdict["created_at"] < oct3:
+            # continue the loop if 'hacktoberfest-accepted' is labeled then
+            # there is no need to check for its topics
+            if (itemdict["created_at"] < oct3):
+                outlist.append(itemdict)
+                continue
+            if not ("labels" in item.keys()):  # if PR has no labels
+                continue
+            # checking whether "hacktoberfest-accepted" is one of the PR's labels
+            if any(label["name"].casefold() == "hacktoberfest-accepted" for label in item["labels"]):
                 outlist.append(itemdict)
                 continue
 
@@ -313,11 +321,9 @@ class HacktoberStats(commands.Cog):
             if not ("names" in jsonresp2.keys()):
                 logging.error(f"Error fetching topics for {shortname}: {jsonresp2['message']}")
 
-            # PRs after oct 3 must be in repo with 'hacktoberfest' topic
-            # unless it has 'hacktoberfest-accepted' label
-            if not ("labels" in jsonresp.keys()):  # if PR has no labels
-                continue
-            if ("hacktoberfest" in jsonresp2["names"]) or ("hacktoberfest-accpeted" in jsonresp["labels"]):
+            # PRs after oct 3 that doesn't have 'hacktoberfest-accepted' label
+            # must be in repo with 'hacktoberfest' topic
+            if "hacktoberfest" in jsonresp2["names"]:
                 outlist.append(itemdict)
         return outlist
 
