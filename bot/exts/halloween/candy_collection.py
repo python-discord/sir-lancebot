@@ -27,13 +27,16 @@ class CandyCollection(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+
         with open(json_location, encoding="utf8") as candy:
-            self.candy_json = json.load(candy)
-            self.msg_reacted = self.candy_json['msg_reacted']
-        self.get_candyinfo = dict()
-        for userinfo in self.candy_json['records']:
-            userid = userinfo['userid']
-            self.get_candyinfo[userid] = userinfo
+            candy_data = json.load(candy)
+
+        # The rank data
+        self.candy_records = candy_data.get("records") or dict()
+
+        # Message ID where bot added the candies/skulls
+        self.candy_messages = set()
+        self.skull_messages = set()
 
     @in_month(Month.OCTOBER)
     @commands.Cog.listener()
@@ -48,13 +51,11 @@ class CandyCollection(commands.Cog):
 
         # do random check for skull first as it has the lower chance
         if random.randint(1, ADD_SKULL_REACTION_CHANCE) == 1:
-            d = {"reaction": '\N{SKULL}', "msg_id": message.id, "won": False}
-            self.msg_reacted.append(d)
+            self.skull_messages.add(message.id)
             return await message.add_reaction('\N{SKULL}')
         # check for the candy chance next
         if random.randint(1, ADD_CANDY_REACTION_CHANCE) == 1:
-            d = {"reaction": '\N{CANDY}', "msg_id": message.id, "won": False}
-            self.msg_reacted.append(d)
+            self.candy_messages.add(message.id)
             return await message.add_reaction('\N{CANDY}')
 
     @in_month(Month.OCTOBER)
@@ -77,33 +78,26 @@ class CandyCollection(commands.Cog):
                 await self.reacted_msg_chance(message)
             return
 
-        for react in self.msg_reacted:
-            # check to see if the message id of a message we added a
-            # reaction to is in json file, and if nobody has won/claimed it yet
-            if react['msg_id'] == message.id and react['won'] is False:
-                react['user_reacted'] = user.id
-                react['won'] = True
-                try:
-                    # if they have record/candies in json already it will do this
-                    user_records = self.get_candyinfo[user.id]
-                    if str(reaction.emoji) == '\N{CANDY}':
-                        user_records['record'] += 1
-                    if str(reaction.emoji) == '\N{SKULL}':
-                        if user_records['record'] <= 3:
-                            user_records['record'] = 0
-                            lost = 'all of your'
-                        else:
-                            lost = random.randint(1, 3)
-                            user_records['record'] -= lost
-                        await self.send_spook_msg(message.author, message.channel, lost)
+        if message.id in self.candy_messages and str(reaction.emoji) == '\N{CANDY}':
+            self.candy_messages.remove(message.id)
+            prev_record = self.candy_records.get(str(message.author.id)) or 0
+            self.candy_records[str(message.author.id)] = prev_record + 1
 
-                except KeyError:
-                    # otherwise it will raise KeyError so we need to add them to file
-                    if str(reaction.emoji) == '\N{CANDY}':
-                        print('ok')
-                        d = {"userid": user.id, "record": 1}
-                        self.candy_json['records'].append(d)
-                await self.remove_reactions(reaction)
+        elif message.id in self.skull_messages and str(reaction.emoji) == '\N{SKULL}':
+            self.skull_messages.remove(message.id)
+
+            if (prev_record := self.candy_records.get(str(message.author.id))) is not None:
+                lost = min(random.randint(1, 3), prev_record)
+
+                if lost == prev_record:
+                    await self.send_spook_msg(message.author, message.channel, 'all of your')
+                else:
+                    await self.send_spook_msg(message.author, message.channel, lost)
+        else:
+            return # Skip saving
+
+        await self.remove_reactions(reaction)
+        await self.bot.loop.run_in_executor(None, self.save_to_json)
 
     async def reacted_msg_chance(self, message: discord.Message) -> None:
         """
@@ -113,13 +107,11 @@ class CandyCollection(commands.Cog):
         existing reaction.
         """
         if random.randint(1, ADD_SKULL_EXISTING_REACTION_CHANCE) == 1:
-            d = {"reaction": '\N{SKULL}', "msg_id": message.id, "won": False}
-            self.msg_reacted.append(d)
+            self.skull_messages.add(message.id)
             return await message.add_reaction('\N{SKULL}')
 
         if random.randint(1, ADD_CANDY_EXISTING_REACTION_CHANCE) == 1:
-            d = {"reaction": '\N{CANDY}', "msg_id": message.id, "won": False}
-            self.msg_reacted.append(d)
+            self.candy_messages.add(message.id)
             return await message.add_reaction('\N{CANDY}')
 
     async def ten_recent_msg(self) -> List[int]:
@@ -179,15 +171,12 @@ class CandyCollection(commands.Cog):
     def save_to_json(self) -> None:
         """Save JSON to a local file."""
         with open(json_location, 'w', encoding="utf8") as outfile:
-            json.dump(self.candy_json, outfile)
+            json.dump(dict(records=self.candy_records), outfile)
 
     @in_month(Month.OCTOBER)
     @commands.command()
     async def candy(self, ctx: commands.Context) -> None:
         """Get the candy leaderboard and save to JSON."""
-        # Use run_in_executor to prevent blocking
-        thing = functools.partial(self.save_to_json)
-        await self.bot.loop.run_in_executor(None, thing)
 
         emoji = (
             '\N{FIRST PLACE MEDAL}',
@@ -197,20 +186,15 @@ class CandyCollection(commands.Cog):
             '\N{SPORTS MEDAL}'
         )
 
-        top_sorted = sorted(self.candy_json['records'], key=lambda k: k.get('record', 0), reverse=True)
+        top_sorted = sorted(((user_id, score) for user_id, score in self.candy_records.items()), \
+            key=lambda x: x[1], reverse=True)
         top_five = top_sorted[:5]
 
-        usersid = []
-        records = []
-        for record in top_five:
-            usersid.append(record['userid'])
-            records.append(record['record'])
-
-        value = '\n'.join(f'{emoji[index]} <@{usersid[index]}>: {records[index]}'
-                          for index in range(0, len(usersid))) or 'No Candies'
+        leaderboard = '\n'.join(f"{emoji[index]} <@{record[0]}>: {record[1]}"
+            for index, record in enumerate(top_five)) or 'No Candies'
 
         e = discord.Embed(colour=discord.Colour.blurple())
-        e.add_field(name="Top Candy Records", value=value, inline=False)
+        e.add_field(name="Top Candy Records", value=leaderboard, inline=False)
         e.add_field(name='\u200b',
                     value="Candies will randomly appear on messages sent. "
                           "\nHit the candy when it appears as fast as possible to get the candy! "
