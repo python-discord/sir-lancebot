@@ -57,9 +57,9 @@ class GithubInfo(commands.Cog):
 
             # Forming blog link
             if user_data['blog'].startswith("http"):  # Blog link is complete
-                blog = f"[Direct link]({user_data['blog']})"
+                blog = user_data['blog']
             elif user_data['blog']:  # Blog exists but the link is not complete
-                blog = f"[Direct link](https://{user_data['blog']})"
+                blog = f"https://{user_data['blog']}"
             else:
                 blog = "No blog link available"
 
