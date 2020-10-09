@@ -44,7 +44,7 @@ class PrideLeader(commands.Cog):
             if fuzz.ratio(pride_leader, name) >= 40:
                 valid_name.append(name)
 
-        if len(valid_name) == 0:
+        if not valid_name:
             valid_name = ", ".join([name for name in self.pride.keys()])
             error_msg = "Sorry your input didn't match any stored name, here is a list of available names"
         else:
