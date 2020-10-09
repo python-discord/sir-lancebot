@@ -223,7 +223,7 @@ class HacktoberStats(commands.Cog):
         return stats_embed
 
     @staticmethod
-    async def get_october_prs(github_username: str) -> List[dict]:
+    async def get_october_prs(github_username: str) -> Union[List[dict], None]:
         """
         Query GitHub's API for PRs created during the month of October by github_username.
 
