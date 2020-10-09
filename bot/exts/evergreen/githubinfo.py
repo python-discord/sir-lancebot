@@ -73,20 +73,24 @@ class GithubInfo(commands.Cog):
             embed.set_thumbnail(url=user_data['avatar_url'])
             embed.set_footer(text="Account created at")
 
-            embed.add_field(name="Followers", value=f"""[{user_data['followers']}]
-                                                    ({user_data['html_url']}?tab=followers)""")
-            embed.add_field(name="\u200b", value="\u200b")
-            embed.add_field(name="Following", value=f"""[{user_data['following']}]
+            if user_data['type'] == "User":
+
+                embed.add_field(name="Followers", value=f"""[{user_data['followers']}]
+                                                        ({user_data['html_url']}?tab=followers)""")
+                embed.add_field(name="\u200b", value="\u200b")
+                embed.add_field(name="Following", value=f"""[{user_data['following']}]
                                                     ({user_data['html_url']}?tab=following)""")
 
             embed.add_field(name="Public repos",
                             value=f"[{user_data['public_repos']}]({user_data['html_url']}?tab=repositories)")
             embed.add_field(name="\u200b", value="\u200b")
-            embed.add_field(name="Starred repos", value=f"[{len(starred_data)}]({user_data['html_url']}?tab=stars)")
 
-            embed.add_field(name=f"Organization{'s' if len(orgs)!=1 else ''}",
-                            value=orgs_to_add if orgs else "No organizations")
-            embed.add_field(name="\u200b", value="\u200b")
+            if user_data['type'] == "User":
+                embed.add_field(name="Starred repos", value=f"[{len(starred_data)}]({user_data['html_url']}?tab=stars)")
+
+                embed.add_field(name=f"Organization{'s' if len(orgs)!=1 else ''}",
+                                value=orgs_to_add if orgs else "No organizations")
+                embed.add_field(name="\u200b", value="\u200b")
             embed.add_field(name="Blog", value=blog)
 
         await ctx.send(embed=embed)
