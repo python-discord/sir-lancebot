@@ -87,6 +87,7 @@ class CandyCollection(commands.Cog):
 
             if (prev_record := self.candy_records.get(str(message.author.id))) is not None:
                 lost = min(random.randint(1, 3), prev_record)
+                self.candy_records[str(message.author.id)] = prev_record - lost
 
                 if lost == prev_record:
                     await self.send_spook_msg(message.author, message.channel, 'all of your')
