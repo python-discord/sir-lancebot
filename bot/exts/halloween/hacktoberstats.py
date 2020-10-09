@@ -4,7 +4,7 @@ import re
 from collections import Counter
 from datetime import datetime
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import aiohttp
 import discord
