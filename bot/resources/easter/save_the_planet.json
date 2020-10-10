@@ -1,0 +1,77 @@
+[
+    {
+        "title": "Choose renewable energy",
+        "image": {"url": "https://cdn.dnaindia.com/sites/default/files/styles/full/public/2019/07/23/851602-renewable-energy-istock-072419.jpg"},
+        "footer": {"text": "Help out by sharing this information!"},
+        "fields": [
+            {
+                "name": "The problem",
+                "value": "Getting energy from oil or fossil fuels isn't a good idea, because there is only so much of it.",
+                "inline": false
+            },
+
+            {
+                "name": "What you can do",
+                "value": "Use renewable energy, such as wind, solar, and hydro, because it is healthier and is not a finite resource!",
+                "inline": false
+            }
+        ]
+    },
+
+    {
+        "title": "Save the trees!",
+        "image": {"url": "https://www.thecollegesolution.com/wp-content/uploads/2014/07/crumpled-paper-1.jpg"},
+        "footer": {"text": "Help out by sharing this information!"},
+        "fields": [
+            {
+                "name": "The problem",
+                "value": "We often waste trees on making paper, and just getting rid of them for no good reason.",
+                "inline": false
+            },
+
+            {
+                "name": "What you can do",
+                "value": "Make sure you only use paper when absolutely necessary. When you do, make sure to use recycled paper because making new paper causes pollution. Find ways to plant trees (Hacktober Fest!) to combat losing them.",
+                "inline": false
+            }
+        ]
+    },
+
+    {
+        "title": "Less time in the car!",
+        "image": {"url": "https://www.careeraddict.com/uploads/article/55294/businessman-riding-bike.jpg"},
+        "footer": {"text": "Help out by sharing this information!"},
+        "fields": [
+            {
+                "name": "The problem",
+                "value": "Every mile you drive to work produces about a pound of C0₂. That's crazy! What's crazier is how clean the planet could be if we spent less time in the car!",
+                "inline": false
+            },
+
+            {
+                "name": "What you can do",
+                "value": "Instead of using your car, ride your bike if possible! Not only does it save that pound of C0₂, it is also great exercise and is cheaper!",
+                "inline": false
+            }
+        ]
+    },
+
+    {
+        "title":"Paint your roof white!",
+        "image": {"url": "https://modernize.com/wp-content/uploads/2016/10/Cool-roof.jpg"},
+        "footer": {"text":"Help out by sharing this information!"},
+        "fields": [
+            {
+                "name": "The problem",
+                "value": "People with dark roofs often spend 20 to 40% more on their electricity bills because of the extra heat, which means more electricity needs to be made, and a lot of it isn't renewable.",
+                "inline": false
+            },
+
+            {
+                "name":"What you can do",
+                "value": "Having a light colored roof will save you money, and also researchers at the Lawrence Berkeley National Laboratory estimated that if 80 percent of roofs in tropical and temperate climate areas were painted white, it could offset the greenhouse gas emissions of 300 million automobiles around the world.",
+                "inline": false
+            }
+        ]
+    }
+]
