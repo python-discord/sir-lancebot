@@ -20,6 +20,17 @@ ADD_CANDY_EXISTING_REACTION_CHANCE = 10  # 10%
 ADD_SKULL_REACTION_CHANCE = 50  # 2%
 ADD_SKULL_EXISTING_REACTION_CHANCE = 20  # 5%
 
+EMOJIS = dict(
+    CANDY="\N{CANDY}",
+    SKULL="\N{SKULL}",
+    MEDALS=('\N{FIRST PLACE MEDAL}',
+            '\N{SECOND PLACE MEDAL}',
+            '\N{THIRD PLACE MEDAL}',
+            '\N{SPORTS MEDAL}',
+            '\N{SPORTS MEDAL}',
+            ),
+)
+
 
 class CandyCollection(commands.Cog):
     """Candy collection game Cog."""
@@ -31,7 +42,7 @@ class CandyCollection(commands.Cog):
             candy_data = json.load(candy)
 
         # The rank data
-        self.candy_records = candy_data.get("records") or dict()
+        self.candy_records = candy_data.get("records", dict())
 
         # Message ID where bot added the candies/skulls
         self.candy_messages = set()
@@ -51,11 +62,11 @@ class CandyCollection(commands.Cog):
         # do random check for skull first as it has the lower chance
         if random.randint(1, ADD_SKULL_REACTION_CHANCE) == 1:
             self.skull_messages.add(message.id)
-            return await message.add_reaction('\N{SKULL}')
+            return await message.add_reaction(EMOJIS['SKULL'])
         # check for the candy chance next
         if random.randint(1, ADD_CANDY_REACTION_CHANCE) == 1:
             self.candy_messages.add(message.id)
-            return await message.add_reaction('\N{CANDY}')
+            return await message.add_reaction(EMOJIS['CANDY'])
 
     @in_month(Month.OCTOBER)
     @commands.Cog.listener()
@@ -72,17 +83,17 @@ class CandyCollection(commands.Cog):
 
         # if its not a candy or skull, and it is one of 10 most recent messages,
         # proceed to add a skull/candy with higher chance
-        if str(reaction.emoji) not in ('\N{SKULL}', '\N{CANDY}'):
+        if str(reaction.emoji) not in (EMOJIS['SKULL'], EMOJIS['CANDY']):
             if message.id in await self.ten_recent_msg():
                 await self.reacted_msg_chance(message)
             return
 
-        if message.id in self.candy_messages and str(reaction.emoji) == '\N{CANDY}':
+        if message.id in self.candy_messages and str(reaction.emoji) == EMOJIS['CANDY']:
             self.candy_messages.remove(message.id)
-            prev_record = self.candy_records.get(str(message.author.id)) or 0
+            prev_record = self.candy_records.get(str(message.author.id), 0)
             self.candy_records[str(message.author.id)] = prev_record + 1
 
-        elif message.id in self.skull_messages and str(reaction.emoji) == '\N{SKULL}':
+        elif message.id in self.skull_messages and str(reaction.emoji) == EMOJIS['SKULL']:
             self.skull_messages.remove(message.id)
 
             if (prev_record := self.candy_records.get(str(message.author.id))) is not None:
@@ -90,13 +101,13 @@ class CandyCollection(commands.Cog):
                 self.candy_records[str(message.author.id)] = prev_record - lost
 
                 if lost == prev_record:
-                    await self.send_spook_msg(message.author, message.channel, 'all of your')
+                    await CandyCollection.send_spook_msg(message.author, message.channel, 'all of your')
                 else:
-                    await self.send_spook_msg(message.author, message.channel, lost)
+                    await CandyCollection.send_spook_msg(message.author, message.channel, lost)
         else:
             return  # Skip saving
 
-        await self.remove_reactions(reaction)
+        await CandyCollection.remove_reactions(reaction)
         await self.bot.loop.run_in_executor(None, self.save_to_json)
 
     async def reacted_msg_chance(self, message: discord.Message) -> None:
@@ -108,11 +119,11 @@ class CandyCollection(commands.Cog):
         """
         if random.randint(1, ADD_SKULL_EXISTING_REACTION_CHANCE) == 1:
             self.skull_messages.add(message.id)
-            return await message.add_reaction('\N{SKULL}')
+            return await message.add_reaction(EMOJIS['SKULL'])
 
         if random.randint(1, ADD_CANDY_EXISTING_REACTION_CHANCE) == 1:
             self.candy_messages.add(message.id)
-            return await message.add_reaction('\N{CANDY}')
+            return await message.add_reaction(EMOJIS['CANDY'])
 
     async def ten_recent_msg(self) -> List[int]:
         """Get the last 10 messages sent in the channel."""
@@ -152,7 +163,8 @@ class CandyCollection(commands.Cog):
         """Get #hacktoberbot channel from its ID."""
         return self.bot.get_channel(id=Channels.seasonalbot_commands)
 
-    async def remove_reactions(self, reaction: discord.Reaction) -> None:
+    @classmethod
+    async def remove_reactions(cls, reaction: discord.Reaction) -> None:
         """Remove all candy/skull reactions."""
         try:
             async for user in reaction.users():
@@ -161,7 +173,9 @@ class CandyCollection(commands.Cog):
         except discord.HTTPException:
             pass
 
-    async def send_spook_msg(self, author: discord.Member, channel: discord.TextChannel, candies: int) -> None:
+    @classmethod
+    async def send_spook_msg(cls, author: discord.Member, channel: discord.TextChannel,
+                             candies: Union[str, int]) -> None:
         """Send a spooky message."""
         e = discord.Embed(colour=author.colour)
         e.set_author(name="Ghosts and Ghouls and Jack o' lanterns at night; "
@@ -177,19 +191,14 @@ class CandyCollection(commands.Cog):
     @commands.command()
     async def candy(self, ctx: commands.Context) -> None:
         """Get the candy leaderboard and save to JSON."""
-        emoji = (
-            '\N{FIRST PLACE MEDAL}',
-            '\N{SECOND PLACE MEDAL}',
-            '\N{THIRD PLACE MEDAL}',
-            '\N{SPORTS MEDAL}',
-            '\N{SPORTS MEDAL}'
+        top_sorted = sorted(
+            ((user_id, score) for user_id, score in self.candy_records.items()),
+            key=lambda x: x[1],
+            reverse=True
         )
-
-        top_sorted = sorted(((user_id, score) for user_id, score in self.candy_records.items()),
-                            key=lambda x: x[1], reverse=True)
         top_five = top_sorted[:5]
 
-        leaderboard = '\n'.join(f"{emoji[index]} <@{record[0]}>: {record[1]}"
+        leaderboard = '\n'.join(f"{EMOJIS['MEDALS'][index]} <@{record[0]}>: {record[1]}"
                                 for index, record in enumerate(top_five)) or 'No Candies'
 
         e = discord.Embed(colour=discord.Colour.blurple())
