@@ -50,7 +50,7 @@ class GithubInfo(commands.Cog):
             orgs = [f"[{org['login']}](https://github.com/{org['login']})" for org in org_data]
             orgs_to_add = ' | '.join(orgs)
 
-            gists_data = await self.fetch_data(f"https://api.github.com/users/{username}/gists")
+            gists = user_data['public_gists']
 
             # Forming blog link
             if user_data['blog'].startswith("http"):  # Blog link is complete
@@ -83,7 +83,7 @@ class GithubInfo(commands.Cog):
             embed.add_field(name="\u200b", value="\u200b")
 
             if user_data['type'] == "User":
-                embed.add_field(name="Gists", value=f"[{len(gists_data)}](https://gist.github.com/{username})")
+                embed.add_field(name="Gists", value=f"[{len(gists)}](https://gist.github.com/{username})")
 
                 embed.add_field(name=f"Organization{'s' if len(orgs)!=1 else ''}",
                                 value=orgs_to_add if orgs else "No organizations")
