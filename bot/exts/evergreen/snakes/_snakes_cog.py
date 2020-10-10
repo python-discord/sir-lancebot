@@ -18,8 +18,8 @@ from discord import Colour, Embed, File, Member, Message, Reaction
 from discord.ext.commands import BadArgument, Bot, Cog, CommandError, Context, bot_has_permissions, group
 
 from bot.constants import ERROR_REPLIES, Tokens
-from bot.exts.evergreen.snakes import utils
-from bot.exts.evergreen.snakes.converter import Snake
+from bot.exts.evergreen.snakes import _utils as utils
+from bot.exts.evergreen.snakes._converter import Snake
 from bot.utils.decorators import locked
 
 log = logging.getLogger(__name__)
@@ -1083,13 +1083,13 @@ class Snakes(Cog):
             url,
             params={
                 "part": "snippet",
-                "q": urllib.parse.quote(query),
+                "q": urllib.parse.quote_plus(query),
                 "type": "video",
                 "key": Tokens.youtube
             }
         )
         response = await response.json()
-        data = response['items']
+        data = response.get("items", [])
 
         # Send the user a video
         if len(data) > 0:

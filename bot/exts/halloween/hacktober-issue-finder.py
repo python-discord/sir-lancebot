@@ -7,13 +7,19 @@ import aiohttp
 import discord
 from discord.ext import commands
 
-from bot.constants import Month
+from bot.constants import Month, Tokens
 from bot.utils.decorators import in_month
 
 log = logging.getLogger(__name__)
 
 URL = "https://api.github.com/search/issues?per_page=100&q=is:issue+label:hacktoberfest+language:python+state:open"
-HEADERS = {"Accept": "application / vnd.github.v3 + json"}
+
+REQUEST_HEADERS = {
+    "User-Agent": "Python Discord Hacktoberbot",
+    "Accept": "application / vnd.github.v3 + json"
+}
+if GITHUB_TOKEN := Tokens.github:
+    REQUEST_HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
 
 
 class HacktoberIssues(commands.Cog):
@@ -66,7 +72,7 @@ class HacktoberIssues(commands.Cog):
                     url += f"&page={page}"
 
             log.debug(f"making api request to url: {url}")
-            async with session.get(url, headers=HEADERS) as response:
+            async with session.get(url, headers=REQUEST_HEADERS) as response:
                 if response.status != 200:
                     log.error(f"expected 200 status (got {response.status}) from the GitHub api.")
                     await ctx.send(f"ERROR: expected 200 status (got {response.status}) from the GitHub api.")
@@ -97,7 +103,7 @@ class HacktoberIssues(commands.Cog):
         labels = [label["name"] for label in issue["labels"]]
 
         embed = discord.Embed(title=title)
-        embed.description = body
+        embed.description = body[:500] + '...' if len(body) > 500 else body
         embed.add_field(name="labels", value="\n".join(labels))
         embed.url = issue_url
         embed.set_footer(text=issue_url)
