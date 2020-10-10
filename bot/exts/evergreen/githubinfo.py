@@ -18,7 +18,6 @@ class GithubInfo(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @staticmethod
     async def fetch_data(self, url: str) -> dict:
         """Retrieve data as a dictionary."""
         async with self.bot.http_session.get(url) as r:
@@ -43,6 +42,7 @@ class GithubInfo(commands.Cog):
             # User_data will not have a message key if the user exists
             if user_data.get('message') is not None:
                 await ctx.send(embed=discord.Embed(title=random.choice(NEGATIVE_REPLIES),
+                                                   description=f"The profile for `{username}` was not found.",
                                                    colour=discord.Colour.red()))
                 return
 
@@ -72,11 +72,11 @@ class GithubInfo(commands.Cog):
 
             if user_data['type'] == "User":
 
-                embed.add_field(name="Followers", value=f"""[{user_data['followers']}]
-                                                        ({user_data['html_url']}?tab=followers)""")
+                embed.add_field(name="Followers",
+                                value=f"[{user_data['followers']}]({user_data['html_url']}?tab=followers)")
                 embed.add_field(name="\u200b", value="\u200b")
-                embed.add_field(name="Following", value=f"""[{user_data['following']}]
-                                                    ({user_data['html_url']}?tab=following)""")
+                embed.add_field(name="Following",
+                                value=f"[{user_data['following']}]({user_data['html_url']}?tab=following)")
 
             embed.add_field(name="Public repos",
                             value=f"[{user_data['public_repos']}]({user_data['html_url']}?tab=repositories)")
