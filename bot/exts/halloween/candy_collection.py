@@ -175,23 +175,30 @@ class CandyCollection(commands.Cog):
     @commands.command()
     async def candy(self, ctx: commands.Context) -> None:
         """Get the candy leaderboard and save to JSON."""
-        top_sorted = sorted(
-            ((user_id, score) for user_id, score in self.candy_records.items()),
-            key=lambda x: x[1],
-            reverse=True
-        )
-        top_five = top_sorted[:5]
+        def generate_leaderboard() -> str:
+            top_sorted = sorted(
+                ((user_id, score) for user_id, score in self.candy_records.items() if score > 0),
+                key=lambda x: x[1],
+                reverse=True
+            )
+            top_five = top_sorted[:5]
 
-        leaderboard = '\n'.join(f"{EMOJIS['MEDALS'][index]} <@{record[0]}>: {record[1]}"
-                                for index, record in enumerate(top_five)) or 'No Candies'
+            return '\n'.join(f"{EMOJIS['MEDALS'][index]} <@{record[0]}>: {record[1]}"
+                             for index, record in enumerate(top_five)) if top_five else 'No Candies'
 
         e = discord.Embed(colour=discord.Colour.blurple())
-        e.add_field(name="Top Candy Records", value=leaderboard, inline=False)
-        e.add_field(name='\u200b',
-                    value="Candies will randomly appear on messages sent. "
-                          "\nHit the candy when it appears as fast as possible to get the candy! "
-                          "\nBut beware the ghosts...",
-                    inline=False)
+        e.add_field(
+            name="Top Candy Records",
+            value=generate_leaderboard(),
+            inline=False
+        )
+        e.add_field(
+            name='\u200b',
+            value="Candies will randomly appear on messages sent. "
+                  "\nHit the candy when it appears as fast as possible to get the candy! "
+                  "\nBut beware the ghosts...",
+            inline=False
+        )
         await ctx.send(embed=e)
 
 
