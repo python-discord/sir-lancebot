@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import random
-from typing import List, Union
+from typing import Union
 
 import discord
 from discord.ext import commands
@@ -84,7 +84,11 @@ class CandyCollection(commands.Cog):
         # if its not a candy or skull, and it is one of 10 most recent messages,
         # proceed to add a skull/candy with higher chance
         if str(reaction.emoji) not in (EMOJIS['SKULL'], EMOJIS['CANDY']):
-            if message.id in await self.ten_recent_msg():
+            recent_message_ids = map(
+                lambda m: m.id,
+                await self.hacktober_channel.history(limit=10).flatten()
+            )
+            if message.id in recent_message_ids:
                 await self.reacted_msg_chance(message)
             return
 
@@ -125,25 +129,8 @@ class CandyCollection(commands.Cog):
             self.candy_messages.add(message.id)
             return await message.add_reaction(EMOJIS['CANDY'])
 
-    async def ten_recent_msg(self) -> List[int]:
-        """Get the last 10 messages sent in the channel."""
-        ten_recent = []
-        recent_msg_id = max(
-            message.id for message in self.bot._connection._messages
-            if message.channel.id == Channels.seasonalbot_commands
-        )
-
-        channel = await self.hacktober_channel()
-        ten_recent.append(recent_msg_id)
-
-        for i in range(9):
-            o = discord.Object(id=recent_msg_id + i)
-            msg = await next(channel.history(limit=1, before=o))
-            ten_recent.append(msg.id)
-
-        return ten_recent
-
-    async def hacktober_channel(self) -> discord.TextChannel:
+    @property
+    def hacktober_channel(self) -> discord.TextChannel:
         """Get #hacktoberbot channel from its ID."""
         return self.bot.get_channel(id=Channels.seasonalbot_commands)
 
