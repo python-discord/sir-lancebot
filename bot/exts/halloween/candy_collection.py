@@ -135,7 +135,7 @@ class CandyCollection(commands.Cog):
 
         for i in range(9):
             o = discord.Object(id=recent_msg_id + i)
-            msg = await channel.history(limit=1, before=o).next()  # noqa: B305
+            msg = await channel.history(limit=1, before=o).next()
             ten_recent.append(msg.id)
 
         return ten_recent
@@ -146,7 +146,7 @@ class CandyCollection(commands.Cog):
             o = discord.Object(id=msg_id + 1)
             # Use history rather than get_message due to
             #         poor ratelimit (50/1s vs 1/1s)
-            msg = await self.hacktober_channel.history(limit=1, before=o).next()  # noqa: B305
+            msg = await self.hacktober_channel.history(limit=1, before=o).next()
 
             if msg.id != msg_id:
                 return None
