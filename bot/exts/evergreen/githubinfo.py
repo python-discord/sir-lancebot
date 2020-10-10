@@ -3,7 +3,6 @@ import random
 from datetime import datetime
 from typing import Optional
 
-import aiohttp
 import discord
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
@@ -20,24 +19,22 @@ class GithubInfo(commands.Cog):
         self.bot = bot
 
     @staticmethod
-    async def fetch_data(url: str) -> dict:
+    async def fetch_data(self, url: str) -> dict:
         """Retrieve data as a dictionary."""
-        async with aiohttp.ClientSession() as cs:
-            async with cs.get(url) as r:
-                return await r.json()
+        async with self.bot.http_session.get(url) as r:
+            return await r.json()
 
     @commands.command(name='github', aliases=['gh'])
-    @commands.cooldown(1, 5, BucketType.user)
+    @commands.cooldown(1, 60, BucketType.user)
     async def get_github_info(self, ctx: commands.Context, username: Optional[str]) -> None:
         """
         Fetches a user's GitHub information.
 
         Username is optional and sends the help command if not specified.
-
-        Usage: .gh [username]
         """
         if username is None:
             await ctx.invoke(self.bot.get_command('help'), 'github')
+            ctx.command.reset_cooldown(ctx)
             return
 
         async with ctx.typing():
@@ -53,7 +50,7 @@ class GithubInfo(commands.Cog):
             orgs = [f"[{org['login']}](https://github.com/{org['login']})" for org in org_data]
             orgs_to_add = ' | '.join(orgs)
 
-            starred_data = await self.fetch_data(user_data['starred_url'])
+            gists_data = await self.fetch_data(f"https://api.github.com/users/{username}/gists")
 
             # Forming blog link
             if user_data['blog'].startswith("http"):  # Blog link is complete
@@ -61,7 +58,7 @@ class GithubInfo(commands.Cog):
             elif user_data['blog']:  # Blog exists but the link is not complete
                 blog = f"https://{user_data['blog']}"
             else:
-                blog = "No blog link available"
+                blog = "No website link available"
 
             embed = discord.Embed(
                 title=f"`{user_data['login']}`'s GitHub profile info",
@@ -86,12 +83,12 @@ class GithubInfo(commands.Cog):
             embed.add_field(name="\u200b", value="\u200b")
 
             if user_data['type'] == "User":
-                embed.add_field(name="Starred repos", value=f"[{len(starred_data)}]({user_data['html_url']}?tab=stars)")
+                embed.add_field(name="Gists", value=f"[{len(gists_data)}](https://gist.github.com/{username})")
 
                 embed.add_field(name=f"Organization{'s' if len(orgs)!=1 else ''}",
                                 value=orgs_to_add if orgs else "No organizations")
                 embed.add_field(name="\u200b", value="\u200b")
-            embed.add_field(name="Blog", value=blog)
+            embed.add_field(name="Website", value=blog)
 
         await ctx.send(embed=embed)
 
