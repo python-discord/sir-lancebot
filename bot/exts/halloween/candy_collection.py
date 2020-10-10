@@ -143,22 +143,6 @@ class CandyCollection(commands.Cog):
 
         return ten_recent
 
-    async def get_message(self, msg_id: int) -> Union[discord.Message, None]:
-        """Get the message from its ID."""
-        try:
-            o = discord.Object(id=msg_id + 1)
-            # Use history rather than get_message due to
-            #         poor ratelimit (50/1s vs 1/1s)
-            msg = await next(self.hacktober_channel.history(limit=1, before=o))
-
-            if msg.id != msg_id:
-                return None
-
-            return msg
-
-        except Exception:
-            return None
-
     async def hacktober_channel(self) -> discord.TextChannel:
         """Get #hacktoberbot channel from its ID."""
         return self.bot.get_channel(id=Channels.seasonalbot_commands)
