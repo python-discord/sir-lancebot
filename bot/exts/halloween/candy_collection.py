@@ -107,7 +107,7 @@ class CandyCollection(commands.Cog):
         else:
             return  # Skip saving
 
-        await CandyCollection.remove_reactions(reaction)
+        await reaction.clear()
         await self.bot.loop.run_in_executor(None, self.save_to_json)
 
     async def reacted_msg_chance(self, message: discord.Message) -> None:
@@ -146,16 +146,6 @@ class CandyCollection(commands.Cog):
     async def hacktober_channel(self) -> discord.TextChannel:
         """Get #hacktoberbot channel from its ID."""
         return self.bot.get_channel(id=Channels.seasonalbot_commands)
-
-    @classmethod
-    async def remove_reactions(cls, reaction: discord.Reaction) -> None:
-        """Remove all candy/skull reactions."""
-        try:
-            async for user in reaction.users():
-                await reaction.message.remove_reaction(reaction.emoji, user)
-
-        except discord.HTTPException:
-            pass
 
     @classmethod
     async def send_spook_msg(cls, author: discord.Member, channel: discord.TextChannel,
