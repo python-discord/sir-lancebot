@@ -48,7 +48,7 @@ class PrideLeader(commands.Cog):
             valid_name = ", ".join([name for name in self.pride.keys()])
             error_msg = "Sorry your input didn't match any stored name, here is a list of available names"
         else:
-            valid_name = "\n".join([name for name in valid_name])
+            valid_name = "\n".join(name for name in valid_name)
             error_msg = "Did you mean?"
 
         embed.description = f"{error_msg}\n```{valid_name}```"
