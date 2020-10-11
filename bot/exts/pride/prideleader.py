@@ -28,7 +28,7 @@ class PrideLeader(commands.Cog):
         return pride
 
     def name_verifier(self, leader_name: str) -> str:
-        """Verify leader name wether it is present in json or not."""
+        """Verify leader name whether it is present in json or not."""
         leader_name = leader_name.title()
         if leader_name in self.pride:
             log.trace("Got Valid name.")
