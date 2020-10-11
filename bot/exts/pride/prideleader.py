@@ -45,7 +45,7 @@ class PrideLeader(commands.Cog):
                 valid_name.append(name)
 
         if not valid_name:
-            valid_name = ", ".join([name for name in self.pride.keys()])
+            valid_name = ", ".join(name for name in self.pride.keys())
             error_msg = "Sorry your input didn't match any stored name, here is a list of available names"
         else:
             valid_name = "\n".join(name for name in valid_name)
