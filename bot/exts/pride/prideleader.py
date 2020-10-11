@@ -35,7 +35,7 @@ class PrideLeader(commands.Cog):
             return leader_name
 
     def invalid_embed_generate(self, pride_leader: str) -> discord.Embed:
-        """Genrates Invalid Embed."""
+        """Generates Invalid Embed."""
         embed = discord.Embed()
         embed.color = Colours.soft_red
         valid_name = []
