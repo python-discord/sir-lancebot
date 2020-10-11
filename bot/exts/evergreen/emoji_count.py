@@ -37,7 +37,10 @@ class EmojiCount(commands.Cog):
         else:
             for category_name, category_emojis in emoji.items():
                 emoji_choice = random.choice(category_emojis)
-                emoji_info = f'There are **{len(category_emojis)}** emojis in the **{category_name}** category'
+                emoji_info = (
+                    f"There {'is' if len(category_emojis) == 1 else 'are'} **{len(category_emojis)}** "
+                    f"{'emoji' if len(category_emojis) == 1 else 'emojis'} in the **{category_name}** category"
+                )
                 if emoji_choice.animated:
                     msg.append(f'<a:{emoji_choice.name}:{emoji_choice.id}> {emoji_info}')
                 else:
