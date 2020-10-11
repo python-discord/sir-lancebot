@@ -31,7 +31,10 @@ class EmojiCount(commands.Cog):
 
         if len(emoji) == 1:
             for category_name, category_emojis in emoji.items():
-                msg.append(f"There is **{len(category_emojis)}** emoji in the **{category_name}** category")
+                msg.append(
+                    f"There {'is' if len(category_emojis)==1 else 'are'} **{len(category_emojis)}** "
+                    f"{'emoji' if len(category_emojis)==1 else 'emojis'} in the **{category_name}** category"
+                )
                 embed.set_thumbnail(url=random.choice(category_emojis).url)
 
         else:
