@@ -2,6 +2,7 @@ import json
 import logging
 import random
 from pathlib import Path
+from typing import Optional
 
 import discord
 from discord.ext import commands
@@ -28,7 +29,7 @@ class PrideLeader(commands.Cog):
 
         return pride
 
-    def name_verifier(self, leader_name: str) -> str:
+    def name_verifier(self, leader_name: str) -> Optional[str]:
         """Verify leader name whether it is present in json or not."""
         leader_name = leader_name.title()
         if leader_name in self.pride:
