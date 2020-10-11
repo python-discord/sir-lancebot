@@ -8,6 +8,7 @@ from discord.ext import commands
 from fuzzywuzzy import fuzz
 
 from bot.constants import Colours
+
 log = logging.getLogger(__name__)
 
 
