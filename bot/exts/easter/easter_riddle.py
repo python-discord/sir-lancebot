@@ -67,7 +67,7 @@ class EasterRiddle(commands.Cog):
         await asyncio.sleep(TIMELIMIT)
 
         if self.winners:
-            win_list = " ".join(self.winners)
+            win_list = " ".join(set(self.winners))  # remove duplicated users if any
             content = f"Well done {win_list} for getting it right!"
         else:
             content = "Nobody got it right..."
