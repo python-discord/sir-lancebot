@@ -75,6 +75,7 @@ class Channels(NamedTuple):
     show_your_projects = int(environ.get("CHANNEL_SHOW_YOUR_PROJECTS", 303934982764625920))
     show_your_projects_discussion = 360148304664723466
     hacktoberfest_2020 = 760857070781071431
+    voice_chat = 412357430186344448
 
 
 class Client(NamedTuple):
@@ -209,6 +210,7 @@ WHITELISTED_CHANNELS = (
     Channels.off_topic_0,
     Channels.off_topic_1,
     Channels.off_topic_2,
+    Channels.voice_chat,
 )
 
 # Bot replies
