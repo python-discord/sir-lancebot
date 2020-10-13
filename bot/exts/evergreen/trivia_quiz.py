@@ -121,8 +121,10 @@ class TriviaQuiz(commands.Cog):
 
             # A function to check whether user input is the correct answer(close to the right answer)
             def check(m: discord.Message) -> bool:
-                ratio = fuzz.ratio(answer.lower(), m.content.lower())
-                return ratio > 85 and m.channel == ctx.channel
+                return (
+                    m.channel == ctx.channel
+                    and fuzz.ratio(answer.lower(), m.content.lower()) > 85
+                )
 
             try:
                 msg = await self.bot.wait_for('message', check=check, timeout=10)
