@@ -152,6 +152,7 @@ class Snakes(Cog):
         self.snake_idioms = utils.get_resource("snake_idioms")
         self.snake_quizzes = utils.get_resource("snake_quiz")
         self.snake_facts = utils.get_resource("snake_facts")
+        self.num_movie_pages = None
 
     # region: Helper methods
     @staticmethod
@@ -746,7 +747,8 @@ class Snakes(Cog):
         Modified by gdude.
         Modified by Will Da Silva.
         """
-        page = random.randint(1, 16)
+        # Initially 8 pages are fetched. The actual number of pages is set after the first request.
+        page = random.randint(1, self.num_movie_pages or 8)
 
         async with ctx.typing():
             response = await self.bot.http_session.get(
@@ -759,6 +761,8 @@ class Snakes(Cog):
                 }
             )
             data = await response.json()
+            if self.num_movie_pages is None:
+                self.num_movie_pages = data["total_pages"]
             movie = random.choice(data["results"])["id"]
 
             response = await self.bot.http_session.get(
