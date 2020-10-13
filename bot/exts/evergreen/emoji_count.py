@@ -31,19 +31,19 @@ class EmojiCount(commands.Cog):
 
         if len(emoji) == 1:
             for category_name, category_emojis in emoji.items():
-                msg.append(
-                    f"There {'is' if len(category_emojis)==1 else 'are'} **{len(category_emojis)}** "
-                    f"{'emoji' if len(category_emojis)==1 else 'emojis'} in the **{category_name}** category"
-                )
+                if len(category_emojis) == 1:
+                    msg.append(f"There is **{len(category_emojis)}** emoji in **{category_name}** category")
+                else:
+                    msg.append(f"There are **{len(category_emojis)}** emojis in **{category_name}** category")
                 embed.set_thumbnail(url=random.choice(category_emojis).url)
 
         else:
             for category_name, category_emojis in emoji.items():
                 emoji_choice = random.choice(category_emojis)
-                emoji_info = (
-                    f"There {'is' if len(category_emojis) == 1 else 'are'} **{len(category_emojis)}** "
-                    f"{'emoji' if len(category_emojis) == 1 else 'emojis'} in the **{category_name}** category"
-                )
+                if len(category_emojis) > 1:
+                    emoji_info = f"There are **{len(category_emojis)}** emojis in **{category_name}** category"
+                else:
+                    emoji_info = f"There is **{len(category_emojis)}** emoji in **{category_name}** category"
                 if emoji_choice.animated:
                     msg.append(f'<a:{emoji_choice.name}:{emoji_choice.id}> {emoji_info}')
                 else:
