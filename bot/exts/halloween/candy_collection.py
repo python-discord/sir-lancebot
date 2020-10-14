@@ -22,12 +22,13 @@ ADD_SKULL_EXISTING_REACTION_CHANCE = 20  # 5%
 EMOJIS = dict(
     CANDY="\N{CANDY}",
     SKULL="\N{SKULL}",
-    MEDALS=('\N{FIRST PLACE MEDAL}',
-            '\N{SECOND PLACE MEDAL}',
-            '\N{THIRD PLACE MEDAL}',
-            '\N{SPORTS MEDAL}',
-            '\N{SPORTS MEDAL}',
-            ),
+    MEDALS=(
+        '\N{FIRST PLACE MEDAL}',
+        '\N{SECOND PLACE MEDAL}',
+        '\N{THIRD PLACE MEDAL}',
+        '\N{SPORTS MEDAL}',
+        '\N{SPORTS MEDAL}',
+    ),
 )
 
 
@@ -136,8 +137,9 @@ class CandyCollection(commands.Cog):
         return self.bot.get_channel(id=Channels.seasonalbot_commands)
 
     @classmethod
-    async def send_spook_msg(cls, author: discord.Member, channel: discord.TextChannel,
-                             candies: Union[str, int]) -> None:
+    async def send_spook_msg(
+        cls, author: discord.Member, channel: discord.TextChannel, candies: Union[str, int]
+    ) -> None:
         """Send a spooky message."""
         e = discord.Embed(colour=author.colour)
         e.set_author(name="Ghosts and Ghouls and Jack o' lanterns at night; "
@@ -161,8 +163,10 @@ class CandyCollection(commands.Cog):
             )
             top_five = top_sorted[:5]
 
-            return '\n'.join(f"{EMOJIS['MEDALS'][index]} <@{record[0]}>: {record[1]}"
-                             for index, record in enumerate(top_five)) if top_five else 'No Candies'
+            return '\n'.join(
+                f"{EMOJIS['MEDALS'][index]} <@{record[0]}>: {record[1]}"
+                for index, record in enumerate(top_five)
+            ) if top_five else 'No Candies'
 
         e = discord.Embed(colour=discord.Colour.blurple())
         e.add_field(
