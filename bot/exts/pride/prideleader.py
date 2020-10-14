@@ -69,27 +69,20 @@ class PrideLeader(commands.Cog):
         return embed
 
     @commands.command(name="prideleader", aliases=['pl'])
-    async def pride_leader(self, ctx: commands.Context, *, pride_leader_name: str) -> None:
+    async def pride_leader(self, ctx: commands.Context, *, pride_leader_name: str = None) -> None:
         """Provides info about pride leader by taking name as input or randomly without input."""
-        leader = self.name_verifier(pride_leader_name)
+        if not pride_leader_name:
+            log.trace("Name not provided by the user.")
+            name_list = [name for name in self.pride]
+            leader = random.choice(name_list)
+        else:
+            leader = self.name_verifier(pride_leader_name)
         if leader is None:
             log.trace("Got invalid name.")
             final_embed = self.invalid_embed_generate(pride_leader_name)
         else:
             final_embed = self.embed_builder(leader)
         await ctx.send(embed=final_embed)
-
-    @pride_leader.error
-    async def pride_leader_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
-        """Error handler of pride leader command."""
-        if isinstance(error, commands.MissingRequiredArgument):
-            log.trace("Name not provided by the user so selecting random from json.")
-            name_list = [name for name in self.pride]
-            leader = random.choice(name_list)
-            final_embed = self.embed_builder(leader)
-            await ctx.send(embed=final_embed)
-        else:
-            raise error
 
 
 def setup(bot: commands.Bot) -> None:
