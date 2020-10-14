@@ -1,7 +1,7 @@
 import json
 import logging
-import os
 import random
+from pathlib import Path
 from typing import Union
 
 import discord
@@ -9,10 +9,9 @@ from discord.ext import commands
 
 from bot.constants import Channels, Month
 from bot.utils.decorators import in_month
+from bot.utils.persist import make_persistent
 
 log = logging.getLogger(__name__)
-
-json_location = os.path.join("bot", "resources", "halloween", "candy_collection.json")
 
 # chance is 1 in x range, so 1 in 20 range would give 5% chance (for add candy)
 ADD_CANDY_REACTION_CHANCE = 20  # 5%
@@ -38,8 +37,10 @@ class CandyCollection(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-        with open(json_location, encoding="utf8") as candy:
-            candy_data = json.load(candy)
+        self.json_file = make_persistent(Path("bot", "resources", "halloween", "candy_collection.json"))
+
+        with self.json_file.open() as fp:
+            candy_data = json.load(fp)
 
         # The rank data
         self.candy_records = candy_data.get("records", dict())
@@ -145,8 +146,8 @@ class CandyCollection(commands.Cog):
 
     def save_to_json(self) -> None:
         """Save JSON to a local file."""
-        with open(json_location, 'w', encoding="utf8") as outfile:
-            json.dump(dict(records=self.candy_records), outfile)
+        with self.json_file.open('w') as fp:
+            json.dump(dict(records=self.candy_records), fp)
 
     @in_month(Month.OCTOBER)
     @commands.command()
