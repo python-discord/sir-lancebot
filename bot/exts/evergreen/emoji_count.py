@@ -67,7 +67,7 @@ class EmojiCount(commands.Cog):
         msg.append(f"These are the valid categories\n```{error_comp}```")
         return embed, msg
 
-    @commands.command(name="emoji_count", aliases=["ec", "emojis"])
+    @commands.command(name="emojicount", aliases=["ec", "emojis"])
     async def emoji_count(self, ctx: commands.Context, *, category_query: str = None) -> None:
         """Returns embed with emoji category and info given by the user."""
         emoji_dict = defaultdict(list)
