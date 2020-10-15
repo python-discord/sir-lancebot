@@ -79,20 +79,20 @@ class Channels(NamedTuple):
 
     # Core Dev Sprint channels
     sprint_announcements = 755958119963557958
-    information = 753338352136224798
-    organisers = 753340132639375420
-    general = 753340631538991305
-    social1_cheese_shop = 758779754789863514
-    social2_pet_shop = 758780951978573824
-    escape_room = 761031075942105109
-    stdlib = 758553316732698634
-    asyncio = 762904152438472714
-    typing = 762904690341838888
-    discussion_capi = 758553358587527218
-    discussion_triage = 758553458365300746
-    discussion_design = 758553492662255616
-    discussion_mentor = 758553536623280159
-    documentation = 761038271127093278
+    sprint_information = 753338352136224798
+    sprint_organisers = 753340132639375420
+    sprint_general = 753340631538991305
+    sprint_social1_cheese_shop = 758779754789863514
+    sprint_social2_pet_shop = 758780951978573824
+    sprint_escape_room = 761031075942105109
+    sprint_stdlib = 758553316732698634
+    sprint_asyncio = 762904152438472714
+    sprint_typing = 762904690341838888
+    sprint_discussion_capi = 758553358587527218
+    sprint_discussion_triage = 758553458365300746
+    sprint_discussion_design = 758553492662255616
+    sprint_discussion_mentor = 758553536623280159
+    sprint_documentation = 761038271127093278
 
 
 class Client(NamedTuple):
@@ -231,20 +231,20 @@ WHITELISTED_CHANNELS = (
 
     # Core Dev Sprint Channels
     Channels.sprint_announcements,
-    Channels.information,
-    Channels.organisers,
-    Channels.general,
-    Channels.social1_cheese_shop,
-    Channels.social2_pet_shop,
-    Channels.escape_room,
-    Channels.stdlib,
-    Channels.asyncio,
-    Channels.typing,
-    Channels.discussion_capi,
-    Channels.discussion_triage,
-    Channels.discussion_design,
-    Channels.discussion_mentor,
-    Channels.documentation,
+    Channels.sprint_information,
+    Channels.sprint_organisers,
+    Channels.sprint_general,
+    Channels.sprint_social1_cheese_shop,
+    Channels.sprint_social2_pet_shop,
+    Channels.sprint_escape_room,
+    Channels.sprint_stdlib,
+    Channels.sprint_asyncio,
+    Channels.sprint_typing,
+    Channels.sprint_discussion_capi,
+    Channels.sprint_discussion_triage,
+    Channels.sprint_discussion_design,
+    Channels.sprint_discussion_mentor,
+    Channels.sprint_documentation,
 )
 
 # Bot replies
