@@ -78,7 +78,7 @@ class Channels(NamedTuple):
     voice_chat = 412357430186344448
 
     # Core Dev Sprint channels
-    announcements = 755958119963557958
+    sprint_announcements = 755958119963557958
     information = 753338352136224798
     organisers = 753340132639375420
     general = 753340631538991305
@@ -230,7 +230,7 @@ WHITELISTED_CHANNELS = (
     Channels.voice_chat,
 
     # Core Dev Sprint Channels
-    Channels.announcements,
+    Channels.sprint_announcements,
     Channels.information,
     Channels.organisers,
     Channels.general,
