@@ -136,9 +136,9 @@ class CandyCollection(commands.Cog):
         """Get #hacktoberbot channel from its ID."""
         return self.bot.get_channel(id=Channels.seasonalbot_commands)
 
-    @classmethod
+    @staticmethod
     async def send_spook_msg(
-        cls, author: discord.Member, channel: discord.TextChannel, candies: Union[str, int]
+        author: discord.Member, channel: discord.TextChannel, candies: Union[str, int]
     ) -> None:
         """Send a spooky message."""
         e = discord.Embed(colour=author.colour)
