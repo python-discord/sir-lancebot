@@ -69,7 +69,7 @@ class PrideLeader(commands.Cog):
         return embed
 
     @commands.command(name="prideleader", aliases=['pl'])
-    async def pride_leader(self, ctx: commands.Context, *, pride_leader_name: str = None) -> None:
+    async def pride_leader(self, ctx: commands.Context, *, pride_leader_name: Optional[str]) -> None:
         """Provides info about pride leader by taking name as input or randomly without input."""
         if not pride_leader_name:
             log.trace("Name not provided by the user.")
