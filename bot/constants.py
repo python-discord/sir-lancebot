@@ -76,7 +76,7 @@ class Channels(NamedTuple):
     show_your_projects_discussion = 360148304664723466
     hacktoberfest_2020 = 760857070781071431
     voice_chat = 412357430186344448
-    
+
     # Core Dev Sprint channels
     announcements = 755958119963557958
     information = 753338352136224798
@@ -228,7 +228,7 @@ WHITELISTED_CHANNELS = (
     Channels.off_topic_1,
     Channels.off_topic_2,
     Channels.voice_chat,
-    
+
     # Core Dev Sprint Channels
     Channels.announcements,
     Channels.information,
