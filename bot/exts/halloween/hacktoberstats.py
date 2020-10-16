@@ -18,6 +18,7 @@ log = logging.getLogger(__name__)
 
 CURRENT_YEAR = datetime.now().year  # Used to construct GH API query
 PRS_FOR_SHIRT = 4  # Minimum number of PRs before a shirt is awarded
+REVIEW_DAYS = 14  # number of days needed after PR can be mature
 HACKTOBER_WHITELIST = WHITELISTED_CHANNELS + (Channels.hacktoberfest_2020,)
 
 REQUEST_HEADERS = {"User-Agent": "Python Discord Hacktoberbot"}
@@ -31,8 +32,6 @@ GITHUB_NONEXISTENT_USER_MESSAGE = (
 
 # using repo topics API during preview period requires an accept header
 GITHUB_TOPICS_ACCEPT_HEADER = {"Accept": "application/vnd.github.mercy-preview+json"}
-
-REVIEW_DAYS = 14
 
 
 class HacktoberStats(commands.Cog):
@@ -55,7 +54,7 @@ class HacktoberStats(commands.Cog):
         get that user's contributions
         """
         if not github_username:
-            author_id, author_mention = HacktoberStats._author_mention_from_context(ctx)
+            author_id, author_mention = self._author_mention_from_context(ctx)
 
             if str(author_id) in self.linked_accounts.keys():
                 github_username = self.linked_accounts[author_id]["github_username"]
@@ -86,7 +85,7 @@ class HacktoberStats(commands.Cog):
                 }
             }
         """
-        author_id, author_mention = HacktoberStats._author_mention_from_context(ctx)
+        author_id, author_mention = self._author_mention_from_context(ctx)
         if github_username:
             if str(author_id) in self.linked_accounts.keys():
                 old_username = self.linked_accounts[author_id]["github_username"]
@@ -111,7 +110,7 @@ class HacktoberStats(commands.Cog):
     @override_in_channel(HACKTOBER_WHITELIST)
     async def unlink_user(self, ctx: commands.Context) -> None:
         """Remove the invoking user's account link from the log."""
-        author_id, author_mention = HacktoberStats._author_mention_from_context(ctx)
+        author_id, author_mention = self._author_mention_from_context(ctx)
 
         stored_user = self.linked_accounts.pop(author_id, None)
         if stored_user:
@@ -206,7 +205,7 @@ class HacktoberStats(commands.Cog):
             color=discord.Color(0x9c4af7),
             description=(
                 f"{github_username} has made {n} valid "
-                f"{HacktoberStats._contributionator(n)} in "
+                f"{self._contributionator(n)} in "
                 f"October\n\n"
                 f"{shirtstr}\n\n"
             )
