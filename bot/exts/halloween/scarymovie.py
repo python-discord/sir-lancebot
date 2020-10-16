@@ -121,7 +121,8 @@ class ScaryMovie(commands.Cog):
             if value:
                 embed.add_field(name=name, value=value)
 
-        embed.set_footer(text='powered by themoviedb.org')
+        embed.set_footer(text="This product uses the TMDb API but is not endorsed or certified by TMDb.")
+        embed.set_thumbnail(url="https://i.imgur.com/LtFtC8H.png")
 
         return embed
 
