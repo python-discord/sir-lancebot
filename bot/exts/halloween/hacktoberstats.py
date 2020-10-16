@@ -1,8 +1,8 @@
 import json
 import logging
 import re
-from collections import Counter
-from datetime import datetime
+# from collections import Counter
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import List, Tuple, Union
 
@@ -31,6 +31,8 @@ GITHUB_NONEXISTENT_USER_MESSAGE = (
 
 # using repo topics API during preview period requires an accept header
 GITHUB_TOPICS_ACCEPT_HEADER = {"Accept": "application/vnd.github.mercy-preview+json"}
+
+REVIEW_DAYS = 14
 
 
 class HacktoberStats(commands.Cog):
@@ -187,9 +189,11 @@ class HacktoberStats(commands.Cog):
     def build_embed(self, github_username: str, prs: List[dict]) -> discord.Embed:
         """Return a stats embed built from github_username's PRs."""
         logging.info(f"Building Hacktoberfest embed for GitHub user: '{github_username}'")
-        pr_stats = self._summarize_prs(prs)
+        prs_dict = self._categorize_prs(prs)
+        accepted = prs_dict['accepted']
+        in_review = prs_dict['in_review']
 
-        n = pr_stats['n_prs']
+        n = len(accepted) + len(in_review)
         if n >= PRS_FOR_SHIRT:
             shirtstr = f"**{github_username} has earned a T-shirt or a tree!**"
         elif n == PRS_FOR_SHIRT - 1:
@@ -201,7 +205,7 @@ class HacktoberStats(commands.Cog):
             title=f"{github_username}'s Hacktoberfest",
             color=discord.Color(0x9c4af7),
             description=(
-                f"{github_username} has made {n} "
+                f"{github_username} has made {n} eligible"
                 f"{HacktoberStats._contributionator(n)} in "
                 f"October\n\n"
                 f"{shirtstr}\n\n"
@@ -215,8 +219,12 @@ class HacktoberStats(commands.Cog):
             icon_url="https://avatars1.githubusercontent.com/u/35706162?s=200&v=4"
         )
         stats_embed.add_field(
-            name="Top 5 Repositories:",
-            value=self._build_top5str(pr_stats)
+            name="In Review",
+            value=self._build_prs_string(in_review, github_username)
+        )
+        stats_embed.add_field(
+            name="Accepted",
+            value=self._build_prs_string(accepted, github_username)
         )
 
         logging.info(f"Hacktoberfest PR built for GitHub user '{github_username}'")
@@ -341,38 +349,42 @@ class HacktoberStats(commands.Cog):
         return re.findall(exp, in_url)[0]
 
     @staticmethod
-    def _summarize_prs(prs: List[dict]) -> dict:
+    def _categorize_prs(prs: List[dict]) -> dict:
         """
-        Generate statistics from an input list of PR dictionaries, as output by get_october_prs.
+        Categorize PRs into 'in_review' and 'accepted'.
 
-        Return a dictionary containing:
-            {
-            "n_prs": int
-            "top5": [(repo_shortname, ncontributions), ...]
-            }
+        PRs created less than 14 days ago are 'in_review', PRs that are not
+        are 'accepted' (after 14 days review period).
         """
-        contributed_repos = [pr["repo_shortname"] for pr in prs]
-        return {"n_prs": len(prs), "top5": Counter(contributed_repos).most_common(5)}
+        now = datetime.now()
+        in_review = []
+        accepted = []
+        for pr in prs:
+            if (pr['created_at'] + timedelta(REVIEW_DAYS)) < now:
+                in_review.append(pr)
+            else:
+                accepted.append(pr)
+
+        out_dict = {
+            "in_review": in_review,
+            "accepted": accepted
+        }
+        return out_dict
 
     @staticmethod
-    def _build_top5str(stats: List[tuple]) -> str:
+    def _build_prs_string(prs: List[tuple], user: str) -> str:
         """
-        Build a string from the Top 5 contributions that is compatible with a discord.Embed field.
+        Builds a discord embed compatible string for a list of PRs.
 
-        Top 5 contributions should be a list of tuples, as output in the stats dictionary by
-        _summarize_prs
-
-        String is of the form:
-           n contribution(s) to [shortname](url)
-           ...
+        Repository name with the link to pull requests authored by 'user' for
+        each PR.
         """
         base_url = "https://www.github.com/"
-        contributionstrs = []
-        for repo in stats['top5']:
-            n = repo[1]
-            contributionstrs.append(f"{n} {HacktoberStats._contributionator(n)} to [{repo[0]}]({base_url}{repo[0]})")
+        str_list = []
+        for pr in prs:
+            str_list.append(f"[{pr['repo_shortname']}]({base_url}{pr['repo_shortname']}/pulls/{user})")
 
-        return "\n".join(contributionstrs)
+        return "\n".join(str_list)
 
     @staticmethod
     def _contributionator(n: int) -> str:
