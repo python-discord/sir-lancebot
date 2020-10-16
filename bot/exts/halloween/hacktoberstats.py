@@ -1,7 +1,7 @@
 import json
 import logging
 import re
-# from collections import Counter
+from collections import Counter
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import List, Tuple, Union
@@ -193,9 +193,9 @@ class HacktoberStats(commands.Cog):
         accepted = prs_dict['accepted']
         in_review = prs_dict['in_review']
 
-        n = len(accepted) + len(in_review)
+        n = len(accepted) + len(in_review)  # total number of PRs
         if n >= PRS_FOR_SHIRT:
-            shirtstr = f"**{github_username} has earned a T-shirt or a tree!**"
+            shirtstr = f"**{github_username} is eligible for a T-shirt or a tree!**"
         elif n == PRS_FOR_SHIRT - 1:
             shirtstr = f"**{github_username} is 1 PR away from a T-shirt or a tree!**"
         else:
@@ -205,7 +205,7 @@ class HacktoberStats(commands.Cog):
             title=f"{github_username}'s Hacktoberfest",
             color=discord.Color(0x9c4af7),
             description=(
-                f"{github_username} has made {n} eligible"
+                f"{github_username} has made {n} valid "
                 f"{HacktoberStats._contributionator(n)} in "
                 f"October\n\n"
                 f"{shirtstr}\n\n"
@@ -381,8 +381,18 @@ class HacktoberStats(commands.Cog):
         """
         base_url = "https://www.github.com/"
         str_list = []
-        for pr in prs:
-            str_list.append(f"[{pr['repo_shortname']}]({base_url}{pr['repo_shortname']}/pulls/{user})")
+        repo_list = [pr["repo_shortname"] for pr in prs]
+        prs_list = Counter(repo_list).most_common(5)  # get first 5 counted PRs
+        more = len(prs) - sum(i[1] for i in prs_list)
+
+        for pr in prs_list:
+            # for example: https://www.github.com/python-discord/bot/pulls/octocat
+            # will display pull requests authored by octocat.
+            # pr[1] is the number of PRs to the repo
+            string = f"[{pr[0]}]({base_url}{pr[0]}/pulls/{user})  ({pr[1]})"
+            str_list.append(string)
+        if more:
+            str_list.append(f"...and {more} more")
 
         return "\n".join(str_list)
 
