@@ -779,9 +779,11 @@ class Snakes(Cog):
         if data["poster_path"] is not None:
             embed.set_image(url=f"https://images.tmdb.org/t/p/original{data['poster_path']}")
 
-        embed.add_field(name="Overview", value=data["overview"])
+        if data["overview"]:
+            embed.add_field(name="Overview", value=data["overview"])
 
-        embed.add_field(name="Release Date", value=data["release_date"])
+        if data["release_date"]:
+            embed.add_field(name="Release Date", value=data["release_date"])
 
         if data["genres"]:
             embed.add_field(name="Genres", value=", ".join([x["name"] for x in data["genres"]]))
