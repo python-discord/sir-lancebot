@@ -793,7 +793,8 @@ class Snakes(Cog):
             embed.add_field(name="Budget", value=data["budget"], inline=True)
             embed.add_field(name="Revenue", value=data["revenue"], inline=True)
 
-        embed.set_footer(text="Data provided by the TMDB")
+        embed.set_footer(text="This product uses the TMDb API but is not endorsed or certified by TMDb.")
+        embed.set_thumbnail(url="https://i.imgur.com/LtFtC8H.png")
 
         try:
             await ctx.channel.send(embed=embed)
