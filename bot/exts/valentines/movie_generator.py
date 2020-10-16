@@ -48,6 +48,8 @@ class RomanceMovieFinder(commands.Cog):
                 embed.set_image(url=f"http://image.tmdb.org/t/p/w200/{selected_movie['poster_path']}")
                 embed.add_field(name="Release date :clock1:", value=selected_movie["release_date"])
                 embed.add_field(name="Rating :star2:", value=selected_movie["vote_average"])
+                embed.set_footer(text="This product uses the TMDb API but is not endorsed or certified by TMDb.")
+                embed.set_thumbnail(url="https://i.imgur.com/LtFtC8H.png")
                 await ctx.send(embed=embed)
             except KeyError:
                 warning_message = "A KeyError was raised while fetching information on the movie. The API service" \
