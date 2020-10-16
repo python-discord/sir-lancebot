@@ -363,7 +363,7 @@ class HacktoberStats(commands.Cog):
         in_review = []
         accepted = []
         for pr in prs:
-            if (pr['created_at'] + timedelta(REVIEW_DAYS)) < now:
+            if (pr['created_at'] + timedelta(REVIEW_DAYS)) > now:
                 in_review.append(pr)
             else:
                 accepted.append(pr)
