@@ -222,11 +222,11 @@ class HacktoberStats(commands.Cog):
         review_str = self._build_prs_string(in_review, github_username) or "None"
         accepted_str = self._build_prs_string(accepted, github_username) or "None"
         stats_embed.add_field(
-            name="In Review",
+            name=":clock1: In Review",
             value=review_str
         )
         stats_embed.add_field(
-            name="Accepted",
+            name=":tada: Accepted",
             value=accepted_str
         )
 
@@ -392,7 +392,7 @@ class HacktoberStats(commands.Cog):
             # for example: https://www.github.com/python-discord/bot/pulls/octocat
             # will display pull requests authored by octocat.
             # pr[1] is the number of PRs to the repo
-            string = f"[{pr[0]}]({base_url}{pr[0]}/pulls/{user})  ({pr[1]})"
+            string = f"{pr[1]} to [{pr[0]}]({base_url}{pr[0]}/pulls/{user})"
             str_list.append(string)
         if more:
             str_list.append(f"...and {more} more")
