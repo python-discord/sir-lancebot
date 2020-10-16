@@ -217,13 +217,17 @@ class HacktoberStats(commands.Cog):
             url="https://hacktoberfest.digitalocean.com",
             icon_url="https://avatars1.githubusercontent.com/u/35706162?s=200&v=4"
         )
+
+        # this will handle when no PRs in_review or accepted
+        review_str = self._build_prs_string(in_review, github_username) or "None"
+        accepted_str = self._build_prs_string(accepted, github_username) or "None"
         stats_embed.add_field(
             name="In Review",
-            value=self._build_prs_string(in_review, github_username)
+            value=review_str
         )
         stats_embed.add_field(
             name="Accepted",
-            value=self._build_prs_string(accepted, github_username)
+            value=accepted_str
         )
 
         logging.info(f"Hacktoberfest PR built for GitHub user '{github_username}'")
