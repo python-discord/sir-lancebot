@@ -180,15 +180,15 @@ class HacktoberStats(commands.Cog):
             prs = await self.get_october_prs(github_username)
 
             if prs:
-                stats_embed = self.build_embed(github_username, prs)
+                stats_embed = await self.build_embed(github_username, prs)
                 await ctx.send('Here are some stats!', embed=stats_embed)
             else:
                 await ctx.send(f"No valid October GitHub contributions found for '{github_username}'")
 
-    def build_embed(self, github_username: str, prs: List[dict]) -> discord.Embed:
+    async def build_embed(self, github_username: str, prs: List[dict]) -> discord.Embed:
         """Return a stats embed built from github_username's PRs."""
         logging.info(f"Building Hacktoberfest embed for GitHub user: '{github_username}'")
-        in_review, accepted = self._categorize_prs(prs)
+        in_review, accepted = await self._categorize_prs(prs)
 
         n = len(accepted) + len(in_review)  # total number of PRs
         if n >= PRS_FOR_SHIRT:
@@ -306,7 +306,7 @@ class HacktoberStats(commands.Cog):
             # if the PR has 'invalid' or 'spam' labels, the PR must be
             # either merged or approved for it to be included
             if HacktoberStats._has_label(item, ["invalid", "spam"]):
-                if not HacktoberStats._is_accepted(item):
+                if not await HacktoberStats._is_accepted(item):
                     continue
 
             # PRs before oct 3 no need to check for topics
@@ -363,8 +363,8 @@ class HacktoberStats(commands.Cog):
     async def _is_accepted(pr: dict) -> bool:
         """Check if a PR is merged, approved, or labelled hacktoberfest-accepted."""
         # checking for merge status
-        query_url = f"https://api.github.com/repos/{pr['repo_shortname']}/pulls"
-        query_url += pr["number"]
+        query_url = f"https://api.github.com/repos/{pr['repo_shortname']}/pulls/"
+        query_url += str(pr["number"])
         jsonresp = await HacktoberStats._fetch_url(query_url, REQUEST_HEADERS)
 
         if "message" in jsonresp.keys():
@@ -407,7 +407,7 @@ class HacktoberStats(commands.Cog):
         return re.findall(exp, in_url)[0]
 
     @staticmethod
-    def _categorize_prs(prs: List[dict]) -> tuple:
+    async def _categorize_prs(prs: List[dict]) -> tuple:
         """
         Categorize PRs into 'in_review' and 'accepted' and returns as a tuple.
 
@@ -423,7 +423,7 @@ class HacktoberStats(commands.Cog):
         for pr in prs:
             if (pr['created_at'] + timedelta(REVIEW_DAYS)) > now:
                 in_review.append(pr)
-            elif HacktoberStats._is_accepted(pr):
+            elif await HacktoberStats._is_accepted(pr):
                 accepted.append(pr)
 
         return in_review, accepted
