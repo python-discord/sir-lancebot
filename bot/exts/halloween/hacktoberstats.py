@@ -188,9 +188,7 @@ class HacktoberStats(commands.Cog):
     def build_embed(self, github_username: str, prs: List[dict]) -> discord.Embed:
         """Return a stats embed built from github_username's PRs."""
         logging.info(f"Building Hacktoberfest embed for GitHub user: '{github_username}'")
-        prs_dict = self._categorize_prs(prs)
-        accepted = prs_dict['accepted']
-        in_review = prs_dict['in_review']
+        in_review, accepted = self._categorize_prs(prs)
 
         n = len(accepted) + len(in_review)  # total number of PRs
         if n >= PRS_FOR_SHIRT:
@@ -238,7 +236,7 @@ class HacktoberStats(commands.Cog):
         """
         Query GitHub's API for PRs created during the month of October by github_username.
 
-        PRs with an 'invalid' or 'spam' label are ignored
+        PRs with an 'invalid' or 'spam' label are ignored unless it is merged or approved
 
         For PRs created after October 3rd, they have to be in a repository that has a
         'hacktoberfest' topic, unless the PR is labelled 'hacktoberfest-accepted' for it
@@ -247,17 +245,17 @@ class HacktoberStats(commands.Cog):
         If PRs are found, return a list of dicts with basic PR information
 
         For each PR:
-            {
+        {
             "repo_url": str
             "repo_shortname": str (e.g. "python-discord/seasonalbot")
             "created_at": datetime.datetime
-            }
+            "number": int
+        }
 
         Otherwise, return None
         """
-        logging.info(f"Generating Hacktoberfest PR query for GitHub user: '{github_username}'")
+        logging.info(f"Fetching Hacktoberfest Stats for GitHub user: '{github_username}'")
         base_url = "https://api.github.com/search/issues?q="
-        not_labels = ("invalid", "spam")
         action_type = "pr"
         is_query = "public"
         not_query = "draft"
@@ -265,8 +263,6 @@ class HacktoberStats(commands.Cog):
         per_page = "300"
         query_url = (
             f"{base_url}"
-            f"-label:{not_labels[0]}"
-            f"+-label:{not_labels[1]}"
             f"+type:{action_type}"
             f"+is:{is_query}"
             f"+author:{github_username}"
@@ -276,10 +272,7 @@ class HacktoberStats(commands.Cog):
         )
         logging.debug(f"GitHub query URL generated: {query_url}")
 
-        async with aiohttp.ClientSession() as session:
-            async with session.get(query_url, headers=REQUEST_HEADERS) as resp:
-                jsonresp = await resp.json()
-
+        jsonresp = await HacktoberStats._fetch_url(query_url, REQUEST_HEADERS)
         if "message" in jsonresp.keys():
             # One of the parameters is invalid, short circuit for now
             api_message = jsonresp["errors"][0]["message"]
@@ -307,28 +300,31 @@ class HacktoberStats(commands.Cog):
                 "created_at": datetime.strptime(
                     item["created_at"], r"%Y-%m-%dT%H:%M:%SZ"
                 ),
+                "number": item["number"]
             }
 
+            # if the PR has 'invalid' or 'spam' labels, the PR must be
+            # either merged or approved for it to be included
+            if HacktoberStats._has_label(item, ["invalid", "spam"]):
+                if not HacktoberStats._is_accepted(item):
+                    continue
+
             # PRs before oct 3 no need to check for topics
-            # continue the loop if 'hacktoberfest-accepted' is labeled then
+            # continue the loop if 'hacktoberfest-accepted' is labelled then
             # there is no need to check for its topics
-            if (itemdict["created_at"] < oct3):
+            if itemdict["created_at"] < oct3:
                 outlist.append(itemdict)
                 continue
-            if not ("labels" in item.keys()):  # if PR has no labels
-                continue
-            # checking whether "hacktoberfest-accepted" is one of the PR's labels
-            if any(label["name"].casefold() == "hacktoberfest-accepted" for label in item["labels"]):
+
+            # checking PR's labels for "hacktoberfest-accepted"
+            if HacktoberStats._has_label(item, "hacktoberfest-accepted"):
                 outlist.append(itemdict)
                 continue
 
             # fetch topics for the pr repo
             topics_query_url = f"https://api.github.com/repos/{shortname}/topics"
             logging.debug(f"Fetching repo topics for {shortname} with url: {topics_query_url}")
-            async with aiohttp.ClientSession() as session:
-                async with session.get(topics_query_url, headers=GITHUB_TOPICS_ACCEPT_HEADER) as resp:
-                    jsonresp2 = await resp.json()
-
+            jsonresp2 = await HacktoberStats._fetch_url(topics_query_url, GITHUB_TOPICS_ACCEPT_HEADER)
             if not ("names" in jsonresp2.keys()):
                 logging.error(f"Error fetching topics for {shortname}: {jsonresp2['message']}")
 
@@ -337,6 +333,65 @@ class HacktoberStats(commands.Cog):
             if "hacktoberfest" in jsonresp2["names"]:
                 outlist.append(itemdict)
         return outlist
+
+    @staticmethod
+    async def _fetch_url(url: str, headers: dict) -> dict:
+        """Retrieve API response from URL."""
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=headers) as resp:
+                jsonresp = await resp.json()
+        return jsonresp
+
+    @staticmethod
+    def _has_label(pr: dict, labels: Union[List[str], str]) -> bool:
+        """
+        Check if a PR has label 'labels'.
+
+        'labels' can be a string or a list of strings, if it's a list of strings
+        it will return true if any of the labels match.
+        """
+        if not pr.get("labels"):  # if PR has no labels
+            return False
+        if (isinstance(labels, str)) and (any(label["name"].casefold() == labels for label in pr["labels"])):
+            return True
+        for item in labels:
+            if any(label["name"].casefold() == item for label in pr["labels"]):
+                return True
+        return False
+
+    @staticmethod
+    async def _is_accepted(pr: dict) -> bool:
+        """Check if a PR is merged, approved, or labelled hacktoberfest-accepted."""
+        # checking for merge status
+        query_url = f"https://api.github.com/repos/{pr['repo_shortname']}/pulls"
+        query_url += pr["number"]
+        jsonresp = await HacktoberStats._fetch_url(query_url, REQUEST_HEADERS)
+
+        if "message" in jsonresp.keys():
+            logging.error(
+                f"Error fetching PR stats for #{pr['number']} in repo {pr['repo_shortname']}:\n"
+                f"{jsonresp['message']}"
+            )
+            return False
+        if ("merged" in jsonresp.keys()) and (jsonresp["merged"] == "true"):
+            return True
+
+        # checking for the label, using `jsonresp` which has the label information
+        if HacktoberStats._has_label(jsonresp, "hacktoberfest-accepted"):
+            return True
+
+        # checking approval
+        query_url += "/reviews"
+        jsonresp2 = await HacktoberStats._fetch_url(query_url, REQUEST_HEADERS)
+        if "message" in jsonresp2.keys():
+            logging.error(
+                f"Error fetching PR reviews for #{pr['number']} in repo {pr['repo_shortname']}:\n"
+                f"{jsonresp2['message']}"
+            )
+            return False
+        if len(jsonresp2) == 0:  # if PR has no reviews
+            return False
+        return any(item['status'] == "APPROVED" for item in jsonresp2)
 
     @staticmethod
     def _get_shortname(in_url: str) -> str:
@@ -352,12 +407,15 @@ class HacktoberStats(commands.Cog):
         return re.findall(exp, in_url)[0]
 
     @staticmethod
-    def _categorize_prs(prs: List[dict]) -> dict:
+    def _categorize_prs(prs: List[dict]) -> tuple:
         """
-        Categorize PRs into 'in_review' and 'accepted'.
+        Categorize PRs into 'in_review' and 'accepted' and returns as a tuple.
 
         PRs created less than 14 days ago are 'in_review', PRs that are not
         are 'accepted' (after 14 days review period).
+
+        PRs that are accepted must either be merged, approved, or labelled
+        'hacktoberfest-accepted.
         """
         now = datetime.now()
         in_review = []
@@ -365,14 +423,10 @@ class HacktoberStats(commands.Cog):
         for pr in prs:
             if (pr['created_at'] + timedelta(REVIEW_DAYS)) > now:
                 in_review.append(pr)
-            else:
+            elif HacktoberStats._is_accepted(pr):
                 accepted.append(pr)
 
-        out_dict = {
-            "in_review": in_review,
-            "accepted": accepted
-        }
-        return out_dict
+        return in_review, accepted
 
     @staticmethod
     def _build_prs_string(prs: List[tuple], user: str) -> str:
