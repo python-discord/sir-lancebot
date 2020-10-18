@@ -22,16 +22,16 @@ REVIEW_DAYS = 14  # number of days needed after PR can be mature
 HACKTOBER_WHITELIST = WHITELISTED_CHANNELS + (Channels.hacktoberfest_2020,)
 
 REQUEST_HEADERS = {"User-Agent": "Python Discord Hacktoberbot"}
+# using repo topics API during preview period requires an accept header
+GITHUB_TOPICS_ACCEPT_HEADER = {"Accept": "application/vnd.github.mercy-preview+json"}
 if GITHUB_TOKEN := Tokens.github:
     REQUEST_HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
+    GITHUB_TOPICS_ACCEPT_HEADER["Authorization"] = f"token {GITHUB_TOKEN}"
 
 GITHUB_NONEXISTENT_USER_MESSAGE = (
     "The listed users cannot be searched either because the users do not exist "
     "or you do not have permission to view the users."
 )
-
-# using repo topics API during preview period requires an accept header
-GITHUB_TOPICS_ACCEPT_HEADER = {"Accept": "application/vnd.github.mercy-preview+json"}
 
 
 class HacktoberStats(commands.Cog):
@@ -292,6 +292,7 @@ class HacktoberStats(commands.Cog):
         logging.info(f"Found {len(jsonresp['items'])} Hacktoberfest PRs for GitHub user: '{github_username}'")
         outlist = []  # list of pr information dicts that will get returned
         oct3 = datetime(int(CURRENT_YEAR), 10, 3, 0, 0, 0)
+        hackto_topics = {}  # cache whether each repo has the appropriate topic (bool values)
         for item in jsonresp["items"]:
             shortname = HacktoberStats._get_shortname(item["repository_url"])
             itemdict = {
@@ -321,16 +322,23 @@ class HacktoberStats(commands.Cog):
                 outlist.append(itemdict)
                 continue
 
+            # no need to query github if repo topics are fetched before already
+            if shortname in hackto_topics.keys():
+                if hackto_topics[shortname]:
+                    outlist.append(itemdict)
+                    continue
             # fetch topics for the pr repo
             topics_query_url = f"https://api.github.com/repos/{shortname}/topics"
             logging.debug(f"Fetching repo topics for {shortname} with url: {topics_query_url}")
             jsonresp2 = await HacktoberStats._fetch_url(topics_query_url, GITHUB_TOPICS_ACCEPT_HEADER)
-            if not ("names" in jsonresp2.keys()):
+            if jsonresp2.get("names") is None:
                 logging.error(f"Error fetching topics for {shortname}: {jsonresp2['message']}")
+                return
 
             # PRs after oct 3 that doesn't have 'hacktoberfest-accepted' label
             # must be in repo with 'hacktoberfest' topic
             if "hacktoberfest" in jsonresp2["names"]:
+                hackto_topics[shortname] = True  # cache result in the dict for later use if needed
                 outlist.append(itemdict)
         return outlist
 
@@ -373,7 +381,7 @@ class HacktoberStats(commands.Cog):
                 f"{jsonresp['message']}"
             )
             return False
-        if ("merged" in jsonresp.keys()) and (jsonresp["merged"] == "true"):
+        if ("merged" in jsonresp.keys()) and jsonresp["merged"]:
             return True
 
         # checking for the label, using `jsonresp` which has the label information
@@ -383,15 +391,23 @@ class HacktoberStats(commands.Cog):
         # checking approval
         query_url += "/reviews"
         jsonresp2 = await HacktoberStats._fetch_url(query_url, REQUEST_HEADERS)
-        if "message" in jsonresp2.keys():
+        if isinstance(jsonresp2, dict):
+            # if API request is unsuccessful it will be a dict with the error in 'message'
             logging.error(
                 f"Error fetching PR reviews for #{pr['number']} in repo {pr['repo_shortname']}:\n"
                 f"{jsonresp2['message']}"
             )
             return False
+        # if it is successful it will be a list instead of a dict
         if len(jsonresp2) == 0:  # if PR has no reviews
             return False
-        return any(item['status'] == "APPROVED" for item in jsonresp2)
+
+        # loop through reviews and check for approval
+        for item in jsonresp2:
+            if "status" in item.keys():
+                if item['status'] == "APPROVED":
+                    return True
+        return False
 
     @staticmethod
     def _get_shortname(in_url: str) -> str:
