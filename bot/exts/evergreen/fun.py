@@ -10,7 +10,7 @@ from discord.ext import commands
 from discord.ext.commands import BadArgument, Bot, Cog, Context, MessageConverter, clean_content
 
 from bot import utils
-from bot.constants import Colours, Emojis
+from bot.constants import Client, Colours, Emojis
 
 log = logging.getLogger(__name__)
 
@@ -70,7 +70,7 @@ class Fun(Cog):
             dice = " ".join(self._get_random_die() for _ in range(num_rolls))
             await ctx.send(dice)
         else:
-            raise BadArgument("`!roll` only supports between 1 and 6 rolls.")
+            raise BadArgument(f"`{Client.prefix}roll` only supports between 1 and 6 rolls.")
 
     @commands.command(name="uwu", aliases=("uwuwize", "uwuify",))
     async def uwu_command(self, ctx: Context, *, text: clean_content(fix_channel_mentions=True)) -> None:
