@@ -22,7 +22,7 @@ class EasterRiddle(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.winners = []
+        self.winners = set()
         self.correct = ""
         self.current_channel = None
 
@@ -79,7 +79,7 @@ class EasterRiddle(commands.Cog):
 
         await ctx.send(content, embed=answer_embed)
 
-        self.winners = []
+        self.winners.clear()
         self.current_channel = None
 
     @commands.Cog.listener()
@@ -92,7 +92,7 @@ class EasterRiddle(commands.Cog):
             return
 
         if message.content.lower() == self.correct.lower():
-            self.winners.append(message.author.mention)
+            self.winners.add(message.author.mention)
 
 
 def setup(bot: commands.Bot) -> None:

@@ -7,10 +7,10 @@ from typing import Callable, Iterable, Tuple, Union
 
 from discord import Embed, Message
 from discord.ext import commands
-from discord.ext.commands import Bot, Cog, Context, MessageConverter, clean_content
+from discord.ext.commands import BadArgument, Bot, Cog, Context, MessageConverter, clean_content
 
 from bot import utils
-from bot.constants import Colours, Emojis
+from bot.constants import Client, Colours, Emojis
 
 log = logging.getLogger(__name__)
 
@@ -57,18 +57,20 @@ class Fun(Cog):
         with Path("bot/resources/evergreen/caesar_info.json").open("r", encoding="UTF-8") as f:
             self._caesar_cipher_embed = json.load(f)
 
+    @staticmethod
+    def _get_random_die() -> str:
+        """Generate a random die emoji, ready to be sent on Discord."""
+        die_name = f"dice_{random.randint(1, 6)}"
+        return getattr(Emojis, die_name)
+
     @commands.command()
     async def roll(self, ctx: Context, num_rolls: int = 1) -> None:
         """Outputs a number of random dice emotes (up to 6)."""
-        output = ""
-        if num_rolls > 6:
-            num_rolls = 6
-        elif num_rolls < 1:
-            output = ":no_entry: You must roll at least once."
-        for _ in range(num_rolls):
-            dice = f"dice_{random.randint(1, 6)}"
-            output += getattr(Emojis, dice, '')
-        await ctx.send(output)
+        if 1 <= num_rolls <= 6:
+            dice = " ".join(self._get_random_die() for _ in range(num_rolls))
+            await ctx.send(dice)
+        else:
+            raise BadArgument(f"`{Client.prefix}roll` only supports between 1 and 6 rolls.")
 
     @commands.command(name="uwu", aliases=("uwuwize", "uwuify",))
     async def uwu_command(self, ctx: Context, *, text: clean_content(fix_channel_mentions=True)) -> None:
