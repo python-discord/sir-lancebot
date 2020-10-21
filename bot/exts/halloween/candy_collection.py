@@ -100,7 +100,6 @@ class CandyCollection(commands.Cog):
         elif message.id in self.skull_messages and str(reaction.emoji) == EMOJIS['SKULL']:
             self.skull_messages.remove(message.id)
 
-            # Skip if no past score exists or if it's 0
             if prev_record := self.candy_records.get(str(user.id)):
                 lost = min(random.randint(1, 3), prev_record)
                 self.candy_records[str(user.id)] = prev_record - lost
@@ -109,6 +108,8 @@ class CandyCollection(commands.Cog):
                     await CandyCollection.send_spook_msg(user, message.channel, 'all of your')
                 else:
                     await CandyCollection.send_spook_msg(user, message.channel, lost)
+            else:
+                await CandyCollection.send_no_candy_spook_message(user, message.channel)
         else:
             return  # Skip saving
 
@@ -144,6 +145,19 @@ class CandyCollection(commands.Cog):
         e.set_author(name="Ghosts and Ghouls and Jack o' lanterns at night; "
                           f"I took {candies} candies and quickly took flight.")
         await channel.send(embed=e)
+
+    @staticmethod
+    async def send_no_candy_spook_message(
+        author: discord.Member,
+        channel: discord.TextChannel
+    ) -> None:
+        """An alternative spooky message sent when user has no candies in the
+        collection"""
+
+        embed = discord.Embed(color=author.color)
+        embed.set_author(name="Ghosts and Ghouls and Jack o' lanterns at night; "
+                              f"I tried to take your candies but you had non to begin with!")
+        await channel.send(embed=embed)
 
     def save_to_json(self) -> None:
         """Save JSON to a local file."""
