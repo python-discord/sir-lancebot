@@ -96,20 +96,21 @@ class CandyCollection(commands.Cog):
 
         if message.id in self.candy_messages and str(reaction.emoji) == EMOJIS['CANDY']:
             self.candy_messages.remove(message.id)
-            prev_record = self.candy_records.get(str(message.author.id), 0)
-            self.candy_records[str(message.author.id)] = prev_record + 1
+            prev_record = self.candy_records.get(str(user.id), 0)
+            self.candy_records[str(user.id)] = prev_record + 1
 
         elif message.id in self.skull_messages and str(reaction.emoji) == EMOJIS['SKULL']:
             self.skull_messages.remove(message.id)
 
-            if (prev_record := self.candy_records.get(str(message.author.id))) is not None:
+            # Skip if no past score exists or if it's 0
+            if prev_record := self.candy_records.get(str(user.id)):
                 lost = min(random.randint(1, 3), prev_record)
-                self.candy_records[str(message.author.id)] = prev_record - lost
+                self.candy_records[str(user.id)] = prev_record - lost
 
                 if lost == prev_record:
-                    await CandyCollection.send_spook_msg(message.author, message.channel, 'all of your')
+                    await CandyCollection.send_spook_msg(user, message.channel, 'all of your')
                 else:
-                    await CandyCollection.send_spook_msg(message.author, message.channel, lost)
+                    await CandyCollection.send_spook_msg(user, message.channel, lost)
         else:
             return  # Skip saving
 
