@@ -37,13 +37,11 @@ class CandyCollection(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-
         self.json_file = make_persistent(Path("bot", "resources", "halloween", "candy_collection.json"))
 
         with self.json_file.open() as fp:
             candy_data = json.load(fp)
 
-        # The rank data
         self.candy_records = candy_data.get("records", dict())
 
         # Message ID where bot added the candies/skulls
