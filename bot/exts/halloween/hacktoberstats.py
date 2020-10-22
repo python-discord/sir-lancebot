@@ -4,7 +4,7 @@ import re
 from collections import Counter
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import List, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 import aiohttp
 import discord
@@ -179,11 +179,15 @@ class HacktoberStats(commands.Cog):
         async with ctx.typing():
             prs = await self.get_october_prs(github_username)
 
+            if isinstance(prs, str):  # it will be a string if user not found or no october prs found
+                await ctx.send(prs)
+                return
+
             if prs:
                 stats_embed = await self.build_embed(github_username, prs)
                 await ctx.send('Here are some stats!', embed=stats_embed)
             else:
-                await ctx.send(f"No valid October GitHub contributions found for '{github_username}'")
+                await ctx.send(f"No valid hacktoberfest contributions found for '{github_username}'")
 
     async def build_embed(self, github_username: str, prs: List[dict]) -> discord.Embed:
         """Return a stats embed built from github_username's PRs."""
@@ -232,7 +236,7 @@ class HacktoberStats(commands.Cog):
         return stats_embed
 
     @staticmethod
-    async def get_october_prs(github_username: str) -> Union[List[dict], None]:
+    async def get_october_prs(github_username: str) -> Optional[Union[List[dict], str]]:
         """
         Query GitHub's API for PRs created during the month of October by github_username.
 
@@ -279,15 +283,18 @@ class HacktoberStats(commands.Cog):
 
             # Ignore logging non-existent users or users we do not have permission to see
             if api_message == GITHUB_NONEXISTENT_USER_MESSAGE:
-                logging.debug(f"No GitHub user found named '{github_username}'")
+                message = f"No GitHub user found named '{github_username}'"
+                logging.debug(message)
             else:
                 logging.error(f"GitHub API request for '{github_username}' failed with message: {api_message}")
-            return
+                message = None
+            return message
 
         if jsonresp["total_count"] == 0:
             # Short circuit if there aren't any PRs
-            logging.info(f"No Hacktoberfest PRs found for GitHub user: '{github_username}'")
-            return
+            message = f"No october PRs found for GitHub user: '{github_username}'"
+            logging.info(message)
+            return message
 
         logging.info(f"Found {len(jsonresp['items'])} Hacktoberfest PRs for GitHub user: '{github_username}'")
         outlist = []  # list of pr information dicts that will get returned
