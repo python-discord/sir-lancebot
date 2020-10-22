@@ -179,8 +179,8 @@ class HacktoberStats(commands.Cog):
         async with ctx.typing():
             prs = await self.get_october_prs(github_username)
 
-            if isinstance(prs, str):  # it will be a string if user not found or no october prs found
-                await ctx.send(prs)
+            if prs is None:  # it will be a None if user not found
+                await ctx.send("GitHub user not found: " + github_username)
                 return
 
             if prs:
@@ -236,7 +236,7 @@ class HacktoberStats(commands.Cog):
         return stats_embed
 
     @staticmethod
-    async def get_october_prs(github_username: str) -> Optional[Union[List[dict], str]]:
+    async def get_october_prs(github_username: str) -> Optional[List[dict]]:
         """
         Query GitHub's API for PRs created during the month of October by github_username.
 
@@ -256,7 +256,8 @@ class HacktoberStats(commands.Cog):
             "number": int
         }
 
-        Otherwise, return None
+        Otherwise, return empty list
+        None will be returned when github user not found
         """
         logging.info(f"Fetching Hacktoberfest Stats for GitHub user: '{github_username}'")
         base_url = "https://api.github.com/search/issues?q="
@@ -283,18 +284,16 @@ class HacktoberStats(commands.Cog):
 
             # Ignore logging non-existent users or users we do not have permission to see
             if api_message == GITHUB_NONEXISTENT_USER_MESSAGE:
-                message = f"No GitHub user found named '{github_username}'"
-                logging.debug(message)
+                logging.debug(f"No GitHub user found named '{github_username}'")
+                return
             else:
                 logging.error(f"GitHub API request for '{github_username}' failed with message: {api_message}")
-                message = None
-            return message
+            return []  # not returning None here, because that should be for when user not found
 
         if jsonresp["total_count"] == 0:
             # Short circuit if there aren't any PRs
-            message = f"No october PRs found for GitHub user: '{github_username}'"
-            logging.info(message)
-            return message
+            logging.info(f"No october PRs found for GitHub user: '{github_username}'")
+            return []
 
         logging.info(f"Found {len(jsonresp['items'])} Hacktoberfest PRs for GitHub user: '{github_username}'")
         outlist = []  # list of pr information dicts that will get returned
@@ -340,7 +339,7 @@ class HacktoberStats(commands.Cog):
             jsonresp2 = await HacktoberStats._fetch_url(topics_query_url, GITHUB_TOPICS_ACCEPT_HEADER)
             if jsonresp2.get("names") is None:
                 logging.error(f"Error fetching topics for {shortname}: {jsonresp2['message']}")
-                return
+                return []
 
             # PRs after oct 3 that doesn't have 'hacktoberfest-accepted' label
             # must be in repo with 'hacktoberfest' topic
