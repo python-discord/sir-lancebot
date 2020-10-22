@@ -314,7 +314,7 @@ class HacktoberStats(commands.Cog):
             # if the PR has 'invalid' or 'spam' labels, the PR must be
             # either merged or approved for it to be included
             if HacktoberStats._has_label(item, ["invalid", "spam"]):
-                if not await HacktoberStats._is_accepted(item):
+                if not await HacktoberStats._is_accepted(itemdict):
                     continue
 
             # PRs before oct 3 no need to check for topics
