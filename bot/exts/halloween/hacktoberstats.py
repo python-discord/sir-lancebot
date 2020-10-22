@@ -187,7 +187,7 @@ class HacktoberStats(commands.Cog):
                 stats_embed = await self.build_embed(github_username, prs)
                 await ctx.send('Here are some stats!', embed=stats_embed)
             else:
-                await ctx.send(f"No valid hacktoberfest contributions found for '{github_username}'")
+                await ctx.send(f"No valid hacktoberfest PRs found for '{github_username}'")
 
     async def build_embed(self, github_username: str, prs: List[dict]) -> discord.Embed:
         """Return a stats embed built from github_username's PRs."""
