@@ -259,7 +259,7 @@ class HacktoberStats(commands.Cog):
         action_type = "pr"
         is_query = "public"
         not_query = "draft"
-        date_range = f"{CURRENT_YEAR}-10-01T00:00:00%2B14:00..{CURRENT_YEAR}-11-01T00:00:00-11:00"
+        date_range = f"{CURRENT_YEAR}-09-30T10:00Z..{CURRENT_YEAR}-11-01T12:00Z"
         per_page = "300"
         query_url = (
             f"{base_url}"
@@ -291,7 +291,7 @@ class HacktoberStats(commands.Cog):
 
         logging.info(f"Found {len(jsonresp['items'])} Hacktoberfest PRs for GitHub user: '{github_username}'")
         outlist = []  # list of pr information dicts that will get returned
-        oct3 = datetime(int(CURRENT_YEAR), 10, 3, 0, 0, 0)
+        oct3 = datetime(int(CURRENT_YEAR), 10, 3, 23, 59, 59, tzinfo=None)
         hackto_topics = {}  # cache whether each repo has the appropriate topic (bool values)
         for item in jsonresp["items"]:
             shortname = HacktoberStats._get_shortname(item["repository_url"])
@@ -434,12 +434,13 @@ class HacktoberStats(commands.Cog):
         'hacktoberfest-accepted.
         """
         now = datetime.now()
+        oct3 = datetime(CURRENT_YEAR, 10, 3, 23, 59, 59, tzinfo=None)
         in_review = []
         accepted = []
         for pr in prs:
             if (pr['created_at'] + timedelta(REVIEW_DAYS)) > now:
                 in_review.append(pr)
-            elif await HacktoberStats._is_accepted(pr):
+            elif (pr['created_at'] <= oct3) or await HacktoberStats._is_accepted(pr):
                 accepted.append(pr)
 
         return in_review, accepted
