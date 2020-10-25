@@ -154,7 +154,7 @@ class CandyCollection(commands.Cog):
         """An alternative spooky message sent when user has no candies in the collection."""
         embed = discord.Embed(color=author.color)
         embed.set_author(name="Ghosts and Ghouls and Jack o' lanterns at night; "
-                              "I tried to take your candies but you had non to begin with!")
+                              "I tried to take your candies but you had none to begin with!")
         await channel.send(embed=embed)
 
     def save_to_json(self) -> None:
