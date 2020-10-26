@@ -75,6 +75,24 @@ class Channels(NamedTuple):
     show_your_projects = int(environ.get("CHANNEL_SHOW_YOUR_PROJECTS", 303934982764625920))
     show_your_projects_discussion = 360148304664723466
     hacktoberfest_2020 = 760857070781071431
+    voice_chat = 412357430186344448
+
+    # Core Dev Sprint channels
+    sprint_announcements = 755958119963557958
+    sprint_information = 753338352136224798
+    sprint_organisers = 753340132639375420
+    sprint_general = 753340631538991305
+    sprint_social1_cheese_shop = 758779754789863514
+    sprint_social2_pet_shop = 758780951978573824
+    sprint_escape_room = 761031075942105109
+    sprint_stdlib = 758553316732698634
+    sprint_asyncio = 762904152438472714
+    sprint_typing = 762904690341838888
+    sprint_discussion_capi = 758553358587527218
+    sprint_discussion_triage = 758553458365300746
+    sprint_discussion_design = 758553492662255616
+    sprint_discussion_mentor = 758553536623280159
+    sprint_documentation = 761038271127093278
 
 
 class Client(NamedTuple):
@@ -209,6 +227,24 @@ WHITELISTED_CHANNELS = (
     Channels.off_topic_0,
     Channels.off_topic_1,
     Channels.off_topic_2,
+    Channels.voice_chat,
+
+    # Core Dev Sprint Channels
+    Channels.sprint_announcements,
+    Channels.sprint_information,
+    Channels.sprint_organisers,
+    Channels.sprint_general,
+    Channels.sprint_social1_cheese_shop,
+    Channels.sprint_social2_pet_shop,
+    Channels.sprint_escape_room,
+    Channels.sprint_stdlib,
+    Channels.sprint_asyncio,
+    Channels.sprint_typing,
+    Channels.sprint_discussion_capi,
+    Channels.sprint_discussion_triage,
+    Channels.sprint_discussion_design,
+    Channels.sprint_discussion_mentor,
+    Channels.sprint_documentation,
 )
 
 # Bot replies
