@@ -1,5 +1,6 @@
 import json
 import logging
+import random
 import re
 from collections import Counter
 from datetime import datetime, timedelta
@@ -10,7 +11,7 @@ import aiohttp
 import discord
 from discord.ext import commands
 
-from bot.constants import Channels, Month, Tokens, WHITELISTED_CHANNELS
+from bot.constants import Channels, Month, NEGATIVE_REPLIES, Tokens, WHITELISTED_CHANNELS
 from bot.utils.decorators import in_month, override_in_channel
 from bot.utils.persist import make_persistent
 
@@ -180,7 +181,9 @@ class HacktoberStats(commands.Cog):
             prs = await self.get_october_prs(github_username)
 
             if prs is None:  # Will be None if the user was not found
-                await ctx.send("GitHub user not found: " + github_username)
+                await ctx.send(embed=discord.Embed(title=random.choice(NEGATIVE_REPLIES),
+                                                   description=f"GitHub user `{github_username}` was not found.",
+                                                   colour=discord.Colour.red()))
                 return
 
             if prs:
