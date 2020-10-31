@@ -209,6 +209,7 @@ _intents = discord.Intents.all()
 _intents.bans = False
 _intents.integrations = False
 _intents.invites = False
+_intents.members = False
 _intents.presences = False
 _intents.typing = False
 _intents.webhooks = False
