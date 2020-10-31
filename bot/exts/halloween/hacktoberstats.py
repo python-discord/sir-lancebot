@@ -336,7 +336,7 @@ class HacktoberStats(commands.Cog):
                 if hackto_topics[shortname]:
                     outlist.append(itemdict)
                     continue
-            # Fetch topics for the pr repo
+            # Fetch topics for the PR's repo
             topics_query_url = f"https://api.github.com/repos/{shortname}/topics"
             logging.debug(f"Fetching repo topics for {shortname} with url: {topics_query_url}")
             jsonresp2 = await HacktoberStats._fetch_url(topics_query_url, GITHUB_TOPICS_ACCEPT_HEADER)
