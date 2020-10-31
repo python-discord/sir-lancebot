@@ -190,7 +190,10 @@ class Movie(Cog):
 
     async def get_embed(self, name: str) -> Embed:
         """Return embed of random movies. Uses name in title."""
-        return Embed(title=f'Random {name} Movies').set_footer(text='Powered by TMDB (themoviedb.org)')
+        embed = Embed(title=f"Random {name} Movies")
+        embed.set_footer(text="This product uses the TMDb API but is not endorsed or certified by TMDb.")
+        embed.set_thumbnail(url="https://i.imgur.com/LtFtC8H.png")
+        return embed
 
 
 def setup(bot: Bot) -> None:

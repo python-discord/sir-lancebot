@@ -38,7 +38,7 @@ class Issues(commands.Cog):
     ) -> None:
         """Command to retrieve issue(s) from a GitHub repository."""
         links = []
-        numbers = set(numbers)
+        numbers = set(numbers)  # Convert from list to set to remove duplicates, if any
 
         if not numbers:
             await ctx.invoke(self.bot.get_command('help'), 'issue')
@@ -53,8 +53,7 @@ class Issues(commands.Cog):
             await ctx.send(embed=embed)
             return
 
-        for number in set(numbers):
-            # Convert from list to set to remove duplicates, if any.
+        for number in numbers:
             url = f"https://api.github.com/repos/{user}/{repository}/issues/{number}"
             merge_url = f"https://api.github.com/repos/{user}/{repository}/pulls/{number}/merge"
 
