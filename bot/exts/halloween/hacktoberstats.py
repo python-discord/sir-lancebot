@@ -342,7 +342,7 @@ class HacktoberStats(commands.Cog):
             jsonresp2 = await HacktoberStats._fetch_url(topics_query_url, GITHUB_TOPICS_ACCEPT_HEADER)
             if jsonresp2.get("names") is None:
                 logging.error(f"Error fetching topics for {shortname}: {jsonresp2['message']}")
-                return []
+                continue  # Assume the repo doesn't have the `hacktoberfest` topic if API  request errored
 
             # PRs after oct 3 that doesn't have 'hacktoberfest-accepted' label
             # must be in repo with 'hacktoberfest' topic
