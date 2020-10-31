@@ -204,8 +204,17 @@ class SeasonalBot(commands.Bot):
 
 
 _allowed_roles = [discord.Object(id_) for id_ in MODERATION_ROLES]
+
+_intents = discord.Intents.default()  # Default is all intents except for privileged ones (Members, Presences, ...)
+_intents.bans = False
+_intents.integrations = False
+_intents.invites = False
+_intents.typing = False
+_intents.webhooks = False
+
 bot = SeasonalBot(
     command_prefix=Client.prefix,
     activity=discord.Game(name=f"Commands: {Client.prefix}help"),
     allowed_mentions=discord.AllowedMentions(everyone=False, roles=_allowed_roles),
+    intents=_intents,
 )
