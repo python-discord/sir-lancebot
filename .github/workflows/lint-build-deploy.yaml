@@ -94,8 +94,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  build-and-push:
-    name: Build and Push to Container Repositories
+  build-and-deploy:
+    name: Build and Deploy to Kubernetes
     needs: lint
     if: github.event_name != 'pull_request_target' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
@@ -142,23 +142,6 @@ jobs:
             ghcr.io/python-discord/seasonalbot:${{ steps.sha_tag.outputs.tag }}
             pythondiscord/seasonalbot:latest
             pythondiscord/seasonalbot:${{ steps.sha_tag.outputs.tag }}
-
-  deploy:
-    name: Deploy to the Kubernetes cluster
-    needs: build-and-push
-    if: github.event_name != 'pull_request_target' && github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      # Create a commit SHA-based tag for the container repositories
-      - name: Create SHA Container Tag
-        id: sha_tag
-        run: |
-          tag=$(cut -c 1-7 <<< $GITHUB_SHA)
-          echo "::set-output name=tag::$tag"
 
       - name: Authenticate with Kubernetes
         uses: azure/k8s-set-context@v1
