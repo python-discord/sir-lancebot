@@ -510,7 +510,7 @@ class BrandingManager(commands.Cog):
 
         await ctx.send(embed=response)
 
-    @daemon_group.command(name="start", disabled=True)
+    @daemon_group.command(name="start", enabled=False)
     async def daemon_start(self, ctx: commands.Context) -> None:
         """If the daemon isn't running, start it."""
         if self._daemon_running:
@@ -522,7 +522,7 @@ class BrandingManager(commands.Cog):
         response = discord.Embed(description=f"Daemon started {Emojis.ok_hand}", colour=Colours.soft_green)
         await ctx.send(embed=response)
 
-    @daemon_group.command(name="stop", disabled=True)
+    @daemon_group.command(name="stop", enabled=False)
     async def daemon_stop(self, ctx: commands.Context) -> None:
         """If the daemon is running, stop it."""
         if not self._daemon_running:

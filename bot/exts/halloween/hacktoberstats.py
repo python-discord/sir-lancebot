@@ -12,7 +12,9 @@ from discord.ext import commands
 
 from bot.constants import Channels, Month, Tokens, WHITELISTED_CHANNELS
 from bot.utils.decorators import in_month, override_in_channel
-from bot.utils.persist import make_persistent
+
+# TODO: Implement substitutes for volume-persistent methods.
+# from bot.utils.persist import make_persistent
 
 log = logging.getLogger(__name__)
 
