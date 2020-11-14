@@ -174,14 +174,6 @@ class BrandingManager(commands.Cog):
         with self.config_file.open("r", encoding="utf8") as persistent_file:
             return json.load(persistent_file)
 
-    def _write_config(self, key: str, value: bool) -> None:
-        """Write a `key`, `value` pair to persistent config file."""
-        current_config = self._read_config()
-        current_config[key] = value
-
-        with self.config_file.open("w", encoding="utf8") as persistent_file:
-            json.dump(current_config, persistent_file)
-
     async def _daemon_func(self) -> None:
         """
         Manage all automated behaviour of the BrandingManager cog.
@@ -306,10 +298,7 @@ class BrandingManager(commands.Cog):
         seasonal_dir = await self._get_files(self.current_season.branding_path, include_dirs=True)
 
         # Only make a call to the fallback directory if there is something to be gained
-        branding_incomplete = any(
-            asset not in seasonal_dir
-            for asset in (FILE_BANNER, FILE_AVATAR, SERVER_ICONS)
-        )
+        branding_incomplete = any(asset not in seasonal_dir for asset in (FILE_BANNER, FILE_AVATAR, SERVER_ICONS))
         if branding_incomplete and self.current_season is not SeasonBase:
             fallback_dir = await self._get_files(SeasonBase.branding_path, include_dirs=True)
         else:
@@ -407,10 +396,7 @@ class BrandingManager(commands.Cog):
             else:
                 active_when = f"in {human_months(season.months)}"
 
-            description = (
-                f"Active {active_when}\n"
-                f"Branding: {season.branding_path}"
-            )
+            description = f"Active {active_when}\n" f"Branding: {season.branding_path}"
             embed.add_field(name=season.season_name, value=description, inline=False)
 
         await ctx.send(embed=embed)
@@ -494,48 +480,6 @@ class BrandingManager(commands.Cog):
 
             response = discord.Embed(description=f"Success {Emojis.ok_hand}", colour=Colours.soft_green)
             await ctx.send(embed=response)
-
-    @branding_cmds.group(name="daemon", aliases=["d", "task"])
-    async def daemon_group(self, ctx: commands.Context) -> None:
-        """Control the background daemon."""
-        if not ctx.invoked_subcommand:
-            await ctx.send_help(ctx.command)
-
-    @daemon_group.command(name="status")
-    async def daemon_status(self, ctx: commands.Context) -> None:
-        """Check whether daemon is currently active."""
-        if self._daemon_running:
-            remaining_time = (arrow.utcnow() + time_until_midnight()).humanize()
-            response = discord.Embed(description=f"Daemon running {Emojis.ok_hand}", colour=Colours.soft_green)
-            response.set_footer(text=f"Next refresh {remaining_time}")
-        else:
-            response = discord.Embed(description="Daemon not running", colour=Colours.soft_red)
-
-        await ctx.send(embed=response)
-
-    @daemon_group.command(name="start")
-    async def daemon_start(self, ctx: commands.Context) -> None:
-        """If the daemon isn't running, start it."""
-        if self._daemon_running:
-            raise BrandingError("Daemon already running!")
-
-        self.daemon = self.bot.loop.create_task(self._daemon_func())
-        self._write_config("daemon_active", True)
-
-        response = discord.Embed(description=f"Daemon started {Emojis.ok_hand}", colour=Colours.soft_green)
-        await ctx.send(embed=response)
-
-    @daemon_group.command(name="stop")
-    async def daemon_stop(self, ctx: commands.Context) -> None:
-        """If the daemon is running, stop it."""
-        if not self._daemon_running:
-            raise BrandingError("Daemon not running!")
-
-        self.daemon.cancel()
-        self._write_config("daemon_active", False)
-
-        response = discord.Embed(description=f"Daemon stopped {Emojis.ok_hand}", colour=Colours.soft_green)
-        await ctx.send(embed=response)
 
 
 def setup(bot: SeasonalBot) -> None:
