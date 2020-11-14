@@ -202,4 +202,3 @@ class MonsterSurvey(Cog):
 
 def setup(bot: Bot) -> None:
     """Monster survey Cog load."""
-    bot.add_cog(MonsterSurvey(bot))
