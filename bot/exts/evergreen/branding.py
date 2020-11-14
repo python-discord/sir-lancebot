@@ -157,13 +157,14 @@ class BrandingManager(commands.Cog):
 
         self.days_since_cycle = itertools.cycle([None])
 
-        self.config_file = make_persistent(Path("bot", "resources", "evergreen", "branding.json"))
+        # self.config_file = make_persistent(Path("bot", "resources", "evergreen", "branding.json"))
+
         # should_run = self._read_config()["daemon_active"]
 
-        if should_run:
-            self.daemon = self.bot.loop.create_task(self._daemon_func())
-        else:
-            self.daemon = None
+        # if should_run:
+        #     self.daemon = self.bot.loop.create_task(self._daemon_func())
+        # else:
+        self.daemon = None
 
     @property
     def _daemon_running(self) -> bool:
