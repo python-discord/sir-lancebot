@@ -197,4 +197,3 @@ class CandyCollection(commands.Cog):
 
 def setup(bot: commands.Bot) -> None:
     """Candy Collection game Cog load."""
-    bot.add_cog(CandyCollection(bot))
