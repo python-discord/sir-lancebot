@@ -136,7 +136,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          cache-from: type=registry,ref=ghcr.io/python-discord/bot:latest
+          cache-from: type=registry,ref=ghcr.io/python-discord/seasonalbot:latest
           tags: |
             ghcr.io/python-discord/seasonalbot:latest
             ghcr.io/python-discord/seasonalbot:${{ steps.sha_tag.outputs.tag }}
