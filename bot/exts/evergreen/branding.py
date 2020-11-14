@@ -7,6 +7,7 @@ import typing as t
 from datetime import datetime, time, timedelta
 from pathlib import Path
 
+import arrow
 import discord
 from discord.embeds import EmptyEmbed
 from discord.ext import commands
@@ -17,7 +18,8 @@ from bot.seasons import SeasonBase, get_all_seasons, get_current_season, get_sea
 from bot.utils import human_months
 from bot.utils.decorators import with_role
 from bot.utils.exceptions import BrandingError
-from bot.utils.persist import make_persistent
+# TODO: Implement substitute for current volume persistence requirements
+# from bot.utils.persist import make_persistent
 
 log = logging.getLogger(__name__)
 
@@ -156,7 +158,7 @@ class BrandingManager(commands.Cog):
         self.days_since_cycle = itertools.cycle([None])
 
         self.config_file = make_persistent(Path("bot", "resources", "evergreen", "branding.json"))
-        should_run = self._read_config()["daemon_active"]
+        # should_run = self._read_config()["daemon_active"]
 
         if should_run:
             self.daemon = self.bot.loop.create_task(self._daemon_func())
@@ -170,8 +172,11 @@ class BrandingManager(commands.Cog):
 
     def _read_config(self) -> t.Dict[str, bool]:
         """Read and return persistent config file."""
-        with self.config_file.open("r", encoding="utf8") as persistent_file:
-            return json.load(persistent_file)
+        raise NotImplementedError("read_config functionality requires mounting a persistent volume.")
+
+    def _write_config(self, key: str, value: bool) -> None:
+        """Write a `key`, `value` pair to persistent config file."""
+        raise NotImplementedError("write_config functionality requires mounting a persistent volume.")
 
     async def _daemon_func(self) -> None:
         """
@@ -485,6 +490,48 @@ class BrandingManager(commands.Cog):
 
             response = discord.Embed(description=f"Success {Emojis.ok_hand}", colour=Colours.soft_green)
             await ctx.send(embed=response)
+
+    @branding_cmds.group(name="daemon", aliases=["d", "task"])
+    async def daemon_group(self, ctx: commands.Context) -> None:
+        """Control the background daemon."""
+        if not ctx.invoked_subcommand:
+            await ctx.send_help(ctx.command)
+
+    @daemon_group.command(name="status")
+    async def daemon_status(self, ctx: commands.Context) -> None:
+        """Check whether daemon is currently active."""
+        if self._daemon_running:
+            remaining_time = (arrow.utcnow() + time_until_midnight()).humanize()
+            response = discord.Embed(description=f"Daemon running {Emojis.ok_hand}", colour=Colours.soft_green)
+            response.set_footer(text=f"Next refresh {remaining_time}")
+        else:
+            response = discord.Embed(description="Daemon not running", colour=Colours.soft_red)
+
+        await ctx.send(embed=response)
+
+    @daemon_group.command(name="start", disabled=True)
+    async def daemon_start(self, ctx: commands.Context) -> None:
+        """If the daemon isn't running, start it."""
+        if self._daemon_running:
+            raise BrandingError("Daemon already running!")
+
+        self.daemon = self.bot.loop.create_task(self._daemon_func())
+        self._write_config("daemon_active", True)
+
+        response = discord.Embed(description=f"Daemon started {Emojis.ok_hand}", colour=Colours.soft_green)
+        await ctx.send(embed=response)
+
+    @daemon_group.command(name="stop", disabled=True)
+    async def daemon_stop(self, ctx: commands.Context) -> None:
+        """If the daemon is running, stop it."""
+        if not self._daemon_running:
+            raise BrandingError("Daemon not running!")
+
+        self.daemon.cancel()
+        self._write_config("daemon_active", False)
+
+        response = discord.Embed(description=f"Daemon stopped {Emojis.ok_hand}", colour=Colours.soft_green)
+        await ctx.send(embed=response)
 
 
 def setup(bot: SeasonalBot) -> None:
