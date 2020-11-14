@@ -7,7 +7,6 @@ import typing as t
 from datetime import datetime, time, timedelta
 from pathlib import Path
 
-import arrow
 import discord
 from discord.embeds import EmptyEmbed
 from discord.ext import commands
