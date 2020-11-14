@@ -298,7 +298,10 @@ class BrandingManager(commands.Cog):
         seasonal_dir = await self._get_files(self.current_season.branding_path, include_dirs=True)
 
         # Only make a call to the fallback directory if there is something to be gained
-        branding_incomplete = any(asset not in seasonal_dir for asset in (FILE_BANNER, FILE_AVATAR, SERVER_ICONS))
+        branding_incomplete = any(
+            asset not in seasonal_dir
+            for asset in (FILE_BANNER, FILE_AVATAR, SERVER_ICONS)
+        )
         if branding_incomplete and self.current_season is not SeasonBase:
             fallback_dir = await self._get_files(SeasonBase.branding_path, include_dirs=True)
         else:
@@ -396,7 +399,10 @@ class BrandingManager(commands.Cog):
             else:
                 active_when = f"in {human_months(season.months)}"
 
-            description = f"Active {active_when}\n" f"Branding: {season.branding_path}"
+            description = (
+                f"Active {active_when}\n"
+                f"Branding: {season.branding_path}"
+            )
             embed.add_field(name=season.season_name, value=description, inline=False)
 
         await ctx.send(embed=embed)
