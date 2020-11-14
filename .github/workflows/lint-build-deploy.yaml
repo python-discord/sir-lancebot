@@ -1,4 +1,4 @@
-name: Linting & Building
+name: Lint, Build & Deploy
 
 on:
   push:
@@ -94,8 +94,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  build-and-push:
-    name: Build and Push to Container Repositories
+  build-and-deploy:
+    name: Build and Deploy to Kubernetes
     needs: lint
     if: github.event_name != 'pull_request_target' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
@@ -142,3 +142,17 @@ jobs:
             ghcr.io/python-discord/seasonalbot:${{ steps.sha_tag.outputs.tag }}
             pythondiscord/seasonalbot:latest
             pythondiscord/seasonalbot:${{ steps.sha_tag.outputs.tag }}
+
+      - name: Authenticate with Kubernetes
+        uses: azure/k8s-set-context@v1
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBECONFIG }}
+
+      - name: Deploy to Kubernetes
+        uses: Azure/k8s-deploy@v1
+        with:
+          manifests: |
+              deployment.yaml
+          images: 'ghcr.io/python-discord/seasonalbot:${{ steps.sha_tag.outputs.tag }}'
+          kubectl-version: 'latest'

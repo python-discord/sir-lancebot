@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seasonalbot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seasonalbot
+  template:
+    metadata:
+      labels:
+        app: seasonalbot
+    spec:
+      containers:
+      - name: seasonalbot
+        image: ghcr.io/python-discord/seasonalbot:latest
+        imagePullPolicy: Always
+        envFrom:
+        - secretRef:
+            name: seasonalbot-env
