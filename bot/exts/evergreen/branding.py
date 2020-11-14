@@ -18,7 +18,8 @@ from bot.seasons import SeasonBase, get_all_seasons, get_current_season, get_sea
 from bot.utils import human_months
 from bot.utils.decorators import with_role
 from bot.utils.exceptions import BrandingError
-from bot.utils.persist import make_persistent
+# TODO: Implement substitute for current volume persistence requirements
+# from bot.utils.persist import make_persistent
 
 log = logging.getLogger(__name__)
 
@@ -156,13 +157,14 @@ class BrandingManager(commands.Cog):
 
         self.days_since_cycle = itertools.cycle([None])
 
-        self.config_file = make_persistent(Path("bot", "resources", "evergreen", "branding.json"))
-        should_run = self._read_config()["daemon_active"]
+        # self.config_file = make_persistent(Path("bot", "resources", "evergreen", "branding.json"))
 
-        if should_run:
-            self.daemon = self.bot.loop.create_task(self._daemon_func())
-        else:
-            self.daemon = None
+        # should_run = self._read_config()["daemon_active"]
+
+        # if should_run:
+        #     self.daemon = self.bot.loop.create_task(self._daemon_func())
+        # else:
+        self.daemon = None
 
     @property
     def _daemon_running(self) -> bool:
@@ -171,16 +173,11 @@ class BrandingManager(commands.Cog):
 
     def _read_config(self) -> t.Dict[str, bool]:
         """Read and return persistent config file."""
-        with self.config_file.open("r", encoding="utf8") as persistent_file:
-            return json.load(persistent_file)
+        raise NotImplementedError("read_config functionality requires mounting a persistent volume.")
 
     def _write_config(self, key: str, value: bool) -> None:
         """Write a `key`, `value` pair to persistent config file."""
-        current_config = self._read_config()
-        current_config[key] = value
-
-        with self.config_file.open("w", encoding="utf8") as persistent_file:
-            json.dump(current_config, persistent_file)
+        raise NotImplementedError("write_config functionality requires mounting a persistent volume.")
 
     async def _daemon_func(self) -> None:
         """
@@ -513,7 +510,7 @@ class BrandingManager(commands.Cog):
 
         await ctx.send(embed=response)
 
-    @daemon_group.command(name="start")
+    @daemon_group.command(name="start", enabled=False)
     async def daemon_start(self, ctx: commands.Context) -> None:
         """If the daemon isn't running, start it."""
         if self._daemon_running:
@@ -525,7 +522,7 @@ class BrandingManager(commands.Cog):
         response = discord.Embed(description=f"Daemon started {Emojis.ok_hand}", colour=Colours.soft_green)
         await ctx.send(embed=response)
 
-    @daemon_group.command(name="stop")
+    @daemon_group.command(name="stop", enabled=False)
     async def daemon_stop(self, ctx: commands.Context) -> None:
         """If the daemon is running, stop it."""
         if not self._daemon_running:

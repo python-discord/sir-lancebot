@@ -9,7 +9,9 @@ from discord.ext import commands
 
 from bot.constants import Channels, Month
 from bot.utils.decorators import in_month
-from bot.utils.persist import make_persistent
+
+# TODO: Implement substitutes for volume-persistent methods.
+# from bot.utils.persist import make_persistent
 
 log = logging.getLogger(__name__)
 
@@ -197,4 +199,3 @@ class CandyCollection(commands.Cog):
 
 def setup(bot: commands.Bot) -> None:
     """Candy Collection game Cog load."""
-    bot.add_cog(CandyCollection(bot))
