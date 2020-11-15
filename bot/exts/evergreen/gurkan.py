@@ -11,7 +11,7 @@ class Gurkan(commands.Cog):
         self.bot = bot
 
     @commands.command(name="gurkancount", aliases=("gc", "gurkcount"))
-    async def gurkancount(self, ctx: commands.Context) -> None:
+    async def gurkan_count(self, ctx: commands.Context) -> None:
         """Get the amount of members with 'gurkan' in their names."""
         gurkan_count = sum(
             1 for member in ctx.guild.members if "gurkan" in member.display_name.lower()
@@ -20,11 +20,12 @@ class Gurkan(commands.Cog):
         embed = discord.Embed(
             title="Gurkancount",
             color=Colours.bright_green,
-            description=f"There are a total of `{gurkan_count}` gurkans in the server!")
+            description=f"There are a total of `{gurkan_count}` gurkans in the server!"
+        )
 
         await ctx.send(embed=embed)
 
 
 def setup(bot: commands.Bot) -> None:
-    """Load the Bookmark cog."""
+    """Load the Gurkan cog."""
     bot.add_cog(Gurkan(bot))
