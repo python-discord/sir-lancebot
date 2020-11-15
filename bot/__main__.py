@@ -27,3 +27,5 @@ for ext in walk_extensions():
     bot.load_extension(ext)
 
 bot.run(Client.token)
+
+def fooBarLintErrors(self): print (self)
