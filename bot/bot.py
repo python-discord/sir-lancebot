@@ -211,6 +211,7 @@ _intents.integrations = False
 _intents.invites = False
 _intents.typing = False
 _intents.webhooks = False
+_intents.members = True
 
 bot = SeasonalBot(
     command_prefix=Client.prefix,
