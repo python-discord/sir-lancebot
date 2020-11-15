@@ -13,8 +13,9 @@ class Gurkan(commands.Cog):
     @commands.command(name="gurkancount", aliases=("gc", "gurkcount"))
     async def gurkancount(self, ctx: commands.Context) -> None:
         """Get the amount of members with 'gurkan' in their names."""
-        gurkans = [1 for member in ctx.guild.members if "gurkan" in member.display_name.lower()]
-        gurkan_count = sum(gurkans)
+        gurkan_count = sum(
+            1 for member in ctx.guild.members if "gurkan" in member.display_name.lower()
+        )
 
         embed = discord.Embed(
             title="Gurkancount",
