@@ -1,20 +1,16 @@
-import json
 import logging
 import re
 from collections import Counter
 from datetime import datetime, timedelta
-from pathlib import Path
 from typing import List, Tuple, Union
 
 import aiohttp
 import discord
+from async_rediscache import RedisCache
 from discord.ext import commands
 
 from bot.constants import Channels, Month, Tokens, WHITELISTED_CHANNELS
 from bot.utils.decorators import in_month, override_in_channel
-
-# TODO: Implement substitutes for volume-persistent methods.
-# from bot.utils.persist import make_persistent
 
 log = logging.getLogger(__name__)
 
@@ -39,10 +35,11 @@ GITHUB_NONEXISTENT_USER_MESSAGE = (
 class HacktoberStats(commands.Cog):
     """Hacktoberfest statistics Cog."""
 
+    # Stores mapping of user IDs and GitHub usernames
+    linked_accounts = RedisCache()
+
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.link_json = make_persistent(Path("bot", "resources", "halloween", "github_links.json"))
-        self.linked_accounts = self.load_linked_users()
 
     @in_month(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)
     @commands.group(name="hacktoberstats", aliases=("hackstats",), invoke_without_command=True)
@@ -58,8 +55,8 @@ class HacktoberStats(commands.Cog):
         if not github_username:
             author_id, author_mention = self._author_mention_from_context(ctx)
 
-            if str(author_id) in self.linked_accounts.keys():
-                github_username = self.linked_accounts[author_id]["github_username"]
+            if await self.linked_accounts.contains(author_id):
+                github_username = await self.linked_accounts.get(author_id)
                 logging.info(f"Getting stats for {author_id} linked GitHub account '{github_username}'")
             else:
                 msg = (
@@ -79,30 +76,19 @@ class HacktoberStats(commands.Cog):
         """
         Link the invoking user's Github github_username to their Discord ID.
 
-        Linked users are stored as a nested dict:
-            {
-                Discord_ID: {
-                    "github_username": str
-                    "date_added": datetime
-                }
-            }
+        Linked users are stored in Redis: User ID => GitHub Username.
         """
         author_id, author_mention = self._author_mention_from_context(ctx)
         if github_username:
-            if str(author_id) in self.linked_accounts.keys():
-                old_username = self.linked_accounts[author_id]["github_username"]
+            if await self.linked_accounts.contains(author_id):
+                old_username = await self.linked_accounts.get(author_id)
                 logging.info(f"{author_id} has changed their github link from '{old_username}' to '{github_username}'")
                 await ctx.send(f"{author_mention}, your GitHub username has been updated to: '{github_username}'")
             else:
                 logging.info(f"{author_id} has added a github link to '{github_username}'")
                 await ctx.send(f"{author_mention}, your GitHub username has been added")
 
-            self.linked_accounts[author_id] = {
-                "github_username": github_username,
-                "date_added": datetime.now()
-            }
-
-            self.save_linked_users()
+            await self.linked_accounts.set(author_id, github_username)
         else:
             logging.info(f"{author_id} tried to link a GitHub account but didn't provide a username")
             await ctx.send(f"{author_mention}, a GitHub username is required to link your account")
@@ -114,55 +100,13 @@ class HacktoberStats(commands.Cog):
         """Remove the invoking user's account link from the log."""
         author_id, author_mention = self._author_mention_from_context(ctx)
 
-        stored_user = self.linked_accounts.pop(author_id, None)
+        stored_user = await self.linked_accounts.pop(author_id, None)
         if stored_user:
             await ctx.send(f"{author_mention}, your GitHub profile has been unlinked")
             logging.info(f"{author_id} has unlinked their GitHub account")
         else:
             await ctx.send(f"{author_mention}, you do not currently have a linked GitHub account")
             logging.info(f"{author_id} tried to unlink their GitHub account but no account was linked")
-
-        self.save_linked_users()
-
-    def load_linked_users(self) -> dict:
-        """
-        Load list of linked users from local JSON file.
-
-        Linked users are stored as a nested dict:
-            {
-                Discord_ID: {
-                    "github_username": str
-                    "date_added": datetime
-                }
-            }
-        """
-        if self.link_json.exists():
-            logging.info(f"Loading linked GitHub accounts from '{self.link_json}'")
-            with open(self.link_json, 'r', encoding="utf8") as file:
-                linked_accounts = json.load(file)
-
-            logging.info(f"Loaded {len(linked_accounts)} linked GitHub accounts from '{self.link_json}'")
-            return linked_accounts
-        else:
-            logging.info(f"Linked account log: '{self.link_json}' does not exist")
-            return {}
-
-    def save_linked_users(self) -> None:
-        """
-        Save list of linked users to local JSON file.
-
-        Linked users are stored as a nested dict:
-            {
-                Discord_ID: {
-                    "github_username": str
-                    "date_added": datetime
-                }
-            }
-        """
-        logging.info(f"Saving linked_accounts to '{self.link_json}'")
-        with open(self.link_json, 'w', encoding="utf8") as file:
-            json.dump(self.linked_accounts, file, default=str)
-        logging.info(f"linked_accounts saved to '{self.link_json}'")
 
     async def get_stats(self, ctx: commands.Context, github_username: str) -> None:
         """
@@ -491,3 +435,4 @@ class HacktoberStats(commands.Cog):
 
 def setup(bot: commands.Bot) -> None:
     """Hacktoberstats Cog load."""
+    bot.add_cog(HacktoberStats(bot))
