@@ -3,7 +3,7 @@ import logging
 import re
 from collections import Counter
 from datetime import datetime, timedelta
-from pathlib import Path
+# from pathlib import Path
 from typing import List, Tuple, Union
 
 import aiohttp
@@ -13,7 +13,7 @@ from discord.ext import commands
 from bot.constants import Channels, Month, Tokens, WHITELISTED_CHANNELS
 from bot.utils.decorators import in_month, override_in_channel
 
-# TODO: Implement substitutes for volume-persistent methods.
+# TODO: Implement substitutes for volume-persistent methods.  # noqa: T000
 # from bot.utils.persist import make_persistent
 
 log = logging.getLogger(__name__)
@@ -41,7 +41,7 @@ class HacktoberStats(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.link_json = make_persistent(Path("bot", "resources", "halloween", "github_links.json"))
+        # self.link_json = make_persistent(Path("bot", "resources", "halloween", "github_links.json"))
         self.linked_accounts = self.load_linked_users()
 
     @in_month(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)

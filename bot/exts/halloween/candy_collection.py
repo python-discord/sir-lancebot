@@ -1,7 +1,7 @@
 import json
 import logging
 import random
-from pathlib import Path
+# from pathlib import Path
 from typing import Union
 
 import discord
@@ -10,7 +10,7 @@ from discord.ext import commands
 from bot.constants import Channels, Month
 from bot.utils.decorators import in_month
 
-# TODO: Implement substitutes for volume-persistent methods.
+# TODO: Implement substitutes for volume-persistent methods.  # noqa: T000
 # from bot.utils.persist import make_persistent
 
 log = logging.getLogger(__name__)
@@ -39,7 +39,7 @@ class CandyCollection(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.json_file = make_persistent(Path("bot", "resources", "halloween", "candy_collection.json"))
+        # self.json_file = make_persistent(Path("bot", "resources", "halloween", "candy_collection.json"))
 
         with self.json_file.open() as fp:
             candy_data = json.load(fp)

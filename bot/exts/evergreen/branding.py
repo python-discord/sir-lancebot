@@ -1,6 +1,6 @@
 import asyncio
 import itertools
-import json
+# import json
 import logging
 import random
 import typing as t
@@ -18,7 +18,7 @@ from bot.seasons import SeasonBase, get_all_seasons, get_current_season, get_sea
 from bot.utils import human_months
 from bot.utils.decorators import with_role
 from bot.utils.exceptions import BrandingError
-# TODO: Implement substitute for current volume persistence requirements
+# TODO: Implement substitute for current volume persistence requirements  # noqa: T000
 # from bot.utils.persist import make_persistent
 
 log = logging.getLogger(__name__)
