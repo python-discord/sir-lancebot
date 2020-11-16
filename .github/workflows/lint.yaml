@@ -1,4 +1,4 @@
-name: Lint, Build & Deploy
+name: Lint
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   lint:
-    name: Lint using pre-commit & flake8
+    name: Run pre-commit & flake8
     runs-on: ubuntu-latest
     env:
       # Configure pip to cache dependencies and do a user install
@@ -91,58 +91,3 @@ jobs:
       - name: Run flake8
         run: "flake8 \
         --format='::error file=%(path)s,line=%(row)d,col=%(col)d::[flake8] %(code)s: %(text)s'"
-
-  build-and-deploy:
-    name: Build and Deploy to Kubernetes
-    needs: lint
-    if: github.event_name != 'pull_request_target' && github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
-
-    steps:
-      # Create a commit SHA-based tag for the container repositories
-      - name: Create SHA Container Tag
-        id: sha_tag
-        run: |
-          tag=$(cut -c 1-7 <<< $GITHUB_SHA)
-          echo "::set-output name=tag::$tag"
-
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Login to Github Container Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GHCR_TOKEN  }}
-
-      # Build and push the container to the GitHub Container
-      # Repository. The container will be tagged as "latest"
-      # and with the short SHA of the commit.
-      - name: Build and push
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          cache-from: type=registry,ref=ghcr.io/python-discord/seasonalbot:latest
-          tags: |
-            ghcr.io/python-discord/seasonalbot:latest
-            ghcr.io/python-discord/seasonalbot:${{ steps.sha_tag.outputs.tag }}
-
-      - name: Authenticate with Kubernetes
-        uses: azure/k8s-set-context@v1
-        with:
-          method: kubeconfig
-          kubeconfig: ${{ secrets.KUBECONFIG }}
-
-      - name: Deploy to Kubernetes
-        uses: Azure/k8s-deploy@v1
-        with:
-          manifests: |
-              deployment.yaml
-          images: 'ghcr.io/python-discord/seasonalbot:${{ steps.sha_tag.outputs.tag }}'
-          kubectl-version: 'latest'
