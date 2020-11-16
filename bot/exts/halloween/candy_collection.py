@@ -1,17 +1,13 @@
-import json
 import logging
 import random
-from pathlib import Path
 from typing import Union
 
 import discord
+from async_rediscache import RedisCache
 from discord.ext import commands
 
 from bot.constants import Channels, Month
 from bot.utils.decorators import in_month
-
-# TODO: Implement substitutes for volume-persistent methods.
-# from bot.utils.persist import make_persistent
 
 log = logging.getLogger(__name__)
 
@@ -37,18 +33,15 @@ EMOJIS = dict(
 class CandyCollection(commands.Cog):
     """Candy collection game Cog."""
 
+    # User candy amount records
+    candy_records = RedisCache()
+
+    # Candy and skull messages mapping
+    candy_messages = RedisCache()
+    skull_messages = RedisCache()
+
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.json_file = make_persistent(Path("bot", "resources", "halloween", "candy_collection.json"))
-
-        with self.json_file.open() as fp:
-            candy_data = json.load(fp)
-
-        self.candy_records = candy_data.get("records", dict())
-
-        # Message ID where bot added the candies/skulls
-        self.candy_messages = set()
-        self.skull_messages = set()
 
     @in_month(Month.OCTOBER)
     @commands.Cog.listener()
@@ -63,11 +56,11 @@ class CandyCollection(commands.Cog):
 
         # do random check for skull first as it has the lower chance
         if random.randint(1, ADD_SKULL_REACTION_CHANCE) == 1:
-            self.skull_messages.add(message.id)
+            await self.skull_messages.set(message.id, "skull")
             return await message.add_reaction(EMOJIS['SKULL'])
         # check for the candy chance next
         if random.randint(1, ADD_CANDY_REACTION_CHANCE) == 1:
-            self.candy_messages.add(message.id)
+            await self.candy_messages.set(message.id, "candy")
             return await message.add_reaction(EMOJIS['CANDY'])
 
     @in_month(Month.OCTOBER)
@@ -94,17 +87,19 @@ class CandyCollection(commands.Cog):
                 await self.reacted_msg_chance(message)
             return
 
-        if message.id in self.candy_messages and str(reaction.emoji) == EMOJIS['CANDY']:
-            self.candy_messages.remove(message.id)
-            prev_record = self.candy_records.get(str(user.id), 0)
-            self.candy_records[str(user.id)] = prev_record + 1
+        if await self.candy_messages.get(message.id) == "candy" and str(reaction.emoji) == EMOJIS['CANDY']:
+            await self.candy_messages.delete(message.id)
+            if await self.candy_records.contains(user.id):
+                await self.candy_records.increment(user.id)
+            else:
+                await self.candy_records.set(user.id, 1)
 
-        elif message.id in self.skull_messages and str(reaction.emoji) == EMOJIS['SKULL']:
-            self.skull_messages.remove(message.id)
+        elif await self.skull_messages.get(message.id) == "skull" and str(reaction.emoji) == EMOJIS['SKULL']:
+            await self.skull_messages.delete(message.id)
 
-            if prev_record := self.candy_records.get(str(user.id)):
+            if prev_record := await self.candy_records.get(user.id):
                 lost = min(random.randint(1, 3), prev_record)
-                self.candy_records[str(user.id)] = prev_record - lost
+                await self.candy_records.decrement(user.id, lost)
 
                 if lost == prev_record:
                     await CandyCollection.send_spook_msg(user, message.channel, 'all of your')
@@ -116,7 +111,6 @@ class CandyCollection(commands.Cog):
             return  # Skip saving
 
         await reaction.clear()
-        await self.bot.loop.run_in_executor(None, self.save_to_json)
 
     async def reacted_msg_chance(self, message: discord.Message) -> None:
         """
@@ -126,11 +120,11 @@ class CandyCollection(commands.Cog):
         existing reaction.
         """
         if random.randint(1, ADD_SKULL_EXISTING_REACTION_CHANCE) == 1:
-            self.skull_messages.add(message.id)
+            await self.skull_messages.set(message.id, "skull")
             return await message.add_reaction(EMOJIS['SKULL'])
 
         if random.randint(1, ADD_CANDY_EXISTING_REACTION_CHANCE) == 1:
-            self.candy_messages.add(message.id)
+            await self.candy_messages.set(message.id, "candy")
             return await message.add_reaction(EMOJIS['CANDY'])
 
     @property
@@ -159,18 +153,15 @@ class CandyCollection(commands.Cog):
                               "I tried to take your candies but you had none to begin with!")
         await channel.send(embed=embed)
 
-    def save_to_json(self) -> None:
-        """Save JSON to a local file."""
-        with self.json_file.open('w') as fp:
-            json.dump(dict(records=self.candy_records), fp)
-
     @in_month(Month.OCTOBER)
     @commands.command()
     async def candy(self, ctx: commands.Context) -> None:
         """Get the candy leaderboard and save to JSON."""
+        records = await self.candy_records.items()
+
         def generate_leaderboard() -> str:
             top_sorted = sorted(
-                ((user_id, score) for user_id, score in self.candy_records.items() if score > 0),
+                ((user_id, score) for user_id, score in records if score > 0),
                 key=lambda x: x[1],
                 reverse=True
             )
@@ -199,3 +190,4 @@ class CandyCollection(commands.Cog):
 
 def setup(bot: commands.Bot) -> None:
     """Candy Collection game Cog load."""
+    bot.add_cog(CandyCollection(bot))
