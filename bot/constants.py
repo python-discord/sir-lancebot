@@ -216,6 +216,13 @@ class Wolfram(NamedTuple):
     key = environ.get("WOLFRAM_API_KEY")
 
 
+class RedisCache(NamedTuple):
+    host = environ.get("REDIS_HOST", "redis.default.svc.cluster.local")
+    port = environ.get("REDIS_PORT", 6379)
+    password = environ.get("REDIS_PASSWORD")
+    use_fakeredis = environ.get("USE_FAKEREDIS", "false").lower() == "true"
+
+
 # Default role combinations
 MODERATION_ROLES = Roles.moderator, Roles.admin, Roles.owner
 STAFF_ROLES = Roles.helpers, Roles.moderator, Roles.admin, Roles.owner
