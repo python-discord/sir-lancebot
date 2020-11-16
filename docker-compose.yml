@@ -10,8 +10,8 @@ services:
     restart: always
 
     environment:
-      - SEASONALBOT_TOKEN=yourtokenhere
-      - SEASONALBOT_DEBUG=true
+      - SEASONALBOT_TOKEN=${SEASONALBOT_TOKEN}
+      - SEASONALBOT_DEBUG=${SEASONALBOT_DEBUG}
       - REDIS_HOST=redis
     # - SEASONALBOT_GUILD=
     # - SEASONALBOT_ADMIN_ROLE_ID=
