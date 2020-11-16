@@ -12,6 +12,7 @@ services:
     environment:
       - SEASONALBOT_TOKEN=yourtokenhere
       - SEASONALBOT_DEBUG=true
+      - REDIS_HOST=redis
     # - SEASONALBOT_GUILD=
     # - SEASONALBOT_ADMIN_ROLE_ID=
     # - CHANNEL_ANNOUNCEMENTS=
