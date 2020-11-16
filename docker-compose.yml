@@ -20,3 +20,8 @@ services:
     volumes:
       - /opt/pythondiscord/seasonalbot/log:/bot/bot/log
       - /opt/pythondiscord/seasonalbot/data:/bot/data
+
+  redis:
+    image: redis:latest
+    ports:
+      - "127.0.0.1:6379:6379"
