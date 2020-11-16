@@ -8,19 +8,22 @@ services:
     init: true
 
     restart: always
+    depends_on:
+      - redis
 
     environment:
       - SEASONALBOT_TOKEN=${SEASONALBOT_TOKEN}
       - SEASONALBOT_DEBUG=${SEASONALBOT_DEBUG}
+      - SEASONALBOT_GUILD=${SEASONALBOT_GUILD}
+      - SEASONALBOT_ADMIN_ROLE_ID=${SEASONALBOT_ADMIN_ROLE_ID}
+      - CHANNEL_DEVLOG=${CHANNEL_DEVLOG}
+      - CHANNEL_SEASONALBOT_COMMANDS=${CHANNEL_SEASONALBOT_COMMANDS}
       - REDIS_HOST=redis
-    # - SEASONALBOT_GUILD=
-    # - SEASONALBOT_ADMIN_ROLE_ID=
-    # - CHANNEL_ANNOUNCEMENTS=
-    # - CHANNEL_DEVLOG=
 
     volumes:
       - /opt/pythondiscord/seasonalbot/log:/bot/bot/log
       - /opt/pythondiscord/seasonalbot/data:/bot/data
+      - .:/bot
 
   redis:
     image: redis:latest
