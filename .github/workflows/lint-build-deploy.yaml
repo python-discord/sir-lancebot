@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-  pull_request_target:
+  pull_request:
 
 
 jobs:
@@ -32,12 +32,8 @@ jobs:
       - name: Add custom PYTHONUSERBASE to PATH
         run: echo '${{ env.PYTHONUSERBASE }}/bin/' >> $GITHUB_PATH
 
-      # We don't want to persist credentials, as our GitHub Action
-      # may be run when a PR is made from a fork.
       - name: Checkout repository
         uses: actions/checkout@v2
-        with:
-          persist-credentials: false
 
       - name: Setup python
         id: python
@@ -84,15 +80,17 @@ jobs:
       - name: Run pre-commit hooks
         run: export PIP_USER=0; SKIP=flake8 pre-commit run --all-files
 
-      # This step requires `pull_request_target` as we need "write" permissions
-      # to add annotations to the Actions results. A normal `pull_request` trigger
-      # does not get those permissions for security reasons.
+      # Run flake8 and have it format the linting errors in the format of
+      # the GitHub Workflow command to register error annotations. This
+      # means that our flake8 output is automatically added as an error
+      # annotation to both the run result and in the "Files" tab of a
+      # pull request.
+      #
+      # Format used:
+      # ::error file={filename},line={line},col={col}::{message}
       - name: Run flake8
-        uses: julianwachholz/flake8-action@v1
-        with:
-          checkName: lint
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: "flake8 \
+        --format='::error file=%(path)s,line=%(row)d,col=%(col)d::[flake8] %(code)s: %(text)s'"
 
   build-and-deploy:
     name: Build and Deploy to Kubernetes
