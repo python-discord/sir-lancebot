@@ -7,10 +7,11 @@ from typing import Optional, Union
 import async_timeout
 import discord
 from aiohttp import AsyncResolver, ClientSession, TCPConnector
+from async_rediscache import RedisSession
 from discord import DiscordException, Embed, Guild, User
 from discord.ext import commands
 
-from bot.constants import Channels, Client, MODERATION_ROLES
+from bot.constants import Channels, Client, MODERATION_ROLES, RedisConfig
 from bot.utils.decorators import mock_in_debug
 
 log = logging.getLogger(__name__)
@@ -39,12 +40,13 @@ class SeasonalBot(commands.Bot):
     that the upload was successful. See the `mock_in_debug` decorator for further details.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, redis_session: RedisSession, **kwargs):
         super().__init__(**kwargs)
         self.http_session = ClientSession(
             connector=TCPConnector(resolver=AsyncResolver(), family=socket.AF_INET)
         )
         self._guild_available = asyncio.Event()
+        self.redis_session = redis_session
 
         self.loop.create_task(self.send_log("SeasonalBot", "Connected!"))
 
@@ -55,6 +57,16 @@ class SeasonalBot(commands.Bot):
         if not guild:
             return None
         return guild.me
+
+    async def close(self) -> None:
+        """Close Redis session when bot is shutting down."""
+        await super().close()
+
+        if self.http_session:
+            await self.http_session.close()
+
+        if self.redis_session:
+            await self.redis_session.close()
 
     def add_cog(self, cog: commands.Cog) -> None:
         """
@@ -212,7 +224,19 @@ _intents.invites = False
 _intents.typing = False
 _intents.webhooks = False
 
+redis_session = RedisSession(
+    address=(RedisConfig.host, RedisConfig.port),
+    password=RedisConfig.password,
+    minsize=1,
+    maxsize=20,
+    use_fakeredis=RedisConfig.use_fakeredis,
+    global_namespace="seasonalbot"
+)
+loop = asyncio.get_event_loop()
+loop.run_until_complete(redis_session.connect())
+
 bot = SeasonalBot(
+    redis_session=redis_session,
     command_prefix=Client.prefix,
     activity=discord.Game(name=f"Commands: {Client.prefix}help"),
     allowed_mentions=discord.AllowedMentions(everyone=False, roles=_allowed_roles),
