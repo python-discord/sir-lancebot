@@ -1,14 +1,13 @@
 import asyncio
 import itertools
-import json
 import logging
 import random
 import typing as t
 from datetime import datetime, time, timedelta
-from pathlib import Path
 
 import arrow
 import discord
+from async_rediscache import RedisCache
 from discord.embeds import EmptyEmbed
 from discord.ext import commands
 
@@ -18,8 +17,6 @@ from bot.seasons import SeasonBase, get_all_seasons, get_current_season, get_sea
 from bot.utils import human_months
 from bot.utils.decorators import with_role
 from bot.utils.exceptions import BrandingError
-# TODO: Implement substitute for current volume persistence requirements
-# from bot.utils.persist import make_persistent
 
 log = logging.getLogger(__name__)
 
@@ -134,9 +131,10 @@ class BrandingManager(commands.Cog):
 
     days_since_cycle: t.Iterator
 
-    config_file: Path
-
     daemon: t.Optional[asyncio.Task]
+
+    # Branding configuration
+    branding_configuration = RedisCache()
 
     def __init__(self, bot: SeasonalBot) -> None:
         """
@@ -157,27 +155,17 @@ class BrandingManager(commands.Cog):
 
         self.days_since_cycle = itertools.cycle([None])
 
-        # self.config_file = make_persistent(Path("bot", "resources", "evergreen", "branding.json"))
+        should_run = self.bot.loop.run_until_complete(self.branding_configuration.get("daemon_active"))
 
-        # should_run = self._read_config()["daemon_active"]
-
-        # if should_run:
-        #     self.daemon = self.bot.loop.create_task(self._daemon_func())
-        # else:
-        self.daemon = None
+        if should_run:
+            self.daemon = self.bot.loop.create_task(self._daemon_func())
+        else:
+            self.daemon = None
 
     @property
     def _daemon_running(self) -> bool:
         """True if the daemon is currently active, False otherwise."""
         return self.daemon is not None and not self.daemon.done()
-
-    def _read_config(self) -> t.Dict[str, bool]:
-        """Read and return persistent config file."""
-        raise NotImplementedError("read_config functionality requires mounting a persistent volume.")
-
-    def _write_config(self, key: str, value: bool) -> None:
-        """Write a `key`, `value` pair to persistent config file."""
-        raise NotImplementedError("write_config functionality requires mounting a persistent volume.")
 
     async def _daemon_func(self) -> None:
         """
@@ -510,26 +498,26 @@ class BrandingManager(commands.Cog):
 
         await ctx.send(embed=response)
 
-    @daemon_group.command(name="start", enabled=False)
+    @daemon_group.command(name="start")
     async def daemon_start(self, ctx: commands.Context) -> None:
         """If the daemon isn't running, start it."""
         if self._daemon_running:
             raise BrandingError("Daemon already running!")
 
         self.daemon = self.bot.loop.create_task(self._daemon_func())
-        self._write_config("daemon_active", True)
+        await self.branding_configuration.set("daemon_active", True)
 
         response = discord.Embed(description=f"Daemon started {Emojis.ok_hand}", colour=Colours.soft_green)
         await ctx.send(embed=response)
 
-    @daemon_group.command(name="stop", enabled=False)
+    @daemon_group.command(name="stop")
     async def daemon_stop(self, ctx: commands.Context) -> None:
         """If the daemon is running, stop it."""
         if not self._daemon_running:
             raise BrandingError("Daemon not running!")
 
         self.daemon.cancel()
-        self._write_config("daemon_active", False)
+        await self.branding_configuration.set("daemon_active", False)
 
         response = discord.Embed(description=f"Daemon stopped {Emojis.ok_hand}", colour=Colours.soft_green)
         await ctx.send(embed=response)
