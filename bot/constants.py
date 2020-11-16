@@ -17,6 +17,7 @@ __all__ = (
     "Roles",
     "Tokens",
     "Wolfram",
+    "RedisConfig",
     "MODERATION_ROLES",
     "STAFF_ROLES",
     "WHITELISTED_CHANNELS",
@@ -216,7 +217,7 @@ class Wolfram(NamedTuple):
     key = environ.get("WOLFRAM_API_KEY")
 
 
-class RedisCache(NamedTuple):
+class RedisConfig(NamedTuple):
     host = environ.get("REDIS_HOST", "redis.default.svc.cluster.local")
     port = environ.get("REDIS_PORT", 6379)
     password = environ.get("REDIS_PASSWORD")
