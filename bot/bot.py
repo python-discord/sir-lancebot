@@ -1,34 +1,19 @@
 import asyncio
-import enum
 import logging
 import socket
-from typing import Optional, Union
+from typing import Optional
 
-import async_timeout
 import discord
 from aiohttp import AsyncResolver, ClientSession, TCPConnector
 from async_rediscache import RedisSession
-from discord import DiscordException, Embed, Guild, User
+from discord import DiscordException, Embed
 from discord.ext import commands
 
 from bot.constants import Channels, Client, MODERATION_ROLES, RedisConfig
-from bot.utils.decorators import mock_in_debug
 
 log = logging.getLogger(__name__)
 
-__all__ = ("AssetType", "SeasonalBot", "bot")
-
-
-class AssetType(enum.Enum):
-    """
-    Discord media assets.
-
-    The values match exactly the kwarg keys that can be passed to `Guild.edit` or `User.edit`.
-    """
-
-    BANNER = "banner"
-    AVATAR = "avatar"
-    SERVER_ICON = "icon"
+__all__ = ("SeasonalBot", "bot")
 
 
 class SeasonalBot(commands.Bot):
@@ -83,83 +68,6 @@ class SeasonalBot(commands.Bot):
             context.command.reset_cooldown(context)
         else:
             await super().on_command_error(context, exception)
-
-    async def _fetch_image(self, url: str) -> bytes:
-        """Retrieve and read image from `url`."""
-        log.debug(f"Getting image from: {url}")
-        async with self.http_session.get(url) as resp:
-            return await resp.read()
-
-    async def _apply_asset(self, target: Union[Guild, User], asset: AssetType, url: str) -> bool:
-        """
-        Internal method for applying media assets to the guild or the bot.
-
-        This shouldn't be called directly. The purpose of this method is mainly generic
-        error handling to reduce needless code repetition.
-
-        Return True if upload was successful, False otherwise.
-        """
-        log.info(f"Attempting to set {asset.name}: {url}")
-
-        kwargs = {asset.value: await self._fetch_image(url)}
-        try:
-            async with async_timeout.timeout(5):
-                await target.edit(**kwargs)
-
-        except asyncio.TimeoutError:
-            log.info("Asset upload timed out")
-            return False
-
-        except discord.HTTPException as discord_error:
-            log.exception("Asset upload failed", exc_info=discord_error)
-            return False
-
-        else:
-            log.info("Asset successfully applied")
-            return True
-
-    @mock_in_debug(return_value=True)
-    async def set_banner(self, url: str) -> bool:
-        """Set the guild's banner to image at `url`."""
-        guild = self.get_guild(Client.guild)
-        if guild is None:
-            log.info("Failed to get guild instance, aborting asset upload")
-            return False
-
-        return await self._apply_asset(guild, AssetType.BANNER, url)
-
-    @mock_in_debug(return_value=True)
-    async def set_icon(self, url: str) -> bool:
-        """Sets the guild's icon to image at `url`."""
-        guild = self.get_guild(Client.guild)
-        if guild is None:
-            log.info("Failed to get guild instance, aborting asset upload")
-            return False
-
-        return await self._apply_asset(guild, AssetType.SERVER_ICON, url)
-
-    @mock_in_debug(return_value=True)
-    async def set_avatar(self, url: str) -> bool:
-        """Set the bot's avatar to image at `url`."""
-        return await self._apply_asset(self.user, AssetType.AVATAR, url)
-
-    @mock_in_debug(return_value=True)
-    async def set_nickname(self, new_name: str) -> bool:
-        """Set the bot nickname in the main guild to `new_name`."""
-        member = self.member
-        if member is None:
-            log.info("Failed to get bot member instance, aborting asset upload")
-            return False
-
-        log.info(f"Attempting to set nickname to {new_name}")
-        try:
-            await member.edit(nick=new_name)
-        except discord.HTTPException as discord_error:
-            log.exception("Setting nickname failed", exc_info=discord_error)
-            return False
-        else:
-            log.info("Nickname set successfully")
-            return True
 
     async def send_log(self, title: str, details: str = None, *, icon: str = None) -> None:
         """Send an embed message to the devlog channel."""
