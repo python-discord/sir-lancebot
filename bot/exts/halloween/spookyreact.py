@@ -29,9 +29,7 @@ class SpookyReact(Cog):
     @in_month(Month.OCTOBER)
     @Cog.listener()
     async def on_message(self, ctx: discord.Message) -> None:
-        """
-        Triggered when the bot sees a message in October.
-        """
+        """Triggered when the bot sees a message in October."""
         for trigger in SPOOKY_TRIGGERS.keys():
             trigger_test = re.search(SPOOKY_TRIGGERS[trigger][0], ctx.content.lower())
             if trigger_test:

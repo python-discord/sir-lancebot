@@ -9,7 +9,7 @@ from async_rediscache import RedisSession
 from discord import DiscordException, Embed
 from discord.ext import commands
 
-import bot.constants as constants
+from bot import constants
 
 log = logging.getLogger(__name__)
 
