@@ -45,6 +45,7 @@ jobs:
           file: ./Dockerfile
           push: true
           cache-from: type=registry,ref=ghcr.io/python-discord/seasonalbot:latest
+          cache-to: type=inline
           tags: |
             ghcr.io/python-discord/seasonalbot:latest
             ghcr.io/python-discord/seasonalbot:${{ steps.sha_tag.outputs.tag }}
