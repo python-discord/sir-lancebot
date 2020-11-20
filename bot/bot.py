@@ -9,14 +9,14 @@ from async_rediscache import RedisSession
 from discord import DiscordException, Embed
 from discord.ext import commands
 
-from bot.constants import Channels, Client, MODERATION_ROLES, RedisConfig
+import bot.constants as constants
 
 log = logging.getLogger(__name__)
 
-__all__ = ("SeasonalBot", "bot")
+__all__ = ("Bot", "bot")
 
 
-class SeasonalBot(commands.Bot):
+class Bot(commands.Bot):
     """
     Base bot instance.
 
@@ -24,6 +24,8 @@ class SeasonalBot(commands.Bot):
     perform the upload, and will instead only log the passed download urls and pretend
     that the upload was successful. See the `mock_in_debug` decorator for further details.
     """
+
+    name = constants.Client.name
 
     def __init__(self, redis_session: RedisSession, **kwargs):
         super().__init__(**kwargs)
@@ -33,12 +35,12 @@ class SeasonalBot(commands.Bot):
         self._guild_available = asyncio.Event()
         self.redis_session = redis_session
 
-        self.loop.create_task(self.send_log("SeasonalBot", "Connected!"))
+        self.loop.create_task(self.send_log(self.name, "Connected!"))
 
     @property
     def member(self) -> Optional[discord.Member]:
         """Retrieves the guild member object for the bot."""
-        guild = self.get_guild(Client.guild)
+        guild = self.get_guild(constants.Client.guild)
         if not guild:
             return None
         return guild.me
@@ -72,12 +74,12 @@ class SeasonalBot(commands.Bot):
     async def send_log(self, title: str, details: str = None, *, icon: str = None) -> None:
         """Send an embed message to the devlog channel."""
         await self.wait_until_guild_available()
-        devlog = self.get_channel(Channels.devlog)
+        devlog = self.get_channel(constants.Channels.devlog)
 
         if not devlog:
-            log.info(f"Fetching devlog channel as it wasn't found in the cache (ID: {Channels.devlog})")
+            log.info(f"Fetching devlog channel as it wasn't found in the cache (ID: {constants.Channels.devlog})")
             try:
-                devlog = await self.fetch_channel(Channels.devlog)
+                devlog = await self.fetch_channel(constants.Channels.devlog)
             except discord.HTTPException as discord_exc:
                 log.exception("Fetch failed", exc_info=discord_exc)
                 return
@@ -97,7 +99,7 @@ class SeasonalBot(commands.Bot):
         If the cache appears to still be empty (no members, no channels, or no roles), the event
         will not be set.
         """
-        if guild.id != Client.guild:
+        if guild.id != constants.Client.guild:
             return
 
         if not guild.roles or not guild.members or not guild.channels:
@@ -108,7 +110,7 @@ class SeasonalBot(commands.Bot):
 
     async def on_guild_unavailable(self, guild: discord.Guild) -> None:
         """Clear the internal `_guild_available` event when PyDis guild becomes unavailable."""
-        if guild.id != Client.guild:
+        if guild.id != constants.Client.guild:
             return
 
         self._guild_available.clear()
@@ -123,7 +125,7 @@ class SeasonalBot(commands.Bot):
         await self._guild_available.wait()
 
 
-_allowed_roles = [discord.Object(id_) for id_ in MODERATION_ROLES]
+_allowed_roles = [discord.Object(id_) for id_ in constants.MODERATION_ROLES]
 
 _intents = discord.Intents.default()  # Default is all intents except for privileged ones (Members, Presences, ...)
 _intents.bans = False
@@ -133,20 +135,20 @@ _intents.typing = False
 _intents.webhooks = False
 
 redis_session = RedisSession(
-    address=(RedisConfig.host, RedisConfig.port),
-    password=RedisConfig.password,
+    address=(constants.RedisConfig.host, constants.RedisConfig.port),
+    password=constants.RedisConfig.password,
     minsize=1,
     maxsize=20,
-    use_fakeredis=RedisConfig.use_fakeredis,
-    global_namespace="seasonalbot"
+    use_fakeredis=constants.RedisConfig.use_fakeredis,
+    global_namespace="sir-lancebot"
 )
 loop = asyncio.get_event_loop()
 loop.run_until_complete(redis_session.connect())
 
-bot = SeasonalBot(
+bot = Bot(
     redis_session=redis_session,
-    command_prefix=Client.prefix,
-    activity=discord.Game(name=f"Commands: {Client.prefix}help"),
+    command_prefix=constants.Client.prefix,
+    activity=discord.Game(name=f"Commands: {constants.Client.prefix}help"),
     allowed_mentions=discord.AllowedMentions(everyone=False, roles=_allowed_roles),
     intents=_intents,
 )
