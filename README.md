@@ -1,6 +1,7 @@
 # SeasonalBot
 
-[![Build Status](https://github.com/python-discord/seasonalbot/workflows/Lint,%20Build%20&%20Deploy/badge.svg?branch=master)
+[![Lint Badge][1]][2]
+[![Build Badge][3]][4]
 [![Discord](https://img.shields.io/static/v1?label=Python%20Discord&logo=discord&message=%3E100k%20members&color=%237289DA&logoColor=white)](https://discord.gg/2B963hn)
 
 A Discord bot for the Python Discord community which changes with the seasons, and provides useful event features.
@@ -17,3 +18,8 @@ This later evolved into a bot that runs all year, providing season-appropriate f
 Before you start, please take some time to read through our [contributing guidelines](CONTRIBUTING.md).
 
 See [Seasonalbot's Wiki](https://pythondiscord.com/pages/contributing/seasonalbot/) for in-depth guides on getting started with the project!
+
+[1]:https://github.com/python-discord/seasonalbot/workflows/Lint/badge.svg?branch=master
+[2]:https://github.com/python-discord/seasonalbot/actions?query=workflow%3ALint+branch%3Amaster
+[3]:https://github.com/python-discord/seasonalbot/workflows/Build/badge.svg?branch=master
+[4]:https://github.com/python-discord/seasonalbot/actions?query=workflow%3ABuild+branch%3Amaster
