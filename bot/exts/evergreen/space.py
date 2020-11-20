@@ -8,7 +8,7 @@ from discord import Embed
 from discord.ext import tasks
 from discord.ext.commands import BadArgument, Cog, Context, Converter, group
 
-from bot.bot import SeasonalBot
+from bot.bot import Bot
 from bot.constants import Tokens
 
 logger = logging.getLogger(__name__)
@@ -37,7 +37,7 @@ class DateConverter(Converter):
 class Space(Cog):
     """Space Cog contains commands, that show images, facts or other information about space."""
 
-    def __init__(self, bot: SeasonalBot):
+    def __init__(self, bot: Bot):
         self.bot = bot
         self.http_session = bot.http_session
 
@@ -240,7 +240,7 @@ class Space(Cog):
         ).set_image(url=image).set_footer(text="Powered by NASA API" + footer)
 
 
-def setup(bot: SeasonalBot) -> None:
+def setup(bot: Bot) -> None:
     """Load Space Cog."""
     if not Tokens.nasa:
         logger.warning("Can't find NASA API key. Not loading Space Cog.")

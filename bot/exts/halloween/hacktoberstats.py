@@ -193,7 +193,7 @@ class HacktoberStats(commands.Cog):
         For each PR:
         {
             "repo_url": str
-            "repo_shortname": str (e.g. "python-discord/seasonalbot")
+            "repo_shortname": str (e.g. "python-discord/sir-lancebot")
             "created_at": datetime.datetime
             "number": int
         }
@@ -360,10 +360,10 @@ class HacktoberStats(commands.Cog):
         """
         Extract shortname from https://api.github.com/repos/* URL.
 
-        e.g. "https://api.github.com/repos/python-discord/seasonalbot"
+        e.g. "https://api.github.com/repos/python-discord/sir-lancebot"
              |
              V
-             "python-discord/seasonalbot"
+             "python-discord/sir-lancebot"
         """
         exp = r"https?:\/\/api.github.com\/repos\/([/\-\_\.\w]+)"
         return re.findall(exp, in_url)[0]

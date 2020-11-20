@@ -68,13 +68,10 @@ class Channels(NamedTuple):
     off_topic_2 = 463035268514185226
     python = 267624335836053506
     reddit = 458224812528238616
-    seasonalbot_commands = int(environ.get("CHANNEL_SEASONALBOT_COMMANDS", 607247579608121354))
-    seasonalbot_voice = int(environ.get("CHANNEL_SEASONALBOT_VOICE", 606259004230074378))
+    community_bot_commands = int(environ.get("CHANNEL_COMMUNITY_BOT_COMMANDS", 607247579608121354))
     staff_lounge = 464905259261755392
     verification = 352442727016693763
     python_discussion = 267624335836053506
-    show_your_projects = int(environ.get("CHANNEL_SHOW_YOUR_PROJECTS", 303934982764625920))
-    show_your_projects_discussion = 360148304664723466
     hacktoberfest_2020 = 760857070781071431
     voice_chat = 412357430186344448
 
@@ -100,10 +97,10 @@ class Client(NamedTuple):
     name = "Sir Lancebot"
     guild = int(environ.get("BOT_GUILD", 267624335836053506))
     prefix = environ.get("PREFIX", ".")
-    token = environ.get("SEASONALBOT_TOKEN")
-    sentry_dsn = environ.get("SEASONALBOT_SENTRY_DSN")
-    debug = environ.get("SEASONALBOT_DEBUG", "").lower() == "true"
-    github_bot_repo = "https://github.com/python-discord/seasonalbot"
+    token = environ.get("BOT_TOKEN")
+    sentry_dsn = environ.get("BOT_SENTRY_DSN")
+    debug = environ.get("BOT_DEBUG", "").lower() == "true"
+    github_bot_repo = "https://github.com/python-discord/sir-lancebot"
     # Override seasonal locks: 1 (January) to 12 (December)
     month_override = int(environ["MONTH_OVERRIDE"]) if "MONTH_OVERRIDE" in environ else None
 
@@ -185,7 +182,7 @@ if Client.month_override is not None:
 
 
 class Roles(NamedTuple):
-    admin = int(environ.get("SEASONALBOT_ADMIN_ROLE_ID", 267628507062992896))
+    admin = int(environ.get("BOT_ADMIN_ROLE_ID", 267628507062992896))
     announcements = 463658397560995840
     champion = 430492892331769857
     contributor = 295488872404484098
@@ -225,6 +222,15 @@ class RedisConfig(NamedTuple):
     use_fakeredis = environ.get("USE_FAKEREDIS", "false").lower() == "true"
 
 
+class Wikipedia:
+    total_chance = 3
+
+
+class Source:
+    github = "https://github.com/python-discord/sir-lancebot"
+    github_avatar_url = "https://avatars1.githubusercontent.com/u/9919"
+
+
 # Default role combinations
 MODERATION_ROLES = Roles.moderator, Roles.admin, Roles.owner
 STAFF_ROLES = Roles.helpers, Roles.moderator, Roles.admin, Roles.owner
@@ -232,7 +238,7 @@ STAFF_ROLES = Roles.helpers, Roles.moderator, Roles.admin, Roles.owner
 # Whitelisted channels
 WHITELISTED_CHANNELS = (
     Channels.bot,
-    Channels.seasonalbot_commands,
+    Channels.community_bot_commands,
     Channels.off_topic_0,
     Channels.off_topic_1,
     Channels.off_topic_2,
@@ -309,10 +315,3 @@ POSITIVE_REPLIES = [
     "Aye aye, cap'n!",
     "I'll allow it.",
 ]
-
-class Wikipedia:
-    total_chance = 3
-
-class Source:
-    github = "https://github.com/python-discord/seasonalbot"
-    github_avatar_url = "https://avatars1.githubusercontent.com/u/9919"

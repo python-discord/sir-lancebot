@@ -1,10 +1,10 @@
 version: "3.7"
 services:
-  seasonalbot:
+  sir-lancebot:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: seasonalbot
+    container_name: sir-lancebot
     init: true
 
     restart: always
@@ -12,17 +12,15 @@ services:
       - redis
 
     environment:
-      - SEASONALBOT_TOKEN
-      - SEASONALBOT_DEBUG
-      - SEASONALBOT_GUILD
-      - SEASONALBOT_ADMIN_ROLE_ID
+      - BOT_TOKEN
+      - BOT_DEBUG
+      - BOT_GUILD
+      - BOT_ADMIN_ROLE_ID
       - CHANNEL_DEVLOG
-      - CHANNEL_SEASONALBOT_COMMANDS
+      - CHANNEL_COMMUNITY_BOT_COMMANDS
       - REDIS_HOST=redis
 
     volumes:
-      - /opt/pythondiscord/seasonalbot/log:/bot/bot/log
-      - /opt/pythondiscord/seasonalbot/data:/bot/data
       - .:/bot
 
   redis:
