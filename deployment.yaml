@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: seasonalbot
+  name: sir-lancebot
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: seasonalbot
+      app: sir-lancebot
   template:
     metadata:
       labels:
-        app: seasonalbot
+        app: sir-lancebot
     spec:
       containers:
-      - name: seasonalbot
-        image: ghcr.io/python-discord/seasonalbot:latest
+      - name: sir-lancebot
+        image: ghcr.io/python-discord/sir-lancebot:latest
         imagePullPolicy: Always
         envFrom:
         - secretRef:
-            name: seasonalbot-env
+            name: sir-lancebot-env

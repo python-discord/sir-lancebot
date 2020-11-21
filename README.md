@@ -1,4 +1,4 @@
-# SeasonalBot
+# Sir Lancebot
 
 [![Lint Badge][1]][2]
 [![Build Badge][3]][4]
@@ -17,9 +17,9 @@ This later evolved into a bot that runs all year, providing season-appropriate f
 ## Getting started
 Before you start, please take some time to read through our [contributing guidelines](CONTRIBUTING.md).
 
-See [Seasonalbot's Wiki](https://pythondiscord.com/pages/contributing/seasonalbot/) for in-depth guides on getting started with the project!
+See [Sir Lancebot's Wiki](https://pythondiscord.com/pages/contributing/sir-lancebot/) for in-depth guides on getting started with the project!
 
-[1]:https://github.com/python-discord/seasonalbot/workflows/Lint/badge.svg?branch=master
-[2]:https://github.com/python-discord/seasonalbot/actions?query=workflow%3ALint+branch%3Amaster
-[3]:https://github.com/python-discord/seasonalbot/workflows/Build/badge.svg?branch=master
-[4]:https://github.com/python-discord/seasonalbot/actions?query=workflow%3ABuild+branch%3Amaster
+[1]:https://github.com/python-discord/sir-lancebot/workflows/Lint/badge.svg?branch=master
+[2]:https://github.com/python-discord/sir-lancebot/actions?query=workflow%3ALint+branch%3Amaster
+[3]:https://github.com/python-discord/sir-lancebot/workflows/Build/badge.svg?branch=master
+[4]:https://github.com/python-discord/sir-lancebot/actions?query=workflow%3ABuild+branch%3Amaster

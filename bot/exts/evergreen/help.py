@@ -12,7 +12,7 @@ from discord.ext.commands import CheckFailure, Cog as DiscordCog, Command, Conte
 from fuzzywuzzy import fuzz, process
 
 from bot import constants
-from bot.bot import SeasonalBot
+from bot.bot import Bot
 from bot.constants import Emojis
 from bot.utils.pagination import (
     FIRST_EMOJI, LAST_EMOJI,
@@ -511,7 +511,7 @@ class Help(DiscordCog):
             await ctx.send(embed=embed)
 
 
-def unload(bot: SeasonalBot) -> None:
+def unload(bot: Bot) -> None:
     """
     Reinstates the original help command.
 
@@ -521,7 +521,7 @@ def unload(bot: SeasonalBot) -> None:
     bot.add_command(bot._old_help)
 
 
-def setup(bot: SeasonalBot) -> None:
+def setup(bot: Bot) -> None:
     """
     The setup for the help extension.
 
@@ -542,7 +542,7 @@ def setup(bot: SeasonalBot) -> None:
         raise
 
 
-def teardown(bot: SeasonalBot) -> None:
+def teardown(bot: Bot) -> None:
     """
     The teardown for the help extension.
 
