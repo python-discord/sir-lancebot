@@ -33,7 +33,7 @@ class Issues(commands.Cog):
         self,
         ctx: commands.Context,
         numbers: commands.Greedy[int],
-        repository: str = "seasonalbot",
+        repository: str = "sir-lancebot",
         user: str = "python-discord"
     ) -> None:
         """Command to retrieve issue(s) from a GitHub repository."""

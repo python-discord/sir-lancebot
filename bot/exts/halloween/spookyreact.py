@@ -29,13 +29,7 @@ class SpookyReact(Cog):
     @in_month(Month.OCTOBER)
     @Cog.listener()
     async def on_message(self, ctx: discord.Message) -> None:
-        """
-        A command to send the seasonalbot github project.
-
-        Lines that begin with the bot's command prefix are ignored
-
-        Seasonalbot's own messages are ignored
-        """
+        """Triggered when the bot sees a message in October."""
         for trigger in SPOOKY_TRIGGERS.keys():
             trigger_test = re.search(SPOOKY_TRIGGERS[trigger][0], ctx.content.lower())
             if trigger_test:
