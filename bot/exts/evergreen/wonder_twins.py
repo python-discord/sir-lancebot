@@ -19,7 +19,7 @@ class WonderTwins(Cog):
 
     @staticmethod
     def append_onto(phrase: str, insert_word: str) -> str:
-        """Appends one word onto the end of another phrase in order to format with proper the determiner"""
+        """Appends one word onto the end of another phrase in order to format with the proper determiner."""
         if insert_word.endswith("s"):
             phrase = phrase.split()
             del phrase[0]
