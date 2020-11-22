@@ -13,11 +13,13 @@ class WonderTwins(Cog):
 
         with open(Path.cwd() / "bot" / "resources" / "evergreen" / "wonder_twins.yaml", "r", encoding="utf-8") as f:
             info = yaml.load(f, Loader=yaml.FullLoader)
-            self.water_types, self.objects, self.adjectives = info["water_types"], info["objects"], info["adjectives"]
+            self.water_types = info["water_types"]
+            self.objects = info["objects"]
+            self.adjectives = info["adjectives"]
 
     @staticmethod
     def append_onto(phrase: str, insert_word: str) -> str:
-        """Appends one word onto the end of another phrase, used to format the use of 'an' or 'a'."""
+        """Appends one word onto the end of another phrase in order to format with proper the determiner"""
         if insert_word.endswith("s"):
             phrase = phrase.split()
             del phrase[0]
@@ -32,11 +34,9 @@ class WonderTwins(Cog):
         object_name = random.choice(self.objects)
         water_type = random.choice(self.water_types)
 
-        words = [object_name, water_type]
         if adjective:
-            new_object = self.append_onto(adjective, object_name)
-            words[0] = new_object
-        return f"{words[0]} of {words[1]}"
+            object_name = self.append_onto(adjective, object_name)
+        return f"{object_name} of {water_type}"
 
     @command(name="formof", aliases=["wondertwins", "wondertwin", "fo"])
     async def form_of(self, ctx: Context) -> None:
