@@ -26,4 +26,5 @@ bot.add_check(in_channel_check(*WHITELISTED_CHANNELS, bypass_roles=STAFF_ROLES))
 for ext in walk_extensions():
     bot.load_extension(ext)
 
+log.info("Get the coconuts, because Sir Lancebot is ready to mount his horse!")
 bot.run(Client.token)
