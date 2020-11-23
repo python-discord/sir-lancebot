@@ -44,10 +44,11 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          cache-from: type=registry,ref=ghcr.io/python-discord/seasonalbot:latest
+          cache-from: type=registry,ref=ghcr.io/python-discord/sir-lancebot:latest
+          cache-to: type=inline
           tags: |
-            ghcr.io/python-discord/seasonalbot:latest
-            ghcr.io/python-discord/seasonalbot:${{ steps.sha_tag.outputs.tag }}
+            ghcr.io/python-discord/sir-lancebot:latest
+            ghcr.io/python-discord/sir-lancebot:${{ steps.sha_tag.outputs.tag }}
 
       - name: Authenticate with Kubernetes
         uses: azure/k8s-set-context@v1
@@ -60,5 +61,5 @@ jobs:
         with:
           manifests: |
               deployment.yaml
-          images: 'ghcr.io/python-discord/seasonalbot:${{ steps.sha_tag.outputs.tag }}'
+          images: 'ghcr.io/python-discord/sir-lancebot:${{ steps.sha_tag.outputs.tag }}'
           kubectl-version: 'latest'
