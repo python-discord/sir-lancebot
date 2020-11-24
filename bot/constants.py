@@ -33,6 +33,7 @@ class AdventOfCode:
     leaderboard_cache_age_threshold_seconds = 3600
     leaderboard_public_ids = [645282]
     leaderboard_staff_id = 957532
+    # Public join codes in environment must be in same order than in AdventOfCode.leaderboard_public_ids
     leaderboard_public_join_codes = environ.get("AOC_PUBLIC_JOIN_CODES", "").split(",")
     leaderboard_staff_join_code = environ.get("AOC_STAFF_JOIN_CODE", "")
     leaderboard_max_displayed_members = 10
@@ -203,7 +204,9 @@ class Roles(NamedTuple):
 
 class Tokens(NamedTuple):
     giphy = environ.get("GIPHY_TOKEN")
-    aoc_session_cookie = environ.get("AOC_SESSION_COOKIE")
+    # Public AoC cookies in environment must be in same order than in AdventOfCode.leaderboard_public_ids
+    aoc_public_session_cookies = environ.get("AOC_PUBLIC_SESSION_COOKIES", "").split(",")
+    aoc_staff_session_cookie = environ.get("AOC_STAFF_SESSION_COOKIE")
     omdb = environ.get("OMDB_API_KEY")
     youtube = environ.get("YOUTUBE_API_KEY")
     tmdb = environ.get("TMDB_API_KEY")
