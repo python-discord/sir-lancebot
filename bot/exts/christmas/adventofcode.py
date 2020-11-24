@@ -25,7 +25,7 @@ AOC_SESSION_COOKIE = {"session": Tokens.aoc_session_cookie}
 EST = timezone("EST")
 COUNTDOWN_STEP = 60 * 5
 
-AOC_WHITELIST = WHITELISTED_CHANNELS + (Channels.advent_of_code,)
+AOC_WHITELIST = WHITELISTED_CHANNELS + (Channels.advent_of_code, Channels.advent_of_code_staff)
 
 
 def is_in_advent() -> bool:
