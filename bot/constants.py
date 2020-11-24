@@ -31,8 +31,10 @@ log = logging.getLogger(__name__)
 
 class AdventOfCode:
     leaderboard_cache_age_threshold_seconds = 3600
-    leaderboard_id = 631135
-    leaderboard_join_code = str(environ.get("AOC_JOIN_CODE", None))
+    leaderboard_public_ids = [645282]
+    leaderboard_staff_id = 957532
+    leaderboard_public_join_codes = environ.get("AOC_PUBLIC_JOIN_CODES", "").split(",")
+    leaderboard_staff_join_code = environ.get("AOC_STAFF_JOIN_CODE", "")
     leaderboard_max_displayed_members = 10
     year = int(environ.get("AOC_YEAR", datetime.utcnow().year))
     role_id = int(environ.get("AOC_ROLE_ID", 518565788744024082))
@@ -44,7 +46,8 @@ class Branding:
 
 class Channels(NamedTuple):
     admins = 365960823622991872
-    advent_of_code = int(environ.get("AOC_CHANNEL_ID", 517745814039166986))
+    advent_of_code = int(environ.get("AOC_CHANNEL_ID", 780818162836439041))
+    advent_of_code_staff = int(environ.get("AOC_STAFF_CHANNEL_ID", 778646502641500181))
     announcements = int(environ.get("CHANNEL_ANNOUNCEMENTS", 354619224620138496))
     big_brother_logs = 468507907357409333
     bot = 267659945086812160
