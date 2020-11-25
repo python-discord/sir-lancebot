@@ -9,18 +9,19 @@ from typing import List, Tuple
 
 import aiohttp
 import discord
+from async_rediscache import RedisCache
 from bs4 import BeautifulSoup
 from discord.ext import commands
 from pytz import timezone
 
+from bot.bot import Bot
 from bot.constants import AdventOfCode as AocConfig, Channels, Colours, Emojis, Month, Tokens, WHITELISTED_CHANNELS
 from bot.utils import unlocked_role
-from bot.utils.decorators import in_month, override_in_channel
+from bot.utils.decorators import in_month, override_in_channel, seasonal_task
 
 log = logging.getLogger(__name__)
 
 AOC_REQUEST_HEADER = {"user-agent": "PythonDiscord AoC Event Bot"}
-AOC_SESSION_COOKIE = {"session": Tokens.aoc_session_cookie}
 
 EST = timezone("EST")
 COUNTDOWN_STEP = 60 * 5
@@ -131,12 +132,19 @@ async def day_countdown(bot: commands.Bot) -> None:
 class AdventOfCode(commands.Cog):
     """Advent of Code festivities! Ho Ho Ho!"""
 
-    def __init__(self, bot: commands.Bot):
+    # Mapping for AoC PyDis community leaderboard IDs -> cached amount of members in leaderboard.
+    public_leaderboard_members = RedisCache()
+
+    # We don't want that users join to multiple leaderboards, so return only 1 code to user.
+    # User ID -> AoC leaderboard ID
+    user_join_codes = RedisCache()
+
+    def __init__(self, bot: Bot):
         self.bot = bot
 
         self._base_url = f"https://adventofcode.com/{AocConfig.year}"
         self.global_leaderboard_url = f"https://adventofcode.com/{AocConfig.year}/leaderboard"
-        self.private_leaderboard_url = f"{self._base_url}/leaderboard/private/view/{AocConfig.leaderboard_id}"
+        self.private_leaderboard_url = f"{self._base_url}/leaderboard/private/view/{AocConfig.leaderboard_staff_id}"
 
         self.about_aoc_filepath = Path("./bot/resources/advent_of_code/about.json")
         self.cached_about_aoc = self._build_about_embed()
@@ -146,12 +154,39 @@ class AdventOfCode(commands.Cog):
 
         self.countdown_task = None
         self.status_task = None
+        self.leaderboard_member_update_task = self.bot.loop.create_task(self.leaderboard_members_updater())
 
         countdown_coro = day_countdown(self.bot)
         self.countdown_task = self.bot.loop.create_task(countdown_coro)
 
         status_coro = countdown_status(self.bot)
         self.status_task = self.bot.loop.create_task(status_coro)
+
+        self.leaderboard_join_codes = {
+            aoc_id: join_code for aoc_id, join_code in zip(
+                AocConfig.leaderboard_public_ids, AocConfig.leaderboard_public_join_codes
+            )
+        }
+        self.leaderboard_cookies = {
+            aoc_id: cookie for aoc_id, cookie in zip(
+                AocConfig.leaderboard_public_ids, Tokens.aoc_public_session_cookies
+            )
+        }
+
+    @seasonal_task(Month.DECEMBER, sleep_time=60 * 30)
+    async def leaderboard_members_updater(self) -> None:
+        """Updates public leaderboards cached member amounts in every 30 minutes."""
+        # Whole December isn't advent
+        if not is_in_advent():
+            return
+
+        # Update every leaderboard for what we have session cookie
+        for aoc_id, cookie in self.leaderboard_cookies.items():
+            leaderboard = await AocPrivateLeaderboard.from_url(aoc_id, cookie)
+            log.info(leaderboard.members)
+            # Update only when API return any members
+            if len(leaderboard.members) > 0:
+                await self.public_leaderboard_members.set(aoc_id, len(leaderboard.members))
 
     @in_month(Month.DECEMBER)
     @commands.group(name="adventofcode", aliases=("aoc",))
@@ -234,9 +269,29 @@ class AdventOfCode(commands.Cog):
         author = ctx.message.author
         log.info(f"{author.name} ({author.id}) has requested the PyDis AoC leaderboard code")
 
+        if ctx.channel.id == Channels.advent_of_code_staff:
+            join_code = AocConfig.leaderboard_staff_join_code
+            log.info(f"{author.name} ({author.id}) ran command in staff AoC channel. Returning staff code.")
+        else:
+            # We want that user get only 1 code
+            if await self.user_join_codes.contains(ctx.author.id):
+                join_code = await self.user_join_codes.get(ctx.author.id)
+                log.info(f"{author.name} ({author.id}) have already cached AoC join code. Returning it.")
+            else:
+                least_id, least = 0, 200
+                for aoc_id, amount in await self.public_leaderboard_members.items():
+                    log.info(amount, least)
+                    if amount < least:
+                        least, least_id = amount, aoc_id
+
+                join_code = self.leaderboard_join_codes[least_id]
+                # Persist this code to Redis, so we can get it later again.
+                await self.user_join_codes.set(ctx.author.id, join_code)
+                log.info(f"{author.name} ({author.id}) got new join code. Persisted it to cache.")
+
         info_str = (
             "Head over to https://adventofcode.com/leaderboard/private "
-            f"with code `{AocConfig.leaderboard_join_code}` to join the PyDis private leaderboard!"
+            f"with code `{join_code}` to join the PyDis private leaderboard!"
         )
         try:
             await author.send(info_str)
@@ -580,8 +635,8 @@ class AocPrivateLeaderboard:
 
     @staticmethod
     async def json_from_url(
-        leaderboard_id: int = AocConfig.leaderboard_id, year: int = AocConfig.year
-    ) -> "AocPrivateLeaderboard":
+        leaderboard_id: int, cookie: str, year: int = AocConfig.year
+    ) -> dict:
         """
         Request the API JSON from Advent of Code for leaderboard_id for the specified year's event.
 
@@ -590,7 +645,7 @@ class AocPrivateLeaderboard:
         api_url = f"https://adventofcode.com/{year}/leaderboard/private/view/{leaderboard_id}.json"
 
         log.debug("Querying Advent of Code Private Leaderboard API")
-        async with aiohttp.ClientSession(cookies=AOC_SESSION_COOKIE, headers=AOC_REQUEST_HEADER) as session:
+        async with aiohttp.ClientSession(headers=AOC_REQUEST_HEADER, cookies={"session": cookie}) as session:
             async with session.get(api_url) as resp:
                 if resp.status == 200:
                     raw_dict = await resp.json()
@@ -608,9 +663,9 @@ class AocPrivateLeaderboard:
         )
 
     @classmethod
-    async def from_url(cls) -> "AocPrivateLeaderboard":
+    async def from_url(cls, leaderboard_id: int, cookie: str) -> "AocPrivateLeaderboard":
         """Helper wrapping of AocPrivateLeaderboard.json_from_url and AocPrivateLeaderboard.from_json."""
-        api_json = await cls.json_from_url()
+        api_json = await cls.json_from_url(leaderboard_id, cookie)
         return cls.from_json(api_json)
 
     @staticmethod
@@ -738,6 +793,6 @@ def _error_embed_helper(title: str, description: str) -> discord.Embed:
     return discord.Embed(title=title, description=description, colour=discord.Colour.red())
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Advent of Code Cog load."""
     bot.add_cog(AdventOfCode(bot))
