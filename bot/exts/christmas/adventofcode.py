@@ -136,8 +136,8 @@ class AdventOfCode(commands.Cog):
     public_leaderboard_members = RedisCache()
 
     # We don't want that users join to multiple leaderboards, so return only 1 code to user.
-    # User ID -> Join code
-    user_join_codes = RedisCache()
+    # User ID -> AoC Leaderboard ID
+    user_leaderboards = RedisCache()
 
     # We must keep track when user got (and what) stars, because we have multiple leaderboards.
     # Format: User ID -> AoCCachedMember (pickle)
@@ -400,8 +400,8 @@ class AdventOfCode(commands.Cog):
             log.info(f"{author.name} ({author.id}) ran command in staff AoC channel. Returning staff code.")
         else:
             # We want that user get only 1 code
-            if await self.user_join_codes.contains(ctx.author.id):
-                join_code = await self.user_join_codes.get(ctx.author.id)
+            if await self.user_leaderboards.contains(ctx.author.id):
+                join_code = self.leaderboard_join_codes[await self.user_leaderboards.get(ctx.author.id)]
                 log.info(f"{author.name} ({author.id}) have already cached AoC join code. Returning it.")
             else:
                 least_id, least = 0, 200
@@ -412,7 +412,7 @@ class AdventOfCode(commands.Cog):
 
                 join_code = self.leaderboard_join_codes[least_id]
                 # Persist this code to Redis, so we can get it later again.
-                await self.user_join_codes.set(ctx.author.id, join_code)
+                await self.user_leaderboards.set(ctx.author.id, least_id)
                 log.info(f"{author.name} ({author.id}) got new join code. Persisted it to cache.")
 
         info_str = (
@@ -465,6 +465,11 @@ class AdventOfCode(commands.Cog):
                 aoc_embed.set_author(
                     name="Advent of Code",
                     url=f"{self._base_url}/leaderboard/private/view/{AocConfig.leaderboard_staff_id}"
+                )
+            elif await self.user_leaderboards.contains(ctx.author.id):
+                aoc_embed.set_author(
+                    name="Advent of Code",
+                    url=f"{self._base_url}/leaderboard/private/view/{await self.user_leaderboards.get(ctx.author.id)}"
                 )
             else:
                 aoc_embed.set_author(name="Advent of Code")
