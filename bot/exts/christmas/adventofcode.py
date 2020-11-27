@@ -306,7 +306,9 @@ class AdventOfCode(commands.Cog):
             return False
 
         leaderboard_members = sorted(
-            [json.loads(data) for user, data in await self.public_user_data.items()], key=lambda k: k["score"]
+            [json.loads(data) for user, data in await self.public_user_data.items()],
+            key=lambda k: k.get("score", 0),
+            reverse=True
         )[:members_amount]
 
         stargroup = f"{Emojis.star}, {Emojis.star * 2}"
