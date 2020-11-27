@@ -3,6 +3,7 @@ import json
 import logging
 import math
 import re
+import typing
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import List, Tuple
@@ -202,6 +203,11 @@ class AdventOfCode(commands.Cog):
             for aoc_id, cookie in self.leaderboard_cookies.items()
         ]
 
+        # Check does this have any failed requests
+        if False in leaderboards:
+            log.warning("Unable to get one or more of the public leaderboards. Not updating cache.")
+            return
+
         for leaderboard in leaderboards:
             for member_id, data in leaderboard["members"].items():
                 leaderboard_users[int(member_id)] = {
@@ -281,15 +287,24 @@ class AdventOfCode(commands.Cog):
         async with self.staff_refresh_lock:
             secs = AocConfig.leaderboard_cache_age_threshold_seconds
             if self.staff_last_updated is None or self.staff_last_updated < datetime.utcnow() - timedelta(seconds=secs):
-                self.staff_last_updated = datetime.utcnow()
-                self.cached_staff_leaderboard = await AocPrivateLeaderboard.from_url(
+                leaderboard = await AocPrivateLeaderboard.from_url(
                     AocConfig.leaderboard_staff_id,
                     Tokens.aoc_staff_session_cookie
                 )
 
-    async def get_leaderboard(self, members_amount: int) -> str:
+                if leaderboard is not None:
+                    self.staff_last_updated = datetime.utcnow()
+                    self.cached_staff_leaderboard = leaderboard
+                else:
+                    log.warning("Can't update staff leaderboard. Got unexpected response.")
+
+    async def get_leaderboard(self, members_amount: int, context: commands.Context) -> typing.Union[str, bool]:
         """Generates leaderboard based on Redis data."""
-        await self.check_leaderboard()
+        # When we don't have users in cache, log warning and return False.
+        if await self.public_user_data.length() == 0:
+            log.warning("Don't have cache for displaying AoC public leaderboard.")
+            return False
+
         leaderboard_members = sorted(
             [json.loads(data) for user, data in await self.public_user_data.items()], key=lambda k: k["score"]
         )[:members_amount]
@@ -446,10 +461,22 @@ class AdventOfCode(commands.Cog):
 
             if staff:
                 await self.check_staff_leaderboard()
-                members_to_print = self.cached_staff_leaderboard.top_n(number_of_people_to_display)
-                table = AocPrivateLeaderboard.build_leaderboard_embed(members_to_print)
+                if self.cached_staff_leaderboard is not None:
+                    members_to_print = self.cached_staff_leaderboard.top_n(number_of_people_to_display)
+                    table = AocPrivateLeaderboard.build_leaderboard_embed(members_to_print)
+                else:
+                    log.warning("Missing AoC staff leaderboard cache.")
+                    table = False
             else:
-                table = await self.get_leaderboard(number_of_people_to_display)
+                await self.check_leaderboard()
+                table = await self.get_leaderboard(number_of_people_to_display, ctx)
+
+            # When we don't have cache, show it to user.
+            if table is False:
+                await ctx.send(
+                    ":x: Sorry, we can't get our leaderboard cache. Please let staff know about it."
+                )
+                return
 
             # Build embed
             aoc_embed = discord.Embed(
@@ -495,6 +522,9 @@ class AdventOfCode(commands.Cog):
             is_staff = ctx.channel.id == Channels.advent_of_code_staff
             if is_staff:
                 await self.check_staff_leaderboard()
+                if self.cached_staff_leaderboard is None:
+                    await ctx.send(":x: Missing leaderboard cache.")
+                    return
             else:
                 await self.check_leaderboard()
 
@@ -503,6 +533,9 @@ class AdventOfCode(commands.Cog):
                 total_members = len(self.cached_staff_leaderboard.members)
             else:
                 total_members = await self.public_user_data.length()
+                if total_members == 0:
+                    await ctx.send(":x: Missing leaderboard cache. Please notify staff about it.")
+                    return
 
             _star = Emojis.star
             header = f"{'Day':4}{_star:^8}{_star*2:^4}{'% ' + _star:^8}{'% ' + _star*2:^4}\n{'='*35}"
@@ -779,7 +812,7 @@ class AocPrivateLeaderboard:
     @staticmethod
     async def json_from_url(
         leaderboard_id: int, cookie: str, year: int = AocConfig.year
-    ) -> dict:
+    ) -> typing.Union[dict, bool]:
         """
         Request the API JSON from Advent of Code for leaderboard_id for the specified year's event.
 
@@ -791,10 +824,14 @@ class AocPrivateLeaderboard:
         async with aiohttp.ClientSession(headers=AOC_REQUEST_HEADER, cookies={"session": cookie}) as session:
             async with session.get(api_url) as resp:
                 if resp.status == 200:
-                    raw_dict = await resp.json()
+                    try:
+                        raw_dict = await resp.json()
+                    except aiohttp.ContentTypeError:
+                        log.warning(f"Got invalid response type from AoC API. Leaderboard ID {leaderboard_id}")
+                        return False
                 else:
                     log.warning(f"Bad response received from AoC ({resp.status}), check session cookie")
-                    resp.raise_for_status()
+                    return False
 
         return raw_dict
 
@@ -806,10 +843,13 @@ class AocPrivateLeaderboard:
         )
 
     @classmethod
-    async def from_url(cls, leaderboard_id: int, cookie: str) -> "AocPrivateLeaderboard":
+    async def from_url(cls, leaderboard_id: int, cookie: str) -> typing.Union["AocPrivateLeaderboard", None]:
         """Helper wrapping of AocPrivateLeaderboard.json_from_url and AocPrivateLeaderboard.from_json."""
         api_json = await cls.json_from_url(leaderboard_id, cookie)
-        return cls.from_json(api_json)
+        if api_json is not False:
+            return cls.from_json(api_json)
+        else:
+            return None
 
     @staticmethod
     def _sorted_members(injson: dict) -> list:
