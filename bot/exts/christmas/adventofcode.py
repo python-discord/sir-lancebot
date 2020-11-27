@@ -404,6 +404,7 @@ class AdventOfCode(commands.Cog):
                 join_code = self.leaderboard_join_codes[await self.user_leaderboards.get(ctx.author.id)]
                 log.info(f"{author.name} ({author.id}) have already cached AoC join code. Returning it.")
             else:
+                # Find leaderboard that have least members inside (based on cache)
                 least_id, least = 0, 200
                 for aoc_id, amount in await self.public_leaderboard_members.items():
                     log.info(amount, least)
