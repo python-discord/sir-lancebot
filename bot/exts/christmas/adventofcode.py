@@ -185,11 +185,11 @@ class AdventOfCode(commands.Cog):
     @seasonal_task(Month.DECEMBER, sleep_time=60 * 30)
     async def leaderboard_members_updater(self) -> None:
         """Updates public leaderboards cached member amounts in every 30 minutes."""
-        # Whole December isn't advent
+        # Check whether we are in the 25 days of advent
         if not is_in_advent():
             return
 
-        # Update every leaderboard for what we have session cookie
+        # Update every leaderboard with our session cookies
         for aoc_id, cookie in self.leaderboard_cookies.items():
             leaderboard = await AocPrivateLeaderboard.from_url(aoc_id, cookie)
             await self.public_leaderboard_members.set(aoc_id, len(leaderboard.members))
@@ -203,7 +203,7 @@ class AdventOfCode(commands.Cog):
             for aoc_id, cookie in self.leaderboard_cookies.items()
         ]
 
-        # Check does this have any failed requests
+        # Check if any requests failed
         if False in leaderboards:
             log.warning("Unable to get one or more of the public leaderboards. Not updating cache.")
             return
@@ -243,7 +243,7 @@ class AdventOfCode(commands.Cog):
                             "earned": datetime.fromtimestamp(user_data["days"][day]["star_two_earned"]),
                         })
 
-            # Sort these lists based on user star earning time
+            # Sort these lists based on the time a user earnt a star
             star_one_users = sorted(star_one_users, key=lambda k: k["earned"])[:100]
             star_two_users = sorted(star_two_users, key=lambda k: k["earned"])[:100]
 
@@ -263,7 +263,7 @@ class AdventOfCode(commands.Cog):
                     leaderboard_users[star_user_two["id"]]["score"] = points
                 points -= 1
 
-        # Put completions also in to make building easier later.
+        # Attach star completions for building the response later
         for user, user_data in leaderboard_users.items():
             completions_star_one = sum([1 for day in user_data["days"].values() if day["star_one"]])
             completions_star_two = sum([1 for day in user_data["days"].values() if day["star_two"]])
@@ -271,7 +271,7 @@ class AdventOfCode(commands.Cog):
             leaderboard_users[user]["star_one_completions"] = completions_star_one
             leaderboard_users[user]["star_two_completions"] = completions_star_two
 
-        # Finally clear old cache and persist everything to Redis
+        # Finally, clear old cache and persist everything to Redis
         await self.public_user_data.clear()
         [await self.public_user_data.set(user, json.dumps(user_data)) for user, user_data in leaderboard_users.items()]
 
@@ -300,7 +300,7 @@ class AdventOfCode(commands.Cog):
 
     async def get_leaderboard(self, members_amount: int, context: commands.Context) -> typing.Union[str, bool]:
         """Generates leaderboard based on Redis data."""
-        # When we don't have users in cache, log warning and return False.
+        # When we don't have users in cache, warn and return False.
         if await self.public_user_data.length() == 0:
             log.warning("Don't have cache for displaying AoC public leaderboard.")
             return False
@@ -414,12 +414,12 @@ class AdventOfCode(commands.Cog):
             join_code = AocConfig.leaderboard_staff_join_code
             log.info(f"{author.name} ({author.id}) ran command in staff AoC channel. Returning staff code.")
         else:
-            # We want that user get only 1 code
+            # Ensure we use the same leaderboard code for the same user
             if await self.user_leaderboards.contains(ctx.author.id):
                 join_code = self.leaderboard_join_codes[await self.user_leaderboards.get(ctx.author.id)]
-                log.info(f"{author.name} ({author.id}) have already cached AoC join code. Returning it.")
+                log.info(f"{author.name} ({author.id}) has a cached AoC join code, returning it.")
             else:
-                # Find leaderboard that have least members inside (based on cache)
+                # Find the leaderboard that has the least members inside from cache
                 least_id, least = 0, 200
                 for aoc_id, amount in await self.public_leaderboard_members.items():
                     log.info(amount, least)
