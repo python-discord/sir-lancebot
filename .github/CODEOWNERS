@@ -2,7 +2,7 @@
 * @Den4200
 
 # CI & Docker
-.github/workflows/**                    @Akarys42
+.github/workflows/**                    @Akarys42 @SebastiaanZ
 Dockerfile                              @Akarys42
 docker-compose.yml                      @Akarys42
 
