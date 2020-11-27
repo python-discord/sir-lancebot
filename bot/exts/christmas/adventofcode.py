@@ -191,9 +191,7 @@ class AdventOfCode(commands.Cog):
         # Update every leaderboard for what we have session cookie
         for aoc_id, cookie in self.leaderboard_cookies.items():
             leaderboard = await AocPrivateLeaderboard.from_url(aoc_id, cookie)
-            # Update only when API return any members
-            if len(leaderboard.members) > 0:
-                await self.public_leaderboard_members.set(aoc_id, len(leaderboard.members))
+            await self.public_leaderboard_members.set(aoc_id, len(leaderboard.members))
 
     async def refresh_leaderboard(self) -> None:
         """Updates public PyDis leaderboard scores based on dates."""
