@@ -2,7 +2,7 @@ import enum
 import logging
 from datetime import datetime
 from os import environ
-from typing import NamedTuple
+from typing import Dict, NamedTuple
 
 __all__ = (
     "AdventOfCode",
@@ -29,14 +29,42 @@ __all__ = (
 log = logging.getLogger(__name__)
 
 
+class AdventOfCodeLeaderboard(NamedTuple):
+    id: str
+    session: str
+    join_code: str
+
+
+def _parse_aoc_leaderboard_env() -> Dict[str, AdventOfCodeLeaderboard]:
+    """
+    Parse the environment variable containing leaderboard information.
+
+    A leaderboard should be specified in the format `id,session,join_code`,
+    without the backticks. If more than leaderboard needs to be added to the
+    constants, separate the individual leaderboards with `::`.
+
+    Example ENV: `id1,session1,join_code1::id2,session2,join_code2`
+    """
+    raw_leaderboards = environ.get("AOC_LEADERBOARDS", "")
+    if not raw_leaderboards:
+        return {}
+
+    leaderboards = {}
+    for leaderboard in raw_leaderboards.split("::"):
+        leaderboard_id, session, join_code = leaderboard.split(",")
+        leaderboards[leaderboard_id] = AdventOfCodeLeaderboard(leaderboard_id, session, join_code)
+
+    return leaderboards
+
+
 class AdventOfCode:
-    leaderboard_cache_age_threshold_seconds = 3600
-    leaderboard_public_ids = [645282]
-    leaderboard_staff_id = 957532
-    # Public join codes in environment must be in the same order as AdventOfCode.leaderboard_public_ids
-    leaderboard_public_join_codes = environ.get("AOC_PUBLIC_JOIN_CODES", "").split(",")
-    leaderboard_staff_join_code = environ.get("AOC_STAFF_JOIN_CODE", "")
-    leaderboard_max_displayed_members = 10
+    # Information for the several leaderboards we have
+    leaderboards = _parse_aoc_leaderboard_env()
+    staff_leaderboard_id = environ.get("AOC_STAFF_LEADERBOARD_ID", "")
+
+    # Other Advent of Code constants
+    leaderboard_displayed_members = 10
+    leaderboard_cache_expiry_seconds = 1800
     year = int(environ.get("AOC_YEAR", datetime.utcnow().year))
     role_id = int(environ.get("AOC_ROLE_ID", 518565788744024082))
 
@@ -197,9 +225,10 @@ class Roles(NamedTuple):
     muted = 277914926603829249
     owner = 267627879762755584
     verified = 352427296948486144
-    helpers = 267630620367257601
+    helpers = int(environ.get("ROLE_HELPERS", 267630620367257601))
     rockstars = 458226413825294336
     core_developers = 587606783669829632
+    events_lead = 778361735739998228
 
 
 class Tokens(NamedTuple):
