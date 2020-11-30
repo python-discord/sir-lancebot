@@ -1,10 +1,7 @@
-# Request Dennis for any PR
-* @Den4200
-
 # CI & Docker
-.github/workflows/**                    @Akarys42 @SebastiaanZ
-Dockerfile                              @Akarys42
-docker-compose.yml                      @Akarys42
+.github/workflows/**                    @Akarys42 @SebastiaanZ @Den4200
+Dockerfile                              @Akarys42 @Den4200
+docker-compose.yml                      @Akarys42 @Den4200
 
 # Tools
 Pipfile*                                @Akarys42
