@@ -282,6 +282,22 @@ class AdventOfCode(commands.Cog):
             await ctx.send(content=f"{header}\n\n{table}", embed=info_embed)
 
     @adventofcode_group.command(
+        name="global",
+        aliases=("globalboard", "gb"),
+        brief="Get a link to the global leaderboard",
+    )
+    @override_in_channel(AOC_WHITELIST)
+    async def aoc_global_leaderboard(self, ctx: commands.Context) -> None:
+        """Get a link to the global Advent of Code leaderboard."""
+        url = self.global_leaderboard_url
+        global_leaderboard = discord.Embed(
+            title="Advent of Code — Global Leaderboard",
+            description=f"You can find the global leaderboard [here]({url})."
+        )
+        global_leaderboard.set_thumbnail(url=_helpers.AOC_EMBED_THUMBNAIL)
+        await ctx.send(embed=global_leaderboard)
+
+    @adventofcode_group.command(
         name="stats",
         aliases=("dailystats", "ds"),
         brief="Get daily statistics for the Python Discord leaderboard"
