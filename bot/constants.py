@@ -232,9 +232,6 @@ class Roles(NamedTuple):
 
 class Tokens(NamedTuple):
     giphy = environ.get("GIPHY_TOKEN")
-    # Public AoC cookies in environment must be in the same order as AdventOfCode.leaderboard_public_ids
-    aoc_public_session_cookies = environ.get("AOC_PUBLIC_SESSION_COOKIES", "").split(",")
-    aoc_staff_session_cookie = environ.get("AOC_STAFF_SESSION_COOKIE")
     omdb = environ.get("OMDB_API_KEY")
     youtube = environ.get("YOUTUBE_API_KEY")
     tmdb = environ.get("TMDB_API_KEY")
