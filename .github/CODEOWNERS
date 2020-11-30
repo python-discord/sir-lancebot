@@ -1,2 +1,10 @@
-# Request Joe for any PR
-* @jb3
+# Request Dennis for any PR
+* @Den4200
+
+# CI & Docker
+.github/workflows/**                    @Akarys42 @SebastiaanZ
+Dockerfile                              @Akarys42
+docker-compose.yml                      @Akarys42
+
+# Tools
+Pipfile*                                @Akarys42
