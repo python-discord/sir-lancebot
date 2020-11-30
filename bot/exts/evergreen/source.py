@@ -38,7 +38,7 @@ class BotSource(commands.Cog):
     async def source_command(self, ctx: commands.Context, *, source_item: SourceConverter = None) -> None:
         """Display information and a GitHub link to the source code of a command, tag, or cog."""
         if not source_item:
-            embed = Embed(title="Seasonal Bot's GitHub Repository")
+            embed = Embed(title="Sir Lancebot's GitHub Repository")
             embed.add_field(name="Repository", value=f"[Go to GitHub]({Source.github})")
             embed.set_thumbnail(url=Source.github_avatar_url)
             await ctx.send(embed=embed)

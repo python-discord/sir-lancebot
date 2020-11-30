@@ -11,7 +11,7 @@ from discord import Colour, Embed
 from discord.ext import commands
 from discord.ext.commands import CheckFailure, Command, Context
 
-from bot.constants import Client, ERROR_REPLIES, Month
+from bot.constants import ERROR_REPLIES, Month
 from bot.utils import human_months, resolve_current_month
 
 ONE_DAY = 24 * 60 * 60
@@ -298,23 +298,3 @@ def locked() -> t.Union[t.Callable, None]:
                 return await func(self, ctx, *args, **kwargs)
         return inner
     return wrap
-
-
-def mock_in_debug(return_value: t.Any) -> t.Callable:
-    """
-    Short-circuit function execution if in debug mode and return `return_value`.
-
-    The original function name, and the incoming args and kwargs are DEBUG level logged
-    upon each call. This is useful for expensive operations, i.e. media asset uploads
-    that are prone to rate-limits but need to be tested extensively.
-    """
-    def decorator(func: t.Callable) -> t.Callable:
-        @functools.wraps(func)
-        async def wrapped(*args, **kwargs) -> t.Any:
-            """Short-circuit and log if in debug mode."""
-            if Client.debug:
-                log.debug(f"Function {func.__name__} called with args: {args}, kwargs: {kwargs}")
-                return return_value
-            return await func(*args, **kwargs)
-        return wrapped
-    return decorator
