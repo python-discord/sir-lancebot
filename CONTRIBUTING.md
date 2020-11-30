@@ -1,6 +1,6 @@
-# Contributing to Seasonalbot
+# Contributing to Sir Lancebot
 
-Seasonalbot is a community project for the Python Discord community over at https://discord.gg/python. We will be providing support for those of you who are new to Git, and this project is to be considered educational.
+Sir Lancebot is a community project for the Python Discord community over at https://discord.gg/python. We will be providing support for those of you who are new to Git, and this project is to be considered educational.
 
 Our projects are open-source and are automatically deployed whenever commits are pushed to the `master` branch on each repository, so we've created a set of guidelines in order to keep everything clean and in working order.
 
@@ -39,7 +39,7 @@ All projects evolve over time, and this contribution guide is no different. This
 
 ##  Supplemental Information
 ### Developer Environment
-Seasonalbot utilizes [Pipenv](https://pipenv.readthedocs.io/en/latest/) for installation and dependency management. For users unfamiliar with the Pipenv workflow, Pipenv's documentation provides a [Basic Usage](https://pipenv.readthedocs.io/en/latest/basics/) tutorial, along with some of the more advanced workflows. A project-specific installation guide can be found in [Seasonalbot's README](https://github.com/python-discord/seasonalbot/blob/master/README.md).
+Sir Lancebot utilizes [Pipenv](https://pipenv.readthedocs.io/en/latest/) for installation and dependency management. For users unfamiliar with the Pipenv workflow, Pipenv's documentation provides a [Basic Usage](https://pipenv.readthedocs.io/en/latest/basics/) tutorial, along with some of the more advanced workflows. A project-specific installation guide can be found in [Sir Lancebot's README](https://github.com/python-discord/sir-lancebot/blob/master/README.md).
 
 When pulling down changes from GitHub, remember to sync your environment using `pipenv sync --dev` to ensure you're using the most up-to-date versions the project's dependencies.
 
