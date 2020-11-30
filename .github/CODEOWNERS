@@ -1,1 +1,7 @@
-* @python-discord/core-developers
+# CI & Docker
+.github/workflows/**                    @Akarys42 @SebastiaanZ @Den4200
+Dockerfile                              @Akarys42 @Den4200
+docker-compose.yml                      @Akarys42 @Den4200
+
+# Tools
+Pipfile*                                @Akarys42
