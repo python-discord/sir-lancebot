@@ -241,9 +241,10 @@ class AdventOfCode(commands.Cog):
 
         if not join_code:
             log.error(f"Failed to get a join code for user {author} ({author.id})")
-            error_embed = _error_embed_helper(
+            error_embed = discord.Embed(
                 title="Unable to get join code",
-                description="Failed to get a join code to one of our boards. Please notify staff."
+                description="Failed to get a join code to one of our boards. Please notify staff.",
+                colour=discord.Colour.red(),
             )
             await ctx.send(embed=error_embed)
             return
@@ -346,8 +347,3 @@ class AdventOfCode(commands.Cog):
 
         about_embed.set_footer(text="Last Updated")
         return about_embed
-
-
-def _error_embed_helper(title: str, description: str) -> discord.Embed:
-    """Return a red-colored Embed with the given title and description."""
-    return discord.Embed(title=title, description=description, colour=discord.Colour.red())
