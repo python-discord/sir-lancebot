@@ -40,8 +40,8 @@ def _parse_aoc_leaderboard_env() -> Dict[str, AdventOfCodeLeaderboard]:
     Parse the environment variable containing leaderboard information.
 
     A leaderboard should be specified in the format `id,session,join_code`,
-    without the backticks. If more than leaderboard needs to be added to the
-    constants, separate the individual leaderboards with `::`.
+    without the backticks. If more than one leaderboard needs to be added to
+    the constant, separate the individual leaderboards with `::`.
 
     Example ENV: `id1,session1,join_code1::id2,session2,join_code2`
     """

@@ -102,10 +102,13 @@ def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
         sorted(leaderboard.items(), key=lambda t: t[1]["score"], reverse=True)
     )
 
+    # Create summary stats for the stars completed for each day of the event.
     daily_stats = {}
     for day in range(1, 26):
         star_one = len(star_results.get((day, 1), []))
         star_two = len(star_results.get((day, 1), []))
+        # By using a dictionary instead of namedtuple here, we can serialize
+        # this data to JSON in order to cache it in Redis.
         daily_stats[day] = {"star_one": star_one, "star_two": star_two}
 
     return {"daily_stats": daily_stats, "leaderboard": sorted_leaderboard}

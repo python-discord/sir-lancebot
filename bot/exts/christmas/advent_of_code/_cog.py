@@ -230,7 +230,7 @@ class AdventOfCode(commands.Cog):
     @adventofcode_group.command(name="join", aliases=("j",), brief="Learn how to join the leaderboard (via DM)")
     @override_in_channel(AOC_WHITELIST)
     async def join_leaderboard(self, ctx: commands.Context) -> None:
-        """DM the user the information for joining the PyDis AoC private leaderboard."""
+        """DM the user the information for joining the Python Discord leaderboard."""
         author = ctx.message.author
         log.info(f"{author.name} ({author.id}) has requested a PyDis AoC leaderboard code")
 
@@ -284,7 +284,7 @@ class AdventOfCode(commands.Cog):
     @adventofcode_group.command(
         name="stats",
         aliases=("dailystats", "ds"),
-        brief="Get daily statistics for the PyDis private leaderboard"
+        brief="Get daily statistics for the Python Discord leaderboard"
     )
     @override_in_channel(AOC_WHITELIST)
     async def private_leaderboard_daily_stats(self, ctx: commands.Context) -> None:

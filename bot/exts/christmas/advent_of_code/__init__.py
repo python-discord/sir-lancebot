@@ -2,7 +2,7 @@ from bot.bot import Bot
 
 
 def setup(bot: Bot) -> None:
-    """Advent of Code Cog load."""
+    """Set up the Advent of Code extension."""
     # Import the Cog at runtime to prevent side effects like defining
     # RedisCache instances too early.
     from ._cog import AdventOfCode
