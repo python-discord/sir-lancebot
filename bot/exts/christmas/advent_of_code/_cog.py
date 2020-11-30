@@ -127,7 +127,6 @@ class AdventOfCode(commands.Cog):
         status_coro = countdown_status(self.bot)
         self.status_task = self.bot.loop.create_task(status_coro)
 
-    @in_month(Month.DECEMBER)
     @commands.group(name="adventofcode", aliases=("aoc",))
     @override_in_channel(AOC_WHITELIST)
     async def adventofcode_group(self, ctx: commands.Context) -> None:
@@ -143,6 +142,11 @@ class AdventOfCode(commands.Cog):
     @override_in_channel(AOC_WHITELIST)
     async def aoc_subscribe(self, ctx: commands.Context) -> None:
         """Assign the role for notifications about new days being ready."""
+        current_year = datetime.now().year
+        if current_year != AocConfig.year:
+            await ctx.send(f"You can't subscribe to {current_year}'s Advent of Code announcements yet!")
+            return
+
         role = ctx.guild.get_role(AocConfig.role_id)
         unsubscribe_command = f"{ctx.prefix}{ctx.command.root_parent} unsubscribe"
 
@@ -154,6 +158,7 @@ class AdventOfCode(commands.Cog):
             await ctx.send("Hey, you already are receiving notifications about new Advent of Code tasks. "
                            f"If you don't want them any more, run `{unsubscribe_command}` instead.")
 
+    @in_month(Month.DECEMBER)
     @adventofcode_group.command(name="unsubscribe", aliases=("unsub",), brief="Notifications for new days")
     @override_in_channel(AOC_WHITELIST)
     async def aoc_unsubscribe(self, ctx: commands.Context) -> None:
@@ -205,6 +210,11 @@ class AdventOfCode(commands.Cog):
     @override_in_channel(AOC_WHITELIST)
     async def join_leaderboard(self, ctx: commands.Context) -> None:
         """DM the user the information for joining the Python Discord leaderboard."""
+        current_year = datetime.now().year
+        if current_year != AocConfig.year:
+            await ctx.send(f"The Python Discord leaderboard for {current_year} is not yet available!")
+            return
+
         author = ctx.message.author
         log.info(f"{author.name} ({author.id}) has requested a PyDis AoC leaderboard code")
 
