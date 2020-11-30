@@ -233,12 +233,14 @@ class AdventOfCode(commands.Cog):
             await ctx.send(embed=error_embed)
             return
 
-        info_str = (
-            "Head over to https://adventofcode.com/leaderboard/private "
-            f"with code `{join_code}` to join the Python Discord leaderboard!"
-        )
+        info_str = [
+            "To join our leaderboard, follow these steps:",
+            "• Log in on https://adventofcode.com",
+            "• Head over to https://adventofcode.com/leaderboard/private",
+            f"• Use this code `{join_code}` to join the Python Discord leaderboard!",
+        ]
         try:
-            await author.send(info_str)
+            await author.send("\n".join(info_str))
         except discord.errors.Forbidden:
             log.debug(f"{author.name} ({author.id}) has disabled DMs from server members")
             await ctx.send(f":x: {author.mention}, please (temporarily) enable DMs to receive the join code")
