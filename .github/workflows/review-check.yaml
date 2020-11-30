@@ -1,0 +1,166 @@
+name: Review Check
+
+# This workflow needs to trigger in two situations:
+#
+# 1. When a pull request is opened, reopened, or synchronized (new commit)
+# This is accomplished using the `pull_request_target` event that triggers in
+# precisely those situations by default. I've opted for `pull_request_target`
+# as we don't need to have access to the PR's code and it's safer to make the
+# secrets we need available to the workflow compared to `pull_request`.
+#
+# The reason we need to run the workflow for this event is because we need to
+# make sure that our check is part of the check suite for the current commit.
+#
+# 2. When a review is added or dismissed.
+# Whenever reviews are submitted or dismissed, the number of Core Developer
+# approvals may obviously change.
+#
+# ---
+#
+# Unfortunately, having two different event triggers means that can't let
+# this workflow fail on its own, as GitHub actions registers a separate check
+# run result per event trigger. As both triggers need to share the success/fail
+# state, we get around that by registering a custom "status".
+on:
+  pull_request_review:
+    types:
+      - submitted
+      - dismissed
+  pull_request_target:
+
+
+jobs:
+  review-check:
+    name:  Check Core Dev Reviews
+    runs-on: ubuntu-latest
+
+    steps:
+      # Fetch the latest Opinionated reviews from users with write
+      # access. We can't narrow it down using a specific team here
+      # yet, so we'll do that later.
+      - uses: octokit/graphql-action@v2.x
+        id: reviews
+        with:
+          query: |
+            query ($repository: String!, $pr: Int!) {
+              repository(owner: "python-discord", name: $repository) {
+                pullRequest(number: $pr) {
+                  latestOpinionatedReviews(last: 100, writersOnly: true) {
+                    nodes{
+                      author{
+                        login
+                      }
+                      state
+                    }
+                  }
+                }
+              }
+            }
+          repository: ${{ github.event.repository.name }}
+          pr: ${{ github.event.pull_request.number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+
+      # Fetch the members of the Core Developers team so we can
+      # check if any of them actually approved this PR.
+      - uses: octokit/graphql-action@v2.x
+        id: core_developers
+        with:
+          query: |
+            query {
+              organization(login: "python-discord") {
+                team(slug: "core-developers") {
+                  members(first: 100) {
+                    nodes {
+                      login
+                    }
+                  }
+                }
+              }
+            }
+        env:
+          GITHUB_TOKEN: ${{ secrets.TEAM_TOKEN }}
+
+      # I've opted for a Python script, as that's what most of us
+      # are familiar with. We do need to setup Python for that.
+      - name: Setup python
+        id: python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      # This is a small, inline Python script that looks for the
+      # intersection between approving reviewers and the core dev
+      # team. If that intersection exists, we have at least one
+      # approving Core Developer.
+      #
+      # I've opted to keep this inline as it's relatively small
+      # and this workflow will be added to multiple repositories.
+      - name: Check for Accepting Core Developers
+        id: core_dev_reviews
+        run: |
+          python -c 'import json
+          reviews = json.loads("""${{ steps.reviews.outputs.data }}""")
+          reviewers = {
+              review["author"]["login"]
+              for review in reviews["repository"]["pullRequest"]["latestOpinionatedReviews"]["nodes"]
+              if review["state"] == "APPROVED"
+          }
+          core_devs = json.loads("""${{ steps.core_developers.outputs.data }}""")
+          core_devs = {
+              member["login"] for member in core_devs["organization"]["team"]["members"]["nodes"]
+          }
+          approving_core_devs = reviewers & core_devs
+          approval_check = "success" if approving_core_devs else "failure"
+          print(f"::set-output name=approval_check::{approval_check}")
+          '
+
+      # This step registers a a new status for the head commit of the pull
+      # request. If a status with the same context and description already
+      # exists, it will be overwritten. The reason we have to do this is
+      # because workflows run for the separate `pull_request_target` and
+      #`pull_request_review` events need to share a single result state.
+      - name: Add Core Dev Approval status check
+        uses: octokit/request-action@v2.x
+        with:
+          route: POST /repos/:repository/statuses/:sha
+          repository: ${{ github.repository }}
+          sha: ${{ github.event.pull_request.head.sha }}
+          state: ${{ steps.core_dev_reviews.outputs.approval_check }}
+          description: At least one core developer needs to approve this PR
+          context: Core Dev Approval
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # If we have at least one Core Developer approval, this step
+      # removes the 'waiting for core dev approval' label if it's
+      # still present for the PR.
+      - name: Remove "waiting for core dev approval" if a core dev approved this PR
+        if: >-
+          steps.core_dev_reviews.outputs.approval_check == 'success' &&
+          contains(github.event.pull_request.labels.*.name, 'waiting for core dev approval')
+        uses: octokit/request-action@v2.x
+        with:
+          route: DELETE /repos/:repository/issues/:number/labels/:label
+          repository: ${{ github.repository }}
+          number: ${{ github.event.pull_request.number }}
+          label: needs core dev approval
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # If we have do not have one Core Developer approval, this step
+      # adds the 'waiting for core dev approval' label if it's not
+      # already present for the PR.
+      - name: Add "waiting for core dev approval" if no core dev has approved yet
+        if: >-
+          steps.core_dev_reviews.outputs.approval_check == 'failure' &&
+          !contains(github.event.pull_request.labels.*.name, 'waiting for core dev approval')
+        uses: octokit/request-action@v2.x
+        with:
+          route: POST /repos/:repository/issues/:number/labels
+          repository: ${{ github.repository }}
+          number: ${{ github.event.pull_request.number }}
+          labels: |
+            - needs core dev approval
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
