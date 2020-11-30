@@ -24,7 +24,7 @@ AOC_REQUEST_HEADER = {"user-agent": "PythonDiscord AoC Event Bot"}
 EST = timezone("EST")
 COUNTDOWN_STEP = 60 * 5
 
-AOC_WHITELIST = WHITELISTED_CHANNELS + (Channels.advent_of_code, Channels.advent_of_code_staff)
+AOC_WHITELIST = WHITELISTED_CHANNELS + (Channels.advent_of_code,)
 
 
 def is_in_advent() -> bool:
