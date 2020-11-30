@@ -4,9 +4,11 @@ import json
 import logging
 import operator
 import typing
+from typing import Tuple
 
 import aiohttp
 import discord
+import pytz
 
 from bot.constants import AdventOfCode, Colours
 from bot.exts.christmas.advent_of_code import _caches
@@ -41,6 +43,9 @@ AOC_EMBED_THUMBNAIL = (
     "https://raw.githubusercontent.com/python-discord"
     "/branding/master/seasonal/christmas/server_icons/festive_256.gif"
 )
+
+# Create an easy constant for the EST timezone
+EST = pytz.timezone("EST")
 
 # Create namedtuple that combines a participant's name and their completion
 # time for a specific star. We're going to use this later to order the results
@@ -313,3 +318,31 @@ async def get_public_join_code(author: discord.Member) -> typing.Optional[str]:
 
     # Return the join code for this board
     return AdventOfCode.leaderboards[best_board].join_code
+
+
+def is_in_advent() -> bool:
+    """
+    Check if we're currently on an Advent of Code day, excluding 25 December.
+
+    This helper function is used to check whether or not a feature that prepares
+    something for the next Advent of Code challenge should run. As the puzzle
+    published on the 25th is the last puzzle, this check excludes that date.
+    """
+    return datetime.datetime.now(EST).day in range(1, 25) and datetime.datetime.now(EST).month == 12
+
+
+def time_left_to_aoc_midnight() -> Tuple[datetime.datetime, datetime.timedelta]:
+    """Calculates the amount of time left until midnight in UTC-5 (Advent of Code maintainer timezone)."""
+    # Change all time properties back to 00:00
+    todays_midnight = datetime.datetime.now(EST).replace(
+        microsecond=0,
+        second=0,
+        minute=0,
+        hour=0
+    )
+
+    # We want tomorrow so add a day on
+    tomorrow = todays_midnight + datetime.timedelta(days=1)
+
+    # Calculate the timedelta between the current time and midnight
+    return tomorrow, tomorrow - datetime.datetime.now(EST)

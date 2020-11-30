@@ -4,11 +4,9 @@ import logging
 import math
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Tuple
 
 import discord
 from discord.ext import commands
-from pytz import timezone
 
 from bot.bot import Bot
 from bot.constants import (
@@ -21,39 +19,15 @@ log = logging.getLogger(__name__)
 
 AOC_REQUEST_HEADER = {"user-agent": "PythonDiscord AoC Event Bot"}
 
-EST = timezone("EST")
 COUNTDOWN_STEP = 60 * 5
 
 AOC_WHITELIST = WHITELISTED_CHANNELS + (Channels.advent_of_code,)
 
 
-def is_in_advent() -> bool:
-    """Utility function to check if we are between December 1st and December 25th."""
-    # Run the code from the 1st to the 24th
-    return datetime.now(EST).day in range(1, 25) and datetime.now(EST).month == 12
-
-
-def time_left_to_aoc_midnight() -> Tuple[datetime, timedelta]:
-    """Calculates the amount of time left until midnight in UTC-5 (Advent of Code maintainer timezone)."""
-    # Change all time properties back to 00:00
-    todays_midnight = datetime.now(EST).replace(
-        microsecond=0,
-        second=0,
-        minute=0,
-        hour=0
-    )
-
-    # We want tomorrow so add a day on
-    tomorrow = todays_midnight + timedelta(days=1)
-
-    # Calculate the timedelta between the current time and midnight
-    return tomorrow, tomorrow - datetime.now(EST)
-
-
 async def countdown_status(bot: commands.Bot) -> None:
     """Set the playing status of the bot to the minutes & hours left until the next day's challenge."""
-    while is_in_advent():
-        _, time_left = time_left_to_aoc_midnight()
+    while _helpers.is_in_advent():
+        _, time_left = _helpers.time_left_to_aoc_midnight()
 
         aligned_seconds = int(math.ceil(time_left.seconds / COUNTDOWN_STEP)) * COUNTDOWN_STEP
         hours, minutes = aligned_seconds // 3600, aligned_seconds // 60 % 60
@@ -84,8 +58,8 @@ async def day_countdown(bot: commands.Bot) -> None:
     Once we have calculated this we should then sleep that number and when the time is reached, ping
     the Advent of Code role notifying them that the new challenge is ready.
     """
-    while is_in_advent():
-        tomorrow, time_left = time_left_to_aoc_midnight()
+    while _helpers.is_in_advent():
+        tomorrow, time_left = _helpers.time_left_to_aoc_midnight()
 
         # Prevent bot from being slightly too early in trying to announce today's puzzle
         await asyncio.sleep(time_left.seconds + 1)
@@ -196,12 +170,12 @@ class AdventOfCode(commands.Cog):
     @override_in_channel(AOC_WHITELIST)
     async def aoc_countdown(self, ctx: commands.Context) -> None:
         """Return time left until next day."""
-        if not is_in_advent():
-            datetime_now = datetime.now(EST)
+        if not _helpers.is_in_advent():
+            datetime_now = datetime.now(_helpers.EST)
 
             # Calculate the delta to this & next year's December 1st to see which one is closest and not in the past
-            this_year = datetime(datetime_now.year, 12, 1, tzinfo=EST)
-            next_year = datetime(datetime_now.year + 1, 12, 1, tzinfo=EST)
+            this_year = datetime(datetime_now.year, 12, 1, tzinfo=_helpers.EST)
+            next_year = datetime(datetime_now.year + 1, 12, 1, tzinfo=_helpers.EST)
             deltas = (dec_first - datetime_now for dec_first in (this_year, next_year))
             delta = min(delta for delta in deltas if delta >= timedelta())  # timedelta() gives 0 duration delta
 
@@ -215,7 +189,7 @@ class AdventOfCode(commands.Cog):
                            f"The next event will start in {delta_str}.")
             return
 
-        tomorrow, time_left = time_left_to_aoc_midnight()
+        tomorrow, time_left = _helpers.time_left_to_aoc_midnight()
 
         hours, minutes = time_left.seconds // 3600, time_left.seconds // 60 % 60
 
