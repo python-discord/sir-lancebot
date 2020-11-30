@@ -1083,13 +1083,13 @@ class Snakes(Cog):
             url,
             params={
                 "part": "snippet",
-                "q": urllib.parse.quote(query),
+                "q": urllib.parse.quote_plus(query),
                 "type": "video",
                 "key": Tokens.youtube
             }
         )
         response = await response.json()
-        data = response['items']
+        data = response.get("items", [])
 
         # Send the user a video
         if len(data) > 0:

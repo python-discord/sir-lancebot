@@ -8,7 +8,7 @@ from discord.ext import commands
 from discord.ext.commands import Context, group
 
 from bot import exts
-from bot.bot import SeasonalBot as Bot
+from bot.bot import Bot
 from bot.constants import Client, Emojis, MODERATION_ROLES, Roles
 from bot.utils.checks import with_role_check
 from bot.utils.extensions import EXTENSIONS, unqualify
