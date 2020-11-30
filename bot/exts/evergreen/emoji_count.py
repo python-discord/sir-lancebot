@@ -1,12 +1,14 @@
 import datetime
 import logging
 import random
-from typing import Dict, Optional
+from collections import defaultdict
+from typing import List, Tuple
 
 import discord
 from discord.ext import commands
 
 from bot.constants import Colours, ERROR_REPLIES
+from bot.utils.pagination import LinePaginator
 
 log = logging.getLogger(__name__)
 
@@ -17,73 +19,77 @@ class EmojiCount(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    def embed_builder(self, emoji: dict) -> discord.Embed:
+    @staticmethod
+    def embed_builder(emoji: dict) -> Tuple[discord.Embed, List[str]]:
         """Generates an embed with the emoji names and count."""
         embed = discord.Embed(
             color=Colours.orange,
             title="Emoji Count",
             timestamp=datetime.datetime.utcnow()
         )
+        msg = []
 
         if len(emoji) == 1:
-            for key, value in emoji.items():
-                embed.description = f"There are **{len(value)}** emojis in the **{key}** category"
-                embed.set_thumbnail(url=random.choice(value).url)
+            for category_name, category_emojis in emoji.items():
+                if len(category_emojis) == 1:
+                    msg.append(f"There is **{len(category_emojis)}** emoji in **{category_name}** category")
+                else:
+                    msg.append(f"There are **{len(category_emojis)}** emojis in **{category_name}** category")
+                embed.set_thumbnail(url=random.choice(category_emojis).url)
+
         else:
-            msg = ''
-            for key, value in emoji.items():
-                emoji_choice = random.choice(value)
-                emoji_info = f'There are **{len(value)}** emojis in the **{key}** category\n'
-                msg += f'<:{emoji_choice.name}:{emoji_choice.id}> {emoji_info}'
-            embed.description = msg
-        return embed
+            for category_name, category_emojis in emoji.items():
+                emoji_choice = random.choice(category_emojis)
+                if len(category_emojis) > 1:
+                    emoji_info = f"There are **{len(category_emojis)}** emojis in **{category_name}** category"
+                else:
+                    emoji_info = f"There is **{len(category_emojis)}** emoji in **{category_name}** category"
+                if emoji_choice.animated:
+                    msg.append(f'<a:{emoji_choice.name}:{emoji_choice.id}> {emoji_info}')
+                else:
+                    msg.append(f'<:{emoji_choice.name}:{emoji_choice.id}> {emoji_info}')
+        return embed, msg
 
     @staticmethod
-    def generate_invalid_embed(ctx: commands.Context) -> discord.Embed:
-        """Genrates error embed."""
+    def generate_invalid_embed(emojis: list) -> Tuple[discord.Embed, List[str]]:
+        """Generates error embed."""
         embed = discord.Embed(
             color=Colours.soft_red,
             title=random.choice(ERROR_REPLIES)
         )
+        msg = []
 
-        emoji_dict = {}
-        for emoji in ctx.guild.emojis:
-            emoji_dict[emoji.name.split("_")[0]] = []
+        emoji_dict = defaultdict(list)
+        for emoji in emojis:
+            emoji_dict[emoji.name.split("_")[0]].append(emoji)
 
-        error_comp = ', '.join(key for key in emoji_dict.keys())
-        embed.description = f"These are the valid categories\n```{error_comp}```"
-        return embed
+        error_comp = ', '.join(emoji_dict)
+        msg.append(f"These are the valid categories\n```{error_comp}```")
+        return embed, msg
 
-    def emoji_list(self, ctx: commands.Context, categories: dict) -> Dict:
-        """Generates an embed with the emoji names and count."""
-        out = {category: [] for category in categories}
-
-        for emoji in ctx.guild.emojis:
-            category = emoji.name.split('_')[0]
-            if category in out:
-                out[category].append(emoji)
-        return out
-
-    @commands.command(name="emoji_count", aliases=["ec"])
-    async def ec(self, ctx: commands.Context, *, emoji: str = None) -> Optional[str]:
+    @commands.command(name="emojicount", aliases=["ec", "emojis"])
+    async def emoji_count(self, ctx: commands.Context, *, category_query: str = None) -> None:
         """Returns embed with emoji category and info given by the user."""
-        emoji_dict = {}
+        emoji_dict = defaultdict(list)
 
-        for a in ctx.guild.emojis:
-            if emoji is None:
-                log.trace("Emoji Category not provided by the user")
-                emoji_dict.update({a.name.split("_")[0]: []})
-            elif a.name.split("_")[0] in emoji:
-                log.trace("Emoji Category provided by the user")
-                emoji_dict.update({a.name.split("_")[0]: []})
+        if not ctx.guild.emojis:
+            await ctx.send("No emojis found.")
+            return
+        log.trace(f"Emoji Category {'' if category_query else 'not '}provided by the user")
+        for emoji in ctx.guild.emojis:
+            emoji_category = emoji.name.split("_")[0]
 
-        emoji_dict = self.emoji_list(ctx, emoji_dict)
+            if category_query is not None and emoji_category not in category_query:
+                continue
 
-        if len(emoji_dict) == 0:
-            embed = self.generate_invalid_embed(ctx)
+            emoji_dict[emoji_category].append(emoji)
+
+        if not emoji_dict:
+            log.trace("Invalid name provided by the user")
+            embed, msg = self.generate_invalid_embed(ctx.guild.emojis)
         else:
-            embed = self.embed_builder(emoji_dict)
-        await ctx.send(embed=embed)
+            embed, msg = self.embed_builder(emoji_dict)
+        await LinePaginator.paginate(lines=msg, ctx=ctx, embed=embed)
 
 
 def setup(bot: commands.Bot) -> None:
