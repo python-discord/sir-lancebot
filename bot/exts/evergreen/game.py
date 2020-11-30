@@ -11,7 +11,7 @@ from discord import Embed
 from discord.ext import tasks
 from discord.ext.commands import Cog, Context, group
 
-from bot.bot import SeasonalBot
+from bot.bot import Bot
 from bot.constants import STAFF_ROLES, Tokens
 from bot.utils.decorators import with_role
 from bot.utils.pagination import ImagePaginator, LinePaginator
@@ -130,7 +130,7 @@ class AgeRatings(IntEnum):
 class Games(Cog):
     """Games Cog contains commands that collect data from IGDB."""
 
-    def __init__(self, bot: SeasonalBot):
+    def __init__(self, bot: Bot):
         self.bot = bot
         self.http_session: ClientSession = bot.http_session
 
@@ -415,7 +415,7 @@ class Games(Cog):
         return sorted((item for item in results if item[0] >= 0.60), reverse=True)[:4]
 
 
-def setup(bot: SeasonalBot) -> None:
+def setup(bot: Bot) -> None:
     """Add/Load Games cog."""
     # Check does IGDB API key exist, if not, log warning and don't load cog
     if not Tokens.igdb:
