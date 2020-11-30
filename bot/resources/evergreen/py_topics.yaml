@@ -1,0 +1,89 @@
+# Conversation starters for Python-related channels.
+
+# python-general
+267624335836053506:
+    - What's your favorite PEP?
+    - What's your current text editor/IDE, and what functionality do you like about it the most when programming in Python?
+    - What functionality is your text editor/IDE missing for programming Python?
+    - What parts of your life has Python automated, if any?
+    - Which Python project are you the most proud of making?
+    - What made you want to learn Python?
+    - When did you start learning Python?
+    - What reasons are you learning Python for?
+    - Where's the strangest place you've seen Python?
+    - How has learning Python changed your life?
+    - Is there a package you wish existed but doesn't? What is it?
+    - What feature do you think should be added to Python?
+    - Has Python helped you in school? If so, how?
+    - What was the first thing you created with Python?
+
+# async
+630504881542791169:
+    - Are there any frameworks you wish were async?
+    - How have coroutines changed the way you write Python?
+
+# c-extensions
+728390945384431688:
+    -
+
+# computer-science
+650401909852864553:
+    -
+
+# databases
+342318764227821568:
+    - Where do you get your best data?
+
+# data-science
+366673247892275221:
+    -
+
+# discord.py
+343944376055103488:
+    - What unique features does your bot contain, if any?
+    - What commands/features are you proud of making?
+    - What feature would you be the most interested in making?
+    - What feature would you like to see added to the library? what feature in the library do you think is redundant?
+    - Do you think there's a way in which Discord could handle bots better?
+
+# esoteric-python
+470884583684964352:
+    - What's a common part of programming we can make harder?
+    - What are the pros and cons of messing with __magic__()?
+
+# game-development
+660625198390837248:
+    -
+
+# microcontrollers
+545603026732318730:
+    -
+
+# networking
+716325106619777044:
+    - If you could wish for a library involving networking, what would it be?
+
+# security
+366674035876167691:
+    - If you could wish for a library involving net-sec, what would it be?
+
+# software-testing
+463035728335732738:
+    -
+
+# tools-and-devops
+463035462760792066:
+    - What editor would you recommend to a beginner? Why?
+    - What editor would you recommend to be the most efficient? Why?
+
+# unix
+491523972836360192:
+    -
+
+# user-interfaces
+338993628049571840:
+    - What's the most impressive Desktop Application you've made with Python so far?
+
+# web-development
+366673702533988363:
+    - How has Python helped you in web development?

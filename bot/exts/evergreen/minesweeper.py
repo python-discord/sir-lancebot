@@ -120,14 +120,14 @@ class Minesweeper(commands.Cog):
     def format_for_discord(board: GameBoard) -> str:
         """Format the board as a string for Discord."""
         discord_msg = (
-            ":stop_button:    :regional_indicator_a::regional_indicator_b::regional_indicator_c:"
-            ":regional_indicator_d::regional_indicator_e::regional_indicator_f::regional_indicator_g:"
-            ":regional_indicator_h::regional_indicator_i::regional_indicator_j:\n\n"
+            ":stop_button:    :regional_indicator_a: :regional_indicator_b: :regional_indicator_c: "
+            ":regional_indicator_d: :regional_indicator_e: :regional_indicator_f: :regional_indicator_g: "
+            ":regional_indicator_h: :regional_indicator_i: :regional_indicator_j:\n\n"
         )
         rows = []
         for row_number, row in enumerate(board):
             new_row = f"{MESSAGE_MAPPING[row_number + 1]}    "
-            new_row += "".join(MESSAGE_MAPPING[cell] for cell in row)
+            new_row += " ".join(MESSAGE_MAPPING[cell] for cell in row)
             rows.append(new_row)
 
         discord_msg += "\n".join(rows)
@@ -141,21 +141,26 @@ class Minesweeper(commands.Cog):
             await ctx.message.delete(delay=2)
             return
 
+        try:
+            await ctx.author.send(
+                f"Play by typing: `{Client.prefix}ms reveal xy [xy]` or `{Client.prefix}ms flag xy [xy]` \n"
+                f"Close the game with `{Client.prefix}ms end`\n"
+            )
+        except discord.errors.Forbidden:
+            log.debug(f"{ctx.author.name} ({ctx.author.id}) has disabled DMs from server members")
+            await ctx.send(f":x: {ctx.author.mention}, please enable DMs to play minesweeper.")
+            return
+
         # Add game to list
         board: GameBoard = self.generate_board(bomb_chance)
         revealed_board: GameBoard = [["hidden"] * 10 for _ in range(10)]
+        dm_msg = await ctx.author.send(f"Here's your board!\n{self.format_for_discord(revealed_board)}")
 
         if ctx.guild:
             await ctx.send(f"{ctx.author.mention} is playing Minesweeper")
-            chat_msg = await ctx.send(f"Here's there board!\n{self.format_for_discord(revealed_board)}")
+            chat_msg = await ctx.send(f"Here's their board!\n{self.format_for_discord(revealed_board)}")
         else:
             chat_msg = None
-
-        await ctx.author.send(
-            f"Play by typing: `{Client.prefix}ms reveal xy [xy]` or `{Client.prefix}ms flag xy [xy]` \n"
-            f"Close the game with `{Client.prefix}ms end`\n"
-        )
-        dm_msg = await ctx.author.send(f"Here's your board!\n{self.format_for_discord(revealed_board)}")
 
         self.games[ctx.author.id] = Game(
             board=board,
@@ -171,7 +176,7 @@ class Minesweeper(commands.Cog):
         await game.dm_msg.delete()
         game.dm_msg = await ctx.author.send(f"Here's your board!\n{self.format_for_discord(game.revealed)}")
         if game.activated_on_server:
-            await game.chat_msg.edit(content=f"Here's there board!\n{self.format_for_discord(game.revealed)}")
+            await game.chat_msg.edit(content=f"Here's their board!\n{self.format_for_discord(game.revealed)}")
 
     @commands.dm_only()
     @minesweeper_group.command(name="flag")

@@ -40,7 +40,7 @@ class TriviaQuiz(commands.Cog):
     def load_questions() -> dict:
         """Load the questions from the JSON file."""
         p = Path("bot", "resources", "evergreen", "trivia_quiz.json")
-        with p.open() as json_data:
+        with p.open(encoding="utf8") as json_data:
             questions = json.load(json_data)
             return questions
 
@@ -121,8 +121,10 @@ class TriviaQuiz(commands.Cog):
 
             # A function to check whether user input is the correct answer(close to the right answer)
             def check(m: discord.Message) -> bool:
-                ratio = fuzz.ratio(answer.lower(), m.content.lower())
-                return ratio > 85 and m.channel == ctx.channel
+                return (
+                    m.channel == ctx.channel
+                    and fuzz.ratio(answer.lower(), m.content.lower()) > 85
+                )
 
             try:
                 msg = await self.bot.wait_for('message', check=check, timeout=10)

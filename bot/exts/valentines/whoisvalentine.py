@@ -10,7 +10,7 @@ from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
-with open(Path("bot/resources/valentines/valentine_facts.json"), "r") as file:
+with open(Path("bot/resources/valentines/valentine_facts.json"), "r", encoding="utf8") as file:
     FACTS = json.load(file)
 
 

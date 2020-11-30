@@ -1,14 +1,16 @@
 import functools
+import json
 import logging
 import random
-from typing import Callable, Tuple, Union
+from pathlib import Path
+from typing import Callable, Iterable, Tuple, Union
 
 from discord import Embed, Message
 from discord.ext import commands
-from discord.ext.commands import Bot, Cog, Context, MessageConverter
+from discord.ext.commands import BadArgument, Bot, Cog, Context, MessageConverter, clean_content
 
 from bot import utils
-from bot.constants import Emojis
+from bot.constants import Client, Colours, Emojis
 
 log = logging.getLogger(__name__)
 
@@ -26,32 +28,53 @@ UWU_WORDS = {
 }
 
 
+def caesar_cipher(text: str, offset: int) -> Iterable[str]:
+    """
+    Implements a lazy Caesar Cipher algorithm.
+
+    Encrypts a `text` given a specific integer `offset`. The sign
+    of the `offset` dictates the direction in which it shifts to,
+    with a negative value shifting to the left, and a positive
+    value shifting to the right.
+    """
+    for char in text:
+        if not char.isascii() or not char.isalpha() or char.isspace():
+            yield char
+            continue
+
+        case_start = 65 if char.isupper() else 97
+        true_offset = (ord(char) - case_start + offset) % 26
+
+        yield chr(case_start + true_offset)
+
+
 class Fun(Cog):
     """A collection of general commands for fun."""
 
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
+        with Path("bot/resources/evergreen/caesar_info.json").open("r", encoding="UTF-8") as f:
+            self._caesar_cipher_embed = json.load(f)
+
+    @staticmethod
+    def _get_random_die() -> str:
+        """Generate a random die emoji, ready to be sent on Discord."""
+        die_name = f"dice_{random.randint(1, 6)}"
+        return getattr(Emojis, die_name)
+
     @commands.command()
     async def roll(self, ctx: Context, num_rolls: int = 1) -> None:
         """Outputs a number of random dice emotes (up to 6)."""
-        output = ""
-        if num_rolls > 6:
-            num_rolls = 6
-        elif num_rolls < 1:
-            output = ":no_entry: You must roll at least once."
-        for _ in range(num_rolls):
-            terning = f"terning{random.randint(1, 6)}"
-            output += getattr(Emojis, terning, '')
-        await ctx.send(output)
+        if 1 <= num_rolls <= 6:
+            dice = " ".join(self._get_random_die() for _ in range(num_rolls))
+            await ctx.send(dice)
+        else:
+            raise BadArgument(f"`{Client.prefix}roll` only supports between 1 and 6 rolls.")
 
     @commands.command(name="uwu", aliases=("uwuwize", "uwuify",))
-    async def uwu_command(self, ctx: Context, *, text: str) -> None:
-        """
-        Converts a given `text` into it's uwu equivalent.
-
-        Also accepts a valid discord Message ID or link.
-        """
+    async def uwu_command(self, ctx: Context, *, text: clean_content(fix_channel_mentions=True)) -> None:
+        """Converts a given `text` into it's uwu equivalent."""
         conversion_func = functools.partial(
             utils.replace_many, replacements=UWU_WORDS, ignore_case=True, match_case=True
         )
@@ -66,12 +89,8 @@ class Fun(Cog):
         await ctx.send(content=converted_text, embed=embed)
 
     @commands.command(name="randomcase", aliases=("rcase", "randomcaps", "rcaps",))
-    async def randomcase_command(self, ctx: Context, *, text: str) -> None:
-        """
-        Randomly converts the casing of a given `text`.
-
-        Also accepts a valid discord Message ID or link.
-        """
+    async def randomcase_command(self, ctx: Context, *, text: clean_content(fix_channel_mentions=True)) -> None:
+        """Randomly converts the casing of a given `text`."""
         def conversion_func(text: str) -> str:
             """Randomly converts the casing of a given string."""
             return "".join(
@@ -87,22 +106,100 @@ class Fun(Cog):
             converted_text = f">>> {converted_text.lstrip('> ')}"
         await ctx.send(content=converted_text, embed=embed)
 
+    @commands.group(name="caesarcipher", aliases=("caesar", "cc",))
+    async def caesarcipher_group(self, ctx: Context) -> None:
+        """
+        Translates a message using the Caesar Cipher.
+
+        See `decrypt`, `encrypt`, and `info` subcommands.
+        """
+        if ctx.invoked_subcommand is None:
+            await ctx.invoke(self.bot.get_command("help"), "caesarcipher")
+
+    @caesarcipher_group.command(name="info")
+    async def caesarcipher_info(self, ctx: Context) -> None:
+        """Information about the Caesar Cipher."""
+        embed = Embed.from_dict(self._caesar_cipher_embed)
+        embed.colour = Colours.dark_green
+
+        await ctx.send(embed=embed)
+
+    @staticmethod
+    async def _caesar_cipher(ctx: Context, offset: int, msg: str, left_shift: bool = False) -> None:
+        """
+        Given a positive integer `offset`, translates and sends the given `msg`.
+
+        Performs a right shift by default unless `left_shift` is specified as `True`.
+
+        Also accepts a valid Discord Message ID or link.
+        """
+        if offset < 0:
+            await ctx.send(":no_entry: Cannot use a negative offset.")
+            return
+
+        if left_shift:
+            offset = -offset
+
+        def conversion_func(text: str) -> str:
+            """Encrypts the given string using the Caesar Cipher."""
+            return "".join(caesar_cipher(text, offset))
+
+        text, embed = await Fun._get_text_and_embed(ctx, msg)
+
+        if embed is not None:
+            embed = Fun._convert_embed(conversion_func, embed)
+
+        converted_text = conversion_func(text)
+
+        if converted_text:
+            converted_text = f">>> {converted_text.lstrip('> ')}"
+
+        await ctx.send(content=converted_text, embed=embed)
+
+    @caesarcipher_group.command(name="encrypt", aliases=("rightshift", "rshift", "enc",))
+    async def caesarcipher_encrypt(self, ctx: Context, offset: int, *, msg: str) -> None:
+        """
+        Given a positive integer `offset`, encrypt the given `msg`.
+
+        Performs a right shift of the letters in the message.
+
+        Also accepts a valid Discord Message ID or link.
+        """
+        await self._caesar_cipher(ctx, offset, msg, left_shift=False)
+
+    @caesarcipher_group.command(name="decrypt", aliases=("leftshift", "lshift", "dec",))
+    async def caesarcipher_decrypt(self, ctx: Context, offset: int, *, msg: str) -> None:
+        """
+        Given a positive integer `offset`, decrypt the given `msg`.
+
+        Performs a left shift of the letters in the message.
+
+        Also accepts a valid Discord Message ID or link.
+        """
+        await self._caesar_cipher(ctx, offset, msg, left_shift=True)
+
     @staticmethod
     async def _get_text_and_embed(ctx: Context, text: str) -> Tuple[str, Union[Embed, None]]:
         """
         Attempts to extract the text and embed from a possible link to a discord Message.
+
+        Does not retrieve the text and embed from the Message if it is in a channel the user does
+        not have read permissions in.
 
         Returns a tuple of:
             str: If `text` is a valid discord Message, the contents of the message, else `text`.
             Union[Embed, None]: The embed if found in the valid Message, else None
         """
         embed = None
-        message = await Fun._get_discord_message(ctx, text)
-        if isinstance(message, Message):
-            text = message.content
+
+        msg = await Fun._get_discord_message(ctx, text)
+        # Ensure the user has read permissions for the channel the message is in
+        if isinstance(msg, Message) and ctx.author.permissions_in(msg.channel).read_messages:
+            text = msg.clean_content
             # Take first embed because we can't send multiple embeds
-            if message.embeds:
-                embed = message.embeds[0]
+            if msg.embeds:
+                embed = msg.embeds[0]
+
         return (text, embed)
 
     @staticmethod

@@ -27,7 +27,7 @@ class BeMyValentine(commands.Cog):
     def load_json() -> dict:
         """Load Valentines messages from the static resources."""
         p = Path("bot/resources/valentines/bemyvalentine_valentines.json")
-        with p.open() as json_data:
+        with p.open(encoding="utf8") as json_data:
             valentines = load(json_data)
             return valentines
 
@@ -99,7 +99,7 @@ class BeMyValentine(commands.Cog):
 
         emoji_1, emoji_2 = self.random_emoji()
         lovefest_role = discord.utils.get(ctx.guild.roles, id=Lovefest.role_id)
-        channel = self.bot.get_channel(Channels.seasonalbot_commands)
+        channel = self.bot.get_channel(Channels.community_bot_commands)
         valentine, title = self.valentine_check(valentine_type)
 
         if user is None:

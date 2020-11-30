@@ -29,7 +29,7 @@ class HalloweenFacts(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        with open(Path("bot/resources/halloween/halloween_facts.json"), "r") as file:
+        with open(Path("bot/resources/halloween/halloween_facts.json"), "r", encoding="utf8") as file:
             self.halloween_facts = json.load(file)
         self.facts = list(enumerate(self.halloween_facts))
         random.shuffle(self.facts)

@@ -1,0 +1,99 @@
+water_types:
+  - ice
+  - water
+  - steam
+  - snow
+
+objects:
+  - a bucket
+  - a spear
+  - a wall
+  - a lake
+  - a ladder
+  - a boat
+  - a vial
+  - a ski slope
+  - a hand
+  - a ramp
+  - clippers
+  - a bridge
+  - a dam
+  - a glacier
+  - a crowbar
+  - stilts
+  - a pole
+  - a hook
+  - a wave
+  - a cage
+  - a basket
+  - bolt cutters
+  - a trapeze
+  - a puddle
+  - a toboggan
+  - a gale
+  - a cloud
+  - a unicycle
+  - a spout
+  - a sheet
+  - a gelatin dessert
+  - a saw
+  - a geyser
+  - a jet
+  - a ball
+  - handcuffs
+  - a door
+  - a row
+  - a gondola
+  - a sled
+  - a rocket
+  - a swing
+  - a blizzard
+  - a saddle
+  - cubes
+  - a horse
+  - a knight
+  - a rocket pack
+  - a slick
+  - a drill
+  - a shield
+  - a crane
+  - a reflector
+  - a bowling ball
+  - a turret
+  - a catapault
+  - a blanket
+  - balls
+  - a faucet
+  - shears
+  - a thunder cloud
+  - a net
+  - a yoyo
+  - a block
+  - a straight-jacket
+  - a slingshot
+  - a jack
+  - a car
+  - a club
+  - a vault
+  - a storm
+  - a wrench
+  - an anchor
+  - a beast
+
+adjectives:
+  - a large
+  - a giant
+  - a massive
+  - a small
+  - a tiny
+  - a super cool
+  - a frozen
+  - a minuscule
+  - a minute
+  - a microscopic
+  - a very small
+  - a little
+  - a huge
+  - an enourmous
+  - a gigantic
+  - a great
