@@ -243,10 +243,12 @@ async def fetch_leaderboard(invalidate_cache: bool = False) -> dict:
 def get_summary_embed(leaderboard: dict) -> discord.Embed:
     """Get an embed with the current summary stats of the leaderboard."""
     leaderboard_url = leaderboard['full_leaderboard_url']
+    refresh_minutes = AdventOfCode.leaderboard_cache_expiry_seconds // 60
 
     aoc_embed = discord.Embed(
         colour=Colours.soft_green,
         timestamp=datetime.datetime.fromisoformat(leaderboard["leaderboard_fetched_at"]),
+        description=f"*The leaderboard is refreshed every {refresh_minutes} minutes.*"
     )
     aoc_embed.add_field(
         name="Number of Participants",
