@@ -3,6 +3,7 @@ import collections
 import datetime
 import json
 import logging
+import math
 import operator
 import typing
 from typing import Tuple
@@ -11,6 +12,7 @@ import aiohttp
 import discord
 import pytz
 
+from bot.bot import Bot
 from bot.constants import AdventOfCode, Colours
 from bot.exts.christmas.advent_of_code import _caches
 
@@ -47,6 +49,9 @@ AOC_EMBED_THUMBNAIL = (
 
 # Create an easy constant for the EST timezone
 EST = pytz.timezone("EST")
+
+# Step size for the challenge countdown status
+COUNTDOWN_STEP = 60 * 5
 
 # Create namedtuple that combines a participant's name and their completion
 # time for a specific star. We're going to use this later to order the results
@@ -384,3 +389,57 @@ async def wait_for_advent_of_code(*, hours_before: int = 1) -> None:
 
     delta = target - now
     await asyncio.sleep(delta.total_seconds())
+
+
+async def countdown_status(bot: Bot) -> None:
+    """
+    Add the time until the next challenge is published to the bot's status.
+
+    This function sleeps until 2 hours before the event and exists one hour
+    after the last challenge has been published. It will not start up again
+    automatically for next year's event, as it will wait for the environment
+    variable AOC_YEAR to be updated.
+
+    This ensures that the task will only start sleeping again once the next
+    event approaches and we're making preparations for that event.
+    """
+    log.debug("Initializing status countdown task.")
+    # We wait until 2 hours before the event starts. Then we
+    # set our first countdown status.
+    await wait_for_advent_of_code(hours_before=2)
+
+    # Log that we're going to start with the countdown status.
+    log.info("The Advent of Code has started or will start soon, starting countdown status.")
+
+    # Calculate when the task needs to stop running. To prevent the task from
+    # sleeping for the entire year, it will only wait in the currently
+    # configured year. This means that the task will only start hibernating once
+    # we start preparing the next event by changing environment variables.
+    last_challenge = datetime.datetime(AdventOfCode.year, 12, 25, 0, 0, 0, tzinfo=EST)
+    end = last_challenge + datetime.timedelta(hours=1)
+
+    while datetime.datetime.now(EST) < end:
+        _, time_left = time_left_to_aoc_midnight()
+
+        aligned_seconds = int(math.ceil(time_left.seconds / COUNTDOWN_STEP)) * COUNTDOWN_STEP
+        hours, minutes = aligned_seconds // 3600, aligned_seconds // 60 % 60
+
+        if aligned_seconds == 0:
+            playing = "right now!"
+        elif aligned_seconds == COUNTDOWN_STEP:
+            playing = f"in less than {minutes} minutes"
+        elif hours == 0:
+            playing = f"in {minutes} minutes"
+        elif hours == 23:
+            playing = f"since {60 - minutes} minutes ago"
+        else:
+            playing = f"in {hours} hours and {minutes} minutes"
+
+        log.trace(f"Changing presence to {playing!r}")
+        # Status will look like "Playing in 5 hours and 30 minutes"
+        await bot.change_presence(activity=discord.Game(playing))
+
+        # Sleep until next aligned time or a full step if already aligned
+        delay = time_left.seconds % COUNTDOWN_STEP or COUNTDOWN_STEP
+        log.trace(f"The countdown status task will sleep for {delay} seconds.")
+        await asyncio.sleep(delay)

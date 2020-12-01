@@ -1,7 +1,6 @@
 import asyncio
 import json
 import logging
-import math
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -19,36 +18,7 @@ log = logging.getLogger(__name__)
 
 AOC_REQUEST_HEADER = {"user-agent": "PythonDiscord AoC Event Bot"}
 
-COUNTDOWN_STEP = 60 * 5
-
 AOC_WHITELIST = WHITELISTED_CHANNELS + (Channels.advent_of_code,)
-
-
-async def countdown_status(bot: commands.Bot) -> None:
-    """Set the playing status of the bot to the minutes & hours left until the next day's challenge."""
-    while _helpers.is_in_advent():
-        _, time_left = _helpers.time_left_to_aoc_midnight()
-
-        aligned_seconds = int(math.ceil(time_left.seconds / COUNTDOWN_STEP)) * COUNTDOWN_STEP
-        hours, minutes = aligned_seconds // 3600, aligned_seconds // 60 % 60
-
-        if aligned_seconds == 0:
-            playing = "right now!"
-        elif aligned_seconds == COUNTDOWN_STEP:
-            playing = f"in less than {minutes} minutes"
-        elif hours == 0:
-            playing = f"in {minutes} minutes"
-        elif hours == 23:
-            playing = f"since {60 - minutes} minutes ago"
-        else:
-            playing = f"in {hours} hours and {minutes} minutes"
-
-        # Status will look like "Playing in 5 hours and 30 minutes"
-        await bot.change_presence(activity=discord.Game(playing))
-
-        # Sleep until next aligned time or a full step if already aligned
-        delay = time_left.seconds % COUNTDOWN_STEP or COUNTDOWN_STEP
-        await asyncio.sleep(delay)
 
 
 async def day_countdown(bot: commands.Bot) -> None:
@@ -124,7 +94,7 @@ class AdventOfCode(commands.Cog):
         countdown_coro = day_countdown(self.bot)
         self.countdown_task = self.bot.loop.create_task(countdown_coro)
 
-        status_coro = countdown_status(self.bot)
+        status_coro = _helpers.countdown_status(self.bot)
         self.status_task = self.bot.loop.create_task(status_coro)
 
     @commands.group(name="adventofcode", aliases=("aoc",))
