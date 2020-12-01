@@ -1,3 +1,4 @@
+import asyncio
 import collections
 import datetime
 import json
@@ -362,3 +363,24 @@ def time_left_to_aoc_midnight() -> Tuple[datetime.datetime, datetime.timedelta]:
 
     # Calculate the timedelta between the current time and midnight
     return tomorrow, tomorrow - datetime.datetime.now(EST)
+
+
+async def wait_for_advent_of_code(*, hours_before: int = 1) -> None:
+    """
+    Wait for the Advent of Code event to start.
+
+    This function returns `hours_before` (default: 1) before the Advent of Code
+    actually starts. This allows functions to schedule and execute code that
+    needs to run before the event starts.
+    """
+    start = datetime.datetime(AdventOfCode.year, 12, 1, 0, 0, 0, tzinfo=EST)
+    target = start - datetime.timedelta(hours=hours_before)
+    now = datetime.datetime.now(EST)
+
+    # If we've already reached or passed to target, we
+    # simply return immediately.
+    if now >= target:
+        return
+
+    delta = target - now
+    await asyncio.sleep(delta.total_seconds())
