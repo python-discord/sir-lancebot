@@ -411,6 +411,10 @@ async def countdown_status(bot: Bot) -> None:
     # Log that we're going to start with the countdown status.
     log.info("The Advent of Code has started or will start soon, starting countdown status.")
 
+    # Trying to change status too early in the bot's startup sequence will fail
+    # the task. Waiting until this event seems to work well.
+    await bot.wait_until_guild_available()
+
     # Calculate when the task needs to stop running. To prevent the task from
     # sleeping for the entire year, it will only wait in the currently
     # configured year. This means that the task will only start hibernating once
