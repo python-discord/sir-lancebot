@@ -108,7 +108,7 @@ class AdventOfCode(commands.Cog):
                            f"The next event will start in {delta_str}.")
             return
 
-        tomorrow, time_left = _helpers.time_left_to_aoc_midnight()
+        tomorrow, time_left = _helpers.time_left_to_est_midnight()
 
         hours, minutes = time_left.seconds // 3600, time_left.seconds // 60 % 60
 

@@ -353,8 +353,8 @@ def is_in_advent() -> bool:
     return datetime.datetime.now(EST).day in range(1, 25) and datetime.datetime.now(EST).month == 12
 
 
-def time_left_to_aoc_midnight() -> Tuple[datetime.datetime, datetime.timedelta]:
-    """Calculates the amount of time left until midnight in UTC-5 (Advent of Code maintainer timezone)."""
+def time_left_to_est_midnight() -> Tuple[datetime.datetime, datetime.timedelta]:
+    """Calculate the amount of time left until midnight EST/UTC-5."""
     # Change all time properties back to 00:00
     todays_midnight = datetime.datetime.now(EST).replace(
         microsecond=0,
@@ -423,7 +423,7 @@ async def countdown_status(bot: Bot) -> None:
     end = last_challenge + datetime.timedelta(hours=1)
 
     while datetime.datetime.now(EST) < end:
-        _, time_left = time_left_to_aoc_midnight()
+        _, time_left = time_left_to_est_midnight()
 
         aligned_seconds = int(math.ceil(time_left.seconds / COUNTDOWN_STEP)) * COUNTDOWN_STEP
         hours, minutes = aligned_seconds // 3600, aligned_seconds // 60 % 60
@@ -481,7 +481,7 @@ async def day_countdown(bot: Bot) -> None:
     end = datetime.datetime(AdventOfCode.year, 12, 25, tzinfo=EST)
     while datetime.datetime.now(EST) < end:
         log.trace("Started puzzle notification loop.")
-        tomorrow, time_left = time_left_to_aoc_midnight()
+        tomorrow, time_left = time_left_to_est_midnight()
 
         # Use fractional `total_seconds` to wake up very close to our target, with
         # padding of 0.1 seconds to ensure that we actually pass midnight.
