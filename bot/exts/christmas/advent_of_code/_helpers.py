@@ -53,6 +53,17 @@ EST = pytz.timezone("EST")
 _StarResult = collections.namedtuple("StarResult", "name completion_time")
 
 
+def leaderboard_sorting_function(entry: typing.Tuple[str, dict]) -> typing.Tuple[int, int]:
+    """
+    Provide a sorting value for our leaderboard.
+
+    The leaderboard is sorted primarily on the score someone has received and
+    secondary on the number of stars someone has completed.
+    """
+    result = entry[1]
+    return result["score"], result["star_2_count"] + result["star_1_count"]
+
+
 def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
     """
     Parse the leaderboard data received from the AoC website.
@@ -98,13 +109,15 @@ def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
     # participants per star, we can compute the rank-based scores each participant
     # should get for that star.
     max_score = len(leaderboard)
-    for star in star_results.values():
-        for rank, star_result in enumerate(sorted(star, key=operator.itemgetter(1))):
+    for(day, _star), results in star_results.items():
+        if day in AdventOfCode.ignored_days:
+            continue
+        for rank, star_result in enumerate(sorted(results, key=operator.itemgetter(1))):
             leaderboard[star_result.name]["score"] += max_score - rank
 
     # Since dictionaries now retain insertion order, let's use that
     sorted_leaderboard = dict(
-        sorted(leaderboard.items(), key=lambda t: t[1]["score"], reverse=True)
+        sorted(leaderboard.items(), key=leaderboard_sorting_function, reverse=True)
     )
 
     # Create summary stats for the stars completed for each day of the event.
