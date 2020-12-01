@@ -35,8 +35,8 @@ class AdventOfCode(commands.Cog):
         self.countdown_task = None
         self.status_task = None
 
-        countdown_coro = _helpers.day_countdown(self.bot)
-        self.countdown_task = self.bot.loop.create_task(countdown_coro)
+        announcement_coro = _helpers.new_puzzle_announcement(self.bot)
+        self.new_puzzle_announcement_task = self.bot.loop.create_task(announcement_coro)
 
         status_coro = _helpers.countdown_status(self.bot)
         self.status_task = self.bot.loop.create_task(status_coro)

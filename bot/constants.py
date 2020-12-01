@@ -63,7 +63,7 @@ class AdventOfCode:
     staff_leaderboard_id = environ.get("AOC_STAFF_LEADERBOARD_ID", "")
 
     # Other Advent of Code constants
-    ignored_days = [day for day in environ.get("AOC_IGNORED_DAYS", "").split(",")]
+    ignored_days = environ.get("AOC_IGNORED_DAYS", "").split(",")
     leaderboard_displayed_members = 10
     leaderboard_cache_expiry_seconds = 1800
     year = int(environ.get("AOC_YEAR", datetime.utcnow().year))

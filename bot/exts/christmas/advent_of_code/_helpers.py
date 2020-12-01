@@ -374,9 +374,16 @@ async def wait_for_advent_of_code(*, hours_before: int = 1) -> None:
     """
     Wait for the Advent of Code event to start.
 
-    This function returns `hours_before` (default: 1) before the Advent of Code
+    This function returns `hours_before` (default: 1) the Advent of Code
     actually starts. This allows functions to schedule and execute code that
     needs to run before the event starts.
+
+    If the event has already started, this function returns immediately.
+
+    Note: The "next Advent of Code" is determined based on the current value
+    of the `AOC_YEAR` environment variable. This allows callers to exit early
+    if we're already past the Advent of Code edition the bot is currently
+    configured for.
     """
     start = datetime.datetime(AdventOfCode.year, 12, 1, 0, 0, 0, tzinfo=EST)
     target = start - datetime.timedelta(hours=hours_before)
@@ -449,12 +456,13 @@ async def countdown_status(bot: Bot) -> None:
         await asyncio.sleep(delay)
 
 
-async def day_countdown(bot: Bot) -> None:
+async def new_puzzle_announcement(bot: Bot) -> None:
     """
-    Calculate the number of seconds left until the next day of Advent.
+    Announce the release of a new Advent of Code puzzle.
 
-    Once we have calculated this we should then sleep that number and when the time is reached, ping
-    the Advent of Code role notifying them that the new challenge is ready.
+    This background task hibernates until just before the Advent of Code starts
+    and will then start announcing puzzles as they are published. After the
+    event has finished, this task will terminate.
     """
     # We wake up one hour before the event starts to prepare the announcement
     # of the release of the first puzzle.
@@ -483,8 +491,10 @@ async def day_countdown(bot: Bot) -> None:
         log.trace("Started puzzle notification loop.")
         tomorrow, time_left = time_left_to_est_midnight()
 
-        # Use fractional `total_seconds` to wake up very close to our target, with
-        # padding of 0.1 seconds to ensure that we actually pass midnight.
+        # Use `total_seconds` to get the time left in fractional seconds This
+        # should wake us up very close to the target. As a safe guard, the sleep
+        # duration is padded with 0.1 second to make sure we wake up after
+        # midnight.
         sleep_seconds = time_left.total_seconds() + 0.1
         log.trace(f"The puzzle notification task will sleep for {sleep_seconds} seconds")
         await asyncio.sleep(sleep_seconds)
