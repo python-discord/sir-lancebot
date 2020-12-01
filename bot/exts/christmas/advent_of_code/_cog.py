@@ -1,4 +1,3 @@
-import asyncio
 import json
 import logging
 from datetime import datetime, timedelta
@@ -21,61 +20,6 @@ AOC_REQUEST_HEADER = {"user-agent": "PythonDiscord AoC Event Bot"}
 AOC_WHITELIST = WHITELISTED_CHANNELS + (Channels.advent_of_code,)
 
 
-async def day_countdown(bot: commands.Bot) -> None:
-    """
-    Calculate the number of seconds left until the next day of Advent.
-
-    Once we have calculated this we should then sleep that number and when the time is reached, ping
-    the Advent of Code role notifying them that the new challenge is ready.
-    """
-    while _helpers.is_in_advent():
-        tomorrow, time_left = _helpers.time_left_to_aoc_midnight()
-
-        # Prevent bot from being slightly too early in trying to announce today's puzzle
-        await asyncio.sleep(time_left.seconds + 1)
-
-        channel = bot.get_channel(Channels.advent_of_code)
-
-        if not channel:
-            log.error("Could not find the AoC channel to send notification in")
-            break
-
-        aoc_role = channel.guild.get_role(AocConfig.role_id)
-        if not aoc_role:
-            log.error("Could not find the AoC role to announce the daily puzzle")
-            break
-
-        puzzle_url = f"https://adventofcode.com/{AocConfig.year}/day/{tomorrow.day}"
-
-        # Check if the puzzle is already available to prevent our members from spamming
-        # the puzzle page before it's available by making a small HEAD request.
-        for retry in range(1, 5):
-            log.debug(f"Checking if the puzzle is already available (attempt {retry}/4)")
-            async with bot.http_session.head(puzzle_url, raise_for_status=False) as resp:
-                if resp.status == 200:
-                    log.debug("Puzzle is available; let's send an announcement message.")
-                    break
-            log.debug(f"The puzzle is not yet available (status={resp.status})")
-            await asyncio.sleep(10)
-        else:
-            log.error("The puzzle does does not appear to be available at this time, canceling announcement")
-            break
-
-        await channel.send(
-            f"{aoc_role.mention} Good morning! Day {tomorrow.day} is ready to be attempted. "
-            f"View it online now at {puzzle_url}. Good luck!",
-            allowed_mentions=discord.AllowedMentions(
-                everyone=False,
-                users=False,
-                roles=[discord.Object(AocConfig.role_id)],
-            )
-        )
-
-        # Wait a couple minutes so that if our sleep didn't sleep enough
-        # time we don't end up announcing twice.
-        await asyncio.sleep(120)
-
-
 class AdventOfCode(commands.Cog):
     """Advent of Code festivities! Ho Ho Ho!"""
 
@@ -91,7 +35,7 @@ class AdventOfCode(commands.Cog):
         self.countdown_task = None
         self.status_task = None
 
-        countdown_coro = day_countdown(self.bot)
+        countdown_coro = _helpers.day_countdown(self.bot)
         self.countdown_task = self.bot.loop.create_task(countdown_coro)
 
         status_coro = _helpers.countdown_status(self.bot)

@@ -13,7 +13,7 @@ import discord
 import pytz
 
 from bot.bot import Bot
-from bot.constants import AdventOfCode, Colours
+from bot.constants import AdventOfCode, Channels, Colours
 from bot.exts.christmas.advent_of_code import _caches
 
 log = logging.getLogger(__name__)
@@ -447,3 +447,78 @@ async def countdown_status(bot: Bot) -> None:
         delay = time_left.seconds % COUNTDOWN_STEP or COUNTDOWN_STEP
         log.trace(f"The countdown status task will sleep for {delay} seconds.")
         await asyncio.sleep(delay)
+
+
+async def day_countdown(bot: Bot) -> None:
+    """
+    Calculate the number of seconds left until the next day of Advent.
+
+    Once we have calculated this we should then sleep that number and when the time is reached, ping
+    the Advent of Code role notifying them that the new challenge is ready.
+    """
+    # We wake up one hour before the event starts to prepare the announcement
+    # of the release of the first puzzle.
+    await wait_for_advent_of_code(hours_before=1)
+
+    log.info("The Advent of Code has started or will start soon, waking up notification task.")
+
+    # Ensure that the guild cache is loaded so we can get the Advent of Code
+    # channel and role.
+    await bot.wait_until_guild_available()
+    aoc_channel = bot.get_channel(Channels.advent_of_code)
+    aoc_role = aoc_channel.guild.get_role(AdventOfCode.role_id)
+
+    if not aoc_channel:
+        log.error("Could not find the AoC channel to send notification in")
+        return
+
+    if not aoc_role:
+        log.error("Could not find the AoC role to announce the daily puzzle")
+        return
+
+    # The last event day is 25 December, so we only have to schedule
+    # a reminder if the current day is before 25 December.
+    end = datetime.datetime(AdventOfCode.year, 12, 25, tzinfo=EST)
+    while datetime.datetime.now(EST) < end:
+        log.trace("Started puzzle notification loop.")
+        tomorrow, time_left = time_left_to_aoc_midnight()
+
+        # Use fractional `total_seconds` to wake up very close to our target, with
+        # padding of 0.1 seconds to ensure that we actually pass midnight.
+        sleep_seconds = time_left.total_seconds() + 0.1
+        log.trace(f"The puzzle notification task will sleep for {sleep_seconds} seconds")
+        await asyncio.sleep(sleep_seconds)
+
+        puzzle_url = f"https://adventofcode.com/{AdventOfCode.year}/day/{tomorrow.day}"
+
+        # Check if the puzzle is already available to prevent our members from spamming
+        # the puzzle page before it's available by making a small HEAD request.
+        for retry in range(1, 5):
+            log.debug(f"Checking if the puzzle is already available (attempt {retry}/4)")
+            async with bot.http_session.head(puzzle_url, raise_for_status=False) as resp:
+                if resp.status == 200:
+                    log.debug("Puzzle is available; let's send an announcement message.")
+                    break
+            log.debug(f"The puzzle is not yet available (status={resp.status})")
+            await asyncio.sleep(10)
+        else:
+            log.error(
+                "The puzzle does does not appear to be available "
+                "at this time, canceling announcement"
+            )
+            break
+
+        await aoc_channel.send(
+            f"{aoc_role.mention} Good morning! Day {tomorrow.day} is ready to be attempted. "
+            f"View it online now at {puzzle_url}. Good luck!",
+            allowed_mentions=discord.AllowedMentions(
+                everyone=False,
+                users=False,
+                roles=[aoc_role],
+            )
+        )
+
+        # Ensure that we don't send duplicate announcements by sleeping to well
+        # over midnight. This means we're certain to calculate the time to the
+        # next midnight at the top of the loop.
+        await asyncio.sleep(120)
