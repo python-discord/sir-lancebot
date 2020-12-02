@@ -21,7 +21,7 @@ AOC_REQUEST_HEADER = {"user-agent": "PythonDiscord AoC Event Bot"}
 
 COUNTDOWN_STEP = 60 * 5
 
-AOC_WHITELIST = WHITELISTED_CHANNELS + (Channels.advent_of_code,)
+AOC_WHITELIST = WHITELISTED_CHANNELS + (Channels.advent_of_code_commands,)
 
 
 async def countdown_status(bot: commands.Bot) -> None:
@@ -139,7 +139,7 @@ class AdventOfCode(commands.Cog):
         aliases=("sub", "notifications", "notify", "notifs"),
         brief="Notifications for new days"
     )
-    @override_in_channel(AOC_WHITELIST)
+    @override_in_channel(AOC_WHITELIST + (Channels.advent_of_code))
     async def aoc_subscribe(self, ctx: commands.Context) -> None:
         """Assign the role for notifications about new days being ready."""
         current_year = datetime.now().year
@@ -160,7 +160,7 @@ class AdventOfCode(commands.Cog):
 
     @in_month(Month.DECEMBER)
     @adventofcode_group.command(name="unsubscribe", aliases=("unsub",), brief="Notifications for new days")
-    @override_in_channel(AOC_WHITELIST)
+    @override_in_channel(AOC_WHITELIST + Channels.advent_of_code)
     async def aoc_unsubscribe(self, ctx: commands.Context) -> None:
         """Remove the role for notifications about new days being ready."""
         role = ctx.guild.get_role(AocConfig.role_id)
@@ -172,7 +172,7 @@ class AdventOfCode(commands.Cog):
             await ctx.send("Hey, you don't even get any notifications about new Advent of Code tasks currently anyway.")
 
     @adventofcode_group.command(name="countdown", aliases=("count", "c"), brief="Return time left until next day")
-    @override_in_channel(AOC_WHITELIST)
+    @override_in_channel(AOC_WHITELIST + (Channels.advent_of_code))
     async def aoc_countdown(self, ctx: commands.Context) -> None:
         """Return time left until next day."""
         if not _helpers.is_in_advent():
@@ -207,7 +207,7 @@ class AdventOfCode(commands.Cog):
         await ctx.send("", embed=self.cached_about_aoc)
 
     @adventofcode_group.command(name="join", aliases=("j",), brief="Learn how to join the leaderboard (via DM)")
-    @override_in_channel(AOC_WHITELIST)
+    @override_in_channel(AOC_WHITELIST + (Channels.advent_of_code))
     async def join_leaderboard(self, ctx: commands.Context) -> None:
         """DM the user the information for joining the Python Discord leaderboard."""
         current_year = datetime.now().year
