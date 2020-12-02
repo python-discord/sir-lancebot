@@ -17,6 +17,7 @@ __all__ = (
     "Roles",
     "Tokens",
     "Wolfram",
+    "Reddit",
     "RedisConfig",
     "MODERATION_ROLES",
     "STAFF_ROLES",
@@ -144,6 +145,15 @@ class Emojis:
     status_dnd = "<:status_dnd:470326272082313216>"
     status_offline = "<:status_offline:470326266537705472>"
 
+    # Reddit emojis
+    reddit = "<:reddit:676030265734332427>"
+    reddit_post_text = "<:reddit_post_text:676030265910493204>"
+    reddit_post_video = "<:reddit_post_video:676030265839190047>"
+    reddit_post_photo = "<:reddit_post_photo:676030265734201344>"
+    reddit_upvote = "<:reddit_upvote:755845219890757644>"
+    reddit_comments = "<:reddit_comments:755845255001014384>"
+    reddit_users = "<:reddit_users:755845303822974997>"
+
 
 class Icons:
     questionmark = "https://cdn.discordapp.com/emojis/512367613339369475.png"
@@ -229,6 +239,14 @@ class Wikipedia:
 class Source:
     github = "https://github.com/python-discord/sir-lancebot"
     github_avatar_url = "https://avatars1.githubusercontent.com/u/9919"
+
+
+class Reddit:
+    subreddits = ["r/Python"]
+
+    client_id = environ.get("REDDIT_CLIENT_ID")
+    secret = environ.get("REDDIT_SECRET")
+    webhook = int(environ.get("REDDIT_WEBHOOK", 635408384794951680))
 
 
 # Default role combinations
