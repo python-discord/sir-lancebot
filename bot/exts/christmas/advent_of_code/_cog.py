@@ -13,7 +13,7 @@ from bot.constants import (
     AdventOfCode as AocConfig, Channels, Colours, Emojis, Month, Roles, WHITELISTED_CHANNELS,
 )
 from bot.exts.christmas.advent_of_code import _helpers
-from bot.utils.decorators import in_month, override_in_channel, with_role
+from bot.utils.decorators import InChannelCheckFailure, in_month, override_in_channel, with_role
 
 log = logging.getLogger(__name__)
 
@@ -22,6 +22,10 @@ AOC_REQUEST_HEADER = {"user-agent": "PythonDiscord AoC Event Bot"}
 COUNTDOWN_STEP = 60 * 5
 
 AOC_WHITELIST = WHITELISTED_CHANNELS + (Channels.advent_of_code_commands,)
+
+# Some commands can be run in the regular advent of code channel
+# They aren't spammy and foster discussion
+AOC_WHITELIST_PLUS = AOC_WHITELIST + (Channels.advent_of_code,)
 
 
 async def countdown_status(bot: commands.Bot) -> None:
@@ -128,7 +132,7 @@ class AdventOfCode(commands.Cog):
         self.status_task = self.bot.loop.create_task(status_coro)
 
     @commands.group(name="adventofcode", aliases=("aoc",))
-    @override_in_channel(AOC_WHITELIST)
+    @override_in_channel(AOC_WHITELIST_PLUS)
     async def adventofcode_group(self, ctx: commands.Context) -> None:
         """All of the Advent of Code commands."""
         if not ctx.invoked_subcommand:
@@ -139,7 +143,7 @@ class AdventOfCode(commands.Cog):
         aliases=("sub", "notifications", "notify", "notifs"),
         brief="Notifications for new days"
     )
-    @override_in_channel(AOC_WHITELIST + (Channels.advent_of_code))
+    @override_in_channel(AOC_WHITELIST_PLUS)
     async def aoc_subscribe(self, ctx: commands.Context) -> None:
         """Assign the role for notifications about new days being ready."""
         current_year = datetime.now().year
@@ -160,7 +164,7 @@ class AdventOfCode(commands.Cog):
 
     @in_month(Month.DECEMBER)
     @adventofcode_group.command(name="unsubscribe", aliases=("unsub",), brief="Notifications for new days")
-    @override_in_channel(AOC_WHITELIST + Channels.advent_of_code)
+    @override_in_channel(AOC_WHITELIST_PLUS)
     async def aoc_unsubscribe(self, ctx: commands.Context) -> None:
         """Remove the role for notifications about new days being ready."""
         role = ctx.guild.get_role(AocConfig.role_id)
@@ -172,7 +176,7 @@ class AdventOfCode(commands.Cog):
             await ctx.send("Hey, you don't even get any notifications about new Advent of Code tasks currently anyway.")
 
     @adventofcode_group.command(name="countdown", aliases=("count", "c"), brief="Return time left until next day")
-    @override_in_channel(AOC_WHITELIST + (Channels.advent_of_code))
+    @override_in_channel(AOC_WHITELIST_PLUS)
     async def aoc_countdown(self, ctx: commands.Context) -> None:
         """Return time left until next day."""
         if not _helpers.is_in_advent():
@@ -207,7 +211,7 @@ class AdventOfCode(commands.Cog):
         await ctx.send("", embed=self.cached_about_aoc)
 
     @adventofcode_group.command(name="join", aliases=("j",), brief="Learn how to join the leaderboard (via DM)")
-    @override_in_channel(AOC_WHITELIST + (Channels.advent_of_code))
+    @override_in_channel(AOC_WHITELIST_PLUS)
     async def join_leaderboard(self, ctx: commands.Context) -> None:
         """DM the user the information for joining the Python Discord leaderboard."""
         current_year = datetime.now().year
@@ -366,3 +370,11 @@ class AdventOfCode(commands.Cog):
 
         about_embed.set_footer(text="Last Updated")
         return about_embed
+
+    async def cog_command_error(self, ctx: commands.Context, error: Exception) -> None:
+        """Custom error handler if an advent of code command was posted in the wrong channel."""
+        if isinstance(error, InChannelCheckFailure):
+            await ctx.send(f":x: Please use <#{Channels.advent_of_code_commands}> for aoc commands instead, please.")
+            ctx.command.on_error = True
+        else:
+            raise error
