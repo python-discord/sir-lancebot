@@ -3,7 +3,6 @@ import random
 import re
 from collections import Counter
 from datetime import datetime, timedelta
-from pathlib import Path
 from typing import List, Optional, Tuple, Union
 
 import aiohttp
