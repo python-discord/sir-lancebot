@@ -53,6 +53,18 @@ EST = pytz.timezone("EST")
 StarResult = collections.namedtuple("StarResult", "member_id completion_time")
 
 
+class UnexpectedRedirect(aiohttp.ClientError):
+    """Raised when an unexpected redirect was detected."""
+
+
+class UnexpectedResponseStatus(aiohttp.ClientError):
+    """Raised when an unexpected redirect was detected."""
+
+
+class FetchingLeaderboardFailed(Exception):
+    """Raised when one or more leaderboards could not be fetched at all."""
+
+
 def leaderboard_sorting_function(entry: typing.Tuple[str, dict]) -> typing.Tuple[int, int]:
     """
     Provide a sorting value for our leaderboard.
@@ -153,6 +165,23 @@ def _format_leaderboard(leaderboard: typing.Dict[str, dict]) -> str:
     return "\n".join(leaderboard_lines)
 
 
+async def _leaderboard_request(url: str, board: int, cookies: dict) -> typing.Optional[dict]:
+    """Make a leaderboard request using the specified session cookie."""
+    async with aiohttp.request("GET", url, headers=AOC_REQUEST_HEADER, cookies=cookies) as resp:
+        # The Advent of Code website redirects silently with a 200 response if a
+        # session cookie has expired, is invalid, or was not provided.
+        if str(resp.url) != url:
+            log.error(f"Fetching leaderboard `{board}` failed! Check the session cookie.")
+            raise UnexpectedRedirect(f"redirected unexpectedly to {resp.url} for board `{board}`")
+
+        # Every status other than `200` is unexpected, not only 400+
+        if not resp.status == 200:
+            log.error(f"Unexpected response `{resp.status}` while fetching leaderboard `{board}`")
+            raise UnexpectedResponseStatus(f"status `{resp.status}`")
+
+        return await resp.json()
+
+
 async def _fetch_leaderboard_data() -> typing.Dict[str, typing.Any]:
     """Fetch data for all leaderboards and return a pooled result."""
     year = AdventOfCode.year
@@ -165,22 +194,34 @@ async def _fetch_leaderboard_data() -> typing.Dict[str, typing.Any]:
     participants = {}
     for leaderboard in AdventOfCode.leaderboards.values():
         leaderboard_url = AOC_API_URL.format(year=year, leaderboard_id=leaderboard.id)
-        cookies = {"session": leaderboard.session}
 
-        # We don't need to create a session if we're going to throw it away after each request
-        async with aiohttp.request(
-            "GET", leaderboard_url, headers=AOC_REQUEST_HEADER, cookies=cookies
-        ) as resp:
-            if resp.status == 200:
-                raw_data = await resp.json()
+        # Two attempts, one with the original session cookie and one with the fallback session
+        for attempt in range(1, 3):
+            log.info(f"Attempting to fetch leaderboard `{leaderboard.id}` ({attempt}/2)")
+            cookies = {"session": leaderboard.session}
+            try:
+                raw_data = await _leaderboard_request(leaderboard_url, leaderboard.id, cookies)
+            except UnexpectedRedirect:
+                if cookies["session"] == AdventOfCode.fallback_session:
+                    log.error("It seems like the fallback cookie has expired!")
+                    raise FetchingLeaderboardFailed from None
 
-                # Get the participants and store their current count
+                # If we're here, it means that the original session did not
+                # work. Let's fall back to the fallback session.
+                leaderboard.use_fallback_session = True
+                continue
+            except aiohttp.ClientError:
+                # Don't retry, something unexpected is wrong and it may not be the session.
+                raise FetchingLeaderboardFailed from None
+            else:
+                # Get the participants and store their current count.
                 board_participants = raw_data["members"]
                 await _caches.leaderboard_counts.set(leaderboard.id, len(board_participants))
                 participants.update(board_participants)
-            else:
-                log.warning(f"Fetching data failed for leaderboard `{leaderboard.id}`")
-                resp.raise_for_status()
+                break
+        else:
+            log.error(f"reached 'unreachable' state while fetching board `{leaderboard.id}`.")
+            raise FetchingLeaderboardFailed
 
     log.info(f"Fetched leaderboard information for {len(participants)} participants")
     return participants

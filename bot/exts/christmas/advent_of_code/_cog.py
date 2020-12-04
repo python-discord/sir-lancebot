@@ -221,7 +221,11 @@ class AdventOfCode(commands.Cog):
         if AocConfig.staff_leaderboard_id and any(r.id == Roles.helpers for r in author.roles):
             join_code = AocConfig.leaderboards[AocConfig.staff_leaderboard_id].join_code
         else:
-            join_code = await _helpers.get_public_join_code(author)
+            try:
+                join_code = await _helpers.get_public_join_code(author)
+            except _helpers.FetchingLeaderboardFailed:
+                await ctx.send(":x: Failed to get join code! Notified maintainers.")
+                return
 
         if not join_code:
             log.error(f"Failed to get a join code for user {author} ({author.id})")
@@ -256,7 +260,12 @@ class AdventOfCode(commands.Cog):
     async def aoc_leaderboard(self, ctx: commands.Context) -> None:
         """Get the current top scorers of the Python Discord Leaderboard."""
         async with ctx.typing():
-            leaderboard = await _helpers.fetch_leaderboard()
+            try:
+                leaderboard = await _helpers.fetch_leaderboard()
+            except _helpers.FetchingLeaderboardFailed:
+                await ctx.send(":x: Unable to fetch leaderboard!")
+                return
+
             number_of_participants = leaderboard["number_of_participants"]
 
             top_count = min(AocConfig.leaderboard_displayed_members, number_of_participants)
@@ -291,7 +300,11 @@ class AdventOfCode(commands.Cog):
     @override_in_channel(AOC_WHITELIST)
     async def private_leaderboard_daily_stats(self, ctx: commands.Context) -> None:
         """Send an embed with daily completion statistics for the Python Discord leaderboard."""
-        leaderboard = await _helpers.fetch_leaderboard()
+        try:
+            leaderboard = await _helpers.fetch_leaderboard()
+        except _helpers.FetchingLeaderboardFailed:
+            await ctx.send(":x: Can't fetch leaderboard for stats right now!")
+            return
 
         # The daily stats are serialized as JSON as they have to be cached in Redis
         daily_stats = json.loads(leaderboard["daily_stats"])
@@ -323,8 +336,12 @@ class AdventOfCode(commands.Cog):
         many requests to the Advent of Code server.
         """
         async with ctx.typing():
-            await _helpers.fetch_leaderboard(invalidate_cache=True)
-            await ctx.send("\N{OK Hand Sign} Refreshed leaderboard cache!")
+            try:
+                await _helpers.fetch_leaderboard(invalidate_cache=True)
+            except _helpers.FetchingLeaderboardFailed:
+                await ctx.send(":x: Something went wrong while trying to refresh the cache!")
+            else:
+                await ctx.send("\N{OK Hand Sign} Refreshed leaderboard cache!")
 
     def cog_unload(self) -> None:
         """Cancel season-related tasks on cog unload."""
