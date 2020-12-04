@@ -42,7 +42,7 @@ class CommandErrorHandler(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
         """Activates when a command opens an error."""
-        if hasattr(error, 'handled'):
+        if getattr(error, 'handled', False):
             logging.debug(f"Command {ctx.command} had its error already handled locally; ignoring.")
             return
 
