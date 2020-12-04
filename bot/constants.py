@@ -1,3 +1,4 @@
+import dataclasses
 import enum
 import logging
 from datetime import datetime
@@ -29,10 +30,26 @@ __all__ = (
 log = logging.getLogger(__name__)
 
 
-class AdventOfCodeLeaderboard(NamedTuple):
+@dataclasses.dataclass
+class AdventOfCodeLeaderboard:
     id: str
-    session: str
+    _session: str
     join_code: str
+
+    # If we notice that the session for this board expired, we set
+    # this attribute to `True`. We will emit a Sentry error so we
+    # can handle it, but, in the meantime, we'll try using the
+    # fallback session to make sure the commands still work.
+    use_fallback_session: bool = False
+
+    @property
+    def session(self) -> str:
+        """Return either the actual `session` cookie or the fallback cookie."""
+        if self.use_fallback_session:
+            log.info(f"Returning fallback cookie for board `{self.id}`.")
+            return AdventOfCode.fallback_session
+
+        return self._session
 
 
 def _parse_aoc_leaderboard_env() -> Dict[str, AdventOfCodeLeaderboard]:
@@ -61,6 +78,7 @@ class AdventOfCode:
     # Information for the several leaderboards we have
     leaderboards = _parse_aoc_leaderboard_env()
     staff_leaderboard_id = environ.get("AOC_STAFF_LEADERBOARD_ID", "")
+    fallback_session = environ.get("AOC_FALLBACK_SESSION", "")
 
     # Other Advent of Code constants
     ignored_days = [day for day in environ.get("AOC_IGNORED_DAYS", "").split(",")]
