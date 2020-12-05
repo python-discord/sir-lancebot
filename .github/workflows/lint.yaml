@@ -91,3 +91,35 @@ jobs:
       - name: Run flake8
         run: "flake8 \
         --format='::error file=%(path)s,line=%(row)d,col=%(col)d::[flake8] %(code)s: %(text)s'"
+
+      # Send an informational status embed to Discord instead of the
+      # standard embeds that Discord sends. This embed will contain
+      # more information and we can fine tune when we actually want
+      # to send an embed.
+      - name: GitHub Actions Status Embed for Discord
+        # For a `pull_request` we always want to send a status embed
+        # here. For a push event, only when this workflow is the last
+        # in lint->build sequence because it failed or was cancelled.
+        if: github.event_name == 'pull_request' || cancelled() || failure()
+        uses: SebastiaanZ/github-status-embed-for-discord@v0.1.1
+        with:
+          # Our GitHub Actions webhook
+          webhook_id: '784184528997842985'
+          webhook_token: ${{ secrets.GHA_WEBHOOK_TOKEN }}
+
+          # Workflow information
+          workflow_name: ${{ github.workflow }}
+          run_id: ${{ github.run_id }}
+          run_number: ${{ github.run_number }}
+          status: ${{ job.status }}
+          actor: ${{ github.actor }}
+          repository:  ${{ github.repository }}
+          ref: ${{ github.ref }}
+          sha: ${{ github.sha }}
+
+          # Optional PR-information. These values will be "null" if
+          # the event trigger was not PR-related.
+          pr_author_login: ${{ github.event.pull_request.user.login }}
+          pr_number: ${{ github.event.pull_request.number }}
+          pr_title: ${{ github.event.pull_request.title }}
+          pr_source: ${{ github.event.pull_request.head.label }}
