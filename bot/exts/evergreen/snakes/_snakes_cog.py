@@ -15,7 +15,7 @@ import aiohttp
 import async_timeout
 from PIL import Image, ImageDraw, ImageFont
 from discord import Colour, Embed, File, Member, Message, Reaction
-from discord.ext.commands import BadArgument, Bot, Cog, CommandError, Context, bot_has_permissions, group
+from discord.ext.commands import Bot, Cog, CommandError, Context, bot_has_permissions, group
 
 from bot.constants import ERROR_REPLIES, Tokens
 from bot.exts.evergreen.snakes import _utils as utils
@@ -1131,21 +1131,11 @@ class Snakes(Cog):
     @video_command.error
     async def command_error(self, ctx: Context, error: CommandError) -> None:
         """Local error handler for the Snake Cog."""
-        embed = Embed()
-        embed.colour = Colour.red()
-
-        if isinstance(error, BadArgument):
-            embed.description = str(error)
-            embed.title = random.choice(ERROR_REPLIES)
-
-        elif isinstance(error, OSError):
+        if isinstance(error, OSError):
+            error.handled = True
+            embed = Embed()
+            embed.colour = Colour.red()
             log.error(f"snake_card encountered an OSError: {error} ({error.original})")
             embed.description = "Could not generate the snake card! Please try again."
             embed.title = random.choice(ERROR_REPLIES)
-
-        else:
-            log.error(f"Unhandled tag command error: {error} ({error.original})")
-            return
-
-        await ctx.send(embed=embed)
-    # endregion
+            await ctx.send(embed=embed)
