@@ -75,3 +75,34 @@ jobs:
               kubernetes/sir-lancebot/deployment.yaml
           images: 'ghcr.io/python-discord/sir-lancebot:${{ steps.sha_tag.outputs.tag }}'
           kubectl-version: 'latest'
+
+      # Send an informational status embed to Discord instead of the
+      # standard embeds that Discord sends. This embed will contain
+      # more information and we can fine tune when we actually want
+      # to send an embed.
+      - name: GitHub Actions Status Embed for Discord
+        # This is the last step in the lint-build sequence, so always send
+        # an embed, regardless of success, failure or cancelled status.
+        if: always()
+        uses: SebastiaanZ/github-status-embed-for-discord@v0.1.1
+        with:
+          # Our GitHub Actions webhook
+          webhook_id: '784184528997842985'
+          webhook_token: ${{ secrets.GHA_WEBHOOK_TOKEN }}
+
+          # Workflow information
+          workflow_name: ${{ github.workflow }}
+          run_id: ${{ github.run_id }}
+          run_number: ${{ github.run_number }}
+          status: ${{ job.status }}
+          actor: ${{ github.actor }}
+          repository:  ${{ github.repository }}
+          ref: ${{ github.ref }}
+          sha: ${{ github.sha }}
+
+          # Optional PR-information. These values will be "null" if
+          # the event trigger was not PR-related.
+          pr_author_login: ${{ github.event.pull_request.user.login }}
+          pr_number: ${{ github.event.pull_request.number }}
+          pr_title: ${{ github.event.pull_request.title }}
+          pr_source: ${{ github.event.pull_request.head.label }}
