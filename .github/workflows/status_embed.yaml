@@ -1,0 +1,71 @@
+name: Status Embed
+
+on:
+  workflow_run:
+    workflows:
+      - Lint
+      - Build
+    types:
+      - completed
+
+jobs:
+  status_embed:
+    # We send the embed in the following situations:
+    # - Always after the `Build` workflow, as it runs at the
+    #   end of our workflow sequence regardless of status.
+    # - Always for the `pull_request` event, as it only
+    #   runs one workflow.
+    # - Always run for non-success workflows, as they
+    #   terminate the workflow sequence.
+    if: >-
+      github.event.workflow_run.name == 'Build' ||
+      github.event.workflow_run.event == 'pull_request' ||
+      github.event.workflow_run.conclusion != 'success'
+    name:  Send Status Embed to Discord
+    runs-on: ubuntu-latest
+
+    steps:
+      # Unfortunately, not all the pull request information we
+      # need is available in the workflow_run payload. We need
+      # to fetch it from the API.
+      - name: Get Pull Request Information
+        if: github.event.workflow_run.event == 'pull_request'
+        uses: octokit/request-action@v2.0.2
+        id: pull_request
+        with:
+          route: GET /repos/{owner}/{repo}/pulls
+          owner: ${{ github.event.repository.owner.login }}
+          repo: ${{ github.event.repository.name }}
+          state: open
+          head: ${{format(
+              '{0}:{1}',
+              github.event.workflow_run.head_repository.owner.login,
+              github.event.workflow_run.head_branch
+            )}}
+          sort: updated
+          direction: desc
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Send an informational status embed to Discord instead of the
+      # standard embeds that Discord sends. This embed will contain
+      # more information and we can fine tune when we actually want
+      # to send an embed.
+      - name: GitHub Actions Status Embed for Discord
+        uses: SebastiaanZ/github-status-embed-for-discord@v0.2.1
+        with:
+          # Our GitHub Actions webhook
+          webhook_id: '784184528997842985'
+          webhook_token: ${{ secrets.GHA_WEBHOOK_TOKEN }}
+
+          # Workflow information
+          workflow_name: ${{ github.event.workflow_run.name }}
+          run_id: ${{ github.event.workflow_run.id }}
+          run_number: ${{ github.event.workflow_run.run_number }}
+          status: ${{ github.event.workflow_run.conclusion }}
+          actor: ${{ github.actor }}
+          repository:  ${{ github.repository }}
+          ref: ${{ github.ref }}
+          sha: ${{ github.event.workflow_run.head_sha }}
+
+          pull_request_payload: ${{ steps.pull_request.outputs.data }}
