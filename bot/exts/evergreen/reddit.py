@@ -62,24 +62,24 @@ class Reddit(Cog):
         """Build embed pages required for Paginator."""
         pages = []
         first_page = ""
-        for i, post in enumerate(posts, start=1):
+        for post in posts:
             post_page = ""
             image_url = ""
 
             data = post["data"]
 
-            title = textwrap.shorten(data["title"], width=64, placeholder="...")
+            title = textwrap.shorten(data["title"], width=50, placeholder="...")
 
             # Normal brackets interfere with Markdown.
             title = escape_markdown(title).replace("[", "⦋").replace("]", "⦌")
             link = self.URL + data["permalink"]
 
-            first_page += f"**{i}. [{title.replace('*', '')}]({link})**\n"
-            post_page += f"**{i}. [{title}]({link})**\n\n"
+            first_page += f"**[{title.replace('*', '')}]({link})**\n"
+            post_page += f"**[{title}]({link})**\n\n"
 
             text = data["selftext"]
             if text:
-                first_page += textwrap.shorten(text, width=128, placeholder="...").replace("*", "") + "\n"
+                first_page += textwrap.shorten(text, width=100, placeholder="...").replace("*", "") + "\n"
                 post_page += textwrap.shorten(text, width=252, placeholder="...") + "\n\n"
 
             ups = data["ups"]
@@ -107,7 +107,7 @@ class Reddit(Cog):
 
             pages.append((post_page, image_url))
 
-        pages.insert(0, (first_page, ""))
+        pages.insert(0, (first_page, ""))  # Using image paginator, hence settings image url to empty string
         return pages
 
     async def get_access_token(self) -> None:
@@ -235,6 +235,7 @@ class Reddit(Cog):
         if paginate:
             return pages
 
+        # Use only starting summary page for #reddit channel posts.
         embed.description += pages[0]
         embed.colour = Colour.blurple()
         return embed
@@ -302,8 +303,8 @@ class Reddit(Cog):
         async with ctx.typing():
             pages = await self.get_top_posts(subreddit=subreddit, time="all", paginate=True)
 
+        await ctx.send("Here are the top r/Python posts of all time!")
         embed = Embed(
-            title=f"{Emojis.reddit} {subreddit} - Top\n\n",
             color=Colour.blurple()
         )
 
@@ -315,8 +316,8 @@ class Reddit(Cog):
         async with ctx.typing():
             pages = await self.get_top_posts(subreddit=subreddit, time="day", paginate=True)
 
+        await ctx.send("Here are today's top r/Python posts!")
         embed = Embed(
-            title=f"{Emojis.reddit} {subreddit} - Daily\n\n",
             color=Colour.blurple()
         )
 
@@ -328,8 +329,8 @@ class Reddit(Cog):
         async with ctx.typing():
             pages = await self.get_top_posts(subreddit=subreddit, time="week", paginate=True)
 
+        await ctx.send("Here are this week's top r/Python posts!")
         embed = Embed(
-            title=f"{Emojis.reddit} {subreddit} - Weekly\n\n",
             color=Colour.blurple()
         )
 
