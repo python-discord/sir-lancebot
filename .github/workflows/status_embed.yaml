@@ -25,25 +25,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Unfortunately, not all the pull request information we
-      # need is available in the workflow_run payload. We need
-      # to fetch it from the API.
+      # A workflow_run event does not contain all the information
+      # we need for a PR embed. That's why we upload an artifact
+      # with that information in the Lint workflow.
       - name: Get Pull Request Information
+        id: pr_info
         if: github.event.workflow_run.event == 'pull_request'
-        uses: octokit/request-action@v2.0.2
-        id: pull_request
-        with:
-          route: GET /repos/{owner}/{repo}/pulls
-          owner: ${{ github.event.repository.owner.login }}
-          repo: ${{ github.event.repository.name }}
-          state: open
-          head: ${{format(
-              '{0}:{1}',
-              github.event.workflow_run.head_repository.owner.login,
-              github.event.workflow_run.head_branch
-            )}}
-          sort: updated
-          direction: desc
+        run: |
+          curl -s -H "Authorization: token $GITHUB_TOKEN" ${{ github.event.workflow_run.artifacts_url }} > artifacts.json
+          DOWNLOAD_URL=$(cat artifacts.json | jq -r '.artifacts[] | select(.name == "pull-request-payload") | .archive_download_url')
+          [ -z "$DOWNLOAD_URL" ] && exit 1
+          wget --quiet --header="Authorization: token $GITHUB_TOKEN" -O pull_request_payload.zip $DOWNLOAD_URL || exit 2
+          unzip -p pull_request_payload.zip > pull_request_payload.json
+          [ -s pull_request_payload.json ] || exit 3
+          echo "::set-output name=pr_author_login::$(jq -r '.user.login // empty' pull_request_payload.json)"
+          echo "::set-output name=pr_number::$(jq -r '.number // empty' pull_request_payload.json)"
+          echo "::set-output name=pr_title::$(jq -r '.title // empty' pull_request_payload.json)"
+          echo "::set-output name=pr_source::$(jq -r '.head.label // empty' pull_request_payload.json)"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -68,4 +66,7 @@ jobs:
           ref: ${{ github.ref }}
           sha: ${{ github.event.workflow_run.head_sha }}
 
-          pull_request_payload: ${{ steps.pull_request.outputs.data }}
+          pr_author_login: ${{ steps.pr_info.outputs.pr_author_login }}
+          pr_number: ${{ steps.pr_info.outputs.pr_number }}
+          pr_title: ${{ steps.pr_info.outputs.pr_title }}
+          pr_source: ${{ steps.pr_info.outputs.pr_source }}
