@@ -376,5 +376,3 @@ class AdventOfCode(commands.Cog):
         if isinstance(error, InChannelCheckFailure):
             await ctx.send(f":x: Please use <#{Channels.advent_of_code_commands}> for aoc commands instead, please.")
             error.handled = True
-        else:
-            raise error
