@@ -374,5 +374,5 @@ class AdventOfCode(commands.Cog):
     async def cog_command_error(self, ctx: commands.Context, error: Exception) -> None:
         """Custom error handler if an advent of code command was posted in the wrong channel."""
         if isinstance(error, InChannelCheckFailure):
-            await ctx.send(f":x: Please use <#{Channels.advent_of_code_commands}> for aoc commands instead, please.")
+            await ctx.send(f":x: Please use <#{Channels.advent_of_code_commands}> for aoc commands instead.")
             error.handled = True
