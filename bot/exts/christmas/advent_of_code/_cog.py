@@ -13,7 +13,7 @@ from bot.constants import (
     AdventOfCode as AocConfig, Channels, Colours, Emojis, Month, Roles, WHITELISTED_CHANNELS,
 )
 from bot.exts.christmas.advent_of_code import _helpers
-from bot.utils.decorators import in_month, override_in_channel, with_role
+from bot.utils.decorators import InChannelCheckFailure, in_month, override_in_channel, with_role
 
 log = logging.getLogger(__name__)
 
@@ -21,7 +21,11 @@ AOC_REQUEST_HEADER = {"user-agent": "PythonDiscord AoC Event Bot"}
 
 COUNTDOWN_STEP = 60 * 5
 
-AOC_WHITELIST = WHITELISTED_CHANNELS + (Channels.advent_of_code,)
+AOC_WHITELIST_RESTRICTED = WHITELISTED_CHANNELS + (Channels.advent_of_code_commands,)
+
+# Some commands can be run in the regular advent of code channel
+# They aren't spammy and foster discussion
+AOC_WHITELIST = AOC_WHITELIST_RESTRICTED + (Channels.advent_of_code,)
 
 
 async def countdown_status(bot: commands.Bot) -> None:
@@ -256,7 +260,7 @@ class AdventOfCode(commands.Cog):
         aliases=("board", "lb"),
         brief="Get a snapshot of the PyDis private AoC leaderboard",
     )
-    @override_in_channel(AOC_WHITELIST)
+    @override_in_channel(AOC_WHITELIST_RESTRICTED)
     async def aoc_leaderboard(self, ctx: commands.Context) -> None:
         """Get the current top scorers of the Python Discord Leaderboard."""
         async with ctx.typing():
@@ -281,7 +285,7 @@ class AdventOfCode(commands.Cog):
         aliases=("globalboard", "gb"),
         brief="Get a link to the global leaderboard",
     )
-    @override_in_channel(AOC_WHITELIST)
+    @override_in_channel(AOC_WHITELIST_RESTRICTED)
     async def aoc_global_leaderboard(self, ctx: commands.Context) -> None:
         """Get a link to the global Advent of Code leaderboard."""
         url = self.global_leaderboard_url
@@ -297,7 +301,7 @@ class AdventOfCode(commands.Cog):
         aliases=("dailystats", "ds"),
         brief="Get daily statistics for the Python Discord leaderboard"
     )
-    @override_in_channel(AOC_WHITELIST)
+    @override_in_channel(AOC_WHITELIST_RESTRICTED)
     async def private_leaderboard_daily_stats(self, ctx: commands.Context) -> None:
         """Send an embed with daily completion statistics for the Python Discord leaderboard."""
         try:
@@ -366,3 +370,9 @@ class AdventOfCode(commands.Cog):
 
         about_embed.set_footer(text="Last Updated")
         return about_embed
+
+    async def cog_command_error(self, ctx: commands.Context, error: Exception) -> None:
+        """Custom error handler if an advent of code command was posted in the wrong channel."""
+        if isinstance(error, InChannelCheckFailure):
+            await ctx.send(f":x: Please use <#{Channels.advent_of_code_commands}> for aoc commands instead.")
+            error.handled = True
