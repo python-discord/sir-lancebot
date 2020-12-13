@@ -39,7 +39,7 @@ class AdventOfCode(commands.Cog):
         self.countdown_task = None
         self.status_task = None
 
-        notification_coro = _helpers.new_puzzle_announcement(self.bot)
+        notification_coro = _helpers.new_puzzle_notification(self.bot)
         self.notification_task = self.bot.loop.create_task(notification_coro)
         self.notification_task.set_name("Daily AoC Notification")
         self.notification_task.add_done_callback(_helpers.background_task_callback)
