@@ -1,3 +1,4 @@
+import asyncio
 import collections
 import datetime
 import json
@@ -407,3 +408,13 @@ def time_left_to_aoc_midnight() -> Tuple[datetime.datetime, datetime.timedelta]:
 
     # Calculate the timedelta between the current time and midnight
     return tomorrow, tomorrow - datetime.datetime.now(EST)
+
+
+def background_task_callback(task: asyncio.Task) -> None:
+    """Check if the finished background task failed to make sure we log errors."""
+    if task.cancelled():
+        log.info(f"Background task `{task.get_name()}` was cancelled.")
+    elif exception := task.exception():
+        log.error(f"Background task `{task.get_name()}` failed:", exc_info=exception)
+    else:
+        log.info(f"Background task `{task.get_name()}` exited normally.")

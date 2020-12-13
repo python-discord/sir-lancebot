@@ -30,6 +30,7 @@ AOC_WHITELIST = AOC_WHITELIST_RESTRICTED + (Channels.advent_of_code,)
 
 async def countdown_status(bot: commands.Bot) -> None:
     """Set the playing status of the bot to the minutes & hours left until the next day's challenge."""
+    log.info("Started `AoC Status Countdown` task")
     while _helpers.is_in_advent():
         _, time_left = _helpers.time_left_to_aoc_midnight()
 
@@ -62,6 +63,7 @@ async def day_countdown(bot: commands.Bot) -> None:
     Once we have calculated this we should then sleep that number and when the time is reached, ping
     the Advent of Code role notifying them that the new challenge is ready.
     """
+    log.info("Started `Daily AoC Notification` task")
     while _helpers.is_in_advent():
         tomorrow, time_left = _helpers.time_left_to_aoc_midnight()
 
@@ -127,9 +129,13 @@ class AdventOfCode(commands.Cog):
 
         countdown_coro = day_countdown(self.bot)
         self.countdown_task = self.bot.loop.create_task(countdown_coro)
+        self.countdown_task.set_name("Daily AoC Notification")
+        self.countdown_task.add_done_callback(_helpers.background_task_callback)
 
         status_coro = countdown_status(self.bot)
         self.status_task = self.bot.loop.create_task(status_coro)
+        self.status_task.set_name("AoC Status Countdown")
+        self.status_task.add_done_callback(_helpers.background_task_callback)
 
     @commands.group(name="adventofcode", aliases=("aoc",))
     @override_in_channel(AOC_WHITELIST)
