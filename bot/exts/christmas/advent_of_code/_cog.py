@@ -11,13 +11,17 @@ from bot.constants import (
     AdventOfCode as AocConfig, Channels, Colours, Emojis, Month, Roles, WHITELISTED_CHANNELS,
 )
 from bot.exts.christmas.advent_of_code import _helpers
-from bot.utils.decorators import in_month, override_in_channel, with_role
+from bot.utils.decorators import InChannelCheckFailure, in_month, override_in_channel, with_role
 
 log = logging.getLogger(__name__)
 
 AOC_REQUEST_HEADER = {"user-agent": "PythonDiscord AoC Event Bot"}
 
-AOC_WHITELIST = WHITELISTED_CHANNELS + (Channels.advent_of_code,)
+AOC_WHITELIST_RESTRICTED = WHITELISTED_CHANNELS + (Channels.advent_of_code_commands,)
+
+# Some commands can be run in the regular advent of code channel
+# They aren't spammy and foster discussion
+AOC_WHITELIST = AOC_WHITELIST_RESTRICTED + (Channels.advent_of_code,)
 
 
 class AdventOfCode(commands.Cog):
@@ -35,11 +39,15 @@ class AdventOfCode(commands.Cog):
         self.countdown_task = None
         self.status_task = None
 
-        announcement_coro = _helpers.new_puzzle_announcement(self.bot)
-        self.new_puzzle_announcement_task = self.bot.loop.create_task(announcement_coro)
+        notification_coro = _helpers.new_puzzle_announcement(self.bot)
+        self.notification_task = self.bot.loop.create_task(notification_coro)
+        self.notification_task.set_name("Daily AoC Notification")
+        self.notification_task.add_done_callback(_helpers.background_task_callback)
 
         status_coro = _helpers.countdown_status(self.bot)
         self.status_task = self.bot.loop.create_task(status_coro)
+        self.status_task.set_name("AoC Status Countdown")
+        self.status_task.add_done_callback(_helpers.background_task_callback)
 
     @commands.group(name="adventofcode", aliases=("aoc",))
     @override_in_channel(AOC_WHITELIST)
@@ -135,7 +143,11 @@ class AdventOfCode(commands.Cog):
         if AocConfig.staff_leaderboard_id and any(r.id == Roles.helpers for r in author.roles):
             join_code = AocConfig.leaderboards[AocConfig.staff_leaderboard_id].join_code
         else:
-            join_code = await _helpers.get_public_join_code(author)
+            try:
+                join_code = await _helpers.get_public_join_code(author)
+            except _helpers.FetchingLeaderboardFailed:
+                await ctx.send(":x: Failed to get join code! Notified maintainers.")
+                return
 
         if not join_code:
             log.error(f"Failed to get a join code for user {author} ({author.id})")
@@ -166,11 +178,16 @@ class AdventOfCode(commands.Cog):
         aliases=("board", "lb"),
         brief="Get a snapshot of the PyDis private AoC leaderboard",
     )
-    @override_in_channel(AOC_WHITELIST)
+    @override_in_channel(AOC_WHITELIST_RESTRICTED)
     async def aoc_leaderboard(self, ctx: commands.Context) -> None:
         """Get the current top scorers of the Python Discord Leaderboard."""
         async with ctx.typing():
-            leaderboard = await _helpers.fetch_leaderboard()
+            try:
+                leaderboard = await _helpers.fetch_leaderboard()
+            except _helpers.FetchingLeaderboardFailed:
+                await ctx.send(":x: Unable to fetch leaderboard!")
+                return
+
             number_of_participants = leaderboard["number_of_participants"]
 
             top_count = min(AocConfig.leaderboard_displayed_members, number_of_participants)
@@ -186,7 +203,7 @@ class AdventOfCode(commands.Cog):
         aliases=("globalboard", "gb"),
         brief="Get a link to the global leaderboard",
     )
-    @override_in_channel(AOC_WHITELIST)
+    @override_in_channel(AOC_WHITELIST_RESTRICTED)
     async def aoc_global_leaderboard(self, ctx: commands.Context) -> None:
         """Get a link to the global Advent of Code leaderboard."""
         url = self.global_leaderboard_url
@@ -202,10 +219,14 @@ class AdventOfCode(commands.Cog):
         aliases=("dailystats", "ds"),
         brief="Get daily statistics for the Python Discord leaderboard"
     )
-    @override_in_channel(AOC_WHITELIST)
+    @override_in_channel(AOC_WHITELIST_RESTRICTED)
     async def private_leaderboard_daily_stats(self, ctx: commands.Context) -> None:
         """Send an embed with daily completion statistics for the Python Discord leaderboard."""
-        leaderboard = await _helpers.fetch_leaderboard()
+        try:
+            leaderboard = await _helpers.fetch_leaderboard()
+        except _helpers.FetchingLeaderboardFailed:
+            await ctx.send(":x: Can't fetch leaderboard for stats right now!")
+            return
 
         # The daily stats are serialized as JSON as they have to be cached in Redis
         daily_stats = json.loads(leaderboard["daily_stats"])
@@ -237,8 +258,12 @@ class AdventOfCode(commands.Cog):
         many requests to the Advent of Code server.
         """
         async with ctx.typing():
-            await _helpers.fetch_leaderboard(invalidate_cache=True)
-            await ctx.send("\N{OK Hand Sign} Refreshed leaderboard cache!")
+            try:
+                await _helpers.fetch_leaderboard(invalidate_cache=True)
+            except _helpers.FetchingLeaderboardFailed:
+                await ctx.send(":x: Something went wrong while trying to refresh the cache!")
+            else:
+                await ctx.send("\N{OK Hand Sign} Refreshed leaderboard cache!")
 
     def cog_unload(self) -> None:
         """Cancel season-related tasks on cog unload."""
@@ -263,3 +288,9 @@ class AdventOfCode(commands.Cog):
 
         about_embed.set_footer(text="Last Updated")
         return about_embed
+
+    async def cog_command_error(self, ctx: commands.Context, error: Exception) -> None:
+        """Custom error handler if an advent of code command was posted in the wrong channel."""
+        if isinstance(error, InChannelCheckFailure):
+            await ctx.send(f":x: Please use <#{Channels.advent_of_code_commands}> for aoc commands instead.")
+            error.handled = True

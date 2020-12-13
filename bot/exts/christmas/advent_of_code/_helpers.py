@@ -56,7 +56,19 @@ COUNTDOWN_STEP = 60 * 5
 # Create namedtuple that combines a participant's name and their completion
 # time for a specific star. We're going to use this later to order the results
 # for each star to compute the rank score.
-_StarResult = collections.namedtuple("StarResult", "name completion_time")
+StarResult = collections.namedtuple("StarResult", "member_id completion_time")
+
+
+class UnexpectedRedirect(aiohttp.ClientError):
+    """Raised when an unexpected redirect was detected."""
+
+
+class UnexpectedResponseStatus(aiohttp.ClientError):
+    """Raised when an unexpected redirect was detected."""
+
+
+class FetchingLeaderboardFailed(Exception):
+    """Raised when one or more leaderboards could not be fetched at all."""
 
 
 def leaderboard_sorting_function(entry: typing.Tuple[str, dict]) -> typing.Tuple[int, int]:
@@ -67,7 +79,7 @@ def leaderboard_sorting_function(entry: typing.Tuple[str, dict]) -> typing.Tuple
     secondary on the number of stars someone has completed.
     """
     result = entry[1]
-    return result["score"], result["star_2_count"] + result["star_1_count"]
+    return result["score"], result["star_2"] + result["star_1"]
 
 
 def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
@@ -96,30 +108,34 @@ def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
     # star view. We need that per star view to compute rank scores per star.
     for member in raw_leaderboard_data.values():
         name = member["name"] if member["name"] else f"Anonymous #{member['id']}"
-        leaderboard[name] = {"score": 0, "star_1_count": 0, "star_2_count": 0}
+        member_id = member['id']
+        leaderboard[member_id] = {"name": name, "score": 0, "star_1": 0, "star_2": 0}
 
         # Iterate over all days for this participant
         for day, stars in member["completion_day_level"].items():
             # Iterate over the complete stars for this day for this participant
             for star, data in stars.items():
                 # Record completion of this star for this individual
-                leaderboard[name][f"star_{star}_count"] += 1
+                leaderboard[member_id][f"star_{star}"] += 1
 
                 # Record completion datetime for this participant for this day/star
                 completion_time = datetime.datetime.fromtimestamp(int(data['get_star_ts']))
                 star_results[(day, star)].append(
-                    _StarResult(name=name, completion_time=completion_time)
+                    StarResult(member_id=member_id, completion_time=completion_time)
                 )
 
     # Now that we have a transposed dataset that holds the completion time of all
     # participants per star, we can compute the rank-based scores each participant
     # should get for that star.
     max_score = len(leaderboard)
-    for(day, _star), results in star_results.items():
+    for (day, _star), results in star_results.items():
+        # If this day should not count in the ranking, skip it.
         if day in AdventOfCode.ignored_days:
             continue
-        for rank, star_result in enumerate(sorted(results, key=operator.itemgetter(1))):
-            leaderboard[star_result.name]["score"] += max_score - rank
+
+        sorted_result = sorted(results, key=operator.attrgetter('completion_time'))
+        for rank, star_result in enumerate(sorted_result):
+            leaderboard[star_result.member_id]["score"] += max_score - rank
 
     # Since dictionaries now retain insertion order, let's use that
     sorted_leaderboard = dict(
@@ -139,20 +155,37 @@ def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
     return {"daily_stats": daily_stats, "leaderboard": sorted_leaderboard}
 
 
-def _format_leaderboard(leaderboard: typing.Dict[str, int]) -> str:
+def _format_leaderboard(leaderboard: typing.Dict[str, dict]) -> str:
     """Format the leaderboard using the AOC_TABLE_TEMPLATE."""
     leaderboard_lines = [HEADER]
-    for rank, (name, results) in enumerate(leaderboard.items(), start=1):
+    for rank, data in enumerate(leaderboard.values(), start=1):
         leaderboard_lines.append(
             AOC_TABLE_TEMPLATE.format(
                 rank=rank,
-                name=name,
-                score=str(results["score"]),
-                stars=f"({results['star_1_count']}, {results['star_2_count']})"
+                name=data["name"],
+                score=str(data["score"]),
+                stars=f"({data['star_1']}, {data['star_2']})"
             )
         )
 
     return "\n".join(leaderboard_lines)
+
+
+async def _leaderboard_request(url: str, board: int, cookies: dict) -> typing.Optional[dict]:
+    """Make a leaderboard request using the specified session cookie."""
+    async with aiohttp.request("GET", url, headers=AOC_REQUEST_HEADER, cookies=cookies) as resp:
+        # The Advent of Code website redirects silently with a 200 response if a
+        # session cookie has expired, is invalid, or was not provided.
+        if str(resp.url) != url:
+            log.error(f"Fetching leaderboard `{board}` failed! Check the session cookie.")
+            raise UnexpectedRedirect(f"redirected unexpectedly to {resp.url} for board `{board}`")
+
+        # Every status other than `200` is unexpected, not only 400+
+        if not resp.status == 200:
+            log.error(f"Unexpected response `{resp.status}` while fetching leaderboard `{board}`")
+            raise UnexpectedResponseStatus(f"status `{resp.status}`")
+
+        return await resp.json()
 
 
 async def _fetch_leaderboard_data() -> typing.Dict[str, typing.Any]:
@@ -167,22 +200,34 @@ async def _fetch_leaderboard_data() -> typing.Dict[str, typing.Any]:
     participants = {}
     for leaderboard in AdventOfCode.leaderboards.values():
         leaderboard_url = AOC_API_URL.format(year=year, leaderboard_id=leaderboard.id)
-        cookies = {"session": leaderboard.session}
 
-        # We don't need to create a session if we're going to throw it away after each request
-        async with aiohttp.request(
-            "GET", leaderboard_url, headers=AOC_REQUEST_HEADER, cookies=cookies
-        ) as resp:
-            if resp.status == 200:
-                raw_data = await resp.json()
+        # Two attempts, one with the original session cookie and one with the fallback session
+        for attempt in range(1, 3):
+            log.info(f"Attempting to fetch leaderboard `{leaderboard.id}` ({attempt}/2)")
+            cookies = {"session": leaderboard.session}
+            try:
+                raw_data = await _leaderboard_request(leaderboard_url, leaderboard.id, cookies)
+            except UnexpectedRedirect:
+                if cookies["session"] == AdventOfCode.fallback_session:
+                    log.error("It seems like the fallback cookie has expired!")
+                    raise FetchingLeaderboardFailed from None
 
-                # Get the participants and store their current count
+                # If we're here, it means that the original session did not
+                # work. Let's fall back to the fallback session.
+                leaderboard.use_fallback_session = True
+                continue
+            except aiohttp.ClientError:
+                # Don't retry, something unexpected is wrong and it may not be the session.
+                raise FetchingLeaderboardFailed from None
+            else:
+                # Get the participants and store their current count.
                 board_participants = raw_data["members"]
                 await _caches.leaderboard_counts.set(leaderboard.id, len(board_participants))
                 participants.update(board_participants)
-            else:
-                log.warning(f"Fetching data failed for leaderboard `{leaderboard.id}`")
-                resp.raise_for_status()
+                break
+        else:
+            log.error(f"reached 'unreachable' state while fetching board `{leaderboard.id}`.")
+            raise FetchingLeaderboardFailed
 
     log.info(f"Fetched leaderboard information for {len(participants)} participants")
     return participants
@@ -532,3 +577,13 @@ async def new_puzzle_announcement(bot: Bot) -> None:
         # over midnight. This means we're certain to calculate the time to the
         # next midnight at the top of the loop.
         await asyncio.sleep(120)
+
+
+def background_task_callback(task: asyncio.Task) -> None:
+    """Check if the finished background task failed to make sure we log errors."""
+    if task.cancelled():
+        log.info(f"Background task `{task.get_name()}` was cancelled.")
+    elif exception := task.exception():
+        log.error(f"Background task `{task.get_name()}` failed:", exc_info=exception)
+    else:
+        log.info(f"Background task `{task.get_name()}` exited normally.")
