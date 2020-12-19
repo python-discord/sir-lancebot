@@ -1,7 +1,7 @@
 FROM python:3.8-slim
 
 # Set SHA build argument
-ARG git_sha
+ARG git_sha="development"
 
 # Set pip to have cleaner logs and no saved cache
 ENV PIP_NO_CACHE_DIR=false \
