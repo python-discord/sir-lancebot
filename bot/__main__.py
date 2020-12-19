@@ -21,7 +21,7 @@ sentry_sdk.init(
         sentry_logging,
         RedisIntegration()
     ],
-    release=f"pydis-sir-lancebot@{GIT_SHA}"
+    release=f"sir-lancebot@{GIT_SHA}"
 )
 
 log = logging.getLogger(__name__)
