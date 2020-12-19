@@ -1,7 +1,6 @@
 import logging
 
 import sentry_sdk
-from sentry_sdk.integrations.aiohttp import AioHttpIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.redis import RedisIntegration
 
@@ -20,8 +19,7 @@ sentry_sdk.init(
     dsn=Client.sentry_dsn,
     integrations=[
         sentry_logging,
-        RedisIntegration(),
-        AioHttpIntegration()
+        RedisIntegration()
     ],
     release=f"pydis-sir-lancebot@{GIT_SHA}"
 )
