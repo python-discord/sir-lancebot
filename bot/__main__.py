@@ -1,12 +1,12 @@
 import logging
 
 import sentry_sdk
+from sentry_sdk.integrations.aiohttp import AioHttpIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.redis import RedisIntegration
-from sentry_sdk.integrations.aiohttp import AioHttpIntegration
 
 from bot.bot import bot
-from bot.constants import Client, STAFF_ROLES, WHITELISTED_CHANNELS
+from bot.constants import Client, GIT_SHA, STAFF_ROLES, WHITELISTED_CHANNELS
 from bot.utils.decorators import in_channel_check
 from bot.utils.extensions import walk_extensions
 
@@ -22,7 +22,8 @@ sentry_sdk.init(
         sentry_logging,
         RedisIntegration(),
         AioHttpIntegration()
-    ]
+    ],
+    release=f"pydis-sir-lancebot@{GIT_SHA}"
 )
 
 log = logging.getLogger(__name__)
