@@ -313,6 +313,8 @@ WHITELISTED_CHANNELS = (
     Channels.sprint_documentation,
 )
 
+GIT_SHA = environ.get("GIT_SHA", "foobar")
+
 # Bot replies
 ERROR_REPLIES = [
     "Please don't do that.",
