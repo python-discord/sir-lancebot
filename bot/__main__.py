@@ -2,6 +2,8 @@ import logging
 
 import sentry_sdk
 from sentry_sdk.integrations.logging import LoggingIntegration
+from sentry_sdk.integrations.redis import RedisIntegration
+from sentry_sdk.integrations.aiohttp import AioHttpIntegration
 
 from bot.bot import bot
 from bot.constants import Client, STAFF_ROLES, WHITELISTED_CHANNELS
@@ -16,7 +18,11 @@ sentry_logging = LoggingIntegration(
 
 sentry_sdk.init(
     dsn=Client.sentry_dsn,
-    integrations=[sentry_logging]
+    integrations=[
+        sentry_logging,
+        RedisIntegration(),
+        AioHttpIntegration()
+    ]
 )
 
 log = logging.getLogger(__name__)
