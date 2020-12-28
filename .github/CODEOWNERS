@@ -1,3 +1,7 @@
+# Extensions groups
+bot/exts/christmas/**                   @ks129
+bot/exts/halloween/**                   @ks129
+
 # CI & Docker
 .github/workflows/**                    @Akarys42 @SebastiaanZ @Den4200
 Dockerfile                              @Akarys42 @Den4200
