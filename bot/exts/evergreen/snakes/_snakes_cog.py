@@ -1125,26 +1125,15 @@ class Snakes(Cog):
     # endregion
 
     # region: Error handlers
-    @get_command.error
     @card_command.error
-    @video_command.error
     async def command_error(self, ctx: Context, error: CommandError) -> None:
         """Local error handler for the Snake Cog."""
-        embed = Embed()
-        embed.colour = Colour.red()
-
-        if isinstance(error, BadArgument):
-            embed.description = str(error)
-            embed.title = random.choice(ERROR_REPLIES)
-
-        elif isinstance(error, OSError):
-            log.error(f"snake_card encountered an OSError: {error} ({error.original})")
+        original_error = getattr(error, "original", None)
+        if isinstance(original_error, OSError):
+            error.handled = True
+            embed = Embed()
+            embed.colour = Colour.red()
+            log.error(f"snake_card encountered an OSError: {error} ({original_error})")
             embed.description = "Could not generate the snake card! Please try again."
             embed.title = random.choice(ERROR_REPLIES)
-
-        else:
-            log.error(f"Unhandled tag command error: {error} ({error.original})")
-            return
-
-        await ctx.send(embed=embed)
-    # endregion
+            await ctx.send(embed=embed)
