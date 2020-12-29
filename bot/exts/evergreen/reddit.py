@@ -58,7 +58,7 @@ class Reddit(Cog):
         """Get the #reddit channel object from the bot's cache."""
         return self.bot.get_channel(Channels.reddit)
 
-    def build_pagination_pages(self, posts: List[dict]) -> List[tuple]:
+    def build_pagination_pages(self, posts: List[dict], paginate) -> Union[List[tuple], str]:
         """Build embed pages required for Paginator."""
         pages = []
         first_page = ""
@@ -75,19 +75,17 @@ class Reddit(Cog):
             link = self.URL + data["permalink"]
 
             first_page += f"**[{title.replace('*', '')}]({link})**\n"
-            post_page += f"**[{title}]({link})**\n\n"
 
             text = data["selftext"]
             if text:
                 first_page += textwrap.shorten(text, width=100, placeholder="...").replace("*", "") + "\n"
-                post_page += textwrap.shorten(text, width=252, placeholder="...") + "\n\n"
 
             ups = data["ups"]
             comments = data["num_comments"]
             author = data["author"]
 
             content_type = Emojis.reddit_post_text
-            if data["is_video"] is True or "youtube" in data["url"].split("."):
+            if data["is_video"] is True or {"youtube", "youtu.be"}.issubset(set(data["url"].split("."))):
                 # This means the content type in the post is a video.
                 content_type = f"{Emojis.reddit_post_video}"
 
@@ -100,12 +98,21 @@ class Reddit(Cog):
                 f"{content_type}\u2003{Emojis.reddit_upvote}{ups}\u2003{Emojis.reddit_comments}"
                 f"\u2002{comments}\u2003{Emojis.reddit_users}{author}\n\n"
             )
-            post_page += (
-                f"{content_type}\u2003{Emojis.reddit_upvote}{ups}\u2003{Emojis.reddit_comments}\u2002"
-                f"{comments}\u2003{Emojis.reddit_users}{author}"
-            )
 
-            pages.append((post_page, image_url))
+            if paginate:
+                post_page += f"**[{title}]({link})**\n\n"
+                if text:
+                    post_page += textwrap.shorten(text, width=252, placeholder="...") + "\n\n"
+                post_page += (
+                    f"{content_type}\u2003{Emojis.reddit_upvote}{ups}\u2003{Emojis.reddit_comments}\u2002"
+                    f"{comments}\u2003{Emojis.reddit_users}{author}"
+                )
+
+                pages.append((post_page, image_url))
+
+        if not paginate:
+            # Return the first summery page if pagination is not required
+            return first_page
 
         pages.insert(0, (first_page, ""))  # Using image paginator, hence settings image url to empty string
         return pages
@@ -213,7 +220,7 @@ class Reddit(Cog):
 
         The amount should be between 0 and 25 as Reddit's JSON requests only provide 25 posts at most.
         """
-        embed = Embed(description="")
+        embed = Embed()
 
         posts = await self.fetch_posts(
             route=f"{subreddit}/top",
@@ -230,13 +237,11 @@ class Reddit(Cog):
 
             return embed
 
-        pages = self.build_pagination_pages(posts)
-
         if paginate:
-            return pages
+            return self.build_pagination_pages(posts, paginate=True)
 
         # Use only starting summary page for #reddit channel posts.
-        embed.description += pages[0]
+        embed.description = self.build_pagination_pages(posts, paginate=False)
         embed.colour = Colour.blurple()
         return embed
 
@@ -303,7 +308,7 @@ class Reddit(Cog):
         async with ctx.typing():
             pages = await self.get_top_posts(subreddit=subreddit, time="all", paginate=True)
 
-        await ctx.send("Here are the top r/Python posts of all time!")
+        await ctx.send(f"Here are the top {subreddit} posts of all time!")
         embed = Embed(
             color=Colour.blurple()
         )
@@ -316,7 +321,7 @@ class Reddit(Cog):
         async with ctx.typing():
             pages = await self.get_top_posts(subreddit=subreddit, time="day", paginate=True)
 
-        await ctx.send("Here are today's top r/Python posts!")
+        await ctx.send(f"Here are today's top {subreddit} posts!")
         embed = Embed(
             color=Colour.blurple()
         )
@@ -329,7 +334,7 @@ class Reddit(Cog):
         async with ctx.typing():
             pages = await self.get_top_posts(subreddit=subreddit, time="week", paginate=True)
 
-        await ctx.send("Here are this week's top r/Python posts!")
+        await ctx.send(f"Here are this week's top {subreddit} posts!")
         embed = Embed(
             color=Colour.blurple()
         )
