@@ -1,1 +1,11 @@
-* @python-discord/core-developers
+# Extensions groups
+bot/exts/christmas/**                   @ks129
+bot/exts/halloween/**                   @ks129
+
+# CI & Docker
+.github/workflows/**                    @Akarys42 @SebastiaanZ @Den4200
+Dockerfile                              @Akarys42 @Den4200
+docker-compose.yml                      @Akarys42 @Den4200
+
+# Tools
+Pipfile*                                @Akarys42

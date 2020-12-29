@@ -9,7 +9,7 @@ from sentry_sdk import push_scope
 
 from bot.constants import Colours, ERROR_REPLIES, NEGATIVE_REPLIES
 from bot.utils.decorators import InChannelCheckFailure, InMonthCheckFailure
-from bot.utils.exceptions import BrandingError, UserNotPlayingError
+from bot.utils.exceptions import UserNotPlayingError
 
 log = logging.getLogger(__name__)
 
@@ -42,8 +42,8 @@ class CommandErrorHandler(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
         """Activates when a command opens an error."""
-        if hasattr(ctx.command, 'on_error'):
-            logging.debug("A command error occured but the command had it's own error handler.")
+        if getattr(error, 'handled', False):
+            logging.debug(f"Command {ctx.command} had its error already handled locally; ignoring.")
             return
 
         error = getattr(error, 'original', error)
@@ -55,10 +55,6 @@ class CommandErrorHandler(commands.Cog):
         )
 
         if isinstance(error, commands.CommandNotFound):
-            return
-
-        if isinstance(error, BrandingError):
-            await ctx.send(embed=self.error_embed(str(error)))
             return
 
         if isinstance(error, (InChannelCheckFailure, InMonthCheckFailure)):

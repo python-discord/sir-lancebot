@@ -15,7 +15,8 @@ import aiohttp
 import async_timeout
 from PIL import Image, ImageDraw, ImageFont
 from discord import Colour, Embed, File, Member, Message, Reaction
-from discord.ext.commands import BadArgument, Bot, Cog, CommandError, Context, bot_has_permissions, group
+from discord.errors import HTTPException
+from discord.ext.commands import Bot, Cog, CommandError, Context, bot_has_permissions, group
 
 from bot.constants import ERROR_REPLIES, Tokens
 from bot.exts.evergreen.snakes import _utils as utils
@@ -151,6 +152,7 @@ class Snakes(Cog):
         self.snake_idioms = utils.get_resource("snake_idioms")
         self.snake_quizzes = utils.get_resource("snake_quiz")
         self.snake_facts = utils.get_resource("snake_facts")
+        self.num_movie_pages = None
 
     # region: Helper methods
     @staticmethod
@@ -739,71 +741,68 @@ class Snakes(Cog):
     @snakes_group.command(name='movie')
     async def movie_command(self, ctx: Context) -> None:
         """
-        Gets a random snake-related movie from OMDB.
+        Gets a random snake-related movie from TMDB.
 
         Written by Samuel.
         Modified by gdude.
+        Modified by Will Da Silva.
         """
-        url = "http://www.omdbapi.com/"
-        page = random.randint(1, 27)
+        # Initially 8 pages are fetched. The actual number of pages is set after the first request.
+        page = random.randint(1, self.num_movie_pages or 8)
 
-        response = await self.bot.http_session.get(
-            url,
-            params={
-                "s": "snake",
-                "page": page,
-                "type": "movie",
-                "apikey": Tokens.omdb
-            }
-        )
-        data = await response.json()
-        movie = random.choice(data["Search"])["imdbID"]
+        async with ctx.typing():
+            response = await self.bot.http_session.get(
+                "https://api.themoviedb.org/3/search/movie",
+                params={
+                    "query": "snake",
+                    "page": page,
+                    "language": "en-US",
+                    "api_key": Tokens.tmdb,
+                }
+            )
+            data = await response.json()
+            if self.num_movie_pages is None:
+                self.num_movie_pages = data["total_pages"]
+            movie = random.choice(data["results"])["id"]
 
-        response = await self.bot.http_session.get(
-            url,
-            params={
-                "i": movie,
-                "apikey": Tokens.omdb
-            }
-        )
-        data = await response.json()
+            response = await self.bot.http_session.get(
+                f"https://api.themoviedb.org/3/movie/{movie}",
+                params={
+                    "language": "en-US",
+                    "api_key": Tokens.tmdb,
+                }
+            )
+            data = await response.json()
 
-        embed = Embed(
-            title=data["Title"],
-            color=SNAKE_COLOR
-        )
+        embed = Embed(title=data["title"], color=SNAKE_COLOR)
 
-        del data["Response"], data["imdbID"], data["Title"]
+        if data["poster_path"] is not None:
+            embed.set_image(url=f"https://images.tmdb.org/t/p/original{data['poster_path']}")
 
-        for key, value in data.items():
-            if not value or value == "N/A" or key in ("Response", "imdbID", "Title", "Type"):
-                continue
+        if data["overview"]:
+            embed.add_field(name="Overview", value=data["overview"])
 
-            if key == "Ratings":  # [{'Source': 'Internet Movie Database', 'Value': '7.6/10'}]
-                rating = random.choice(value)
+        if data["release_date"]:
+            embed.add_field(name="Release Date", value=data["release_date"])
 
-                if rating["Source"] != "Internet Movie Database":
-                    embed.add_field(name=f"Rating: {rating['Source']}", value=rating["Value"])
+        if data["genres"]:
+            embed.add_field(name="Genres", value=", ".join([x["name"] for x in data["genres"]]))
 
-                continue
+        if data["vote_count"]:
+            embed.add_field(name="Rating", value=f"{data['vote_average']}/10 ({data['vote_count']} votes)", inline=True)
 
-            if key == "Poster":
-                embed.set_image(url=value)
-                continue
+        if data["budget"] and data["revenue"]:
+            embed.add_field(name="Budget", value=data["budget"], inline=True)
+            embed.add_field(name="Revenue", value=data["revenue"], inline=True)
 
-            elif key == "imdbRating":
-                key = "IMDB Rating"
+        embed.set_footer(text="This product uses the TMDb API but is not endorsed or certified by TMDb.")
+        embed.set_thumbnail(url="https://i.imgur.com/LtFtC8H.png")
 
-            elif key == "imdbVotes":
-                key = "IMDB Votes"
-
-            embed.add_field(name=key, value=value, inline=True)
-
-        embed.set_footer(text="Data provided by the OMDB API")
-
-        await ctx.channel.send(
-            embed=embed
-        )
+        try:
+            await ctx.channel.send(embed=embed)
+        except HTTPException as err:
+            await ctx.channel.send("An error occurred while fetching a snake-related movie!")
+            raise err from None
 
     @snakes_group.command(name='quiz')
     @locked()
@@ -1083,13 +1082,13 @@ class Snakes(Cog):
             url,
             params={
                 "part": "snippet",
-                "q": urllib.parse.quote(query),
+                "q": urllib.parse.quote_plus(query),
                 "type": "video",
                 "key": Tokens.youtube
             }
         )
         response = await response.json()
-        data = response['items']
+        data = response.get("items", [])
 
         # Send the user a video
         if len(data) > 0:
@@ -1126,26 +1125,15 @@ class Snakes(Cog):
     # endregion
 
     # region: Error handlers
-    @get_command.error
     @card_command.error
-    @video_command.error
     async def command_error(self, ctx: Context, error: CommandError) -> None:
         """Local error handler for the Snake Cog."""
-        embed = Embed()
-        embed.colour = Colour.red()
-
-        if isinstance(error, BadArgument):
-            embed.description = str(error)
-            embed.title = random.choice(ERROR_REPLIES)
-
-        elif isinstance(error, OSError):
-            log.error(f"snake_card encountered an OSError: {error} ({error.original})")
+        original_error = getattr(error, "original", None)
+        if isinstance(original_error, OSError):
+            error.handled = True
+            embed = Embed()
+            embed.colour = Colour.red()
+            log.error(f"snake_card encountered an OSError: {error} ({original_error})")
             embed.description = "Could not generate the snake card! Please try again."
             embed.title = random.choice(ERROR_REPLIES)
-
-        else:
-            log.error(f"Unhandled tag command error: {error} ({error.original})")
-            return
-
-        await ctx.send(embed=embed)
-    # endregion
+            await ctx.send(embed=embed)
