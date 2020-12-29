@@ -16,7 +16,7 @@ import async_timeout
 from PIL import Image, ImageDraw, ImageFont
 from discord import Colour, Embed, File, Member, Message, Reaction
 from discord.errors import HTTPException
-from discord.ext.commands import BadArgument, Bot, Cog, CommandError, Context, bot_has_permissions, group
+from discord.ext.commands import Bot, Cog, CommandError, Context, bot_has_permissions, group
 
 from bot.constants import ERROR_REPLIES, Tokens
 from bot.exts.evergreen.snakes import _utils as utils
