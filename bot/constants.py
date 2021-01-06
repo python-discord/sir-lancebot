@@ -1,8 +1,9 @@
+import dataclasses
 import enum
 import logging
 from datetime import datetime
 from os import environ
-from typing import NamedTuple
+from typing import Dict, NamedTuple
 
 __all__ = (
     "AdventOfCode",
@@ -29,11 +30,60 @@ __all__ = (
 log = logging.getLogger(__name__)
 
 
+@dataclasses.dataclass
+class AdventOfCodeLeaderboard:
+    id: str
+    _session: str
+    join_code: str
+
+    # If we notice that the session for this board expired, we set
+    # this attribute to `True`. We will emit a Sentry error so we
+    # can handle it, but, in the meantime, we'll try using the
+    # fallback session to make sure the commands still work.
+    use_fallback_session: bool = False
+
+    @property
+    def session(self) -> str:
+        """Return either the actual `session` cookie or the fallback cookie."""
+        if self.use_fallback_session:
+            log.info(f"Returning fallback cookie for board `{self.id}`.")
+            return AdventOfCode.fallback_session
+
+        return self._session
+
+
+def _parse_aoc_leaderboard_env() -> Dict[str, AdventOfCodeLeaderboard]:
+    """
+    Parse the environment variable containing leaderboard information.
+
+    A leaderboard should be specified in the format `id,session,join_code`,
+    without the backticks. If more than one leaderboard needs to be added to
+    the constant, separate the individual leaderboards with `::`.
+
+    Example ENV: `id1,session1,join_code1::id2,session2,join_code2`
+    """
+    raw_leaderboards = environ.get("AOC_LEADERBOARDS", "")
+    if not raw_leaderboards:
+        return {}
+
+    leaderboards = {}
+    for leaderboard in raw_leaderboards.split("::"):
+        leaderboard_id, session, join_code = leaderboard.split(",")
+        leaderboards[leaderboard_id] = AdventOfCodeLeaderboard(leaderboard_id, session, join_code)
+
+    return leaderboards
+
+
 class AdventOfCode:
-    leaderboard_cache_age_threshold_seconds = 3600
-    leaderboard_id = 631135
-    leaderboard_join_code = str(environ.get("AOC_JOIN_CODE", None))
-    leaderboard_max_displayed_members = 10
+    # Information for the several leaderboards we have
+    leaderboards = _parse_aoc_leaderboard_env()
+    staff_leaderboard_id = environ.get("AOC_STAFF_LEADERBOARD_ID", "")
+    fallback_session = environ.get("AOC_FALLBACK_SESSION", "")
+
+    # Other Advent of Code constants
+    ignored_days = environ.get("AOC_IGNORED_DAYS", "").split(",")
+    leaderboard_displayed_members = 10
+    leaderboard_cache_expiry_seconds = 1800
     year = int(environ.get("AOC_YEAR", datetime.utcnow().year))
     role_id = int(environ.get("AOC_ROLE_ID", 518565788744024082))
 
@@ -44,7 +94,8 @@ class Branding:
 
 class Channels(NamedTuple):
     admins = 365960823622991872
-    advent_of_code = int(environ.get("AOC_CHANNEL_ID", 517745814039166986))
+    advent_of_code = int(environ.get("AOC_CHANNEL_ID", 782715290437943306))
+    advent_of_code_commands = int(environ.get("AOC_COMMANDS_CHANNEL_ID", 607247579608121354))
     announcements = int(environ.get("CHANNEL_ANNOUNCEMENTS", 354619224620138496))
     big_brother_logs = 468507907357409333
     bot = 267659945086812160
@@ -193,9 +244,10 @@ class Roles(NamedTuple):
     muted = 277914926603829249
     owner = 267627879762755584
     verified = 352427296948486144
-    helpers = 267630620367257601
+    helpers = int(environ.get("ROLE_HELPERS", 267630620367257601))
     rockstars = 458226413825294336
     core_developers = 587606783669829632
+    events_lead = 778361735739998228
 
 
 class Tokens(NamedTuple):
@@ -261,6 +313,8 @@ WHITELISTED_CHANNELS = (
     Channels.sprint_discussion_mentor,
     Channels.sprint_documentation,
 )
+
+GIT_SHA = environ.get("GIT_SHA", "foobar")
 
 # Bot replies
 ERROR_REPLIES = [
