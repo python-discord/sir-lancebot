@@ -127,9 +127,13 @@ class HacktoberStats(commands.Cog):
             prs = await self.get_october_prs(github_username)
 
             if prs is None:  # Will be None if the user was not found
-                await ctx.send(embed=discord.Embed(title=random.choice(NEGATIVE_REPLIES),
-                                                   description=f"GitHub user `{github_username}` was not found.",
-                                                   colour=discord.Colour.red()))
+                await ctx.send(
+                    embed=discord.Embed(
+                        title=random.choice(NEGATIVE_REPLIES),
+                        description=f"GitHub user `{github_username}` was not found.",
+                        colour=discord.Colour.red()
+                    )
+                )
                 return
 
             if prs:
@@ -205,8 +209,8 @@ class HacktoberStats(commands.Cog):
             "number": int
         }
 
-        Otherwise, return empty list
-        None will be returned when the GitHub user was not found
+        Otherwise, return empty list.
+        None will be returned when the GitHub user was not found.
         """
         logging.info(f"Fetching Hacktoberfest Stats for GitHub user: '{github_username}'")
         base_url = "https://api.github.com/search/issues?q="
