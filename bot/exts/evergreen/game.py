@@ -23,6 +23,9 @@ BASE_URL = "https://api.igdb.com/v4"
 CLIENT_ID = Tokens.igdb_client_id
 CLIENT_SECRET = Tokens.igdb_client_secret
 
+# The number of seconds before expiry that we attempt to re-fetch a new access token
+ACCESS_TOKEN_RENEWAL_WINDOW = 60*60*24*2
+
 # URL to request API access token
 OAUTH_URL = "https://id.twitch.tv/oauth2/token"
 
@@ -168,8 +171,8 @@ class Games(Cog):
 
             self.access_token = result["access_token"]
 
-            # Set next renewal to 2 days before expire time
-            next_renewal = result["expires_in"] - 60*60*24*2
+            # Attempt to renew before the token expires
+            next_renewal = result["expires_in"] - ACCESS_TOKEN_RENEWAL_WINDOW
 
             time_delta = timedelta(seconds=next_renewal)
             logger.info(f"Successfully renewed access token. Refreshing again in {time_delta}")
