@@ -174,7 +174,7 @@ class Emojis:
     christmas_tree = "\U0001F384"
     check = "\u2611"
     envelope = "\U0001F4E8"
-    trashcan = "<:trashcan:637136429717389331>"
+    trashcan = "<:trashcan:796854840293589003>"
     ok_hand = ":ok_hand:"
 
     dice_1 = "<:dice_1:755891608859443290>"
@@ -257,7 +257,8 @@ class Tokens(NamedTuple):
     youtube = environ.get("YOUTUBE_API_KEY")
     tmdb = environ.get("TMDB_API_KEY")
     nasa = environ.get("NASA_API_KEY")
-    igdb = environ.get("IGDB_API_KEY")
+    igdb_client_id = environ.get("IGDB_CLIENT_ID")
+    igdb_client_secret = environ.get("IGDB_CLIENT_SECRET")
     github = environ.get("GITHUB_TOKEN")
 
 

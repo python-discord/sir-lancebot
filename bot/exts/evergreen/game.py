@@ -2,7 +2,8 @@ import difflib
 import logging
 import random
 import re
-from datetime import datetime as dt
+from asyncio import sleep
+from datetime import datetime as dt, timedelta
 from enum import IntEnum
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -17,10 +18,22 @@ from bot.utils.decorators import with_role
 from bot.utils.pagination import ImagePaginator, LinePaginator
 
 # Base URL of IGDB API
-BASE_URL = "https://api-v3.igdb.com"
+BASE_URL = "https://api.igdb.com/v4"
+
+CLIENT_ID = Tokens.igdb_client_id
+CLIENT_SECRET = Tokens.igdb_client_secret
+
+# URL to request API access token
+OAUTH_URL = "https://id.twitch.tv/oauth2/token"
+
+OAUTH_PARAMS = {
+    "client_id": CLIENT_ID,
+    "client_secret": CLIENT_SECRET,
+    "grant_type": "client_credentials"
+}
 
 HEADERS = {
-    "user-key": Tokens.igdb,
+    "Client-ID": CLIENT_ID,
     "Accept": "application/json"
 }
 
@@ -136,7 +149,32 @@ class Games(Cog):
 
         self.genres: Dict[str, int] = {}
 
-        self.refresh_genres_task.start()
+        self.bot.loop.create_task(self.renew_access_token())
+
+        # self.refresh_genres_task.start()
+
+    async def renew_access_token(self) -> None:
+        """Refeshes V4 access token 2 days before expiry."""
+        while True:
+            async with self.http_session.post(OAUTH_URL, params=OAUTH_PARAMS) as resp:
+                result = await resp.json()
+                if resp.status != 200:
+                    logger.error(
+                        "Failed to renew IGDB access token, unloading Games cog."
+                        f"OAuth response message: {result['message']}"
+                    )
+                    self.bot.remove_cog('Games')
+                    return
+
+            self.access_token = result["access_token"]
+
+            # Set next renewal to 2 days before expire time
+            next_renewal = result["expires_in"] - 60*60*24*2
+
+            time_delta = timedelta(seconds=next_renewal)
+            logger.info(f"Successfully renewed access token. Refreshing again in {time_delta}")
+
+            await sleep(next_renewal)
 
     @tasks.loop(hours=24.0)
     async def refresh_genres_task(self) -> None:
@@ -418,7 +456,10 @@ class Games(Cog):
 def setup(bot: Bot) -> None:
     """Add/Load Games cog."""
     # Check does IGDB API key exist, if not, log warning and don't load cog
-    if not Tokens.igdb:
-        logger.warning("No IGDB API key. Not loading Games cog.")
+    if not Tokens.igdb_client_id:
+        logger.warning("No IGDB client ID. Not loading Games cog.")
+        return
+    if not Tokens.igdb_client_secret:
+        logger.warning("No IGDB client secret. Not loading Games cog.")
         return
     bot.add_cog(Games(bot))
