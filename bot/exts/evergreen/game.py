@@ -151,7 +151,7 @@ class Games(Cog):
 
         self.bot.loop.create_task(self.renew_access_token())
 
-        # self.refresh_genres_task.start()
+        self.refresh_genres_task.start()
 
     async def renew_access_token(self) -> None:
         """Refeshes V4 access token 2 days before expiry."""
