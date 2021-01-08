@@ -174,7 +174,7 @@ class Emojis:
     christmas_tree = "\U0001F384"
     check = "\u2611"
     envelope = "\U0001F4E8"
-    trashcan = "<:trashcan:796854840293589003>"
+    trashcan = "<:trashcan:637136429717389331>"
     ok_hand = ":ok_hand:"
 
     dice_1 = "<:dice_1:755891608859443290>"
