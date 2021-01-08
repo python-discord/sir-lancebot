@@ -171,7 +171,10 @@ class Games(Cog):
                             f"OAuth response message: {result['message']}"
                         )
                     else:
-                        logger.warning("Invalid OAuth credentials. Unloading Games cog.")
+                        logger.warning(
+                            "Invalid OAuth credentials. Unloading Games cog. "
+                            f"OAuth response message: {result['message']}"
+                        )
                         self.bot.remove_cog('Games')
 
                     return
