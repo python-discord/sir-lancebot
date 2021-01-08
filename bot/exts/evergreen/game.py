@@ -155,8 +155,6 @@ class Games(Cog):
 
         self.bot.loop.create_task(self.renew_access_token())
 
-        self.refresh_genres_task.start()
-
     async def renew_access_token(self) -> None:
         """Refeshes V4 access token a number of seconds before expiry. See `ACCESS_TOKEN_RENEWAL_WINDOW`."""
         while True:
@@ -165,7 +163,7 @@ class Games(Cog):
                 if resp.status != 200:
                     # If there is a valid access token continue to use that,
                     # otherwise unload cog.
-                    if "access_token" in self.headers:
+                    if "Authorization" in self.headers:
                         time_delta = timedelta(seconds=ACCESS_TOKEN_RENEWAL_WINDOW)
                         logger.error(
                             "Failed to renew IGDB access token. "
@@ -178,7 +176,7 @@ class Games(Cog):
 
                     return
 
-            self.headers["access_token"] = result["access_token"]
+            self.headers["Authorization"] = f"Bearer {result['access_token']}"
 
             # Attempt to renew before the token expires
             next_renewal = result["expires_in"] - ACCESS_TOKEN_RENEWAL_WINDOW
@@ -186,6 +184,10 @@ class Games(Cog):
             time_delta = timedelta(seconds=next_renewal)
             logger.info(f"Successfully renewed access token. Refreshing again in {time_delta}")
 
+            # This will be true the first time this loop runs.
+            # Since we now have an access token, its safe to start this task.
+            if self.genres == {}:
+                self.refresh_genres_task.start()
             await sleep(next_renewal)
 
     @tasks.loop(hours=24.0)
@@ -206,9 +208,8 @@ class Games(Cog):
     async def _get_genres(self) -> None:
         """Create genres variable for games command."""
         body = "fields name; limit 100;"
-        async with self.http_session.get(f"{BASE_URL}/genres", data=body, headers=self.headers) as resp:
+        async with self.http_session.post(f"{BASE_URL}/genres", data=body, headers=self.headers) as resp:
             result = await resp.json()
-
         genres = {genre["name"].capitalize(): genre["id"] for genre in result}
 
         # Replace complex names with names from ALIASES
@@ -356,7 +357,7 @@ class Games(Cog):
         body = GAMES_LIST_BODY.format(**params)
 
         # Do request to IGDB API, create headers, URL, define body, return result
-        async with self.http_session.get(url=f"{BASE_URL}/games", data=body, headers=self.headers) as resp:
+        async with self.http_session.post(url=f"{BASE_URL}/games", data=body, headers=self.headers) as resp:
             return await resp.json()
 
     async def create_page(self, data: Dict[str, Any]) -> Tuple[str, str]:
@@ -398,7 +399,7 @@ class Games(Cog):
         # Define request body of IGDB API request and do request
         body = SEARCH_BODY.format(**{"term": search_term})
 
-        async with self.http_session.get(url=f"{BASE_URL}/games", data=body, headers=self.headers) as resp:
+        async with self.http_session.post(url=f"{BASE_URL}/games", data=body, headers=self.headers) as resp:
             data = await resp.json()
 
         # Loop over games, format them to good format, make line and append this to total lines
@@ -427,7 +428,7 @@ class Games(Cog):
             "offset": offset
         })
 
-        async with self.http_session.get(url=f"{BASE_URL}/companies", data=body, headers=self.headers) as resp:
+        async with self.http_session.post(url=f"{BASE_URL}/companies", data=body, headers=self.headers) as resp:
             return await resp.json()
 
     async def create_company_page(self, data: Dict[str, Any]) -> Tuple[str, str]:
