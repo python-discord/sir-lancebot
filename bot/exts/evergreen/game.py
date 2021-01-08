@@ -35,7 +35,7 @@ OAUTH_PARAMS = {
     "grant_type": "client_credentials"
 }
 
-HEADERS = {
+BASE_HEADERS = {
     "Client-ID": CLIENT_ID,
     "Accept": "application/json"
 }
@@ -151,25 +151,34 @@ class Games(Cog):
         self.http_session: ClientSession = bot.http_session
 
         self.genres: Dict[str, int] = {}
+        self.headers = BASE_HEADERS
 
         self.bot.loop.create_task(self.renew_access_token())
 
         self.refresh_genres_task.start()
 
     async def renew_access_token(self) -> None:
-        """Refeshes V4 access token 2 days before expiry."""
+        """Refeshes V4 access token a number of seconds before expiry. See `ACCESS_TOKEN_RENEWAL_WINDOW`."""
         while True:
             async with self.http_session.post(OAUTH_URL, params=OAUTH_PARAMS) as resp:
                 result = await resp.json()
                 if resp.status != 200:
-                    logger.error(
-                        "Failed to renew IGDB access token, unloading Games cog."
-                        f"OAuth response message: {result['message']}"
-                    )
-                    self.bot.remove_cog('Games')
+                    # If there is a valid access token continue to use that,
+                    # otherwise unload cog.
+                    if "access_token" in self.headers:
+                        time_delta = timedelta(seconds=ACCESS_TOKEN_RENEWAL_WINDOW)
+                        logger.error(
+                            "Failed to renew IGDB access token. "
+                            f"Current token will last for {time_delta} "
+                            f"OAuth response message: {result['message']}"
+                        )
+                    else:
+                        logger.warning("Invalid OAuth credentials. Unloading Games cog.")
+                        self.bot.remove_cog('Games')
+
                     return
 
-            self.access_token = result["access_token"]
+            self.headers["access_token"] = result["access_token"]
 
             # Attempt to renew before the token expires
             next_renewal = result["expires_in"] - ACCESS_TOKEN_RENEWAL_WINDOW
@@ -197,7 +206,7 @@ class Games(Cog):
     async def _get_genres(self) -> None:
         """Create genres variable for games command."""
         body = "fields name; limit 100;"
-        async with self.http_session.get(f"{BASE_URL}/genres", data=body, headers=HEADERS) as resp:
+        async with self.http_session.get(f"{BASE_URL}/genres", data=body, headers=self.headers) as resp:
             result = await resp.json()
 
         genres = {genre["name"].capitalize(): genre["id"] for genre in result}
@@ -347,7 +356,7 @@ class Games(Cog):
         body = GAMES_LIST_BODY.format(**params)
 
         # Do request to IGDB API, create headers, URL, define body, return result
-        async with self.http_session.get(url=f"{BASE_URL}/games", data=body, headers=HEADERS) as resp:
+        async with self.http_session.get(url=f"{BASE_URL}/games", data=body, headers=self.headers) as resp:
             return await resp.json()
 
     async def create_page(self, data: Dict[str, Any]) -> Tuple[str, str]:
@@ -389,7 +398,7 @@ class Games(Cog):
         # Define request body of IGDB API request and do request
         body = SEARCH_BODY.format(**{"term": search_term})
 
-        async with self.http_session.get(url=f"{BASE_URL}/games", data=body, headers=HEADERS) as resp:
+        async with self.http_session.get(url=f"{BASE_URL}/games", data=body, headers=self.headers) as resp:
             data = await resp.json()
 
         # Loop over games, format them to good format, make line and append this to total lines
@@ -418,7 +427,7 @@ class Games(Cog):
             "offset": offset
         })
 
-        async with self.http_session.get(url=f"{BASE_URL}/companies", data=body, headers=HEADERS) as resp:
+        async with self.http_session.get(url=f"{BASE_URL}/companies", data=body, headers=self.headers) as resp:
             return await resp.json()
 
     async def create_company_page(self, data: Dict[str, Any]) -> Tuple[str, str]:
