@@ -5,7 +5,7 @@ import typing as t
 import discord
 from discord.ext.commands import Cog, Context, check, group, guild_only
 
-from bot.bot import SeasonalBot
+from bot.bot import Bot
 from bot.constants import Emojis
 from bot.utils.pagination import LinePaginator
 
@@ -239,7 +239,7 @@ def is_requester_free() -> t.Callable:
 class TicTacToe(Cog):
     """TicTacToe cog contains tic-tac-toe game commands."""
 
-    def __init__(self, bot: SeasonalBot):
+    def __init__(self, bot: Bot):
         self.bot = bot
         self.games: t.List[Game] = []
 
@@ -248,7 +248,7 @@ class TicTacToe(Cog):
     @is_requester_free()
     @group(name="tictactoe", aliases=("ttt",), invoke_without_command=True)
     async def tic_tac_toe(self, ctx: Context, opponent: t.Optional[discord.User]) -> None:
-        """Tic Tac Toe game. Play agains friends or AI. Use reactions to add your mark to field."""
+        """Tic Tac Toe game. Play against friends or AI. Use reactions to add your mark to field."""
         if opponent == ctx.author:
             await ctx.send("You can't play against yourself.")
             return
@@ -313,6 +313,6 @@ class TicTacToe(Cog):
         await ctx.send(game.format_board())
 
 
-def setup(bot: SeasonalBot) -> None:
+def setup(bot: Bot) -> None:
     """Load TicTacToe Cog."""
     bot.add_cog(TicTacToe(bot))
