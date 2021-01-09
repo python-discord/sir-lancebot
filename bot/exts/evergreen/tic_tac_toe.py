@@ -17,21 +17,21 @@ CONFIRMATION_MESSAGE = (
 
 def check_win(board: t.Dict[int, str]) -> bool:
     """Check from board, is any player won game."""
-    if (
+    return any(
+        (
             # Horizontal
-            board[1] == board[2] == board[3]
-            or board[4] == board[5] == board[6]
-            or board[7] == board[8] == board[9]
+            board[1] == board[2] == board[3],
+            board[4] == board[5] == board[6],
+            board[7] == board[8] == board[9],
             # Vertical
-            or board[1] == board[4] == board[7]
-            or board[2] == board[5] == board[8]
-            or board[3] == board[6] == board[9]
+            board[1] == board[4] == board[7],
+            board[2] == board[5] == board[8],
+            board[3] == board[6] == board[9],
             # Diagonal
-            or board[1] == board[5] == board[9]
-            or board[3] == board[5] == board[7]
-    ):
-        return True
-    return False
+            board[1] == board[5] == board[9],
+            board[3] == board[5] == board[7],
+        )
+    )
 
 
 class Player:
