@@ -11,14 +11,8 @@ services:
     depends_on:
       - redis
 
-    environment:
-      - BOT_TOKEN
-      - BOT_DEBUG
-      - BOT_GUILD
-      - BOT_ADMIN_ROLE_ID
-      - CHANNEL_DEVLOG
-      - CHANNEL_COMMUNITY_BOT_COMMANDS
-      - REDIS_HOST=redis
+    env_file:
+      - .env
 
     volumes:
       - .:/bot
