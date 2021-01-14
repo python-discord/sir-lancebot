@@ -66,24 +66,38 @@ class LinePaginator(Paginator):
         """
         Adds a line to the current page.
 
-        If the line exceeds the `max_size` then a RuntimeError is raised.
+        If a line on a page exceeds `max_size` characters, then `max_size` will go up to
+        `scale_to_size` for a single line before creating a new page for the overflow words. If it
+        is still exceeded, the excess characters are stored and placed on the next pages until
+        there are none remaining (by word boundary). The line is truncated if `scale_to_size` is
+        still exceeded after attempting to continue onto the next page.
 
-        Overrides the Paginator.add_line from inside discord.ext.commands in order to allow
-        configuration of the maximum number of lines per page.
+        In the case that the page already contains one or more lines and the new lines would cause
+        `max_size` to be exceeded, a new page is created. This is done in order to make a best
+        effort to avoid breaking up single lines across pages, while keeping the total length of the
+        page at a reasonable size.
 
-        If `empty` is True, an empty line will be placed after the a given `line`.
+        This function overrides the `Paginator.add_line` from inside `discord.ext.commands`.
+
+        It overrides in order to allow us to configure the maximum number of lines per page.
         """
-        if len(line) > self.max_size - len(self.prefix) - 2:
-            raise RuntimeError('Line exceeds maximum page size %s' % (self.max_size - len(self.prefix) - 2))
+        remaining_words = None
+        if len(line) > (max_chars := self.max_size - len(self.prefix) - 2):
+            if len(line) > self.scale_to_size:
+                line, remaining_words = self._split_remaining_words(line, max_chars)
+                if len(line) > self.scale_to_size:
+                    log.debug("Could not continue to next page, truncating line.")
+                    line = line[:self.scale_to_size]
 
-        if self.max_lines is not None:
-            if self._linecount >= self.max_lines:
-                self._linecount = 0
-                self.close_page()
+        # Check if we should start a new page or continue the line on the current one
+        if self.max_lines is not None and self._linecount >= self.max_lines:
+            log.debug("max_lines exceeded, creating new page.")
+            self._new_page()
+        elif self._count + len(line) + 1 > self.max_size and self._linecount > 0:
+            log.debug("max_size exceeded on page with lines, creating new page.")
+            self._new_page()
 
-            self._linecount += 1
-        if self._count + len(line) + 1 > self.max_size:
-            self.close_page()
+        self._linecount += 1
 
         self._count += len(line) + 1
         self._current_page.append(line)
@@ -91,6 +105,11 @@ class LinePaginator(Paginator):
         if empty:
             self._current_page.append('')
             self._count += 1
+
+        # Start a new page if there were any overflow words
+        if remaining_words:
+            self._new_page()
+            self.add_line(remaining_words)
 
     def _new_page(self) -> None:
         """
