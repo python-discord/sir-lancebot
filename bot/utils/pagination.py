@@ -1,8 +1,9 @@
 import asyncio
 import logging
-from typing import Iterable, List, Optional, Tuple
+from contextlib import suppress
+from typing import List, Optional, Tuple
 
-from discord import Embed, Member, Reaction
+from discord import Embed, Member, Message, NotFound, Reaction
 from discord.abc import User
 from discord.ext.commands import Context, Paginator
 
@@ -172,39 +173,35 @@ class LinePaginator(Paginator):
     @classmethod
     async def paginate(
         cls,
-        lines: Iterable[str],
+        lines: List[str],
         ctx: Context,
         embed: Embed,
         prefix: str = "",
         suffix: str = "",
         max_lines: Optional[int] = None,
         max_size: int = 500,
+        scale_to_size: int = 2000,
         empty: bool = True,
         restrict_to_user: User = None,
         timeout: int = 300,
         footer_text: str = None,
         url: str = None,
         exception_on_empty_embed: bool = False
-    ):
+    ) -> Optional[Message]:
         """
         Use a paginator and set of reactions to provide pagination over a set of lines.
 
         The reactions are used to switch page, or to finish with pagination.
 
-        When used, this will send a message using `ctx.send()` and apply a set of reactions to it.
-        These reactions may be used to change page, or to remove pagination from the message.
+        When used, this will send a message using `ctx.send()` and apply a set of reactions to it. These reactions may
+        be used to change page, or to remove pagination from the message.
 
-        Pagination will also be removed automatically if no reaction is added for `timeout` seconds,
-        defaulting to five minutes (300 seconds).
+        Pagination will also be removed automatically if no reaction is added for five minutes (300 seconds).
 
-        If `empty` is True, an empty line will be placed between each given line.
-
+        Example:
         >>> embed = Embed()
         >>> embed.set_author(name="Some Operation", url=url, icon_url=icon)
-        >>> await LinePaginator.paginate(
-        ...     (line for line in lines),
-        ...     ctx, embed
-        ... )
+        >>> await LinePaginator.paginate([line for line in lines], ctx, embed)
         """
         def event_check(reaction_: Reaction, user_: Member) -> bool:
             """Make sure that this reaction is what we want to operate on."""
@@ -221,7 +218,7 @@ class LinePaginator(Paginator):
                     # Reaction is on this message
                     reaction_.message.id == message.id,
                     # Reaction is one of the pagination emotes
-                    str(reaction_.emoji) in PAGINATION_EMOJI,  # Note: DELETE_EMOJI is a string and not unicode
+                    str(reaction_.emoji) in PAGINATION_EMOJI,
                     # Reaction was not made by the Bot
                     user_.id != ctx.bot.user.id,
                     # There were no restrictions
@@ -229,7 +226,8 @@ class LinePaginator(Paginator):
                 ))
             )
 
-        paginator = cls(prefix=prefix, suffix=suffix, max_size=max_size, max_lines=max_lines)
+        paginator = cls(prefix=prefix, suffix=suffix, max_size=max_size, max_lines=max_lines,
+                        scale_to_size=scale_to_size)
         current_page = 0
 
         if not lines:
@@ -293,7 +291,7 @@ class LinePaginator(Paginator):
                 log.debug("Timed out waiting for a reaction")
                 break  # We're done, no reactions for the last 5 minutes
 
-            if str(reaction.emoji) == DELETE_EMOJI:  # Note: DELETE_EMOJI is a string and not unicode
+            if str(reaction.emoji) == DELETE_EMOJI:
                 log.debug("Got delete reaction")
                 return await message.delete()
 
@@ -303,8 +301,6 @@ class LinePaginator(Paginator):
 
                 log.debug(f"Got first page reaction - changing to page 1/{len(paginator.pages)}")
 
-                embed.description = ""
-                await message.edit(embed=embed)
                 embed.description = paginator.pages[current_page]
                 if footer_text:
                     embed.set_footer(text=f"{footer_text} (Page {current_page + 1}/{len(paginator.pages)})")
@@ -318,8 +314,6 @@ class LinePaginator(Paginator):
 
                 log.debug(f"Got last page reaction - changing to page {current_page + 1}/{len(paginator.pages)}")
 
-                embed.description = ""
-                await message.edit(embed=embed)
                 embed.description = paginator.pages[current_page]
                 if footer_text:
                     embed.set_footer(text=f"{footer_text} (Page {current_page + 1}/{len(paginator.pages)})")
@@ -337,8 +331,6 @@ class LinePaginator(Paginator):
                 current_page -= 1
                 log.debug(f"Got previous page reaction - changing to page {current_page + 1}/{len(paginator.pages)}")
 
-                embed.description = ""
-                await message.edit(embed=embed)
                 embed.description = paginator.pages[current_page]
 
                 if footer_text:
@@ -358,8 +350,6 @@ class LinePaginator(Paginator):
                 current_page += 1
                 log.debug(f"Got next page reaction - changing to page {current_page + 1}/{len(paginator.pages)}")
 
-                embed.description = ""
-                await message.edit(embed=embed)
                 embed.description = paginator.pages[current_page]
 
                 if footer_text:
@@ -369,8 +359,9 @@ class LinePaginator(Paginator):
 
                 await message.edit(embed=embed)
 
-        log.debug("Ending pagination and clearing reactions...")
-        await message.clear_reactions()
+        log.debug("Ending pagination and clearing reactions.")
+        with suppress(NotFound):
+            await message.clear_reactions()
 
 
 class ImagePaginator(Paginator):
