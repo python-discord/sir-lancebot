@@ -103,6 +103,53 @@ class LinePaginator(Paginator):
         self._count = len(self.prefix) + 1
         self.close_page()
 
+    def _split_remaining_words(
+        self,
+        line: str,
+        max_chars: int
+    ) -> Tuple[str, Optional[str]]:
+        """
+        Internal: split a line into two strings -- reduced_words and remaining_words.
+
+        reduced_words: the remaining words in `line`, after attempting to remove all words that
+            exceed `max_chars` (rounding down to the nearest word boundary).
+
+        remaining_words: the words in `line` which exceed `max_chars`. This value is None if
+            no words could be split from `line`.
+
+        If there are any remaining_words, an ellipses is appended to reduced_words and a
+        continuation header is inserted before remaining_words to visually communicate the line
+        continuation.
+
+        Return a tuple in the format (reduced_words, remaining_words).
+        """
+        reduced_words = []
+        remaining_words = []
+
+        # "(Continued)" is used on a line by itself to indicate the continuation of last page
+        continuation_header = "(Continued)\n-----------\n"
+        reduced_char_count = 0
+        is_full = False
+
+        for word in line.split(" "):
+            if not is_full:
+                if len(word) + reduced_char_count <= max_chars:
+                    reduced_words.append(word)
+                    reduced_char_count += len(word) + 1
+                else:
+                    # If reduced_words is empty, we were unable to split the words across pages
+                    if not reduced_words:
+                        return line, None
+                    is_full = True
+                    remaining_words.append(word)
+            else:
+                remaining_words.append(word)
+
+        return (
+            " ".join(reduced_words) + "..." if remaining_words else "",
+            continuation_header + " ".join(remaining_words) if remaining_words else None
+        )
+
     @classmethod
     async def paginate(
         cls,
