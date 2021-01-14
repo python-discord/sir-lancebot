@@ -26,7 +26,13 @@ class EmptyPaginatorEmbed(Exception):
 class LinePaginator(Paginator):
     """A class that aids in paginating code blocks for Discord messages."""
 
-    def __init__(self, prefix: str = '```', suffix: str = '```', max_size: int = 2000, max_lines: int = None):
+    def __init__(
+        self,
+        prefix: str = '```',
+        suffix: str = '```',
+        max_size: int = 2000,
+        max_lines: int = None
+    ):
         """
         Overrides the Paginator.__init__ from inside discord.ext.commands.
 
@@ -75,11 +81,22 @@ class LinePaginator(Paginator):
             self._count += 1
 
     @classmethod
-    async def paginate(cls, lines: Iterable[str], ctx: Context, embed: Embed,
-                       prefix: str = "", suffix: str = "", max_lines: Optional[int] = None,
-                       max_size: int = 500, empty: bool = True, restrict_to_user: User = None,
-                       timeout: int = 300, footer_text: str = None, url: str = None,
-                       exception_on_empty_embed: bool = False):
+    async def paginate(
+        cls,
+        lines: Iterable[str],
+        ctx: Context,
+        embed: Embed,
+        prefix: str = "",
+        suffix: str = "",
+        max_lines: Optional[int] = None,
+        max_size: int = 500,
+        empty: bool = True,
+        restrict_to_user: User = None,
+        timeout: int = 300,
+        footer_text: str = None,
+        url: str = None,
+        exception_on_empty_embed: bool = False
+    ):
         """
         Use a paginator and set of reactions to provide pagination over a set of lines.
 
@@ -293,6 +310,17 @@ class ImagePaginator(Paginator):
         else:
             self._count = 0
         self._current_page.append(line)
+        self.close_page()
+
+    def _new_page(self) -> None:
+        """
+        Internal: start a new page for the paginator.
+
+        This closes the current page and resets the counters for the new page's line count and
+        character count.
+        """
+        self._linecount = 0
+        self._count = len(self.prefix) + 1
         self.close_page()
 
     def add_image(self, image: str = None) -> None:
