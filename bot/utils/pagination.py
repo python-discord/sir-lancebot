@@ -80,6 +80,17 @@ class LinePaginator(Paginator):
             self._current_page.append('')
             self._count += 1
 
+    def _new_page(self) -> None:
+        """
+        Internal: start a new page for the paginator.
+
+        This closes the current page and resets the counters for the new page's line count and
+        character count.
+        """
+        self._linecount = 0
+        self._count = len(self.prefix) + 1
+        self.close_page()
+
     @classmethod
     async def paginate(
         cls,
@@ -310,17 +321,6 @@ class ImagePaginator(Paginator):
         else:
             self._count = 0
         self._current_page.append(line)
-        self.close_page()
-
-    def _new_page(self) -> None:
-        """
-        Internal: start a new page for the paginator.
-
-        This closes the current page and resets the counters for the new page's line count and
-        character count.
-        """
-        self._linecount = 0
-        self._count = len(self.prefix) + 1
         self.close_page()
 
     def add_image(self, image: str = None) -> None:
