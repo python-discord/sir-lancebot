@@ -124,7 +124,8 @@ class Channels(NamedTuple):
     verification = 352442727016693763
     python_discussion = 267624335836053506
     hacktoberfest_2020 = 760857070781071431
-    voice_chat = 412357430186344448
+    voice_chat_0 = 412357430186344448
+    voice_chat_1 = 799647045886541885
 
 
 class Client(NamedTuple):
@@ -277,7 +278,8 @@ WHITELISTED_CHANNELS = (
     Channels.off_topic_0,
     Channels.off_topic_1,
     Channels.off_topic_2,
-    Channels.voice_chat,
+    Channels.voice_chat_0,
+    Channels.voice_chat_1,
 )
 
 GIT_SHA = environ.get("GIT_SHA", "foobar")
