@@ -10,7 +10,7 @@ from bot.constants import Emojis
 from bot.utils.pagination import LinePaginator
 
 CONFIRMATION_MESSAGE = (
-    "{opponent}, {requester} want to play Tic-Tac-Toe against you. React to this message with "
+    "{opponent}, {requester} wants to play Tic-Tac-Toe against you. React to this message with "
     f"{Emojis.confirmation} to accept or with {Emojis.decline} to decline."
 )
 
