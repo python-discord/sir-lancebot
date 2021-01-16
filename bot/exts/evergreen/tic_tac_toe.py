@@ -188,7 +188,9 @@ class Game:
     async def play(self) -> None:
         """Start and handle game."""
         await self.ctx.send("It's time for game! Let's begin.")
-        board = await self.ctx.send(self.format_board())
+        board = await self.ctx.send(
+            embed=discord.Embed(description=self.format_board())
+        )
         await self.add_reactions(board)
 
         for _ in range(9):
@@ -203,7 +205,9 @@ class Game:
                 self.canceled = True
                 return
             self.board[pos] = self.current.symbol
-            await board.edit(content=self.format_board())
+            await board.edit(
+                embed=discord.Embed(description=self.format_board())
+            )
             await board.clear_reaction(Emojis.number_emojis[pos])
             if check_win(self.board):
                 self.winner = self.current
