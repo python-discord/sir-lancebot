@@ -187,7 +187,7 @@ class Game:
 
     async def play(self) -> None:
         """Start and handle game."""
-        await self.ctx.send("It's time for game! Let's begin.")
+        await self.ctx.send("It's time for the game! Let's begin.")
         board = await self.ctx.send(
             embed=discord.Embed(description=self.format_board())
         )
@@ -213,7 +213,7 @@ class Game:
                 self.winner = self.current
                 self.loser = self.next
                 await self.ctx.send(
-                    f":tada: {self.current} is won this game! :tada:"
+                    f":tada: {self.current} won this game! :tada:"
                 )
                 await board.clear_reactions()
                 break
