@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "9be419062bd9db364ac9dddfcd50aef9c932384b45850363e482591fe7d12403"
+            "sha256": "f913068891d3112aa7f2fd9dbe20124b3a9347b062400cc457826d8cdae182aa"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -235,6 +235,13 @@
             "markers": "python_version >= '3.4'",
             "version": "==3.1"
         },
+        "markovify": {
+            "hashes": [
+                "sha256:254405c5b2f819ae388c39a53e6bc038bfbc24713441869ce90a1cd67e4a89ce"
+            ],
+            "index": "pypi",
+            "version": "==0.8.3"
+        },
         "multidict": {
             "hashes": [
                 "sha256:1ece5a3369835c20ed57adadc663400b5525904e53bae59ec854a5d36b39b21a",
@@ -433,6 +440,13 @@
             ],
             "markers": "python_version >= '3.0'",
             "version": "==2.1"
+        },
+        "unidecode": {
+            "hashes": [
+                "sha256:4c9d15d2f73eb0d2649a151c566901f80a030da1ccb0a2043352e1dbf647586b",
+                "sha256:a039f89014245e0cad8858976293e23501accc9ff5a7bdbc739a14a2b7b85cdc"
+            ],
+            "version": "==1.1.2"
         },
         "urllib3": {
             "hashes": [
