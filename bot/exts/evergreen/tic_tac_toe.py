@@ -195,7 +195,10 @@ class Game:
 
         for _ in range(9):
             if isinstance(self.current, Player):
-                announce = await self.ctx.send(f"{self.current.user.mention}, it's your turn! React with an emoji to take your go.")
+                announce = await self.ctx.send(
+                    f"{self.current.user.mention}, it's your turn! "
+                    "React with an emoji to take your go."
+                )
             timeout, pos = await self.current.get_move(self.board, board)
             if isinstance(self.current, Player):
                 await announce.delete()
