@@ -19,7 +19,7 @@ class EightBitify(commands.Cog):
     @staticmethod
     def quantize(image: Image) -> Image:
         """Reduces colour palette to 256 colours."""
-        return image.quantize(colors=32)
+        return image.quantize()
 
     @commands.command(name="8bitify")
     async def eightbit_command(self, ctx: commands.Context) -> None:
