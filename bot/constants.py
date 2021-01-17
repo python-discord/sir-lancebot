@@ -241,7 +241,8 @@ class Tokens(NamedTuple):
     youtube = environ.get("YOUTUBE_API_KEY")
     tmdb = environ.get("TMDB_API_KEY")
     nasa = environ.get("NASA_API_KEY")
-    igdb = environ.get("IGDB_API_KEY")
+    igdb_client_id = environ.get("IGDB_CLIENT_ID")
+    igdb_client_secret = environ.get("IGDB_CLIENT_SECRET")
     github = environ.get("GITHUB_TOKEN")
 
 
