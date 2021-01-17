@@ -314,7 +314,7 @@ class TicTacToe(Cog):
             await ctx.send("Game don't exist.")
             return
         game = self.games[game_id - 1]
-       await ctx.send(f"{game.winner} :trophy: vs {game.loser}")
+        await ctx.send(f"{game.winner} :trophy: vs {game.loser}")
         await ctx.send(game.format_board())
 
 
