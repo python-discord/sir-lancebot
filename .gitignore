@@ -1,5 +1,6 @@
 # bot (project-specific)
 log/*
+data/*
 
 
 
@@ -113,5 +114,5 @@ venv.bak/
 .idea/
 .DS_Store
 
-# vscode 
+# vscode
 .vscode/

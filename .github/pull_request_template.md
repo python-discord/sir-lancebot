@@ -1,11 +1,3 @@
----
-name: Pull Request
-about: Request to pull code changes into the repository.
-title: ''
-assignees: ''
-
----
-
 ## Relevant Issues
 <!-- List relevant issue tickets here. -->
 <!-- Say "Closes #0" for issues that the PR resolves, replacing 0 with the issue number. -->
