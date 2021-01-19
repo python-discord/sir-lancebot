@@ -58,8 +58,8 @@ class Game:
 
         self.message = None
 
-        self.turn = None
-        self.next = None
+        self.player_active = None
+        self.player_inactive = None
 
     @staticmethod
     def generate_board(size: int) -> typing.List[typing.List[int]]:
@@ -82,51 +82,51 @@ class Game:
 
     async def start_game(self) -> None:
         """Begins the game."""
-        self.turn, self.next = self.player1, self.player2
+        self.player_active, self.player_inactive = self.player1, self.player2
 
         while True:
             await self.print_grid()
-            if isinstance(self.turn, AI):
-                coords = self.turn.play()
+            if isinstance(self.player_active, AI):
+                coords = self.player_active.play()
             else:
                 coords = await self.player_turn()
 
             if not coords:
                 return
 
-            if self.check_win(coords, 1 if self.turn == self.player1 else 2):
-                if isinstance(self.turn, AI):
-                    await self.channel.send(f"Game Over! {self.turn.mention} lost against AI")
+            if self.check_win(coords, 1 if self.player_active == self.player1 else 2):
+                if isinstance(self.player_active, AI):
+                    await self.channel.send(f"Game Over! {self.player_active.mention} lost against AI")
                 else:
-                    if isinstance(self.next, AI):
-                        await self.channel.send(f"Game Over! {self.turn.mention} won against AI")
+                    if isinstance(self.player_inactive, AI):
+                        await self.channel.send(f"Game Over! {self.player_active.mention} won against AI")
                     else:
-                        await self.channel.send(f"Game Over! {self.turn.mention} won against {self.next.mention}")
+                        await self.channel.send(f"Game Over! {self.player_active.mention} won against {self.player_inactive.mention}")
                 await self.print_grid()
                 return
 
-            self.turn, self.next = self.next, self.turn
+            self.player_active, self.player_inactive = self.player_inactive, self.player_active
 
     def predicate(self, reaction: discord.Reaction, user: discord.Member) -> bool:
         """The predicate to check for the player's reaction."""
         return (
             reaction.message.id == self.message.id
-            and user.id == self.turn.id
+            and user.id == self.player_active.id
             and str(reaction.emoji) in self.unicode_numbers
         )
 
     async def player_turn(self) -> Coordinate:
         """Initiate the player's turn."""
         message = await self.channel.send(
-            f"{self.turn.mention}, it's your turn! React with a column you want to place your token"
+            f"{self.turn.mention}, it's your turn! React with the column you want to place your token in."
         )
-        player_num = 1 if self.turn == self.player1 else 2
+        player_num = 1 if self.player_active == self.player1 else 2
         while True:
             full_column = False
             try:
                 reaction, user = await self.bot.wait_for("reaction_add", check=self.predicate, timeout=30.0)
             except asyncio.TimeoutError:
-                await self.channel.send(f"{self.turn.mention}, you took too long. Game over!")
+                await self.channel.send(f"{self.player_active.mention}, you took too long. Game over!")
                 return
             else:
                 await message.delete()
@@ -156,7 +156,7 @@ class Game:
         axes = [vertical, horizontal, forward_diag, backward_diag]
 
         for axis in axes:
-            in_a_row = 1  # The initial counter that is compared to
+            counters_in_a_row = 1  # The initial counter that is compared to
             for (row_incr, column_incr) in axis:
                 row, column = coords
                 row += row_incr
@@ -164,12 +164,12 @@ class Game:
 
                 while 0 <= row < self.grid_size and 0 <= column < self.grid_size:
                     if self.grid[row][column] == player_num:
-                        in_a_row += 1
+                        counters_in_a_row += 1
                         row += row_incr
                         column += column_incr
                     else:
                         break
-            if in_a_row >= 4:
+            if counters_in_a_row >= 4:
                 return True
         return False
 
@@ -287,16 +287,17 @@ class ConnectFour(commands.Cog):
             await game.start_game()
             self.games.remove(game)
         except Exception:
-            # End the game in the event of an unforseen error so the players aren't stuck in a game
+            # End the game in the event of an unforeseen error so the players aren't stuck in a game
             await ctx.send(f"{ctx.author.mention} {user.mention if user else ''} An error occurred. Game failed")
             self.games.remove(game)
             raise
 
-    @commands.group(invoke_without_command=True, aliases=[
-        "4inarow", "4-in-a-row", "4_in_a_row", "connect4", "connect-four", "connect_four"
-    ])
+    @commands.group(
+        invoke_without_command=True,
+        aliases=["4inarow", "connect4", "connectfour", "c4"]
+    )
     @commands.guild_only()
-    async def connectfour(self, ctx: commands.Context, board_size: int = 7) -> None:
+    async def connect_four(self, ctx: commands.Context, board_size: int = 7) -> None:
         """
         Play the classic game of Connect Four with someone!
 
@@ -313,8 +314,8 @@ class ConnectFour(commands.Cog):
             return
 
         if board_size > self.max_board_size or board_size < self.min_board_size:
-            await ctx.send(f"{board_size} is not a valid board size. A valid board size it "
-                           f"between `{self.min_board_size}` to `{self.max_board_size}`")
+            await ctx.send(f"{board_size} is not a valid board size. A valid board size is "
+                           f"between `{self.min_board_size}` and `{self.max_board_size}`.")
             return
 
         announcement = await ctx.send(
@@ -335,9 +336,10 @@ class ConnectFour(commands.Cog):
         except asyncio.TimeoutError:
             self.waiting.remove(ctx.author)
             await announcement.delete()
-            await ctx.send(f"{ctx.author.mention} Seems like there's no one here to play"
-                           f"Use `{ctx.prefix}{ctx.invoked_with} ai` to play against a computer."
-                           )
+            await ctx.send(
+                f"{ctx.author.mention} Seems like there's no one here to play. "
+                f"Use `{ctx.prefix}{ctx.invoked_with} ai` to play against a computer."
+            )
             return
 
         if str(reaction.emoji) == CROSS_EMOJI:
@@ -353,7 +355,7 @@ class ConnectFour(commands.Cog):
 
         await self._play_game(ctx, user, board_size)
 
-    @connectfour.command(aliases=["AI", "CPU", "computer", "cpu", "Computer"])
+    @connectfour.command(aliases=["bot", "computer", "cpu"])
     async def ai(self, ctx: commands.Context, board_size: int = 7) -> None:
         """Play Connect Four against a computer player."""
         if self.already_playing(ctx.author):
