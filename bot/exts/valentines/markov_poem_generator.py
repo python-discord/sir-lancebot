@@ -3,7 +3,6 @@ import logging
 import random
 import string
 from asyncio import TimeoutError
-from collections import defaultdict
 from pathlib import Path
 from types import TracebackType
 from typing import Callable, Dict, List, Optional, Set, Tuple, Type
@@ -70,7 +69,7 @@ def memoize(func: Callable) -> Callable:  # Decorator
     @functools.wraps(func)
     async def wrapper(
         *args,
-        instance: MarkovPoemGenerator = None,
+        instance: Callable = None,
         word: str = None,
         is_instant_fail: bool = None
     ) -> Set[str]:
@@ -190,25 +189,9 @@ class MarkovPoemGenerator(commands.Cog):
 
         return line
 
-    def _get_is_instant_fail(self, scheme: str) -> Dict[str, bool]:
-        """
-        Checks if a word without rhyme sets should instantly fail.
-
-        If a unit appears more than once but its last word does not have any
-        rhyme sets, then it should fail instantly. If not, it would only fail
-        when the markov model cannot find a sentence that rhymes, which wastes
-        a lot of time.
-
-        It should not fail at all if the unit appears only once as the markov
-        model would never need to find a sentence that rhymes with it.
-        """
-        is_instant_fail: Dict[str, bool] = defaultdict(lambda: False)
-
-        for char in set(scheme):
-            if scheme.count(char) >= 2:
-                is_instant_fail[char] = True
-
-        return is_instant_fail
+    def _get_unit_count(self, scheme: str) -> Dict[str, bool]:
+        """Checks how many times a unit occurs in a rhyme scheme."""
+        return {char: scheme.count(char) for char in set(scheme)}
 
     @commands.command()
     async def poem(self, ctx: commands.Context, scheme: str) -> None:
@@ -224,6 +207,10 @@ class MarkovPoemGenerator(commands.Cog):
         two or more units are the same, they are meant to rhyme (i.e their last
         words rhyme).
 
+        If the count of a unit is one, that means it is the last unit in the
+        rhyme scheme being processed. Having no more units left means that it
+        is okay for it to not have any rhymes.
+
         A timeout has been added to the command as a fail-safe measure if
         something freezes.
         """
@@ -232,7 +219,7 @@ class MarkovPoemGenerator(commands.Cog):
 
         # If a sentence does not rhyme and has a rhyming sentence,
         # it would eventually fail.
-        is_instant_fail = self._get_is_instant_fail(scheme)
+        unit_count = self._get_unit_count(scheme)
 
         try:
             async with async_timeout.timeout(self.POEM_TIMEOUT), ctx.typing():
@@ -258,13 +245,15 @@ class MarkovPoemGenerator(commands.Cog):
                         rhyme_track[unit] = await self._get_rhyme_set(
                             instance=self,
                             word=self._get_last_word(new_line),
-                            is_instant_fail=is_instant_fail[unit]
+                            is_instant_fail=(unit_count[unit] != 1)
                         )
                     else:
                         new_line = await self._get_rhyming_line(
                             word_rhymes=rhyme_track[unit]
                         )
                         acc_lines.append(new_line)
+
+                    unit_count[unit] -= 1
 
                 stanzas.append("\n".join(acc_lines))  # Append final stanza
 
