@@ -17,12 +17,6 @@ from bot.constants import Colours
 log = logging.getLogger(__name__)
 
 
-class RhymeNotFound(commands.CommandError):
-    """Raised when a word has no other rhymes."""
-
-    pass
-
-
 class RhymingSentenceNotFound(commands.CommandError):
     """Raised when a rhyming sentence could not be found."""
 
@@ -54,8 +48,6 @@ class Cache:
     ):
         if len(self.cache[self.word]) == 0:
             logging.info(f"No rhymes were found for the word: {self.word}")
-            if self.is_instant_fail:
-                raise RhymeNotFound
 
 
 def memoize(func: Callable) -> Callable:  # Decorator
@@ -100,7 +92,8 @@ class MarkovPoemGenerator(commands.Cog):
     ]
 
     templates: Dict[str, str] = {
-        "shakespearean-sonnet": "abab/cdcd/efef/gg"
+        "shakespearean-sonnet": "abab/cdcd/efef/gg",
+        "quads": "aaaa/bbbb/cccc/dddd/eeee"  # For testing
     }
 
     rhyme_websites: List[Tuple[bool, str]] = [
@@ -193,6 +186,38 @@ class MarkovPoemGenerator(commands.Cog):
         """Checks how many times a unit occurs in a rhyme scheme."""
         return {char: scheme.count(char) for char in set(scheme)}
 
+    async def _init_unit(
+        self,
+        is_last_line: bool,
+        rhyme_track: Dict[str, Set[str]],
+        unit: str
+    ) -> str:
+        line = self.model.make_short_sentence(
+            random.randint(50, 120)
+        )
+
+        rhyme_set = await self._get_rhyme_set(
+            instance=self,
+            word=self._get_last_word(line),
+            is_instant_fail=(not is_last_line)
+        )
+
+        while len(rhyme_set) == 0:
+            print("Resetting line...")
+            line = self.model.make_short_sentence(
+                random.randint(50, 120)
+            )
+
+            rhyme_set = await self._get_rhyme_set(
+                instance=self,
+                word=self._get_last_word(line),
+                is_instant_fail=(not is_last_line)
+            )
+
+        rhyme_track[unit] = rhyme_set
+
+        return line
+
     @commands.command()
     async def poem(self, ctx: commands.Context, scheme: str) -> None:
         """
@@ -211,14 +236,19 @@ class MarkovPoemGenerator(commands.Cog):
         rhyme scheme being processed. Having no more units left means that it
         is okay for it to not have any rhymes.
 
+        The function will run through the units of scheme. If it is a new
+        scheme, the unit will be added to `rhyme_track` as a key with the value
+        of the rhyme set. If a unit is found again and it is not the last in
+        the scheme, then then its rhyme set will be added to `rhyme_track`.
+        This is so that all the rhymes are not contingent on the first unit of
+        the scheme.
+
         A timeout has been added to the command as a fail-safe measure if
         something freezes.
         """
         # If the `scheme` is actually a template, convert it into a scheme
         scheme = self.templates.get(scheme, scheme)
 
-        # If a sentence does not rhyme and has a rhyming sentence,
-        # it would eventually fail.
         unit_count = self._get_unit_count(scheme)
 
         try:
@@ -228,6 +258,8 @@ class MarkovPoemGenerator(commands.Cog):
                 rhyme_track = {}  # Maps units to their rhyme sets
 
                 for unit in scheme:
+                    is_last_line = True if unit_count[unit] == 1 else False
+
                     # Create new stanza
                     if unit == "/":
                         new_stanza = "\n".join(acc_lines)
@@ -237,21 +269,23 @@ class MarkovPoemGenerator(commands.Cog):
 
                     # Creating a line for the unit
                     if unit not in rhyme_track:
-                        new_line = self.model.make_short_sentence(
-                            random.randint(50, 120)
+                        new_line = await self._init_unit(
+                            is_last_line, rhyme_track, unit
                         )
                         acc_lines.append(new_line)
-
-                        rhyme_track[unit] = await self._get_rhyme_set(
-                            instance=self,
-                            word=self._get_last_word(new_line),
-                            is_instant_fail=(unit_count[unit] != 1)
-                        )
                     else:
                         new_line = await self._get_rhyming_line(
                             word_rhymes=rhyme_track[unit]
                         )
                         acc_lines.append(new_line)
+
+                        # If last line, it will not be referred to again
+                        if not is_last_line:
+                            rhyme_track[unit] |= await self._get_rhyme_set(
+                                instance=self,
+                                word=self._get_last_word(new_line),
+                                is_instant_fail=(not is_last_line)
+                            )
 
                     unit_count[unit] -= 1
 
@@ -275,9 +309,7 @@ class MarkovPoemGenerator(commands.Cog):
         error: Exception
     ) -> None:
         """Handles Discord errors and exceptions."""
-        if isinstance(error, RhymeNotFound):
-            return await ctx.send("Rhyme impossible.")
-        elif isinstance(error, RhymingSentenceNotFound):
+        if isinstance(error, RhymingSentenceNotFound):
             return await ctx.send("Sentence failed.")
         else:
             logging.error(f"Unknown error caught: {error}")
