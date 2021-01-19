@@ -3,6 +3,7 @@ import logging
 import random
 import string
 from asyncio import TimeoutError
+from datetime import datetime
 from pathlib import Path
 from types import TracebackType
 from typing import Callable, Dict, List, Optional, Set, Tuple, Type
@@ -24,12 +25,7 @@ class RhymingSentenceNotFound(commands.CommandError):
 
 
 class Cache:
-    """
-    A storage for word to rhyme sets to reduce API requests.
-
-    Once a rhyme set has been stored or is retrieved, it is also checked to see
-    if the poem command should fail immediately to save time.
-    """
+    """A context manager to facilitate storage of word to rhyme sets."""
 
     cache: Dict[str, Set[str]] = {}
 
@@ -38,7 +34,8 @@ class Cache:
         self.is_instant_fail = is_instant_fail
 
     def __enter__(self):
-        return self.cache
+        self.word = self.word.replace("'", "e")  # Sometimes ' replaces e
+        return (self.cache, self.word)
 
     def __exit__(
         self,
@@ -50,7 +47,7 @@ class Cache:
             logging.info(f"No rhymes were found for the word: {self.word}")
 
 
-def memoize(func: Callable) -> Callable:  # Decorator
+def memoize(func: Callable) -> Callable:
     """
     A decorator to access and cache rhyme sets.
 
@@ -65,10 +62,10 @@ def memoize(func: Callable) -> Callable:  # Decorator
         word: str = None,
         is_instant_fail: bool = None
     ) -> Set[str]:
-        with Cache(word, is_instant_fail) as cache:
-            if word not in cache:
-                logging.info(f"New word cached: {word}")
+        with Cache(word, is_instant_fail) as (cache, word):
+            if word not in cache.keys():
                 cache[word] = await func(instance, word)
+                logging.info(f"New word cached: {word}")
             else:
                 logging.info(f"Old word used: {word}")
 
@@ -232,13 +229,19 @@ class MarkovPoemGenerator(commands.Cog):
         This is so that all the rhymes are not contingent on the first unit of
         the scheme.
 
+        The time taken to process the command is recorded and shown in the
+        footer of the embed.
+
         A timeout has been added to the command as a fail-safe measure if
         something freezes.
         """
         # If the `scheme` is actually a template, convert it into a scheme
         scheme = self.templates.get(scheme, scheme)
+        self.scheme = scheme
 
         unit_count = self._get_unit_count(scheme)
+
+        time_start = datetime.now()
 
         try:
             async with async_timeout.timeout(self.POEM_TIMEOUT), ctx.typing():
@@ -280,17 +283,20 @@ class MarkovPoemGenerator(commands.Cog):
 
                 stanzas.append("\n".join(acc_lines))  # Append final stanza
 
+                elapsed_time = datetime.now() - time_start
+                elapsed_time = elapsed_time.seconds
+
                 poem_embed = Embed(
                     title="A Markov Poem For " + str(ctx.author.name),
                     color=Colours.pink,
                     description="\n\n".join(stanzas)
                 )
+                poem_embed.set_footer(text=f"Elapsed time: {elapsed_time}s\n"
+                                      "Rhymes API provided by datamuse.")
                 await ctx.send(embed=poem_embed)
         except TimeoutError:
             logging.warning("Poem generator timed out.")
             await ctx.send("Unlucky, try again!")
-        # except TypeError:
-        #     await ctx.send("Type error'd")
 
     async def cog_command_error(
         self,
@@ -299,7 +305,9 @@ class MarkovPoemGenerator(commands.Cog):
     ) -> None:
         """Handles Discord errors and exceptions."""
         if isinstance(error, RhymingSentenceNotFound):
-            return await ctx.send("Sentence failed.")
+            logging.warning("Rhyming sentence not found!")
+            await ctx.send("Sentence failed, trying again...")
+            return await self.poem(ctx, self.scheme)
         else:
             logging.error(f"Unknown error caught: {error}")
 
