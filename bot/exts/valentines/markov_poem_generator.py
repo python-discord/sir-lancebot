@@ -68,11 +68,12 @@ def memoize(func: Callable) -> Callable:  # Decorator
     cache. Otherwise, execute `func` and store the results into the cache.
     """
     @functools.wraps(func)
-    async def wrapper(*args, **kwargs) -> Set[str]:
-        word = kwargs['word']
-        instance = kwargs['instance']
-        is_instant_fail = kwargs['is_instant_fail']
-
+    async def wrapper(
+        *args,
+        instance: MarkovPoemGenerator = None,
+        word: str = None,
+        is_instant_fail: bool = None
+    ) -> Set[str]:
         with Cache(word, is_instant_fail) as cache:
             if word not in cache:
                 logging.info(f"New word cached: {word}")
@@ -255,9 +256,9 @@ class MarkovPoemGenerator(commands.Cog):
                         acc_lines.append(new_line)
 
                         rhyme_track[unit] = await self._get_rhyme_set(
+                            instance=self,
                             word=self._get_last_word(new_line),
-                            is_instant_fail=is_instant_fail[unit],
-                            instance=self
+                            is_instant_fail=is_instant_fail[unit]
                         )
                     else:
                         new_line = await self._get_rhyming_line(
@@ -276,8 +277,8 @@ class MarkovPoemGenerator(commands.Cog):
         except TimeoutError:
             logging.warning("Poem generator timed out.")
             await ctx.send("Unlucky, try again!")
-        except TypeError:
-            await ctx.send("Type error'd")
+        # except TypeError:
+        #     await ctx.send("Type error'd")
 
     async def cog_command_error(
         self,
