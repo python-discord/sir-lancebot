@@ -277,7 +277,7 @@ class ConnectFour(commands.Cog):
 
     def already_playing(self, player: discord.Member) -> bool:
         """Check if someone is already in a game."""
-        return any(player in (game.player1.user, game.player2.user) for game in self.games)
+        return any(player in (game.player1, game.player2) for game in self.games)
 
     async def _play_game(self, ctx: commands.Context, user: typing.Optional[discord.Member], board_size: int) -> None:
         """Helper for playing a game of connect four."""
@@ -296,7 +296,7 @@ class ConnectFour(commands.Cog):
         "4inarow", "4-in-a-row", "4_in_a_row", "connect4", "connect-four", "connect_four"
     ])
     @commands.guild_only()
-    async def connectfour(self, ctx: commands.Context, board_size: commands.Greedy[int] = 7) -> None:
+    async def connectfour(self, ctx: commands.Context, board_size: int = 7) -> None:
         """
         Play the classic game of Connect Four with someone!
 
