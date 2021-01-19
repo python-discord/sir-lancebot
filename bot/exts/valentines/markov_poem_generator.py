@@ -192,18 +192,8 @@ class MarkovPoemGenerator(commands.Cog):
         rhyme_track: Dict[str, Set[str]],
         unit: str
     ) -> str:
-        line = self.model.make_short_sentence(
-            random.randint(50, 120)
-        )
-
-        rhyme_set = await self._get_rhyme_set(
-            instance=self,
-            word=self._get_last_word(line),
-            is_instant_fail=(not is_last_line)
-        )
-
+        rhyme_set = set()
         while len(rhyme_set) == 0:
-            print("Resetting line...")
             line = self.model.make_short_sentence(
                 random.randint(50, 120)
             )
@@ -215,7 +205,6 @@ class MarkovPoemGenerator(commands.Cog):
             )
 
         rhyme_track[unit] = rhyme_set
-
         return line
 
     @commands.command()
