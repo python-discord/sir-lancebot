@@ -42,7 +42,7 @@ class Game:
             bot: commands.Bot,
             channel: discord.TextChannel,
             player1: discord.Member,
-            player2: discord.Member = None,
+            player2: typing.Optional[discord.Member],
             size: int = 7,
     ) -> None:
 
@@ -64,7 +64,7 @@ class Game:
     @staticmethod
     def generate_board(size: int) -> typing.List[typing.List[int]]:
         """Generate the connect 4 board."""
-        return [[0 for _ in range(size)] for _ in range(size)]
+        return [[0]*size]*size
 
     async def print_grid(self) -> None:
         """Formats and outputs the Connect Four grid to the channel."""
@@ -101,7 +101,9 @@ class Game:
                     if isinstance(self.player_inactive, AI):
                         await self.channel.send(f"Game Over! {self.player_active.mention} won against AI")
                     else:
-                        await self.channel.send(f"Game Over! {self.player_active.mention} won against {self.player_inactive.mention}")
+                        await self.channel.send(
+                            f"Game Over! {self.player_active.mention} won against {self.player_inactive.mention}"
+                        )
                 await self.print_grid()
                 return
 
@@ -213,14 +215,22 @@ class AI:
         return random.choice(coord_list)
 
     def play(self) -> Coordinate:
-        """The AI's turn."""
+        """
+        Plays for the AI.
+
+        Gets all possible coords, and determins the move:
+        1. coords where it can win.
+        2. coords where the player can win.
+        3. Random coord
+        The first possible value is choosen.
+        """
         possible_coords = self.get_possible_places()
 
-        coords = self.check_ai_win(possible_coords)  # Win
-        if not coords:
-            coords = self.check_player_win(possible_coords)  # Try to stop P1 from winning
-        if not coords:
-            coords = self.random_coords(possible_coords)
+        coords = (
+            self.check_ai_win(possible_coords)
+            or self.check_player_win(possible_coords)
+            or self.random_coords(possible_coords)
+        )
 
         row, column = coords
         self.game.grid[row][column] = 2
@@ -296,7 +306,6 @@ class ConnectFour(commands.Cog):
         invoke_without_command=True,
         aliases=["4inarow", "connect4", "connectfour", "c4"]
     )
-    @commands.guild_only()
     async def connect_four(self, ctx: commands.Context, board_size: int = 7) -> None:
         """
         Play the classic game of Connect Four with someone!
@@ -313,7 +322,7 @@ class ConnectFour(commands.Cog):
             await ctx.send("You've already sent out a request for a player 2")
             return
 
-        if board_size > self.max_board_size or board_size < self.min_board_size:
+        if not self.min_board_size <= board_size <= self.max_board_size:
             await ctx.send(f"{board_size} is not a valid board size. A valid board size is "
                            f"between `{self.min_board_size}` and `{self.max_board_size}`.")
             return
@@ -355,7 +364,7 @@ class ConnectFour(commands.Cog):
 
         await self._play_game(ctx, user, board_size)
 
-    @connectfour.command(aliases=["bot", "computer", "cpu"])
+    @connect_four.command(aliases=["bot", "computer", "cpu"])
     async def ai(self, ctx: commands.Context, board_size: int = 7) -> None:
         """Play Connect Four against a computer player."""
         if self.already_playing(ctx.author):
