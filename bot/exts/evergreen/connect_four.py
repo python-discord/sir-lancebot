@@ -49,7 +49,7 @@ class Game:
         self.bot = bot
         self.channel = channel
         self.player1 = player1
-        self.player2 = player2 or AI(game=self)
+        self.player2 = player2 or AI(self.bot, game=self)
 
         self.grid = self.generate_board(size)
         self.grid_size = size
@@ -64,7 +64,7 @@ class Game:
     @staticmethod
     def generate_board(size: int) -> typing.List[typing.List[int]]:
         """Generate the connect 4 board."""
-        return [[0]*size]*size
+        return [[0 for _ in range(size)] for _ in range(size)]
 
     async def print_grid(self) -> None:
         """Formats and outputs the Connect Four grid to the channel."""
@@ -79,6 +79,7 @@ class Game:
             self.message = await self.channel.send(embed=embed)
             for emoji in self.unicode_numbers:
                 await self.message.add_reaction(emoji)
+            await self.message.add_reaction(CROSS_EMOJI)
 
     async def start_game(self) -> None:
         """Begins the game."""
@@ -96,10 +97,12 @@ class Game:
 
             if self.check_win(coords, 1 if self.player_active == self.player1 else 2):
                 if isinstance(self.player_active, AI):
-                    await self.channel.send(f"Game Over! {self.player_active.mention} lost against AI")
+                    await self.channel.send(f"Game Over! {self.player_inactive.mention} lost against"
+                                            f" {self.bot.user.mention}")
                 else:
                     if isinstance(self.player_inactive, AI):
-                        await self.channel.send(f"Game Over! {self.player_active.mention} won against AI")
+                        await self.channel.send(f"Game Over! {self.player_active.mention} won against"
+                                                f" {self.bot.user.mention}")
                     else:
                         await self.channel.send(
                             f"Game Over! {self.player_active.mention} won against {self.player_inactive.mention}"
@@ -114,13 +117,13 @@ class Game:
         return (
             reaction.message.id == self.message.id
             and user.id == self.player_active.id
-            and str(reaction.emoji) in self.unicode_numbers
+            and str(reaction.emoji) in (*self.unicode_numbers, CROSS_EMOJI)
         )
 
     async def player_turn(self) -> Coordinate:
         """Initiate the player's turn."""
         message = await self.channel.send(
-            f"{self.turn.mention}, it's your turn! React with the column you want to place your token in."
+            f"{self.player_active.mention}, it's your turn! React with the column you want to place your token in."
         )
         player_num = 1 if self.player_active == self.player1 else 2
         while True:
@@ -131,6 +134,13 @@ class Game:
                 await self.channel.send(f"{self.player_active.mention}, you took too long. Game over!")
                 return
             else:
+                if str(reaction.emoji) == CROSS_EMOJI:
+                    await message.delete()
+                    await self.channel.send(
+                        f"{user.mention} has abandoned the game :("
+                    )
+                    return
+
                 await message.delete()
                 await self.message.remove_reaction(reaction, user)
                 column_num = self.unicode_numbers.index(str(reaction.emoji))
@@ -179,8 +189,9 @@ class Game:
 class AI:
     """The Computer Player for Single-Player games."""
 
-    def __init__(self, game: Game) -> None:
+    def __init__(self, bot: commands.Bot, game: Game) -> None:
         self.game = game
+        self.mention = bot.user.mention
 
     def get_possible_places(self) -> typing.List[Coordinate]:
         """Gets all the coordinates where the AI could possibly place a counter."""
@@ -248,6 +259,23 @@ class ConnectFour(commands.Cog):
         self.max_board_size = 9
         self.min_board_size = 5
 
+    async def check_author(self, ctx: commands.Context, board_size: int) -> bool:
+        """Check if the requester is free and the board size is correct."""
+        if self.already_playing(ctx.author):
+            await ctx.send("You're already playing a game!")
+            return False
+
+        if ctx.author in self.waiting:
+            await ctx.send("You've already sent out a request for a player 2")
+            return False
+
+        if not self.min_board_size <= board_size <= self.max_board_size:
+            await ctx.send(f"{board_size} is not a valid board size. A valid board size is "
+                           f"between `{self.min_board_size}` and `{self.max_board_size}`.")
+            return False
+
+        return True
+
     def get_player(
             self,
             ctx: commands.Context,
@@ -314,17 +342,8 @@ class ConnectFour(commands.Cog):
         The game will start once someone has reacted.
         All inputs will be through reactions.
         """
-        if self.already_playing(ctx.author):
-            await ctx.send("You're already playing a game!")
-            return
-
-        if ctx.author in self.waiting:
-            await ctx.send("You've already sent out a request for a player 2")
-            return
-
-        if not self.min_board_size <= board_size <= self.max_board_size:
-            await ctx.send(f"{board_size} is not a valid board size. A valid board size is "
-                           f"between `{self.min_board_size}` and `{self.max_board_size}`.")
+        check_author_result = await self.check_author(ctx, board_size)
+        if not check_author_result:
             return
 
         announcement = await ctx.send(
@@ -367,17 +386,8 @@ class ConnectFour(commands.Cog):
     @connect_four.command(aliases=["bot", "computer", "cpu"])
     async def ai(self, ctx: commands.Context, board_size: int = 7) -> None:
         """Play Connect Four against a computer player."""
-        if self.already_playing(ctx.author):
-            await ctx.send("You're already playing a game!")
-            return
-
-        if ctx.author in self.waiting:
-            await ctx.send("You've already sent out a request for a player 2")
-            return
-
-        if board_size > self.max_board_size or board_size < self.min_board_size:
-            await ctx.send(f"{board_size} is not a valid board size. A valid board size it "
-                           f"between `{self.min_board_size}` to `{self.max_board_size}`")
+        check_author_result = await self.check_author(ctx, board_size)
+        if not check_author_result:
             return
 
         await self._play_game(ctx, user=None, board_size=board_size)
