@@ -133,7 +133,6 @@ class Game:
         )
         player_num = 1 if self.player_active == self.player1 else 2
         while True:
-            full_column = False
             try:
                 reaction, user = await self.bot.wait_for("reaction_add", check=self.predicate, timeout=30.0)
             except asyncio.TimeoutError:
@@ -149,21 +148,15 @@ class Game:
 
                 await message.delete()
                 await self.message.remove_reaction(reaction, user)
-                column_num = self.unicode_numbers.index(str(reaction.emoji))
 
+                column_num = self.unicode_numbers.index(str(reaction.emoji))
                 column = [row[column_num] for row in self.grid]
 
                 for row_num, square in reversed(list(enumerate(column))):
                     if not square:
                         self.grid[row_num][column_num] = player_num
-                        coords = row_num, column_num
-                        break
-                else:
-                    await self.channel.send(f"Column {column_num + 1} is full. Try again")
-                    full_column = True
-            if not full_column:
-                break
-        return coords
+                        return row_num, column_num
+                message = await self.channel.send(f"Column {column_num + 1} is full. Try again")
 
     def check_win(self, coords: Coordinate, player_num: int) -> bool:
         """Check that placing a counter here would cause the player to win."""
