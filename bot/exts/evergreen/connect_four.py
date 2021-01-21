@@ -6,7 +6,7 @@ from functools import partial
 import discord
 from discord.ext import commands
 
-EMOJIS = [":white_circle:", ":blue_circle:", ":red_circle:"]
+EMOJIS = None
 NUMBERS = [
     ":one:",
     ":two:",
@@ -38,12 +38,12 @@ class Game:
     """A Connect 4 Game."""
 
     def __init__(
-        self,
-        bot: commands.Bot,
-        channel: discord.TextChannel,
-        player1: discord.Member,
-        player2: typing.Optional[discord.Member],
-        size: int = 7,
+            self,
+            bot: commands.Bot,
+            channel: discord.TextChannel,
+            player1: discord.Member,
+            player2: typing.Optional[discord.Member],
+            size: int = 7,
     ) -> None:
 
         self.bot = bot
@@ -293,20 +293,20 @@ class ConnectFour(commands.Cog):
         return True
 
     def get_player(
-        self,
-        ctx: commands.Context,
-        announcement: discord.Message,
-        reaction: discord.Reaction,
-        user: discord.Member
+            self,
+            ctx: commands.Context,
+            announcement: discord.Message,
+            reaction: discord.Reaction,
+            user: discord.Member
     ) -> bool:
         """Predicate checking the criteria for the announcement message."""
         if self.already_playing(ctx.author):  # If they've joined a game since requesting a player 2
             return True  # Is dealt with later on
 
         if (
-            user.id not in (ctx.me.id, ctx.author.id)
-            and str(reaction.emoji) == HAND_RAISED_EMOJI
-            and reaction.message.id == announcement.id
+                user.id not in (ctx.me.id, ctx.author.id)
+                and str(reaction.emoji) == HAND_RAISED_EMOJI
+                and reaction.message.id == announcement.id
         ):
             if self.already_playing(user):
                 self.bot.loop.create_task(ctx.send(f"{user.mention} You're already playing a game!"))
@@ -323,9 +323,9 @@ class ConnectFour(commands.Cog):
             return True
 
         if (
-            user.id == ctx.author.id
-            and str(reaction.emoji) == CROSS_EMOJI
-            and reaction.message.id == announcement.id
+                user.id == ctx.author.id
+                and str(reaction.emoji) == CROSS_EMOJI
+                and reaction.message.id == announcement.id
         ):
             return True
         return False
@@ -334,9 +334,18 @@ class ConnectFour(commands.Cog):
         """Check if someone is already in a game."""
         return any(player in (game.player1, game.player2) for game in self.games)
 
-    async def _play_game(self, ctx: commands.Context, user: typing.Optional[discord.Member], board_size: int) -> None:
+    async def _play_game(
+            self,
+            ctx: commands.Context,
+            user: typing.Optional[discord.Member],
+            board_size: int,
+            emoji1: str,
+            emoji2: str
+    ) -> None:
         """Helper for playing a game of connect four."""
         try:
+            global EMOJIS
+            EMOJIS = [":white_circle:", str(emoji1), str(emoji2)]
             game = Game(self.bot, ctx.channel, ctx.author, user, size=board_size)
             self.games.append(game)
             await game.start_game()
@@ -352,7 +361,13 @@ class ConnectFour(commands.Cog):
         invoke_without_command=True,
         aliases=["4inarow", "connect4", "connectfour", "c4"]
     )
-    async def connect_four(self, ctx: commands.Context, board_size: int = 7) -> None:
+    async def connect_four(
+            self,
+            ctx: commands.Context,
+            board_size: int = 7,
+            emoji1: str = ":blue_circle:",
+            emoji2: str = ":red_circle:"
+    ) -> None:
         """
         Play the classic game of Connect Four with someone!
 
@@ -399,16 +414,22 @@ class ConnectFour(commands.Cog):
         if self.already_playing(ctx.author):
             return
 
-        await self._play_game(ctx, user, board_size)
+        await self._play_game(ctx, user, board_size, emoji1, emoji2)
 
     @connect_four.command(aliases=["bot", "computer", "cpu"])
-    async def ai(self, ctx: commands.Context, board_size: int = 7) -> None:
+    async def ai(
+            self,
+            ctx: commands.Context,
+            board_size: int = 7,
+            emoji1: str = ":blue_circle:",
+            emoji2: str = ":red_circle:"
+    ) -> None:
         """Play Connect Four against a computer player."""
         check_author_result = await self.check_author(ctx, board_size)
         if not check_author_result:
             return
 
-        await self._play_game(ctx, user=None, board_size=board_size)
+        await self._play_game(ctx, None, board_size, emoji1, emoji2)
 
 
 def setup(bot: commands.Bot) -> None:
