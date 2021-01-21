@@ -68,18 +68,24 @@ class Game:
 
     async def print_grid(self) -> None:
         """Formats and outputs the Connect Four grid to the channel."""
+        title = (
+            f'Connect 4: {self.player1.display_name}'
+            f'VS {self.player2.display_name}'
+        )
+
         rows = [" ".join(EMOJIS[s] for s in row) for row in self.grid]
         first_row = " ".join(x for x in NUMBERS[:self.grid_size])
         formatted_grid = "\n".join([first_row] + rows)
-        embed = discord.Embed(title="Connect Four Board", description=formatted_grid)
+        embed = discord.Embed(title=title, description=formatted_grid)
 
         if self.message:
             await self.message.edit(embed=embed)
         else:
-            self.message = await self.channel.send(embed=embed)
+            self.message = await self.channel.send(content='Loading ....')
             for emoji in self.unicode_numbers:
                 await self.message.add_reaction(emoji)
             await self.message.add_reaction(CROSS_EMOJI)
+            await self.message.edit(content=None, embed=embed)
 
     async def start_game(self) -> None:
         """Begins the game."""
