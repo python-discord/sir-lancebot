@@ -38,12 +38,12 @@ class Game:
     """A Connect 4 Game."""
 
     def __init__(
-            self,
-            bot: commands.Bot,
-            channel: discord.TextChannel,
-            player1: discord.Member,
-            player2: typing.Optional[discord.Member],
-            size: int = 7,
+        self,
+        bot: commands.Bot,
+        channel: discord.TextChannel,
+        player1: discord.Member,
+        player2: typing.Optional[discord.Member],
+        size: int = 7,
     ) -> None:
 
         self.bot = bot
@@ -70,7 +70,7 @@ class Game:
         """Formats and outputs the Connect Four grid to the channel."""
         title = (
             f'Connect 4: {self.player1.display_name}'
-            f'VS {self.player2.display_name}'
+            f'VS {self.bot.user.display_name if isinstance(self.player2, AI) else self.player2.display_name}'
         )
 
         rows = [" ".join(EMOJIS[s] for s in row) for row in self.grid]
@@ -211,16 +211,26 @@ class AI:
         return possible_coords
 
     def check_ai_win(self, coord_list: typing.List[Coordinate]) -> typing.Optional[Coordinate]:
-        """Check if placing a counter in any possible coordinate would cause the AI to win."""
-        if random.randint(1, 10) == 1:  # 10% chance of not winning
+        """
+        Check AI win.
+
+        Check if placing a counter in any possible coordinate would cause the AI to win
+        with 10% chance of not winning and returning None
+        """
+        if random.randint(1, 10) == 1:
             return
         for coords in coord_list:
             if self.game.check_win(coords, 2):
                 return coords
 
     def check_player_win(self, coord_list: typing.List[Coordinate]) -> typing.Optional[Coordinate]:
-        """Check if placing a counter in any possible coordinate would stop the player from winning."""
-        if random.randint(1, 4) == 1:  # 25% chance of not blocking the player
+        """
+        Check Player win.
+
+        Check if placing a counter in possible coordinates would stop the player
+        from winning with 25% of not blocking them  and returning None.
+        """
+        if random.randint(1, 4) == 1:
             return
         for coords in coord_list:
             if self.game.check_win(coords, 1):
@@ -283,19 +293,20 @@ class ConnectFour(commands.Cog):
         return True
 
     def get_player(
-            self,
-            ctx: commands.Context,
-            announcement: discord.Message,
-            reaction: discord.Reaction,
-            user: discord.Member
+        self,
+        ctx: commands.Context,
+        announcement: discord.Message,
+        reaction: discord.Reaction,
+        user: discord.Member
     ) -> bool:
         """Predicate checking the criteria for the announcement message."""
         if self.already_playing(ctx.author):  # If they've joined a game since requesting a player 2
             return True  # Is dealt with later on
+
         if (
-                user.id not in (ctx.me.id, ctx.author.id)
-                and str(reaction.emoji) == HAND_RAISED_EMOJI
-                and reaction.message.id == announcement.id
+            user.id not in (ctx.me.id, ctx.author.id)
+            and str(reaction.emoji) == HAND_RAISED_EMOJI
+            and reaction.message.id == announcement.id
         ):
             if self.already_playing(user):
                 self.bot.loop.create_task(ctx.send(f"{user.mention} You're already playing a game!"))
@@ -312,9 +323,9 @@ class ConnectFour(commands.Cog):
             return True
 
         if (
-                user.id == ctx.author.id
-                and str(reaction.emoji) == CROSS_EMOJI
-                and reaction.message.id == announcement.id
+            user.id == ctx.author.id
+            and str(reaction.emoji) == CROSS_EMOJI
+            and reaction.message.id == announcement.id
         ):
             return True
         return False
@@ -333,7 +344,8 @@ class ConnectFour(commands.Cog):
         except Exception:
             # End the game in the event of an unforeseen error so the players aren't stuck in a game
             await ctx.send(f"{ctx.author.mention} {user.mention if user else ''} An error occurred. Game failed")
-            self.games.remove(game)
+            if game in self.games:
+                self.games.remove(game)
             raise
 
     @commands.group(
