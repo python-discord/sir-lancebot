@@ -358,8 +358,8 @@ class ConnectFour(commands.Cog):
             self,
             ctx: commands.Context,
             board_size: int = 7,
-            emoji1: str = ":blue_circle:",
-            emoji2: str = ":red_circle:"
+            emoji1: discord.Emoji = ":blue_circle:",
+            emoji2: discord.Emoji = ":red_circle:"
     ) -> None:
         """
         Play the classic game of Connect Four with someone!
@@ -407,6 +407,9 @@ class ConnectFour(commands.Cog):
         if self.already_playing(ctx.author):
             return
 
+        emoji1 = str(emoji1)
+        emoji2 = str(emoji2)
+
         await self._play_game(ctx, user, board_size, emoji1, emoji2)
 
     @connect_four.command(aliases=["bot", "computer", "cpu"])
@@ -414,13 +417,16 @@ class ConnectFour(commands.Cog):
             self,
             ctx: commands.Context,
             board_size: int = 7,
-            emoji1: str = ":blue_circle:",
-            emoji2: str = ":red_circle:"
+            emoji1: discord.Emoji = ":blue_circle:",
+            emoji2: discord.Emoji = ":red_circle:"
     ) -> None:
         """Play Connect Four against a computer player."""
         check_author_result = await self.check_author(ctx, board_size)
         if not check_author_result:
             return
+
+        emoji1 = str(emoji1)
+        emoji2 = str(emoji2)
 
         await self._play_game(ctx, None, board_size, emoji1, emoji2)
 
