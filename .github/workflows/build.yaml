@@ -61,6 +61,8 @@ jobs:
           tags: |
             ghcr.io/python-discord/sir-lancebot:latest
             ghcr.io/python-discord/sir-lancebot:${{ steps.sha_tag.outputs.tag }}
+          build-args: |
+            git_sha=${{ github.sha }}
 
       - name: Authenticate with Kubernetes
         uses: azure/k8s-set-context@v1
