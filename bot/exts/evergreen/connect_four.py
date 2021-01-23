@@ -6,7 +6,7 @@ from functools import partial
 import discord
 from discord.ext import commands
 
-EMOJIS = None
+EMOJI_TOKENS = [":white_circle:", ":blue_circle:", ":red_circle:"]
 NUMBERS = [
     ":one:",
     ":two:",
@@ -32,6 +32,7 @@ UNICODE_NUMBERS = [
 CROSS_EMOJI = "\u274e"
 HAND_RAISED_EMOJI = "\U0001f64b"
 Coordinate = typing.Optional[typing.Tuple[int, int]]
+EMOJI_CHECK = typing.Union[discord.Emoji, str]
 
 
 class Game:
@@ -336,9 +337,10 @@ class ConnectFour(commands.Cog):
             emoji2: str
     ) -> None:
         """Helper for playing a game of connect four."""
+        global EMOJIS
+        EMOJIS = [":white_circle:", str(emoji1), str(emoji2)]
+
         try:
-            global EMOJIS
-            EMOJIS = [":white_circle:", str(emoji1), str(emoji2)]
             game = Game(self.bot, ctx.channel, ctx.author, user, size=board_size)
             self.games.append(game)
             await game.start_game()
@@ -358,8 +360,8 @@ class ConnectFour(commands.Cog):
             self,
             ctx: commands.Context,
             board_size: int = 7,
-            emoji1: discord.Emoji = ":blue_circle:",
-            emoji2: discord.Emoji = ":red_circle:"
+            emoji1: EMOJI_CHECK = ":blue_circle:",
+            emoji2: EMOJI_CHECK = ":red_circle:"
     ) -> None:
         """
         Play the classic game of Connect Four with someone!
@@ -368,6 +370,11 @@ class ConnectFour(commands.Cog):
         The game will start once someone has reacted.
         All inputs will be through reactions.
         """
+        if isinstance(emoji1, str) and len(emoji1) > 1:
+            raise commands.EmojiNotFound(emoji1)
+        if isinstance(emoji2, str) and len(emoji2) > 1:
+            raise commands.EmojiNotFound(emoji2)
+
         check_author_result = await self.check_author(ctx, board_size)
         if not check_author_result:
             return
@@ -407,28 +414,22 @@ class ConnectFour(commands.Cog):
         if self.already_playing(ctx.author):
             return
 
-        emoji1 = str(emoji1)
-        emoji2 = str(emoji2)
-
-        await self._play_game(ctx, user, board_size, emoji1, emoji2)
+        await self._play_game(ctx, user, board_size, str(emoji1), str(emoji2))
 
     @connect_four.command(aliases=["bot", "computer", "cpu"])
     async def ai(
             self,
             ctx: commands.Context,
             board_size: int = 7,
-            emoji1: discord.Emoji = ":blue_circle:",
-            emoji2: discord.Emoji = ":red_circle:"
+            emoji1: EMOJI_CHECK = ":blue_circle:"
     ) -> None:
         """Play Connect Four against a computer player."""
+        if isinstance(emoji1, str) and len(emoji1) > 1:
+            raise commands.EmojiNotFound(emoji1)
         check_author_result = await self.check_author(ctx, board_size)
         if not check_author_result:
             return
-
-        emoji1 = str(emoji1)
-        emoji2 = str(emoji2)
-
-        await self._play_game(ctx, None, board_size, emoji1, emoji2)
+        await self._play_game(ctx, None, board_size, str(emoji1), ":red_circle:")
 
 
 def setup(bot: commands.Bot) -> None:
