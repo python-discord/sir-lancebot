@@ -1,5 +1,7 @@
 import logging
 import random
+import re
+import typing as t
 
 import discord
 from discord.ext import commands
@@ -13,9 +15,7 @@ BAD_RESPONSE = {
     404: "Issue/pull request not located! Please enter a valid number!",
     403: "Rate limit has been hit! Please try again later!"
 }
-
 MAX_REQUESTS = 10
-
 REQUEST_HEADERS = dict()
 if GITHUB_TOKEN := Tokens.github:
     REQUEST_HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
@@ -27,31 +27,19 @@ class Issues(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @commands.command(aliases=("pr",))
-    @override_in_channel(WHITELISTED_CHANNELS + (Channels.dev_contrib, Channels.dev_branding))
-    async def issue(
-        self,
-        ctx: commands.Context,
-        numbers: commands.Greedy[int],
-        repository: str = "sir-lancebot",
-        user: str = "python-discord"
-    ) -> None:
-        """Command to retrieve issue(s) from a GitHub repository."""
+    async def fetch_issues(
+            self,
+            numbers: set,
+            repository: str,
+            user: str
+    ) -> t.Union[str, list]:
+        """Retrieve issue(s) from a GitHub repository."""
         links = []
-        numbers = set(numbers)  # Convert from list to set to remove duplicates, if any
-
         if not numbers:
-            await ctx.invoke(self.bot.get_command('help'), 'issue')
-            return
+            return "Numbers not found."
 
         if len(numbers) > MAX_REQUESTS:
-            embed = discord.Embed(
-                title=random.choice(ERROR_REPLIES),
-                color=Colours.soft_red,
-                description=f"Too many issues/PRs! (maximum of {MAX_REQUESTS})"
-            )
-            await ctx.send(embed=embed)
-            return
+            return "Max requests hit."
 
         for number in numbers:
             url = f"https://api.github.com/repos/{user}/{repository}/issues/{number}"
@@ -63,7 +51,7 @@ class Issues(commands.Cog):
 
             if r.status in BAD_RESPONSE:
                 log.warning(f"Received response {r.status} from: {url}")
-                return await ctx.send(f"[{str(r.status)}] #{number} {BAD_RESPONSE.get(r.status)}")
+                return f"[{str(r.status)}] #{number} {BAD_RESPONSE.get(r.status)}"
 
             # The initial API request is made to the issues API endpoint, which will return information
             # if the issue or PR is present. However, the scope of information returned for PRs differs
@@ -92,15 +80,69 @@ class Issues(commands.Cog):
             issue_url = json_data.get("html_url")
             links.append([icon_url, f"[{repository}] #{number} {json_data.get('title')}", issue_url])
 
-        # Issue/PR format: emoji to show if open/closed/merged, number and the title as a singular link.
-        description_list = ["{0} [{1}]({2})".format(*link) for link in links]
+        return links
+
+    @staticmethod
+    def get_embed(result: list, user: str = "python-discord", repository: str = "") -> discord.Embed:
+        """Get Response Embed."""
+        description_list = ["{0} [{1}]({2})".format(*link) for link in result]
         resp = discord.Embed(
             colour=Colours.bright_green,
             description='\n'.join(description_list)
         )
 
         resp.set_author(name="GitHub", url=f"https://github.com/{user}/{repository}")
-        await ctx.send(embed=resp)
+        return resp
+
+    @commands.command(aliases=("pr",))
+    @override_in_channel(WHITELISTED_CHANNELS + (Channels.dev_contrib, Channels.dev_branding))
+    async def issue(
+            self,
+            ctx: commands.Context,
+            numbers: commands.Greedy[int],
+            repository: str = "sir-lancebot",
+            user: str = "python-discord"
+    ) -> None:
+        """Command to retrieve issue(s) from a GitHub repository."""
+        print(numbers)
+        result = await self.fetch_issues(set(numbers), repository, user)
+
+        if result == "Numbers not found.":
+            await ctx.invoke(self.bot.get_command('help'), 'issue')
+
+        elif result == "Max requests hit.":
+            embed = discord.Embed(
+                title=random.choice(ERROR_REPLIES),
+                color=Colours.soft_red,
+                description=f"Too many issues/PRs! (maximum of {MAX_REQUESTS})"
+            )
+            await ctx.send(embed=embed)
+
+        elif isinstance(result, list):
+            # Issue/PR format: emoji to show if open/closed/merged, number and the title as a singular link.
+            resp = self.get_embed(result, user, repository)
+            await ctx.send(embed=resp)
+
+        elif isinstance(result, str):
+            await ctx.send(result)
+
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message) -> None:
+        """Command to retrieve issue(s) from a GitHub repository using automatic linking if matching <repo>#<issue>."""
+        message_repo_issue_map = re.findall(r".+?(bot|meta|sir-lancebot|logcord)#(\d+)", message.content)
+        links = []
+
+        if message_repo_issue_map:
+            for repo_issue in message_repo_issue_map:
+                result = await self.fetch_issues({repo_issue[1]}, repo_issue[0], "python-discord")
+                if isinstance(result, list):
+                    links.append(*result)
+
+        if not links:
+            return
+
+        resp = self.get_embed(links, "python-discord")
+        await message.channel.send(embed=resp)
 
 
 def setup(bot: commands.Bot) -> None:
