@@ -103,7 +103,7 @@ class Game:
             if isinstance(self.player_active, AI):
                 coords = self.player_active.play()
                 if not coords:
-                    await self.channel.send(f"Game Over! Its's A Draw :tada:")
+                    await self.channel.send("Game Over! It's A Draw :tada:")
                     await self.print_grid()
             else:
                 coords = await self.player_turn()
@@ -123,9 +123,9 @@ class Game:
     def predicate(self, reaction: discord.Reaction, user: discord.Member) -> bool:
         """The predicate to check for the player's reaction."""
         return (
-                reaction.message.id == self.message.id
-                and user.id == self.player_active.id
-                and str(reaction.emoji) in (*self.unicode_numbers, CROSS_EMOJI)
+            reaction.message.id == self.message.id
+            and user.id == self.player_active.id
+            and str(reaction.emoji) in (*self.unicode_numbers, CROSS_EMOJI)
         )
 
     async def player_turn(self) -> Coordinate:
@@ -250,9 +250,9 @@ class AI:
             return False
 
         coords = (
-                self.check_ai_win(possible_coords)
-                or self.check_player_win(possible_coords)
-                or self.random_coords(possible_coords)
+            self.check_ai_win(possible_coords)
+            or self.check_player_win(possible_coords)
+            or self.random_coords(possible_coords)
         )
 
         row, column = coords
