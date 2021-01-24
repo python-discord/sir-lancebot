@@ -1,4 +1,5 @@
 import logging
+import re
 from random import randint
 from typing import Dict, Optional, Union
 
@@ -11,8 +12,8 @@ from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
-URL = "https://xkcd.com/{0}/info.0.json"
-LATEST = "https://xkcd.com/info.0.json"
+COMIC_FORMAT = re.compile(r"latest|[0-9]+")
+BASE_URL = "https://xkcd.com"
 
 
 class XKCD(Cog):
@@ -30,7 +31,7 @@ class XKCD(Cog):
     @tasks.loop(minutes=30)
     async def get_latest_comic_info(self) -> None:
         """Refreshes latest comic's information ever 30 minutes. Also used for finding a random comic."""
-        async with self.bot.http_session.get(LATEST) as resp:
+        async with self.bot.http_session.get(f"{BASE_URL}/info.0.json") as resp:
             if resp.status == 200:
                 self.latest_comic_info = await resp.json()
             else:
@@ -41,29 +42,42 @@ class XKCD(Cog):
         """
         Getting an xkcd comic's information along with the image.
 
-        To get a random comic, don't type any number as an argument. To get the latest, enter 0.
+        To get a random comic, don't type any number as an argument. To get the latest, type 'latest'.
         """
-        embed = Embed()
+        embed = Embed(title=f"XKCD comic #{self.latest_comic_info['num'] if comic == 'latest' else comic}")
 
-        comic = comic or randint(1, self.latest_comic_info['num'])
+        embed.colour = Colours.soft_red
+
+        if (comic := re.match(COMIC_FORMAT, comic)) is None:
+            embed.description = "Inputted comic parameter should either be an integer or 'latest'."
+            await ctx.send(embed=embed)
+            return
+
+        comic = comic.group(0) or randint(1, self.latest_comic_info['num'])
 
         if comic == "latest":
             info = self.latest_comic_info
 
         else:
-            async with self.bot.http_session.get(URL.format(comic)) as resp:
+            async with self.bot.http_session.get(f"{BASE_URL}/{comic}/info.0.json") as resp:
                 if resp.status == 200:
                     info = await resp.json()
                 else:
                     embed.description = f"{resp.status}: Could not retrieve xkcd comic #{comic}."
-                    embed.colour = Colours.soft_red
                     log.debug(f"Retrieving xkcd comic #{comic} failed with status code {resp.status}.")
                     await ctx.send(embed=embed)
                     return
 
-        embed.set_image(url=info["img"])
-        date = f"{info['year']}/{info['month']}/{info['day']}"
-        embed.set_footer(text=f"{date} - #{info['num']}, \'{info['safe_title']}\'")
+        if info["img"][:-3] in ("jpg", "png", "gif"):
+            embed.set_image(url=info["img"])
+            date = f"{info['year']}/{info['month']}/{info['day']}"
+            embed.set_footer(text=f"{date} - #{info['num']}, \'{info['safe_title']}\'")
+            embed.colour = Colours.soft_green
+        else:
+            embed.description = (
+                "Selected comic is interactive, and cannot be displayed within an embed.\n"
+                f"Comic can be viewed [here](https://xkcd.com/{info['num']})"
+            )
 
         await ctx.send(embed=embed)
 
