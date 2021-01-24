@@ -49,7 +49,7 @@ class XKCD(Cog):
         embed.colour = Colours.soft_red
 
         if comic and (comic := re.match(COMIC_FORMAT, comic)) is None:
-            embed.description = "Inputted comic parameter should either be an integer or 'latest'."
+            embed.description = "Comic parameter should either be an integer or 'latest'."
             await ctx.send(embed=embed)
             return
 
