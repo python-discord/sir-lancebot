@@ -57,7 +57,6 @@ class XKCD(Cog):
 
         if comic == "latest":
             info = self.latest_comic_info
-
         else:
             async with self.bot.http_session.get(f"{BASE_URL}/{comic}/info.0.json") as resp:
                 if resp.status == 200:
