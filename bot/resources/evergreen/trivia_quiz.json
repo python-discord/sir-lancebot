@@ -250,15 +250,15 @@
     },
     {
       "id": 136,
-      "question":"The United Nations headquarters is located at which city?",
-      "answer":"New York",
-      "info":"The United Nations is headquartered in New York City in a complex designed by a board of architects led by Wallace Harrison and built by the architectural firm Harrison & Abramovitz. The complex has served as the official headquarters of the United Nations since its completion in 1951."
+      "question": "The United Nations headquarters is located at which city?",
+      "answer": "New York",
+      "info": "The United Nations is headquartered in New York City in a complex designed by a board of architects led by Wallace Harrison and built by the architectural firm Harrison & Abramovitz. The complex has served as the official headquarters of the United Nations since its completion in 1951."
     },
     {
       "id": 137,
-      "question":"At what year did Christopher Columbus discover America?",
-      "answer":"1492",
-      "info":"The explorer Christopher Columbus made four trips across the Atlantic Ocean from Spain: in 1492, 1493, 1498 and 1502. He was determined to find a direct water route west from Europe to Asia, but he never did. Instead, he stumbled upon the Americas"
+      "question": "At what year did Christopher Columbus discover America?",
+      "answer": "1492",
+      "info": "The explorer Christopher Columbus made four trips across the Atlantic Ocean from Spain: in 1492, 1493, 1498 and 1502. He was determined to find a direct water route west from Europe to Asia, but he never did. Instead, he stumbled upon the Americas"
     }
   ]
 }
