@@ -61,7 +61,7 @@ class XKCD(Cog):
 
         embed.set_image(url=info["img"])
         date = f"{info['year']}/{info['month']}/{info['day']}"
-        embed.set_footer(text=f"{date} - #{comic}, \'{info['safe_title']}\'")
+        embed.set_footer(text=f"{date} - #{info['num']}, \'{info['safe_title']}\'")
 
         await ctx.send(embed=embed)
 
