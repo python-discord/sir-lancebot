@@ -1,72 +1,71 @@
 import logging
-import random
+from random import randint
+from typing import Dict, Optional, Union
 
-import discord
-from discord.ext import commands
+from discord import Embed
+from discord.ext import tasks
+from discord.ext.commands import Cog, Context, command
+
+from bot.bot import Bot
 
 log = logging.getLogger(__name__)
 
+URL = "https://xkcd.com/{0}/info.0.json"
+LATEST = "https://xkcd.com/info.0.json"
 
-class XKCD(commands.Cog):
-    """A cog for posting the XKCD ."""
 
-    def __init__(self, bot: commands.Bot):
+class XKCD(Cog):
+    """Retrieving XKCD comics."""
+
+    def __init__(self, bot: Bot) -> None:
         self.bot = bot
+        self.latest_comic_info: Dict[str, Union[str, int]] = {}
+        self.get_latest_comic_info.start()
 
-    @commands.command(name="xkcd")
-    async def fetch_xkcd_comics(self, ctx: commands.Context, comic: str = "latest") -> None:
-        """Read your Fav XKCD comics."""
-        if comic not in ["random", "latest"]:
-            url = f"https://xkcd.com/{comic}/info.0.json"
-        else:
-            url = "https://xkcd.com/info.0.json"
+    def cog_unload(self) -> None:
+        """Cancels refreshing of the task for refreshing the most recent comic info."""
+        self.get_latest_comic_info.cancel()
 
-        # ---- random choice -----
-        if comic == "random":
-            async with self.bot.http_session.get(url) as r:
-                json_data = await r.json()
-            random_pick = random.randint(1, int(json_data["num"]))
-            url = f"https://xkcd.com/{random_pick}/info.0.json"
-
-        log.trace(f"Querying xkcd API: {url}")
-        async with self.bot.http_session.get(url) as r:
-            if r.status == "200":
-                json_data = await r.json()
+    @tasks.loop(minutes=30)
+    async def get_latest_comic_info(self) -> None:
+        """Refreshes latest comic's information ever 30 minutes. Also used for finding a random comic."""
+        async with self.bot.http_session.get(LATEST) as resp:
+            if resp.status == 200:
+                self.latest_comic_info = await resp.json()
             else:
-                # ----- Exception handling | Guides to use ------
-                log.warning(f"Received response {r.status} from: {url}")
-                # -- get the latest comic number ---
-                url = f"https://xkcd.com/info.0.json"
-                async with self.bot.http_session.get(url) as r:
-                    latest_data = await r.json()
+                log.debug(f"Failed to get latest XKCD comic information. Status code {resp.status}")
 
-                # --- beautify response ---
-                latest_num = latest_data["num"]
-                resp = discord.Embed(
-                    title="Guides | Usage",
-                    description=f'''
-                    .xkcd latest (Retrieves the latest comic)
-                    .xkcd random (Retrieves random comic)
-                    .xkcd number (Enter a comic number between 1 & {latest_num})
-                    '''
-                )
-                return await ctx.send(embed=resp)
+    @command(name="xkcd")
+    async def fetch_xkcd_comics(self, ctx: Context, comic: Optional[str]) -> None:
+        """
+        Getting an xkcd comic's information along with the image.
 
-        # --- response variables ----
-        day, month, year = json_data["day"], json_data["month"], json_data["year"]
-        comic_number = json_data["num"]
+        To get a random comic, don't type any number as an argument. To get the latest, enter 0.
+        """
+        embed = Embed()
 
-        # ---- beautify response ----
-        embed = discord.Embed(
-            title=json_data['title'],
-            description=json_data["alt"]
-        )
-        embed.set_image(url=json_data['img'])
-        embed.set_footer(text=f"Post date : {day}-{month}-{year} | xkcd comics - {comic_number}")
+        comic = comic or randint(1, self.latest_comic_info['num'])
+
+        if comic == "latest":
+            info = self.latest_comic_info
+
+        else:
+            async with self.bot.http_session.get(URL.format(comic)) as resp:
+                if resp.status == 200:
+                    info = await resp.json()
+                else:
+                    embed.description = f"{resp.status}: Could not retrieve xkcd comic #{comic}."
+                    log.debug(f"Retrieving xkcd comic #{comic} failed with status code {resp.status}.")
+                    await ctx.send(embed=embed)
+                    return
+
+        embed.set_image(url=info["img"])
+        date = f"{info['year']}/{info['month']}/{info['day']}"
+        embed.set_footer(text=f"{date} - #{comic}, \'{info['safe_title']}\'")
 
         await ctx.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
-    """XKCD Cog load."""
+def setup(bot: Bot) -> None:
+    """Loading the XKCD cog."""
     bot.add_cog(XKCD(bot))
