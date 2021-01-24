@@ -1,8 +1,9 @@
 # Sir Lancebot
 
+[![Discord][5]][6]
 [![Lint Badge][1]][2]
 [![Build Badge][3]][4]
-[![Discord](https://img.shields.io/static/v1?label=Python%20Discord&logo=discord&message=%3E100k%20members&color=%237289DA&logoColor=white)](https://discord.gg/2B963hn)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 ![Header](sir-lancebot-logo.png)
 
@@ -25,3 +26,5 @@ See [Sir Lancebot's Wiki](https://pythondiscord.com/pages/contributing/sir-lance
 [2]:https://github.com/python-discord/sir-lancebot/actions?query=workflow%3ALint+branch%3Amaster
 [3]:https://github.com/python-discord/sir-lancebot/workflows/Build/badge.svg?branch=master
 [4]:https://github.com/python-discord/sir-lancebot/actions?query=workflow%3ABuild+branch%3Amaster
+[5]: https://raw.githubusercontent.com/python-discord/branding/master/logos/badge/badge_github.svg
+[6]: https://discord.gg/python

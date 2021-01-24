@@ -1,15 +1,16 @@
 import logging
+import random
 import re
 from collections import Counter
 from datetime import datetime, timedelta
-from typing import List, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 import aiohttp
 import discord
 from async_rediscache import RedisCache
 from discord.ext import commands
 
-from bot.constants import Channels, Month, Tokens, WHITELISTED_CHANNELS
+from bot.constants import Channels, Month, NEGATIVE_REPLIES, Tokens, WHITELISTED_CHANNELS
 from bot.utils.decorators import in_month, override_in_channel
 
 log = logging.getLogger(__name__)
@@ -125,18 +126,28 @@ class HacktoberStats(commands.Cog):
         async with ctx.typing():
             prs = await self.get_october_prs(github_username)
 
+            if prs is None:  # Will be None if the user was not found
+                await ctx.send(
+                    embed=discord.Embed(
+                        title=random.choice(NEGATIVE_REPLIES),
+                        description=f"GitHub user `{github_username}` was not found.",
+                        colour=discord.Colour.red()
+                    )
+                )
+                return
+
             if prs:
                 stats_embed = await self.build_embed(github_username, prs)
                 await ctx.send('Here are some stats!', embed=stats_embed)
             else:
-                await ctx.send(f"No valid October GitHub contributions found for '{github_username}'")
+                await ctx.send(f"No valid Hacktoberfest PRs found for '{github_username}'")
 
     async def build_embed(self, github_username: str, prs: List[dict]) -> discord.Embed:
         """Return a stats embed built from github_username's PRs."""
         logging.info(f"Building Hacktoberfest embed for GitHub user: '{github_username}'")
         in_review, accepted = await self._categorize_prs(prs)
 
-        n = len(accepted) + len(in_review)  # total number of PRs
+        n = len(accepted) + len(in_review)  # Total number of PRs
         if n >= PRS_FOR_SHIRT:
             shirtstr = f"**{github_username} is eligible for a T-shirt or a tree!**"
         elif n == PRS_FOR_SHIRT - 1:
@@ -162,7 +173,7 @@ class HacktoberStats(commands.Cog):
             icon_url="https://avatars1.githubusercontent.com/u/35706162?s=200&v=4"
         )
 
-        # this will handle when no PRs in_review or accepted
+        # This will handle when no PRs in_review or accepted
         review_str = self._build_prs_string(in_review, github_username) or "None"
         accepted_str = self._build_prs_string(accepted, github_username) or "None"
         stats_embed.add_field(
@@ -178,7 +189,7 @@ class HacktoberStats(commands.Cog):
         return stats_embed
 
     @staticmethod
-    async def get_october_prs(github_username: str) -> Union[List[dict], None]:
+    async def get_october_prs(github_username: str) -> Optional[List[dict]]:
         """
         Query GitHub's API for PRs created during the month of October by github_username.
 
@@ -198,7 +209,8 @@ class HacktoberStats(commands.Cog):
             "number": int
         }
 
-        Otherwise, return None
+        Otherwise, return empty list.
+        None will be returned when the GitHub user was not found.
         """
         logging.info(f"Fetching Hacktoberfest Stats for GitHub user: '{github_username}'")
         base_url = "https://api.github.com/search/issues?q="
@@ -226,14 +238,15 @@ class HacktoberStats(commands.Cog):
             # Ignore logging non-existent users or users we do not have permission to see
             if api_message == GITHUB_NONEXISTENT_USER_MESSAGE:
                 logging.debug(f"No GitHub user found named '{github_username}'")
+                return
             else:
                 logging.error(f"GitHub API request for '{github_username}' failed with message: {api_message}")
-            return
+            return []  # No October PRs were found due to error
 
         if jsonresp["total_count"] == 0:
             # Short circuit if there aren't any PRs
-            logging.info(f"No Hacktoberfest PRs found for GitHub user: '{github_username}'")
-            return
+            logging.info(f"No October PRs found for GitHub user: '{github_username}'")
+            return []
 
         logging.info(f"Found {len(jsonresp['items'])} Hacktoberfest PRs for GitHub user: '{github_username}'")
         outlist = []  # list of pr information dicts that will get returned
@@ -250,7 +263,7 @@ class HacktoberStats(commands.Cog):
                 "number": item["number"]
             }
 
-            # if the PR has 'invalid' or 'spam' labels, the PR must be
+            # If the PR has 'invalid' or 'spam' labels, the PR must be
             # either merged or approved for it to be included
             if HacktoberStats._has_label(item, ["invalid", "spam"]):
                 if not await HacktoberStats._is_accepted(itemdict):
@@ -263,28 +276,28 @@ class HacktoberStats(commands.Cog):
                 outlist.append(itemdict)
                 continue
 
-            # checking PR's labels for "hacktoberfest-accepted"
+            # Checking PR's labels for "hacktoberfest-accepted"
             if HacktoberStats._has_label(item, "hacktoberfest-accepted"):
                 outlist.append(itemdict)
                 continue
 
-            # no need to query github if repo topics are fetched before already
+            # No need to query GitHub if repo topics are fetched before already
             if shortname in hackto_topics.keys():
                 if hackto_topics[shortname]:
                     outlist.append(itemdict)
                     continue
-            # fetch topics for the pr repo
+            # Fetch topics for the PR's repo
             topics_query_url = f"https://api.github.com/repos/{shortname}/topics"
             logging.debug(f"Fetching repo topics for {shortname} with url: {topics_query_url}")
             jsonresp2 = await HacktoberStats._fetch_url(topics_query_url, GITHUB_TOPICS_ACCEPT_HEADER)
             if jsonresp2.get("names") is None:
                 logging.error(f"Error fetching topics for {shortname}: {jsonresp2['message']}")
-                return
+                continue  # Assume the repo doesn't have the `hacktoberfest` topic if API  request errored
 
             # PRs after oct 3 that doesn't have 'hacktoberfest-accepted' label
             # must be in repo with 'hacktoberfest' topic
             if "hacktoberfest" in jsonresp2["names"]:
-                hackto_topics[shortname] = True  # cache result in the dict for later use if needed
+                hackto_topics[shortname] = True  # Cache result in the dict for later use if needed
                 outlist.append(itemdict)
         return outlist
 
