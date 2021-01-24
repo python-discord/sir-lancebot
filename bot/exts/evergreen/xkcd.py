@@ -44,16 +44,16 @@ class XKCD(Cog):
 
         To get a random comic, don't type any number as an argument. To get the latest, type 'latest'.
         """
-        embed = Embed(title=f"XKCD comic #{self.latest_comic_info['num'] if comic == 'latest' else comic}")
+        embed = Embed(title=f"XKCD comic '{comic}'")
 
         embed.colour = Colours.soft_red
 
-        if (comic := re.match(COMIC_FORMAT, comic)) is None:
+        if comic and (comic := re.match(COMIC_FORMAT, comic)) is None:
             embed.description = "Inputted comic parameter should either be an integer or 'latest'."
             await ctx.send(embed=embed)
             return
 
-        comic = comic.group(0) or randint(1, self.latest_comic_info['num'])
+        comic = randint(1, self.latest_comic_info['num']) if comic is None else comic.group(0)
 
         if comic == "latest":
             info = self.latest_comic_info
@@ -63,12 +63,15 @@ class XKCD(Cog):
                 if resp.status == 200:
                     info = await resp.json()
                 else:
+                    embed.title = f"XKCD comic #{comic}"
                     embed.description = f"{resp.status}: Could not retrieve xkcd comic #{comic}."
                     log.debug(f"Retrieving xkcd comic #{comic} failed with status code {resp.status}.")
                     await ctx.send(embed=embed)
                     return
 
-        if info["img"][:-3] in ("jpg", "png", "gif"):
+        embed.title = f"XKCD comic #{info['num']}"
+
+        if info["img"][-3:] in ("jpg", "png", "gif"):
             embed.set_image(url=info["img"])
             date = f"{info['year']}/{info['month']}/{info['day']}"
             embed.set_footer(text=f"{date} - #{info['num']}, \'{info['safe_title']}\'")
