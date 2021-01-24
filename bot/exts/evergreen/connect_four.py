@@ -71,7 +71,7 @@ class Game:
         """Formats and outputs the Connect Four grid to the channel."""
         title = (
             f'Connect 4: {self.player1.display_name}'
-            f'VS {self.bot.user.display_name if isinstance(self.player2, AI) else self.player2.display_name}'
+            f' VS {self.bot.user.display_name if isinstance(self.player2, AI) else self.player2.display_name}'
         )
 
         rows = [" ".join(EMOJIS[s] for s in row) for row in self.grid]
@@ -88,14 +88,23 @@ class Game:
             await self.message.add_reaction(CROSS_EMOJI)
             await self.message.edit(content=None, embed=embed)
 
+    async def game_over(self, winner: discord.user, loser: discord.user) -> None:
+        """Removes games from list of current games and announces to public chat."""
+        await self.channel.send(f"Game Over! {winner.mention} won against {loser.mention}")
+        await self.print_grid()
+
     async def start_game(self) -> None:
         """Begins the game."""
         self.player_active, self.player_inactive = self.player1, self.player2
 
         while True:
             await self.print_grid()
+
             if isinstance(self.player_active, AI):
                 coords = self.player_active.play()
+                if not coords:
+                    await self.channel.send(f"Game Over! Its's A Draw :tada:")
+                    await self.print_grid()
             else:
                 coords = await self.player_turn()
 
@@ -103,18 +112,10 @@ class Game:
                 return
 
             if self.check_win(coords, 1 if self.player_active == self.player1 else 2):
-                if isinstance(self.player_active, AI):
-                    await self.channel.send(f"Game Over! {self.player_inactive.mention} lost against"
-                                            f" {self.bot.user.mention}")
-                else:
-                    if isinstance(self.player_inactive, AI):
-                        await self.channel.send(f"Game Over! {self.player_active.mention} won against"
-                                                f" {self.bot.user.mention}")
-                    else:
-                        await self.channel.send(
-                            f"Game Over! {self.player_active.mention} won against {self.player_inactive.mention}"
-                        )
-                await self.print_grid()
+                await self.game_over(
+                    self.bot.user if isinstance(self.player_active, AI) else {self.player_active},
+                    self.bot.user if isinstance(self.player_inactive, AI) else {self.player_inactive},
+                )
                 return
 
             self.player_active, self.player_inactive = self.player_inactive, self.player_active
@@ -122,9 +123,9 @@ class Game:
     def predicate(self, reaction: discord.Reaction, user: discord.Member) -> bool:
         """The predicate to check for the player's reaction."""
         return (
-            reaction.message.id == self.message.id
-            and user.id == self.player_active.id
-            and str(reaction.emoji) in (*self.unicode_numbers, CROSS_EMOJI)
+                reaction.message.id == self.message.id
+                and user.id == self.player_active.id
+                and str(reaction.emoji) in (*self.unicode_numbers, CROSS_EMOJI)
         )
 
     async def player_turn(self) -> Coordinate:
@@ -142,9 +143,7 @@ class Game:
             else:
                 if str(reaction.emoji) == CROSS_EMOJI:
                     await message.delete()
-                    await self.channel.send(
-                        f"{user.mention} has abandoned the game :("
-                    )
+                    await self.channel.send(f"{self.player_active.user} surrendered. Game over!")
                     return
 
                 await message.delete()
@@ -235,7 +234,7 @@ class AI:
         """Picks a random coordinate from the possible ones."""
         return random.choice(coord_list)
 
-    def play(self) -> Coordinate:
+    def play(self) -> typing.Union[Coordinate, bool]:
         """
         Plays for the AI.
 
@@ -247,10 +246,13 @@ class AI:
         """
         possible_coords = self.get_possible_places()
 
+        if not possible_coords:
+            return False
+
         coords = (
-            self.check_ai_win(possible_coords)
-            or self.check_player_win(possible_coords)
-            or self.random_coords(possible_coords)
+                self.check_ai_win(possible_coords)
+                or self.check_player_win(possible_coords)
+                or self.random_coords(possible_coords)
         )
 
         row, column = coords
@@ -354,14 +356,15 @@ class ConnectFour(commands.Cog):
 
     @commands.group(
         invoke_without_command=True,
-        aliases=["4inarow", "connect4", "connectfour", "c4"]
+        aliases=["4inarow", "connect4", "connectfour", "c4"],
+        case_insensitive=True
     )
     async def connect_four(
             self,
             ctx: commands.Context,
             board_size: int = 7,
-            emoji1: EMOJI_CHECK = ":blue_circle:",
-            emoji2: EMOJI_CHECK = ":red_circle:"
+            emoji1: EMOJI_CHECK = "\U0001f535",
+            emoji2: EMOJI_CHECK = "\U0001f534"
     ) -> None:
         """
         Play the classic game of Connect Four with someone!
@@ -421,7 +424,7 @@ class ConnectFour(commands.Cog):
             self,
             ctx: commands.Context,
             board_size: int = 7,
-            emoji1: EMOJI_CHECK = ":blue_circle:"
+            emoji1: EMOJI_CHECK = "\U0001f535"
     ) -> None:
         """Play Connect Four against a computer player."""
         if isinstance(emoji1, str) and len(emoji1) > 1:
