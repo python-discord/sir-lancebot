@@ -58,7 +58,7 @@ class Player:
             )
 
         try:
-            react, _ = await self.ctx.bot.wait_for('reaction_add', timeout=120.0, check=check_for_move)
+            react, _ = await self.ctx.bot.wait_for('reaction_add', timeout=30.0, check=check_for_move)
         except asyncio.TimeoutError:
             return True, None
         else:
