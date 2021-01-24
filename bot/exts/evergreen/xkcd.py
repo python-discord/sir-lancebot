@@ -75,8 +75,8 @@ class XKCD(Cog):
             embed.colour = Colours.soft_green
         else:
             embed.description = (
-                "Selected comic is interactive, and cannot be displayed within an embed.\n"
-                f"Comic can be viewed [here](https://xkcd.com/{info['num']})"
+                "The selected comic is interactive, and cannot be displayed within an embed.\n"
+                f"Comic can be viewed [here](https://xkcd.com/{info['num']})."
             )
 
         await ctx.send(embed=embed)
