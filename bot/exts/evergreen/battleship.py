@@ -140,7 +140,7 @@ class Game:
     @staticmethod
     def get_square(grid: Grid, square: str) -> Square:
         """Grabs a square from a grid with an inputted key."""
-        index = ord(square[0]) - ord("A")
+        index = ord(square[0].upper()) - ord("A")
         number = int(square[1:])
 
         return grid[number-1][index]  # -1 since lists are indexed from 0
