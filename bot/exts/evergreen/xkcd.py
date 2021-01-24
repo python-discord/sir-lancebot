@@ -7,6 +7,7 @@ from discord.ext import tasks
 from discord.ext.commands import Cog, Context, command
 
 from bot.bot import Bot
+from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
@@ -55,6 +56,7 @@ class XKCD(Cog):
                     info = await resp.json()
                 else:
                     embed.description = f"{resp.status}: Could not retrieve xkcd comic #{comic}."
+                    embed.colour = Colours.soft_red
                     log.debug(f"Retrieving xkcd comic #{comic} failed with status code {resp.status}.")
                     await ctx.send(embed=embed)
                     return
