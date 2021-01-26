@@ -169,7 +169,7 @@ class Issues(commands.Cog):
                 else:
                     result = await self.fetch_issues({repo_issue[1]}, repo_issue[0], "python-discord")
                     if isinstance(result, list):
-                        links.append(*result)
+                        links.extend(result)
 
         if not links:
             return
