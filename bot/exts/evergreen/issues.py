@@ -22,6 +22,7 @@ PYDIS_REPOS = "https://api.github.com/orgs/python-discord/repos"
 if GITHUB_TOKEN := Tokens.github:
     REQUEST_HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
 
+
 class Issues(commands.Cog):
     """Cog that allows users to retrieve issues from GitHub."""
 
@@ -32,6 +33,7 @@ class Issues(commands.Cog):
 
     @tasks.loop(minutes=30)
     async def get_pydis_repos(self) -> None:
+        """Get all python-discord repositories on github."""
         async with self.bot.http_session.get(PYDIS_REPOS) as resp:
             if resp.status == 200:
                 data = await resp.json()
@@ -42,6 +44,7 @@ class Issues(commands.Cog):
 
     @staticmethod
     def check_in_block(message: discord.Message, repo_issue: str) -> bool:
+        """Check whether the <repo>#<issue> is in codeblocks."""
         block = (
             re.findall(r"```([\s\S]*)?```", message.content)
             or re.findall(r"```*\n([\s\S]*)?\n```", message.content)
@@ -49,7 +52,6 @@ class Issues(commands.Cog):
             or re.findall(r"```*\n([\s\S]*)?```", message.content)
             or re.findall(r"`([\s\S]*)?`", message.content)
         )
-        print(block)
 
         if "#".join(repo_issue.split(" ")) in "".join([*block]):
             return True
@@ -163,7 +165,6 @@ class Issues(commands.Cog):
         if message_repo_issue_map:
             for repo_issue in message_repo_issue_map:
                 if self.check_in_block(message, " ".join([*repo_issue])):
-                    print("in")
                     continue
                 else:
                     result = await self.fetch_issues({repo_issue[1]}, repo_issue[0], "python-discord")
