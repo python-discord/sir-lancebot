@@ -82,7 +82,6 @@ class Issues(commands.Cog):
         for number in numbers:
             url = f"https://api.github.com/repos/{user}/{repository}/issues/{number}"
             merge_url = f"https://api.github.com/repos/{user}/{repository}/pulls/{number}/merge"
-            print(url)
             log.trace(f"Querying GH issues API: {url}")
             async with self.bot.http_session.get(url, headers=REQUEST_HEADERS) as r:
                 json_data = await r.json()
