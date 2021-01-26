@@ -4,7 +4,7 @@ import re
 import typing as t
 
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 from bot.constants import Channels, Colours, ERROR_REPLIES, Emojis, Tokens, WHITELISTED_CHANNELS
 from bot.utils.decorators import override_in_channel
@@ -17,15 +17,43 @@ BAD_RESPONSE = {
 }
 MAX_REQUESTS = 10
 REQUEST_HEADERS = dict()
+PYDIS_REPOS = "https://api.github.com/orgs/python-discord/repos"
+
 if GITHUB_TOKEN := Tokens.github:
     REQUEST_HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
-
 
 class Issues(commands.Cog):
     """Cog that allows users to retrieve issues from GitHub."""
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+        self.repos = []
+        self.get_pydis_repos.start()
+
+    @tasks.loop(minutes=30)
+    async def get_pydis_repos(self) -> None:
+        async with self.bot.http_session.get(PYDIS_REPOS) as resp:
+            if resp.status == 200:
+                data = await resp.json()
+                for repo in data:
+                    self.repos.append(repo["full_name"].split("/")[1])
+            else:
+                log.debug(f"Failed to get latest Pydis repositories. Status code {resp.status}")
+
+    @staticmethod
+    def check_in_block(message: discord.Message, repo_issue: str) -> bool:
+        block = (
+            re.findall(r"```([\s\S]*)?```", message.content)
+            or re.findall(r"```*\n([\s\S]*)?\n```", message.content)
+            or re.findall(r"```*([\s\S]*)?\n```", message.content)
+            or re.findall(r"```*\n([\s\S]*)?```", message.content)
+            or re.findall(r"`([\s\S]*)?`", message.content)
+        )
+        print(block)
+
+        if "#".join(repo_issue.split(" ")) in "".join([*block]):
+            return True
+        return False
 
     async def fetch_issues(
             self,
@@ -44,7 +72,7 @@ class Issues(commands.Cog):
         for number in numbers:
             url = f"https://api.github.com/repos/{user}/{repository}/issues/{number}"
             merge_url = f"https://api.github.com/repos/{user}/{repository}/pulls/{number}/merge"
-
+            print(url)
             log.trace(f"Querying GH issues API: {url}")
             async with self.bot.http_session.get(url, headers=REQUEST_HEADERS) as r:
                 json_data = await r.json()
@@ -104,7 +132,6 @@ class Issues(commands.Cog):
             user: str = "python-discord"
     ) -> None:
         """Command to retrieve issue(s) from a GitHub repository."""
-        print(numbers)
         result = await self.fetch_issues(set(numbers), repository, user)
 
         if result == "Numbers not found.":
@@ -129,14 +156,19 @@ class Issues(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message) -> None:
         """Command to retrieve issue(s) from a GitHub repository using automatic linking if matching <repo>#<issue>."""
-        message_repo_issue_map = re.findall(r".+?(bot|meta|sir-lancebot|logcord)#(\d+)", message.content)
+        repo_regex = "|".join(repo for repo in self.repos)
+        message_repo_issue_map = re.findall(fr".+?({repo_regex})#(\d+)", message.content)
         links = []
 
         if message_repo_issue_map:
             for repo_issue in message_repo_issue_map:
-                result = await self.fetch_issues({repo_issue[1]}, repo_issue[0], "python-discord")
-                if isinstance(result, list):
-                    links.append(*result)
+                if self.check_in_block(message, " ".join([*repo_issue])):
+                    print("in")
+                    continue
+                else:
+                    result = await self.fetch_issues({repo_issue[1]}, repo_issue[0], "python-discord")
+                    if isinstance(result, list):
+                        links.append(*result)
 
         if not links:
             return
