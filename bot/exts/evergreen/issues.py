@@ -17,7 +17,7 @@ BAD_RESPONSE = {
 }
 MAX_REQUESTS = 10
 REQUEST_HEADERS = dict()
-PYDIS_REPOS = "https://api.github.com/orgs/python-discord/repos"
+PYTHON_DISCORD_REPOS = "https://api.github.com/orgs/python-discord/repos"
 
 if GITHUB_TOKEN := Tokens.github:
     REQUEST_HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
@@ -34,7 +34,7 @@ class Issues(commands.Cog):
     @tasks.loop(minutes=30)
     async def get_pydis_repos(self) -> None:
         """Get all python-discord repositories on github."""
-        async with self.bot.http_session.get(PYDIS_REPOS) as resp:
+        async with self.bot.http_session.get(PYTHON_DISCORD_REPOS) as resp:
             if resp.status == 200:
                 data = await resp.json()
                 for repo in data:
@@ -155,8 +155,9 @@ class Issues(commands.Cog):
 
         elif isinstance(result, str):
             await ctx.send(result)
-
+    
     @commands.Cog.listener()
+    @override_in_channel(WHITELISTED_CHANNELS + (Channels.dev_contrib, Channels.dev_branding))
     async def on_message(self, message: discord.Message) -> None:
         """Command to retrieve issue(s) from a GitHub repository using automatic linking if matching <repo>#<issue>."""
         message_repo_issue_map = re.findall(fr".+?({self.repo_regex})#(\d+)", message.content)
