@@ -2,7 +2,7 @@ import logging
 import random
 import re
 import typing as t
-from enum import Enum 
+from enum import Enum
 
 import discord
 from discord.ext import commands, tasks
