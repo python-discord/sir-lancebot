@@ -2,6 +2,7 @@ import logging
 import random
 import re
 import typing as t
+from enum import Enum 
 
 import discord
 from discord.ext import commands, tasks
@@ -21,6 +22,12 @@ PYTHON_DISCORD_REPOS = "https://api.github.com/orgs/{repo}/repos"
 
 if GITHUB_TOKEN := Tokens.github:
     REQUEST_HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
+
+
+class FetchIssueErrors(Enum):
+    value_error = "Numbers not found."
+    max_requests = "Max requests hit."
+
 
 
 class Issues(commands.Cog):
@@ -67,10 +74,10 @@ class Issues(commands.Cog):
         """Retrieve issue(s) from a GitHub repository."""
         links = []
         if not numbers:
-            return "Numbers not found."
+            return FetchIssueErrors.value_error
 
         if len(numbers) > MAX_REQUESTS:
-            return "Max requests hit."
+            return FetchIssueErrors.max_requests
 
         for number in numbers:
             url = f"https://api.github.com/repos/{user}/{repository}/issues/{number}"
@@ -137,10 +144,10 @@ class Issues(commands.Cog):
         """Command to retrieve issue(s) from a GitHub repository."""
         result = await self.fetch_issues(set(numbers), repository, user)
 
-        if result == "Numbers not found.":
+        if result == FetchIssueErrors.value_error:
             await ctx.invoke(self.bot.get_command('help'), 'issue')
 
-        elif result == "Max requests hit.":
+        elif result == FetchIssueErrors.max_requests:
             embed = discord.Embed(
                 title=random.choice(ERROR_REPLIES),
                 color=Colours.soft_red,
