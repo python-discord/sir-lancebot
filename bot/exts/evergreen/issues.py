@@ -39,6 +39,7 @@ class Issues(commands.Cog):
                 data = await resp.json()
                 for repo in data:
                     self.repos.append(repo["full_name"].split("/")[1])
+                self.repo_regex = "|".join(repo for repo in self.repos)
             else:
                 log.debug(f"Failed to get latest Pydis repositories. Status code {resp.status}")
 
@@ -158,8 +159,7 @@ class Issues(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message) -> None:
         """Command to retrieve issue(s) from a GitHub repository using automatic linking if matching <repo>#<issue>."""
-        repo_regex = "|".join(repo for repo in self.repos)
-        message_repo_issue_map = re.findall(fr".+?({repo_regex})#(\d+)", message.content)
+        message_repo_issue_map = re.findall(fr".+?({self.repo_regex})#(\d+)", message.content)
         links = []
 
         if message_repo_issue_map:
