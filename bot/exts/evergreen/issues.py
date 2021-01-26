@@ -25,9 +25,10 @@ if GITHUB_TOKEN := Tokens.github:
 
 
 class FetchIssueErrors(Enum):
+    """Errors returned in fetch issues."""
+
     value_error = "Numbers not found."
     max_requests = "Max requests hit."
-
 
 
 class Issues(commands.Cog):
