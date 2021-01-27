@@ -23,6 +23,12 @@ PYTHON_DISCORD_REPOS = "https://api.github.com/orgs/{repo}/repos"
 if GITHUB_TOKEN := Tokens.github:
     REQUEST_HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
 
+CODE_BLOCK_RE = re.compile(
+    r"^`([^`\n]+)`"  # Inline codeblock
+    r"|```(.+?)```",  # Multiline codeblock
+    re.DOTALL | re.MULTILINE
+)
+
 
 class FetchIssueErrors(Enum):
     """Errors returned in fetch issues."""
@@ -54,15 +60,11 @@ class Issues(commands.Cog):
     @staticmethod
     def check_in_block(message: discord.Message, repo_issue: str) -> bool:
         """Check whether the <repo>#<issue> is in codeblocks."""
-        block = (
-            re.findall(r"```([\s\S]*)?```", message.content)
-            or re.findall(r"```*\n([\s\S]*)?\n```", message.content)
-            or re.findall(r"```*([\s\S]*)?\n```", message.content)
-            or re.findall(r"```*\n([\s\S]*)?```", message.content)
-            or re.findall(r"`([\s\S]*)?`", message.content)
-        )
+        block = re.findall(CODE_BLOCK_RE, message.content)
 
-        if "#".join(repo_issue.split(" ")) in "".join([*block]):
+        if not block:
+            return False
+        elif "#".join(repo_issue.split(" ")) in "".join([*block[0]]):
             return True
         return False
 
