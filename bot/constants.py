@@ -9,6 +9,7 @@ __all__ = (
     "AdventOfCode",
     "Branding",
     "Channels",
+    "Categories",
     "Client",
     "Colours",
     "Emojis",
@@ -100,6 +101,7 @@ class Channels(NamedTuple):
     big_brother_logs = 468507907357409333
     bot = 267659945086812160
     checkpoint_test = 422077681434099723
+    organisation = 551789653284356126
     devalerts = 460181980097675264
     devlog = int(environ.get("CHANNEL_DEVLOG", 622895325144940554))
     dev_contrib = 635950537262759947
@@ -126,6 +128,12 @@ class Channels(NamedTuple):
     hacktoberfest_2020 = 760857070781071431
     voice_chat_0 = 412357430186344448
     voice_chat_1 = 799647045886541885
+
+
+class Categories(NamedTuple):
+    development = 411199786025484308
+    devprojects = 787641585624940544
+    media = 799054581991997460
 
 
 class Client(NamedTuple):

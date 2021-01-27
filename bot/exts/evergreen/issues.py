@@ -7,8 +7,7 @@ from enum import Enum
 import discord
 from discord.ext import commands, tasks
 
-from bot.constants import Channels, Colours, ERROR_REPLIES, Emojis, Tokens, WHITELISTED_CHANNELS
-from bot.utils.decorators import override_in_channel
+from bot.constants import Categories, Channels, Colours, ERROR_REPLIES, Emojis, Tokens, WHITELISTED_CHANNELS
 
 log = logging.getLogger(__name__)
 
@@ -16,12 +15,18 @@ BAD_RESPONSE = {
     404: "Issue/pull request not located! Please enter a valid number!",
     403: "Rate limit has been hit! Please try again later!"
 }
+
 MAX_REQUESTS = 10
 REQUEST_HEADERS = dict()
-PYTHON_DISCORD_REPOS = "https://api.github.com/orgs/{repo}/repos"
 
+PYTHON_DISCORD_REPOS = "https://api.github.com/orgs/{repo}/repos"
 if GITHUB_TOKEN := Tokens.github:
     REQUEST_HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
+
+WHITELISTED_CATEGORIES = (
+    Categories.devprojects, Categories.media, Categories.development
+)
+WHITELISTED_CHANNELS += (Channels.organisation)
 
 CODE_BLOCK_RE = re.compile(
     r"^`([^`\n]+)`"  # Inline codeblock
@@ -135,7 +140,6 @@ class Issues(commands.Cog):
         return resp
 
     @commands.command(aliases=("pr",))
-    @override_in_channel(WHITELISTED_CHANNELS + (Channels.dev_contrib, Channels.dev_branding))
     async def issue(
             self,
             ctx: commands.Context,
@@ -144,6 +148,9 @@ class Issues(commands.Cog):
             user: str = "python-discord"
     ) -> None:
         """Command to retrieve issue(s) from a GitHub repository."""
+        if ctx.channel.category not in WHITELISTED_CATEGORIES or ctx.channel.category in WHITELISTED_CHANNELS:
+            return
+
         result = await self.fetch_issues(set(numbers), repository, user)
 
         if result == FetchIssueErrors.value_error:
@@ -166,9 +173,11 @@ class Issues(commands.Cog):
             await ctx.send(result)
 
     @commands.Cog.listener()
-    @override_in_channel(WHITELISTED_CHANNELS + (Channels.dev_contrib, Channels.dev_branding))
     async def on_message(self, message: discord.Message) -> None:
         """Command to retrieve issue(s) from a GitHub repository using automatic linking if matching <repo>#<issue>."""
+        if message.channel.category not in WHITELISTED_CATEGORIES or message.channel.category in WHITELISTED_CHANNELS:
+            return
+
         message_repo_issue_map = re.findall(fr".+?({self.repo_regex})#(\d+)", message.content)
         links = []
 
