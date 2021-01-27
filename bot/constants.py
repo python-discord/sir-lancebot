@@ -175,6 +175,23 @@ class Emojis:
     pull_request_closed = "<:PRClosed:629695470519713818>"
     merge = "<:PRMerged:629695470570176522>"
 
+    # TicTacToe Emojis
+    number_emojis = {
+        1: "\u0031\ufe0f\u20e3",
+        2: "\u0032\ufe0f\u20e3",
+        3: "\u0033\ufe0f\u20e3",
+        4: "\u0034\ufe0f\u20e3",
+        5: "\u0035\ufe0f\u20e3",
+        6: "\u0036\ufe0f\u20e3",
+        7: "\u0037\ufe0f\u20e3",
+        8: "\u0038\ufe0f\u20e3",
+        9: "\u0039\ufe0f\u20e3"
+    }
+    confirmation = "\u2705"
+    decline = "\u274c"
+    x = "\U0001f1fd"
+    o = "\U0001f1f4"
+
     status_online = "<:status_online:470326272351010816>"
     status_idle = "<:status_idle:470326266625785866>"
     status_dnd = "<:status_dnd:470326272082313216>"
