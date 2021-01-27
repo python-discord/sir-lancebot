@@ -58,7 +58,7 @@ class Reddit(Cog):
         """Get the #reddit channel object from the bot's cache."""
         return self.bot.get_channel(Channels.reddit)
 
-    def build_pagination_pages(self, posts: List[dict], paginate) -> Union[List[tuple], str]:
+    def build_pagination_pages(self, posts: List[dict], paginate: bool) -> Union[List[tuple], str]:
         """Build embed pages required for Paginator."""
         pages = []
         first_page = ""
