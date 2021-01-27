@@ -26,7 +26,7 @@ if GITHUB_TOKEN := Tokens.github:
 WHITELISTED_CATEGORIES = (
     Categories.devprojects, Categories.media, Categories.development
 )
-WHITELISTED_CHANNELS += (Channels.organisation)
+WHITELISTED_CHANNELS += Channels.organisation
 
 CODE_BLOCK_RE = re.compile(
     r"^`([^`\n]+)`"  # Inline codeblock
@@ -78,7 +78,7 @@ class Issues(commands.Cog):
             numbers: set,
             repository: str,
             user: str
-    ) -> t.Union[str, list]:
+    ) -> t.Union[FetchIssueErrors, str, list]:
         """Retrieve issue(s) from a GitHub repository."""
         links = []
         if not numbers:
