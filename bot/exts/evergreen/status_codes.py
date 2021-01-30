@@ -1,8 +1,6 @@
-import re
 from http import HTTPStatus
 
 import discord
-from discord import HTTPException
 from discord.ext import commands
 
 
