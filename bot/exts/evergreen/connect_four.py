@@ -338,6 +338,15 @@ class ConnectFour(commands.Cog):
         """Check if someone is already in a game."""
         return any(player in (game.player1, game.player2) for game in self.games)
 
+    @staticmethod
+    def check_emojis(e1: EMOJI_CHECK, e2: EMOJI_CHECK) -> typing.Tuple[bool, typing.Optional[str]]:
+        """Validate the emojis, the user put."""
+        if isinstance(e1, str) and len(e1) > 1:
+            return False, e1
+        if isinstance(e2, str) and len(e2) > 1:
+            return False, e2
+        return True, None
+
     async def _play_game(
             self,
             ctx: commands.Context,
@@ -381,10 +390,9 @@ class ConnectFour(commands.Cog):
         The game will start once someone has reacted.
         All inputs will be through reactions.
         """
-        if isinstance(emoji1, str) and len(emoji1) > 1:
-            raise commands.EmojiNotFound(emoji1)
-        if isinstance(emoji2, str) and len(emoji2) > 1:
-            raise commands.EmojiNotFound(emoji2)
+        check, emoji = self.check_emojis(emoji1, emoji2)
+        if not check:
+            raise commands.EmojiNotFound(emoji)
 
         check_author_result = await self.check_author(ctx, board_size)
         if not check_author_result:
@@ -432,15 +440,19 @@ class ConnectFour(commands.Cog):
             self,
             ctx: commands.Context,
             board_size: int = 7,
-            emoji1: EMOJI_CHECK = "\U0001f535"
+            emoji1: EMOJI_CHECK = "\U0001f535",
+            emoji2: EMOJI_CHECK = "\U0001f534"
     ) -> None:
         """Play Connect Four against a computer player."""
-        if isinstance(emoji1, str) and len(emoji1) > 1:
-            raise commands.EmojiNotFound(emoji1)
+        check, emoji = self.check_emojis(emoji1, emoji2)
+        if not check:
+            raise commands.EmojiNotFound(emoji)
+
         check_author_result = await self.check_author(ctx, board_size)
         if not check_author_result:
             return
-        await self._play_game(ctx, None, board_size, str(emoji1), ":red_circle:")
+
+        await self._play_game(ctx, None, board_size, str(emoji1), str(emoji2))
 
 
 def setup(bot: commands.Bot) -> None:
