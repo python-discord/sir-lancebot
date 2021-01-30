@@ -141,12 +141,11 @@ class Game:
                 await self.channel.send(f"{self.player_active.mention}, you took too long. Game over!")
                 return
             else:
+                await message.delete()
                 if str(reaction.emoji) == CROSS_EMOJI:
-                    await message.delete()
                     await self.channel.send(f"{self.player_active.user} surrendered. Game over!")
                     return
-
-                await message.delete()
+                
                 await self.message.remove_reaction(reaction, user)
 
                 column_num = self.unicode_numbers.index(str(reaction.emoji))
