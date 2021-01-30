@@ -89,7 +89,7 @@ class Game:
             await self.message.edit(content=None, embed=embed)
 
     async def game_over(self, winner: discord.user, loser: discord.user) -> None:
-        """Removes games from list of current games and announces to public chat."""
+        """Announces to public chat."""
         await self.channel.send(f"Game Over! {winner.mention} won against {loser.mention}")
         await self.print_grid()
 
