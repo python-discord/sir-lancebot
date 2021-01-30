@@ -26,7 +26,7 @@ if GITHUB_TOKEN := Tokens.github:
 WHITELISTED_CATEGORIES = (
     Categories.devprojects, Categories.media, Categories.development
 )
-WHITELISTED_CHANNELS += Channels.organisation
+WHITELISTED_CHANNELS_ON_MESSAGE = (Channels.organisation,)
 
 CODE_BLOCK_RE = re.compile(
     r"^`([^`\n]+)`"  # Inline codeblock
@@ -58,7 +58,7 @@ class Issues(commands.Cog):
                 data = await resp.json()
                 for repo in data:
                     self.repos.append(repo["full_name"].split("/")[1])
-                self.repo_regex = "|".join(repo for repo in self.repos)
+                self.repo_regex = "|".join(self.repos)
             else:
                 log.debug(f"Failed to get latest Pydis repositories. Status code {resp.status}")
 
@@ -148,7 +148,10 @@ class Issues(commands.Cog):
             user: str = "python-discord"
     ) -> None:
         """Command to retrieve issue(s) from a GitHub repository."""
-        if ctx.channel.category not in WHITELISTED_CATEGORIES or ctx.channel.category in WHITELISTED_CHANNELS:
+        if not(
+            ctx.channel.category.id in WHITELISTED_CATEGORIES
+            or ctx.channel.id in WHITELISTED_CHANNELS
+        ):
             return
 
         result = await self.fetch_issues(set(numbers), repository, user)
@@ -175,7 +178,10 @@ class Issues(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message) -> None:
         """Command to retrieve issue(s) from a GitHub repository using automatic linking if matching <repo>#<issue>."""
-        if message.channel.category not in WHITELISTED_CATEGORIES or message.channel.category in WHITELISTED_CHANNELS:
+        if not(
+            message.channel.category.id in WHITELISTED_CATEGORIES
+            or message.channel.id in WHITELISTED_CHANNELS_ON_MESSAGE
+        ):
             return
 
         message_repo_issue_map = re.findall(fr".+?({self.repo_regex})#(\d+)", message.content)
@@ -183,9 +189,7 @@ class Issues(commands.Cog):
 
         if message_repo_issue_map:
             for repo_issue in message_repo_issue_map:
-                if self.check_in_block(message, " ".join([*repo_issue])):
-                    continue
-                else:
+                if not self.check_in_block(message, " ".join([*repo_issue])):
                     result = await self.fetch_issues({repo_issue[1]}, repo_issue[0], "python-discord")
                     if isinstance(result, list):
                         links.extend(result)
