@@ -113,8 +113,8 @@ class Game:
 
             if self.check_win(coords, 1 if self.player_active == self.player1 else 2):
                 await self.game_over(
-                    self.bot.user if isinstance(self.player_active, AI) else {self.player_active},
-                    self.bot.user if isinstance(self.player_inactive, AI) else {self.player_inactive},
+                    self.bot.user if isinstance(self.player_active, AI) else self.player_active,
+                    self.bot.user if isinstance(self.player_inactive, AI) else self.player_inactive,
                 )
                 return
 
