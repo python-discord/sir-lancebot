@@ -82,7 +82,7 @@ class Game:
         if self.message:
             await self.message.edit(embed=embed)
         else:
-            self.message = await self.channel.send(content='Loading ....')
+            self.message = await self.channel.send(content='Loading...')
             for emoji in self.unicode_numbers:
                 await self.message.add_reaction(emoji)
             await self.message.add_reaction(CROSS_EMOJI)
@@ -143,7 +143,7 @@ class Game:
             else:
                 await message.delete()
                 if str(reaction.emoji) == CROSS_EMOJI:
-                    await self.channel.send(f"{self.player_active.user} surrendered. Game over!")
+                    await self.channel.send(f"{self.player_active.mention} surrendered. Game over!")
                     return
                 
                 await self.message.remove_reaction(reaction, user)
