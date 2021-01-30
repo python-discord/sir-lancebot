@@ -26,7 +26,7 @@ if GITHUB_TOKEN := Tokens.github:
 WHITELISTED_CATEGORIES = (
     Categories.devprojects, Categories.media, Categories.development
 )
-WHITELISTED_CHANNELS_ON_MESSAGE = (Channels.organisation,)
+WHITELISTED_CHANNELS_ON_MESSAGE = (Channels.organisation, Channels.mod_meta, Channels.mod_tools)
 
 CODE_BLOCK_RE = re.compile(
     r"^`([^`\n]+)`"  # Inline codeblock
