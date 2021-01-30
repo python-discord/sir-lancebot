@@ -88,9 +88,14 @@ class Game:
             await self.message.add_reaction(CROSS_EMOJI)
             await self.message.edit(content=None, embed=embed)
 
-    async def game_over(self, winner: discord.user, loser: discord.user) -> None:
+    async def game_over(self, action: str, player1: discord.user, player2: discord.user) -> None:
         """Announces to public chat."""
-        await self.channel.send(f"Game Over! {winner.mention} won against {loser.mention}")
+        if action == "win":
+            await self.channel.send(f"Game Over! {player1.mention} won against {player2.mention}")
+        elif action == "draw":
+            await self.channel.send(f"Game Over! {player1.mention} {player2.mention} It's A Draw :tada:")
+        elif action == "quit":
+            await self.channel.send(f"{self.player1.mention} surrendered. Game over!")
         await self.print_grid()
 
     async def start_game(self) -> None:
@@ -103,8 +108,11 @@ class Game:
             if isinstance(self.player_active, AI):
                 coords = self.player_active.play()
                 if not coords:
-                    await self.channel.send("Game Over! It's A Draw :tada:")
-                    await self.print_grid()
+                    await self.game_over(
+                        "draw",
+                        self.bot.user if isinstance(self.player_active, AI) else self.player_active,
+                        self.bot.user if isinstance(self.player_inactive, AI) else self.player_inactive,
+                    )
             else:
                 coords = await self.player_turn()
 
@@ -113,6 +121,7 @@ class Game:
 
             if self.check_win(coords, 1 if self.player_active == self.player1 else 2):
                 await self.game_over(
+                    "win",
                     self.bot.user if isinstance(self.player_active, AI) else self.player_active,
                     self.bot.user if isinstance(self.player_inactive, AI) else self.player_inactive,
                 )
@@ -143,9 +152,9 @@ class Game:
             else:
                 await message.delete()
                 if str(reaction.emoji) == CROSS_EMOJI:
-                    await self.channel.send(f"{self.player_active.mention} surrendered. Game over!")
+                    await self.game_over("quit", self.player_active, self.player_inactive)
                     return
-                
+
                 await self.message.remove_reaction(reaction, user)
 
                 column_num = self.unicode_numbers.index(str(reaction.emoji))
