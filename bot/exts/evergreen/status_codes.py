@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 
 
-class StatusCats(commands.Cog):
+class HTTPStatusCodes(commands.Cog):
     """Commands that give HTTP statuses described and visualized by cats and dogs."""
 
     def __init__(self, bot: commands.Bot):
@@ -57,5 +57,5 @@ class StatusCats(commands.Cog):
 
 
 def setup(bot: commands.Bot) -> None:
-    """Load the StatusCats cog."""
-    bot.add_cog(StatusCats(bot))
+    """Load the HTTPStatusCodes cog."""
+    bot.add_cog(HTTPStatusCodes(bot))
