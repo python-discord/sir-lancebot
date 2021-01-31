@@ -35,7 +35,7 @@ class Cache:
 
     def __enter__(self):
         self.word = self.word.replace("'", "e")  # Sometimes ' replaces e
-        return (self.cache, self.word)
+        return self.cache, self.word
 
     def __exit__(
         self,
@@ -83,6 +83,9 @@ class MarkovPoemGenerator(commands.Cog):
     """
 
     POEM_TIMEOUT = 20  # In seconds
+    near_rhyme_min_score = 2000
+    rhyming_line_finder_limiter = 80000
+    max_char_range = (50, 120)
 
     SOURCES: List[str] = [
         "shakespeare_corpus.txt"
@@ -116,7 +119,7 @@ class MarkovPoemGenerator(commands.Cog):
     @staticmethod
     def _get_last_word(sentence: str) -> str:
         """Returns the last word of a sentence string."""
-        if isinstance(sentence, str) is False:
+        if not isinstance(sentence, str):
             # Likely to be caused by `make_short_sentence` running out
             # and feeding it None, which is an unlikely scenario
             raise TypeError(f"Argument is a {type(sentence)} instead of a str.")
@@ -126,7 +129,7 @@ class MarkovPoemGenerator(commands.Cog):
     async def _get_rhyme_set(
         self,
         word: str,
-        near_rhyme_min_score: int = 2000
+        near_rhyme_min_score: int = near_rhyme_min_score
     ) -> None:
         """
         Accesses web APIs to get rhymes and returns a set.
@@ -148,6 +151,12 @@ class MarkovPoemGenerator(commands.Cog):
                 website + word,
                 timeout=10
             ) as response:
+                if response.status != 200:  # 200 means 'ok'
+                    logging.warning(
+                        f"Received response {response.status} "
+                        "from: {website + word}"
+                    )
+                    raise Exception
                 curr_set = set(
                     data["word"] for data in await response.json()
                     if data.get("score", 0) >= min_score
@@ -159,7 +168,7 @@ class MarkovPoemGenerator(commands.Cog):
     async def _get_rhyming_line(
         self,
         word_rhymes: List[str],
-        limiter: int = 80000
+        limiter: int = rhyming_line_finder_limiter
     ) -> str:
         """
         Returns a sentence string with a last word in `word_rhymes`.
@@ -169,17 +178,22 @@ class MarkovPoemGenerator(commands.Cog):
         limiter.
         """
         curr = 0
-        line = self.model.make_short_sentence(random.randint(50, 120))
+        line = self.model.make_short_sentence(
+            random.randint(*self.max_char_range)
+        )
         while self._get_last_word(line) not in word_rhymes:
             if curr >= limiter:
                 raise RhymingSentenceNotFound
 
-            line = self.model.make_short_sentence(random.randint(50, 120))
+            line = self.model.make_short_sentence(
+                random.randint(*self.max_char_range)
+            )
             curr += 1
 
         return line
 
-    def _get_unit_count(self, scheme: str) -> Dict[str, bool]:
+    @staticmethod
+    def _get_unit_count(scheme: str) -> Dict[str, bool]:
         """Checks how many times a unit occurs in a rhyme scheme."""
         return {char: scheme.count(char) for char in set(scheme)}
 
@@ -192,7 +206,7 @@ class MarkovPoemGenerator(commands.Cog):
         rhyme_set = set()
         while len(rhyme_set) == 0:
             line = self.model.make_short_sentence(
-                random.randint(50, 120)
+                random.randint(*self.max_char_range)
             )
 
             rhyme_set = await self._get_rhyme_set(
