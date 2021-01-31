@@ -23,12 +23,17 @@ class HTTPStatusCodes(commands.Cog):
 
         try:
             HTTPStatus(code)
+            async with self.bot.http_session.get(
+                    f'https://http.cat/{code}.jpg',
+                    allow_redirects=False
+            ) as response:
+                if response.status != 404:
+                    embed.set_image(url=f'https://http.cat/{code}.jpg')
+                else:
+                    raise NotImplementedError
 
         except ValueError:
             embed.set_footer(text='Inputted status code does not exist.')
-
-        else:
-            embed.set_image(url=f'https://http.cat/{code}.jpg')
 
         finally:
             await ctx.send(embed=embed)
@@ -47,10 +52,13 @@ class HTTPStatusCodes(commands.Cog):
                 if response.status != 302:
                     embed.set_image(url=f'https://httpstatusdogs.com/img/{code}.jpg')
                 else:
-                    raise ValueError
+                    raise NotImplementedError
 
         except ValueError:
             embed.set_footer(text='Inputted status code does not exist.')
+
+        except NotImplementedError:
+            embed.set_footer(text='Inputted status code is not implemented by httpstatusdogs.com yet.')
 
         finally:
             await ctx.send(embed=embed)
