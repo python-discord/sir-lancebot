@@ -203,6 +203,7 @@ class MarkovPoemGenerator(commands.Cog):
         rhyme_track: Dict[str, Set[str]],
         unit: str
     ) -> str:
+        """Returns a line with a last word that has a rhyme set."""
         rhyme_set = set()
         while len(rhyme_set) == 0:
             line = self.model.make_short_sentence(
