@@ -7,19 +7,24 @@ from discord import Embed
 from discord.ext import commands
 from discord.ext.commands import BucketType, Context
 
+from bot import constants
 from bot.constants import Channels, Colours, ERROR_REPLIES
 
-ERROR_MESSAGE = """
+ERROR_MESSAGE = f"""
 Unknown cheat sheet. Please try to reformulate your query.
 
 **Examples**:
 ```md
-.cht read json
-.cht hello world
-.cht lambda
+{constants.Client.prefix}cht read json
+{constants.Client.prefix}cht hello world
+{constants.Client.prefix}cht lambda
 ```
-If the problem persists send a message in <#{channel}>
+If the problem persists send a message in <#{Channels.dev_contrib}>
 """
+
+URL = 'https://cheat.sh/python/{search}'
+ESCAPE_TT = str.maketrans({"`": "\\`"})
+ANSI_RE = re.compile(r"\x1b\[.*?m")
 
 
 class CheatSheet(commands.Cog):
@@ -38,7 +43,7 @@ class CheatSheet(commands.Cog):
         """
         embed = Embed(
             title=random.choice(ERROR_REPLIES),
-            description=ERROR_MESSAGE.format(channel=Channels.dev_contrib),
+            description=ERROR_MESSAGE,
             colour=Colours.soft_red
         )
         return embed
@@ -67,9 +72,7 @@ class CheatSheet(commands.Cog):
         aliases=("cht.sh", "cheatsheet", "cheat-sheet", "cht"),
     )
     @commands.cooldown(1, 10, BucketType.user)
-    async def cheat_sheet(
-            self, ctx: Context, *search_terms: str
-    ) -> None:
+    async def cheat_sheet(self, ctx: Context, *search_terms: str) -> None:
         """
         Search cheat.sh.
 
@@ -77,15 +80,15 @@ class CheatSheet(commands.Cog):
         Usage:
         --> .cht read json
         """
-        url = f'https://cheat.sh/python/{quote_plus(" ".join(search_terms))}'
+        async with self.bot.http_session.get(
+                URL.format(search=quote_plus(" ".join(search_terms)))
+        ) as response:
+            result = ANSI_RE.sub("", await response.text()).translate(ESCAPE_TT)
 
-        escape_tt = str.maketrans({"`": "\\`"})
-        ansi_re = re.compile(r"\x1b\[.*?m")
-
-        async with self.bot.http_session.get(url) as response:
-            result = ansi_re.sub("", await response.text()).translate(escape_tt)
-
-        is_embed, description = self.result_fmt(url, result)
+        is_embed, description = self.result_fmt(
+            URL.format(search=quote_plus(" ".join(search_terms))),
+            result
+        )
         if is_embed:
             await ctx.send(embed=description)
         else:
