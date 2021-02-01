@@ -189,7 +189,7 @@ class Issues(commands.Cog):
 
         if message_repo_issue_map:
             for repo_issue in message_repo_issue_map:
-                if not self.check_in_block(message, " ".join([*repo_issue])):
+                if not self.check_in_block(message, " ".join(repo_issue)):
                     result = await self.fetch_issues({repo_issue[1]}, repo_issue[0], "python-discord")
                     if isinstance(result, list):
                         links.extend(result)
