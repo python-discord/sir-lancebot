@@ -35,6 +35,9 @@ class HTTPStatusCodes(commands.Cog):
         except ValueError:
             embed.set_footer(text='Inputted status code does not exist.')
 
+        except NotImplementedError:
+            embed.set_footer(text='Inputted status code is not implemented by http.cat yet.')
+
         finally:
             await ctx.send(embed=embed)
 
