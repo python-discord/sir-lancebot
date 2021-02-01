@@ -6,7 +6,6 @@ from functools import partial
 import discord
 from discord.ext import commands
 
-EMOJI_TOKENS = [":white_circle:", ":blue_circle:", ":red_circle:"]
 NUMBERS = [
     ":one:",
     ":two:",
@@ -44,13 +43,15 @@ class Game:
             channel: discord.TextChannel,
             player1: discord.Member,
             player2: typing.Optional[discord.Member],
-            size: int = 7,
+            tokens: typing.List[str],
+            size: int = 7
     ) -> None:
 
         self.bot = bot
         self.channel = channel
         self.player1 = player1
         self.player2 = player2 or AI(self.bot, game=self)
+        self.tokens = tokens
 
         self.grid = self.generate_board(size)
         self.grid_size = size
@@ -74,7 +75,7 @@ class Game:
             f' VS {self.bot.user.display_name if isinstance(self.player2, AI) else self.player2.display_name}'
         )
 
-        rows = [" ".join(EMOJIS[s] for s in row) for row in self.grid]
+        rows = [" ".join(self.tokens[s] for s in row) for row in self.grid]
         first_row = " ".join(x for x in NUMBERS[:self.grid_size])
         formatted_grid = "\n".join([first_row] + rows)
         embed = discord.Embed(title=title, description=formatted_grid)
@@ -276,6 +277,8 @@ class ConnectFour(commands.Cog):
         self.games: typing.List[Game] = []
         self.waiting: typing.List[discord.Member] = []
 
+        self.tokens = [":white_circle:", ":blue_circle:", ":red_circle:"]
+
         self.max_board_size = 9
         self.min_board_size = 5
 
@@ -356,11 +359,10 @@ class ConnectFour(commands.Cog):
             emoji2: str
     ) -> None:
         """Helper for playing a game of connect four."""
-        global EMOJIS
-        EMOJIS = [":white_circle:", str(emoji1), str(emoji2)]
+        self.tokens = [":white_circle:", str(emoji1), str(emoji2)]
 
         try:
-            game = Game(self.bot, ctx.channel, ctx.author, user, size=board_size)
+            game = Game(self.bot, ctx.channel, ctx.author, user, self.tokens, size=board_size)
             self.games.append(game)
             await game.start_game()
             self.games.remove(game)
