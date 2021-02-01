@@ -360,6 +360,7 @@ class ConnectFour(commands.Cog):
     ) -> None:
         """Helper for playing a game of connect four."""
         self.tokens = [":white_circle:", str(emoji1), str(emoji2)]
+        game = None  # if game fails to intialize in try...except
 
         try:
             game = Game(self.bot, ctx.channel, ctx.author, user, self.tokens, size=board_size)
