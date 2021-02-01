@@ -8,7 +8,8 @@ from discord.ext import commands
 from discord.ext.commands import BucketType, Context
 
 from bot import constants
-from bot.constants import Channels, Colours, ERROR_REPLIES
+from bot.constants import Channels, Colours, ERROR_REPLIES, WHITELISTED_CHANNELS
+from bot.utils.decorators import override_in_channel
 
 ERROR_MESSAGE = f"""
 Unknown cheat sheet. Please try to reformulate your query.
@@ -71,6 +72,7 @@ class CheatSheet(commands.Cog):
         name="cheat",
         aliases=("cht.sh", "cheatsheet", "cheat-sheet", "cht"),
     )
+    @override_in_channel(WHITELISTED_CHANNELS)
     @commands.cooldown(1, 10, BucketType.user)
     async def cheat_sheet(self, ctx: Context, *search_terms: str) -> None:
         """
