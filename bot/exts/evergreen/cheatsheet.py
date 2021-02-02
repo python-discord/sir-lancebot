@@ -3,7 +3,7 @@ import re
 import typing as t
 from urllib.parse import quote_plus
 
-from discord import Embed, utils
+from discord import Embed
 from discord.ext import commands
 from discord.ext.commands import BucketType, Context
 
@@ -82,9 +82,10 @@ class CheatSheet(commands.Cog):
         Usage:
         --> .cht read json
         """
-        category = utils.get(ctx.message.guild.categories, id=Categories.help_in_use)
-        all_allowed_channels = WHITELISTED_CHANNELS + tuple(category.channels)
-        if ctx.channel not in all_allowed_channels:
+        if not (
+            ctx.channel.category.id == Categories.help_in_use
+            or ctx.channel.id in WHITELISTED_CHANNELS
+        ):
             return
 
         async with self.bot.http_session.get(
