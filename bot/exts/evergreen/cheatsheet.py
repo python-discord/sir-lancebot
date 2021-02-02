@@ -3,13 +3,13 @@ import re
 import typing as t
 from urllib.parse import quote_plus
 
-from discord import Embed
+from discord import Embed, utils
 from discord.ext import commands
 from discord.ext.commands import BucketType, Context
 
 from bot import constants
-from bot.constants import Channels, Colours, ERROR_REPLIES, WHITELISTED_CHANNELS
-from bot.utils.decorators import override_in_channel
+from bot.constants import Categories, Channels, Colours, ERROR_REPLIES, Roles, WHITELISTED_CHANNELS
+from bot.utils.decorators import with_role
 
 ERROR_MESSAGE = f"""
 Unknown cheat sheet. Please try to reformulate your query.
@@ -72,8 +72,8 @@ class CheatSheet(commands.Cog):
         name="cheat",
         aliases=("cht.sh", "cheatsheet", "cheat-sheet", "cht"),
     )
-    @override_in_channel(WHITELISTED_CHANNELS)
     @commands.cooldown(1, 10, BucketType.user)
+    @with_role(Roles.everyone)
     async def cheat_sheet(self, ctx: Context, *search_terms: str) -> None:
         """
         Search cheat.sh.
@@ -82,6 +82,11 @@ class CheatSheet(commands.Cog):
         Usage:
         --> .cht read json
         """
+        category = utils.get(ctx.message.guild.categories, id=Categories.help_in_use)
+        all_allowed_channels = WHITELISTED_CHANNELS + tuple(category.channels)
+        if ctx.channel not in all_allowed_channels:
+            return
+
         async with self.bot.http_session.get(
                 URL.format(search=quote_plus(" ".join(search_terms)))
         ) as response:
