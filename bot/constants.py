@@ -236,7 +236,6 @@ class Roles(NamedTuple):
     announcements = 463658397560995840
     champion = 430492892331769857
     contributor = 295488872404484098
-    developer = 352427296948486144
     devops = 409416496733880320
     jammer = 423054537079783434
     moderator = 267629731250176001
@@ -247,7 +246,7 @@ class Roles(NamedTuple):
     rockstars = 458226413825294336
     core_developers = 587606783669829632
     events_lead = 778361735739998228
-    everyone = 267624335836053506
+    everyone_role = 267624335836053506
 
 
 class Tokens(NamedTuple):

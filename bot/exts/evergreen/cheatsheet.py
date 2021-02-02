@@ -73,7 +73,7 @@ class CheatSheet(commands.Cog):
         aliases=("cht.sh", "cheatsheet", "cheat-sheet", "cht"),
     )
     @commands.cooldown(1, 10, BucketType.user)
-    @with_role(Roles.everyone)
+    @with_role(Roles.everyone_role)
     async def cheat_sheet(self, ctx: Context, *search_terms: str) -> None:
         """
         Search cheat.sh.
