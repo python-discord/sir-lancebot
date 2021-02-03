@@ -3,6 +3,9 @@ from http import HTTPStatus
 import discord
 from discord.ext import commands
 
+HTTP_DOG_URL = "https://httpstatusdogs.com/img/{code}.jpg"
+HTTP_CAT_URL = "https://http.cat/{code}.jpg"
+
 
 class HTTPStatusCodes(commands.Cog):
     """Commands that give HTTP statuses described and visualized by cats and dogs."""
@@ -16,19 +19,17 @@ class HTTPStatusCodes(commands.Cog):
         if not ctx.invoked_subcommand:
             await ctx.send_help(ctx.command)
 
-    @http_status_group.command(aliases=['cat'])
+    @http_status_group.command(name='cat')
     async def http_cat(self, ctx: commands.Context, code: int) -> None:
         """Sends an embed with an image of a cat, portraying the status code."""
         embed = discord.Embed(title=f'**Status: {code}**')
+        url = HTTP_CAT_URL.format(code=code)
 
         try:
             HTTPStatus(code)
-            async with self.bot.http_session.get(
-                    f'https://http.cat/{code}.jpg',
-                    allow_redirects=False
-            ) as response:
+            async with self.bot.http_session.get(url, allow_redirects=False) as response:
                 if response.status != 404:
-                    embed.set_image(url=f'https://http.cat/{code}.jpg')
+                    embed.set_image(url=url)
                 else:
                     raise NotImplementedError
 
@@ -41,19 +42,17 @@ class HTTPStatusCodes(commands.Cog):
         finally:
             await ctx.send(embed=embed)
 
-    @http_status_group.command(aliases=['dog'])
+    @http_status_group.command(name='dog')
     async def http_dog(self, ctx: commands.Context, code: int) -> None:
         """Sends an embed with an image of a dog, portraying the status code."""
         embed = discord.Embed(title=f'**Status: {code}**')
+        url = HTTP_DOG_URL.format(code=code)
 
         try:
             HTTPStatus(code)
-            async with self.bot.http_session.get(
-                    f'https://httpstatusdogs.com/img/{code}.jpg',
-                    allow_redirects=False
-            ) as response:
+            async with self.bot.http_session.get(url, allow_redirects=False) as response:
                 if response.status != 302:
-                    embed.set_image(url=f'https://httpstatusdogs.com/img/{code}.jpg')
+                    embed.set_image(url=url)
                 else:
                     raise NotImplementedError
 
