@@ -58,14 +58,14 @@ class CheatSheet(commands.Cog):
         body_space = min(1986 - len(url), 1000)
 
         if len(body_text) > body_space:
-            description = f"**Result Of cht.sh**\n" \
-                          f"```python\n{body_text[:body_space]}\n" \
-                          f"... (truncated - too many lines)```\n" \
-                          f"Full results: {url} "
+            description = (f"**Result Of cht.sh**\n"
+                          f"```python\n{body_text[:body_space]}\n"
+                          f"... (truncated - too many lines)```\n"
+                          f"Full results: {url} ")
         else:
-            description = f"**Result Of cht.sh**\n" \
-                          f"```python\n{body_text}```\n" \
-                          f"{url}"
+            description = (f"**Result Of cht.sh**\n"
+                          f"```python\n{body_text}```\n"
+                          f"{url}")
         return False, description
 
     @commands.command(
