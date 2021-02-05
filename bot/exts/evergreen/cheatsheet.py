@@ -59,13 +59,13 @@ class CheatSheet(commands.Cog):
 
         if len(body_text) > body_space:
             description = (f"**Result Of cht.sh**\n"
-                          f"```python\n{body_text[:body_space]}\n"
-                          f"... (truncated - too many lines)```\n"
-                          f"Full results: {url} ")
+                           f"```python\n{body_text[:body_space]}\n"
+                           f"... (truncated - too many lines)```\n"
+                           f"Full results: {url} ")
         else:
             description = (f"**Result Of cht.sh**\n"
-                          f"```python\n{body_text}```\n"
-                          f"{url}")
+                           f"```python\n{body_text}```\n"
+                           f"{url}")
         return False, description
 
     @commands.command(
@@ -83,8 +83,8 @@ class CheatSheet(commands.Cog):
         --> .cht read json
         """
         if not (
-            ctx.channel.category.id == Categories.help_in_use
-            or ctx.channel.id in WHITELISTED_CHANNELS
+                ctx.channel.category.id == Categories.help_in_use
+                or ctx.channel.id in WHITELISTED_CHANNELS
         ):
             return
 
