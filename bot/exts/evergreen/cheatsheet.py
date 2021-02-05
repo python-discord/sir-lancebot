@@ -89,13 +89,15 @@ class CheatSheet(commands.Cog):
             return
 
         async with ctx.typing():
+            search_string = quote_plus(" ".join(search_terms))
+
             async with self.bot.http_session.get(
-                    URL.format(search=quote_plus(" ".join(search_terms)))
+                    URL.format(search=search_string)
             ) as response:
                 result = ANSI_RE.sub("", await response.text()).translate(ESCAPE_TT)
 
             is_embed, description = self.result_fmt(
-                URL.format(search=quote_plus(" ".join(search_terms))),
+                URL.format(search=search_string),
                 result
             )
             if is_embed:
