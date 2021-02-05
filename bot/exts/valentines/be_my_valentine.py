@@ -85,15 +85,18 @@ class BeMyValentine(commands.Cog):
         if ctx.guild is None:
             # This command should only be used in the server
             msg = "You are supposed to use this command in the server."
-            return await ctx.send(msg)
+            await ctx.send(msg)
+            return
 
         if Lovefest.role_id not in [role.id for role in user.roles]:
             message = f"You cannot send a valentine to {user} as he/she does not have the lovefest role!"
-            return await ctx.send(message)
+            await ctx.send(message)
+            return
 
         if user == ctx.author:
             # Well a user can't valentine himself/herself.
-            return await ctx.send("Come on dude, you can't send a valentine to yourself :expressionless:")
+            await ctx.send("Come on dude, you can't send a valentine to yourself :expressionless:")
+            return
 
         emoji_1, emoji_2 = self.random_emoji()
         channel = self.bot.get_channel(Channels.community_bot_commands)
