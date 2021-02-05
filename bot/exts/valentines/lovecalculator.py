@@ -4,7 +4,7 @@ import json
 import logging
 import random
 from pathlib import Path
-from typing import Union
+from typing import Coroutine, Union
 
 import discord
 from discord import Member
@@ -26,7 +26,7 @@ class LoveCalculator(Cog):
 
     @commands.command(aliases=('love_calculator', 'love_calc'))
     @commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
-    async def love(self, ctx: commands.Context, who: Union[Member, str], whom: Union[Member, str]) -> None:
+    async def love(self, ctx: commands.Context, who: Union[Member, str], whom: Union[Member, str] = None) -> None:
         """
         Tells you how much the two love each other.
 
@@ -45,7 +45,10 @@ class LoveCalculator(Cog):
         If you want to use multiple words for one argument, you must include quotes.
           .love "Zes Vappa" "morning coffee"
         """
-        def normalize(arg: Union[Member, str]) -> str:
+        if whom is None:
+            whom = ctx.author
+
+        def normalize(arg: Union[Member, str]) -> Coroutine:
             if isinstance(arg, Member):
                 # If we are given a member, return name#discrim without any extra changes
                 arg = str(arg)
