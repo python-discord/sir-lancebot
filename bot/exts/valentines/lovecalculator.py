@@ -11,8 +11,6 @@ from discord import Member
 from discord.ext import commands
 from discord.ext.commands import BadArgument, Cog, clean_content
 
-from bot.constants import Roles
-
 log = logging.getLogger(__name__)
 
 with Path("bot/resources/valentines/love_matches.json").open(encoding="utf8") as file:
@@ -28,7 +26,7 @@ class LoveCalculator(Cog):
 
     @commands.command(aliases=('love_calculator', 'love_calc'))
     @commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
-    async def love(self, ctx: commands.Context, who: Union[Member, str], whom: Union[Member, str] = None) -> None:
+    async def love(self, ctx: commands.Context, who: Union[Member, str], whom: Union[Member, str]) -> None:
         """
         Tells you how much the two love each other.
 
@@ -46,13 +44,7 @@ class LoveCalculator(Cog):
 
         If you want to use multiple words for one argument, you must include quotes.
           .love "Zes Vappa" "morning coffee"
-
-        If only one argument is provided, the subject will become one of the helpers at random.
         """
-        if whom is None:
-            staff = ctx.guild.get_role(Roles.helpers).members
-            whom = random.choice(staff)
-
         def normalize(arg: Union[Member, str]) -> str:
             if isinstance(arg, Member):
                 # If we are given a member, return name#discrim without any extra changes
