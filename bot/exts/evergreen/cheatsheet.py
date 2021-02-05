@@ -88,19 +88,20 @@ class CheatSheet(commands.Cog):
         ):
             return
 
-        async with self.bot.http_session.get(
-                URL.format(search=quote_plus(" ".join(search_terms)))
-        ) as response:
-            result = ANSI_RE.sub("", await response.text()).translate(ESCAPE_TT)
+        async with ctx.typing():
+            async with self.bot.http_session.get(
+                    URL.format(search=quote_plus(" ".join(search_terms)))
+            ) as response:
+                result = ANSI_RE.sub("", await response.text()).translate(ESCAPE_TT)
 
-        is_embed, description = self.result_fmt(
-            URL.format(search=quote_plus(" ".join(search_terms))),
-            result
-        )
-        if is_embed:
-            await ctx.send(embed=description)
-        else:
-            await ctx.send(content=description)
+            is_embed, description = self.result_fmt(
+                URL.format(search=quote_plus(" ".join(search_terms))),
+                result
+            )
+            if is_embed:
+                await ctx.send(embed=description)
+            else:
+                await ctx.send(content=description)
 
 
 def setup(bot: commands.Bot) -> None:
