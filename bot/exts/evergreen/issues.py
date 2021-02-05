@@ -178,7 +178,12 @@ class Issues(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message) -> None:
         """Command to retrieve issue(s) from a GitHub repository using automatic linking if matching <repo>#<issue>."""
-        if not(
+        # Ignore messages from DMs
+        if not message.guild:
+            return
+
+        # Ignore messages not in whitelisted categories / channels
+        if not (
             message.channel.category.id in WHITELISTED_CATEGORIES
             or message.channel.id in WHITELISTED_CHANNELS_ON_MESSAGE
         ):
