@@ -73,7 +73,7 @@ class BeMyValentine(commands.Cog):
         self, ctx: commands.Context, user: discord.Member, *, valentine_type: str = None
     ) -> None:
         """
-        Send a valentine to user, if specified, or to a random user with the lovefest role.
+        Send a valentine to a specified user with the lovefest role.
 
         syntax: .bemyvalentine [user] [p/poem/c/compliment/or you can type your own valentine message]
         (optional)
@@ -89,7 +89,7 @@ class BeMyValentine(commands.Cog):
             return
 
         if Lovefest.role_id not in [role.id for role in user.roles]:
-            message = f"You cannot send a valentine to {user} as he/she does not have the lovefest role!"
+            message = f"You cannot send a valentine to {user} as they do not have the lovefest role!"
             await ctx.send(message)
             return
 
@@ -115,7 +115,7 @@ class BeMyValentine(commands.Cog):
         self, ctx: commands.Context, user: discord.Member, *, valentine_type: str = None
     ) -> None:
         """
-        Send an anonymous Valentine via DM to to a user, if specified, or to a random with the lovefest role.
+        Send an anonymous Valentine via DM to to a specified user with the lovefest role.
 
         syntax : .bemyvalentine secret [user] [p/poem/c/compliment/or you can type your own valentine message]
         (optional)
@@ -125,14 +125,17 @@ class BeMyValentine(commands.Cog):
         Iceman in DM making you anonymous)
         """
         if Lovefest.role_id not in [role.id for role in user.roles]:
-            message = f"You cannot send a valentine to {user} as he/she does not have the lovefest role!"
+            message = f"You cannot send a valentine to {user} as they do not have the lovefest role!"
             await ctx.message.delete()
-            return await ctx.author.send(message)
+            try:
+                await ctx.author.send(message)
+            except discord.Forbidden:
+                await ctx.send(message)
 
         if user == ctx.author:
             # Well a user cant valentine himself/herself.
             await ctx.message.delete()
-            return await ctx.author.send('Come on dude, you cant send a valentine to yourself :expressionless:')
+            await ctx.send('Come on dude, you cant send a valentine to yourself :expressionless:')
 
         emoji_1, emoji_2 = self.random_emoji()
         valentine, title = self.valentine_check(valentine_type)
