@@ -95,7 +95,7 @@ class BeMyValentine(commands.Cog):
 
         if user == ctx.author:
             # Well a user can't valentine himself/herself.
-            await ctx.send("Come on dude, you can't send a valentine to yourself :expressionless:")
+            await ctx.send("Come on, you can't send a valentine to yourself :expressionless:")
             return
 
         emoji_1, emoji_2 = self.random_emoji()
@@ -109,7 +109,7 @@ class BeMyValentine(commands.Cog):
         )
         await channel.send(user.mention, embed=embed)
 
-    @commands.cooldown(1, 1800, BucketType.user)
+    # @commands.cooldown(1, 1800, BucketType.user)
     @send_valentine.command(name='secret')
     async def anonymous(
         self, ctx: commands.Context, user: discord.Member, *, valentine_type: str = None
@@ -131,11 +131,12 @@ class BeMyValentine(commands.Cog):
                 await ctx.author.send(message)
             except discord.Forbidden:
                 await ctx.send(message)
+            return
 
         if user == ctx.author:
             # Well a user cant valentine himself/herself.
-            await ctx.message.delete()
-            await ctx.send('Come on dude, you cant send a valentine to yourself :expressionless:')
+            await ctx.send('Come on, you cant send a valentine to yourself :expressionless:')
+            return
 
         emoji_1, emoji_2 = self.random_emoji()
         valentine, title = self.valentine_check(valentine_type)
