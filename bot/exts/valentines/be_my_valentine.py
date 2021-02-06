@@ -135,7 +135,7 @@ class BeMyValentine(commands.Cog):
 
         if user == ctx.author:
             # Well a user cant valentine himself/herself.
-            await ctx.send('Come on, you cant send a valentine to yourself :expressionless:')
+            await ctx.send('Come on, you can\'t send a valentine to yourself :expressionless:')
             return
 
         emoji_1, emoji_2 = self.random_emoji()
