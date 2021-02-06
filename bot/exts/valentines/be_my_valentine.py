@@ -109,7 +109,7 @@ class BeMyValentine(commands.Cog):
         )
         await channel.send(user.mention, embed=embed)
 
-    # @commands.cooldown(1, 1800, BucketType.user)
+    @commands.cooldown(1, 1800, BucketType.user)
     @send_valentine.command(name='secret')
     async def anonymous(
         self, ctx: commands.Context, user: discord.Member, *, valentine_type: str = None
