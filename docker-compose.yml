@@ -11,6 +11,8 @@ services:
     depends_on:
       - redis
 
+    environment:
+      - REDIS_HOST=redis
     env_file:
       - .env
 
