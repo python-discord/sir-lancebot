@@ -250,7 +250,18 @@ def whitelist_check(**default_kwargs: t.Container[int]) -> t.Callable[[Context],
         )
 
         # Raise error if the check did not pass
-        channels = kwargs.get("channels")
+        channels = set(kwargs.get("channels") or {})
+        categories = kwargs.get("categories")
+
+        # Add all whitelisted category channels
+        if categories:
+            for category_id in categories:
+                category = ctx.guild.get_channel(category_id)
+                if category is None:
+                    continue
+
+                [channels.add(channel.id) for channel in category.text_channels]
+
         if channels:
             channels_str = ', '.join(f"<#{c_id}>" for c_id in channels)
             message = f"Sorry, but you may only use this command within {channels_str}."
