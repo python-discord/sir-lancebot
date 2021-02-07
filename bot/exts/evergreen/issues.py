@@ -184,7 +184,7 @@ class Issues(commands.Cog):
         ):
             return
 
-        message_repo_issue_map = re.findall(fr"({self.repo_regex})#(\d+)", message.content)
+        message_repo_issue_map = re.findall(fr".+?({self.repo_regex})#(\d+)", message.content)
         links = []
 
         if message_repo_issue_map:
