@@ -26,6 +26,7 @@ If the problem persists send a message in <#{Channels.dev_contrib}>
 URL = 'https://cheat.sh/python/{search}'
 ESCAPE_TT = str.maketrans({"`": "\\`"})
 ANSI_RE = re.compile(r"\x1b\[.*?m")
+HEADERS = {'User-Agent': 'curl/7.68.0'}
 
 
 class CheatSheet(commands.Cog):
@@ -92,7 +93,7 @@ class CheatSheet(commands.Cog):
             search_string = quote_plus(" ".join(search_terms))
 
             async with self.bot.http_session.get(
-                    URL.format(search=search_string)
+                    URL.format(search=search_string), headers=HEADERS
             ) as response:
                 result = ANSI_RE.sub("", await response.text()).translate(ESCAPE_TT)
 
