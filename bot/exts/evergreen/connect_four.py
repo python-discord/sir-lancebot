@@ -4,6 +4,7 @@ import typing
 from functools import partial
 
 import discord
+import emojis
 from discord.ext import commands
 
 NUMBERS = [
@@ -342,11 +343,13 @@ class ConnectFour(commands.Cog):
         return any(player in (game.player1, game.player2) for game in self.games)
 
     @staticmethod
-    def check_emojis(e1: EMOJI_CHECK, e2: EMOJI_CHECK) -> typing.Tuple[bool, typing.Optional[str]]:
+    def check_emojis(
+            e1: EMOJI_CHECK, e2: EMOJI_CHECK
+    ) -> typing.Tuple[bool, typing.Optional[str]]:
         """Validate the emojis, the user put."""
-        if isinstance(e1, str) and len(e1) > 1:
+        if isinstance(e1, str) and emojis.count(e1) != 1:
             return False, e1
-        if isinstance(e2, str) and len(e2) > 1:
+        if isinstance(e2, str) and emojis.count(e2) != 1:
             return False, e2
         return True, None
 
