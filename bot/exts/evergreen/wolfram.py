@@ -171,6 +171,9 @@ class Wolfram(Cog):
         url_str = parse.urlencode({
             "i": query,
             "appid": APPID,
+            "location": "the moon",
+            "latlong": "0.0,0.0",
+            "ip": "1.1.1.1"
         })
         query = QUERY.format(request="simple", data=url_str)
 
@@ -251,6 +254,9 @@ class Wolfram(Cog):
         url_str = parse.urlencode({
             "i": query,
             "appid": APPID,
+            "location": "the moon",
+            "latlong": "0.0,0.0",
+            "ip": "1.1.1.1"
         })
         query = QUERY.format(request="result", data=url_str)
 
