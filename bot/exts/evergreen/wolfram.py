@@ -108,7 +108,10 @@ async def get_pod_pages(ctx: Context, bot: commands.Bot, query: str) -> Optional
             "input": query,
             "appid": APPID,
             "output": DEFAULT_OUTPUT_FORMAT,
-            "format": "image,plaintext"
+            "format": "image,plaintext",
+            "location": "the moon",
+            "latlong": "0.0,0.0",
+            "ip": "1.1.1.1"
         })
         request_url = QUERY.format(request="query", data=url_str)
 
