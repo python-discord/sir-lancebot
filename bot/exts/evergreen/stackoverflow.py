@@ -30,10 +30,10 @@ class Stackoverflow(Cog):
         for item in top5:
             embed.add_field(
                 name=f"{unescape(item['title'])}",
-                value=(f"{item['score']} upvotes ┃ "
+                value=(f"[{item['score']} upvotes ┃ "
                        f"{item['view_count']} views ┃ "
-                       f"{item['answer_count']} answers "
-                       ),
+                       f"{item['answer_count']} answer{'s' if item['answer_count'] != 1 else ''} ]"
+                       f"({item['link']})"),
                 inline=False)
         embed.set_footer()
         await ctx.send(embed=embed)
