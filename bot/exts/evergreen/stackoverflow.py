@@ -36,7 +36,7 @@ class Stackoverflow(Cog):
                        f"Tags: {', '.join(item['tags'])}]"
                        f"({item['link']})"),
                 inline=False)
-        embed.set_footer()
+        embed.set_footer(text="View the original link for more results.")
         await ctx.send(embed=embed)
 
 
