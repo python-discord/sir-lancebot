@@ -1,3 +1,4 @@
+from html import unescape
 from typing import Dict, List
 
 from discord import Embed
@@ -31,8 +32,8 @@ class YouTubeSearch(commands.Cog):
             for item in data["items"]:
                 results.append(
                     {
-                        "title": escape_markdown(item["snippet"]["title"]),
-                        "author": escape_markdown(item["snippet"]["channelTitle"]),
+                        "title": escape_markdown(unescape(item["snippet"]["title"])),
+                        "author": escape_markdown(unescape(item["snippet"]["channelTitle"])),
                         "id": item["id"]["videoId"],
                     }
                 )
@@ -57,7 +58,7 @@ class YouTubeSearch(commands.Cog):
                 ]
             )
             embed = Embed(
-                colour=Colours.soft_red,
+                colour=Colours.dark_green,
                 title=f"YouTube results for `{search}`",
                 url=YOUTUBE_SEARCH_URL.format(search=search),
                 description=description
