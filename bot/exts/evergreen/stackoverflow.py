@@ -2,22 +2,22 @@ from html import unescape
 from urllib.parse import quote_plus
 
 from discord import Embed
-from discord.ext.commands import Bot, Cog, Context, command, cooldown
+from discord.ext import commands
 
 BASE_URL = "https://api.stackexchange.com/2.2/search/advanced?order=desc&sort=activity&site=stackoverflow&q={query}"
 SEARCH_URL = "https://stackoverflow.com/search?q={query}"
 SO_COLOR = 0xF98036
 
 
-class Stackoverflow(Cog):
+class Stackoverflow(commands.Cog):
     """A cog which returns the top 5 results of a query from stackoverflow."""
 
-    def __init__(self, bot: Bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @command(name="stackoverflow", aliases=["so"])
-    @cooldown(1, 15)
-    async def stackoverflow(self, ctx: Context, *, search_query: str) -> None:
+    @commands.command(name="stackoverflow", aliases=["so"])
+    @commands.cooldown(1, 15)
+    async def stackoverflow(self, ctx: commands.Context, *, search_query: str) -> None:
         """Sends the top 5 results from stackoverflow based on a search query."""
         async with self.bot.http_session.get(BASE_URL.format(query=quote_plus(search_query))) as response:
             data = await response.json()
@@ -40,6 +40,6 @@ class Stackoverflow(Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: Bot) -> None:
+def setup(bot: commands.Bot) -> None:
     """Adds the cog to the bot."""
     bot.add_cog(Stackoverflow(bot))
