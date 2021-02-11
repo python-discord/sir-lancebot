@@ -20,8 +20,8 @@ RESULT = "`{index}` [{title}]({url}) - {author}"
 
 
 @dataclass
-class SearchResult:
-    """Represents one video."""
+class Video:
+    """Represents a video search result."""
 
     title: str
     author: str
@@ -35,7 +35,7 @@ class YouTubeSearch(commands.Cog):
         self.bot = bot
         self.http_session = bot.http_session
 
-    async def search_youtube(self, search: str) -> List[SearchResult]:
+    async def search_youtube(self, search: str) -> List[Video]:
         """Queries API for top 5 results matching the search term."""
         results = []
         async with self.http_session.get(
@@ -49,7 +49,7 @@ class YouTubeSearch(commands.Cog):
             data = await response.json()
             for item in data["items"]:
                 results.append(
-                    SearchResult(
+                    Video(
                         title=escape_markdown(unescape(item["snippet"]["title"])),
                         author=escape_markdown(
                             unescape(item["snippet"]["channelTitle"])
