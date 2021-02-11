@@ -1,6 +1,7 @@
 import logging
+from dataclasses import dataclass
 from html import unescape
-from typing import Dict, List
+from typing import List
 
 from discord import Embed
 from discord.ext import commands
@@ -17,6 +18,15 @@ YOUTUBE_SEARCH_URL = "https://www.youtube.com/results?search_query={search}"
 RESULT = "`{index}` [{title}]({url}) - {author}"
 
 
+@dataclass
+class Video:
+    """Represents one video."""
+
+    title: str
+    author: str
+    id: str
+
+
 class YouTubeSearch(commands.Cog):
     """Sends the top 5 results of a query from YouTube."""
 
@@ -24,27 +34,27 @@ class YouTubeSearch(commands.Cog):
         self.bot = bot
         self.http_session = bot.http_session
 
-    async def search_youtube(self, search: str) -> List[Dict[str, str]]:
+    async def search_youtube(self, search: str) -> List[Video]:
         """Queries API for top 5 results matching the search term."""
         results = []
         async with self.http_session.get(
             SEARCH_API,
             params={"part": "snippet", "q": search, "type": "video", "key": KEY},
         ) as response:
-            if await response.status != 200:
+            if response.status != 200:
                 log.error("youtube response not succesful")
                 return None
 
             data = await response.json()
             for item in data["items"]:
                 results.append(
-                    {
-                        "title": escape_markdown(unescape(item["snippet"]["title"])),
-                        "author": escape_markdown(
+                    Video(
+                        title=escape_markdown(unescape(item["snippet"]["title"])),
+                        author=escape_markdown(
                             unescape(item["snippet"]["channelTitle"])
                         ),
-                        "id": item["id"]["videoId"],
-                    }
+                        id=item["id"]["videoId"],
+                    )
                 )
         return results
 
@@ -59,9 +69,9 @@ class YouTubeSearch(commands.Cog):
                 [
                     RESULT.format(
                         index=index,
-                        title=result["title"],
-                        url=YOUTUBE_VIDEO_URL.format(id=result["id"]),
-                        author=result["author"],
+                        title=result.title,
+                        url=YOUTUBE_VIDEO_URL.format(id=result.id),
+                        author=result.author,
                     )
                     for index, result in enumerate(results, start=1)
                 ]
