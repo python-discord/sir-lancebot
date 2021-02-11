@@ -8,7 +8,8 @@ from bot.constants import Colours, Tokens
 
 KEY = Tokens.youtube
 SEARCH_API = "https://www.googleapis.com/youtube/v3/search"
-YOUTUBE_URL = "https://www.youtube.com/watch?v={id}"
+YOUTUBE_VIDEO_URL = "https://www.youtube.com/watch?v={id}"
+YOUTUBE_SEARCH_URL = "https://www.youtube.com/results?search_query={search}"
 RESULT = "`{index}` [{title}]({url}) - {author}"
 
 
@@ -19,12 +20,12 @@ class YouTubeSearch(commands.Cog):
         self.bot = bot
         self.http_session = bot.http_session
 
-    async def search_youtube(self, search_term: str) -> List[Dict[str, str]]:
+    async def search_youtube(self, search: str) -> List[Dict[str, str]]:
         """Queries API for top 5 results matching the search term."""
         results = []
         async with self.http_session.get(
             SEARCH_API,
-            params={"part": "snippet", "q": search_term, "type": "video", "key": KEY},
+            params={"part": "snippet", "q": search, "type": "video", "key": KEY},
         ) as response:
             data = await response.json()
             for item in data["items"]:
@@ -49,7 +50,7 @@ class YouTubeSearch(commands.Cog):
                     RESULT.format(
                         index=index,
                         title=result["title"],
-                        url=YOUTUBE_URL.format(id=result["id"]),
+                        url=YOUTUBE_VIDEO_URL.format(id=result["id"]),
                         author=result["author"],
                     )
                     for index, result in enumerate(results, start=1)
@@ -58,7 +59,8 @@ class YouTubeSearch(commands.Cog):
             embed = Embed(
                 colour=Colours.soft_red,
                 title=f"YouTube results for `{search}`",
-                description=description,
+                url=YOUTUBE_SEARCH_URL.format(search=search),
+                description=description
             )
             await ctx.send(embed=embed)
         else:
