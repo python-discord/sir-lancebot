@@ -2,6 +2,7 @@ import logging
 from dataclasses import dataclass
 from html import unescape
 from typing import List
+from urllib.parse import quote_plus
 
 from discord import Embed
 from discord.ext import commands
@@ -79,7 +80,7 @@ class YouTubeSearch(commands.Cog):
             embed = Embed(
                 colour=Colours.dark_green,
                 title=f"YouTube results for `{search}`",
-                url=YOUTUBE_SEARCH_URL.format(search=search),
+                url=YOUTUBE_SEARCH_URL.format(search=quote_plus(search)),
                 description=description,
             )
             await ctx.send(embed=embed)
