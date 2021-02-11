@@ -7,7 +7,10 @@ from discord.utils import escape_markdown
 from bot.constants import Colours, Tokens
 
 KEY = Tokens.youtube
-SEARCH_API = "https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=5&q={search_term}&key={key}"
+SEARCH_API = (
+    "https://youtube.googleapis.com/youtube/v3/search?"
+    "part=snippet&type=video&maxResults=5&q={search_term}&key={key}"
+)
 YOUTUBE_URL = "https://www.youtube.com/watch?v={id}"
 RESULT = "`{index}` [{title}]({url}) - {author}"
 
@@ -26,6 +29,7 @@ class YouTubeSearch(Cog):
             SEARCH_API.format(search_term=search_term, key=KEY)
         ) as response:
             data = await response.json()
+            print(data)
             for item in data["items"]:
                 results.append(
                     {
