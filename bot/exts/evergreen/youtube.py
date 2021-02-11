@@ -1,7 +1,7 @@
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from discord import Embed
-from discord.ext.commands import Bot, Cog, Context, command, cooldown
+from discord.ext import commands
 from discord.utils import escape_markdown
 
 from bot.constants import Colours, Tokens
@@ -15,14 +15,14 @@ YOUTUBE_URL = "https://www.youtube.com/watch?v={id}"
 RESULT = "`{index}` [{title}]({url}) - {author}"
 
 
-class YouTubeSearch(Cog):
+class YouTubeSearch(commands.Cog):
     """Sends the top 5 results of a query from YouTube."""
 
-    def __init__(self, bot: Bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.http_session = bot.http_session
 
-    async def search_youtube(self, search_term: str) -> Optional[List[Dict[str, str]]]:
+    async def search_youtube(self, search_term: str) -> List[Dict[str, str]]:
         """Queries API for top 5 results matching the search term."""
         results = []
         async with self.http_session.get(
@@ -39,9 +39,9 @@ class YouTubeSearch(Cog):
                 )
         return results
 
-    @command(name="youtube", aliases=["yt"])
-    @cooldown(1, 15)
-    async def youtube(self, ctx: Context, *, search: str) -> None:
+    @commands.command(aliases=["yt"])
+    @commands.cooldown(1, 15, commands.BucketType.user)
+    async def youtube(self, ctx: commands.Context, *, search: str) -> None:
         """Sends the top 5 results of a query from YouTube."""
         results = await self.search_youtube(search)
 
@@ -49,12 +49,12 @@ class YouTubeSearch(Cog):
             description = "\n".join(
                 [
                     RESULT.format(
-                        index=index + 1,
+                        index=index,
                         title=result["title"],
                         url=YOUTUBE_URL.format(id=result["id"]),
                         author=result["author"],
                     )
-                    for index, result in enumerate(results)
+                    for index, result in enumerate(results, start=1)
                 ]
             )
             embed = Embed(
@@ -72,6 +72,6 @@ class YouTubeSearch(Cog):
             await ctx.send(embed=embed)
 
 
-def setup(bot: Bot) -> None:
-    """Wikipedia Cog load."""
+def setup(bot: commands.Bot) -> None:
+    """Load the YouTube cog."""
     bot.add_cog(YouTubeSearch(bot))
