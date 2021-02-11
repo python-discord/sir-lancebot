@@ -1,3 +1,4 @@
+import logging
 from html import unescape
 from typing import Dict, List
 
@@ -6,6 +7,8 @@ from discord.ext import commands
 from discord.utils import escape_markdown
 
 from bot.constants import Colours, Tokens
+
+log = logging.getLogger(__name__)
 
 KEY = Tokens.youtube
 SEARCH_API = "https://www.googleapis.com/youtube/v3/search"
@@ -28,12 +31,18 @@ class YouTubeSearch(commands.Cog):
             SEARCH_API,
             params={"part": "snippet", "q": search, "type": "video", "key": KEY},
         ) as response:
+            if await response.status != 200:
+                log.error("youtube response not succesful")
+                return None
+
             data = await response.json()
             for item in data["items"]:
                 results.append(
                     {
                         "title": escape_markdown(unescape(item["snippet"]["title"])),
-                        "author": escape_markdown(unescape(item["snippet"]["channelTitle"])),
+                        "author": escape_markdown(
+                            unescape(item["snippet"]["channelTitle"])
+                        ),
                         "id": item["id"]["videoId"],
                     }
                 )
@@ -61,14 +70,14 @@ class YouTubeSearch(commands.Cog):
                 colour=Colours.dark_green,
                 title=f"YouTube results for `{search}`",
                 url=YOUTUBE_SEARCH_URL.format(search=search),
-                description=description
+                description=description,
             )
             await ctx.send(embed=embed)
         else:
             embed = Embed(
                 colour=Colours.soft_red,
-                title="No Results",
-                description="Sorry, we could not find a YouTube video using that search term",
+                title="Something went wrong :/",
+                description="Sorry, we could not find a YouTube video.",
             )
             await ctx.send(embed=embed)
 
