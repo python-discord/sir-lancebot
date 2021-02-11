@@ -29,7 +29,6 @@ class YouTubeSearch(Cog):
             SEARCH_API.format(search_term=search_term, key=KEY)
         ) as response:
             data = await response.json()
-            print(data)
             for item in data["items"]:
                 results.append(
                     {
