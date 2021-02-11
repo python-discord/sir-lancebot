@@ -1,12 +1,11 @@
 from html import unescape
 from urllib.parse import quote_plus
 
-from discord import Embed
+from discord import Colour, Embed
 from discord.ext import commands
 
 BASE_URL = "https://api.stackexchange.com/2.2/search/advanced?order=desc&sort=activity&site=stackoverflow&q={query}"
 SEARCH_URL = "https://stackoverflow.com/search?q={query}"
-SO_COLOR = 0xF98036
 
 
 class Stackoverflow(commands.Cog):
@@ -26,7 +25,7 @@ class Stackoverflow(commands.Cog):
         embed = Embed(title=f"Search results for {search_query!r} - Stackoverflow",
                       url=SEARCH_URL.format(query=quote_plus(search_query)),
                       description=f"Here are the top {len(top5)} results:",
-                      color=SO_COLOR)
+                      color=Colour.orange)
         for item in top5:
             embed.add_field(
                 name=f"{unescape(item['title'])}",
