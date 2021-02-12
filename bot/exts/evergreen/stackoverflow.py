@@ -40,5 +40,5 @@ class Stackoverflow(commands.Cog):
 
 
 def setup(bot: commands.Bot) -> None:
-    """Adds the cog to the bot."""
+    """Loads Stackoverflow Cog."""
     bot.add_cog(Stackoverflow(bot))
