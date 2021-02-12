@@ -14,7 +14,7 @@ class Stackoverflow(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @commands.command(name="stackoverflow", aliases=["so"])
+    @commands.command(aliases=["so"])
     @commands.cooldown(1, 15, commands.cooldowns.BucketType.user)
     async def stackoverflow(self, ctx: commands.Context, *, search_query: str) -> None:
         """Sends the top 5 results from stackoverflow based on a search query."""
