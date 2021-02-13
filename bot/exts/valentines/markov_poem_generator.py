@@ -111,7 +111,7 @@ def command_wrapper(func: Callable) -> Callable:
         scheme: str = None,
         unit_count: Dict[str, bool] = None,
         time_start: datetime.time = None,
-        is_first_error: bool = True
+        is_first_error: bool = None
     ) -> None:
         try:
             async with async_timeout.timeout(timeout), ctx.typing():
@@ -320,14 +320,14 @@ class MarkovPoemGenerator(commands.Cog):
         return line
 
     @command_wrapper
-    async def send_markov_poem(
+    async def _get_generated_markov_poem(
         self,
         ctx: commands.Context,
         scheme: str,
-        unit_count: Dict[str, bool],
+        unit_count: Dict[str, Set[str]],
         time_start: datetime.time,
         is_first_error: bool
-    ) -> None:
+    ) -> List[str]:
         """
         Generates a love poem with the markov chain and sends it off.
 
@@ -342,7 +342,7 @@ class MarkovPoemGenerator(commands.Cog):
         This is so that all the rhymes are not contingent on the first unit of
         the scheme.
         """
-        acc_lines = []
+        lines = []
         rhyme_track = {}  # Maps units to their accumulative rhyme sets
 
         for unit in scheme:
@@ -351,7 +351,7 @@ class MarkovPoemGenerator(commands.Cog):
 
             # Create new stanza
             if unit == "/":
-                acc_lines.append("")
+                lines.append("")
                 continue
 
             # Creating a line for the unit
@@ -359,15 +359,15 @@ class MarkovPoemGenerator(commands.Cog):
                 new_line = await self._init_unit(
                     rhyme_track, unit, is_last_line
                 )
-                acc_lines.append(new_line)
+                lines.append(new_line)
             else:
                 new_line = await self._get_rhyming_line(
                     word_rhymes=rhyme_track[unit],
-                    existing_lines=acc_lines,
+                    existing_lines=lines,
                     error_info=(ctx, is_first_error, scheme, unit_count,
                                 time_start)
                 )
-                acc_lines.append(new_line)
+                lines.append(new_line)
 
                 # If last line, it will not be referred to again
                 if not is_last_line:
@@ -378,6 +378,27 @@ class MarkovPoemGenerator(commands.Cog):
 
             unit_count[unit] -= 1
 
+        return lines
+
+    async def send_markov_poem(
+        self,
+        ctx: commands.Context,
+        scheme: str,
+        unit_count: Dict[str, bool],
+        time_start: datetime.time,
+        is_first_error: bool = True
+    ) -> None:
+        """Gives the user a paginated embed of their markov poem."""
+        lines = await self._get_generated_markov_poem(
+            instance=self,
+            timeout=self.POEM_TIMEOUT,
+            ctx=ctx,
+            scheme=scheme,
+            unit_count=unit_count,
+            time_start=time_start,
+            is_first_error=is_first_error
+        )
+
         elapsed_time = datetime.now() - time_start
         elapsed_time = elapsed_time.seconds
 
@@ -385,12 +406,16 @@ class MarkovPoemGenerator(commands.Cog):
             title="A Markov Poem For " + str(ctx.author.name),
             color=Colours.pink
         )
-        poem_embed.set_footer(text=f"Elapsed time: {elapsed_time}s\n"
-                                   "Rhymes API provided by datamuse.")
+
         await LinePaginator.paginate(
-            acc_lines,
+            lines,
             ctx,
-            poem_embed
+            poem_embed,
+            max_lines=31,
+            max_size=1000,
+            empty=False,
+            footer_text=f"Elapsed time: {elapsed_time}s\n"
+                        "Rhymes API provided by datamuse."
         )
 
     @commands.command(
@@ -425,14 +450,7 @@ class MarkovPoemGenerator(commands.Cog):
         unit_count = self._get_unit_count(scheme)
         time_start = datetime.now()
 
-        return await self.send_markov_poem(
-            instance=self,
-            timeout=self.POEM_TIMEOUT,
-            ctx=ctx,
-            scheme=scheme,
-            unit_count=unit_count,
-            time_start=time_start
-        )
+        return await self.send_markov_poem(ctx, scheme, unit_count, time_start)
 
     async def cog_command_error(
         self,
@@ -443,12 +461,7 @@ class MarkovPoemGenerator(commands.Cog):
         if isinstance(error, RhymingSentenceNotFound):
             error.handled = True
             return await self.send_markov_poem(
-                instance=self,
-                timeout=self.POEM_TIMEOUT,
-                ctx=ctx,
-                scheme=error.scheme,
-                unit_count=error.unit_count,
-                time_start=error.time_start,
+                ctx, error.scheme, error.unit_count, error.time_start,
                 is_first_error=False
             )
         elif isinstance(error, RhymeAPIUnresponsive):
@@ -470,7 +483,8 @@ class MarkovPoemGenerator(commands.Cog):
                 color=Colours.pink,
                 description=f"""
                     Apologies {ctx.author.mention},
-                    but it appears that we have encountered a rare bug,
+                    but it appears that we have encountered a rare bug.
+                    It might be the case that your poem is too long,
                     please try again.
                     """
             )
