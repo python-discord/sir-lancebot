@@ -124,7 +124,7 @@ class BeMyValentine(commands.Cog):
         if Lovefest.role_id not in [role.id for role in user.roles]:
             await ctx.message.delete()
             raise commands.UserInputError(
-                f"You cannot send a valentine to {user}> as they do not have the lovefest role!"
+                f"You cannot send a valentine to {user} as they do not have the lovefest role!"
             )
 
         if user == ctx.author:
