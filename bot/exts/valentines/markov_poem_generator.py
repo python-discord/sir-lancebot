@@ -342,8 +342,7 @@ class MarkovPoemGenerator(commands.Cog):
         This is so that all the rhymes are not contingent on the first unit of
         the scheme.
         """
-        # stanzas = []
-        acc_lines = []  # Accumulate lines before joining into a stanza
+        acc_lines = []
         rhyme_track = {}  # Maps units to their accumulative rhyme sets
 
         for unit in scheme:
@@ -352,9 +351,6 @@ class MarkovPoemGenerator(commands.Cog):
 
             # Create new stanza
             if unit == "/":
-                # new_stanza = "\n".join(acc_lines)
-                # stanzas.append(new_stanza)
-                # acc_lines = []
                 acc_lines.append("")
                 continue
 
@@ -367,7 +363,7 @@ class MarkovPoemGenerator(commands.Cog):
             else:
                 new_line = await self._get_rhyming_line(
                     word_rhymes=rhyme_track[unit],
-                    existing_lines="\n".join(acc_lines),
+                    existing_lines=acc_lines,
                     error_info=(ctx, is_first_error, scheme, unit_count,
                                 time_start)
                 )
@@ -382,25 +378,20 @@ class MarkovPoemGenerator(commands.Cog):
 
             unit_count[unit] -= 1
 
-        # stanzas.append("\n".join(acc_lines))  # Append final stanza
-
         elapsed_time = datetime.now() - time_start
         elapsed_time = elapsed_time.seconds
 
         poem_embed = Embed(
             title="A Markov Poem For " + str(ctx.author.name),
             color=Colours.pink
-            # description="\n\n".join(stanzas)
         )
         poem_embed.set_footer(text=f"Elapsed time: {elapsed_time}s\n"
                                    "Rhymes API provided by datamuse.")
-        print(acc_lines)
         await LinePaginator.paginate(
             acc_lines,
             ctx,
             poem_embed
         )
-        # await ctx.send(embed=poem_embed)
 
     @commands.command(
         help=f"""
@@ -419,10 +410,8 @@ class MarkovPoemGenerator(commands.Cog):
         """
         Gives the user a love poem.
 
-        Poems are often structured by a rhyme scheme, which is often split into
-        stanzas. Stanzas are the equivalent of verses in modern pop songs, and
-        they are separated by an empty line. The blackslash character indicates
-        that an empty line should be generated to create a stanza.
+        The user's `rhyme_scheme` is processed before being placed into the
+        poem generation process.
 
         In this code, a unit is defined by a single character of the scheme. If
         two or more units are the same, they are meant to rhyme (i.e their last
@@ -467,8 +456,11 @@ class MarkovPoemGenerator(commands.Cog):
             embed = Embed(
                 title="Uh oh... Markov Poem can\'t give you a poem...",
                 color=Colours.pink,
-                description="""I am sorry, but it looks like the API that is used to help make your poems is down...
-                please come back another time."""
+                description=f"""
+                    I am sorry {ctx.author.mention}, but it looks like the API
+                    that is used to help make your poems is down...
+                    Please come back another time.
+                    """
             )
             return await ctx.send(embed=embed)
         elif isinstance(error, MakeShortSentenceRanOut):
@@ -476,8 +468,11 @@ class MarkovPoemGenerator(commands.Cog):
             embed = Embed(
                 title="Uh oh... Markov Poem can\'t give you a poem...",
                 color=Colours.pink,
-                description="""Apologies, but it appears that we have
-                encountered a rare bug, please try again."""
+                description=f"""
+                    Apologies {ctx.author.mention},
+                    but it appears that we have encountered a rare bug,
+                    please try again.
+                    """
             )
             return await ctx.send(embed=embed)
 
