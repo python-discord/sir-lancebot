@@ -11,7 +11,7 @@ from async_rediscache import RedisCache
 from discord.ext import commands
 
 from bot.constants import Channels, Month, NEGATIVE_REPLIES, Tokens, WHITELISTED_CHANNELS
-from bot.utils.decorators import in_month, override_in_channel
+from bot.utils.decorators import in_month, whitelist_override
 
 log = logging.getLogger(__name__)
 
@@ -44,7 +44,7 @@ class HacktoberStats(commands.Cog):
 
     @in_month(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)
     @commands.group(name="hacktoberstats", aliases=("hackstats",), invoke_without_command=True)
-    @override_in_channel(HACKTOBER_WHITELIST)
+    @whitelist_override(channels=HACKTOBER_WHITELIST)
     async def hacktoberstats_group(self, ctx: commands.Context, github_username: str = None) -> None:
         """
         Display an embed for a user's Hacktoberfest contributions.
@@ -72,7 +72,7 @@ class HacktoberStats(commands.Cog):
 
     @in_month(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)
     @hacktoberstats_group.command(name="link")
-    @override_in_channel(HACKTOBER_WHITELIST)
+    @whitelist_override(channels=HACKTOBER_WHITELIST)
     async def link_user(self, ctx: commands.Context, github_username: str = None) -> None:
         """
         Link the invoking user's Github github_username to their Discord ID.
@@ -96,7 +96,7 @@ class HacktoberStats(commands.Cog):
 
     @in_month(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)
     @hacktoberstats_group.command(name="unlink")
-    @override_in_channel(HACKTOBER_WHITELIST)
+    @whitelist_override(channels=HACKTOBER_WHITELIST)
     async def unlink_user(self, ctx: commands.Context) -> None:
         """Remove the invoking user's account link from the log."""
         author_id, author_mention = self._author_mention_from_context(ctx)

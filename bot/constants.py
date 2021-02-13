@@ -9,6 +9,7 @@ __all__ = (
     "AdventOfCode",
     "Branding",
     "Channels",
+    "Categories",
     "Client",
     "Colours",
     "Emojis",
@@ -100,20 +101,17 @@ class Channels(NamedTuple):
     big_brother_logs = 468507907357409333
     bot = 267659945086812160
     checkpoint_test = 422077681434099723
+    organisation = 551789653284356126
     devalerts = 460181980097675264
     devlog = int(environ.get("CHANNEL_DEVLOG", 622895325144940554))
     dev_contrib = 635950537262759947
     dev_branding = 753252897059373066
-    help_0 = 303906576991780866
-    help_1 = 303906556754395136
-    help_2 = 303906514266226689
-    help_3 = 439702951246692352
-    help_4 = 451312046647148554
-    help_5 = 454941769734422538
     helpers = 385474242440986624
     message_log = 467752170159079424
     mod_alerts = 473092532147060736
     modlog = 282638479504965634
+    mod_meta = 775412552795947058
+    mod_tools = 775413915391098921
     off_topic_0 = 291284109232308226
     off_topic_1 = 463035241142026251
     off_topic_2 = 463035268514185226
@@ -126,6 +124,13 @@ class Channels(NamedTuple):
     hacktoberfest_2020 = 760857070781071431
     voice_chat_0 = 412357430186344448
     voice_chat_1 = 799647045886541885
+
+
+class Categories(NamedTuple):
+    help_in_use = 696958401460043776
+    development = 411199786025484308
+    devprojects = 787641585624940544
+    media = 799054581991997460
 
 
 class Client(NamedTuple):
@@ -238,7 +243,6 @@ class Roles(NamedTuple):
     announcements = 463658397560995840
     champion = 430492892331769857
     contributor = 295488872404484098
-    developer = 352427296948486144
     devops = 409416496733880320
     jammer = 423054537079783434
     moderator = 267629731250176001
@@ -249,6 +253,7 @@ class Roles(NamedTuple):
     rockstars = 458226413825294336
     core_developers = 587606783669829632
     events_lead = 778361735739998228
+    everyone_role = 267624335836053506
 
 
 class Tokens(NamedTuple):
