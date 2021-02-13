@@ -86,17 +86,17 @@ class BeMyValentine(commands.Cog):
             # This command should only be used in the server
             msg = "You are supposed to use this command in the server."
             await ctx.send(msg)
-            return
+            raise commands.UserInputError
 
         if Lovefest.role_id not in [role.id for role in user.roles]:
             message = f"You cannot send a valentine to {user} as they do not have the lovefest role!"
             await ctx.send(message)
-            return
+            raise commands.UserInputError
 
         if user == ctx.author:
             # Well a user can't valentine himself/herself.
             await ctx.send("Come on, you can't send a valentine to yourself :expressionless:")
-            return
+            raise commands.UserInputError
 
         emoji_1, emoji_2 = self.random_emoji()
         channel = self.bot.get_channel(Channels.community_bot_commands)
@@ -131,12 +131,12 @@ class BeMyValentine(commands.Cog):
                 await ctx.author.send(message)
             except discord.Forbidden:
                 await ctx.send(message)
-            return
+            raise commands.UserInputError
 
         if user == ctx.author:
             # Well a user cant valentine himself/herself.
             await ctx.send('Come on, you can\'t send a valentine to yourself :expressionless:')
-            return
+            raise commands.UserInputError
 
         emoji_1, emoji_2 = self.random_emoji()
         valentine, title = self.valentine_check(valentine_type)
@@ -151,6 +151,7 @@ class BeMyValentine(commands.Cog):
             await ctx.message.delete()
         except discord.Forbidden:
             await ctx.send(f"{user} has DMs disabled, so I couldn't send the message. Sorry!")
+            raise commands.UserInputError
         else:
             await ctx.author.send(f"Your message has been sent to {user}")
 
