@@ -172,12 +172,21 @@ class MarkovPoemGenerator(commands.Cog):
         logging.info("Full text corpus and markov model successfully loaded.")
 
     @staticmethod
+    def _get_unit_count(scheme: str) -> Dict[str, bool]:
+        """Checks how many times a unit occurs in a rhyme scheme."""
+        return {char: scheme.count(char) for char in set(scheme)}
+
+    @staticmethod
     def _get_last_word(sentence: str) -> str:
         """Returns the last word of a sentence string."""
         return sentence.strip(string.punctuation).split()[-1]
 
     async def _get_sentence(self) -> str:
-        """Uses `in_thread` to return a sentence asynchronously."""
+        """
+        Uses `in_thread` to return a sentence asynchronously.
+
+        The sentence is generated via the markov chain.
+        """
         def func() -> str:
             line = self.model.make_short_sentence(
                 random.randint(*self.max_char_range)
@@ -239,11 +248,11 @@ class MarkovPoemGenerator(commands.Cog):
         unit_count: Dict[str, Set[str]],
         time_start: datetime.time
     ) -> None:
+        """Updates the user and raises the error."""
         if is_first_error:
             await ctx.send(
                 f"Sorry {ctx.author.mention}, but the rhymes are"
-                " really tricky, your poem is"
-                " going to take a while..."
+                " really tricky, your poem is going to take a while..."
             )
         else:
             await ctx.send(
@@ -281,11 +290,6 @@ class MarkovPoemGenerator(commands.Cog):
             curr += 1
         return line
 
-    @staticmethod
-    def _get_unit_count(scheme: str) -> Dict[str, bool]:
-        """Checks how many times a unit occurs in a rhyme scheme."""
-        return {char: scheme.count(char) for char in set(scheme)}
-
     async def _init_unit(
         self,
         rhyme_track: Dict[str, Set[str]],
@@ -296,7 +300,7 @@ class MarkovPoemGenerator(commands.Cog):
         Returns a line with a last word that has a rhyme set.
 
         If there is only one line in this unit, then the last word does not
-        need a rhyme set. Otherwise, it needs one.
+        need a rhyme set.
         """
         rhyme_set = set()
 
@@ -332,15 +336,13 @@ class MarkovPoemGenerator(commands.Cog):
         Generates a love poem with the markov chain and sends it off.
 
         If the count of a unit is one, that means it is the last unit in the
-        rhyme scheme being processed. Having no more units left means that it
-        is okay for it to not have any rhymes.
+        rhyme scheme being processed.
 
-        The function will run through the units of scheme. If it is a new
-        scheme, the unit will be added to `rhyme_track` as a key with the value
-        of the rhyme set. If a unit is found again and it is not the last in
-        the scheme, then then its rhyme set will be added to `rhyme_track`.
-        This is so that all the rhymes are not contingent on the first unit of
-        the scheme.
+        The function will iterate through the units of scheme. If it is a new
+        unit, it will be added to `rhyme_track` as a key with the rhyme set
+        as the value. If a unit is found again, then then the last word of the
+        new line's rhyme set will be added to `rhyme_track`. This is so that
+        all the rhymes are not contingent on the first unit of the scheme.
         """
         lines = []
         rhyme_track = {}  # Maps units to their accumulative rhyme sets
@@ -422,8 +424,8 @@ class MarkovPoemGenerator(commands.Cog):
         help=f"""
             The rhyme scheme is made from characters separated by slashes. E.g
             "abab/cdcd/efef/gg". The slashes denote a new stanza, i.e, they
-            create a new line. Same characters mean that the lines rhyme. Note
-            that the characters are case sensitive! For example, a and A
+            create an empty line. Same characters mean that the lines rhyme.
+            Note that the characters are case sensitive! For example, a and A
             represent two different rhyme schemes.
 
             You may also use our existing rhyme scheme templates:
@@ -433,7 +435,7 @@ class MarkovPoemGenerator(commands.Cog):
     )
     async def poem(self, ctx: commands.Context, rhyme_scheme: str) -> None:
         """
-        Gives the user a love poem.
+        Gives the user a love poem based on a rhyme_scheme.
 
         The user's `rhyme_scheme` is processed before being placed into the
         poem generation process.
