@@ -421,7 +421,11 @@ class MarkovPoemGenerator(commands.Cog):
         )
 
     @commands.command(
+        aliases=("poem", "mpoem", "m_poem", "markpoem", "mark_poem"),
         help=f"""
+            This command generates a poem via a markov chain, and all you have
+            to do is provide a rhyme scheme.
+
             The rhyme scheme is made from characters separated by slashes. E.g
             "abab/cdcd/efef/gg". The slashes denote a new stanza, i.e, they
             create an empty line. Same characters mean that the lines rhyme.
@@ -433,7 +437,11 @@ class MarkovPoemGenerator(commands.Cog):
             """,
         brief="Gives the user a love poem made with a markov chain."
     )
-    async def poem(self, ctx: commands.Context, rhyme_scheme: str) -> None:
+    async def markov_poem(
+        self,
+        ctx: commands.Context,
+        rhyme_scheme: str
+    ) -> None:
         """
         Gives the user a love poem based on a rhyme_scheme.
 
