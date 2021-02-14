@@ -285,6 +285,14 @@ class Wikipedia:
     total_chance = 3
 
 
+class YouTube:
+    youtube_emoji_id = 810358765114622053
+    post_detail_emoji_id = 810362544287383624
+    user_emoji_id = 810359435960385536
+    view_emoji_id = 810371390124458024
+    like_emoji_id = 810361845353021471
+
+
 class Source:
     github = "https://github.com/python-discord/sir-lancebot"
     github_avatar_url = "https://avatars1.githubusercontent.com/u/9919"

@@ -8,15 +8,27 @@ from discord import Embed
 from discord.ext import commands
 from discord.utils import escape_markdown
 
-from bot.constants import Colours, Tokens
+from bot.constants import Colours, Tokens, YouTube
 
 log = logging.getLogger(__name__)
 
 KEY = Tokens.youtube
 SEARCH_API = "https://www.googleapis.com/youtube/v3/search"
+STATS_API = "https://www.googleapis.com/youtube/v3/videos"
 YOUTUBE_VIDEO_URL = "https://www.youtube.com/watch?v={id}"
 YOUTUBE_SEARCH_URL = "https://www.youtube.com/results?search_query={search}"
-RESULT = "`{index}` [{title}]({url}) - {author}"
+RESULT = (
+    "**{index}. [{title}]({url})**\n"
+    "{post_detail_emoji} {user_emoji} {username} {view_emoji} {view_count} {like_emoji} {like_count}\n"
+)
+
+
+@dataclass
+class VideoStatistics:
+    """Represents YouTube video statistics."""
+
+    view_count: int
+    like_count: int
 
 
 @dataclass
@@ -24,8 +36,9 @@ class Video:
     """Represents a video search result."""
 
     title: str
-    author: str
+    username: str
     id: str
+    video_statistics: VideoStatistics
 
 
 class YouTubeSearch(commands.Cog):
@@ -35,6 +48,22 @@ class YouTubeSearch(commands.Cog):
         self.bot = bot
         self.http_session = bot.http_session
 
+    async def get_statistics(self, id: str) -> VideoStatistics:
+        """Queries API for statistics of one video."""
+        async with self.http_session.get(
+            STATS_API,
+            params={"part": "statistics", "id": id, "key": KEY},
+        ) as response:
+            if response.status != 200:
+                log.error("youtube statistics response not succesful")
+                return None
+
+            statistics = (await response.json())["items"][0]["statistics"]
+
+            return VideoStatistics(
+                view_count=statistics["viewCount"], like_count=statistics["likeCount"]
+            )
+
     async def search_youtube(self, search: str) -> List[Video]:
         """Queries API for top 5 results matching the search term."""
         results = []
@@ -43,26 +72,43 @@ class YouTubeSearch(commands.Cog):
             params={"part": "snippet", "q": search, "type": "video", "key": KEY},
         ) as response:
             if response.status != 200:
-                log.error("youtube response not succesful")
+                log.error("youtube search response not succesful")
                 return None
 
-            data = await response.json()
-            for item in data["items"]:
+            video_snippet = await response.json()
+
+            for item in video_snippet["items"]:
+                video_statistics = await self.get_statistics(item["id"]["videoId"])
+
+                if video_statistics is None:
+                    log.error(
+                        "youtube statistics response not succesful, aborting youtube search"
+                    )
+                    return None
+
                 results.append(
                     Video(
                         title=escape_markdown(unescape(item["snippet"]["title"])),
-                        author=escape_markdown(
+                        username=escape_markdown(
                             unescape(item["snippet"]["channelTitle"])
                         ),
                         id=item["id"]["videoId"],
+                        video_statistics=video_statistics,
                     )
                 )
+
         return results
 
     @commands.command(aliases=["yt"])
     @commands.cooldown(1, 15, commands.BucketType.user)
     async def youtube(self, ctx: commands.Context, *, search: str) -> None:
         """Sends the top 5 results of a query from YouTube."""
+        youtube_emoji = self.bot.get_emoji(YouTube.youtube_emoji_id)
+        post_detail_emoji = self.bot.get_emoji(YouTube.post_detail_emoji_id)
+        user_emoji = self.bot.get_emoji(YouTube.user_emoji_id)
+        view_emoji = self.bot.get_emoji(YouTube.view_emoji_id)
+        like_emoji = self.bot.get_emoji(YouTube.like_emoji_id)
+
         results = await self.search_youtube(search)
 
         if results:
@@ -72,14 +118,20 @@ class YouTubeSearch(commands.Cog):
                         index=index,
                         title=result.title,
                         url=YOUTUBE_VIDEO_URL.format(id=result.id),
-                        author=result.author,
+                        post_detail_emoji=post_detail_emoji,
+                        user_emoji=user_emoji,
+                        username=result.username,
+                        view_emoji=view_emoji,
+                        view_count=result.video_statistics.view_count,
+                        like_emoji=like_emoji,
+                        like_count=result.video_statistics.like_count,
                     )
                     for index, result in enumerate(results, start=1)
                 ]
             )
             embed = Embed(
                 colour=Colours.dark_green,
-                title=f"YouTube results for `{search}`",
+                title=f"{youtube_emoji} YouTube results for `{search}`",
                 url=YOUTUBE_SEARCH_URL.format(search=quote_plus(search)),
                 description=description,
             )
