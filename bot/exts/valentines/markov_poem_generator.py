@@ -162,9 +162,11 @@ class MarkovPoemGenerator(commands.Cog):
         self.bot = bot
 
         # Load the full text corpus
+        full_corpus = []
         for source_file in self.SOURCES:
             with Path(f"bot/resources/valentines/{source_file}").open() as f:
-                full_corpus = f.read().splitlines()
+                curr_corpus = f.read().splitlines()
+                full_corpus.extend(curr_corpus)
 
         # Create the markov model
         self.model = markovify.Text(full_corpus, state_size=1)
