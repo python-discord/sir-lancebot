@@ -201,11 +201,11 @@ class Emojis:
     status_dnd = "<:status_dnd:470326272082313216>"
     status_offline = "<:status_offline:470326266537705472>"
 
-    youtube = "<:youtube:810358765114622053>"
-    post_detail = "<:post_detail:810362544287383624>"
-    user = "<:user:810359435960385536>"
-    view = "<:view:810371390124458024>"
-    like = "<:like:810384603881406534>"
+    youtube = "<:youtube:810332588698107906>"
+    post_detail = "<:reddit_post_text:676030265910493204>"
+    user = "<:reddit_users:755845303822974997>"
+    view = "<:youtube_views:810369803893604352>"
+    like = "<:youtube_like:810387168735264809>"
 
 
 class Icons:
