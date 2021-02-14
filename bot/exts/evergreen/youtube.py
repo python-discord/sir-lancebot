@@ -48,12 +48,6 @@ class YouTubeSearch(commands.Cog):
         self.bot = bot
         self.http_session = bot.http_session
 
-        self.youtube_emoji = Emojis.youtube
-        self.post_detail_emoji = Emojis.post_detail
-        self.user_emoji = Emojis.user
-        self.view_emoji = Emojis.view
-        self.like_emoji = Emojis.like
-
     async def get_statistics(self, id: str) -> VideoStatistics:
         """Queries API for statistics of one video."""
         async with self.http_session.get(
@@ -118,12 +112,12 @@ class YouTubeSearch(commands.Cog):
                         index=index,
                         title=result.title,
                         url=YOUTUBE_VIDEO_URL.format(id=result.id),
-                        post_detail_emoji=self.post_detail_emoji,
-                        user_emoji=self.user_emoji,
+                        post_detail_emoji=Emojis.post_detail,
+                        user_emoji=Emojis.user,
                         username=result.username,
-                        view_emoji=self.view_emoji,
+                        view_emoji=Emojis.view,
                         view_count=result.video_statistics.view_count,
-                        like_emoji=self.like_emoji,
+                        like_emoji=Emojis.like,
                         like_count=result.video_statistics.like_count,
                     )
                     for index, result in enumerate(results, start=1)
@@ -131,7 +125,7 @@ class YouTubeSearch(commands.Cog):
             )
             embed = Embed(
                 colour=Colours.dark_green,
-                title=f"{self.youtube_emoji} YouTube results for `{search}`",
+                title=f"{Emojis.youtube} YouTube results for `{search}`",
                 url=YOUTUBE_SEARCH_URL.format(search=quote_plus(search)),
                 description=description,
             )
