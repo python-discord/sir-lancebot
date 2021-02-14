@@ -19,13 +19,13 @@ from bot.utils.pagination import LinePaginator
 
 log = logging.getLogger(__name__)
 
-_executor = ThreadPoolExecutor(10)
+_EXECUTOR = ThreadPoolExecutor(10)
 
 
 async def in_thread(func: Callable) -> Future:
     """Allows non-async functions to work in async functions."""
     loop = get_event_loop()
-    return await loop.run_in_executor(_executor, func)
+    return await loop.run_in_executor(_EXECUTOR, func)
 
 
 class MakeShortSentenceRanOut(commands.CommandError):
@@ -40,7 +40,7 @@ class RhymingSentenceNotFound(commands.CommandError):
     def __init__(
         self,
         scheme: str,
-        unit_count: Dict[str, bool],
+        unit_count: Dict[str, int],
         time_start: datetime.time
     ):
         self.scheme = scheme
@@ -109,10 +109,10 @@ def command_wrapper(func: Callable) -> Callable:
         timeout: int = None,
         ctx: commands.Context = None,
         scheme: str = None,
-        unit_count: Dict[str, bool] = None,
+        unit_count: Dict[str, int] = None,
         time_start: datetime.time = None,
         is_first_error: bool = None
-    ) -> None:
+    ) -> Callable:
         try:
             async with async_timeout.timeout(timeout), ctx.typing():
                 return await func(instance, ctx, scheme, unit_count,
@@ -172,7 +172,7 @@ class MarkovPoemGenerator(commands.Cog):
         logging.info("Full text corpus and markov model successfully loaded.")
 
     @staticmethod
-    def _get_unit_count(scheme: str) -> Dict[str, bool]:
+    def _get_unit_count(scheme: str) -> Dict[str, int]:
         """Checks how many times a unit occurs in a rhyme scheme."""
         return {char: scheme.count(char) for char in set(scheme)}
 
@@ -240,12 +240,12 @@ class MarkovPoemGenerator(commands.Cog):
 
         return rhyme_set
 
+    @staticmethod
     async def _handle_rhyming_sentence_not_found(
-        self,
         ctx: commands.Context,
         is_first_error: bool,
         scheme: str,
-        unit_count: Dict[str, Set[str]],
+        unit_count: Dict[str, int],
         time_start: datetime.time
     ) -> None:
         """Updates the user and raises the error."""
@@ -266,7 +266,8 @@ class MarkovPoemGenerator(commands.Cog):
         self,
         word_rhymes: List[str],
         existing_lines: List[str],
-        error_info: Tuple[str, Dict[str, Set[str]], datetime.time],
+        error_info: Tuple[commands.Context, bool, str, Dict[str, int],
+                          datetime.time],
         limiter: int = rhyming_line_finder_limiter
     ) -> str:
         """
@@ -328,7 +329,7 @@ class MarkovPoemGenerator(commands.Cog):
         self,
         ctx: commands.Context,
         scheme: str,
-        unit_count: Dict[str, Set[str]],
+        unit_count: Dict[str, int],
         time_start: datetime.time,
         is_first_error: bool
     ) -> List[str]:
@@ -386,7 +387,7 @@ class MarkovPoemGenerator(commands.Cog):
         self,
         ctx: commands.Context,
         scheme: str,
-        unit_count: Dict[str, bool],
+        unit_count: Dict[str, int],
         time_start: datetime.time,
         is_first_error: bool = True
     ) -> None:
@@ -406,7 +407,7 @@ class MarkovPoemGenerator(commands.Cog):
 
         poem_embed = Embed(
             title="A Markov Poem For " + str(ctx.author.name),
-            color=Colours.pink
+            color=Colours.soft_red
         )
 
         await LinePaginator.paginate(
@@ -422,9 +423,8 @@ class MarkovPoemGenerator(commands.Cog):
 
     @commands.command(
         aliases=("poem", "mpoem", "m_poem", "markpoem", "mark_poem"),
-        help=f"""
-            This command generates a poem via a markov chain, and all you have
-            to do is provide a rhyme scheme.
+        help=f"""This command generates a poem via a markov chain, and all you
+            have to do is provide a rhyme scheme.
 
             The rhyme scheme is made from characters separated by slashes. E.g
             "abab/cdcd/efef/gg". The slashes denote a new stanza, i.e, they
@@ -433,8 +433,7 @@ class MarkovPoemGenerator(commands.Cog):
             represent two different rhyme schemes.
 
             You may also use our existing rhyme scheme templates:
-            {chr(10).join((k + " --- " + v) for k, v in templates.items())}
-            """,
+            {chr(10).join((k + " --- " + v) for k, v in templates.items())}""",
         brief="Gives the user a love poem made with a markov chain."
     )
     async def markov_poem(
@@ -460,7 +459,7 @@ class MarkovPoemGenerator(commands.Cog):
         unit_count = self._get_unit_count(scheme)
         time_start = datetime.now()
 
-        return await self.send_markov_poem(ctx, scheme, unit_count, time_start)
+        await self.send_markov_poem(ctx, scheme, unit_count, time_start)
 
     async def cog_command_error(
         self,
@@ -470,7 +469,7 @@ class MarkovPoemGenerator(commands.Cog):
         """Handles Discord errors and exceptions."""
         if isinstance(error, RhymingSentenceNotFound):
             error.handled = True
-            return await self.send_markov_poem(
+            await self.send_markov_poem(
                 ctx, error.scheme, error.unit_count, error.time_start,
                 is_first_error=False
             )
@@ -478,19 +477,19 @@ class MarkovPoemGenerator(commands.Cog):
             error.handled = True
             embed = Embed(
                 title="Uh oh... Markov Poem can\'t give you a poem...",
-                color=Colours.pink,
+                color=Colours.soft_red,
                 description=f"""
                     I am sorry {ctx.author.mention}, but it looks like the API
                     that is used to help make your poems is down...
                     Please come back another time.
                     """
             )
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
         elif isinstance(error, MakeShortSentenceRanOut):
             error.handled = True
             embed = Embed(
                 title="Uh oh... Markov Poem can\'t give you a poem...",
-                color=Colours.pink,
+                color=Colours.soft_red,
                 description=f"""
                     Apologies {ctx.author.mention},
                     but it appears that we have encountered a rare bug.
@@ -498,7 +497,7 @@ class MarkovPoemGenerator(commands.Cog):
                     please try again.
                     """
             )
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
 
 
 def setup(bot: commands.Bot) -> None:
