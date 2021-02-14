@@ -71,7 +71,7 @@ class YouTubeSearch(commands.Cog):
             )
 
     async def search_youtube(self, search: str) -> List[Video]:
-        """Queries API for top 5 results matching the search term."""
+        """Queries API for top 5 results matching the search term with fifteen second cool down per user."""
         results = []
         async with self.http_session.get(
             SEARCH_API,
