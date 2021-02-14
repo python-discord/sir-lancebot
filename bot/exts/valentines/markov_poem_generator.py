@@ -132,7 +132,7 @@ class MarkovPoemGenerator(commands.Cog):
     can be iterated through, whilst corresponding to the given rhyme scheme.
     """
 
-    POEM_TIMEOUT = 60  # In seconds
+    POEM_TIMEOUT = 30  # In seconds
     near_rhyme_min_score = 2000
     rhyming_line_finder_limiter = 80000
     max_char_range = (50, 120)  # For the sentence generator
@@ -421,6 +421,7 @@ class MarkovPoemGenerator(commands.Cog):
                         "Rhymes API provided by datamuse."
         )
 
+    @commands.max_concurrency(1, commands.BucketType.user)
     @commands.command(
         aliases=("poem", "mpoem", "m_poem", "markpoem", "mark_poem"),
         help=f"""This command generates a poem via a markov chain, and all you
@@ -498,6 +499,10 @@ class MarkovPoemGenerator(commands.Cog):
                     """
             )
             await ctx.send(embed=embed)
+        elif isinstance(error, commands.errors.MaxConcurrencyReached):
+            error.handled = True
+            await ctx.send(f"Please be patient {ctx.author.mention},"
+                           " we are currently working on your poem!")
 
 
 def setup(bot: commands.Bot) -> None:
