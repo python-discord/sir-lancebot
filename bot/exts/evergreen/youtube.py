@@ -46,11 +46,10 @@ class YouTubeSearch(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.http_session = bot.http_session
 
     async def get_statistics(self, id: str) -> VideoStatistics:
         """Queries API for statistics of one video."""
-        async with self.http_session.get(
+        async with self.bot.http_session.get(
             STATS_API,
             params={"part": "statistics", "id": id, "key": KEY},
         ) as response:
@@ -67,7 +66,7 @@ class YouTubeSearch(commands.Cog):
     async def search_youtube(self, search: str) -> List[Video]:
         """Queries API for top 5 results matching the search term with fifteen second cool down per user."""
         results = []
-        async with self.http_session.get(
+        async with self.bot.http_session.get(
             SEARCH_API,
             params={"part": "snippet", "q": search, "type": "video", "key": KEY},
         ) as response:
