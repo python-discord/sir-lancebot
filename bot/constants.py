@@ -286,11 +286,11 @@ class Wikipedia:
 
 
 class YouTube:
-    youtube_emoji_id = 810358765114622053
-    post_detail_emoji_id = 810362544287383624
-    user_emoji_id = 810359435960385536
-    view_emoji_id = 810371390124458024
-    like_emoji_id = 810361845353021471
+    youtube_emoji_id = 810332588698107906
+    post_detail_emoji_id = 676030265910493204
+    user_emoji_id = 755845303822974997
+    view_emoji_id = 810369803893604352
+    like_emoji_id = 810387168735264809
 
 
 class Source:
