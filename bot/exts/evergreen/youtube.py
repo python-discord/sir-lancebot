@@ -109,7 +109,6 @@ class YouTubeSearch(commands.Cog):
     @commands.cooldown(1, 15, commands.BucketType.user)
     async def youtube(self, ctx: commands.Context, *, search: str) -> None:
         """Sends the top 5 results of a query from YouTube."""
-
         results = await self.search_youtube(search)
 
         if results:
