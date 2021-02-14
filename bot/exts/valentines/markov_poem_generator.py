@@ -134,7 +134,7 @@ class MarkovPoemGenerator(commands.Cog):
 
     POEM_TIMEOUT = 30  # In seconds
     near_rhyme_min_score = 2000
-    rhyming_line_finder_limiter = 80000
+    rhyming_line_finder_limiter = 20000
     max_char_range = (50, 120)  # For the sentence generator
 
     SOURCES: List[str] = [
