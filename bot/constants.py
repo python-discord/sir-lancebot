@@ -201,6 +201,12 @@ class Emojis:
     status_dnd = "<:status_dnd:470326272082313216>"
     status_offline = "<:status_offline:470326266537705472>"
 
+    youtube = "<:youtube:810358765114622053>"
+    post_detail = "<:post_detail:810362544287383624>"
+    user = "<:user:810359435960385536>"
+    view = "<:view:810371390124458024>"
+    like = "<:like:810384603881406534>"
+
 
 class Icons:
     questionmark = "https://cdn.discordapp.com/emojis/512367613339369475.png"
@@ -283,14 +289,6 @@ class RedisConfig(NamedTuple):
 
 class Wikipedia:
     total_chance = 3
-
-
-class YouTube:
-    youtube_emoji_id = 810332588698107906
-    post_detail_emoji_id = 676030265910493204
-    user_emoji_id = 755845303822974997
-    view_emoji_id = 810369803893604352
-    like_emoji_id = 810387168735264809
 
 
 class Source:

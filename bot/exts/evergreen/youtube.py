@@ -8,7 +8,7 @@ from discord import Embed
 from discord.ext import commands
 from discord.utils import escape_markdown
 
-from bot.constants import Colours, Tokens, YouTube
+from bot.constants import Colours, Emojis, Tokens
 
 log = logging.getLogger(__name__)
 
@@ -47,6 +47,12 @@ class YouTubeSearch(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.http_session = bot.http_session
+
+        self.youtube_emoji = Emojis.youtube
+        self.post_detail_emoji = Emojis.post_detail
+        self.user_emoji = Emojis.user
+        self.view_emoji = Emojis.view
+        self.like_emoji = Emojis.like
 
     async def get_statistics(self, id: str) -> VideoStatistics:
         """Queries API for statistics of one video."""
@@ -103,11 +109,6 @@ class YouTubeSearch(commands.Cog):
     @commands.cooldown(1, 15, commands.BucketType.user)
     async def youtube(self, ctx: commands.Context, *, search: str) -> None:
         """Sends the top 5 results of a query from YouTube."""
-        youtube_emoji = self.bot.get_emoji(YouTube.youtube_emoji_id)
-        post_detail_emoji = self.bot.get_emoji(YouTube.post_detail_emoji_id)
-        user_emoji = self.bot.get_emoji(YouTube.user_emoji_id)
-        view_emoji = self.bot.get_emoji(YouTube.view_emoji_id)
-        like_emoji = self.bot.get_emoji(YouTube.like_emoji_id)
 
         results = await self.search_youtube(search)
 
@@ -118,12 +119,12 @@ class YouTubeSearch(commands.Cog):
                         index=index,
                         title=result.title,
                         url=YOUTUBE_VIDEO_URL.format(id=result.id),
-                        post_detail_emoji=post_detail_emoji,
-                        user_emoji=user_emoji,
+                        post_detail_emoji=self.post_detail_emoji,
+                        user_emoji=self.user_emoji,
                         username=result.username,
-                        view_emoji=view_emoji,
+                        view_emoji=self.view_emoji,
                         view_count=result.video_statistics.view_count,
-                        like_emoji=like_emoji,
+                        like_emoji=self.like_emoji,
                         like_count=result.video_statistics.like_count,
                     )
                     for index, result in enumerate(results, start=1)
@@ -131,7 +132,7 @@ class YouTubeSearch(commands.Cog):
             )
             embed = Embed(
                 colour=Colours.dark_green,
-                title=f"{youtube_emoji} YouTube results for `{search}`",
+                title=f"{self.youtube_emoji} YouTube results for `{search}`",
                 url=YOUTUBE_SEARCH_URL.format(search=quote_plus(search)),
                 description=description,
             )
