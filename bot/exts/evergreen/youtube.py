@@ -61,7 +61,7 @@ class YouTubeSearch(commands.Cog):
             params={"part": "statistics", "id": id, "key": KEY},
         ) as response:
             if response.status != 200:
-                log.error("youtube statistics response not succesful")
+                log.error(f"YouTube statistics response not succesful: response code {response.status}")
                 return None
 
             statistics = (await response.json())["items"][0]["statistics"]
@@ -78,7 +78,7 @@ class YouTubeSearch(commands.Cog):
             params={"part": "snippet", "q": search, "type": "video", "key": KEY},
         ) as response:
             if response.status != 200:
-                log.error("youtube search response not succesful")
+                log.error(f"YouTube search response not succesful: response code {response.status}")
                 return None
 
             video_snippet = await response.json()
@@ -87,8 +87,8 @@ class YouTubeSearch(commands.Cog):
                 video_statistics = await self.get_statistics(item["id"]["videoId"])
 
                 if video_statistics is None:
-                    log.error(
-                        "youtube statistics response not succesful, aborting youtube search"
+                    log.warn(
+                        "YouTube statistics response not succesful, aborting youtube search"
                     )
                     return None
 
