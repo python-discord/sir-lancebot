@@ -1,7 +1,7 @@
 import logging
 from dataclasses import dataclass
 from html import unescape
-from typing import List
+from typing import List, Optional
 from urllib.parse import quote_plus
 
 from discord import Embed
@@ -47,14 +47,31 @@ class YouTubeSearch(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    async def get_statistics(self, id: str) -> VideoStatistics:
+    async def format_search_results(self, index: int, result: List[Video]) -> str:
+        """Formats search result to put in embed."""
+        return RESULT.format(
+            index=index,
+            title=result.title,
+            url=YOUTUBE_VIDEO_URL.format(id=result.id),
+            post_detail_emoji=Emojis.post_detail,
+            user_emoji=Emojis.user,
+            username=result.username,
+            view_emoji=Emojis.view,
+            view_count=result.video_statistics.view_count,
+            like_emoji=Emojis.like,
+            like_count=result.video_statistics.like_count,
+        )
+
+    async def get_statistics(self, id: str) -> Optional[VideoStatistics]:
         """Queries API for statistics of one video."""
         async with self.bot.http_session.get(
             STATS_API,
             params={"part": "statistics", "id": id, "key": KEY},
         ) as response:
             if response.status != 200:
-                log.error(f"YouTube statistics response not succesful: response code {response.status}")
+                log.error(
+                    f"YouTube statistics response not succesful: response code {response.status}"
+                )
                 return None
 
             statistics = (await response.json())["items"][0]["statistics"]
@@ -63,7 +80,7 @@ class YouTubeSearch(commands.Cog):
                 view_count=statistics["viewCount"], like_count=statistics["likeCount"]
             )
 
-    async def search_youtube(self, search: str) -> List[Video]:
+    async def search_youtube(self, search: str) -> Optional[List[Video]]:
         """Queries API for top 5 results matching the search term with fifteen second cool down per user."""
         results = []
         async with self.bot.http_session.get(
@@ -71,7 +88,9 @@ class YouTubeSearch(commands.Cog):
             params={"part": "snippet", "q": search, "type": "video", "key": KEY},
         ) as response:
             if response.status != 200:
-                log.error(f"YouTube search response not succesful: response code {response.status}")
+                log.error(
+                    f"YouTube search response not succesful: response code {response.status}"
+                )
                 return None
 
             video_snippet = await response.json()
@@ -107,18 +126,7 @@ class YouTubeSearch(commands.Cog):
         if results:
             description = "\n".join(
                 [
-                    RESULT.format(
-                        index=index,
-                        title=result.title,
-                        url=YOUTUBE_VIDEO_URL.format(id=result.id),
-                        post_detail_emoji=Emojis.post_detail,
-                        user_emoji=Emojis.user,
-                        username=result.username,
-                        view_emoji=Emojis.view,
-                        view_count=result.video_statistics.view_count,
-                        like_emoji=Emojis.like,
-                        like_count=result.video_statistics.like_count,
-                    )
+                    self.format_search_result(index, result)
                     for index, result in enumerate(results, start=1)
                 ]
             )
