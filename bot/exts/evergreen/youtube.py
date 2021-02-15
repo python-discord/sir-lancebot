@@ -70,7 +70,7 @@ class YouTubeSearch(commands.Cog):
         ) as response:
             if response.status != 200:
                 log.error(
-                    f"YouTube statistics response not succesful: response code {response.status}"
+                    f"YouTube statistics response not successful: response code {response.status}"
                 )
                 return None
 
@@ -89,7 +89,7 @@ class YouTubeSearch(commands.Cog):
         ) as response:
             if response.status != 200:
                 log.error(
-                    f"YouTube search response not succesful: response code {response.status}"
+                    f"YouTube search response not successful: response code {response.status}"
                 )
                 return None
 
@@ -100,7 +100,7 @@ class YouTubeSearch(commands.Cog):
 
                 if video_statistics is None:
                     log.warning(
-                        "YouTube statistics response not succesful, aborting youtube search"
+                        "YouTube statistics response not successful, aborting youtube search"
                     )
                     return None
 
