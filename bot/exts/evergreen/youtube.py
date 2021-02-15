@@ -81,7 +81,7 @@ class YouTubeSearch(commands.Cog):
             )
 
     async def search_youtube(self, search: str) -> Optional[List[Video]]:
-        """Queries API for top 5 results matching the search term with fifteen second cool down per user."""
+        """Queries API for top 5 results matching the search term."""
         results = []
         async with self.bot.http_session.get(
             SEARCH_API,
@@ -120,7 +120,7 @@ class YouTubeSearch(commands.Cog):
     @commands.command(aliases=["yt"])
     @commands.cooldown(1, 15, commands.BucketType.user)
     async def youtube(self, ctx: commands.Context, *, search: str) -> None:
-        """Sends the top 5 results of a query from YouTube."""
+        """Sends the top 5 results of a query from YouTube with fifteen second cool down per user."""
         results = await self.search_youtube(search)
 
         if results:
