@@ -85,7 +85,7 @@ class YouTubeSearch(commands.Cog):
         results = []
         async with self.bot.http_session.get(
             SEARCH_API,
-            params={"part": "snippet", "q": search, "type": "video", "key": KEY},
+            params={"part": "snippet", "q": search, "safeSearch": "strict", "type": "video", "key": KEY},
         ) as response:
             if response.status != 200:
                 log.error(
@@ -126,7 +126,7 @@ class YouTubeSearch(commands.Cog):
         if results:
             description = "\n".join(
                 [
-                    self.format_search_result(index, result)
+                    await self.format_search_result(index, result)
                     for index, result in enumerate(results, start=1)
                 ]
             )
