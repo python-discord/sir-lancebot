@@ -47,7 +47,7 @@ class YouTubeSearch(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    async def format_search_results(self, index: int, result: List[Video]) -> str:
+    async def format_search_result(self, index: int, result: List[Video]) -> str:
         """Formats search result to put in embed."""
         return RESULT.format(
             index=index,
