@@ -99,7 +99,7 @@ class YouTubeSearch(commands.Cog):
                 video_statistics = await self.get_statistics(item["id"]["videoId"])
 
                 if video_statistics is None:
-                    log.warn(
+                    log.warning(
                         "YouTube statistics response not succesful, aborting youtube search"
                     )
                     return None
