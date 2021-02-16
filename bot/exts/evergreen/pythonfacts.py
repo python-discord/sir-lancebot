@@ -4,6 +4,10 @@ import discord
 from discord.ext import commands
 
 
+with open('bot/resources/evergreen/python_facts.txt') as file:
+    FACTS = list(file)
+
+
 class PythonFacts(commands.Cog):
     """Gives a random fun fact about Python."""
 
@@ -13,8 +17,7 @@ class PythonFacts(commands.Cog):
     @commands.command(name='pythonfact', aliases=['pyfact'])
     async def get_python_fact(self, ctx: commands.Context) -> None:
         """Gives a Random fun fact about Python."""
-        with open('bot/resources/evergreen/python_facts.txt') as file:
-            await ctx.send(embed=discord.Embed(title='Python Facts', description=f'**{random.choice(list(file))}**'))
+        await ctx.send(embed=discord.Embed(title='Python Facts', description=f'**{random.choice(FACTS)}**'))
 
 
 def setup(bot: commands.Bot) -> None:
