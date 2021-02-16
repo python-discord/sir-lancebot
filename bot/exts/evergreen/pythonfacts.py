@@ -2,13 +2,12 @@ import random
 
 import discord
 from discord.ext import commands
-from discord.ext.commands.bot import Bot
 
 
 class PythonFacts(commands.Cog):
     """Gives a random fun fact about Python."""
 
-    def __init__(self, bot: Bot) -> None:
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
     @commands.command(name='pythonfact', aliases=['pyfact'])
