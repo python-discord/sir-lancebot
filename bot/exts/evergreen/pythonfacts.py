@@ -16,7 +16,7 @@ class PythonFacts(commands.Cog):
 
     @commands.command(name='pythonfact', aliases=['pyfact'])
     async def get_python_fact(self, ctx: commands.Context) -> None:
-        """Gives a Random fun fact about Python."""
+        """Sends a Random fun fact about Python."""
         await ctx.send(embed=discord.Embed(title='Python Facts', description=random.choice(FACTS)))
 
 
