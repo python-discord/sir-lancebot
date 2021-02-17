@@ -7,9 +7,11 @@ from discord.ext import commands
 with open('bot/resources/evergreen/python_facts.txt') as file:
     FACTS = list(file)
 
+COLORS = [0x4B8BBE, 0xFFD43B, ]
+
 
 class PythonFacts(commands.Cog):
-    """Gives a random fun fact about Python."""
+    """Sends a random fun fact about Python."""
 
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
@@ -17,7 +19,8 @@ class PythonFacts(commands.Cog):
     @commands.command(name='pythonfact', aliases=['pyfact'])
     async def get_python_fact(self, ctx: commands.Context) -> None:
         """Sends a Random fun fact about Python."""
-        await ctx.send(embed=discord.Embed(title='Python Facts', description=random.choice(FACTS)))
+        embed = discord.Embed(title='Python Facts', description=random.choice(FACTS), colour=random.choice(COLORS))
+        await ctx.send(embed=embed)
 
 
 def setup(bot: commands.Bot) -> None:
