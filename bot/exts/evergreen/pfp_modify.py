@@ -173,7 +173,7 @@ class PfpModify(commands.Cog):
 
         await ctx.send(file=file, embed=embed)
 
-    @pfp_modify.command(pass_context=True, aliases=["easterify"])
+    @pfp_modify.command(pass_context=True, aliases=["easterify"], root_aliases=("easterify", "avatareasterify"))
     async def avatareasterify(self, ctx: commands.Context, *colours: t.Union[discord.Colour, str]) -> None:
         """
         This "Easterifies" the user's avatar.
@@ -249,7 +249,11 @@ class PfpModify(commands.Cog):
 
         await ctx.send(file=file, embed=embed)
 
-    @pfp_modify.group(aliases=["avatarpride", "pridepfp", "prideprofile"], invoke_without_command=True)
+    @pfp_modify.group(
+        aliases=["avatarpride", "pridepfp", "prideprofile"],
+        root_aliases=("prideavatar", "avatarpride", "pridepfp", "prideprofile"),
+        invoke_without_command=True
+    )
     async def prideavatar(self, ctx: commands.Context, option: str = "lgbt", pixels: int = 64) -> None:
         """
         This surrounds an avatar with a border of a specified LGBT flag.
@@ -310,6 +314,7 @@ class PfpModify(commands.Cog):
     @pfp_modify.command(
         name='savatar',
         aliases=('spookyavatar', 'spookify'),
+        root_aliases=('spookyavatar', 'spookify'),
         brief='Spookify an user\'s avatar.'
     )
     async def spooky_avatar(self, ctx: commands.Context, user: discord.Member = None) -> None:

@@ -10,6 +10,7 @@ from discord.ext import commands
 
 from bot.command import Command
 from bot.constants import Client
+from bot.group import Group
 
 
 # Configure the "TRACE" logging level (e.g. "log.trace(message)")
@@ -75,7 +76,10 @@ if os.name == "nt":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
-# Monkey-patch discord.py decorators to use the Command subclass which supports root aliases.
+# Monkey-patch discord.py decorators to use the both the Command and Group subclasses which supports root aliases.
 # Must be patched before any cogs are added.
 commands.command = partial(commands.command, cls=Command)
 commands.GroupMixin.command = partialmethod(commands.GroupMixin.command, cls=Command)
+
+commands.group = partial(commands.group, cls=Group)
+commands.GroupMixin.group = partialmethod(commands.GroupMixin.group, cls=Group)
