@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "9be419062bd9db364ac9dddfcd50aef9c932384b45850363e482591fe7d12403"
+            "sha256": "640043d117ada0863e85327e52288393fc6f08568f4bf1aeba53e0443fe7f8f0"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -23,6 +23,14 @@
             ],
             "index": "pypi",
             "version": "==2.0.0"
+        },
+        "aiofiles": {
+            "hashes": [
+                "sha256:bd3019af67f83b739f8e4053c6c0512a7f545b9a8d91aaeab55e6e0f9d123c27",
+                "sha256:e0281b157d3d5d59d803e3f4557dcc9a3dff28a4dd4829a9ff478adae50ca092"
+            ],
+            "index": "pypi",
+            "version": "==0.6.0"
         },
         "aiohttp": {
             "hashes": [
@@ -406,10 +414,11 @@
         },
         "sentry-sdk": {
             "hashes": [
-                "sha256:3693cb47ba8d90c004ac002425770b32aaf0c83a846ec48e2d1364e7db1d072d"
+                "sha256:4ae8d1ced6c67f1c8ea51d82a16721c166c489b76876c9f2c202b8a50334b237",
+                "sha256:e75c8c58932bda8cd293ea8e4b242527129e1caaec91433d21b8b2f20fee030b"
             ],
             "index": "pypi",
-            "version": "==0.20.1"
+            "version": "==0.20.3"
         },
         "six": {
             "hashes": [
