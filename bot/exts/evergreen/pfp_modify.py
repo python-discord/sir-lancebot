@@ -29,6 +29,7 @@ _EXECUTOR = ThreadPoolExecutor(10)
 
 async def in_thread(func: t.Callable, *args) -> asyncio.Future:
     """Allows non-async functions to work in async functions."""
+    log.trace(f"Running {func.__name__} in an executor.")
     loop = asyncio.get_event_loop()
     return await loop.run_in_executor(_EXECUTOR, func, *args)
 
@@ -138,7 +139,6 @@ class PfpModify(commands.Cog):
         await ctx.send(file=file, embed=embed)
 
     @commands.max_concurrency(1, commands.BucketType.guild, wait=True)
-    @commands.group()
     async def pfp_modify(self, ctx: commands.Context) -> None:
         """Groups all of the pfp modifing commands to allow a single concurrency limit."""
         if not ctx.invoked_subcommand:
