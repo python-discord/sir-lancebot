@@ -139,12 +139,13 @@ class PfpModify(commands.Cog):
         await ctx.send(file=file, embed=embed)
 
     @commands.max_concurrency(1, commands.BucketType.guild, wait=True)
+    @commands.group()
     async def pfp_modify(self, ctx: commands.Context) -> None:
         """Groups all of the pfp modifing commands to allow a single concurrency limit."""
         if not ctx.invoked_subcommand:
             await ctx.send_help(ctx.command)
 
-    @pfp_modify.command(name="8bitify")
+    @pfp_modify.command(name="8bitify", root_aliases=("8bitify",))
     async def eightbit_command(self, ctx: commands.Context) -> None:
         """Pixelates your avatar and changes the palette to an 8bit one."""
         async with ctx.typing():
