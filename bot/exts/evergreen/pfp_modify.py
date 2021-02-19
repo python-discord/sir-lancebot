@@ -1,16 +1,15 @@
 import asyncio
 import json
 import logging
-import os
 import typing as t
 from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 from pathlib import Path
 
 import aiofiles
-import aiohttp
 import discord
-from PIL import Image, ImageDraw, ImageOps, UnidentifiedImageError
+from PIL import Image, ImageDraw, ImageOps
+from aiohttp import client_exceptions
 from discord.ext import commands
 
 from bot.constants import Colours
@@ -69,7 +68,7 @@ class PfpModify(commands.Cog):
         return (r, g, b)
 
     @staticmethod
-    def crop_avatar(avatar: Image) -> Image:
+    def crop_avatar_circle(avatar: Image) -> Image:
         """This crops the avatar given into a circle."""
         mask = Image.new("L", avatar.size, 0)
         draw = ImageDraw.Draw(mask)
@@ -87,58 +86,71 @@ class PfpModify(commands.Cog):
         ring.putalpha(mask)
         return ring
 
-    def process_options(self, option: str, pixels: int) -> t.Tuple[str, int, str]:
-        """Does some shared preprocessing for the prideavatar commands."""
-        return option.lower(), max(0, min(512, pixels)), self.GENDER_OPTIONS.get(option)
+    @staticmethod
+    def _apply_effect(image_bytes: bytes, effect: t.Callable, *args) -> discord.File:
+        im = Image.open(BytesIO(image_bytes))
+        im = im.convert("RGBA")
+        im = effect(im, *args)
 
-    def process_image(
-        self,
-        image_bytes: bytes,
+        bufferedio = BytesIO()
+        im.save(bufferedio, format="PNG")
+        bufferedio.seek(0)
+
+        return discord.File(bufferedio, filename="modified_avatar.png")
+
+    @staticmethod
+    def pridify_effect(
+        image: Image,
         pixels: int,
         flag: str
-    ) -> discord.File:
-        """Constructs and returns the final image. Used by the pride commands."""
-        # This line can raise UnidentifiedImageError and must be handled by the calling func.
-        avatar = Image.open(BytesIO(image_bytes))
-        avatar = avatar.convert("RGBA").resize((1024, 1024))
-
-        avatar = self.crop_avatar(avatar)
+    ) -> Image:
+        """Applies the pride effect to the given image."""
+        image = image.resize((1024, 1024))
+        image = PfpModify.crop_avatar_circle(image)
 
         ring = Image.open(Path(f"bot/resources/pride/flags/{flag}.png")).resize((1024, 1024))
         ring = ring.convert("RGBA")
-        ring = self.crop_ring(ring, pixels)
+        ring = PfpModify.crop_ring(ring, pixels)
 
-        avatar.alpha_composite(ring, (0, 0))
-        bufferedio = BytesIO()
-        avatar.save(bufferedio, format="PNG")
-        bufferedio.seek(0)
+        image.alpha_composite(ring, (0, 0))
+        return image
 
-        return discord.File(bufferedio, filename="pride_avatar.png")  # Creates file to be used in embed
+    @staticmethod
+    def eight_bitify_effect(image: Image) -> Image:
+        """Applies the 8bit effect to the given image."""
+        image = image.resize((32, 32), resample=Image.NEAREST).resize((1024, 1024), resample=Image.NEAREST)
+        return image.quantize()
 
-    async def send_image(
-        self,
-        ctx: commands.Context,
-        image_bytes: bytes,
-        pixels: int,
-        flag: str,
-        option: str
-    ) -> None:
-        """Gets and sends the image in an embed. Used by the pride commands."""
-        try:
-            file = await in_thread(self.process_image, image_bytes, pixels, flag)
-        except UnidentifiedImageError:
-            ctx.send("Cannot identify image from provided URL")
-            return
+    @staticmethod
+    def easterify_effect(image: Image, overlay_image: Image = None) -> Image:
+        """Applies the easter effect to the given image."""
+        if overlay_image:
+            ratio = 64 / overlay_image.height
+            overlay_image = overlay_image.resize((
+                round(overlay_image.width * ratio),
+                round(overlay_image.height * ratio)
+            ))
+            overlay_image = overlay_image.convert("RGBA")
+        else:
+            overlay_image = overlay_image = Image.open(Path("bot/resources/easter/chocolate_bunny.png"))
 
-        embed = discord.Embed(
-            name="Your Lovely Pride Avatar",
-            description=f"Here is your lovely avatar, surrounded by\n a beautiful {option} flag. Enjoy :D"
-        )
-        embed.set_image(url="attachment://pride_avatar.png")
-        embed.set_footer(text=f"Made by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
-        await ctx.send(file=file, embed=embed)
+        alpha = image.getchannel("A").getdata()
+        image = image.convert("RGB")
+        image = ImageOps.posterize(image, 6)
 
-    @commands.max_concurrency(1, commands.BucketType.guild, wait=True)
+        data = image.getdata()
+        setted_data = set(data)
+        new_d = {}
+
+        for x in setted_data:
+            new_d[x] = PfpModify.closest(x)
+        new_data = [(*new_d[x], alpha[i]) if x in new_d else x for i, x in enumerate(data)]
+
+        im = Image.new("RGBA", image.size)
+        im.putdata(new_data)
+        im.alpha_composite(overlay_image, (im.width - overlay_image.width, (im.height - overlay_image.height)//2))
+        return im
+
     @commands.group()
     async def pfp_modify(self, ctx: commands.Context) -> None:
         """Groups all of the pfp modifing commands to allow a single concurrency limit."""
@@ -150,25 +162,18 @@ class PfpModify(commands.Cog):
         """Pixelates your avatar and changes the palette to an 8bit one."""
         async with ctx.typing():
             image_bytes = await ctx.author.avatar_url.read()
-            avatar = Image.open(BytesIO(image_bytes))
-            avatar = avatar.convert("RGBA").resize((1024, 1024))
-
-            # Pixilate and quantize
-            eightbit = avatar.resize((32, 32), resample=Image.NEAREST).resize((1024, 1024), resample=Image.NEAREST)
-            eightbit = eightbit.quantize()
-
-            bufferedio = BytesIO()
-            eightbit.save(bufferedio, format="PNG")
-            bufferedio.seek(0)
-
-            file = discord.File(bufferedio, filename="8bitavatar.png")
+            file = await in_thread(
+                self._apply_effect,
+                image_bytes,
+                self.eight_bitify_effect
+            )
 
             embed = discord.Embed(
                 title="Your 8-bit avatar",
                 description='Here is your avatar. I think it looks all cool and "retro"'
             )
 
-            embed.set_image(url="attachment://8bitavatar.png")
+            embed.set_image(url="attachment://modified_avatar.png")
             embed.set_footer(text=f"Made by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
 
         await ctx.send(file=file, embed=embed)
@@ -194,60 +199,58 @@ class PfpModify(commands.Cog):
                 return args[0]
 
         async with ctx.typing():
-
-            # Grabs image of avatar
-            image_bytes = await ctx.author.avatar_url_as(size=256).read()
-
-            old = Image.open(BytesIO(image_bytes))
-            old = old.convert("RGBA")
-
-            # Grabs alpha channel since posterize can't be used with an RGBA image.
-            alpha = old.getchannel("A").getdata()
-            old = old.convert("RGB")
-            old = ImageOps.posterize(old, 6)
-
-            data = old.getdata()
-            setted_data = set(data)
-            new_d = {}
-
-            for x in setted_data:
-                new_d[x] = self.closest(x)
-                await asyncio.sleep(0)  # Ensures discord doesn't break in the background.
-            new_data = [(*new_d[x], alpha[i]) if x in new_d else x for i, x in enumerate(data)]
-
-            im = Image.new("RGBA", old.size)
-            im.putdata(new_data)
-
+            egg = None
             if colours:
                 send_message = ctx.send
                 ctx.send = send  # Assigns ctx.send to a fake send
                 egg = await ctx.invoke(self.bot.get_command("eggdecorate"), *colours)
                 if isinstance(egg, str):  # When an error message occurs in eggdecorate.
-                    return await send_message(egg)
-
-                ratio = 64 / egg.height
-                egg = egg.resize((round(egg.width * ratio), round(egg.height * ratio)))
-                egg = egg.convert("RGBA")
-                im.alpha_composite(egg, (im.width - egg.width, (im.height - egg.height)//2))  # Right centre.
+                    await send_message(egg)
+                    return
                 ctx.send = send_message  # Reassigns ctx.send
-            else:
-                bunny = Image.open(Path("bot/resources/easter/chocolate_bunny.png"))
-                im.alpha_composite(bunny, (im.width - bunny.width, (im.height - bunny.height)//2))  # Right centre.
 
-            bufferedio = BytesIO()
-            im.save(bufferedio, format="PNG")
+            image_bytes = await ctx.author.avatar_url_as(size=256).read()
+            file = await in_thread(
+                self._apply_effect,
+                image_bytes,
+                self.easterify_effect,
+                egg
+            )
 
-            bufferedio.seek(0)
-
-            file = discord.File(bufferedio, filename="easterified_avatar.png")  # Creates file to be used in embed
             embed = discord.Embed(
                 name="Your Lovely Easterified Avatar",
                 description="Here is your lovely avatar, all bright and colourful\nwith Easter pastel colours. Enjoy :D"
             )
-            embed.set_image(url="attachment://easterified_avatar.png")
+            embed.set_image(url="attachment://modified_avatar.png")
             embed.set_footer(text=f"Made by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
 
         await ctx.send(file=file, embed=embed)
+
+    async def send_pride_image(
+        self,
+        ctx: commands.Context,
+        image_bytes: bytes,
+        pixels: int,
+        flag: str,
+        option: str
+    ) -> None:
+        """Gets and sends the image in an embed. Used by the pride commands."""
+        async with ctx.typing():
+            file = await in_thread(
+                self._apply_effect,
+                image_bytes,
+                self.pridify_effect,
+                pixels,
+                flag
+            )
+
+            embed = discord.Embed(
+                name="Your Lovely Pride Avatar",
+                description=f"Here is your lovely avatar, surrounded by\n a beautiful {option} flag. Enjoy :D"
+            )
+            embed.set_image(url="attachment://modified_avatar.png")
+            embed.set_footer(text=f"Made by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
+            await ctx.send(file=file, embed=embed)
 
     @pfp_modify.group(
         aliases=["avatarpride", "pridepfp", "prideprofile"],
@@ -263,13 +266,15 @@ class PfpModify(commands.Cog):
         This has a maximum of 512px and defaults to a 64px border.
         The full image is 1024x1024.
         """
-        option, pixels, flag = self.process_options(option, pixels)
+        option = option.lower()
+        pixels = max(0, min(512, pixels))
+        flag = self.GENDER_OPTIONS.get(option)
         if flag is None:
             return await ctx.send("I don't have that flag!")
 
         async with ctx.typing():
             image_bytes = await ctx.author.avatar_url.read()
-            await self.send_image(ctx, image_bytes, pixels, flag, option)
+            await self.send_pride_image(ctx, image_bytes, pixels, flag, option)
 
     @prideavatar.command()
     async def image(self, ctx: commands.Context, url: str, option: str = "lgbt", pixels: int = 64) -> None:
@@ -281,22 +286,24 @@ class PfpModify(commands.Cog):
         This has a maximum of 512px and defaults to a 64px border.
         The full image is 1024x1024.
         """
-        option, pixels, flag = self.process_options(option, pixels)
+        option = option.lower()
+        pixels = max(0, min(512, pixels))
+        flag = self.GENDER_OPTIONS.get(option)
         if flag is None:
             return await ctx.send("I don't have that flag!")
 
         async with ctx.typing():
-            async with aiohttp.ClientSession() as session:
+            async with self.bot.http_session as session:
                 try:
                     response = await session.get(url)
-                except aiohttp.client_exceptions.ClientConnectorError:
+                except client_exceptions.ClientConnectorError:
                     return await ctx.send("Cannot connect to provided URL!")
-                except aiohttp.client_exceptions.InvalidURL:
+                except client_exceptions.InvalidURL:
                     return await ctx.send("Invalid URL!")
                 if response.status != 200:
                     return await ctx.send("Bad response from provided URL!")
                 image_bytes = await response.read()
-                await self.send_image(ctx, image_bytes, pixels, flag, option)
+                await self.send_pride_image(ctx, image_bytes, pixels, flag, option)
 
     @prideavatar.command()
     async def flags(self, ctx: commands.Context) -> None:
@@ -308,7 +315,6 @@ class PfpModify(commands.Cog):
             description=options,
             colour=Colours.soft_red
         )
-
         await ctx.send(embed=embed)
 
     @pfp_modify.command(
@@ -323,19 +329,18 @@ class PfpModify(commands.Cog):
             user = ctx.message.author
 
         async with ctx.typing():
-            embed = discord.Embed(colour=0xFF0000)
-            embed.title = "Is this you or am I just really paranoid?"
-            embed.set_author(name=str(user.name), icon_url=user.avatar_url)
-
             image_bytes = await ctx.author.avatar_url.read()
-            im = Image.open(BytesIO(image_bytes))
-            modified_im = spookifications.get_random_effect(im)
-            modified_im.save(str(ctx.message.id)+'.png')
-            f = discord.File(str(ctx.message.id)+'.png')
-            embed.set_image(url='attachment://'+str(ctx.message.id)+'.png')
+            file = await in_thread(self._apply_effect, image_bytes, spookifications.get_random_effect)
 
-        await ctx.send(file=f, embed=embed)
-        os.remove(str(ctx.message.id)+'.png')
+            embed = discord.Embed(
+                title="Is this you or am I just really paranoid?",
+                colour=0xFF0000
+            )
+            embed.set_author(name=str(user.name), icon_url=user.avatar_url)
+            embed.set_image(url='attachment://modified_avatar.png')
+            embed.set_footer(text=f"Made by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
+
+            await ctx.send(file=file, embed=embed)
 
 
 def setup(bot: commands.Bot) -> None:
