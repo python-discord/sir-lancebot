@@ -16,6 +16,19 @@ class PfpEffects():
     """Implements various image effects."""
 
     @staticmethod
+    def apply_effect(image_bytes: bytes, effect: t.Callable, *args) -> discord.File:
+        """Applies the given effect to the image passed to it."""
+        im = Image.open(BytesIO(image_bytes))
+        im = im.convert("RGBA")
+        im = effect(im, *args)
+
+        bufferedio = BytesIO()
+        im.save(bufferedio, format="PNG")
+        bufferedio.seek(0)
+
+        return discord.File(bufferedio, filename="modified_avatar.png")
+
+    @staticmethod
     def closest(x: t.Tuple[int, int, int]) -> t.Tuple[int, int, int]:
         """
         Finds the closest easter colour to a given pixel.
@@ -55,18 +68,6 @@ class PfpEffects():
         draw.ellipse((px, px, 1024-px, 1024-px), fill=0)
         ring.putalpha(mask)
         return ring
-
-    @staticmethod
-    def _apply_effect(image_bytes: bytes, effect: t.Callable, *args) -> discord.File:
-        im = Image.open(BytesIO(image_bytes))
-        im = im.convert("RGBA")
-        im = effect(im, *args)
-
-        bufferedio = BytesIO()
-        im.save(bufferedio, format="PNG")
-        bufferedio.seek(0)
-
-        return discord.File(bufferedio, filename="modified_avatar.png")
 
     @staticmethod
     def pridify_effect(

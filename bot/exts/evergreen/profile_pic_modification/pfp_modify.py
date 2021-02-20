@@ -49,7 +49,7 @@ class PfpModify(commands.Cog):
         async with ctx.typing():
             image_bytes = await ctx.author.avatar_url.read()
             file = await in_thread(
-                PfpEffects._apply_effect,
+                PfpEffects.apply_effect,
                 image_bytes,
                 PfpEffects.eight_bitify_effect
             )
@@ -97,7 +97,7 @@ class PfpModify(commands.Cog):
 
             image_bytes = await ctx.author.avatar_url_as(size=256).read()
             file = await in_thread(
-                PfpEffects._apply_effect,
+                PfpEffects.apply_effect,
                 image_bytes,
                 PfpEffects.easterify_effect,
                 egg
@@ -123,7 +123,7 @@ class PfpModify(commands.Cog):
         """Gets and sends the image in an embed. Used by the pride commands."""
         async with ctx.typing():
             file = await in_thread(
-                PfpEffects._apply_effect,
+                PfpEffects.apply_effect,
                 image_bytes,
                 PfpEffects.pridify_effect,
                 pixels,
@@ -216,7 +216,7 @@ class PfpModify(commands.Cog):
 
         async with ctx.typing():
             image_bytes = await ctx.author.avatar_url.read()
-            file = await in_thread(PfpEffects._apply_effect, image_bytes, spookifications.get_random_effect)
+            file = await in_thread(PfpEffects.apply_effect, image_bytes, spookifications.get_random_effect)
 
             embed = discord.Embed(
                 title="Is this you or am I just really paranoid?",
