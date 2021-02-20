@@ -156,7 +156,8 @@ class PfpModify(commands.Cog):
         pixels = max(0, min(512, pixels))
         flag = self.GENDER_OPTIONS.get(option)
         if flag is None:
-            return await ctx.send("I don't have that flag!")
+            await ctx.send("I don't have that flag!")
+            return
 
         async with ctx.typing():
             image_bytes = await ctx.author.avatar_url.read()
@@ -176,7 +177,8 @@ class PfpModify(commands.Cog):
         pixels = max(0, min(512, pixels))
         flag = self.GENDER_OPTIONS.get(option)
         if flag is None:
-            return await ctx.send("I don't have that flag!")
+            await ctx.send("I don't have that flag!")
+            return
 
         async with ctx.typing():
             async with self.bot.http_session as session:
