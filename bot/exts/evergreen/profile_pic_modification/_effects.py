@@ -13,7 +13,11 @@ EASTER_COLOURS = [
 
 
 class PfpEffects():
-    """Implements various image effects."""
+    """
+    Implements various image effects.
+
+    All of these methods are blocking, so should be ran in threads.
+    """
 
     @staticmethod
     def apply_effect(image_bytes: bytes, effect: t.Callable, *args) -> discord.File:
