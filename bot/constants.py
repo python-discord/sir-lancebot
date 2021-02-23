@@ -106,12 +106,6 @@ class Channels(NamedTuple):
     devlog = int(environ.get("CHANNEL_DEVLOG", 622895325144940554))
     dev_contrib = 635950537262759947
     dev_branding = 753252897059373066
-    help_0 = 303906576991780866
-    help_1 = 303906556754395136
-    help_2 = 303906514266226689
-    help_3 = 439702951246692352
-    help_4 = 451312046647148554
-    help_5 = 454941769734422538
     helpers = 385474242440986624
     message_log = 467752170159079424
     mod_alerts = 473092532147060736
@@ -133,6 +127,7 @@ class Channels(NamedTuple):
 
 
 class Categories(NamedTuple):
+    help_in_use = 696958401460043776
     development = 411199786025484308
     devprojects = 787641585624940544
     media = 799054581991997460
@@ -248,7 +243,6 @@ class Roles(NamedTuple):
     announcements = 463658397560995840
     champion = 430492892331769857
     contributor = 295488872404484098
-    developer = 352427296948486144
     devops = 409416496733880320
     jammer = 423054537079783434
     moderator = 267629731250176001
@@ -259,6 +253,7 @@ class Roles(NamedTuple):
     rockstars = 458226413825294336
     core_developers = 587606783669829632
     events_lead = 778361735739998228
+    everyone_role = 267624335836053506
 
 
 class Tokens(NamedTuple):
