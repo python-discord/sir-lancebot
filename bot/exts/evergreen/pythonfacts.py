@@ -6,11 +6,9 @@ from discord.ext import commands
 from bot.constants import Colours
 
 with open('bot/resources/evergreen/python_facts.txt') as file:
-    FACTS = list(file)
-    FACT_CYCLE = itertools.cycle(FACTS)
+    FACTS = itertools.cycle(list(file))
 
-COLORS = [Colours.python_blue, Colours.python_yellow]
-COLOR_CYCLE = itertools.cycle(COLORS)
+COLORS = itertools.cycle([Colours.python_blue, Colours.python_yellow])
 
 
 class PythonFacts(commands.Cog):
@@ -22,7 +20,7 @@ class PythonFacts(commands.Cog):
     @commands.command(name='pythonfact', aliases=['pyfact'])
     async def get_python_fact(self, ctx: commands.Context) -> None:
         """Sends a Random fun fact about Python."""
-        embed = discord.Embed(title='Python Facts', description=next(FACT_CYCLE), colour=next(COLOR_CYCLE))
+        embed = discord.Embed(title='Python Facts', description=next(FACTS), colour=next(COLORS))
         await ctx.send(embed=embed)
 
 
