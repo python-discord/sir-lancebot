@@ -70,6 +70,7 @@ class WikipediaSearch(commands.Cog):
                     )
                     return None
             else:
+                log.info(f"Unexpected response `{resp.status}` while searching wikipedia for `{search}`")
                 await ctx.send(
                     WikipediaSearchErrors.api_issue.value
                 )
