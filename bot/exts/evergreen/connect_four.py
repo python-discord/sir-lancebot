@@ -7,30 +7,11 @@ import discord
 import emojis
 from discord.ext import commands
 
-NUMBERS = [
-    ":one:",
-    ":two:",
-    ":three:",
-    ":four:",
-    ":five:",
-    ":six:",
-    ":seven:",
-    ":eight:",
-    ":nine:"
-]
-UNICODE_NUMBERS = [
-    "\u0031\u20e3",
-    "\u0032\u20e3",
-    "\u0033\u20e3",
-    "\u0034\u20e3",
-    "\u0035\u20e3",
-    "\u0036\u20e3",
-    "\u0037\u20e3",
-    "\u0038\u20e3",
-    "\u0039\u20e3",
-]
-CROSS_EMOJI = "\u274e"
-HAND_RAISED_EMOJI = "\U0001f64b"
+from bot.constants import Emojis
+
+NUMBERS = list(Emojis.number_emojis.values())
+CROSS_EMOJI = Emojis.incident_unactioned
+
 Coordinate = typing.Optional[typing.Tuple[int, int]]
 EMOJI_CHECK = typing.Union[discord.Emoji, str]
 
@@ -57,7 +38,7 @@ class Game:
         self.grid = self.generate_board(size)
         self.grid_size = size
 
-        self.unicode_numbers = UNICODE_NUMBERS[:self.grid_size]
+        self.unicode_numbers = NUMBERS[:self.grid_size]
 
         self.message = None
 
@@ -313,7 +294,7 @@ class ConnectFour(commands.Cog):
 
         if (
                 user.id not in (ctx.me.id, ctx.author.id)
-                and str(reaction.emoji) == HAND_RAISED_EMOJI
+                and str(reaction.emoji) == Emojis.hand_raised
                 and reaction.message.id == announcement.id
         ):
             if self.already_playing(user):
@@ -406,11 +387,11 @@ class ConnectFour(commands.Cog):
 
         announcement = await ctx.send(
             "**Connect Four**: A new game is about to start!\n"
-            f"Press {HAND_RAISED_EMOJI} to play against {ctx.author.mention}!\n"
+            f"Press {Emojis.hand_raised} to play against {ctx.author.mention}!\n"
             f"(Cancel the game with {CROSS_EMOJI}.)"
         )
         self.waiting.append(ctx.author)
-        await announcement.add_reaction(HAND_RAISED_EMOJI)
+        await announcement.add_reaction(Emojis.hand_raised)
         await announcement.add_reaction(CROSS_EMOJI)
 
         try:
