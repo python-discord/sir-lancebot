@@ -86,7 +86,8 @@ class CommandErrorHandler(commands.Cog):
             await ctx.send(
                 embed=self.error_embed(
                     f"This command can only be used in the server. Go to <#{Channels.community_bot_commands}> instead!",
-                    NEGATIVE_REPLIES)
+                    NEGATIVE_REPLIES
+                )
             )
             return
 
