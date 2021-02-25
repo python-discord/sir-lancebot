@@ -1,11 +1,10 @@
 import logging
 import re
 from datetime import datetime
-from enum import Enum
 from html import unescape
 from typing import List, Optional
 
-from discord import Color, Embed
+from discord import Color, Embed, TextChannel
 from discord.ext import commands
 
 from bot.bot import Bot
@@ -13,22 +12,19 @@ from bot.utils import LinePaginator
 
 log = logging.getLogger(__name__)
 
-SEARCH_API = "https://en.wikipedia.org/w/api.php?action=query&list=search&prop=info&inprop=url&utf8=& \
-      format=json&origin=*&srlimit={number_of_results}&srsearch={string}"
-WIKI_THUMBNAIL = "https://upload.wikimedia.org/wikipedia/en/thumb/8/80/Wikipedia-logo-v2.svg" \
-                 "/330px-Wikipedia-logo-v2.svg.png"
+SEARCH_API = (
+    "https://en.wikipedia.org/w/api.php?action=query&list=search&prop=info&inprop=url&utf8=&"
+    "format=json&origin=*&srlimit={number_of_results}&srsearch={string}"
+)
+WIKI_THUMBNAIL = (
+    "https://upload.wikimedia.org/wikipedia/en/thumb/8/80/Wikipedia-logo-v2.svg"
+    "/330px-Wikipedia-logo-v2.svg.png"
+)
 WIKI_SNIPPET_REGEX = r'(<!--.*?-->|<[^>]*>)'
 WIKI_SEARCH_RESULT = (
     "**[{name}]({url})**\n"
     "{description}\n"
 )
-
-
-class WikipediaSearchErrors(Enum):
-    """Errors returned in wikipedia search function."""
-
-    no_results = "Sorry, we could not find a wikipedia article using that search term."
-    api_issue = "Whoops, the Wikipedia API is having some issues right now. Try again later."
 
 
 class WikipediaSearch(commands.Cog):
@@ -37,7 +33,7 @@ class WikipediaSearch(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    async def wiki_request(self, ctx: commands.Context, search: str) -> Optional[List[str]]:
+    async def wiki_request(self, channel: TextChannel, search: str) -> Optional[List[str]]:
         """Search wikipedia search string and return formatted first 10 pages found."""
         url = SEARCH_API.format(number_of_results=10, string=search)
         async with self.bot.http_session.get(url=url) as resp:
@@ -50,37 +46,36 @@ class WikipediaSearch(commands.Cog):
                     lines = []
 
                     for article in results:
-                        formatting = {
-                            'name': article['title'],
-                            'description': unescape(
+                        line = WIKI_SEARCH_RESULT.format(
+                            name=article['title'],
+                            description=unescape(
                                 re.sub(
                                     WIKI_SNIPPET_REGEX, '', article['snippet']
                                 )
                             ),
-                            'url': f"https://en.wikipedia.org/?curid={article['pageid']}"
-                        }
-                        line = WIKI_SEARCH_RESULT.format(**formatting)
+                            url=f"https://en.wikipedia.org/?curid={article['pageid']}"
+                        )
                         lines.append(line)
 
                     return lines
 
                 else:
-                    await ctx.send(
-                        WikipediaSearchErrors.no_results.value
+                    await channel.send(
+                        "Sorry, we could not find a wikipedia article using that search term."
                     )
-                    return None
+                    return
             else:
                 log.info(f"Unexpected response `{resp.status}` while searching wikipedia for `{search}`")
-                await ctx.send(
-                    WikipediaSearchErrors.api_issue.value
+                await channel.send(
+                    "Whoops, the Wikipedia API is having some issues right now. Try again later."
                 )
-                return None
+                return
 
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(name="wikipedia", aliases=["wiki"])
     async def wikipedia_search_command(self, ctx: commands.Context, *, search: str) -> None:
         """Sends paginated top 10 results of Wikipedia search.."""
-        contents = await self.wiki_request(ctx, search)
+        contents = await self.wiki_request(ctx.channel, search)
 
         if contents:
             embed = Embed(
