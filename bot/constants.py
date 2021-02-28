@@ -165,6 +165,7 @@ class Emojis:
     envelope = "\U0001F4E8"
     trashcan = "<:trashcan:637136429717389331>"
     ok_hand = ":ok_hand:"
+    hand_raised = "\U0001f64b"
 
     dice_1 = "<:dice_1:755891608859443290>"
     dice_2 = "<:dice_2:755891608741740635>"
@@ -179,7 +180,6 @@ class Emojis:
     pull_request_closed = "<:PRClosed:629695470519713818>"
     merge = "<:PRMerged:629695470570176522>"
 
-    # TicTacToe Emojis
     number_emojis = {
         1: "\u0031\ufe0f\u20e3",
         2: "\u0032\ufe0f\u20e3",
@@ -191,8 +191,11 @@ class Emojis:
         8: "\u0038\ufe0f\u20e3",
         9: "\u0039\ufe0f\u20e3"
     }
+
     confirmation = "\u2705"
     decline = "\u274c"
+    incident_unactioned = "<:incident_unactioned:719645583245180960>"
+
     x = "\U0001f1fd"
     o = "\U0001f1f4"
 
