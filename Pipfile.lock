@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "9be419062bd9db364ac9dddfcd50aef9c932384b45850363e482591fe7d12403"
+            "sha256": "b4aaaacbab13179145e36d7b86c736db512286f6cce8e513cc30c48d68fe3810"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -160,6 +160,14 @@
             ],
             "index": "pypi",
             "version": "==1.5.1"
+        },
+        "emojis": {
+            "hashes": [
+                "sha256:7da34c8a78ae262fd68cef9e2c78a3c1feb59784489eeea0f54ba1d4b7111c7c",
+                "sha256:bf605d1f1a27a81cd37fe82eb65781c904467f569295a541c33710b97e4225ec"
+            ],
+            "index": "pypi",
+            "version": "==0.6.0"
         },
         "fakeredis": {
             "hashes": [
@@ -406,10 +414,11 @@
         },
         "sentry-sdk": {
             "hashes": [
-                "sha256:3693cb47ba8d90c004ac002425770b32aaf0c83a846ec48e2d1364e7db1d072d"
+                "sha256:4ae8d1ced6c67f1c8ea51d82a16721c166c489b76876c9f2c202b8a50334b237",
+                "sha256:e75c8c58932bda8cd293ea8e4b242527129e1caaec91433d21b8b2f20fee030b"
             ],
             "index": "pypi",
-            "version": "==0.20.1"
+            "version": "==0.20.3"
         },
         "six": {
             "hashes": [
@@ -576,11 +585,11 @@
         },
         "identify": {
             "hashes": [
-                "sha256:70b638cf4743f33042bebb3b51e25261a0a10e80f978739f17e7fd4837664a66",
-                "sha256:9dfb63a2e871b807e3ba62f029813552a24b5289504f5b071dea9b041aee9fe4"
+                "sha256:de7129142a5c86d75a52b96f394d94d96d497881d2aaf8eafe320cdbe8ac4bcc",
+                "sha256:e0dae57c0397629ce13c289f6ddde0204edf518f557bfdb1e56474aa143e77c3"
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
-            "version": "==1.5.13"
+            "version": "==1.5.14"
         },
         "mccabe": {
             "hashes": [
