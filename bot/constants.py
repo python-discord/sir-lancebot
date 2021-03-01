@@ -286,10 +286,6 @@ class RedisConfig(NamedTuple):
     use_fakeredis = environ.get("USE_FAKEREDIS", "false").lower() == "true"
 
 
-class Wikipedia:
-    total_chance = 3
-
-
 class Source:
     github = "https://github.com/python-discord/sir-lancebot"
     github_avatar_url = "https://avatars1.githubusercontent.com/u/9919"
