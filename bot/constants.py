@@ -124,6 +124,7 @@ class Channels(NamedTuple):
     hacktoberfest_2020 = 760857070781071431
     voice_chat_0 = 412357430186344448
     voice_chat_1 = 799647045886541885
+    staff_voice = 541638762007101470
 
 
 class Categories(NamedTuple):
@@ -131,6 +132,7 @@ class Categories(NamedTuple):
     development = 411199786025484308
     devprojects = 787641585624940544
     media = 799054581991997460
+    staff = 364918151625965579
 
 
 class Client(NamedTuple):
