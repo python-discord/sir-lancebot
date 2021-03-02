@@ -74,11 +74,16 @@ class Bot(commands.Bot):
     async def check_channels(self) -> None:
         """Verifies that all channel constants refer to channels which exist."""
         await self.wait_until_guild_available()
-        all_channels = set(self.get_all_channels())
+
+        if constants.Client.debug:
+            log.info("Skipping Channels Check.")
+            return
+
+        all_channels_ids = [channel.id for channel in set(self.get_all_channels())]
         for name, channel_id in vars(constants.Channels).items():
             if name.startswith('_'):
                 continue
-            if channel_id not in all_channels:
+            if channel_id not in all_channels_ids:
                 log.error(f'Channel "{name}" with ID {channel_id} missing')
 
     async def send_log(self, title: str, details: str = None, *, icon: str = None) -> None:
