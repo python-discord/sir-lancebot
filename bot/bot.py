@@ -79,7 +79,7 @@ class Bot(commands.Bot):
             log.info("Skipping Channels Check.")
             return
 
-        all_channels_ids = [channel.id for channel in set(self.get_all_channels())]
+        all_channels_ids = [channel.id for channel in self.get_all_channels()]
         for name, channel_id in vars(constants.Channels).items():
             if name.startswith('_'):
                 continue
