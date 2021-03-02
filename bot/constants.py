@@ -124,6 +124,7 @@ class Channels(NamedTuple):
     hacktoberfest_2020 = 760857070781071431
     voice_chat_0 = 412357430186344448
     voice_chat_1 = 799647045886541885
+    staff_voice = 541638762007101470
 
 
 class Categories(NamedTuple):
@@ -131,6 +132,7 @@ class Categories(NamedTuple):
     development = 411199786025484308
     devprojects = 787641585624940544
     media = 799054581991997460
+    staff = 364918151625965579
 
 
 class Client(NamedTuple):
@@ -165,6 +167,7 @@ class Emojis:
     envelope = "\U0001F4E8"
     trashcan = "<:trashcan:637136429717389331>"
     ok_hand = ":ok_hand:"
+    hand_raised = "\U0001f64b"
 
     dice_1 = "<:dice_1:755891608859443290>"
     dice_2 = "<:dice_2:755891608741740635>"
@@ -179,7 +182,6 @@ class Emojis:
     pull_request_closed = "<:PRClosed:629695470519713818>"
     merge = "<:PRMerged:629695470570176522>"
 
-    # TicTacToe Emojis
     number_emojis = {
         1: "\u0031\ufe0f\u20e3",
         2: "\u0032\ufe0f\u20e3",
@@ -191,8 +193,11 @@ class Emojis:
         8: "\u0038\ufe0f\u20e3",
         9: "\u0039\ufe0f\u20e3"
     }
+
     confirmation = "\u2705"
     decline = "\u274c"
+    incident_unactioned = "<:incident_unactioned:719645583245180960>"
+
     x = "\U0001f1fd"
     o = "\U0001f1f4"
 
@@ -279,10 +284,6 @@ class RedisConfig(NamedTuple):
     port = environ.get("REDIS_PORT", 6379)
     password = environ.get("REDIS_PASSWORD")
     use_fakeredis = environ.get("USE_FAKEREDIS", "false").lower() == "true"
-
-
-class Wikipedia:
-    total_chance = 3
 
 
 class Source:
