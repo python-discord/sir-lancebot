@@ -14,7 +14,7 @@ UnClient_id = Tokens.unsplash_key
 class EarthPhotos(commands.Cog):
     """This cog contains the command for earth photos."""
 
-    def init(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.current_channel = None
 
