@@ -1,11 +1,9 @@
-import discord
-
 import logging
 
-from discord.ext import commands
-
+import discord
 
 import requests
+from discord.ext import commands
 
 from bot.constants import Tokens
 
