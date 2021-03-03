@@ -35,8 +35,6 @@ class HTTPStatusCodes(Cog):
         async with self.bot.http_session.get(url, allow_redirects=False) as response:
             if 200 <= response.status <= 299:
                 await ctx.send(embed=discord.Embed(title=STATUS_TEMPLATE.format(code), url=url))
-            elif 404 == response.status:
-                await ctx.send(embed=discord.Embed(title=STATUS_TEMPLATE.format(response.status), url=url))
             else:
                 await ctx.send(embed=discord.Embed(
                     title=STATUS_TEMPLATE.format(code),
