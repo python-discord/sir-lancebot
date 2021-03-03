@@ -15,7 +15,6 @@ class EarthPhotos(commands.Cog):
     """This cog contains the command for earth photos."""
 
     def init(self, bot: commands.Bot) -> None:
-        """Init function."""
         self.bot = bot
         self.current_channel = None
 
