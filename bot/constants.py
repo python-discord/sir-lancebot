@@ -271,6 +271,7 @@ class Tokens(NamedTuple):
     igdb_client_id = environ.get("IGDB_CLIENT_ID")
     igdb_client_secret = environ.get("IGDB_CLIENT_SECRET")
     github = environ.get("GITHUB_TOKEN")
+    unsplash_key = environ.get("UNSPLASH_KEY")
 
 
 class Wolfram(NamedTuple):
