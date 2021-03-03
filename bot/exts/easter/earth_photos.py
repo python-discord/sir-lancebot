@@ -34,5 +34,5 @@ class EarthPhotos(commands.Cog):
 
 
 def setup(bot: commands.Bot) -> None:
-    """Cog load."""
+    """Load the Earth Photos cog."""
     bot.add_cog(EarthPhotos(bot))
