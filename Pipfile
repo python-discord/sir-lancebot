@@ -16,6 +16,7 @@ PyYAML = "~=5.3.1"
 async-rediscache = {extras = ["fakeredis"], version = "~=0.1.4"}
 emojis = "~=0.6.0"
 requests = "~=2.25.1"
+pre-commit = "*"
 
 [dev-packages]
 flake8 = "~=3.8"

@@ -20,19 +20,17 @@ class EarthPhotos(commands.Cog):
         async with ctx.typing():
             async with aiohttp.ClientSession as session:
                 async with session.get(
-                    'https://api.unsplash.com/photos/random?query=earth&client_id=' + UnClientId) as r:
+                    'https://api.unsplash.com/photos/random?query=earth&client_id=' + UnClient_id) as r:
                     jsondata = await r.json()
                     linksdata = jsondata.get("urls")
+                    embedlink = linksdata.get("full")
                     downloadlinksdata = jsondata.get("links")
                 async with session.get(
                     downloadlinksdata.get("download_location") + "?client_id=" + UnClient_id) as er:
-                    pass
-                await ctx.send("Still a work in progress, coming soon.")
-                    
-                    
-                    
-            
-                    
+                    er.status()
+                embed = discord.Embed(title="In progress")
+                embed.set_photo(url=embedlink)
+                await ctx.send(embed=embed)
 
 
 def setup(bot: commands.Bot) -> None:
