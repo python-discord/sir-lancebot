@@ -31,15 +31,23 @@ class HTTPStatusCodes(Cog):
         await self.build_embed(url=HTTP_DOG_URL.format(code), ctx=ctx, code=code)
 
     async def build_embed(self, url: str, code: int, ctx: Context, ) -> None:
-        """Attempt to build and dispatch embed. Append error message instead of something goes wrong."""
+        """Attempt to build and dispatch embed. Append error message instead if something goes wrong."""
         async with self.bot.http_session.get(url, allow_redirects=False) as response:
             if 200 <= response.status <= 299:
-                await ctx.send(embed=discord.Embed(title=STATUS_TEMPLATE.format(code), url=url))
+                await ctx.send(embed=discord.Embed(
+                    title=STATUS_TEMPLATE.format(code),
+                    url=url
+                ))
+            elif 404 == response.status:
+                await ctx.send(embed=discord.Embed(
+                    title=ERR_404.format(code),
+                    url=url
+                ))
             else:
                 await ctx.send(embed=discord.Embed(
                     title=STATUS_TEMPLATE.format(code),
-                    footer=ERR_404.format(code) if response.status == 404 else ERR_UNKNOWN.format(code))
-                )
+                    footer=ERR_UNKNOWN.format(code)
+                ))
 
 
 def setup(bot: Bot) -> None:
