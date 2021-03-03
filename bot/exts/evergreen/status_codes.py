@@ -2,20 +2,19 @@ from http import HTTPStatus
 from random import choice
 
 import discord
-from discord.ext import commands
+from discord.ext.commands import Cog, commands
 
 from bot.bot import Bot
 
 HTTP_DOG_URL = "https://httpstatusdogs.com/img/{code}.jpg"
 HTTP_CAT_URL = "https://http.cat/{code}.jpg"
+STATUS_TEMPLATE = '**Status: {code}**'
+ERR_404 = 'Unable to find status Floof for {code}.'
+ERR_UNKNOWN = 'Error attempting to retrieve status Floof for {code}.'
 
 
-class HTTPStatusCodes(commands.Cog):
-    """
-    Fetch an image depicting HTTP status codes as a dog or a cat.
-
-    If neither animal is selected a cat or dog is chosen randomly for the given status code.
-    """
+class HTTPStatusCodes(Cog):
+    """Commands that give HTTP statuses described and visualized by cats and dogs."""
 
     def __init__(self, bot: Bot):
         self.bot = bot
