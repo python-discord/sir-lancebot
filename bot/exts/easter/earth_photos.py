@@ -1,7 +1,6 @@
 import logging
 
 import discord
-
 import requests
 from discord.ext import commands
 
@@ -15,13 +14,13 @@ UnClient_id = Tokens.unsplash_key
 class EarthPhotos(commands.Cog):
     """This cog contains the command for earth photos."""
 
-    def init(self, bot: commands.Bot):
+    def init(self, bot: commands.Bot) -> None:
         """Init function."""
         self.bot = bot
         self.current_channel = None
 
     @commands.command(aliases=["earth"])
-    async def earth_photos(self, ctx: commands.Context):
+    async def earth_photos(self, ctx: commands.Context) -> None:
         """Returns a random photo of earth, sourced from Unsplash."""
         photorequest = requests.get("https://api.unsplash.com/photos/random?query=earth&client_id=" + UnClient_id)
         photojson = photorequest.json()
