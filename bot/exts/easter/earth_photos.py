@@ -1,7 +1,9 @@
 import discord
-from discord.ext import commands
 
 import logging
+
+from discord.ext import commands
+
 
 import requests
 
@@ -22,9 +24,7 @@ class EarthPhotos(commands.Cog):
 
     @commands.command(aliases=["earth"])
     async def earth_photos(self, ctx: commands.Context):
-        """
-        Returns a random photo of earth, sourced from Unsplash.
-        """
+        """Returns a random photo of earth, sourced from Unsplash."""
         photorequest = requests.get("https://api.unsplash.com/photos/random?query=earth&client_id=" + UnClient_id)
         photojson = photorequest.json()
         photourls = photojson.get('urls')
