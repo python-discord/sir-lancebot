@@ -27,7 +27,7 @@ class EarthPhotos(commands.Cog):
                 async with session.get(
                     downloadlinksdata.get("download_location") + "?client_id=" + UnClient_id) as er:
                     pass
-                await ctx.send("Still a work in progress")
+                await ctx.send("Still a work in progress, coming soon.")
                     
                     
                     
