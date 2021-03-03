@@ -1,8 +1,8 @@
 import discord
 from discord.ext import commands
 
-from bot.constants import Tokens
 from bot.constants import Colours
+from bot.constants import Tokens
 
 UnClient_id = Tokens.unsplash_key
 
