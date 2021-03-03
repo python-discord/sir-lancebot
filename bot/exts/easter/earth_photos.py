@@ -1,12 +1,8 @@
-import logging
-
+import aiohttp
 import discord
-import requests
 from discord.ext import commands
 
 from bot.constants import Tokens
-
-log = logging.getLogger(__name__)
 
 UnClient_id = Tokens.unsplash_key
 
@@ -21,16 +17,14 @@ class EarthPhotos(commands.Cog):
     @commands.command(aliases=["earth"])
     async def earth_photos(self, ctx: commands.Context) -> None:
         """Returns a random photo of earth, sourced from Unsplash."""
-        photorequest = requests.get("https://api.unsplash.com/photos/random?query=earth&client_id=" + UnClient_id)
-        photojson = photorequest.json()
-        photourls = photojson.get('urls')
-        urltosend = photourls.get('regular')
-        userjson = photojson.get('user')
-        username = userjson.get('name')
-        embed = discord.Embed(title="Earth Photo", description="A photo of Earth from Unsplash.", color=0x66ff00)
-        embed.set_image(url=urltosend)
-        embed.set_footer(text="Image by " + username + " on Unsplash.")
-        await ctx.send(embed=embed)
+        async with ctx.typing():
+            async with aiohttp.ClientSession as session:
+                async with session.get(
+                    'https://api.unsplash.com/photos/random?query=earth&client_id=' + UnClientId
+                ) as r:
+                    jsondata = await r.json()
+            await ctx.send("Still a placeholder")
+                    
 
 
 def setup(bot: commands.Bot) -> None:
