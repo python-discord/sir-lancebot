@@ -33,7 +33,7 @@ class EarthPhotos(commands.Cog):
             async with self.bot.http_session.get(
                 downloadlinksdata.get("download_location"),
                     params={"client_id": Tokens.unsplash_access_key}
-            ) as er:
+            ) as _:
                 pass
 
             embed = discord.Embed(
