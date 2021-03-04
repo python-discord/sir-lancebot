@@ -32,7 +32,7 @@ class EarthPhotos(commands.Cog):
                 userlinks = userdata.get("links")
                 profile = userlinks.get("html")
                 # Referral flags
-                rf = "?utm_source=sir_lancebot&utm_medium=referral"
+                rf = "?utm_source=Sir%20Lancebot&utm_medium=referral"
             async with self.bot.http_session.get(
                 downloadlinksdata.get("download_location"),
                     params={"client_id": Tokens.unsplash_access_key}
