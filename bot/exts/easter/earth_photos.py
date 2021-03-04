@@ -35,7 +35,8 @@ class EarthPhotos(commands.Cog):
             embed = discord.Embed(
                 title="Earth Photo",
                 description="A photo of earth from Unsplash.",
-                color=Colours.grass_green)
+                color=Colours.grass_green
+            )
             embed.set_image(url=embedlink)
             embed.add_field(name="Author", value=f"Made by [{username}]({profile}) on Unsplash.")
         await ctx.send(embed=embed)
