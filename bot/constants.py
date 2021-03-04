@@ -158,6 +158,7 @@ class Colours:
     soft_orange = 0xf9cb54
     soft_red = 0xcd6d6d
     yellow = 0xf9f586
+    grass_green = 0x66ff00
 
 
 class Emojis:
@@ -271,6 +272,7 @@ class Tokens(NamedTuple):
     igdb_client_id = environ.get("IGDB_CLIENT_ID")
     igdb_client_secret = environ.get("IGDB_CLIENT_SECRET")
     github = environ.get("GITHUB_TOKEN")
+    unsplash_access_key = environ.get("UNSPLASH_KEY")
 
 
 class Wolfram(NamedTuple):
