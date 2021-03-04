@@ -24,8 +24,7 @@ class PythonFacts(commands.Cog):
                                     description=next(FACTS),
                                     colour=next(COLORS))
         embed.add_field(name='Suggestions',
-                        value="Want to suggest more facts? "
-                        "Suggest more facts [here!](https://github.com/python-discord/meta/discussions/93)")
+                        value="Suggest more facts [here!](https://github.com/python-discord/meta/discussions/93)")
         await ctx.send(embed=embed)
 
 
