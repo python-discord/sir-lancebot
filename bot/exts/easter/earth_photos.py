@@ -19,8 +19,7 @@ class EarthPhotos(commands.Cog):
         async with ctx.typing():
             async with self.bot.http_session.get(
                     'https://api.unsplash.com/photos/random',
-                    params={"query": "earth", "client_id": UnClient_id}
-            ) as r:
+                    params={"query": "earth", "client_id": UnClient_id}) as r:
                 jsondata = await r.json()
                 linksdata = jsondata.get("urls")
                 embedlink = linksdata.get("regular")
