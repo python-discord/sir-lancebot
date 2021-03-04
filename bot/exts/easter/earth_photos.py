@@ -41,7 +41,7 @@ class EarthPhotos(commands.Cog):
 
             embed = discord.Embed(
                 title="Earth Photo",
-                description="A photo of Earth 🌎  from Unsplash.",
+                description="A photo of Earth 🌎 from Unsplash.",
                 color=Colours.grass_green
             )
             embed.set_image(url=embedlink)
