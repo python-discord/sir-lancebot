@@ -20,7 +20,12 @@ class PythonFacts(commands.Cog):
     @commands.command(name='pythonfact', aliases=['pyfact'])
     async def get_python_fact(self, ctx: commands.Context) -> None:
         """Sends a Random fun fact about Python."""
-        embed = discord.Embed(title='Python Facts', description=next(FACTS), colour=next(COLORS))
+        embed = discord.Embed(title='Python Facts',
+                                    description=next(FACTS),
+                                    colour=next(COLORS))
+        embed.add_field(name='Suggestions',
+                        value="Want to suggest more facts? "
+                        "Suggest more facts [here!](https://github.com/python-discord/meta/discussions/93)")
         await ctx.send(embed=embed)
 
 
