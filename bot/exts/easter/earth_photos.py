@@ -30,7 +30,8 @@ class EarthPhotos(commands.Cog):
                 profile = userlinks.get("html")
             async with self.bot.http_session.get(
                 downloadlinksdata.get("download_location"),
-                    params={"client_id": UnClient_id}) as er:
+                    params={"client_id": UnClient_id}
+            ) as er:
                 er.status
             embed = discord.Embed(
                 title="Earth Photo",
