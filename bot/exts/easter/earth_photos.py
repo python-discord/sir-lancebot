@@ -31,7 +31,6 @@ class EarthPhotos(commands.Cog):
                 username = userdata.get("name")
                 userlinks = userdata.get("links")
                 profile = userlinks.get("html")
-            # Extra request as per Unsplash Guidelines
             async with self.bot.http_session.get(
                 downloadlinksdata.get("download_location"),
                     params={"client_id": Tokens.unsplash_access_key}
@@ -44,7 +43,9 @@ class EarthPhotos(commands.Cog):
                 color=Colours.grass_green
             )
             embed.set_image(url=embedlink)
-            embed.add_field(name="Author", value=f"Photo by [{username}]({profile}) on Unsplash.")
+            embed.add_field(name="Author", 
+            value=f"Photo by [{username}]({profile}?utm_source=sir_lancebot&utm_medium=referral)\
+ on [Unsplash](https://unsplash.com?utm_source=sir_lancebot&utm_medium=referral).")
             await ctx.send(embed=embed)
 
 
