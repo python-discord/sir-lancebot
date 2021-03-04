@@ -158,6 +158,8 @@ class Colours:
     soft_orange = 0xf9cb54
     soft_red = 0xcd6d6d
     yellow = 0xf9f586
+    python_blue = 0x4B8BBE
+    python_yellow = 0xFFD43B
     grass_green = 0x66ff00
 
 
