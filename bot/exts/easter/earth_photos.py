@@ -45,9 +45,11 @@ class EarthPhotos(commands.Cog):
                 color=Colours.grass_green
             )
             embed.set_image(url=embedlink)
-            embed.add_field(name="Author",
-                            value=f"Photo by [{username}]({profile}" + rf + ") \
-on [Unsplash](https://unsplash.com?" + rf + ").")
+            embed.add_field(
+                name="Author",
+                value=f"Photo by [{username}]({profile}{rf}) \
+                on [Unsplash](https://unsplash.com{rf})."
+            )
             await ctx.send(embed=embed)
 
 
