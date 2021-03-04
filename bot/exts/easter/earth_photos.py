@@ -44,7 +44,7 @@ class EarthPhotos(commands.Cog):
             )
             embed.set_image(url=embedlink)
             embed.add_field(name="Author", value=f"Photo by [{username}]({profile}) on Unsplash.")
-        await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
 
 
 def setup(bot: commands.Bot) -> None:
