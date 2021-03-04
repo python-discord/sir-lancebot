@@ -1,10 +1,12 @@
+import logging
+
 import discord
 from discord.ext import commands
 
 from bot.constants import Colours
 from bot.constants import Tokens
 
-UnClient_id = Tokens.unsplash_key
+log = logging.getLogger(__name__)
 
 
 class EarthPhotos(commands.Cog):
@@ -19,7 +21,7 @@ class EarthPhotos(commands.Cog):
         async with ctx.typing():
             async with self.bot.http_session.get(
                     'https://api.unsplash.com/photos/random',
-                    params={"query": "earth", "client_id": UnClient_id}) as r:
+                    params={"query": "earth", "client_id": Tokens.unsplash_access_key}) as r:
                 jsondata = await r.json()
                 linksdata = jsondata.get("urls")
                 embedlink = linksdata.get("regular")
@@ -30,9 +32,10 @@ class EarthPhotos(commands.Cog):
                 profile = userlinks.get("html")
             async with self.bot.http_session.get(
                 downloadlinksdata.get("download_location"),
-                    params={"client_id": UnClient_id}
-            ) as _:
+                    params={"client_id": Tokens.unsplash_access_key}
+            ) as er:
                 pass
+
             embed = discord.Embed(
                 title="Earth Photo",
                 description="A photo of earth from Unsplash.",
@@ -45,4 +48,7 @@ class EarthPhotos(commands.Cog):
 
 def setup(bot: commands.Bot) -> None:
     """Load the Earth Photos cog."""
+    if not Tokens.unsplash_access_key:
+        log.warning("No Unsplash access key found. Cog not loading.")
+        return
     bot.add_cog(EarthPhotos(bot))
