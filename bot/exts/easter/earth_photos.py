@@ -31,6 +31,7 @@ class EarthPhotos(commands.Cog):
                 username = userdata.get("name")
                 userlinks = userdata.get("links")
                 profile = userlinks.get("html")
+            # Extra request as per Unsplash Guidelines
             async with self.bot.http_session.get(
                 downloadlinksdata.get("download_location"),
                     params={"client_id": Tokens.unsplash_access_key}
