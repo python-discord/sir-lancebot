@@ -37,12 +37,11 @@ class WTFPython(commands.Cog):
         self.bot = bot
         self.get_wtf_python_readme.start()
 
-        self.data: dict = {}
         self.headers: Dict[str] = dict()
 
     @tasks.loop(hours=1)
     async def get_wtf_python_readme(self) -> None:
-        """Gets content of README.md of WTF Python Repository."""
+        """"Gets the content of README.md from the WTF Python Repository."""
         async with self.bot.http_session.get(WTF_PYTHON_RAW_URL) as resp:
             if resp.status == 200:
                 self.raw = await resp.text()
@@ -71,13 +70,9 @@ class WTFPython(commands.Cog):
                 )
 
     def fuzzy_match_header(self, query: str) -> Optional[str]:
-        """Returns the fizzy match of a query if its ratio is above 90 else returns None."""
-        keys = list(self.headers.keys())
-        match = process.extractOne(query, keys)
-        print(match)
-        if match[1] < 90:
-            return
-        return match[0]
+         """Returns the fuzzy match of a query if its ratio is above 90 else returns None."""
+        match, certainty = process.extractOne(query, list(self.headers.keys()))
+        return match if certainty > 90 else None
 
     @staticmethod
     async def make_embed(query: str, link: str) -> Embed:
