@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "640043d117ada0863e85327e52288393fc6f08568f4bf1aeba53e0443fe7f8f0"
+            "sha256": "91281e9ed353fea748de3da19abd7bef402402b23fc78a1260dc8bf8bd2bd98c"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -168,6 +168,14 @@
             ],
             "index": "pypi",
             "version": "==1.5.1"
+        },
+        "emojis": {
+            "hashes": [
+                "sha256:7da34c8a78ae262fd68cef9e2c78a3c1feb59784489eeea0f54ba1d4b7111c7c",
+                "sha256:bf605d1f1a27a81cd37fe82eb65781c904467f569295a541c33710b97e4225ec"
+            ],
+            "index": "pypi",
+            "version": "==0.6.0"
         },
         "fakeredis": {
             "hashes": [
@@ -585,11 +593,11 @@
         },
         "identify": {
             "hashes": [
-                "sha256:70b638cf4743f33042bebb3b51e25261a0a10e80f978739f17e7fd4837664a66",
-                "sha256:9dfb63a2e871b807e3ba62f029813552a24b5289504f5b071dea9b041aee9fe4"
+                "sha256:2179e7359471ab55729f201b3fdf7dc2778e221f868410fedcb0987b791ba552",
+                "sha256:2a5fdf2f5319cc357eda2550bea713a404392495961022cf2462624ce62f0f46"
             ],
-            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
-            "version": "==1.5.13"
+            "markers": "python_full_version >= '3.6.1'",
+            "version": "==2.1.0"
         },
         "mccabe": {
             "hashes": [
