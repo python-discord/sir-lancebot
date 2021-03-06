@@ -185,11 +185,16 @@ class PfpModify(commands.Cog):
                 try:
                     response = await session.get(url)
                 except client_exceptions.ClientConnectorError:
-                    return await ctx.send("Cannot connect to provided URL!")
+                    await ctx.send("Cannot connect to provided URL!")
+                    return
                 except client_exceptions.InvalidURL:
-                    return await ctx.send("Invalid URL!")
+                    await ctx.send("Invalid URL!")
+                    return
+
                 if response.status != 200:
-                    return await ctx.send("Bad response from provided URL!")
+                    await ctx.send("Bad response from provided URL!")
+                    return
+
                 image_bytes = await response.read()
                 await self.send_pride_image(ctx, image_bytes, pixels, flag, option)
 
