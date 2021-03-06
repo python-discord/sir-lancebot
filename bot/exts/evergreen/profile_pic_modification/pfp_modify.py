@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 _EXECUTOR = ThreadPoolExecutor(10)
 
 
-async def in_executor(func: t.Callable, *args) -> asyncio.Future:
+async def in_executor(func: t.Callable, *args) -> t.Any:
     """Allows non-async functions to work in async functions."""
     log.trace(f"Running {func.__name__} in an executor.")
     loop = asyncio.get_event_loop()
