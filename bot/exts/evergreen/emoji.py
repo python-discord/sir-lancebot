@@ -1,28 +1,30 @@
 import datetime
 import logging
 import random
+import textwrap
 from collections import defaultdict
 from typing import List, Tuple
 
-import discord
+from discord import Color, Embed, Emoji
 from discord.ext import commands
 
 from bot.constants import Colours, ERROR_REPLIES
 from bot.utils.pagination import LinePaginator
+from bot.utils.time import time_since
 
 log = logging.getLogger(__name__)
 
 
-class EmojiCount(commands.Cog):
-    """Command that give random emoji based on category."""
+class Emoji(commands.Cog):
+    """A collection of commands related to emojis in the server."""
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @staticmethod
-    def embed_builder(emoji: dict) -> Tuple[discord.Embed, List[str]]:
+    def embed_builder(emoji: dict) -> Tuple[Embed, List[str]]:
         """Generates an embed with the emoji names and count."""
-        embed = discord.Embed(
+        embed = Embed(
             color=Colours.orange,
             title="Emoji Count",
             timestamp=datetime.datetime.utcnow()
@@ -51,9 +53,9 @@ class EmojiCount(commands.Cog):
         return embed, msg
 
     @staticmethod
-    def generate_invalid_embed(emojis: list) -> Tuple[discord.Embed, List[str]]:
+    def generate_invalid_embed(emojis: list) -> Tuple[Embed, List[str]]:
         """Generates error embed."""
-        embed = discord.Embed(
+        embed = Embed(
             color=Colours.soft_red,
             title=random.choice(ERROR_REPLIES)
         )
@@ -67,8 +69,13 @@ class EmojiCount(commands.Cog):
         msg.append(f"These are the valid categories\n```{error_comp}```")
         return embed, msg
 
-    @commands.command(name="emojicount", aliases=["ec", "emojis"])
-    async def emoji_count(self, ctx: commands.Context, *, category_query: str = None) -> None:
+    @commands.group(name="emoji", invoke_without_command=True)
+    async def emoji_group(self, ctx: commands.Context) -> None:
+        """A group of commands related to emojis."""
+        await ctx.send_help(ctx.command)
+
+    @emoji_group.command(name="count", aliases=("c",))
+    async def count_command(self, ctx: commands.Context, *, category_query: str = None) -> None:
         """Returns embed with emoji category and info given by the user."""
         emoji_dict = defaultdict(list)
 
@@ -91,7 +98,25 @@ class EmojiCount(commands.Cog):
             embed, msg = self.embed_builder(emoji_dict)
         await LinePaginator.paginate(lines=msg, ctx=ctx, embed=embed)
 
+    @emoji_group.command(name="info", aliases=("i",))
+    async def info_command(self, ctx: commands.Context, emoji: Emoji) -> None:
+        """Returns relevant information about a Discord Emoji."""
+        emoji_information = Embed(
+            title=f'Information about "{emoji.name}"',
+            description=textwrap.dedent(f"""
+                Name: {emoji.name}
+                Created: {time_since(emoji.created_at, precision="hours")}
+                ID: {emoji.id}
+                [Emoji source image]({emoji.url})
+            """),
+            color=Color.blurple()
+        )
+        emoji_information.set_thumbnail(
+            url=emoji.url
+        )
+        await ctx.send(embed=emoji_information)
+
 
 def setup(bot: commands.Bot) -> None:
-    """Emoji Count Cog load."""
-    bot.add_cog(EmojiCount(bot))
+    """Add the Emoji cog into the bot."""
+    bot.add_cog(Emoji(bot))
