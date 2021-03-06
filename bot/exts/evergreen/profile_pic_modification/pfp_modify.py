@@ -112,8 +112,8 @@ class PfpModify(commands.Cog):
 
         await ctx.send(file=file, embed=embed)
 
+    @staticmethod
     async def send_pride_image(
-        self,
         ctx: commands.Context,
         image_bytes: bytes,
         pixels: int,
