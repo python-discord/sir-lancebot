@@ -127,5 +127,8 @@ class PfpEffects:
 
         im = Image.new("RGBA", image.size)
         im.putdata(new_pixel_data)
-        im.alpha_composite(overlay_image, (im.width - overlay_image.width, (im.height - overlay_image.height)//2))
+        im.alpha_composite(
+            overlay_image,
+            (im.width - overlay_image.width, (im.height - overlay_image.height) // 2)
+        )
         return im
