@@ -53,7 +53,9 @@ class WTFPython(commands.Cog):
         """
         Parses the README.md into a dict.
 
-        Key is the name of the section and link to it.
+        It parses the readme into the `self.headers` dict,
+        where the key is the heading and the value is the
+        link to the heading.
         """
         table_of_contents = re.findall(
             r"\[👀 Examples\]\(#-examples\)\n([\w\W]*)<!-- tocstop -->", data
@@ -71,10 +73,7 @@ class WTFPython(commands.Cog):
 
     def fuzzy_match_header(self, query: str) -> Optional[str]:
         """Returns the fuzzy match of a query if its ratio is above 90 else returns None."""
-        match, certainty = process.extractOne(
-            query,
-            list(self.headers.keys())
-        )
+        match, certainty = process.extractOne(query, self.headers.keys())
         return match if certainty > 90 else None
 
     @staticmethod
