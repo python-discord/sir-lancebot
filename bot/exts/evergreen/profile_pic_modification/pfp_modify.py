@@ -229,7 +229,7 @@ class PfpModify(commands.Cog):
                 title="Is this you or am I just really paranoid?",
                 colour=Colours.soft_red
             )
-            embed.set_author(name=str(user.name), icon_url=user.avatar_url)
+            embed.set_author(name=user.name, icon_url=user.avatar_url)
             embed.set_image(url='attachment://modified_avatar.png')
             embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=ctx.author.avatar_url)
 
