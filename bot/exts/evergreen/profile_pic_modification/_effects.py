@@ -12,7 +12,7 @@ EASTER_COLOURS = [
 ]  # Pastel colours - Easter-like
 
 
-class PfpEffects():
+class PfpEffects:
     """
     Implements various image effects.
 
@@ -37,14 +37,14 @@ class PfpEffects():
         """
         Finds the closest easter colour to a given pixel.
 
-        Returns a merge between the original colour and the closest colour
+        Returns a merge between the original colour and the closest colour.
         """
         r1, g1, b1 = x
 
         def distance(point: t.Tuple[int, int, int]) -> t.Tuple[int, int, int]:
             """Finds the difference between a pastel colour and the original pixel colour."""
             r2, g2, b2 = point
-            return ((r1 - r2)**2 + (g1 - g2)**2 + (b1 - b2)**2)
+            return (r1 - r2) ** 2 + (g1 - g2) ** 2 + (b1 - b2) ** 2
 
         closest_colours = sorted(EASTER_COLOURS, key=lambda point: distance(point))
         r2, g2, b2 = closest_colours[0]
@@ -52,7 +52,7 @@ class PfpEffects():
         g = (g1 + g2) // 2
         b = (b1 + b2) // 2
 
-        return (r, g, b)
+        return r, g, b
 
     @staticmethod
     def crop_avatar_circle(avatar: Image) -> Image:
@@ -114,14 +114,18 @@ class PfpEffects():
         image = ImageOps.posterize(image, 6)
 
         data = image.getdata()
-        setted_data = set(data)
-        new_d = {}
+        data_set = set(data)
+        easterified_data_set = {}
 
-        for x in setted_data:
-            new_d[x] = PfpEffects.closest(x)
-        new_data = [(*new_d[x], alpha[i]) if x in new_d else x for i, x in enumerate(data)]
+        for x in data_set:
+            easterified_data_set[x] = PfpEffects.closest(x)
+        new_pixel_data = [
+            (*easterified_data_set[x], alpha[i])
+            if x in easterified_data_set else x
+            for i, x in enumerate(data)
+        ]
 
         im = Image.new("RGBA", image.size)
-        im.putdata(new_data)
+        im.putdata(new_pixel_data)
         im.alpha_composite(overlay_image, (im.width - overlay_image.width, (im.height - overlay_image.height)//2))
         return im

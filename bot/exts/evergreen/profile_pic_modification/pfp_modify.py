@@ -39,7 +39,7 @@ class PfpModify(commands.Cog):
 
     @commands.group()
     async def pfp_modify(self, ctx: commands.Context) -> None:
-        """Groups all of the pfp modifing commands to allow a single concurrency limit."""
+        """Groups all of the pfp modifying commands to allow a single concurrency limit."""
         if not ctx.invoked_subcommand:
             await ctx.send_help(ctx.command)
 
@@ -56,11 +56,11 @@ class PfpModify(commands.Cog):
 
             embed = discord.Embed(
                 title="Your 8-bit avatar",
-                description='Here is your avatar. I think it looks all cool and "retro"'
+                description="Here is your avatar. I think it looks all cool and 'retro'."
             )
 
             embed.set_image(url="attachment://modified_avatar.png")
-            embed.set_footer(text=f"Made by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
+            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=ctx.author.avatar_url)
 
         await ctx.send(file=file, embed=embed)
 
@@ -104,11 +104,11 @@ class PfpModify(commands.Cog):
             )
 
             embed = discord.Embed(
-                name="Your Lovely Easterified Avatar",
+                name="Your Lovely Easterified Avatar!",
                 description="Here is your lovely avatar, all bright and colourful\nwith Easter pastel colours. Enjoy :D"
             )
             embed.set_image(url="attachment://modified_avatar.png")
-            embed.set_footer(text=f"Made by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
+            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=ctx.author.avatar_url)
 
         await ctx.send(file=file, embed=embed)
 
@@ -131,11 +131,11 @@ class PfpModify(commands.Cog):
             )
 
             embed = discord.Embed(
-                name="Your Lovely Pride Avatar",
+                name="Your Lovely Pride Avatar!",
                 description=f"Here is your lovely avatar, surrounded by\n a beautiful {option} flag. Enjoy :D"
             )
             embed.set_image(url="attachment://modified_avatar.png")
-            embed.set_footer(text=f"Made by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
+            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=ctx.author.avatar_url)
             await ctx.send(file=file, embed=embed)
 
     @pfp_modify.group(
@@ -222,11 +222,11 @@ class PfpModify(commands.Cog):
 
             embed = discord.Embed(
                 title="Is this you or am I just really paranoid?",
-                colour=0xFF0000
+                colour=Colours.soft_red
             )
             embed.set_author(name=str(user.name), icon_url=user.avatar_url)
             embed.set_image(url='attachment://modified_avatar.png')
-            embed.set_footer(text=f"Made by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
+            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=ctx.author.avatar_url)
 
             await ctx.send(file=file, embed=embed)
 
