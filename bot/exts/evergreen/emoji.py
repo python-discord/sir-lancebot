@@ -1,9 +1,9 @@
-import datetime
 import logging
 import random
 import textwrap
 from collections import defaultdict
-from typing import List, Tuple
+from datetime import datetime
+from typing import List, Optional, Tuple
 
 from discord import Color, Embed, Emoji
 from discord.ext import commands
@@ -27,7 +27,7 @@ class Emoji(commands.Cog):
         embed = Embed(
             color=Colours.orange,
             title="Emoji Count",
-            timestamp=datetime.datetime.utcnow()
+            timestamp=datetime.utcnow()
         )
         msg = []
 
@@ -54,7 +54,7 @@ class Emoji(commands.Cog):
 
     @staticmethod
     def generate_invalid_embed(emojis: list) -> Tuple[Embed, List[str]]:
-        """Generates error embed."""
+        """Generates error embed for invalid emoji categories."""
         embed = Embed(
             color=Colours.soft_red,
             title=random.choice(ERROR_REPLIES)
@@ -70,9 +70,12 @@ class Emoji(commands.Cog):
         return embed, msg
 
     @commands.group(name="emoji", invoke_without_command=True)
-    async def emoji_group(self, ctx: commands.Context) -> None:
+    async def emoji_group(self, ctx: commands.Context, emoji: Optional[Emoji]) -> None:
         """A group of commands related to emojis."""
-        await ctx.send_help(ctx.command)
+        if emoji is not None:
+            await ctx.invoke(self.info_command, emoji)
+        else:
+            await ctx.send_help(ctx.command)
 
     @emoji_group.command(name="count", aliases=("c",))
     async def count_command(self, ctx: commands.Context, *, category_query: str = None) -> None:
@@ -102,18 +105,17 @@ class Emoji(commands.Cog):
     async def info_command(self, ctx: commands.Context, emoji: Emoji) -> None:
         """Returns relevant information about a Discord Emoji."""
         emoji_information = Embed(
-            title=f'Information about "{emoji.name}"',
+            title=f"Emoji Information: {emoji.name}",
             description=textwrap.dedent(f"""
-                Name: {emoji.name}
-                Created: {time_since(emoji.created_at, precision="hours")}
-                ID: {emoji.id}
-                [Emoji source image]({emoji.url})
+                **Name:** {emoji.name}
+                **Created:** {time_since(emoji.created_at, precision="hours")}
+                **Date:** {datetime.strftime(emoji.created_at, "%d/%m/%Y")}
+                **ID:** {emoji.id}
             """),
-            color=Color.blurple()
-        )
-        emoji_information.set_thumbnail(
-            url=emoji.url
-        )
+            color=Color.blurple(),
+            url=str(emoji.url),
+        ).set_thumbnail(url=emoji.url)
+
         await ctx.send(embed=emoji_information)
 
 
