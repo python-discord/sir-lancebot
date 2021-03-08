@@ -36,7 +36,7 @@ class AdventOfCode(commands.Cog):
         self.about_aoc_filepath = Path("./bot/resources/advent_of_code/about.json")
         self.cached_about_aoc = self._build_about_embed()
 
-        self.countdown_task = None
+        self.notification_task = None
         self.status_task = None
 
         notification_coro = _helpers.new_puzzle_notification(self.bot)
@@ -268,7 +268,7 @@ class AdventOfCode(commands.Cog):
     def cog_unload(self) -> None:
         """Cancel season-related tasks on cog unload."""
         log.debug("Unloading the cog and canceling the background task.")
-        self.countdown_task.cancel()
+        self.notification_task.cancel()
         self.status_task.cancel()
 
     def _build_about_embed(self) -> discord.Embed:
