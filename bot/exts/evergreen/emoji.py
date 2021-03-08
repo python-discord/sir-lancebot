@@ -34,18 +34,18 @@ class Emojis(commands.Cog):
         if len(emoji) == 1:
             for category_name, category_emojis in emoji.items():
                 if len(category_emojis) == 1:
-                    msg.append(f"There is **{len(category_emojis)}** emoji in **{category_name}** category")
+                    msg.append(f"There is **{len(category_emojis)}** emoji in the **{category_name}** category.")
                 else:
-                    msg.append(f"There are **{len(category_emojis)}** emojis in **{category_name}** category")
+                    msg.append(f"There are **{len(category_emojis)}** emojis in the **{category_name}** category.")
                 embed.set_thumbnail(url=random.choice(category_emojis).url)
 
         else:
             for category_name, category_emojis in emoji.items():
                 emoji_choice = random.choice(category_emojis)
                 if len(category_emojis) > 1:
-                    emoji_info = f"There are **{len(category_emojis)}** emojis in **{category_name}** category"
+                    emoji_info = f"There are **{len(category_emojis)}** emojis in the **{category_name}** category."
                 else:
-                    emoji_info = f"There is **{len(category_emojis)}** emoji in **{category_name}** category"
+                    emoji_info = f"There is **{len(category_emojis)}** emoji in the **{category_name}** category."
                 if emoji_choice.animated:
                     msg.append(f'<a:{emoji_choice.name}:{emoji_choice.id}> {emoji_info}')
                 else:
@@ -66,7 +66,7 @@ class Emojis(commands.Cog):
             emoji_dict[emoji.name.split("_")[0]].append(emoji)
 
         error_comp = ', '.join(emoji_dict)
-        msg.append(f"These are the valid categories\n```{error_comp}```")
+        msg.append(f"These are the valid emoji categories:\n```{error_comp}```")
         return embed, msg
 
     @commands.group(name="emoji", invoke_without_command=True)
