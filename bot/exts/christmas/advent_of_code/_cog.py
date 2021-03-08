@@ -173,6 +173,7 @@ class AdventOfCode(commands.Cog):
         else:
             await ctx.message.add_reaction(Emojis.envelope)
 
+    @in_month(Month.DECEMBER)
     @adventofcode_group.command(
         name="leaderboard",
         aliases=("board", "lb"),
@@ -198,6 +199,7 @@ class AdventOfCode(commands.Cog):
 
             await ctx.send(content=f"{header}\n\n{table}", embed=info_embed)
 
+    @in_month(Month.DECEMBER)
     @adventofcode_group.command(
         name="global",
         aliases=("globalboard", "gb"),
