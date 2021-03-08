@@ -8,7 +8,7 @@ import discord
 from discord.ext import commands
 from fuzzywuzzy import fuzz
 
-from bot.constants import Colours
+from bot import constants
 
 log = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ class PrideLeader(commands.Cog):
     def invalid_embed_generate(self, pride_leader: str) -> discord.Embed:
         """Generates Invalid Embed."""
         embed = discord.Embed(
-            color=Colours.soft_red
+            color=constants.Colours.soft_red
         )
         valid_names = []
         pride_leader = pride_leader.title()
@@ -51,6 +51,13 @@ class PrideLeader(commands.Cog):
             error_msg = "Did you mean?"
 
         embed.description = f"{error_msg}\n```{valid_names}```"
+        embed.add_field(
+            name="You can get information about the Pride Leader on the Wikipedia command",
+            value=f"Do `{constants.Client.prefix}wiki {pride_leader}`"
+                  f" in <#{constants.Channels.community_bot_commands}>",
+            inline=False
+        )
+
         return embed
 
     def embed_builder(self, leader_name: str) -> discord.Embed:
@@ -58,7 +65,7 @@ class PrideLeader(commands.Cog):
         embed = discord.Embed(
             title=leader_name,
             description=self.pride[leader_name]["About"],
-            color=Colours.blue
+            color=constants.Colours.blue
         )
         embed.add_field(
             name="Known for",
@@ -73,6 +80,12 @@ class PrideLeader(commands.Cog):
         embed.add_field(
             name="Awards and honors",
             value=self.pride[leader_name]["Awards"],
+            inline=False
+        )
+        embed.add_field(
+            name="For More Information",
+            value=f"Do `{constants.Client.prefix}wiki {leader_name}`"
+                  f" in <#{constants.Channels.community_bot_commands}>",
             inline=False
         )
         embed.set_thumbnail(url=self.pride[leader_name]["url"])
