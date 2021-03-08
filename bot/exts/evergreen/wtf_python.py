@@ -29,6 +29,8 @@ Unknown WTF Python Query. Please try to reformulate your query.
 If the problem persists send a message in <#{constants.Channels.dev_contrib}>
 """
 
+MINIMUM_CERTAINTY = 75
+
 
 class WTFPython(commands.Cog):
     """Cog that allows users to retrieve issues from GitHub."""
@@ -74,7 +76,7 @@ class WTFPython(commands.Cog):
     def fuzzy_match_header(self, query: str) -> Optional[str]:
         """Returns the fuzzy match of a query if its ratio is above 90 else returns None."""
         match, certainty = process.extractOne(query, self.headers.keys())
-        return match if certainty > 90 else None
+        return match if certainty > MINIMUM_CERTAINTY else None
 
     @staticmethod
     async def make_embed(query: str, link: str) -> Embed:
