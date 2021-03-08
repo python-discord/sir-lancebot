@@ -5,7 +5,7 @@ from discord import Color, Embed
 from discord.ext import commands
 
 from bot.constants import WHITELISTED_CHANNELS
-from bot.utils.decorators import override_in_channel
+from bot.utils.decorators import whitelist_override
 from bot.utils.randomization import RandomCycle
 
 SUGGESTION_FORM = 'https://forms.gle/zw6kkJqv8U43Nfjg9'
@@ -38,7 +38,7 @@ class ConvoStarters(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    @override_in_channel(ALL_ALLOWED_CHANNELS)
+    @whitelist_override(channels=ALL_ALLOWED_CHANNELS)
     async def topic(self, ctx: commands.Context) -> None:
         """
         Responds with a random topic to start a conversation.

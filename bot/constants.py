@@ -9,6 +9,7 @@ __all__ = (
     "AdventOfCode",
     "Branding",
     "Channels",
+    "Categories",
     "Client",
     "Colours",
     "Emojis",
@@ -100,20 +101,17 @@ class Channels(NamedTuple):
     big_brother_logs = 468507907357409333
     bot = 267659945086812160
     checkpoint_test = 422077681434099723
+    organisation = 551789653284356126
     devalerts = 460181980097675264
     devlog = int(environ.get("CHANNEL_DEVLOG", 622895325144940554))
     dev_contrib = 635950537262759947
     dev_branding = 753252897059373066
-    help_0 = 303906576991780866
-    help_1 = 303906556754395136
-    help_2 = 303906514266226689
-    help_3 = 439702951246692352
-    help_4 = 451312046647148554
-    help_5 = 454941769734422538
     helpers = 385474242440986624
     message_log = 467752170159079424
     mod_alerts = 473092532147060736
     modlog = 282638479504965634
+    mod_meta = 775412552795947058
+    mod_tools = 775413915391098921
     off_topic_0 = 291284109232308226
     off_topic_1 = 463035241142026251
     off_topic_2 = 463035268514185226
@@ -126,6 +124,15 @@ class Channels(NamedTuple):
     hacktoberfest_2020 = 760857070781071431
     voice_chat_0 = 412357430186344448
     voice_chat_1 = 799647045886541885
+    staff_voice = 541638762007101470
+
+
+class Categories(NamedTuple):
+    help_in_use = 696958401460043776
+    development = 411199786025484308
+    devprojects = 787641585624940544
+    media = 799054581991997460
+    staff = 364918151625965579
 
 
 class Client(NamedTuple):
@@ -151,6 +158,9 @@ class Colours:
     soft_orange = 0xf9cb54
     soft_red = 0xcd6d6d
     yellow = 0xf9f586
+    python_blue = 0x4B8BBE
+    python_yellow = 0xFFD43B
+    grass_green = 0x66ff00
 
 
 class Emojis:
@@ -160,6 +170,7 @@ class Emojis:
     envelope = "\U0001F4E8"
     trashcan = "<:trashcan:637136429717389331>"
     ok_hand = ":ok_hand:"
+    hand_raised = "\U0001f64b"
 
     dice_1 = "<:dice_1:755891608859443290>"
     dice_2 = "<:dice_2:755891608741740635>"
@@ -173,6 +184,25 @@ class Emojis:
     pull_request = "<:PROpen:629695470175780875>"
     pull_request_closed = "<:PRClosed:629695470519713818>"
     merge = "<:PRMerged:629695470570176522>"
+
+    number_emojis = {
+        1: "\u0031\ufe0f\u20e3",
+        2: "\u0032\ufe0f\u20e3",
+        3: "\u0033\ufe0f\u20e3",
+        4: "\u0034\ufe0f\u20e3",
+        5: "\u0035\ufe0f\u20e3",
+        6: "\u0036\ufe0f\u20e3",
+        7: "\u0037\ufe0f\u20e3",
+        8: "\u0038\ufe0f\u20e3",
+        9: "\u0039\ufe0f\u20e3"
+    }
+
+    confirmation = "\u2705"
+    decline = "\u274c"
+    incident_unactioned = "<:incident_unactioned:719645583245180960>"
+
+    x = "\U0001f1fd"
+    o = "\U0001f1f4"
 
     status_online = "<:status_online:470326272351010816>"
     status_idle = "<:status_idle:470326266625785866>"
@@ -221,7 +251,6 @@ class Roles(NamedTuple):
     announcements = 463658397560995840
     champion = 430492892331769857
     contributor = 295488872404484098
-    developer = 352427296948486144
     devops = 409416496733880320
     jammer = 423054537079783434
     moderator = 267629731250176001
@@ -232,6 +261,7 @@ class Roles(NamedTuple):
     rockstars = 458226413825294336
     core_developers = 587606783669829632
     events_lead = 778361735739998228
+    everyone_role = 267624335836053506
 
 
 class Tokens(NamedTuple):
@@ -244,6 +274,7 @@ class Tokens(NamedTuple):
     igdb_client_id = environ.get("IGDB_CLIENT_ID")
     igdb_client_secret = environ.get("IGDB_CLIENT_SECRET")
     github = environ.get("GITHUB_TOKEN")
+    unsplash_access_key = environ.get("UNSPLASH_KEY")
 
 
 class Wolfram(NamedTuple):
@@ -257,10 +288,6 @@ class RedisConfig(NamedTuple):
     port = environ.get("REDIS_PORT", 6379)
     password = environ.get("REDIS_PASSWORD")
     use_fakeredis = environ.get("USE_FAKEREDIS", "false").lower() == "true"
-
-
-class Wikipedia:
-    total_chance = 3
 
 
 class Source:

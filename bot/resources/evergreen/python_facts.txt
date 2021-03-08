@@ -1,0 +1,3 @@
+Python was named after Monty Python, a British Comedy Troupe, which Guido van Rossum likes.
+If you type `import this` in the Python REPL, you'll get a poem about the philosophies about Python. (check it out by doing !zen in <#267659945086812160>)
+If you type `import antigravity` in the Python REPL, you'll be directed to an [xkcd comic](https://xkcd.com/353/) about how easy Python is.
