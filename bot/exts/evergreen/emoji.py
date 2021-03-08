@@ -15,7 +15,7 @@ from bot.utils.time import time_since
 log = logging.getLogger(__name__)
 
 
-class Emoji(commands.Cog):
+class Emojis(commands.Cog):
     """A collection of commands related to emojis in the server."""
 
     def __init__(self, bot: commands.Bot):
@@ -120,5 +120,5 @@ class Emoji(commands.Cog):
 
 
 def setup(bot: commands.Bot) -> None:
-    """Add the Emoji cog into the bot."""
-    bot.add_cog(Emoji(bot))
+    """Add the Emojis cog into the bot."""
+    bot.add_cog(Emojis(bot))
