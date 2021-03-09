@@ -36,9 +36,6 @@ class AdventOfCode(commands.Cog):
         self.about_aoc_filepath = Path("./bot/resources/advent_of_code/about.json")
         self.cached_about_aoc = self._build_about_embed()
 
-        self.notification_task = None
-        self.status_task = None
-
         notification_coro = _helpers.new_puzzle_notification(self.bot)
         self.notification_task = self.bot.loop.create_task(notification_coro)
         self.notification_task.set_name("Daily AoC Notification")
