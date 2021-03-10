@@ -16,6 +16,9 @@ jobs:
       PIP_NO_CACHE_DIR: false
       PIP_USER: 1
 
+      # Disable Poetry virtualenv creation
+      POETRY_VIRTUALENVS_CREATE: false
+
       # Specify explicit paths for python dependencies and the pre-commit
       # environment so we know which directories to cache
       PYTHONUSERBASE: ${{ github.workspace }}/.cache/py-user-base
@@ -71,7 +74,7 @@ jobs:
       # action. As pre-commit does not support user installs, we set
       # PIP_USER=0 to not do a user install.
       - name: Run pre-commit hooks
-        run: export PIP_USER=0; SKIP=flake8 poetry run pre-commit run --all-files
+        run: export PIP_USER=0; SKIP=flake8 pre-commit run --all-files
 
       # Run flake8 and have it format the linting errors in the format of
       # the GitHub Workflow command to register error annotations. This
@@ -82,7 +85,7 @@ jobs:
       # Format used:
       # ::error file={filename},line={line},col={col}::{message}
       - name: Run flake8
-        run: "poetry run flake8 \
+        run: "flake8 \
         --format='::error file=%(path)s,line=%(row)d,col=%(col)d::[flake8] %(code)s: %(text)s'"
 
       # Prepare the Pull Request Payload artifact. If this fails, we
