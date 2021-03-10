@@ -88,8 +88,14 @@ class PfpEffects:
 
     @staticmethod
     def eight_bitify_effect(image: Image) -> Image:
-        """Applies the 8bit effect to the given image."""
-        image = image.resize((32, 32), resample=Image.NEAREST).resize((1024, 1024), resample=Image.NEAREST)
+        """
+        Applies the 8bit effect to the given image.
+
+        This is done by reducing the image to 32x32 and then back up to 1024x1024.
+        We then quantize the image before returning too.
+        """
+        image = image.resize((32, 32), resample=Image.NEAREST)
+        image = image.resize((1024, 1024), resample=Image.NEAREST)
         return image.quantize()
 
     @staticmethod
