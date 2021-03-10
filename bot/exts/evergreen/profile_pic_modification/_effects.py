@@ -5,11 +5,7 @@ from pathlib import Path
 import discord
 from PIL import Image, ImageDraw, ImageOps
 
-EASTER_COLOURS = [
-    (255, 247, 0), (255, 255, 224), (0, 255, 127), (189, 252, 201), (255, 192, 203),
-    (255, 160, 122), (181, 115, 220), (221, 160, 221), (200, 162, 200), (238, 130, 238),
-    (135, 206, 235), (0, 204, 204), (64, 224, 208)
-]  # Pastel colours - Easter-like
+from bot.constants import Colours
 
 
 class PfpEffects:
@@ -46,7 +42,7 @@ class PfpEffects:
             r2, g2, b2 = point
             return (r1 - r2) ** 2 + (g1 - g2) ** 2 + (b1 - b2) ** 2
 
-        closest_colours = sorted(EASTER_COLOURS, key=lambda point: distance(point))
+        closest_colours = sorted(Colours.easter_like_colours, key=lambda point: distance(point))
         r2, g2, b2 = closest_colours[0]
         r = (r1 + r2) // 2
         g = (g1 + g2) // 2
