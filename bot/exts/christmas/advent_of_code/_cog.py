@@ -36,9 +36,6 @@ class AdventOfCode(commands.Cog):
         self.about_aoc_filepath = Path("./bot/resources/advent_of_code/about.json")
         self.cached_about_aoc = self._build_about_embed()
 
-        self.countdown_task = None
-        self.status_task = None
-
         notification_coro = _helpers.new_puzzle_notification(self.bot)
         self.notification_task = self.bot.loop.create_task(notification_coro)
         self.notification_task.set_name("Daily AoC Notification")
@@ -173,6 +170,7 @@ class AdventOfCode(commands.Cog):
         else:
             await ctx.message.add_reaction(Emojis.envelope)
 
+    @in_month(Month.DECEMBER)
     @adventofcode_group.command(
         name="leaderboard",
         aliases=("board", "lb"),
@@ -198,6 +196,7 @@ class AdventOfCode(commands.Cog):
 
             await ctx.send(content=f"{header}\n\n{table}", embed=info_embed)
 
+    @in_month(Month.DECEMBER)
     @adventofcode_group.command(
         name="global",
         aliases=("globalboard", "gb"),
@@ -268,7 +267,7 @@ class AdventOfCode(commands.Cog):
     def cog_unload(self) -> None:
         """Cancel season-related tasks on cog unload."""
         log.debug("Unloading the cog and canceling the background task.")
-        self.countdown_task.cancel()
+        self.notification_task.cancel()
         self.status_task.cancel()
 
     def _build_about_embed(self) -> discord.Embed:
