@@ -25,6 +25,6 @@
 <!-- Replace [ ] with [x] to mark items as done. -->
 
 - [ ] Join the [**Python Discord Community**](https://discord.gg/python)?
-- [ ] If dependencies have been added or updated, run `pipenv lock`?
-- [ ] **Lint your code** (`pipenv run lint`)?
+- [ ] If dependencies have been added or updated, run `poetry lock`?
+- [ ] **Lint your code** (`poetry run task lint`)?
 - [ ] Set the PR to **allow edits from contributors**?
