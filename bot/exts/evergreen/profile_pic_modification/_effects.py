@@ -109,7 +109,7 @@ class PfpEffects:
             ))
             overlay_image = overlay_image.convert("RGBA")
         else:
-            overlay_image = overlay_image = Image.open(Path("bot/resources/easter/chocolate_bunny.png"))
+            overlay_image = Image.open(Path("bot/resources/easter/chocolate_bunny.png"))
 
         alpha = image.getchannel("A").getdata()
         image = image.convert("RGB")
