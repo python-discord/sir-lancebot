@@ -8,6 +8,7 @@ import aiofiles
 import discord
 from aiohttp import client_exceptions
 from discord.ext import commands
+from discord.ext.commands.errors import BadArgument
 
 from bot.constants import Colours
 from bot.exts.evergreen.profile_pic_modification._effects import PfpEffects
@@ -205,11 +206,9 @@ class PfpModify(commands.Cog):
                 try:
                     response = await session.get(url)
                 except client_exceptions.ClientConnectorError:
-                    await ctx.send("Cannot connect to provided URL!")
-                    return
+                    raise BadArgument("Cannot connect to provided URL!")
                 except client_exceptions.InvalidURL:
-                    await ctx.send("Invalid URL!")
-                    return
+                    raise BadArgument("Invalid URL!")
 
                 if response.status != 200:
                     await ctx.send("Bad response from provided URL!")
