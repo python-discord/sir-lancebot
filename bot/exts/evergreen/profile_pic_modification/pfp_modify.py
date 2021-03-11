@@ -244,7 +244,7 @@ class PfpModify(commands.Cog):
             image_bytes = await ctx.author.avatar_url.read()
 
             file_name = FILENAME_STRING.format(
-                effect="pride_avatar",
+                effect="spooky_avatar",
                 author=ctx.author.display_name
             )
             file = await in_executor(
