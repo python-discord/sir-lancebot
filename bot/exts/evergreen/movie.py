@@ -73,7 +73,8 @@ class Movie(Cog):
         try:
             result = await self.get_movies_list(self.http_session, MovieGenres[genre].value, 1)
         except KeyError:
-            await ctx.send_help('movies')
+            help_command = self.bot.get_command("help")
+            await ctx.invoke(help_command, ctx.command.name)
             return
 
         # Check if "results" is in result. If not, throw error.

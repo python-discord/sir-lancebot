@@ -440,7 +440,8 @@ class Snakes(Cog):
     @group(name='snakes', aliases=('snake',), invoke_without_command=True)
     async def snakes_group(self, ctx: Context) -> None:
         """Commands from our first code jam."""
-        await ctx.send_help(ctx.command)
+        help_command = self.bot.get_command("help")
+        await ctx.invoke(help_command, ctx.command.name)
 
     @bot_has_permissions(manage_messages=True)
     @snakes_group.command(name='antidote')

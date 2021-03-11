@@ -234,7 +234,8 @@ class Games(Cog):
         """
         # When user didn't specified genre, send help message
         if genre is None:
-            await ctx.send_help("games")
+            help_command = self.bot.get_command("help")
+            await ctx.invoke(help_command, ctx.command.name)
             return
 
         # Capitalize genre for check

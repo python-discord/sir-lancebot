@@ -51,7 +51,8 @@ class AdventOfCode(commands.Cog):
     async def adventofcode_group(self, ctx: commands.Context) -> None:
         """All of the Advent of Code commands."""
         if not ctx.invoked_subcommand:
-            await ctx.send_help(ctx.command)
+            help_command = self.bot.get_command("help")
+            await ctx.invoke(help_command, ctx.command.name)
 
     @adventofcode_group.command(
         name="subscribe",
