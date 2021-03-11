@@ -16,7 +16,7 @@ class PfpEffects:
     """
 
     @staticmethod
-    def apply_effect(image_bytes: bytes, effect: t.Callable, *args) -> discord.File:
+    def apply_effect(image_bytes: bytes, effect: t.Callable, filename: str, *args) -> discord.File:
         """Applies the given effect to the image passed to it."""
         im = Image.open(BytesIO(image_bytes))
         im = im.convert("RGBA")
@@ -26,7 +26,7 @@ class PfpEffects:
         im.save(bufferedio, format="PNG")
         bufferedio.seek(0)
 
-        return discord.File(bufferedio, filename="modified_avatar.png")
+        return discord.File(bufferedio, filename=filename)
 
     @staticmethod
     def closest(x: t.Tuple[int, int, int]) -> t.Tuple[int, int, int]:

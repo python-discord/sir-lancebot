@@ -17,6 +17,8 @@ log = logging.getLogger(__name__)
 
 _EXECUTOR = ThreadPoolExecutor(10)
 
+FILENAME_STRING = "{effect}_{author}.png"
+
 
 async def in_executor(func: t.Callable, *args) -> t.Any:
     """Allows non-async functions to work in async functions."""
@@ -48,10 +50,16 @@ class PfpModify(commands.Cog):
         """Pixelates your avatar and changes the palette to an 8bit one."""
         async with ctx.typing():
             image_bytes = await ctx.author.avatar_url.read()
+            file_name = FILENAME_STRING.format(
+                effect="eightbit_avatar",
+                author=ctx.author.display_name
+            )
+
             file = await in_executor(
                 PfpEffects.apply_effect,
                 image_bytes,
-                PfpEffects.eight_bitify_effect
+                PfpEffects.eight_bitify_effect,
+                file_name
             )
 
             embed = discord.Embed(
@@ -59,10 +67,10 @@ class PfpModify(commands.Cog):
                 description="Here is your avatar. I think it looks all cool and 'retro'."
             )
 
-            embed.set_image(url="attachment://modified_avatar.png")
+            embed.set_image(url=f"attachment://{file_name}")
             embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=ctx.author.avatar_url)
 
-        await ctx.send(file=file, embed=embed)
+        await ctx.send(embed=embed, file=file)
 
     @pfp_modify.command(pass_context=True, aliases=["easterify"], root_aliases=("easterify", "avatareasterify"))
     async def avatareasterify(self, ctx: commands.Context, *colours: t.Union[discord.Colour, str]) -> None:
@@ -96,10 +104,16 @@ class PfpModify(commands.Cog):
                 ctx.send = send_message  # Reassigns ctx.send
 
             image_bytes = await ctx.author.avatar_url_as(size=256).read()
+            file_name = FILENAME_STRING.format(
+                effect="easterified_avatar",
+                author=ctx.author.display_name
+            )
+
             file = await in_executor(
                 PfpEffects.apply_effect,
                 image_bytes,
                 PfpEffects.easterify_effect,
+                file_name,
                 egg
             )
 
@@ -107,7 +121,7 @@ class PfpModify(commands.Cog):
                 name="Your Lovely Easterified Avatar!",
                 description="Here is your lovely avatar, all bright and colourful\nwith Easter pastel colours. Enjoy :D"
             )
-            embed.set_image(url="attachment://modified_avatar.png")
+            embed.set_image(url=f"attachment://{file_name}")
             embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=ctx.author.avatar_url)
 
         await ctx.send(file=file, embed=embed)
@@ -122,10 +136,16 @@ class PfpModify(commands.Cog):
     ) -> None:
         """Gets and sends the image in an embed. Used by the pride commands."""
         async with ctx.typing():
+            file_name = FILENAME_STRING.format(
+                effect="pride_avatar",
+                author=ctx.author.display_name
+            )
+
             file = await in_executor(
                 PfpEffects.apply_effect,
                 image_bytes,
                 PfpEffects.pridify_effect,
+                file_name,
                 pixels,
                 flag
             )
@@ -134,7 +154,7 @@ class PfpModify(commands.Cog):
                 name="Your Lovely Pride Avatar!",
                 description=f"Here is your lovely avatar, surrounded by\n a beautiful {option} flag. Enjoy :D"
             )
-            embed.set_image(url="attachment://modified_avatar.png")
+            embed.set_image(url=f"attachment://{file_name}")
             embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=ctx.author.avatar_url)
             await ctx.send(file=file, embed=embed)
 
@@ -223,14 +243,24 @@ class PfpModify(commands.Cog):
 
         async with ctx.typing():
             image_bytes = await ctx.author.avatar_url.read()
-            file = await in_executor(PfpEffects.apply_effect, image_bytes, spookifications.get_random_effect)
+
+            file_name = FILENAME_STRING.format(
+                effect="pride_avatar",
+                author=ctx.author.display_name
+            )
+            file = await in_executor(
+                PfpEffects.apply_effect,
+                image_bytes,
+                spookifications.get_random_effect,
+                file_name
+            )
 
             embed = discord.Embed(
                 title="Is this you or am I just really paranoid?",
                 colour=Colours.soft_red
             )
             embed.set_author(name=user.name, icon_url=user.avatar_url)
-            embed.set_image(url='attachment://modified_avatar.png')
+            embed.set_image(url=f"attachment://{file_name}")
             embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=ctx.author.avatar_url)
 
             await ctx.send(file=file, embed=embed)
