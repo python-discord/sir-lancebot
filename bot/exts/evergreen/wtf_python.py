@@ -79,7 +79,7 @@ class WTFPython(commands.Cog):
         return match if certainty > MINIMUM_CERTAINTY else None
 
     @staticmethod
-    async def make_embed(query: str, link: str) -> Embed:
+    def make_embed(query: str, link: str) -> Embed:
         """Generates a embed for a search."""
         embed = Embed(
             title=f"WTF Python Search Result For {query}",
@@ -107,7 +107,7 @@ class WTFPython(commands.Cog):
                 colour=constants.Colours.soft_red
             )
         else:
-            embed = await self.make_embed(query, self.headers[match])
+            embed = self.make_embed(query, self.headers[match])
         await ctx.send(embed=embed)
 
 
