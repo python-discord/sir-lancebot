@@ -9,9 +9,9 @@ from discord import Color, Embed, Emoji
 from discord.ext import commands
 
 from bot.constants import Colours, ERROR_REPLIES
+from bot.utils.extensions import invoke_help_command
 from bot.utils.pagination import LinePaginator
 from bot.utils.time import time_since
-from bot.utils.extensions import invoke_help_command
 
 log = logging.getLogger(__name__)
 

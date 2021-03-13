@@ -1,8 +1,9 @@
-from discord.ext.commands import Context
 import importlib
 import inspect
 import pkgutil
 from typing import Iterator, NoReturn
+
+from discord.ext.commands import Context
 
 from bot import exts
 

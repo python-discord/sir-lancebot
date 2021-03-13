@@ -9,8 +9,8 @@ from discord import Embed
 from discord.ext.commands import Bot, Cog, Context, group
 
 from bot.constants import Tokens
-from bot.utils.pagination import ImagePaginator
 from bot.utils.extensions import invoke_help_command
+from bot.utils.pagination import ImagePaginator
 
 # Define base URL of TMDB
 BASE_URL = "https://api.themoviedb.org/3/"
