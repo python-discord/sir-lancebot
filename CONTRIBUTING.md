@@ -2,7 +2,7 @@
 
 Sir Lancebot is a community project for the Python Discord community over at https://discord.gg/python. We will be providing support for those of you who are new to Git, and this project is to be considered educational.
 
-Our projects are open-source and are automatically deployed whenever commits are pushed to the `master` branch on each repository, so we've created a set of guidelines in order to keep everything clean and in working order.
+Our projects are open-source and are automatically deployed whenever commits are pushed to the `main` branch on each repository, so we've created a set of guidelines in order to keep everything clean and in working order.
 
 Note that contributions may be rejected on the basis of a contributor failing to follow these guidelines.
 
@@ -12,7 +12,7 @@ Note that contributions may be rejected on the basis of a contributor failing to
 2. Your pull request must solve an issue created or approved by a staff member. These will be labeled with the `approved` label. Feel free to suggest issues of your own, which staff can review for approval.
 3. **No force-pushes** or modifying the Git history in any way.
 4. If you have direct access to the repository, **create a branch for your changes** and create a pull request for that branch. If not, create a branch on a fork of the repository and create a pull request from there.
-    * It's common practice for a repository to reject direct pushes to `master`, so make branching a habit!
+    * It's common practice for a repository to reject direct pushes to `main`, so make branching a habit!
     * If PRing from your own fork, **ensure that "Allow edits from maintainers" is checked**. This gives permission for maintainers to commit changes directly to your fork, speeding up the review process.
 5. **Adhere to the prevailing code style**, which we enforce using [`flake8`](http://flake8.pycqa.org/en/latest/index.html) and [`pre-commit`](https://pre-commit.com/).
     * Run `flake8` and `pre-commit` against your code [**before** you push it](https://soundcloud.com/lemonsaurusrex/lint-before-you-push). Your commit will be rejected by the build server if it fails to lint.
@@ -22,7 +22,7 @@ Note that contributions may be rejected on the basis of a contributor failing to
     * Avoid making minor commits for fixing typos or linting errors. Since you've already set up a `pre-commit` hook to run the linting pipeline before a commit, you shouldn't be committing linting issues anyway.
     * A more in-depth guide to writing great commit messages can be found in Chris Beam's [*How to Write a Git Commit Message*](https://chris.beams.io/posts/git-commit/)
 7. **Avoid frequent pushes to the main repository**. This goes for PRs opened against your fork as well. Our test build pipelines are triggered every time a push to the repository (or PR) is made. Try to batch your commits until you've finished working for that session, or you've reached a point where collaborators need your commits to continue their own work. This also provides you the opportunity to amend commits for minor changes rather than having to commit them on their own because you've already pushed.
-    * This includes merging master into your branch. Try to leave merging from master for after your PR passes review; a maintainer will bring your PR up to date before merging. Exceptions to this include: resolving merge conflicts, needing something that was pushed to master for your branch, or something was pushed to master that could potentionally affect the functionality of what you're writing.
+    * This includes merging main into your branch. Try to leave merging from main for after your PR passes review; a maintainer will bring your PR up to date before merging. Exceptions to this include: resolving merge conflicts, needing something that was pushed to main for your branch, or something was pushed to main that could potentionally affect the functionality of what you're writing.
 8. **Don't fight the framework**. Every framework has its flaws, but the frameworks we've picked out have been carefully chosen for their particular merits. If you can avoid it, please resist reimplementing swathes of framework logic - the work has already been done for you!
 9. If someone is working on an issue or pull request, **do not open your own pull request for the same task**. Instead, collaborate with the author(s) of the existing pull request. Duplicate PRs opened without communicating with the other author(s) and/or PyDis staff will be closed. Communication is key, and there's no point in two separate implementations of the same thing.
     * One option is to fork the other contributor's repository and submit your changes to their branch with your own pull request. We suggest following these guidelines when interacting with their repository as well.
@@ -39,7 +39,7 @@ All projects evolve over time, and this contribution guide is no different. This
 
 ##  Supplemental Information
 ### Developer Environment
-Sir Lancebot utilizes [Pipenv](https://pipenv.readthedocs.io/en/latest/) for installation and dependency management. For users unfamiliar with the Pipenv workflow, Pipenv's documentation provides a [Basic Usage](https://pipenv.readthedocs.io/en/latest/basics/) tutorial, along with some of the more advanced workflows. A project-specific installation guide can be found in [Sir Lancebot's README](https://github.com/python-discord/sir-lancebot/blob/master/README.md).
+Sir Lancebot utilizes [Pipenv](https://pipenv.readthedocs.io/en/latest/) for installation and dependency management. For users unfamiliar with the Pipenv workflow, Pipenv's documentation provides a [Basic Usage](https://pipenv.readthedocs.io/en/latest/basics/) tutorial, along with some of the more advanced workflows. A project-specific installation guide can be found in [Sir Lancebot's README](https://github.com/python-discord/sir-lancebot/blob/main/README.md).
 
 When pulling down changes from GitHub, remember to sync your environment using `pipenv sync --dev` to ensure you're using the most up-to-date versions the project's dependencies.
 
