@@ -12,6 +12,7 @@ from discord.ext.commands.errors import BadArgument
 
 from bot.constants import Colours
 from bot.exts.evergreen.profile_pic_modification._effects import PfpEffects
+from bot.utils.extensions import invoke_help_command
 from bot.utils.halloween import spookifications
 
 log = logging.getLogger(__name__)
@@ -44,7 +45,7 @@ class PfpModify(commands.Cog):
     async def pfp_modify(self, ctx: commands.Context) -> None:
         """Groups all of the pfp modifying commands to allow a single concurrency limit."""
         if not ctx.invoked_subcommand:
-            await ctx.send_help(ctx.command)
+            await invoke_help_command(ctx)
 
     @pfp_modify.command(name="8bitify", root_aliases=("8bitify",))
     async def eightbit_command(self, ctx: commands.Context) -> None:
