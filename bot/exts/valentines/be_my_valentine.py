@@ -44,7 +44,7 @@ class BeMyValentine(commands.Cog):
         2) use the command \".lovefest unsub\" to get rid of the lovefest role.
         """
         if not ctx.invoked_subcommand:
-            await invoke_help_command(ctx, ctx.command.name)
+            await invoke_help_command(ctx)
 
     @lovefest_role.command(name="sub")
     async def add_role(self, ctx: commands.Context) -> None:

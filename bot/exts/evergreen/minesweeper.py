@@ -84,7 +84,7 @@ class Minesweeper(commands.Cog):
     @commands.group(name='minesweeper', aliases=('ms',), invoke_without_command=True)
     async def minesweeper_group(self, ctx: commands.Context) -> None:
         """Commands for Playing Minesweeper."""
-        await invoke_help_command(ctx, ctx.command.name)
+        await invoke_help_command(ctx)
 
     @staticmethod
     def get_neighbours(x: int, y: int) -> typing.Generator[typing.Tuple[int, int], None, None]:

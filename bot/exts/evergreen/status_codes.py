@@ -19,7 +19,7 @@ class HTTPStatusCodes(commands.Cog):
     async def http_status_group(self, ctx: commands.Context) -> None:
         """Group containing dog and cat http status code commands."""
         if not ctx.invoked_subcommand:
-            await invoke_help_command(ctx, ctx.command.name)
+            await invoke_help_command(ctx)
 
     @http_status_group.command(name='cat')
     async def http_cat(self, ctx: commands.Context, code: int) -> None:

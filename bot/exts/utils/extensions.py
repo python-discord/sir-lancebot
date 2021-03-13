@@ -77,7 +77,7 @@ class Extensions(commands.Cog):
     @group(name="extensions", aliases=("ext", "exts", "c", "cogs"), invoke_without_command=True)
     async def extensions_group(self, ctx: Context) -> None:
         """Load, unload, reload, and list loaded extensions."""
-        await invoke_help_command(ctx, ctx.command.name)
+        await invoke_help_command(ctx)
 
     @extensions_group.command(name="load", aliases=("l",))
     async def load_command(self, ctx: Context, *extensions: Extension) -> None:
@@ -87,7 +87,7 @@ class Extensions(commands.Cog):
         If '\*' or '\*\*' is given as the name, all unloaded extensions will be loaded.
         """  # noqa: W605
         if not extensions:
-            await invoke_help_command(ctx, "extensions", ctx.command.name)
+            await invoke_help_command(ctx)
             return
 
         if "*" in extensions or "**" in extensions:
@@ -104,7 +104,7 @@ class Extensions(commands.Cog):
         If '\*' or '\*\*' is given as the name, all loaded extensions will be unloaded.
         """  # noqa: W605
         if not extensions:
-            await invoke_help_command(ctx, "extensions", ctx.command.name)
+            await invoke_help_command(ctx)
             return
 
         blacklisted = "\n".join(UNLOAD_BLACKLIST & set(extensions))
@@ -130,7 +130,7 @@ class Extensions(commands.Cog):
         If '\*\*' is given as the name, all extensions, including unloaded ones, will be reloaded.
         """  # noqa: W605
         if not extensions:
-            await invoke_help_command(ctx, "extensions", ctx.command.name)
+            await invoke_help_command(ctx)
             return
 
         if "**" in extensions:

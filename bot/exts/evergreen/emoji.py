@@ -76,7 +76,7 @@ class Emojis(commands.Cog):
         if emoji is not None:
             await ctx.invoke(self.info_command, emoji)
         else:
-            await invoke_help_command(ctx, ctx.command.name)
+            await invoke_help_command(ctx)
 
     @emoji_group.command(name="count", aliases=("c",))
     async def count_command(self, ctx: commands.Context, *, category_query: str = None) -> None:

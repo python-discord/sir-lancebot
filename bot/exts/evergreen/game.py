@@ -235,7 +235,7 @@ class Games(Cog):
         """
         # When user didn't specified genre, send help message
         if genre is None:
-            await invoke_help_command(ctx, ctx.command.name)
+            await invoke_help_command(ctx)
             return
 
         # Capitalize genre for check

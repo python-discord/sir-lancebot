@@ -64,7 +64,7 @@ class Space(Cog):
     @group(name="space", invoke_without_command=True)
     async def space(self, ctx: Context) -> None:
         """Head command that contains commands about space."""
-        await invoke_help_command(ctx, ctx.command.name)
+        await invoke_help_command(ctx)
 
     @space.command(name="apod")
     async def apod(self, ctx: Context, date: Optional[str] = None) -> None:
