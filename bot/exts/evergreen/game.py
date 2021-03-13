@@ -15,8 +15,8 @@ from discord.ext.commands import Cog, Context, group
 from bot.bot import Bot
 from bot.constants import STAFF_ROLES, Tokens
 from bot.utils.decorators import with_role
-from bot.utils.pagination import ImagePaginator, LinePaginator
 from bot.utils.extensions import invoke_help_command
+from bot.utils.pagination import ImagePaginator, LinePaginator
 
 # Base URL of IGDB API
 BASE_URL = "https://api.igdb.com/v4"

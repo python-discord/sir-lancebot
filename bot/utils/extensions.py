@@ -1,10 +1,10 @@
+from discord.ext.commands import Context
 import importlib
 import inspect
 import pkgutil
 from typing import Iterator, NoReturn
 
 from bot import exts
-from discord.ext.commands import Context
 
 
 def unqualify(name: str) -> str:
@@ -33,10 +33,7 @@ def walk_extensions() -> Iterator[str]:
 
 
 async def invoke_help_command(ctx: Context, *commands: str) -> None:
-    """Invoke the help command, and will use the default help command
-       if the help exten is not loaded.
-    """
-
+    """Invoke the help command or default help command if help extensions is not loaded."""
     if 'bot.exts.evergreen.help' in ctx.bot.extensions:
         help_command = ctx.bot.get_command('help')
         await ctx.invoke(help_command, *commands)

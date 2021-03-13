@@ -2,6 +2,7 @@ from http import HTTPStatus
 
 import discord
 from discord.ext import commands
+
 from bot.utils.extensions import invoke_help_command
 
 HTTP_DOG_URL = "https://httpstatusdogs.com/img/{code}.jpg"

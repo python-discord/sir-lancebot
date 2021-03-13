@@ -11,7 +11,7 @@ from bot import exts
 from bot.bot import Bot
 from bot.constants import Client, Emojis, MODERATION_ROLES, Roles
 from bot.utils.checks import with_role_check
-from bot.utils.extensions import EXTENSIONS, unqualify, invoke_help_command
+from bot.utils.extensions import EXTENSIONS, invoke_help_command, unqualify
 from bot.utils.pagination import LinePaginator
 
 log = logging.getLogger(__name__)
