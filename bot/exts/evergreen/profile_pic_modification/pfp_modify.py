@@ -241,11 +241,11 @@ class PfpModify(commands.Cog):
             user = ctx.message.author
 
         async with ctx.typing():
-            image_bytes = await ctx.author.avatar_url.read()
+            image_bytes = await user.avatar_url.read()
 
             file_name = FILENAME_STRING.format(
                 effect="spooky_avatar",
-                author=ctx.author.display_name
+                author=user.display_name
             )
             file = await in_executor(
                 PfpEffects.apply_effect,
