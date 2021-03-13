@@ -12,6 +12,7 @@ from bot.constants import (
 )
 from bot.exts.christmas.advent_of_code import _helpers
 from bot.utils.decorators import InChannelCheckFailure, in_month, whitelist_override, with_role
+from bot.utils.extensions import invoke_help_command
 
 log = logging.getLogger(__name__)
 
@@ -51,7 +52,7 @@ class AdventOfCode(commands.Cog):
     async def adventofcode_group(self, ctx: commands.Context) -> None:
         """All of the Advent of Code commands."""
         if not ctx.invoked_subcommand:
-            await ctx.send_help(ctx.command)
+            await invoke_help_command(ctx)
 
     @adventofcode_group.command(
         name="subscribe",

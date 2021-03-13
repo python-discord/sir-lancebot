@@ -9,6 +9,7 @@ from discord import Color, Embed, Emoji
 from discord.ext import commands
 
 from bot.constants import Colours, ERROR_REPLIES
+from bot.utils.extensions import invoke_help_command
 from bot.utils.pagination import LinePaginator
 from bot.utils.time import time_since
 
@@ -75,7 +76,7 @@ class Emojis(commands.Cog):
         if emoji is not None:
             await ctx.invoke(self.info_command, emoji)
         else:
-            await ctx.send_help(ctx.command)
+            await invoke_help_command(ctx)
 
     @emoji_group.command(name="count", aliases=("c",))
     async def count_command(self, ctx: commands.Context, *, category_query: str = None) -> None:
