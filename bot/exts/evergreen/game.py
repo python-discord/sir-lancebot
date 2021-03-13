@@ -16,6 +16,7 @@ from bot.bot import Bot
 from bot.constants import STAFF_ROLES, Tokens
 from bot.utils.decorators import with_role
 from bot.utils.pagination import ImagePaginator, LinePaginator
+from bot.utils.extensions import invoke_help_command
 
 # Base URL of IGDB API
 BASE_URL = "https://api.igdb.com/v4"
@@ -234,8 +235,7 @@ class Games(Cog):
         """
         # When user didn't specified genre, send help message
         if genre is None:
-            help_command = self.bot.get_command("help")
-            await ctx.invoke(help_command, ctx.command.name)
+            await invoke_help_command(ctx, ctx.command.name)
             return
 
         # Capitalize genre for check

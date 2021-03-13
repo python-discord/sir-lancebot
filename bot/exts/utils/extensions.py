@@ -11,7 +11,7 @@ from bot import exts
 from bot.bot import Bot
 from bot.constants import Client, Emojis, MODERATION_ROLES, Roles
 from bot.utils.checks import with_role_check
-from bot.utils.extensions import EXTENSIONS, unqualify
+from bot.utils.extensions import EXTENSIONS, unqualify, invoke_help_command
 from bot.utils.pagination import LinePaginator
 
 log = logging.getLogger(__name__)
@@ -77,8 +77,7 @@ class Extensions(commands.Cog):
     @group(name="extensions", aliases=("ext", "exts", "c", "cogs"), invoke_without_command=True)
     async def extensions_group(self, ctx: Context) -> None:
         """Load, unload, reload, and list loaded extensions."""
-        help_command = self.bot.get_command("help")
-        await ctx.invoke(help_command, ctx.command.name)
+        await invoke_help_command(ctx, ctx.command.name)
 
     @extensions_group.command(name="load", aliases=("l",))
     async def load_command(self, ctx: Context, *extensions: Extension) -> None:
@@ -88,8 +87,7 @@ class Extensions(commands.Cog):
         If '\*' or '\*\*' is given as the name, all unloaded extensions will be loaded.
         """  # noqa: W605
         if not extensions:
-            help_command = self.bot.get_command("help")
-            await ctx.invoke(help_command, "extensions", ctx.command.name)
+            await invoke_help_command(ctx, "extensions", ctx.command.name)
             return
 
         if "*" in extensions or "**" in extensions:
@@ -106,8 +104,7 @@ class Extensions(commands.Cog):
         If '\*' or '\*\*' is given as the name, all loaded extensions will be unloaded.
         """  # noqa: W605
         if not extensions:
-            help_command = self.bot.get_command("help")
-            await ctx.invoke(help_command, "extensions", ctx.command.name)
+            await invoke_help_command(ctx, "extensions", ctx.command.name)
             return
 
         blacklisted = "\n".join(UNLOAD_BLACKLIST & set(extensions))
@@ -133,8 +130,7 @@ class Extensions(commands.Cog):
         If '\*\*' is given as the name, all extensions, including unloaded ones, will be reloaded.
         """  # noqa: W605
         if not extensions:
-            help_command = self.bot.get_command("help")
-            await ctx.invoke(help_command, "extensions", ctx.command.name)
+            await invoke_help_command(ctx, "extensions", ctx.command.name)
             return
 
         if "**" in extensions:

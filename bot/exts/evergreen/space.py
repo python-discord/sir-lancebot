@@ -10,6 +10,7 @@ from discord.ext.commands import BadArgument, Cog, Context, Converter, group
 
 from bot.bot import Bot
 from bot.constants import Tokens
+from bot.utils.extensions import invoke_help_command
 
 logger = logging.getLogger(__name__)
 
@@ -63,8 +64,7 @@ class Space(Cog):
     @group(name="space", invoke_without_command=True)
     async def space(self, ctx: Context) -> None:
         """Head command that contains commands about space."""
-        help_command = self.bot.get_command("help")
-        await ctx.invoke(help_command, ctx.command.name)
+        await invoke_help_command(ctx, ctx.command.name)
 
     @space.command(name="apod")
     async def apod(self, ctx: Context, date: Optional[str] = None) -> None:

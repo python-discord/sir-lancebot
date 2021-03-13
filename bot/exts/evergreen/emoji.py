@@ -11,6 +11,7 @@ from discord.ext import commands
 from bot.constants import Colours, ERROR_REPLIES
 from bot.utils.pagination import LinePaginator
 from bot.utils.time import time_since
+from bot.utils.extensions import invoke_help_command
 
 log = logging.getLogger(__name__)
 
@@ -75,8 +76,7 @@ class Emojis(commands.Cog):
         if emoji is not None:
             await ctx.invoke(self.info_command, emoji)
         else:
-            help_command = self.bot.get_command("help")
-            await ctx.invoke(help_command, ctx.command.name)
+            await invoke_help_command(ctx, ctx.command.name)
 
     @emoji_group.command(name="count", aliases=("c",))
     async def count_command(self, ctx: commands.Context, *, category_query: str = None) -> None:

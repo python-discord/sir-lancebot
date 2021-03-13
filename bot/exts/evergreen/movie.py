@@ -10,6 +10,7 @@ from discord.ext.commands import Bot, Cog, Context, group
 
 from bot.constants import Tokens
 from bot.utils.pagination import ImagePaginator
+from bot.utils.extensions import invoke_help_command
 
 # Define base URL of TMDB
 BASE_URL = "https://api.themoviedb.org/3/"
@@ -73,8 +74,7 @@ class Movie(Cog):
         try:
             result = await self.get_movies_list(self.http_session, MovieGenres[genre].value, 1)
         except KeyError:
-            help_command = self.bot.get_command("help")
-            await ctx.invoke(help_command, ctx.command.name)
+            await invoke_help_command(ctx, ctx.command.name)
             return
 
         # Check if "results" is in result. If not, throw error.
