@@ -57,12 +57,12 @@ class WTFPython(commands.Cog):
 
         for x in range(FETCH_TRIES):
             async with self.bot.http_session.get(f"{WTF_PYTHON_RAW_URL}README.md") as resp:
-                log.trace(f"Fetching the latest WTF Python README.md")
+                log.trace("Fetching the latest WTF Python README.md")
 
                 if resp.status == 200:
                     self.raw = await resp.text()
                     await self.parse_readme(self.raw)
-                    log.debug(f"Successfully fetched the latest WTF Python README.md, breaking out of retry loop")
+                    log.debug("Successfully fetched the latest WTF Python README.md, breaking out of retry loop")
                     break
 
                 else:
@@ -81,7 +81,7 @@ class WTFPython(commands.Cog):
 
         try:
             action.value(self.bot, ext)
-        except (commands.ExtensionAlreadyLoaded, commands.ExtensionNotLoaded) as e:
+        except (commands.ExtensionAlreadyLoaded, commands.ExtensionNotLoaded):
             log.debug(f"Extension `{ext}` is already  is already {verb}ed.")
         else:
             log.debug(f"Extension {verb}ed: `{ext}`.")
