@@ -42,7 +42,7 @@ class PfpEffects:
             r2, g2, b2 = point
             return (r1 - r2) ** 2 + (g1 - g2) ** 2 + (b1 - b2) ** 2
 
-        closest_colours = sorted(Colours.easter_like_colours, key=lambda point: distance(point))
+        closest_colours = sorted(Colours.easter_like_colours, key=distance)
         r2, g2, b2 = closest_colours[0]
         r = (r1 + r2) // 2
         g = (g1 + g2) // 2
