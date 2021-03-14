@@ -1,6 +1,8 @@
+import functools
 import logging
 import random
 import re
+from enum import Enum
 from typing import Dict, Optional
 
 from discord import Embed
@@ -12,10 +14,9 @@ from bot.bot import Bot
 
 log = logging.getLogger(__name__)
 
-WTF_PYTHON_RAW_URL = ("http://raw.githubusercontent.com/satwikkansal/"
-                      "wtfpython/master/README.md")
+WTF_PYTHON_RAW_URL = "http://raw.githubusercontent.com/satwikkansal/wtfpython/master/"
 BASE_URL = "https://github.com/satwikkansal/wtfpython"
-THUMBNAIL = "https://raw.githubusercontent.com/satwikkansal/wtfpython/master/images/logo.png"
+FETCH_TRIES = 3
 
 ERROR_MESSAGE = f"""
 Unknown WTF Python Query. Please try to reformulate your query.
@@ -32,6 +33,14 @@ If the problem persists send a message in <#{constants.Channels.dev_contrib}>
 MINIMUM_CERTAINTY = 75
 
 
+class Action(Enum):
+    """Represents an action to perform on an extension."""
+
+    # Need to be partial otherwise they are considered to be function definitions.
+    LOAD = functools.partial(Bot.load_extension)
+    UNLOAD = functools.partial(Bot.unload_extension)
+
+
 class WTFPython(commands.Cog):
     """Cog that allows users to retrieve issues from GitHub."""
 
@@ -44,12 +53,42 @@ class WTFPython(commands.Cog):
     @tasks.loop(hours=1)
     async def get_wtf_python_readme(self) -> None:
         """Gets the content of README.md from the WTF Python Repository."""
-        async with self.bot.http_session.get(WTF_PYTHON_RAW_URL) as resp:
-            if resp.status == 200:
-                self.raw = await resp.text()
-                await self.parse_readme(self.raw)
-            else:
-                log.debug(f"Failed to get latest WTF Python README.md. Status code {resp.status}")
+        failed_tries = 0
+
+        for x in range(FETCH_TRIES):
+            async with self.bot.http_session.get(f"{WTF_PYTHON_RAW_URL}README.md") as resp:
+                log.trace(f"Fetching the latest WTF Python README.md")
+
+                if resp.status == 200:
+                    self.raw = await resp.text()
+                    await self.parse_readme(self.raw)
+                    log.debug(f"Successfully fetched the latest WTF Python README.md, breaking out of retry loop")
+                    break
+
+                else:
+                    failed_tries += 1
+                    log.debug(
+                        f"Failed to get latest WTF Python README.md on try {x}/{FETCH_TRIES}. Status code {resp.status}"
+                    )
+
+        if failed_tries == 3:
+            action = Action.UNLOAD
+        else:
+            action = Action.LOAD
+
+        verb = action.name.lower()
+        ext = self.__class__.__name__
+
+        try:
+            action.value(self.bot, ext)
+        except (commands.ExtensionAlreadyLoaded, commands.ExtensionNotLoaded):
+            log.debug(
+                f"Reached maximum failed `FETCH_TRIES`.\n\nExtension `{ext}` is already  is already {verb}ed.."
+            )
+        else:
+            log.debug(
+                f"Reached maximum failed `FETCH_TRIES`.\n\nExtension {verb}ed: `{ext}`."
+            )
 
     async def parse_readme(self, data: str) -> None:
         """
@@ -86,7 +125,7 @@ class WTFPython(commands.Cog):
             colour=constants.Colours.dark_green,
             description=f"[Go to Repository Section]({link})"
         )
-        embed.set_thumbnail(url=THUMBNAIL)
+        embed.set_thumbnail(url=f"{WTF_PYTHON_RAW_URL}images/logo.png")
         return embed
 
     @commands.command(aliases=("wtf",))
