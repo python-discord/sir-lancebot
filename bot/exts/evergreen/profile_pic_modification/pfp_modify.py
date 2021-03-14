@@ -4,7 +4,6 @@ import logging
 import typing as t
 from concurrent.futures import ThreadPoolExecutor
 
-import aiofiles
 import discord
 from aiohttp import client_exceptions
 from discord.ext import commands
@@ -21,6 +20,9 @@ _EXECUTOR = ThreadPoolExecutor(10)
 
 FILENAME_STRING = "{effect}_{author}.png"
 
+with open('bot/resources/pride/gender_options.json') as f:
+    GENDER_OPTIONS = json.loads(f.read())
+
 
 async def in_executor(func: t.Callable, *args) -> t.Any:
     """Allows non-async functions to work in async functions."""
@@ -34,12 +36,6 @@ class PfpModify(commands.Cog):
 
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
-        self.bot.loop.create_task(self.init_cog())
-
-    async def init_cog(self) -> None:
-        """Initial load from resources asynchronously."""
-        async with aiofiles.open('bot/resources/pride/gender_options.json') as f:
-            self.GENDER_OPTIONS = json.loads(await f.read())
 
     @commands.group()
     async def pfp_modify(self, ctx: commands.Context) -> None:
@@ -176,7 +172,7 @@ class PfpModify(commands.Cog):
         """
         option = option.lower()
         pixels = max(0, min(512, pixels))
-        flag = self.GENDER_OPTIONS.get(option)
+        flag = GENDER_OPTIONS.get(option)
         if flag is None:
             await ctx.send("I don't have that flag!")
             return
@@ -197,7 +193,7 @@ class PfpModify(commands.Cog):
         """
         option = option.lower()
         pixels = max(0, min(512, pixels))
-        flag = self.GENDER_OPTIONS.get(option)
+        flag = GENDER_OPTIONS.get(option)
         if flag is None:
             await ctx.send("I don't have that flag!")
             return
@@ -221,7 +217,7 @@ class PfpModify(commands.Cog):
     @prideavatar.command()
     async def flags(self, ctx: commands.Context) -> None:
         """This lists the flags that can be used with the prideavatar command."""
-        choices = sorted(set(self.GENDER_OPTIONS.values()))
+        choices = sorted(set(GENDER_OPTIONS.values()))
         options = "• " + "\n• ".join(choices)
         embed = discord.Embed(
             title="I have the following flags:",
