@@ -70,11 +70,7 @@ class PfpEffects:
         return ring
 
     @staticmethod
-    def pridify_effect(
-        image: Image,
-        pixels: int,
-        flag: str
-    ) -> Image:
+    def pridify_effect(image: Image, pixels: int, flag: str) -> Image:
         """Applies the pride effect to the given image."""
         image = image.resize((1024, 1024))
         image = PfpEffects.crop_avatar_circle(image)
