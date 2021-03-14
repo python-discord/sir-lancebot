@@ -45,7 +45,7 @@ class PrideLeader(commands.Cog):
 
         if not valid_names:
             valid_names = ", ".join(self.pride)
-            error_msg = "Sorry your input didn't match any stored name, here is a list of available names:"
+            error_msg = "Sorry your input didn't match any stored names, here is a list of available names:"
         else:
             valid_names = "\n".join(valid_names)
             error_msg = "Did you mean?"
@@ -113,5 +113,5 @@ class PrideLeader(commands.Cog):
 
 
 def setup(bot: commands.Bot) -> None:
-    """Loads Pride leader cog."""
+    """Loads the Pride leader cog."""
     bot.add_cog(PrideLeader(bot))
