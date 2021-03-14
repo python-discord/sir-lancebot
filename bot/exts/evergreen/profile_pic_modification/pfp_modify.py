@@ -25,7 +25,12 @@ with open('bot/resources/pride/gender_options.json') as f:
 
 
 async def in_executor(func: t.Callable, *args) -> t.Any:
-    """Allows non-async functions to work in async functions."""
+    """
+    Runs the given synchronus function `func` in an executor.
+
+    This is useful for running slow, blocking code within async
+    functions, so that they don't block the bot.
+    """
     log.trace(f"Running {func.__name__} in an executor.")
     loop = asyncio.get_event_loop()
     return await loop.run_in_executor(_EXECUTOR, func, *args)
@@ -233,7 +238,7 @@ class PfpModify(commands.Cog):
         brief='Spookify an user\'s avatar.'
     )
     async def spooky_avatar(self, ctx: commands.Context, user: discord.Member = None) -> None:
-        """A command to print the user's spookified avatar."""
+        """This "spookifies" the given user's avatar, with a random *spooky* effect."""
         if user is None:
             user = ctx.message.author
 

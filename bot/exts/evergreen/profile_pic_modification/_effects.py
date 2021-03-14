@@ -10,9 +10,9 @@ from bot.constants import Colours
 
 class PfpEffects:
     """
-    Implements various image effects.
+    Implements various image modifying effects, for the PfpModify cog.
 
-    All of these methods are blocking, so should be ran in threads.
+    All of these fuctions are slow, and blocking, so should be ran in executors.
     """
 
     @staticmethod
@@ -31,7 +31,7 @@ class PfpEffects:
     @staticmethod
     def closest(x: t.Tuple[int, int, int]) -> t.Tuple[int, int, int]:
         """
-        Finds the closest easter colour to a given pixel.
+        Finds the closest "easter" colour to a given pixel.
 
         Returns a merge between the original colour and the closest colour.
         """
@@ -71,7 +71,7 @@ class PfpEffects:
 
     @staticmethod
     def pridify_effect(image: Image, pixels: int, flag: str) -> Image:
-        """Applies the pride effect to the given image."""
+        """Applies the given pride effect to the given image."""
         image = image.resize((1024, 1024))
         image = PfpEffects.crop_avatar_circle(image)
 
@@ -96,7 +96,14 @@ class PfpEffects:
 
     @staticmethod
     def easterify_effect(image: Image, overlay_image: Image = None) -> Image:
-        """Applies the easter effect to the given image."""
+        """
+        Applies the easter effect to the given image.
+
+        This is done by getting the closest "easter" colour to each pixel and changing the colour
+        to the half-way RGBvalue.
+
+        We also then add an overlay image on top in middle right, a chocolate bunny by default.
+        """
         if overlay_image:
             ratio = 64 / overlay_image.height
             overlay_image = overlay_image.resize((
