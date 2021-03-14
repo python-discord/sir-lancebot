@@ -81,14 +81,10 @@ class WTFPython(commands.Cog):
 
         try:
             action.value(self.bot, ext)
-        except (commands.ExtensionAlreadyLoaded, commands.ExtensionNotLoaded):
-            log.debug(
-                f"Reached maximum failed `FETCH_TRIES`.\n\nExtension `{ext}` is already  is already {verb}ed.."
-            )
+        except (commands.ExtensionAlreadyLoaded, commands.ExtensionNotLoaded) as e:
+            log.debug(f"Extension `{ext}` is already  is already {verb}ed.")
         else:
-            log.debug(
-                f"Reached maximum failed `FETCH_TRIES`.\n\nExtension {verb}ed: `{ext}`."
-            )
+            log.debug(f"Extension {verb}ed: `{ext}`.")
 
     async def parse_readme(self, data: str) -> None:
         """
