@@ -44,7 +44,7 @@ REQUIRED_CACHE_KEYS = (
 
 AOC_EMBED_THUMBNAIL = (
     "https://raw.githubusercontent.com/python-discord"
-    "/branding/master/seasonal/christmas/server_icons/festive_256.gif"
+    "/branding/main/seasonal/christmas/server_icons/festive_256.gif"
 )
 
 # Create an easy constant for the EST timezone
