@@ -14,7 +14,7 @@ from bot.bot import Bot
 
 log = logging.getLogger(__name__)
 
-WTF_PYTHON_RAW_URL = "http://raw.githubusercontent.com/satwikkansal/wtfpython/master/"
+WTF_PYTHON_RAW_URL = "http://raw.githubusercontent.com/satwikkansal/wtfpython/mster/"
 BASE_URL = "https://github.com/satwikkansal/wtfpython"
 FETCH_TRIES = 3
 
@@ -72,12 +72,13 @@ class WTFPython(commands.Cog):
                     )
 
         if failed_tries == 3:
+            log.error("Couldn't fetch WTF Python README.md after 3 tries, unloading extension.")
             action = Action.UNLOAD
         else:
             action = Action.LOAD
 
         verb = action.name.lower()
-        ext = self.__class__.__name__
+        ext = "bot.exts.evergreen.wtf_python"
 
         try:
             action.value(self.bot, ext)
