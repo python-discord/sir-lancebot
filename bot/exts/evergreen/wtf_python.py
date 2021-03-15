@@ -82,7 +82,7 @@ class WTFPython(commands.Cog):
         try:
             action.value(self.bot, ext)
         except (commands.ExtensionAlreadyLoaded, commands.ExtensionNotLoaded):
-            log.debug(f"Extension `{ext}` is already  is already {verb}ed.")
+            log.debug(f"Extension `{ext}` is already {verb}ed.")
         else:
             log.debug(f"Extension {verb}ed: `{ext}`.")
 
@@ -113,19 +113,8 @@ class WTFPython(commands.Cog):
         match, certainty = process.extractOne(query, self.headers.keys())
         return match if certainty > MINIMUM_CERTAINTY else None
 
-    @staticmethod
-    def make_embed(query: str, link: str) -> Embed:
-        """Generates a embed for a search."""
-        embed = Embed(
-            title=f"WTF Python Search Result For {query}",
-            colour=constants.Colours.dark_green,
-            description=f"[Go to Repository Section]({link})"
-        )
-        embed.set_thumbnail(url=f"{WTF_PYTHON_RAW_URL}images/logo.png")
-        return embed
-
     @commands.command(aliases=("wtf",))
-    async def wtf_python(self, ctx: commands.Context, *query: str) -> None:
+    async def wtf_python(self, ctx: commands.Context, *, query: str) -> None:
         """
         Search wtf python.
 
@@ -133,7 +122,6 @@ class WTFPython(commands.Cog):
         Usage:
             --> .wtf wild imports
         """
-        query = " ".join(query)
         match = self.fuzzy_match_header(query)
         if not match:
             embed = Embed(
@@ -142,7 +130,12 @@ class WTFPython(commands.Cog):
                 colour=constants.Colours.soft_red
             )
         else:
-            embed = self.make_embed(query, self.headers[match])
+            embed = Embed(
+                title=f"WTF Python Search Result For {query}",
+                colour=constants.Colours.dark_green,
+                description=f"[Go to Repository Section]({self.headers[match]})"
+            )
+            embed.set_thumbnail(url=f"{WTF_PYTHON_RAW_URL}images/logo.png")
         await ctx.send(embed=embed)
 
 
