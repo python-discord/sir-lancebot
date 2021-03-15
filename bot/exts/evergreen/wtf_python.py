@@ -60,8 +60,8 @@ class WTFPython(commands.Cog):
                 log.trace("Fetching the latest WTF Python README.md")
 
                 if resp.status == 200:
-                    self.raw = await resp.text()
-                    await self.parse_readme(self.raw)
+                    raw = await resp.text()
+                    self.parse_readme(raw)
                     log.debug("Successfully fetched the latest WTF Python README.md, breaking out of retry loop")
                     break
 
@@ -86,7 +86,7 @@ class WTFPython(commands.Cog):
         else:
             log.debug(f"Extension {verb}ed: `{ext}`.")
 
-    async def parse_readme(self, data: str) -> None:
+    def parse_readme(self, data: str) -> None:
         """
         Parses the README.md into a dict.
 
