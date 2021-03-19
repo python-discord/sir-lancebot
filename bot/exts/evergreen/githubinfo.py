@@ -28,7 +28,7 @@ class GithubInfo(commands.Cog):
 
     @commands.group(name='github', aliases=('gh',))
     @commands.cooldown(1, 10, BucketType.user)
-    async def github_group(self, ctx: commands.Context):
+    async def github_group(self, ctx: commands.Context) -> None:
         """Commands for finding info related to Github."""
         if ctx.invoked_subcommand is None:
             await invoke_help_command(ctx)
@@ -99,7 +99,7 @@ class GithubInfo(commands.Cog):
         await ctx.send(embed=embed)
 
     @github_group.command(name='repo', aliases=('repository',))
-    async def github_repo_info(self, ctx: commands.Context, repo: Optional[str]):
+    async def github_repo_info(self, ctx: commands.Context, repo: Optional[str]) -> None:
         """
         Fetches a repositories's GitHub information. Repository should look like `user/reponame`.
 
@@ -115,7 +115,7 @@ class GithubInfo(commands.Cog):
             # There won't be a message key if this repo exists
             if repo_data.get('message') is not None:
                 await ctx.send(embed=discord.Embed(title=random.choice(NEGATIVE_REPLIES),
-                                                   description=f"The requested repository was not found.",
+                                                   description="The requested repository was not found.",
                                                    colour=discord.Colour.red()))
                 return
 
