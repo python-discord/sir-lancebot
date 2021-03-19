@@ -132,7 +132,7 @@ class GithubInfo(commands.Cog):
 
         # If it's a fork, then it will have a parent key
         if parent:
-            embed.description += f"\nForked from [{parent['full_name']}]({parent['html_url']})"
+            embed.description += f"\n\nForked from [{parent['full_name']}]({parent['html_url']})"
 
         embed.set_author(
             name=repo_owner["login"],
