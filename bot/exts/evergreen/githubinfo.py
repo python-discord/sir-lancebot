@@ -8,8 +8,11 @@ from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
 
 from bot.constants import NEGATIVE_REPLIES
+from bot.exts.utils.extensions import invoke_help_command
 
 log = logging.getLogger(__name__)
+
+GITHUB_API_URL = "https://api.github.com"
 
 
 class GithubInfo(commands.Cog):
@@ -23,21 +26,27 @@ class GithubInfo(commands.Cog):
         async with self.bot.http_session.get(url) as r:
             return await r.json()
 
-    @commands.command(name='github', aliases=['gh'])
-    @commands.cooldown(1, 60, BucketType.user)
-    async def get_github_info(self, ctx: commands.Context, username: Optional[str]) -> None:
+    @commands.group(name='github', aliases=('gh',))
+    @commands.cooldown(1, 10, BucketType.user)
+    async def github_group(self, ctx: commands.Context):
+        """Commands for finding info related to Github."""
+        if ctx.invoked_subcommand is None:
+            await invoke_help_command(ctx)
+
+    @github_group.command(name='user', aliases=('userinfo',))
+    async def github_user_info(self, ctx: commands.Context, username: Optional[str]) -> None:
         """
         Fetches a user's GitHub information.
 
         Username is optional and sends the help command if not specified.
         """
         if username is None:
-            await ctx.invoke(self.bot.get_command('help'), 'github')
+            await invoke_help_command(ctx)
             ctx.command.reset_cooldown(ctx)
             return
 
         async with ctx.typing():
-            user_data = await self.fetch_data(f"https://api.github.com/users/{username}")
+            user_data = await self.fetch_data(f"{GITHUB_API_URL}/users/{username}")
 
             # User_data will not have a message key if the user exists
             if user_data.get('message') is not None:
@@ -74,21 +83,68 @@ class GithubInfo(commands.Cog):
 
                 embed.add_field(name="Followers",
                                 value=f"[{user_data['followers']}]({user_data['html_url']}?tab=followers)")
-                embed.add_field(name="\u200b", value="\u200b")
                 embed.add_field(name="Following",
                                 value=f"[{user_data['following']}]({user_data['html_url']}?tab=following)")
 
             embed.add_field(name="Public repos",
                             value=f"[{user_data['public_repos']}]({user_data['html_url']}?tab=repositories)")
-            embed.add_field(name="\u200b", value="\u200b")
 
             if user_data['type'] == "User":
                 embed.add_field(name="Gists", value=f"[{gists}](https://gist.github.com/{username})")
 
                 embed.add_field(name=f"Organization{'s' if len(orgs)!=1 else ''}",
                                 value=orgs_to_add if orgs else "No organizations")
-                embed.add_field(name="\u200b", value="\u200b")
             embed.add_field(name="Website", value=blog)
+
+        await ctx.send(embed=embed)
+
+    @github_group.command(name='repo', aliases=('repositories',))
+    async def github_repo_info(self, ctx: commands.Context, repo: Optional[str]):
+        """
+        Fetches a repositories's GitHub information. Repository should look like `user/reponame`.
+
+        Repository is optional and sends the help command if not specified.
+        """
+        if repo is None:
+            await invoke_help_command(ctx)
+            ctx.command.reset_cooldown()
+            return
+        async with ctx.typing():
+            repo_data = await self.fetch_data(f"{GITHUB_API_URL}/repos/{repo}")
+
+            # There won't be a message key if this repo exists
+            if repo_data.get('message') is not None:
+                await ctx.send(embed=discord.Embed(title=random.choice(NEGATIVE_REPLIES),
+                                                   description=f"The requested repository was not found.",
+                                                   colour=discord.Colour.red()))
+                return
+
+        repo_owner = repo_data['owner']
+
+        parent = repo_data.get('parent')
+
+        embed = discord.Embed(title=f"{repo_data['name']}",
+                              description=repo_data["description"],
+                              colour=0x7289da,
+                              url=repo_data['html_url'],
+                              timestamp=datetime.strptime(repo_data['pushed_at'], "%Y-%m-%dT%H:%M:%SZ")
+                              )
+
+        # If it's a fork, then it will have a parent key
+        if parent:
+            embed.description += f"\nForked from [{parent['full_name']}]({parent['html_url']})"
+
+        embed.set_author(
+            name=repo_owner["login"],
+            url=repo_owner["html_url"],
+            icon_url=repo_owner["avatar_url"]
+        )
+
+        repo_created_at = datetime.strptime(repo_data['created_at'], "%Y-%m-%dT%H:%M:%SZ").strftime("%d/%m/%Y")
+
+        embed.set_footer(text=f"{repo_data['forks_count']} "
+                              f"⑂  •  {repo_data['stargazers_count']} ⭐ •  Created At {repo_created_at}  • "
+                              " Last commit ")
 
         await ctx.send(embed=embed)
 
