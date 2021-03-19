@@ -98,7 +98,7 @@ class GithubInfo(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @github_group.command(name='repo', aliases=('repositories',))
+    @github_group.command(name='repo', aliases=('repository',))
     async def github_repo_info(self, ctx: commands.Context, repo: Optional[str]):
         """
         Fetches a repositories's GitHub information. Repository should look like `user/reponame`.
