@@ -8,8 +8,8 @@ from discord.ext import commands
 from discord.ext.commands import BucketType, Context
 
 from bot import constants
-from bot.constants import Categories, Channels, Colours, ERROR_REPLIES, Roles, WHITELISTED_CHANNELS
-from bot.utils.decorators import with_role
+from bot.constants import Categories, Channels, Colours, ERROR_REPLIES
+from bot.utils.decorators import whitelist_override
 
 ERROR_MESSAGE = f"""
 Unknown cheat sheet. Please try to reformulate your query.
@@ -26,6 +26,8 @@ If the problem persists send a message in <#{Channels.dev_contrib}>
 URL = 'https://cheat.sh/python/{search}'
 ESCAPE_TT = str.maketrans({"`": "\\`"})
 ANSI_RE = re.compile(r"\x1b\[.*?m")
+# We need to pass headers as curl otherwise it would default to aiohttp which would return raw html.
+HEADERS = {'User-Agent': 'curl/7.68.0'}
 
 
 class CheatSheet(commands.Cog):
@@ -73,7 +75,7 @@ class CheatSheet(commands.Cog):
         aliases=("cht.sh", "cheatsheet", "cheat-sheet", "cht"),
     )
     @commands.cooldown(1, 10, BucketType.user)
-    @with_role(Roles.everyone_role)
+    @whitelist_override(categories=[Categories.help_in_use])
     async def cheat_sheet(self, ctx: Context, *search_terms: str) -> None:
         """
         Search cheat.sh.
@@ -82,17 +84,11 @@ class CheatSheet(commands.Cog):
         Usage:
         --> .cht read json
         """
-        if not (
-                ctx.channel.category.id == Categories.help_in_use
-                or ctx.channel.id in WHITELISTED_CHANNELS
-        ):
-            return
-
         async with ctx.typing():
             search_string = quote_plus(" ".join(search_terms))
 
             async with self.bot.http_session.get(
-                    URL.format(search=search_string)
+                    URL.format(search=search_string), headers=HEADERS
             ) as response:
                 result = ANSI_RE.sub("", await response.text()).translate(ESCAPE_TT)
 

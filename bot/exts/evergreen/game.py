@@ -15,6 +15,7 @@ from discord.ext.commands import Cog, Context, group
 from bot.bot import Bot
 from bot.constants import STAFF_ROLES, Tokens
 from bot.utils.decorators import with_role
+from bot.utils.extensions import invoke_help_command
 from bot.utils.pagination import ImagePaginator, LinePaginator
 
 # Base URL of IGDB API
@@ -234,7 +235,7 @@ class Games(Cog):
         """
         # When user didn't specified genre, send help message
         if genre is None:
-            await ctx.send_help("games")
+            await invoke_help_command(ctx)
             return
 
         # Capitalize genre for check

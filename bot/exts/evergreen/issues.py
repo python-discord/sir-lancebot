@@ -24,9 +24,11 @@ if GITHUB_TOKEN := Tokens.github:
     REQUEST_HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
 
 WHITELISTED_CATEGORIES = (
-    Categories.devprojects, Categories.media, Categories.development
+    Categories.development, Categories.devprojects, Categories.media, Categories.staff
 )
-WHITELISTED_CHANNELS_ON_MESSAGE = (Channels.organisation, Channels.mod_meta, Channels.mod_tools)
+WHITELISTED_CHANNELS_ON_MESSAGE = (
+    Channels.organisation, Channels.mod_meta, Channels.mod_tools, Channels.staff_voice
+)
 
 CODE_BLOCK_RE = re.compile(
     r"^`([^`\n]+)`"  # Inline codeblock
