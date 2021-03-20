@@ -26,7 +26,7 @@ class GithubInfo(commands.Cog):
         async with self.bot.http_session.get(url) as r:
             return await r.json()
 
-    @commands.group(name='github', aliases=('gh',))
+    @commands.group(name='github', aliases=('gh', 'git'))
     @commands.cooldown(1, 10, BucketType.user)
     async def github_group(self, ctx: commands.Context) -> None:
         """Commands for finding info related to Github."""
@@ -98,7 +98,7 @@ class GithubInfo(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @github_group.command(name='repository', aliases=('repo', 'git'))
+    @github_group.command(name='repository', aliases=('repo'))
     async def github_repo_info(self, ctx: commands.Context, repo: str) -> None:
         """
         Fetches a repositories's GitHub information. Repository should look like `user/reponame`.
