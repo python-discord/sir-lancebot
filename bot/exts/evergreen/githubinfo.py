@@ -98,37 +98,38 @@ class GithubInfo(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @github_group.command(name='repo', aliases=('repository',))
-    async def github_repo_info(self, ctx: commands.Context, repo: Optional[str]) -> None:
+    @github_group.command(name='repository', aliases=('repo', 'git'))
+    async def github_repo_info(self, ctx: commands.Context, repo: str) -> None:
         """
         Fetches a repositories's GitHub information. Repository should look like `user/reponame`.
 
         Repository is optional and sends the help command if not specified.
         """
-        if repo is None:
-            await invoke_help_command(ctx)
-            ctx.command.reset_cooldown()
-            return
         async with ctx.typing():
             repo_data = await self.fetch_data(f"{GITHUB_API_URL}/repos/{repo}")
 
             # There won't be a message key if this repo exists
             if repo_data.get('message') is not None:
-                await ctx.send(embed=discord.Embed(title=random.choice(NEGATIVE_REPLIES),
-                                                   description="The requested repository was not found.",
-                                                   colour=discord.Colour.red()))
+                embed = discord.Embed(
+                    title=random.choice(NEGATIVE_REPLIES),
+                    description="The requested repository was not found.",
+                    colour=discord.Colour.red()
+                )
+
+                await ctx.send(embed=embed)
                 return
 
         repo_owner = repo_data['owner']
 
         parent = repo_data.get('parent')
 
-        embed = discord.Embed(title=f"{repo_data['name']}",
-                              description=repo_data["description"],
-                              colour=0x7289da,
-                              url=repo_data['html_url'],
-                              timestamp=datetime.strptime(repo_data['pushed_at'], "%Y-%m-%dT%H:%M:%SZ")
-                              )
+        embed = discord.Embed(
+            title=f"{repo_data['name']}",
+            description=repo_data["description"],
+            colour=0x7289da,
+            url=repo_data['html_url'],
+            timestamp=datetime.strptime(repo_data['pushed_at'], "%Y-%m-%dT%H:%M:%SZ")
+        )
 
         # If it's a fork, then it will have a parent key
         if parent:
@@ -142,9 +143,13 @@ class GithubInfo(commands.Cog):
 
         repo_created_at = datetime.strptime(repo_data['created_at'], "%Y-%m-%dT%H:%M:%SZ").strftime("%d/%m/%Y")
 
-        embed.set_footer(text=f"{repo_data['forks_count']} "
-                              f"⑂  •  {repo_data['stargazers_count']} ⭐ •  Created At {repo_created_at}  • "
-                              " Last commit ")
+        embed.set_footer(
+            text=(
+                f"{repo_data['forks_count']} "
+                f"⑂  •  {repo_data['stargazers_count']} ⭐ •  Created At {repo_created_at}  • "
+                " Last commit "
+            )
+        )
 
         await ctx.send(embed=embed)
 
