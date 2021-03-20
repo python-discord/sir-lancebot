@@ -133,8 +133,7 @@ class GithubInfo(commands.Cog):
             title=f"{repo_data['name']}",
             description=repo_data["description"],
             colour=discord.Colour.blurple(),
-            url=repo_data['html_url'],
-            timestamp=datetime.strptime(repo_data['pushed_at'], "%Y-%m-%dT%H:%M:%SZ")
+            url=repo_data['html_url']
         )
 
         # If it's a fork, then it will have a parent key
@@ -148,13 +147,14 @@ class GithubInfo(commands.Cog):
         )
 
         repo_created_at = datetime.strptime(repo_data['created_at'], "%Y-%m-%dT%H:%M:%SZ").strftime("%d/%m/%Y")
+        last_pushed = datetime.strptime(repo_data['pushed_at'], "%Y-%m-%dT%H:%M:%SZ").strftime("%d/%m/%Y at %H:%M")
 
         embed.set_footer(
             text=(
                 f"{repo_data['forks_count']} ⑂ "
                 f"• {repo_data['stargazers_count']} ⭐ "
                 f"• Created At {repo_created_at} "
-                f"• Last commit "
+                f"• Last Commit {last_pushed}"
             )
         )
 
