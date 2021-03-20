@@ -152,7 +152,7 @@ class GithubInfo(commands.Cog):
         embed.set_footer(
             text=(
                 f"{repo_data['forks_count']} ⑂ "
-                f"• {repo_data['stargazers_count']} ⭐ " 
+                f"• {repo_data['stargazers_count']} ⭐ "
                 f"• Created At {repo_created_at} "
                 f"• Last commit "
             )
