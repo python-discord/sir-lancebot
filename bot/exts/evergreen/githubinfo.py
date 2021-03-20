@@ -6,7 +6,7 @@ import discord
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
 
-from bot.constants import NEGATIVE_REPLIES, Colours
+from bot.constants import Colours, NEGATIVE_REPLIES
 from bot.exts.utils.extensions import invoke_help_command
 
 log = logging.getLogger(__name__)
