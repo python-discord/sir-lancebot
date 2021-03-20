@@ -11,7 +11,7 @@ from discord import Colour, Embed
 from discord.ext import commands
 from discord.ext.commands import CheckFailure, Command, Context
 
-from bot.constants import ERROR_REPLIES, Month
+from bot.constants import Channels, ERROR_REPLIES, Month, WHITELISTED_CHANNELS
 from bot.utils import human_months, resolve_current_month
 from bot.utils.checks import in_whitelist_check
 
@@ -252,6 +252,12 @@ def whitelist_check(**default_kwargs: t.Container[int]) -> t.Callable[[Context],
         # Raise error if the check did not pass
         channels = set(kwargs.get("channels") or {})
         categories = kwargs.get("categories")
+
+        # Only output override channels + community_bot_commands
+        if channels:
+            default_whitelist_channels = set(WHITELISTED_CHANNELS)
+            default_whitelist_channels.discard(Channels.community_bot_commands)
+            channels.difference_update(default_whitelist_channels)
 
         # Add all whitelisted category channels
         if categories:
