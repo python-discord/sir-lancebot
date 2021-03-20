@@ -101,7 +101,7 @@ class GithubInfo(commands.Cog):
     @github_group.command(name='repository', aliases=('repo',))
     async def github_repo_info(self, ctx: commands.Context, repo: str) -> None:
         """
-        Fetches a repositories's GitHub information. Repository should look like `user/reponame`.
+        Fetches a repositories' GitHub information. The repository should look like `user/reponame`.
 
         Repository is optional and sends the help command if not specified.
         """
