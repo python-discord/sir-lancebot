@@ -132,7 +132,7 @@ class GithubInfo(commands.Cog):
         embed = discord.Embed(
             title=f"{repo_data['name']}",
             description=repo_data["description"],
-            colour=0x7289da,
+            colour=discord.Colour.blurple(),
             url=repo_data['html_url'],
             timestamp=datetime.strptime(repo_data['pushed_at'], "%Y-%m-%dT%H:%M:%SZ")
         )
