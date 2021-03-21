@@ -204,20 +204,18 @@ class PfpModify(commands.Cog):
             return
 
         async with ctx.typing():
-            async with self.bot.http_session as session:
-                try:
-                    response = await session.get(url)
-                except client_exceptions.ClientConnectorError:
-                    raise BadArgument("Cannot connect to provided URL!")
-                except client_exceptions.InvalidURL:
-                    raise BadArgument("Invalid URL!")
+            try:
+                async with self.bot.http_session.get(url) as response:
+                    if response.status != 200:
+                        await ctx.send("Bad response from provided URL!")
+                        return
+                    image_bytes = await response.read()
+            except client_exceptions.ClientConnectorError:
+                raise BadArgument("Cannot connect to provided URL!")
+            except client_exceptions.InvalidURL:
+                raise BadArgument("Invalid URL!")
 
-                if response.status != 200:
-                    await ctx.send("Bad response from provided URL!")
-                    return
-
-                image_bytes = await response.read()
-                await self.send_pride_image(ctx, image_bytes, pixels, flag, option)
+            await self.send_pride_image(ctx, image_bytes, pixels, flag, option)
 
     @prideavatar.command()
     async def flags(self, ctx: commands.Context) -> None:
