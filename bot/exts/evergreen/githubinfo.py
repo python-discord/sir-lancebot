@@ -50,7 +50,7 @@ class GithubInfo(commands.Cog):
                     colour=Colours.soft_red
                 )
 
-                await ctx.send()
+                await ctx.send(embed=embed)
                 return
 
             org_data = await self.fetch_data(user_data['organizations_url'])
