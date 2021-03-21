@@ -266,7 +266,7 @@ def whitelist_check(**default_kwargs: t.Container[int]) -> t.Callable[[Context],
                 if category is None:
                     continue
 
-                [channels.add(channel.id) for channel in category.text_channels]
+                channels.update(channel.id for channel in category.text_channels)
 
         if channels:
             channels_str = ', '.join(f"<#{c_id}>" for c_id in channels)
