@@ -6,7 +6,6 @@ from typing import Iterable, Union
 
 from discord import Embed, Message
 from discord.ext import commands
-from discord.ext.commands import errors
 from sentry_sdk import push_scope
 
 from bot.constants import Channels, Colours, ERROR_REPLIES, NEGATIVE_REPLIES
@@ -152,7 +151,7 @@ class CommandErrorHandler(commands.Cog):
                 if not await similar_command.can_run(ctx):
                     log.debug(log_msg)
                     return
-            except errors.CommandError as cmd_error:
+            except commands.errors.CommandError as cmd_error:
                 log.debug(log_msg)
                 await self.on_command_error(ctx, cmd_error)
                 return
