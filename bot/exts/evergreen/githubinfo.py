@@ -28,7 +28,7 @@ class GithubInfo(commands.Cog):
     @commands.group(name='github', aliases=('gh', 'git'))
     @commands.cooldown(1, 10, BucketType.user)
     async def github_group(self, ctx: commands.Context) -> None:
-        """Commands for finding info related to Github."""
+        """Commands for finding information related to GitHub."""
         if ctx.invoked_subcommand is None:
             await invoke_help_command(ctx)
 
