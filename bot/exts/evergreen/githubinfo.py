@@ -34,11 +34,7 @@ class GithubInfo(commands.Cog):
 
     @github_group.command(name='user', aliases=('userinfo',))
     async def github_user_info(self, ctx: commands.Context, username: str) -> None:
-        """
-        Fetches a user's GitHub information.
-
-        Username is optional and sends the help command if not specified.
-        """
+        """Fetches a user's GitHub information."""
         async with ctx.typing():
             user_data = await self.fetch_data(f"{GITHUB_API_URL}/users/{username}")
 
@@ -106,11 +102,7 @@ class GithubInfo(commands.Cog):
 
     @github_group.command(name='repository', aliases=('repo',))
     async def github_repo_info(self, ctx: commands.Context, repo: str) -> None:
-        """
-        Fetches a repositories' GitHub information. The repository should look like `user/reponame`.
-
-        Repository is optional and sends the help command if not specified.
-        """
+        """Fetches a repositories' GitHub information. The repository should look like `user/reponame`."""
         async with ctx.typing():
             repo_data = await self.fetch_data(f"{GITHUB_API_URL}/repos/{repo}")
 
