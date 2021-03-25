@@ -1,6 +1,7 @@
 import logging
 import random
 from datetime import datetime
+from urllib.parse import quote
 
 import discord
 from discord.ext import commands
@@ -90,7 +91,7 @@ class GithubInfo(commands.Cog):
             )
 
             if user_data['type'] == "User":
-                embed.add_field(name="Gists", value=f"[{gists}](https://gist.github.com/{username})")
+                embed.add_field(name="Gists", value=f"[{gists}](https://gist.github.com/{quote(username, safe='')})")
 
                 embed.add_field(
                     name=f"Organization{'s' if len(orgs)!=1 else ''}",
@@ -103,8 +104,18 @@ class GithubInfo(commands.Cog):
     @github_group.command(name='repository', aliases=('repo',))
     async def github_repo_info(self, ctx: commands.Context, repo: str) -> None:
         """Fetches a repositories' GitHub information. The repository should look like `user/reponame`."""
+        if repo.count('/') != 1:
+            embed = discord.Embed(
+                title=random.choice(NEGATIVE_REPLIES),
+                description="The repository should look like `user/reponame`.",
+                colour=Colours.soft_red
+            )
+
+            await ctx.send(embed=embed)
+            return
+
         async with ctx.typing():
-            repo_data = await self.fetch_data(f"{GITHUB_API_URL}/repos/{repo}")
+            repo_data = await self.fetch_data(f"{GITHUB_API_URL}/repos/{quote(repo)}")
 
             # There won't be a message key if this repo exists
             if repo_data.get('message') is not None:
