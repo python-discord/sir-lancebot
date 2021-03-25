@@ -8,6 +8,7 @@ import discord
 from discord.ext import commands, tasks
 
 from bot.constants import Categories, Channels, Colours, ERROR_REPLIES, Emojis, Tokens, WHITELISTED_CHANNELS
+from bot.utils.decorators import whitelist_override
 
 log = logging.getLogger(__name__)
 
@@ -26,7 +27,7 @@ if GITHUB_TOKEN := Tokens.github:
 WHITELISTED_CATEGORIES = (
     Categories.development, Categories.devprojects, Categories.media, Categories.staff
 )
-WHITELISTED_CHANNELS_ON_MESSAGE = (
+WHITELISTED_CHANNELS_ISSUES = (
     Channels.organisation, Channels.mod_meta, Channels.mod_tools, Channels.staff_voice
 )
 
@@ -142,6 +143,10 @@ class Issues(commands.Cog):
         return resp
 
     @commands.command(aliases=("pr",))
+    @whitelist_override(
+        categories=WHITELISTED_CATEGORIES,
+        channels=WHITELISTED_CHANNELS_ISSUES
+    )
     async def issue(
             self,
             ctx: commands.Context,
@@ -181,8 +186,8 @@ class Issues(commands.Cog):
     async def on_message(self, message: discord.Message) -> None:
         """Command to retrieve issue(s) from a GitHub repository using automatic linking if matching <repo>#<issue>."""
         if not(
-            message.channel.category.id in WHITELISTED_CATEGORIES
-            or message.channel.id in WHITELISTED_CHANNELS_ON_MESSAGE
+                message.channel.category.id in WHITELISTED_CATEGORIES
+                or message.channel.id in WHITELISTED_CHANNELS_ISSUES
         ):
             return
 
