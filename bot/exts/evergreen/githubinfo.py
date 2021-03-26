@@ -40,7 +40,7 @@ class GithubInfo(commands.Cog):
             user_data = await self.fetch_data(f"{GITHUB_API_URL}/users/{username}")
 
             # User_data will not have a message key if the user exists
-            if user_data.get('message') is not None:
+            if "message" in user_data:
                 embed = discord.Embed(
                     title=random.choice(NEGATIVE_REPLIES),
                     description=f"The profile for `{username}` was not found.",
@@ -118,7 +118,7 @@ class GithubInfo(commands.Cog):
             repo_data = await self.fetch_data(f"{GITHUB_API_URL}/repos/{quote(repo)}")
 
             # There won't be a message key if this repo exists
-            if repo_data.get('message') is not None:
+            if "message" in repo_data:
                 embed = discord.Embed(
                     title=random.choice(NEGATIVE_REPLIES),
                     description="The requested repository was not found.",
@@ -128,20 +128,21 @@ class GithubInfo(commands.Cog):
                 await ctx.send(embed=embed)
                 return
 
-        repo_owner = repo_data['owner']
-
-        parent = repo_data.get('parent')
-
         embed = discord.Embed(
-            title=f"{repo_data['name']}",
+            title=repo_data['name'],
             description=repo_data["description"],
             colour=discord.Colour.blurple(),
             url=repo_data['html_url']
         )
 
         # If it's a fork, then it will have a parent key
-        if parent:
+        try:
+            parent = repo_data["parent"]
             embed.description += f"\n\nForked from [{parent['full_name']}]({parent['html_url']})"
+        except KeyError:
+            log.debug("Repository is not a fork.")
+
+        repo_owner = repo_data['owner']
 
         embed.set_author(
             name=repo_owner["login"],
