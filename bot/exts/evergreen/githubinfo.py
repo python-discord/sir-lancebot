@@ -102,12 +102,17 @@ class GithubInfo(commands.Cog):
         await ctx.send(embed=embed)
 
     @github_group.command(name='repository', aliases=('repo',))
-    async def github_repo_info(self, ctx: commands.Context, repo: str) -> None:
-        """Fetches a repositories' GitHub information. The repository should look like `user/reponame`."""
+    async def github_repo_info(self, ctx: commands.Context, *repo: str) -> None:
+        """
+        Fetches a repositories' GitHub information.
+
+        The repository should look like `user/reponame` or `user reponame`.
+        """
+        repo = '/'.join(repo)
         if repo.count('/') != 1:
             embed = discord.Embed(
                 title=random.choice(NEGATIVE_REPLIES),
-                description="The repository should look like `user/reponame`.",
+                description="The repository should look like `user/reponame` or `user reponame`.",
                 colour=Colours.soft_red
             )
 
