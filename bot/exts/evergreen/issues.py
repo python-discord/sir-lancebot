@@ -180,12 +180,6 @@ class Issues(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message) -> None:
         """Command to retrieve issue(s) from a GitHub repository using automatic linking if matching <repo>#<issue>."""
-        if not(
-            message.channel.category.id in WHITELISTED_CATEGORIES
-            or message.channel.id in WHITELISTED_CHANNELS_ON_MESSAGE
-        ):
-            return
-
         message_repo_issue_map = re.findall(fr"({self.repo_regex})#(\d+)", message.content)
         links = []
 
