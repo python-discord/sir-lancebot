@@ -7,7 +7,7 @@ from enum import Enum
 import discord
 from discord.ext import commands, tasks
 
-from bot.constants import Categories, Channels, Colours, ERROR_REPLIES, Emojis, Tokens, WHITELISTED_CHANNELS
+from bot.constants import Categories, Colours, ERROR_REPLIES, Emojis, Tokens, WHITELISTED_CHANNELS
 
 log = logging.getLogger(__name__)
 
@@ -25,9 +25,6 @@ if GITHUB_TOKEN := Tokens.github:
 
 WHITELISTED_CATEGORIES = (
     Categories.development, Categories.devprojects, Categories.media, Categories.staff
-)
-WHITELISTED_CHANNELS_ON_MESSAGE = (
-    Channels.organisation, Channels.mod_meta, Channels.mod_tools, Channels.staff_voice
 )
 
 CODE_BLOCK_RE = re.compile(
