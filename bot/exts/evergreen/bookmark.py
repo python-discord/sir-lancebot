@@ -12,6 +12,7 @@ log = logging.getLogger(__name__)
 
 # Number of seconds to wait for other users to bookmark the same message
 TIMEOUT = 120
+BOOKMARK_EMOJI = "📌"
 
 
 class Bookmark(commands.Cog):
@@ -29,7 +30,7 @@ class Bookmark(commands.Cog):
             colour=Colours.soft_green
         )
         embed.add_field(
-            name="Wanna give it a visit?", 
+            name="Wanna give it a visit?",
             value=f"[Visit original message]({target_message.jump_url})"
         )
         embed.set_author(name=target_message.author, icon_url=target_message.author.avatar_url)
@@ -72,13 +73,14 @@ class Bookmark(commands.Cog):
         message = await channel.send(
             embed=discord.Embed(
                 description=(
-                    f"React with 📌 to be sent your very own bookmark to [this message]({target_message.jump_url})."
+                    f"React with {BOOKMARK_EMOJI} to be sent your very own bookmark to "
+                    f"[this message]({target_message.jump_url})."
                 ),
                 colour=Colours.soft_green
             )
         )
 
-        await message.add_reaction("📌")
+        await message.add_reaction(BOOKMARK_EMOJI)
         return message
 
     @commands.command(name="bookmark", aliases=("bm", "pin"))
@@ -111,8 +113,8 @@ class Bookmark(commands.Cog):
                     reaction_.message.id == reaction_message.id,
                     # User has not already bookmarked this message
                     user_.id not in bookmarked_users,
-                    # Reaction is the 📌 emoji
-                    str(reaction_.emoji) == "📌",
+                    # Reaction is the `BOOKMARK_EMOJI` emoji
+                    str(reaction_.emoji) == BOOKMARK_EMOJI,
                     # Reaction was not made by the Bot
                     user_.id != self.bot.user.id
                 ))
