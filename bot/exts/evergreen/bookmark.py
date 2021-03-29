@@ -22,7 +22,7 @@ class Bookmark(commands.Cog):
 
     @staticmethod
     def build_bookmark_dm(target_message: WrappedMessageConverter, title: str) -> discord.Embed:
-        """Builds the embed to DM the bookmark requestor."""
+        """Builds the embed to DM the bookmark requester."""
         embed = discord.Embed(
             title=title,
             description=target_message.content,
@@ -36,10 +36,10 @@ class Bookmark(commands.Cog):
 
     @staticmethod
     def build_error_embed(user: discord.Member) -> discord.Embed:
-        """Builds an error embed for when a bookmark requestor has DMs disabled."""
+        """Builds an error embed for when a bookmark requester has DMs disabled."""
         return discord.Embed(
             title=random.choice(ERROR_REPLIES),
-            description=f"{user.mention}, please enable your DMs to receive the bookmark",
+            description=f"{user.mention}, please enable your DMs to receive the bookmark.",
             colour=Colours.soft_red
         )
 
@@ -126,7 +126,7 @@ class Bookmark(commands.Cog):
             except asyncio.TimeoutError:
                 log.debug("Timed out waiting for a reaction")
                 break  # No reactions for the last `TIMEOUT` seconds
-            log.trace(f"{user} has sucessfully bookmarked from a reaction, attempting to DM them.")
+            log.trace(f"{user} has successfully bookmarked from a reaction, attempting to DM them.")
             await self.action_bookmark(ctx.channel, user, target_message, title)
             bookmarked_users.append(user.id)
 
