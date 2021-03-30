@@ -104,19 +104,19 @@ class Bookmark(commands.Cog):
             await ctx.send(embed=embed)
             return
 
-        def event_check(reaction_: discord.Reaction, user_: discord.Member) -> bool:
+        def event_check(reaction: discord.Reaction, user: discord.Member) -> bool:
             """Make sure that this reaction is what we want to operate on."""
             return (
                 # Conditions for a successful pagination:
                 all((
                     # Reaction is on this message
-                    reaction_.message.id == reaction_message.id,
+                    reaction.message.id == reaction_message.id,
                     # User has not already bookmarked this message
-                    user_.id not in bookmarked_users,
+                    user.id not in bookmarked_users,
                     # Reaction is the `BOOKMARK_EMOJI` emoji
-                    str(reaction_.emoji) == BOOKMARK_EMOJI,
+                    str(reaction.emoji) == BOOKMARK_EMOJI,
                     # Reaction was not made by the Bot
-                    user_.id != self.bot.user.id
+                    user.id != self.bot.user.id
                 ))
             )
         await self.action_bookmark(ctx.channel, ctx.author, target_message, title)
