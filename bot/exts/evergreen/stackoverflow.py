@@ -24,8 +24,10 @@ class Stackoverflow(commands.Cog):
     @commands.cooldown(1, 15, commands.cooldowns.BucketType.user)
     async def stackoverflow(self, ctx: commands.Context, *, search_query: str) -> None:
         """Sends the top 5 results of a search query from stackoverflow."""
+        encoded_search_query = quote_plus(search_query)
+
         for _ in range(3):
-            async with self.bot.http_session.get(BASE_URL.format(query=quote_plus(search_query))) as response:
+            async with self.bot.http_session.get(BASE_URL.format(query=encoded_search_query)) as response:
                 if response.status == 200:
                     data = await response.json()
                     break
@@ -52,7 +54,7 @@ class Stackoverflow(commands.Cog):
 
         top5 = data["items"][:5]
         embed = Embed(title=f"Search results for {search_query!r} - Stackoverflow",
-                      url=SEARCH_URL.format(query=quote_plus(search_query)),
+                      url=SEARCH_URL.format(query=encoded_search_query),
                       description=f"Here are the top {len(top5)} results:",
                       color=Colours.orange)
         for item in top5:
