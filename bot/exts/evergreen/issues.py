@@ -181,8 +181,8 @@ class Issues(commands.Cog):
     async def on_message(self, message: discord.Message) -> None:
         """Command to retrieve issue(s) from a GitHub repository using automatic linking if matching <repo>#<issue>."""
         if not(
-            (hasattr(message.channel, "category") and
-             message.channel.category and message.channel.category.id in WHITELISTED_CATEGORIES)
+            (hasattr(message.channel, "category")
+             and message.channel.category and message.channel.category.id in WHITELISTED_CATEGORIES)
             or message.channel.id in WHITELISTED_CHANNELS_ON_MESSAGE
         ):
             return
