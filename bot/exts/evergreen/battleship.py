@@ -227,7 +227,7 @@ class Game:
             if message.content.lower() == "surrender":
                 self.surrender = True
                 return True
-            self.match = re.match("([A-J]|[a-j]) ?((10)|[1-9])", message.content.strip())
+            self.match = re.fullmatch("([A-J]|[a-j]) ?((10)|[1-9])", message.content.strip())
             if not self.match:
                 self.bot.loop.create_task(message.add_reaction(CROSS_EMOJI))
             return bool(self.match)
