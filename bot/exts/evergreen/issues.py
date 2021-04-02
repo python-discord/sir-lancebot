@@ -7,7 +7,16 @@ from enum import Enum
 import discord
 from discord.ext import commands, tasks
 
-from bot.constants import Categories, Channels, Colours, ERROR_REPLIES, Emojis, Tokens, WHITELISTED_CHANNELS
+from bot.constants import (
+    Categories,
+    Channels,
+    Colours,
+    ERROR_REPLIES,
+    Emojis,
+    NEGATIVE_REPLIES,
+    Tokens,
+    WHITELISTED_CHANNELS
+)
 
 log = logging.getLogger(__name__)
 
@@ -148,11 +157,20 @@ class Issues(commands.Cog):
             user: str = "python-discord"
     ) -> None:
         """Command to retrieve issue(s) from a GitHub repository."""
-        if not(
+        if not ctx.guild or not(
             ctx.channel.category.id in WHITELISTED_CATEGORIES
             or ctx.channel.id in WHITELISTED_CHANNELS
         ):
-            return
+            await ctx.send(
+                embed=discord.Embed(
+                    title=random.choice(NEGATIVE_REPLIES),
+                    description=(
+                        "You can't run this command in this channel. "
+                        f"Try again in {Channels.community_bot_commands}"
+                    ),
+                    colour=discord.Colour.red()
+                )
+            )
 
         result = await self.fetch_issues(set(numbers), repository, user)
 
