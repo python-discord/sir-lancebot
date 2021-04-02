@@ -168,11 +168,12 @@ class Issues(commands.Cog):
                     title=random.choice(NEGATIVE_REPLIES),
                     description=(
                         "You can't run this command in this channel. "
-                        f"Try again in {Channels.community_bot_commands}"
+                        f"Try again in <#{Channels.community_bot_commands}>"
                     ),
                     colour=discord.Colour.red()
                 )
             )
+            return
 
         result = await self.fetch_issues(set(numbers), repository, user)
 
@@ -198,12 +199,8 @@ class Issues(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message) -> None:
         """Command to retrieve issue(s) from a GitHub repository using automatic linking if matching <repo>#<issue>."""
-        # Ignore messages from DMs
-        if not message.guild:
-            return
-
-        # Ignore messages not in whitelisted categories / channels
-        if not (
+        # Ignore messages not in whitelisted categories / channels, only when in guild.
+        if message.guild and not (
             message.channel.category.id in WHITELISTED_CATEGORIES
             or message.channel.id in WHITELISTED_CHANNELS_ON_MESSAGE
         ):
@@ -213,6 +210,18 @@ class Issues(commands.Cog):
         links = []
 
         if message_repo_issue_map:
+            if not message.guild:
+                await message.channel.send(
+                    embed=discord.Embed(
+                        title=random.choice(NEGATIVE_REPLIES),
+                        description=(
+                            "You can't retreive issues from DMs. "
+                            f"Try again in <#{Channels.community_bot_commands}>"
+                        ),
+                        colour=discord.Colour.red()
+                    )
+                )
+                return
             for repo_issue in message_repo_issue_map:
                 if not self.check_in_block(message, " ".join(repo_issue)):
                     result = await self.fetch_issues({repo_issue[1]}, repo_issue[0], "python-discord")
