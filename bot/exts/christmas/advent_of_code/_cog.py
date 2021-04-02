@@ -11,7 +11,8 @@ from bot.constants import (
     AdventOfCode as AocConfig, Channels, Colours, Emojis, Month, Roles, WHITELISTED_CHANNELS,
 )
 from bot.exts.christmas.advent_of_code import _helpers
-from bot.utils.decorators import InChannelCheckFailure, in_month, override_in_channel, with_role
+from bot.utils.decorators import InChannelCheckFailure, in_month, whitelist_override, with_role
+from bot.utils.extensions import invoke_help_command
 
 log = logging.getLogger(__name__)
 
@@ -36,9 +37,6 @@ class AdventOfCode(commands.Cog):
         self.about_aoc_filepath = Path("./bot/resources/advent_of_code/about.json")
         self.cached_about_aoc = self._build_about_embed()
 
-        self.countdown_task = None
-        self.status_task = None
-
         notification_coro = _helpers.new_puzzle_notification(self.bot)
         self.notification_task = self.bot.loop.create_task(notification_coro)
         self.notification_task.set_name("Daily AoC Notification")
@@ -50,18 +48,18 @@ class AdventOfCode(commands.Cog):
         self.status_task.add_done_callback(_helpers.background_task_callback)
 
     @commands.group(name="adventofcode", aliases=("aoc",))
-    @override_in_channel(AOC_WHITELIST)
+    @whitelist_override(channels=AOC_WHITELIST)
     async def adventofcode_group(self, ctx: commands.Context) -> None:
         """All of the Advent of Code commands."""
         if not ctx.invoked_subcommand:
-            await ctx.send_help(ctx.command)
+            await invoke_help_command(ctx)
 
     @adventofcode_group.command(
         name="subscribe",
         aliases=("sub", "notifications", "notify", "notifs"),
         brief="Notifications for new days"
     )
-    @override_in_channel(AOC_WHITELIST)
+    @whitelist_override(channels=AOC_WHITELIST)
     async def aoc_subscribe(self, ctx: commands.Context) -> None:
         """Assign the role for notifications about new days being ready."""
         current_year = datetime.now().year
@@ -82,7 +80,7 @@ class AdventOfCode(commands.Cog):
 
     @in_month(Month.DECEMBER)
     @adventofcode_group.command(name="unsubscribe", aliases=("unsub",), brief="Notifications for new days")
-    @override_in_channel(AOC_WHITELIST)
+    @whitelist_override(channels=AOC_WHITELIST)
     async def aoc_unsubscribe(self, ctx: commands.Context) -> None:
         """Remove the role for notifications about new days being ready."""
         role = ctx.guild.get_role(AocConfig.role_id)
@@ -94,7 +92,7 @@ class AdventOfCode(commands.Cog):
             await ctx.send("Hey, you don't even get any notifications about new Advent of Code tasks currently anyway.")
 
     @adventofcode_group.command(name="countdown", aliases=("count", "c"), brief="Return time left until next day")
-    @override_in_channel(AOC_WHITELIST)
+    @whitelist_override(channels=AOC_WHITELIST)
     async def aoc_countdown(self, ctx: commands.Context) -> None:
         """Return time left until next day."""
         if not _helpers.is_in_advent():
@@ -123,13 +121,13 @@ class AdventOfCode(commands.Cog):
         await ctx.send(f"There are {hours} hours and {minutes} minutes left until day {tomorrow.day}.")
 
     @adventofcode_group.command(name="about", aliases=("ab", "info"), brief="Learn about Advent of Code")
-    @override_in_channel(AOC_WHITELIST)
+    @whitelist_override(channels=AOC_WHITELIST)
     async def about_aoc(self, ctx: commands.Context) -> None:
         """Respond with an explanation of all things Advent of Code."""
         await ctx.send("", embed=self.cached_about_aoc)
 
     @adventofcode_group.command(name="join", aliases=("j",), brief="Learn how to join the leaderboard (via DM)")
-    @override_in_channel(AOC_WHITELIST)
+    @whitelist_override(channels=AOC_WHITELIST)
     async def join_leaderboard(self, ctx: commands.Context) -> None:
         """DM the user the information for joining the Python Discord leaderboard."""
         current_year = datetime.now().year
@@ -173,12 +171,13 @@ class AdventOfCode(commands.Cog):
         else:
             await ctx.message.add_reaction(Emojis.envelope)
 
+    @in_month(Month.DECEMBER)
     @adventofcode_group.command(
         name="leaderboard",
         aliases=("board", "lb"),
         brief="Get a snapshot of the PyDis private AoC leaderboard",
     )
-    @override_in_channel(AOC_WHITELIST_RESTRICTED)
+    @whitelist_override(channels=AOC_WHITELIST_RESTRICTED)
     async def aoc_leaderboard(self, ctx: commands.Context) -> None:
         """Get the current top scorers of the Python Discord Leaderboard."""
         async with ctx.typing():
@@ -198,12 +197,13 @@ class AdventOfCode(commands.Cog):
 
             await ctx.send(content=f"{header}\n\n{table}", embed=info_embed)
 
+    @in_month(Month.DECEMBER)
     @adventofcode_group.command(
         name="global",
         aliases=("globalboard", "gb"),
         brief="Get a link to the global leaderboard",
     )
-    @override_in_channel(AOC_WHITELIST_RESTRICTED)
+    @whitelist_override(channels=AOC_WHITELIST_RESTRICTED)
     async def aoc_global_leaderboard(self, ctx: commands.Context) -> None:
         """Get a link to the global Advent of Code leaderboard."""
         url = self.global_leaderboard_url
@@ -219,7 +219,7 @@ class AdventOfCode(commands.Cog):
         aliases=("dailystats", "ds"),
         brief="Get daily statistics for the Python Discord leaderboard"
     )
-    @override_in_channel(AOC_WHITELIST_RESTRICTED)
+    @whitelist_override(channels=AOC_WHITELIST_RESTRICTED)
     async def private_leaderboard_daily_stats(self, ctx: commands.Context) -> None:
         """Send an embed with daily completion statistics for the Python Discord leaderboard."""
         try:
@@ -244,7 +244,7 @@ class AdventOfCode(commands.Cog):
             info_embed = _helpers.get_summary_embed(leaderboard)
             await ctx.send(f"```\n{table}\n```", embed=info_embed)
 
-    @with_role(Roles.admin, Roles.events_lead)
+    @with_role(Roles.admin)
     @adventofcode_group.command(
         name="refresh",
         aliases=("fetch",),
@@ -268,7 +268,7 @@ class AdventOfCode(commands.Cog):
     def cog_unload(self) -> None:
         """Cancel season-related tasks on cog unload."""
         log.debug("Unloading the cog and canceling the background task.")
-        self.countdown_task.cancel()
+        self.notification_task.cancel()
         self.status_task.cancel()
 
     def _build_about_embed(self) -> discord.Embed:
