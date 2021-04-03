@@ -8,7 +8,7 @@ from discord import Embed, Message
 from discord.ext import commands
 from sentry_sdk import push_scope
 
-from bot.constants import Channels, Colours, ERROR_REPLIES, NEGATIVE_REPLIES
+from bot.constants import Channels, Colours, ERROR_REPLIES, NEGATIVE_REPLIES, RedirectOutput
 from bot.utils.decorators import InChannelCheckFailure, InMonthCheckFailure
 from bot.utils.exceptions import UserNotPlayingError
 
@@ -159,8 +159,8 @@ class CommandErrorHandler(commands.Cog):
             misspelled_content = ctx.message.content
             e = Embed()
             e.set_author(name="Did you mean:", icon_url=QUESTION_MARK_ICON)
-            e.description = f"{misspelled_content.replace(command_name, similar_command_name, 1)}"
-            await ctx.send(embed=e, delete_after=10.0)
+            e.description = misspelled_content.replace(command_name, similar_command_name, 1)
+            await ctx.send(embed=e, delete_after=RedirectOutput.delete_delay)
 
 
 def setup(bot: commands.Bot) -> None:
