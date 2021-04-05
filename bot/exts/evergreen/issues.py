@@ -15,8 +15,6 @@ BAD_RESPONSE = {
     404: "Issue/pull request not located! Please enter a valid number!",
     403: "Rate limit has been hit! Please try again later!"
 }
-
-MAX_REQUESTS = 10
 REQUEST_HEADERS = dict()
 
 REPOS_API = "https://api.github.com/orgs/{org}/repos"
@@ -32,6 +30,9 @@ CODE_BLOCK_RE = re.compile(
     r"|```(.+?)```",  # Multiline codeblock
     re.DOTALL | re.MULTILINE
 )
+
+# Maximum number of issues in one message
+MAXIMUM_ISSUES = 5
 
 
 class FetchIssueErrors(Enum):
@@ -83,7 +84,7 @@ class Issues(commands.Cog):
         if not numbers:
             return FetchIssueErrors.value_error
 
-        if len(numbers) > MAX_REQUESTS:
+        if len(numbers) > MAXIMUM_ISSUES:
             return FetchIssueErrors.max_requests
 
         for number in numbers:
@@ -162,7 +163,7 @@ class Issues(commands.Cog):
             embed = discord.Embed(
                 title=random.choice(ERROR_REPLIES),
                 color=Colours.soft_red,
-                description=f"Too many issues/PRs! (maximum of {MAX_REQUESTS})"
+                description=f"Too many issues/PRs! (maximum of {MAXIMUM_ISSUES})"
             )
             await ctx.send(embed=embed)
 
@@ -183,6 +184,15 @@ class Issues(commands.Cog):
         if message_repo_issue_map:
             # Remove duplicates
             message_repo_issue_map = set(message_repo_issue_map)
+
+            if len(message_repo_issue_map) > MAXIMUM_ISSUES:
+                embed = discord.Embed(
+                    title=random.choice(ERROR_REPLIES),
+                    color=Colours.soft_red,
+                    description=f"Too many issues/PRs! (maximum of {MAXIMUM_ISSUES})"
+                )
+                await message.channel.send(embed=embed)
+                return
 
             for repo_issue in message_repo_issue_map:
                 if not self.check_in_block(message, " ".join(repo_issue)):
