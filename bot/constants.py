@@ -165,6 +165,7 @@ class Colours:
 
 
 class Emojis:
+    cross_mark = "\u274C"
     star = "\u2B50"
     christmas_tree = "\U0001F384"
     check = "\u2611"

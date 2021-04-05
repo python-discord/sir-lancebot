@@ -9,7 +9,7 @@ from aiohttp import client_exceptions
 from discord.ext import commands
 from discord.ext.commands.errors import BadArgument
 
-from bot.constants import Colours
+from bot.constants import Client, Colours, Emojis
 from bot.exts.evergreen.profile_pic_modification._effects import PfpEffects
 from bot.utils.extensions import invoke_help_command
 from bot.utils.halloween import spookifications
@@ -42,6 +42,24 @@ class PfpModify(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
+    async def _fetch_member(self, member_id: int) -> t.Optional[discord.Member]:
+        """
+        Fetches a member and handles errors.
+
+        This helper funciton is required as the member cache doesn't always have the most up to date
+        profile picture. THis can lead to errors if the image is delted from the Discord CDN.
+        """
+        try:
+            member = await self.bot.get_guild(Client.guild).fetch_member(member_id)
+        except discord.errors.NotFound:
+            log.debug(f"Member {member_id} left the guild before we could get their pfp.")
+            return None
+        except discord.HTTPException:
+            log.exception(f"Exception while trying to retrieve member {member_id} from Discord.")
+            return None
+
+        return member
+
     @commands.group()
     async def pfp_modify(self, ctx: commands.Context) -> None:
         """Groups all of the pfp modifying commands to allow a single concurrency limit."""
@@ -52,10 +70,15 @@ class PfpModify(commands.Cog):
     async def eightbit_command(self, ctx: commands.Context) -> None:
         """Pixelates your avatar and changes the palette to an 8bit one."""
         async with ctx.typing():
-            image_bytes = await ctx.author.avatar_url.read()
+            member = await self._fetch_member(ctx.author.id)
+            if not member:
+                ctx.send(f"{Emojis.cross_mark} Could not get member info.")
+                return
+
+            image_bytes = await member.avatar_url.read()
             file_name = FILENAME_STRING.format(
                 effect="eightbit_avatar",
-                author=ctx.author.display_name
+                author=member.display_name
             )
 
             file = await in_executor(
@@ -71,7 +94,7 @@ class PfpModify(commands.Cog):
             )
 
             embed.set_image(url=f"attachment://{file_name}")
-            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=ctx.author.avatar_url)
+            embed.set_footer(text=f"Made by {member.display_name}.", icon_url=member.avatar_url)
 
         await ctx.send(embed=embed, file=file)
 
@@ -96,6 +119,11 @@ class PfpModify(commands.Cog):
                 return args[0]
 
         async with ctx.typing():
+            member = await self._fetch_member(ctx.author.id)
+            if not member:
+                ctx.send(f"{Emojis.cross_mark} Could not get member info.")
+                return
+
             egg = None
             if colours:
                 send_message = ctx.send
@@ -106,10 +134,10 @@ class PfpModify(commands.Cog):
                     return
                 ctx.send = send_message  # Reassigns ctx.send
 
-            image_bytes = await ctx.author.avatar_url_as(size=256).read()
+            image_bytes = await member.avatar_url_as(size=256).read()
             file_name = FILENAME_STRING.format(
                 effect="easterified_avatar",
-                author=ctx.author.display_name
+                author=member.display_name
             )
 
             file = await in_executor(
@@ -125,7 +153,7 @@ class PfpModify(commands.Cog):
                 description="Here is your lovely avatar, all bright and colourful\nwith Easter pastel colours. Enjoy :D"
             )
             embed.set_image(url=f"attachment://{file_name}")
-            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=ctx.author.avatar_url)
+            embed.set_footer(text=f"Made by {member.display_name}.", icon_url=member.avatar_url)
 
         await ctx.send(file=file, embed=embed)
 
@@ -183,7 +211,11 @@ class PfpModify(commands.Cog):
             return
 
         async with ctx.typing():
-            image_bytes = await ctx.author.avatar_url.read()
+            member = await self._fetch_member(ctx.author.id)
+            if not member:
+                ctx.send(f"{Emojis.cross_mark} Could not get member info.")
+                return
+            image_bytes = await member.avatar_url.read()
             await self.send_pride_image(ctx, image_bytes, pixels, flag, option)
 
     @prideavatar.command()
@@ -235,17 +267,22 @@ class PfpModify(commands.Cog):
         root_aliases=('spookyavatar', 'spookify', 'savatar'),
         brief='Spookify an user\'s avatar.'
     )
-    async def spooky_avatar(self, ctx: commands.Context, user: discord.Member = None) -> None:
+    async def spooky_avatar(self, ctx: commands.Context, member: discord.Member = None) -> None:
         """This "spookifies" the given user's avatar, with a random *spooky* effect."""
-        if user is None:
-            user = ctx.message.author
+        if member is None:
+            member = ctx.author
+
+        member = await self._fetch_member(member.id)
+        if not member:
+            ctx.send(f"{Emojis.cross_mark} Could not get member info.")
+            return
 
         async with ctx.typing():
-            image_bytes = await user.avatar_url.read()
+            image_bytes = await member.avatar_url.read()
 
             file_name = FILENAME_STRING.format(
                 effect="spooky_avatar",
-                author=user.display_name
+                author=member.display_name
             )
             file = await in_executor(
                 PfpEffects.apply_effect,
@@ -258,7 +295,7 @@ class PfpModify(commands.Cog):
                 title="Is this you or am I just really paranoid?",
                 colour=Colours.soft_red
             )
-            embed.set_author(name=user.name, icon_url=user.avatar_url)
+            embed.set_author(name=member.name, icon_url=member.avatar_url)
             embed.set_image(url=f"attachment://{file_name}")
             embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=ctx.author.avatar_url)
 
