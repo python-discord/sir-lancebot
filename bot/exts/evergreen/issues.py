@@ -181,6 +181,9 @@ class Issues(commands.Cog):
         links = []
 
         if message_repo_issue_map:
+            # Remove duplicates
+            message_repo_issue_map = set(message_repo_issue_map)
+
             for repo_issue in message_repo_issue_map:
                 if not self.check_in_block(message, " ".join(repo_issue)):
                     result = await self.fetch_issues({repo_issue[1]}, repo_issue[0], "python-discord")
