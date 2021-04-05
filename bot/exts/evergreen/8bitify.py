@@ -25,7 +25,7 @@ class EightBitify(commands.Cog):
     async def eightbit_command(self, ctx: commands.Context) -> None:
         """Pixelates your avatar and changes the palette to an 8bit one."""
         async with ctx.typing():
-            author = await self.bot.get_user(ctx.author.id)
+            author = await self.bot.fetch_user(ctx.author.id)
             image_bytes = await author.avatar_url.read()
             avatar = Image.open(BytesIO(image_bytes))
             avatar = avatar.convert("RGBA").resize((1024, 1024))
