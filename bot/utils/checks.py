@@ -39,6 +39,7 @@ def in_whitelist_check(
     channels: Container[int] = (),
     categories: Container[int] = (),
     roles: Container[int] = (),
+    allow_dms: bool = False,
     redirect: Optional[int] = constants.Channels.community_bot_commands,
     fail_silently: bool = False,
 ) -> bool:
@@ -66,21 +67,23 @@ def in_whitelist_check(
         # categories, it's probably not wise to rely on its category in any case.
         channels = tuple(channels) + (redirect,)
 
-    if channels and ctx.channel.id in channels:
-        log.trace(f"{ctx.author} may use the `{ctx.command.name}` command as they are in a whitelisted channel.")
-        return True
+    if allow_dms or ctx.guild is not None:
+        if channels and ctx.channel.id in channels:
+            log.trace(f"{ctx.author} may use the `{ctx.command.name}` command as they are in a whitelisted channel.")
+            return True
 
-    # Only check the category id if we have a category whitelist and the channel has a `category_id`
-    if categories and hasattr(ctx.channel, "category_id") and ctx.channel.category_id in categories:
-        log.trace(f"{ctx.author} may use the `{ctx.command.name}` command as they are in a whitelisted category.")
-        return True
+        # Only check the category id if we have a category whitelist and the channel has a `category_id`
+        if categories and hasattr(ctx.channel, "category_id") and ctx.channel.category_id in categories:
+            log.trace(f"{ctx.author} may use the `{ctx.command.name}` command as they are in a whitelisted category.")
+            return True
 
-    # Only check the roles whitelist if we have one and ensure the author's roles attribute returns
-    # an iterable to prevent breakage in DM channels (for if we ever decide to enable commands there).
-    if roles and any(r.id in roles for r in getattr(ctx.author, "roles", ())):
-        log.trace(f"{ctx.author} may use the `{ctx.command.name}` command as they have a whitelisted role.")
-        return True
-
+        # Only check the roles whitelist if we have one and ensure the author's roles attribute returns
+        # an iterable to prevent breakage in DM channels (for if we ever decide to enable commands there).
+        if roles and any(r.id in roles for r in getattr(ctx.author, "roles", ())):
+            log.trace(f"{ctx.author} may use the `{ctx.command.name}` command as they have a whitelisted role.")
+            return True
+    else:
+        log.trace(f"{ctx.author} tried to use the `{ctx.command.name}` in DMs.")
     log.trace(f"{ctx.author} may not use the `{ctx.command.name}` command within this context.")
 
     # Some commands are secret, and should produce no feedback at all.
