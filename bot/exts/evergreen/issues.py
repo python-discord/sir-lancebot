@@ -209,6 +209,10 @@ class Issues(commands.Cog):
             log.warning("repo_regex isn't ready, cannot look for issues.")
             return
 
+        # Ignore bots
+        if message.author.bot:
+            return
+
         # `issues` will hold a list of two element tuples `(repository, issue_number)`
         issues = re.findall(fr"({self.repo_regex})#(\d+)", message.content)
         links = []
