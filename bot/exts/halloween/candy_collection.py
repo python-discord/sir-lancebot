@@ -47,6 +47,9 @@ class CandyCollection(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message) -> None:
         """Randomly adds candy or skull reaction to non-bot messages in the Event channel."""
+        # Ignore messages in DMs
+        if not message.guild:
+            return
         # make sure its a human message
         if message.author.bot:
             return

@@ -7,7 +7,16 @@ from dataclasses import dataclass
 import discord
 from discord.ext import commands, tasks
 
-from bot.constants import Categories, Colours, ERROR_REPLIES, Emojis, Tokens, WHITELISTED_CHANNELS
+from bot.constants import (
+    Categories,
+    Channels,
+    Colours,
+    ERROR_REPLIES,
+    Emojis,
+    NEGATIVE_REPLIES,
+    Tokens,
+    WHITELISTED_CHANNELS
+)
 from bot.utils.decorators import whitelist_override
 
 log = logging.getLogger(__name__)
@@ -200,7 +209,7 @@ class Issues(commands.Cog):
             await ctx.invoke(self.bot.get_command('help'), 'issue')
 
         results = [await self.fetch_issues(number, repository, user) for number in numbers]
-        await ctx.send(embed=self.format_embed(results))
+        await ctx.send(embed=self.format_embed(results, user, repository))
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message) -> None:
@@ -218,6 +227,20 @@ class Issues(commands.Cog):
         links = []
 
         if issues:
+            # Block this from working in DMs
+            if not message.guild:
+                await message.channel.send(
+                    embed=discord.Embed(
+                        title=random.choice(NEGATIVE_REPLIES),
+                        description=(
+                            "You can't retrieve issues from DMs. "
+                            f"Try again in <#{Channels.community_bot_commands}>"
+                        ),
+                        colour=discord.Colour.red()
+                    )
+                )
+                return
+
             log.trace(f"Found {issues = }")
             # Remove duplicates
             issues = set(issues)
