@@ -14,7 +14,7 @@ from bot.bot import Bot
 
 log = logging.getLogger(__name__)
 
-WTF_PYTHON_RAW_URL = "http://raw.githubusercontent.com/satwikkansal/wtfpython/mster/"
+WTF_PYTHON_RAW_URL = "http://raw.githubusercontent.com/satwikkansal/wtfpython/master/"
 BASE_URL = "https://github.com/satwikkansal/wtfpython"
 FETCH_TRIES = 3
 
