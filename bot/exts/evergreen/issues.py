@@ -28,7 +28,7 @@ BAD_RESPONSE = {
 MAX_REQUESTS = 10
 REQUEST_HEADERS = dict()
 
-REPOS_API = "https://api.github.com/orgs/{org}/repos"
+REPOS_API = "https://api.github.com/orgs/{org}/repos?per_page=100"
 if GITHUB_TOKEN := Tokens.github:
     REQUEST_HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
 
