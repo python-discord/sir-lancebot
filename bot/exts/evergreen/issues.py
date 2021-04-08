@@ -26,7 +26,9 @@ BAD_RESPONSE = {
     404: "Issue/pull request not located! Please enter a valid number!",
     403: "Rate limit has been hit! Please try again later!"
 }
-REQUEST_HEADERS = dict()
+REQUEST_HEADERS = {
+    "Accept": "application/vnd.github.v3+json"
+}
 
 REPOSITORY_ENDPOINT = "https://api.github.com/orgs/{org}/repos"
 ISSUE_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/issues/{number}"
