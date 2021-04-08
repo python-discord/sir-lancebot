@@ -100,7 +100,7 @@ class Issues(commands.Cog):
 
         for number in numbers:
             url = f"https://api.github.com/repos/{user}/{repository}/issues/{number}"
-            merge_url = f"https://api.github.com/repos/{user}/{repository}/pulls/{number}/merge"
+            pulls_url = f"https://api.github.com/repos/{user}/{repository}/pulls/{number}"
             log.trace(f"Querying GH issues API: {url}")
             async with self.bot.http_session.get(url, headers=REQUEST_HEADERS) as r:
                 json_data = await r.json()
@@ -123,12 +123,15 @@ class Issues(commands.Cog):
             # we know that a PR has been requested and a call to the pulls API endpoint is necessary
             # to get the desired information for the PR.
             else:
-                log.trace(f"PR provided, querying GH pulls API for additional information: {merge_url}")
-                async with self.bot.http_session.get(merge_url) as m:
-                    if json_data.get("state") == "open":
+                log.trace(f"PR provided, querying GH pulls API for additional information: {pulls_url}")
+                async with self.bot.http_session.get(pulls_url) as p:
+                    pull_data = await p.json()
+                    if pull_data["draft"]:
+                        icon_url = Emojis.pull_request_draft
+                    elif pull_data["state"] == "open":
                         icon_url = Emojis.pull_request
                     # When the status is 204 this means that the state of the PR is merged
-                    elif m.status == 204:
+                    elif pull_data["merged_at"] is not None:
                         icon_url = Emojis.merge
                     else:
                         icon_url = Emojis.pull_request_closed
