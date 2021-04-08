@@ -178,7 +178,7 @@ class Issues(commands.Cog):
             if isinstance(result, IssueState):
                 description_list.append(f"{result.emoji} [{result.title}]({result.url})")
             elif isinstance(result, FetchError):
-                description_list.append(f"[{result.return_code}] {result.message}")
+                description_list.append(f":x: [{result.return_code}] {result.message}")
 
         resp = discord.Embed(
             colour=Colours.bright_green,
