@@ -67,7 +67,7 @@ class IssueState:
     number: int
     url: str
     title: str
-    icon_url: str
+    emoji_url: str
 
 
 class Issues(commands.Cog):
@@ -176,7 +176,7 @@ class Issues(commands.Cog):
 
         for result in results:
             if isinstance(result, IssueState):
-                description_list.append(f"{result.icon_url} [{result.title}]({result.url})")
+                description_list.append(f"{result.emoji_url} [{result.title}]({result.url})")
             elif isinstance(result, FetchError):
                 description_list.append(f"[{result.return_code}] {result.message}")
 
