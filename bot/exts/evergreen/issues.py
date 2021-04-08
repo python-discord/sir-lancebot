@@ -115,7 +115,7 @@ class Issues(commands.Cog):
         """
         Retrieve an issue from a GitHub repository.
 
-        returns IssueState on success, FetchError on failure.
+        Returns IssueState on success, FetchError on failure.
         """
         url = ISSUE_ENDPOINT.format(user=user, repository=repository, number=number)
         merge_url = PR_MERGE_ENDPOINT.format(user=user, repository=repository, number=number)
@@ -125,7 +125,7 @@ class Issues(commands.Cog):
             json_data = await r.json()
 
         if r.status == 403:
-            if "X-RateLimit-Remaining" in r.headers and r.headers["X-RateLimit-Remaining"] == "0":
+            if r.headers.get("X-RateLimit-Remaining") == "0":
                 log.info(f"Ratelimit reached while fetching {url}")
                 return FetchError(403, "Ratelimit reached, please retry in a few minutes.")
             return FetchError(403, "Cannot access issue.")
@@ -138,7 +138,7 @@ class Issues(commands.Cog):
         # if the issue or PR is present. However, the scope of information returned for PRs differs
         # from issues: if the 'issues' key is present in the response then we can pull the data we
         # need from the initial API call.
-        if "issues" in json_data.get("html_url"):
+        if "issues" in json_data["html_url"]:
             if json_data.get("state") == "open":
                 icon_url = Emojis.issue
             else:
@@ -251,7 +251,7 @@ class Issues(commands.Cog):
                     color=Colours.soft_red,
                     description=f"Too many issues/PRs! (maximum of {MAXIMUM_ISSUES})"
                 )
-                await message.channel.send(embed=embed).delete(delay=5)
+                await message.channel.send(embed=embed, delete_after=5)
                 return
 
             for repo_issue in issues:
