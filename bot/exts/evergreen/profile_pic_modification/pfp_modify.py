@@ -72,7 +72,7 @@ class PfpModify(commands.Cog):
         async with ctx.typing():
             member = await self._fetch_member(ctx.author.id)
             if not member:
-                ctx.send(f"{Emojis.cross_mark} Could not get member info.")
+                await ctx.send(f"{Emojis.cross_mark} Could not get member info.")
                 return
 
             image_bytes = await member.avatar_url.read()
@@ -121,7 +121,7 @@ class PfpModify(commands.Cog):
         async with ctx.typing():
             member = await self._fetch_member(ctx.author.id)
             if not member:
-                ctx.send(f"{Emojis.cross_mark} Could not get member info.")
+                await ctx.send(f"{Emojis.cross_mark} Could not get member info.")
                 return
 
             egg = None
@@ -213,7 +213,7 @@ class PfpModify(commands.Cog):
         async with ctx.typing():
             member = await self._fetch_member(ctx.author.id)
             if not member:
-                ctx.send(f"{Emojis.cross_mark} Could not get member info.")
+                await ctx.send(f"{Emojis.cross_mark} Could not get member info.")
                 return
             image_bytes = await member.avatar_url.read()
             await self.send_pride_image(ctx, image_bytes, pixels, flag, option)
@@ -274,7 +274,7 @@ class PfpModify(commands.Cog):
 
         member = await self._fetch_member(member.id)
         if not member:
-            ctx.send(f"{Emojis.cross_mark} Could not get member info.")
+            await ctx.send(f"{Emojis.cross_mark} Could not get member info.")
             return
 
         async with ctx.typing():
