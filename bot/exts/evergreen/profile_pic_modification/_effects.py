@@ -12,7 +12,7 @@ class PfpEffects:
     """
     Implements various image modifying effects, for the PfpModify cog.
 
-    All of these fuctions are slow, and blocking, so should be ran in executors.
+    All of these fuctions are slow, and blocking, so they should be ran in executors.
     """
 
     @staticmethod

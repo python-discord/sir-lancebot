@@ -21,7 +21,7 @@ _EXECUTOR = ThreadPoolExecutor(10)
 FILENAME_STRING = "{effect}_{author}.png"
 
 with open('bot/resources/pride/gender_options.json') as f:
-    GENDER_OPTIONS = json.loads(f.read())
+    GENDER_OPTIONS = json.load(f)
 
 
 async def in_executor(func: t.Callable, *args) -> t.Any:
@@ -98,7 +98,7 @@ class PfpModify(commands.Cog):
 
         await ctx.send(embed=embed, file=file)
 
-    @pfp_modify.command(pass_context=True, aliases=["easterify"], root_aliases=("easterify", "avatareasterify"))
+    @pfp_modify.command(aliases=["easterify"], root_aliases=("easterify", "avatareasterify"))
     async def avatareasterify(self, ctx: commands.Context, *colours: t.Union[discord.Colour, str]) -> None:
         """
         This "Easterifies" the user's avatar.
