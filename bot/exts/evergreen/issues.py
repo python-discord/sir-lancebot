@@ -28,7 +28,7 @@ BAD_RESPONSE = {
 }
 REQUEST_HEADERS = dict()
 
-REPOSITORY_ENDPOINT = "https://api.github.com/orgs/{org}/repos"
+REPOSITORY_ENDPOINT = "https://api.github.com/orgs/{org}/repos?per_page=100"
 ISSUE_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/issues/{number}"
 PR_MERGE_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/pulls/{number}/merge"
 
