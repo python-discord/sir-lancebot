@@ -18,6 +18,7 @@ from bot.constants import (
     WHITELISTED_CHANNELS
 )
 from bot.utils.decorators import whitelist_override
+from bot.utils.extensions import invoke_help_command
 
 log = logging.getLogger(__name__)
 
@@ -206,7 +207,7 @@ class Issues(commands.Cog):
                 description=f"Too many issues/PRs! (maximum of {MAXIMUM_ISSUES})"
             )
             await ctx.send(embed=embed)
-            await ctx.invoke(self.bot.get_command('help'), 'issue')
+            await invoke_help_command(ctx)
 
         results = [await self.fetch_issues(number, repository, user) for number in numbers]
         await ctx.send(embed=self.format_embed(results, user, repository))
