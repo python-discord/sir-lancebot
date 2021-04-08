@@ -226,7 +226,7 @@ class Issues(commands.Cog):
             return
 
         # `issues` will hold a list of two element tuples `(repository, issue_number)`
-        issues = re.findall(fr"({self.repo_regex})#(\d+)", message.content)
+        issues = re.findall(fr"\b({self.repo_regex})#(\d+)\b", message.content)
         links = []
 
         if issues:
