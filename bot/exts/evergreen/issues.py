@@ -67,7 +67,7 @@ class IssueState:
     number: int
     url: str
     title: str
-    emoji_url: str
+    emoji: str
 
 
 class Issues(commands.Cog):
@@ -143,9 +143,9 @@ class Issues(commands.Cog):
         # need from the initial API call.
         if "issues" in json_data["html_url"]:
             if json_data.get("state") == "open":
-                icon_url = Emojis.issue
+                emoji = Emojis.issue
             else:
-                icon_url = Emojis.issue_closed
+                emoji = Emojis.issue_closed
 
         # If the 'issues' key is not contained in the API response and there is no error code, then
         # we know that a PR has been requested and a call to the pulls API endpoint is necessary
@@ -154,16 +154,16 @@ class Issues(commands.Cog):
             log.trace(f"PR provided, querying GH pulls API for additional information: {merge_url}")
             async with self.bot.http_session.get(merge_url) as m:
                 if json_data.get("state") == "open":
-                    icon_url = Emojis.pull_request
+                    emoji = Emojis.pull_request
                 # When the status is 204 this means that the state of the PR is merged
                 elif m.status == 204:
-                    icon_url = Emojis.merge
+                    emoji = Emojis.merge
                 else:
-                    icon_url = Emojis.pull_request_closed
+                    emoji = Emojis.pull_request_closed
 
         issue_url = json_data.get("html_url")
 
-        return IssueState(repository, number, issue_url, json_data.get('title', ''), icon_url)
+        return IssueState(repository, number, issue_url, json_data.get('title', ''), emoji)
 
     @staticmethod
     def format_embed(
@@ -176,7 +176,7 @@ class Issues(commands.Cog):
 
         for result in results:
             if isinstance(result, IssueState):
-                description_list.append(f"{result.emoji_url} [{result.title}]({result.url})")
+                description_list.append(f"{result.emoji} [{result.title}]({result.url})")
             elif isinstance(result, FetchError):
                 description_list.append(f"[{result.return_code}] {result.message}")
 
