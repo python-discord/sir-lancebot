@@ -32,7 +32,7 @@ REQUEST_HEADERS = {
 
 REPOSITORY_ENDPOINT = "https://api.github.com/orgs/{org}/repos?per_page=100"
 ISSUE_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/issues/{number}"
-PR_MERGE_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/pulls/{number}/merge"
+PR_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/pulls/{number}"
 
 if GITHUB_TOKEN := Tokens.github:
     REQUEST_HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
@@ -121,7 +121,7 @@ class Issues(commands.Cog):
         Returns IssueState on success, FetchError on failure.
         """
         url = ISSUE_ENDPOINT.format(user=user, repository=repository, number=number)
-        merge_url = PR_MERGE_ENDPOINT.format(user=user, repository=repository, number=number)
+        pulls_url = PR_ENDPOINT.format(user=user, repository=repository, number=number)
         log.trace(f"Querying GH issues API: {url}")
 
         async with self.bot.http_session.get(url, headers=REQUEST_HEADERS) as r:
@@ -151,12 +151,15 @@ class Issues(commands.Cog):
         # we know that a PR has been requested and a call to the pulls API endpoint is necessary
         # to get the desired information for the PR.
         else:
-            log.trace(f"PR provided, querying GH pulls API for additional information: {merge_url}")
-            async with self.bot.http_session.get(merge_url) as m:
-                if json_data.get("state") == "open":
+            log.trace(f"PR provided, querying GH pulls API for additional information: {pulls_url}")
+            async with self.bot.http_session.get(pulls_url) as p:
+                pull_data = await p.json()
+                if pull_data["draft"]:
+                    emoji = Emojis.pull_request_draft
+                elif pull_data["state"] == "open":
                     emoji = Emojis.pull_request
-                # When the status is 204 this means that the state of the PR is merged
-                elif m.status == 204:
+                # When 'merged_at' is not None, this means that the state of the PR is merged
+                elif pull_data["merged_at"] is not None:
                     emoji = Emojis.merge
                 else:
                     emoji = Emojis.pull_request_closed
