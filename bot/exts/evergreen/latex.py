@@ -1,6 +1,8 @@
+import asyncio
 import re
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
 from io import BytesIO
-from typing import Union
 
 import discord
 import matplotlib.pyplot as plt
@@ -31,12 +33,9 @@ FORMATTED_CODE_REGEX = re.compile(
 class Latex(commands.Cog):
     """Renders latex."""
 
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
-
     @staticmethod
-    def _render(text: str) -> Union[BytesIO, str]:
-        """Return the rendered image if latex compiles without errors, otherwise return the error message."""
+    def _render(text: str) -> BytesIO:
+        """Return the rendered image if latex compiles without errors, otherwise raise a BadArgument Exception."""
         fig = plt.figure()
 
         try:
@@ -48,7 +47,7 @@ class Latex(commands.Cog):
             return rendered_image
 
         except ValueError as e:
-            return str(e)
+            raise commands.BadArgument(str(e))
 
     @staticmethod
     def _prepare_input(text: str) -> str:
@@ -64,12 +63,13 @@ class Latex(commands.Cog):
         """Renders the text in latex and sends the image."""
         text = self._prepare_input(text)
         async with ctx.typing():
-            image = self._render(text)
 
-            if isinstance(image, BytesIO):
-                await ctx.send(file=discord.File(image, "latex.png"))
-            else:
-                await ctx.send("```" + image + "```")
+            with ThreadPoolExecutor() as pool:
+                image = await asyncio.get_running_loop().run_in_executor(
+                    pool, partial(self._render, text)
+                )
+
+            await ctx.send(file=discord.File(image, "latex.png"))
 
 
 def setup(bot: commands.Bot) -> None:
