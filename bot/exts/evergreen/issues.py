@@ -239,7 +239,7 @@ class Issues(commands.Cog):
                             "You can't retrieve issues from DMs. "
                             f"Try again in <#{Channels.community_bot_commands}>"
                         ),
-                        colour=discord.Colour.red()
+                        colour=Colours.soft_red
                     )
                 )
                 return
