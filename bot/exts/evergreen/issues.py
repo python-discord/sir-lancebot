@@ -158,7 +158,7 @@ class Issues(commands.Cog):
                     emoji = Emojis.pull_request_draft
                 elif pull_data["state"] == "open":
                     emoji = Emojis.pull_request
-                # When the status is 204 this means that the state of the PR is merged
+                # When 'merged_at' is not None, this means that the state of the PR is merged
                 elif pull_data["merged_at"] is not None:
                     emoji = Emojis.merge
                 else:
