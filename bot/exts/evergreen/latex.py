@@ -36,17 +36,16 @@ class Latex(commands.Cog):
     def _render(text: str) -> BytesIO:
         """Return the rendered image if latex compiles without errors, otherwise raise a BadArgument Exception."""
         fig = plt.figure()
+        rendered_image = BytesIO()
+        fig.text(0, 1, text, horizontalalignment="left", verticalalignment="top")
 
         try:
-            fig.text(0, 1, text, horizontalalignment="left", verticalalignment="top")
-
-            rendered_image = BytesIO()
             plt.savefig(rendered_image, bbox_inches="tight", dpi=600)
-            rendered_image.seek(0)
-            return rendered_image
-
         except ValueError as e:
             raise commands.BadArgument(str(e))
+
+        rendered_image.seek(0)
+        return rendered_image
 
     @staticmethod
     def _prepare_input(text: str) -> str:
