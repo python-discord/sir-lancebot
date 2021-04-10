@@ -8,9 +8,6 @@ from discord.ext import commands
 class TimedCommands(commands.Cog):
     """Time the command execution of a command."""
 
-    def __init__(self, bot: commands.Bot) -> None:
-        self.bot = bot
-
     @staticmethod
     async def create_execution_context(ctx: commands.Context, command: str) -> commands.Context:
         """Get a new execution context for a command."""
@@ -23,6 +20,9 @@ class TimedCommands(commands.Cog):
     async def timed(self, ctx: commands.Context, *, command: str) -> None:
         """Time the command execution of a command."""
         new_ctx = await self.create_execution_context(ctx, command)
+
+        if new_ctx.command and new_ctx.command.qualified_name == "timed":
+            return await ctx.send("You are not allowed to time the execution of the `timed` command.")
 
         t_start = perf_counter()
         await new_ctx.command.invoke(new_ctx)
