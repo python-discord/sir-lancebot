@@ -31,16 +31,16 @@ FORMATTED_CODE_REGEX = re.compile(
 )
 
 CACHE_DIRECTORY = pathlib.Path("_latex_cache")
-if not CACHE_DIRECTORY.exists():
-    CACHE_DIRECTORY.mkdir()
+CACHE_DIRECTORY.mkdir(exist_ok=True)
 
 
 class Latex(commands.Cog):
     """Renders latex."""
 
     @staticmethod
-    def _render(text: str) -> BytesIO:
-        """Return the rendered image if latex compiles without errors, otherwise raise a BadArgument Exception."""
+    def _render(text: str, filepath: pathlib.Path) -> BytesIO:
+        """Return the rendered image if latex compiles without errors, otherwise raise a BadArgument Exception.
+        Saves rendered image to cache."""
         fig = plt.figure()
         rendered_image = BytesIO()
         fig.text(0, 1, text, horizontalalignment="left", verticalalignment="top")
@@ -51,6 +51,10 @@ class Latex(commands.Cog):
             raise commands.BadArgument(str(e))
 
         rendered_image.seek(0)
+
+        with open(filepath, "wb") as f:
+            f.write(rendered_image.getbuffer())
+
         return rendered_image
 
     @staticmethod
@@ -63,6 +67,7 @@ class Latex(commands.Cog):
             return text
 
     @commands.command()
+    @commands.max_concurrency(1, commands.BucketType.guild, wait=True)
     async def latex(self, ctx: commands.Context, *, text: str) -> None:
         """Renders the text in latex and sends the image."""
         text = self._prepare_input(text)
@@ -75,13 +80,10 @@ class Latex(commands.Cog):
 
             with ThreadPoolExecutor() as pool:
                 image = await asyncio.get_running_loop().run_in_executor(
-                    pool, self._render, text
+                    pool, self._render, text, image_path
                 )
 
             await ctx.send(file=discord.File(image, "latex.png"))
-
-            with open(image_path, "wb") as f:
-                f.write(image.getbuffer())
 
 
 def setup(bot: commands.Bot) -> None:
