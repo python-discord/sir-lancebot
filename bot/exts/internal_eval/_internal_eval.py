@@ -13,7 +13,7 @@ from ._helpers import EvalContext
 
 __all__ = ["InternalEval"]
 
-log = logging.getLogger("rattlesnake.exts.admin_tools.internal_eval")
+log = logging.getLogger(__name__)
 
 CODEBLOCK_REGEX = re.compile(r"(^```(py(thon)?)?\n)|(```$)")
 

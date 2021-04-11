@@ -11,7 +11,7 @@ import types
 import typing
 
 
-log = logging.getLogger("rattlesnake.exts.admin_tools.internal_eval")
+log = logging.getLogger(__name__)
 
 # A type alias to annotate the tuples returned from `sys.exc_info()`
 ExcInfo = typing.Tuple[typing.Type[Exception], Exception, types.TracebackType]
