@@ -9,6 +9,7 @@ from discord.ext import commands
 from bot.bot import Bot
 from bot.constants import Roles
 from bot.utils.decorators import with_role
+from bot.utils.extensions import invoke_help_command
 from ._helpers import EvalContext
 
 __all__ = ["InternalEval"]
@@ -151,7 +152,7 @@ class InternalEval(commands.Cog):
     async def internal_group(self, ctx: commands.Context) -> None:
         """Internal commands. Top secret!"""
         if not ctx.invoked_subcommand:
-            await ctx.send_help(ctx.command)
+            await invoke_help_command(ctx)
 
     @internal_group.command(name='eval', aliases=('e',))
     @with_role(Roles.admin)
