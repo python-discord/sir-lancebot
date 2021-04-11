@@ -50,6 +50,7 @@ class InternalEval(commands.Cog):
     ) -> str:
         """
         Shorten the `output` so it's shorter than `max_length`.
+
         There are three tactics for this, tried in the following order:
         - Shorten the output on a line-by-line basis
         - Shorten the output on any whitespace character
@@ -158,7 +159,6 @@ class InternalEval(commands.Cog):
     @with_role(Roles.admin)
     async def eval(self, ctx: commands.Context, *, code: str) -> None:
         """Run eval in a REPL-like format."""
-
         if match := list(FORMATTED_CODE_REGEX.finditer(code)):
             blocks = [block for block in match if block.group("block")]
 

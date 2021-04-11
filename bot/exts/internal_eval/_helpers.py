@@ -74,6 +74,7 @@ def format_internal_eval_exception(exc_info: ExcInfo, code: str) -> str:
 class EvalContext:
     """
     Represents the current `internal eval` context.
+
     The context remembers names set during earlier runs of `internal eval`. To
     clear the context, use the `?internal clear` command.
     """
@@ -93,6 +94,7 @@ class EvalContext:
     def dependencies(self) -> typing.Dict[str, typing.Any]:
         """
         Return a mapping of the dependencies for the wrapper function.
+
         By using a property descriptor, the mapping can't be accidentally
         mutated during evaluation. This ensures the dependencies are always
         available.
@@ -194,6 +196,7 @@ class WrapEvalCodeTree(ast.NodeTransformer):
     def visit_Pass(self, node: ast.Pass) -> typing.List[ast.AST]:  # noqa: N802
         """
         Replace the `_ast.Pass` node in the wrapper function by the eval AST.
+
         This method works on the assumption that there's a single `pass`
         statement in the wrapper function.
         """
@@ -211,6 +214,7 @@ class CaptureLastExpression(ast.NodeTransformer):
     def visit_Expr(self, node: ast.Expr) -> typing.Union[ast.Expr, ast.Assign]:  # noqa: N802
         """
         Replace the Expr node that is last child node of Module with an assignment.
+
         We use an assignment to capture the value of the last node, if it's a loose
         Expr node. Normally, the value of an Expr node is lost, meaning we don't get
         the output of such a last "loose" expression. By assigning it a name, we can
