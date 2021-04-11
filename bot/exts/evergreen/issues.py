@@ -30,7 +30,7 @@ REQUEST_HEADERS = {
     "Accept": "application/vnd.github.v3+json"
 }
 
-REPOSITORY_ENDPOINT = "https://api.github.com/orgs/{org}/repos?per_page=100"
+REPOSITORY_ENDPOINT = "https://api.github.com/orgs/{org}/repos?per_page=100&type=public"
 ISSUE_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/issues/{number}"
 PR_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/pulls/{number}"
 
