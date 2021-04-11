@@ -21,7 +21,11 @@ class TimedCommands(commands.Cog):
         """Time the command execution of a command."""
         new_ctx = await self.create_execution_context(ctx, command)
 
-        if new_ctx.command and new_ctx.command.qualified_name == "timed":
+        if not new_ctx.command:
+            await ctx.send("The command you are trying to time doesn't exist. Use `.help` for a list of commands.")
+            return
+
+        if new_ctx.command.qualified_name == "timed":
             await ctx.send("You are not allowed to time the execution of the `timed` command.")
             return
 
