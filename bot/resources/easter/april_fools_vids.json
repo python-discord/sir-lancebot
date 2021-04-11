@@ -115,11 +115,15 @@
     {
       "title": "Introducing Gmail Motion",
       "link": "https://youtu.be/Bu927_ul_X0"
-    },
+    }
+  ],
+  "nvidia": [
     {
       "title": "Introducing GeForce GTX G-Assist",
       "link": "https://youtu.be/smM-Wdk2RLQ"
-    },
+    }
+  ],
+  "razer": [
     {
       "title": "The Hovering Mouse - Project McFly | Razer",
       "link": "https://youtu.be/IlCx5gjAmqI"
@@ -129,5 +133,4 @@
       "link": "https://youtu.be/j8UJE7DoyJ8"
     }
   ]
-
 }
