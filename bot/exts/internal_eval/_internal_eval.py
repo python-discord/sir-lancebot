@@ -175,6 +175,6 @@ class InternalEval(commands.Cog):
     @internal_group.command(name='reset', aliases=("clear", "exit", "r", "c"))
     @with_role(Roles.admin)
     async def reset(self, ctx: commands.Context) -> None:
-        """Run eval in a REPL-like format."""
+        """Reset the context and locals of the eval session."""
         self.locals = {}
         await ctx.send("The evaluation context was reset.")
