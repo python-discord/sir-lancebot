@@ -12,7 +12,7 @@ class TimedCommands(commands.Cog):
     async def create_execution_context(ctx: commands.Context, command: str) -> commands.Context:
         """Get a new execution context for a command."""
         msg: Message = copy(ctx.message)
-        msg._update({"content": f"{ctx.prefix}{command}"})
+        msg.content = f"{ctx.prefix}{command}"
 
         return await ctx.bot.get_context(msg)
 
@@ -22,7 +22,8 @@ class TimedCommands(commands.Cog):
         new_ctx = await self.create_execution_context(ctx, command)
 
         if new_ctx.command and new_ctx.command.qualified_name == "timed":
-            return await ctx.send("You are not allowed to time the execution of the `timed` command.")
+            await ctx.send("You are not allowed to time the execution of the `timed` command.")
+            return
 
         t_start = perf_counter()
         await new_ctx.command.invoke(new_ctx)
