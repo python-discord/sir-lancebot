@@ -76,7 +76,7 @@ class EvalContext:
     Represents the current `internal eval` context.
 
     The context remembers names set during earlier runs of `internal eval`. To
-    clear the context, use the `?internal clear` command.
+    clear the context, use the `.internal clear` command.
     """
 
     def __init__(self, context_vars: Namespace, local_vars: Namespace) -> None:
