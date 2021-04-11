@@ -108,7 +108,7 @@ class InternalEval(commands.Cog):
 
             output = self.shorten_output(output)
 
-        await ctx.send(f"```py\n{output}```{upload_message}")
+        await ctx.send(f"```py\n{output}\n```{upload_message}")
 
     async def _eval(self, ctx: commands.Context, code: str) -> None:
         """Evaluate the `code` in the current evaluation context."""
