@@ -1,4 +1,6 @@
 import asyncio
+import hashlib
+import pathlib
 import re
 from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
@@ -27,6 +29,10 @@ FORMATTED_CODE_REGEX = re.compile(
     r"(?P=delim)",                          # match the exact same delimiter from the start again
     re.DOTALL | re.IGNORECASE,              # "." also matches newlines, case insensitive
 )
+
+CACHE_DIRECTORY = pathlib.Path("_latex_cache")
+if not CACHE_DIRECTORY.exists():
+    CACHE_DIRECTORY.mkdir()
 
 
 class Latex(commands.Cog):
@@ -60,7 +66,12 @@ class Latex(commands.Cog):
     async def latex(self, ctx: commands.Context, *, text: str) -> None:
         """Renders the text in latex and sends the image."""
         text = self._prepare_input(text)
+        query_hash = hashlib.md5(text.encode()).hexdigest()
+        image_path = CACHE_DIRECTORY.joinpath(f"{query_hash}.png")
         async with ctx.typing():
+            if image_path.exists():
+                await ctx.send(file=discord.File(image_path))
+                return
 
             with ThreadPoolExecutor() as pool:
                 image = await asyncio.get_running_loop().run_in_executor(
@@ -68,6 +79,9 @@ class Latex(commands.Cog):
                 )
 
             await ctx.send(file=discord.File(image, "latex.png"))
+
+            with open(image_path, "wb") as f:
+                f.write(image.getbuffer())
 
 
 def setup(bot: commands.Bot) -> None:
