@@ -15,8 +15,6 @@ __all__ = ["InternalEval"]
 
 log = logging.getLogger(__name__)
 
-CODEBLOCK_REGEX = re.compile(r"(^```(py(thon)?)?\n)|(```$)")
-
 FORMATTED_CODE_REGEX = re.compile(
     r"(?P<delim>(?P<block>```)|``?)"        # code delimiter: 1-3 backticks; (?P=block) only matches if it's a block
     r"(?(block)(?:(?P<lang>[a-z]+)\n)?)"    # if we're in a block, match optional language (only letters plus newline)
