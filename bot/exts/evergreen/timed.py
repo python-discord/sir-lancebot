@@ -16,7 +16,7 @@ class TimedCommands(commands.Cog):
 
         return await ctx.bot.get_context(msg)
 
-    @commands.command(name="timed", aliases=["t"])
+    @commands.command(name="timed", aliases=["time", "t"])
     async def timed(self, ctx: commands.Context, *, command: str) -> None:
         """Time the command execution of a command."""
         new_ctx = await self.create_execution_context(ctx, command)
