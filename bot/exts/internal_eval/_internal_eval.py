@@ -164,17 +164,12 @@ class InternalEval(commands.Cog):
 
             if len(blocks) > 1:
                 code = '\n'.join(block.group("code") for block in blocks)
-                info = "several code blocks"
             else:
                 match = match[0] if len(blocks) == 0 else blocks[0]
                 code, block, lang, delim = match.group("code", "block", "lang", "delim")
-                if block:
-                    info = (f"'{lang}' highlighted" if lang else "plain") + " code block"
-                else:
-                    info = f"{delim}-enclosed inline code"
+
         else:
             code = RAW_CODE_REGEX.fullmatch(code).group("code")
-            info = "unformatted or badly formatted code"
 
         code = textwrap.dedent(code)
         await self._eval(ctx, code)
