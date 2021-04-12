@@ -112,11 +112,6 @@ class InternalEval(commands.Cog):
 
     async def _eval(self, ctx: commands.Context, code: str) -> None:
         """Evaluate the `code` in the current evaluation context."""
-        if code.startswith("exit"):
-            self.locals = {}
-            await ctx.send("The evaluation context was reset.")
-            return
-
         context_vars = {
             "message": ctx.message,
             "author": ctx.message.author,
