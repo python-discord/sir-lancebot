@@ -15,6 +15,7 @@ PyYAML = "~=5.4"
 "discord.py" = {extras = ["voice"], version = "~=1.5.1"}
 async-rediscache = {extras = ["fakeredis"], version = "~=0.1.4"}
 emojis = "~=0.6.0"
+matplotlib = "~=3.4.1"
 
 [dev-packages]
 flake8 = "~=3.8"
