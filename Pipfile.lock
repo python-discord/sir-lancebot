@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "2cddd3d7f43bb0df21fabd1c801c844c56db93049db460e2c5b2d9beb9165b9d"
+            "sha256": "03b52d5b9fdfa6d037780d5aa2896c82fd5454a40bd69acf7e9b0e129557dbd5"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -398,15 +398,8 @@
                 "sha256:e98eca29a05913e82177b3ba3d198b1728e164869c613d76d0de4bde6768a50e",
                 "sha256:f217c3954ce5fd88303fc0c317af55d5e0204106d86dea17eb8205700d47dec2"
             ],
-            "markers": "python_version >= '3.6'",
-            "version": "==8.2.0"
-        },
-        "pillow-simd": {
-            "hashes": [
-                "sha256:c27907af0e7ede1ceed281719e722e7dbf3e1dbfe561373978654a6b64896cb7"
-            ],
             "index": "pypi",
-            "version": "==7.0.0.post3"
+            "version": "==8.2.0"
         },
         "pycares": {
             "hashes": [
@@ -716,11 +709,11 @@
         },
         "identify": {
             "hashes": [
-                "sha256:398cb92a7599da0b433c65301a1b62b9b1f4bb8248719b84736af6c0b22289d6",
-                "sha256:4537474817e0bbb8cea3e5b7504b7de6d44e3f169a90846cbc6adb0fc8294502"
+                "sha256:43cb1965e84cdd247e875dec6d13332ef5be355ddc16776396d98089b9053d87",
+                "sha256:c7c0f590526008911ccc5ceee6ed7b085cbc92f7b6591d0ee5913a130ad64034"
             ],
             "markers": "python_full_version >= '3.6.1'",
-            "version": "==2.2.3"
+            "version": "==2.2.2"
         },
         "mccabe": {
             "hashes": [
@@ -731,10 +724,10 @@
         },
         "nodeenv": {
             "hashes": [
-                "sha256:3ef13ff90291ba2a4a7a4ff9a979b63ffdd00a464dbe04acf0ea6471517a4c2b",
-                "sha256:621e6b7076565ddcacd2db0294c0381e01fd28945ab36bcf00f41c5daf63bef7"
+                "sha256:5304d424c529c997bc888453aeaa6362d242b6b4631e90f3d4bf1b290f1c84a9",
+                "sha256:ab45090ae383b716c4ef89e690c41ff8c2b257b85b309f01f3654df3d084bd7c"
             ],
-            "version": "==1.6.0"
+            "version": "==1.5.0"
         },
         "pep8-naming": {
             "hashes": [
