@@ -14,7 +14,6 @@ class AprilFoolVideos(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.yt_vids = self.load_json()
-        self.youtubers = ['google']  # will add more in future
 
     @staticmethod
     def load_json() -> dict:
@@ -27,10 +26,11 @@ class AprilFoolVideos(commands.Cog):
     @commands.command(name='fool')
     async def april_fools(self, ctx: commands.Context) -> None:
         """Get a random April Fools' video from Youtube."""
-        random_youtuber = random.choice(self.youtubers)
-        category = self.yt_vids[random_youtuber]
-        random_vid = random.choice(category)
-        await ctx.send(f"Check out this April Fools' video by {random_youtuber}.\n\n{random_vid['link']}")
+        video = random.choice(self.yt_vids)
+
+        channel, url = video["channel"], video["url"]
+
+        await ctx.send(f"Check out this April Fools' video by {channel}.\n\n{url}")
 
 
 def setup(bot: commands.Bot) -> None:
