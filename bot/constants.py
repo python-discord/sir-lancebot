@@ -168,6 +168,7 @@ class Emojis:
     issue_closed = "<:IssueClosed:629695470570307614>"
     pull_request = "<:PROpen:629695470175780875>"
     pull_request_closed = "<:PRClosed:629695470519713818>"
+    pull_request_draft = "<:PRDraft:829755345425399848>"
     merge = "<:PRMerged:629695470570176522>"
 
     number_emojis = {
