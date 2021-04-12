@@ -41,6 +41,8 @@ async def _eval_wrapper_function():
         _eval_context.locals = locals()
 _eval_context.function = _eval_wrapper_function
 """
+INTERNAL_EVAL_FRAMENAME = "<internal eval>"
+EVAL_WRAPPER_FUNCTION_FRAMENAME = "_eval_wrapper_function"
 
 
 def format_internal_eval_exception(exc_info: ExcInfo, code: str) -> str:
@@ -51,11 +53,11 @@ def format_internal_eval_exception(exc_info: ExcInfo, code: str) -> str:
 
     output = ["Traceback (most recent call last):"]
     for frame in stack_summary:
-        if frame.filename == "<internal eval>":
+        if frame.filename == INTERNAL_EVAL_FRAMENAME:
             line = code[frame.lineno - 1].lstrip()
 
-            if frame.name == "_eval_wrapper_function":
-                name = "<internal eval>"
+            if frame.name == EVAL_WRAPPER_FUNCTION_FRAMENAME:
+                name = INTERNAL_EVAL_FRAMENAME
             else:
                 name = frame.name
         else:
@@ -128,7 +130,7 @@ class EvalContext:
             return "[No code detected]"
 
         try:
-            code_tree = ast.parse(code, filename="<internal eval>")
+            code_tree = ast.parse(code, filename=INTERNAL_EVAL_FRAMENAME)
         except SyntaxError:
             log.debug("Got a SyntaxError while parsing the eval code")
             return "".join(traceback.format_exception(*sys.exc_info(), limit=0))
@@ -145,7 +147,7 @@ class EvalContext:
     async def run_eval(self) -> Namespace:
         """Run the evaluation and return the updated locals."""
         log.trace("Compiling the AST to bytecode using `exec` mode")
-        compiled_code = compile(self.eval_tree, filename="<internal eval>", mode="exec")
+        compiled_code = compile(self.eval_tree, filename=INTERNAL_EVAL_FRAMENAME, mode="exec")
 
         log.trace("Executing the compiled code with the desired namespace environment")
         exec(compiled_code, self.locals)  # noqa: B102,S102
@@ -186,7 +188,7 @@ class WrapEvalCodeTree(ast.NodeTransformer):
         self.eval_code_tree = eval_code_tree
 
         # To avoid mutable aliasing, parse the WRAPPER_FUNC for each wrapping
-        self.wrapper = ast.parse(EVAL_WRAPPER, filename="<internal eval>")
+        self.wrapper = ast.parse(EVAL_WRAPPER, filename=INTERNAL_EVAL_FRAMENAME)
 
     def wrap(self) -> ast.AST:
         """Wrap the tree of the code by the tree of the wrapper function."""
