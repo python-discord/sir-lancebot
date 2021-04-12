@@ -5,7 +5,7 @@ import typing as t
 from dataclasses import dataclass
 
 import discord
-from discord.ext import commands, tasks
+from discord.ext import commands
 
 from bot.constants import (
     Categories,
@@ -50,6 +50,21 @@ CODE_BLOCK_RE = re.compile(
 # Maximum number of issues in one message
 MAXIMUM_ISSUES = 5
 
+# Regex used when looking for automatic linking in messages
+AUTOMATIC_REGEX = re.compile(r"((?P<org>.+?)\/)?(?P<repo>.+?)#(?P<number>.+?)")
+
+
+@dataclass
+class FoundIssue:
+    """Dataclass representing an issue found by the regex."""
+
+    organisation: t.Optional[str]
+    repository: str
+    number: str
+
+    def __hash__(self) -> int:
+        return hash(self.organisation) + hash(self.repository) + hash(self.number)
+
 
 @dataclass
 class FetchError:
@@ -76,38 +91,11 @@ class Issues(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.repos = []
-        self.repo_regex = None
-        self.get_pydis_repos.start()
-
-    @tasks.loop(minutes=30)
-    async def get_pydis_repos(self) -> None:
-        """
-        Get all python-discord repositories on github.
-
-        This task will update a pipe-separated list of repositories in self.repo_regex.
-        """
-        async with self.bot.http_session.get(
-                REPOSITORY_ENDPOINT.format(org="python-discord"),
-                headers=REQUEST_HEADERS
-        ) as resp:
-            if resp.status == 200:
-                data = await resp.json()
-                for repo in data:
-                    self.repos.append(repo["full_name"].split("/")[1])
-                self.repo_regex = "|".join(self.repos)
-            else:
-                log.warning(f"Failed to get latest Pydis repositories. Status code {resp.status}")
 
     @staticmethod
-    def check_in_block(message: discord.Message, repo_issue: str) -> bool:
-        """Check whether the <repo>#<issue> is in codeblocks."""
-        block = re.findall(CODE_BLOCK_RE, message.content)
-
-        if not block:
-            return False
-        elif "#".join(repo_issue.split(" ")) in "".join([*block[0]]):
-            return True
-        return False
+    def remove_codeblocks(message: str) -> str:
+        """Remove any codeblock in a message."""
+        return re.sub(CODE_BLOCK_RE, "", message)
 
     async def fetch_issues(
             self,
@@ -219,17 +207,19 @@ class Issues(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message) -> None:
-        """Command to retrieve issue(s) from a GitHub repository using automatic linking if matching <repo>#<issue>."""
-        if not self.repo_regex:
-            log.warning("repo_regex isn't ready, cannot look for issues.")
-            return
+        """
+        Automatic issue linking.
 
+        Listener to retrieve issue(s) from a GitHub repository using automatic linking if matching <org>/<repo>#<issue>.
+        """
         # Ignore bots
         if message.author.bot:
             return
 
-        # `issues` will hold a list of two element tuples `(repository, issue_number)`
-        issues = re.findall(fr"\b({self.repo_regex})#(\d+)\b", message.content)
+        issues = [
+            FoundIssue(*match.group("org", "repo", "number"))
+            for match in AUTOMATIC_REGEX.finditer(self.remove_codeblocks(message.content))
+        ]
         links = []
 
         if issues:
@@ -261,10 +251,13 @@ class Issues(commands.Cog):
                 return
 
             for repo_issue in issues:
-                if not self.check_in_block(message, " ".join(repo_issue)):
-                    result = await self.fetch_issues(repo_issue[1], repo_issue[0], "python-discord")
-                    if isinstance(result, IssueState):
-                        links.append(result)
+                result = await self.fetch_issues(
+                    int(repo_issue.number),
+                    repo_issue.repository,
+                    repo_issue.organisation or "python-discord"
+                )
+                if isinstance(result, IssueState):
+                    links.append(result)
 
         if not links:
             return
