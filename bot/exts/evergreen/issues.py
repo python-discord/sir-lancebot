@@ -63,7 +63,7 @@ class FoundIssue:
     number: str
 
     def __hash__(self) -> int:
-        return hash(self.organisation) + hash(self.repository) + hash(self.number)
+        return hash((self.organisation, self.repository, self.number))
 
 
 @dataclass
