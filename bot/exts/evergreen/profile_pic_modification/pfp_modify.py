@@ -215,7 +215,7 @@ class PfpModify(commands.Cog):
             if not member:
                 await ctx.send(f"{Emojis.cross_mark} Could not get member info.")
                 return
-            image_bytes = await member.avatar_url.read()
+            image_bytes = await member.avatar_url_as(size=1024).read()
             await self.send_pride_image(ctx, image_bytes, pixels, flag, option)
 
     @prideavatar.command()
