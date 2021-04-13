@@ -6,12 +6,20 @@ from discord import Embed
 from discord.errors import HTTPException
 from discord.ext import commands
 
-from bot.constants import Colours
+from bot.constants import Colours, Emojis
 
 logger = logging.getLogger(__name__)
 
 BASE_URL = "https://api.stackexchange.com/2.2/search/advanced?order=desc&sort=activity&site=stackoverflow&q={query}"
 SEARCH_URL = "https://stackoverflow.com/search?q={query}"
+ERR_EMBED = Embed(
+    title="Error in fetching results from Stackoverflow",
+    description=(
+        "Sorry, there was en error while trying to fetch data from the Stackoverflow website. Please try again in some "
+        "time. If this issue persists, please contact the mods or send a message in #dev-contrib."
+    ),
+    color=Colours.soft_red
+)
 
 
 class Stackoverflow(commands.Cog):
@@ -35,21 +43,14 @@ class Stackoverflow(commands.Cog):
                     logger.error(f'Status code is not 200, it is {response.status}')
                     continue
         if response.status != 200:  # If the status is still not 200 after the 3 tries
-            err_embed = Embed(
-                title="Error in fetching results from Stackoverflow",
-                description=("Sorry, there was en error while trying to fetch data from the Stackoverflow website. "
-                             "Please try again in some time. If this issue persists, please contact the mods or send a "
-                             "message in #dev-contrib."),
-                color=Colours.soft_red
-            )
-            await ctx.send(embed=err_embed)
+            await ctx.send(embed=ERR_EMBED)
             return
         elif not data['items']:
-            err_embed = Embed(
+            no_search_result = Embed(
                 title=f"No search results found for {search_query!r}",
                 color=Colours.soft_red
             )
-            await ctx.send(embed=err_embed)
+            await ctx.send(embed=no_search_result)
             return
 
         top5 = data["items"][:5]
@@ -60,23 +61,28 @@ class Stackoverflow(commands.Cog):
         for item in top5:
             embed.add_field(
                 name=f"{unescape(item['title'])}",
-                value=(f"[{item['score']} upvote{'s' if item['score'] != 1 else ''} ┃ "
-                       f"{item['view_count']} view{'s' if item['view_count'] != 1 else ''} ┃ "
-                       f"{item['answer_count']} answer{'s' if item['answer_count'] != 1 else ''} ┃ "
-                       f"Tags: {', '.join(item['tags'])}]"
+                value=(f"[{Emojis.stackoverflow_upvote} {item['score']}    "
+                       f"{Emojis.stackoverflow_views} {item['view_count']}     "
+                       f"{Emojis.stackoverflow_ans} {item['answer_count']}   "
+                       f"{Emojis.stackoverflow_tag} {', '.join(item['tags'][:3])}]"
                        f"({item['link']})"),
                 inline=False)
         embed.set_footer(text="View the original link for more results.")
         try:
             await ctx.send(embed=embed)
         except HTTPException:
-            err_embed = Embed(
+            search_query_too_long = Embed(
                 title="Your search query is too long, please try shortening your search query",
                 color=Colours.soft_red
             )
-            await ctx.send(embed=err_embed)
+            await ctx.send(embed=search_query_too_long)
 
 
 def setup(bot: commands.Bot) -> None:
     """Loads Stackoverflow Cog."""
     bot.add_cog(Stackoverflow(bot))
+
+# View icon made by Gregor Cresnar (https://www.flaticon.com/authors/gregor-cresnar) from www.flaticon.com, and edited
+# by me
+# Answer icon made by Prosymbols (https://www.flaticon.com/authors/prosymbols) from www.flaticon.com, and edited by me
+# Tag icon made by Freepik (https://www.flaticon.com/authors/freepik) from www.flaticon.com, and edited by me

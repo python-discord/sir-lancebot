@@ -201,6 +201,11 @@ class Emojis:
     status_dnd = "<:status_dnd:470326272082313216>"
     status_offline = "<:status_offline:470326266537705472>"
 
+    stackoverflow_upvote = environ.get('stack_upvote', "<:stack_upvote:831468823320330270>")
+    stackoverflow_tag = environ.get('stack_tag', "<:stack_tag:831468691647889419> ")
+    stackoverflow_views = environ.get('stack_views', "<:stack_eye:831455489040318464>")
+    stackoverflow_ans = environ.get('stack_ans', "<:stack_ans:831455489195638784>")
+
 
 class Icons:
     questionmark = "https://cdn.discordapp.com/emojis/512367613339369475.png"
