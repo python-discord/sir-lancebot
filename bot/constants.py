@@ -3,7 +3,7 @@ import enum
 import logging
 from datetime import datetime
 from os import environ
-from typing import Dict, NamedTuple
+from typing import NamedTuple
 
 __all__ = (
     "AdventOfCode",
@@ -53,7 +53,7 @@ class AdventOfCodeLeaderboard:
         return self._session
 
 
-def _parse_aoc_leaderboard_env() -> Dict[str, AdventOfCodeLeaderboard]:
+def _parse_aoc_leaderboard_env() -> dict[str, AdventOfCodeLeaderboard]:
     """
     Parse the environment variable containing leaderboard information.
 

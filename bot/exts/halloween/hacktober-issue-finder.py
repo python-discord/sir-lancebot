@@ -1,7 +1,7 @@
 import datetime
 import logging
 import random
-from typing import Dict, Optional
+from typing import Optional
 
 import aiohttp
 import discord
@@ -95,7 +95,7 @@ class HacktoberIssues(commands.Cog):
                 return data
 
     @staticmethod
-    def format_embed(issue: Dict) -> discord.Embed:
+    def format_embed(issue: dict) -> discord.Embed:
         """Format the issue data into a embed."""
         title = issue["title"]
         issue_url = issue["url"].replace("api.", "").replace("/repos/", "/")

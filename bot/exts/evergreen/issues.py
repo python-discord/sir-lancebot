@@ -158,7 +158,7 @@ class Issues(commands.Cog):
 
     @staticmethod
     def format_embed(
-            results: t.List[t.Union[IssueState, FetchError]],
+            results: list[t.Union[IssueState, FetchError]],
             user: str,
             repository: t.Optional[str] = None
     ) -> discord.Embed:

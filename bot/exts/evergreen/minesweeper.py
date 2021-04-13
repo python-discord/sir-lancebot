@@ -34,7 +34,7 @@ log = logging.getLogger(__name__)
 class CoordinateConverter(commands.Converter):
     """Converter for Coordinates."""
 
-    async def convert(self, ctx: commands.Context, coordinate: str) -> typing.Tuple[int, int]:
+    async def convert(self, ctx: commands.Context, coordinate: str) -> tuple[int, int]:
         """Take in a coordinate string and turn it into an (x, y) tuple."""
         if not 2 <= len(coordinate) <= 3:
             raise commands.BadArgument('Invalid co-ordinate provided')
@@ -58,7 +58,7 @@ class CoordinateConverter(commands.Converter):
         return x, y
 
 
-GameBoard = typing.List[typing.List[typing.Union[str, int]]]
+GameBoard = list[list[typing.Union[str, int]]]
 
 
 @dataclass
@@ -72,7 +72,7 @@ class Game:
     activated_on_server: bool
 
 
-GamesDict = typing.Dict[int, Game]
+GamesDict = dict[int, Game]
 
 
 class Minesweeper(commands.Cog):
@@ -87,7 +87,7 @@ class Minesweeper(commands.Cog):
         await invoke_help_command(ctx)
 
     @staticmethod
-    def get_neighbours(x: int, y: int) -> typing.Generator[typing.Tuple[int, int], None, None]:
+    def get_neighbours(x: int, y: int) -> typing.Generator[tuple[int, int], None, None]:
         """Get all the neighbouring x and y including it self."""
         for x_ in [x - 1, x, x + 1]:
             for y_ in [y - 1, y, y + 1]:

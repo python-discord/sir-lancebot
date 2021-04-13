@@ -1,7 +1,6 @@
 import logging
 from io import BytesIO
 from pathlib import Path
-from typing import Tuple
 
 import aiohttp
 import discord
@@ -81,7 +80,7 @@ class PrideAvatar(Cog):
         return ring
 
     @staticmethod
-    def process_options(option: str, pixels: int) -> Tuple[str, int, str]:
+    def process_options(option: str, pixels: int) -> tuple[str, int, str]:
         """Does some shared preprocessing for the prideavatar commands."""
         return option.lower(), max(0, min(512, pixels)), OPTIONS.get(option)
 

@@ -22,8 +22,8 @@ class Square:
     aimed: bool
 
 
-Grid = typing.List[typing.List[Square]]
-EmojiSet = typing.Dict[typing.Tuple[bool, bool], str]
+Grid = list[list[Square]]
+EmojiSet = dict[tuple[bool, bool], str]
 
 
 @dataclass
@@ -267,7 +267,7 @@ class Game:
         await turn_message.delete()
         return square
 
-    async def hit(self, square: Square, alert_messages: typing.List[discord.Message]) -> None:
+    async def hit(self, square: Square, alert_messages: list[discord.Message]) -> None:
         """Occurs when a player successfully aims for a ship."""
         await self.turn.user.send("Hit!", delete_after=3.0)
         alert_messages.append(await self.next.user.send("Hit!"))
@@ -323,8 +323,8 @@ class Battleship(commands.Cog):
 
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
-        self.games: typing.List[Game] = []
-        self.waiting: typing.List[discord.Member] = []
+        self.games: list[Game] = []
+        self.waiting: list[discord.Member] = []
 
     def predicate(
         self,

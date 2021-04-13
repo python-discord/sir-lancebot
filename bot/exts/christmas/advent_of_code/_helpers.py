@@ -6,7 +6,6 @@ import logging
 import math
 import operator
 import typing
-from typing import Tuple
 
 import aiohttp
 import discord
@@ -398,7 +397,7 @@ def is_in_advent() -> bool:
     return datetime.datetime.now(EST).day in range(1, 25) and datetime.datetime.now(EST).month == 12
 
 
-def time_left_to_est_midnight() -> Tuple[datetime.datetime, datetime.timedelta]:
+def time_left_to_est_midnight() -> tuple[datetime.datetime, datetime.timedelta]:
     """Calculate the amount of time left until midnight EST/UTC-5."""
     # Change all time properties back to 00:00
     todays_midnight = datetime.datetime.now(EST).replace(

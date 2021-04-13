@@ -3,7 +3,7 @@ import logging
 import random
 import re
 from pathlib import Path
-from typing import List, Union
+from typing import Union
 
 from discord.ext import commands
 
@@ -19,7 +19,7 @@ class BunnyNameGenerator(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    def find_separators(self, displayname: str) -> Union[List[str], None]:
+    def find_separators(self, displayname: str) -> Union[list[str], None]:
         """Check if Discord name contains spaces so we can bunnify an individual word in the name."""
         new_name = re.split(r'[_.\s]', displayname)
         if displayname not in new_name:

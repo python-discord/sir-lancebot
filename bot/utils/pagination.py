@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from typing import Iterable, List, Optional, Tuple
+from typing import Iterable, Optional
 
 from discord import Embed, Member, Reaction
 from discord.abc import User
@@ -300,7 +300,7 @@ class ImagePaginator(Paginator):
         self.images.append(image)
 
     @classmethod
-    async def paginate(cls, pages: List[Tuple[str, str]], ctx: Context, embed: Embed,
+    async def paginate(cls, pages: list[tuple[str, str]], ctx: Context, embed: Embed,
                        prefix: str = "", suffix: str = "", timeout: int = 300,
                        exception_on_empty_embed: bool = False):
         """

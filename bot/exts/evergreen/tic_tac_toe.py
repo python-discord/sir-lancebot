@@ -15,7 +15,7 @@ CONFIRMATION_MESSAGE = (
 )
 
 
-def check_win(board: t.Dict[int, str]) -> bool:
+def check_win(board: dict[int, str]) -> bool:
     """Check from board, is any player won game."""
     return any(
         (
@@ -42,7 +42,7 @@ class Player:
         self.ctx = ctx
         self.symbol = symbol
 
-    async def get_move(self, board: t.Dict[int, str], msg: discord.Message) -> t.Tuple[bool, t.Optional[int]]:
+    async def get_move(self, board: dict[int, str], msg: discord.Message) -> tuple[bool, t.Optional[int]]:
         """
         Get move from user.
 
@@ -75,7 +75,7 @@ class AI:
     def __init__(self, symbol: str):
         self.symbol = symbol
 
-    async def get_move(self, board: t.Dict[int, str], _: discord.Message) -> t.Tuple[bool, int]:
+    async def get_move(self, board: dict[int, str], _: discord.Message) -> tuple[bool, int]:
         """Get move from AI. AI use Minimax strategy."""
         possible_moves = [i for i, emoji in board.items() if emoji in list(Emojis.number_emojis.values())]
 
@@ -104,7 +104,7 @@ class AI:
 class Game:
     """Class that contains information and functions about Tic Tac Toe game."""
 
-    def __init__(self, players: t.List[t.Union[Player, AI]], ctx: Context):
+    def __init__(self, players: list[t.Union[Player, AI]], ctx: Context):
         self.players = players
         self.ctx = ctx
         self.board = {
@@ -128,7 +128,7 @@ class Game:
         self.canceled = False
         self.draw = False
 
-    async def get_confirmation(self) -> t.Tuple[bool, t.Optional[str]]:
+    async def get_confirmation(self) -> tuple[bool, t.Optional[str]]:
         """
         Ask does user want to play TicTacToe against requester. First player is always requester.
 
@@ -248,7 +248,7 @@ class TicTacToe(Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.games: t.List[Game] = []
+        self.games: list[Game] = []
 
     @guild_only()
     @is_channel_free()
