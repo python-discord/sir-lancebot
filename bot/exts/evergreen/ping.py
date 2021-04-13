@@ -14,7 +14,7 @@ class Ping(commands.Cog):
     async def ping(self, ctx: commands.Context) -> None:
         """Ping the bot to see its latency and state."""
         embed = Embed(
-            title="Pong!",
+            title=":ping_pong: Pong!",
             colour=Colours.bright_green,
             description=f"WS Latency: {round(self.bot.latency * 1000)}ms",
         )
