@@ -8,6 +8,7 @@ from io import BytesIO
 
 import discord
 import matplotlib.pyplot as plt
+from matplotlib import figure
 from discord.ext import commands
 from matplotlib import figure
 
