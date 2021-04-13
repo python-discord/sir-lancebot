@@ -1,4 +1,5 @@
 import asyncio
+import gc
 import hashlib
 import pathlib
 import re
@@ -8,6 +9,7 @@ from io import BytesIO
 import discord
 import matplotlib.pyplot as plt
 from discord.ext import commands
+from matplotlib import figure
 
 # configure fonts and colors for matplotlib
 plt.rcParams.update(
@@ -44,14 +46,18 @@ class Latex(commands.Cog):
 
         Saves rendered image to cache.
         """
-        fig = plt.figure()
+        fig = figure.Figure()
         rendered_image = BytesIO()
         fig.text(0, 1, text, horizontalalignment="left", verticalalignment="top")
 
         try:
-            plt.savefig(rendered_image, bbox_inches="tight", dpi=600)
+            fig.savefig(rendered_image, bbox_inches="tight", dpi=600)
         except ValueError as e:
             raise commands.BadArgument(str(e))
+        finally:
+            fig.clf()
+            del fig
+            gc.collect()
 
         rendered_image.seek(0)
 
@@ -71,6 +77,7 @@ class Latex(commands.Cog):
 
     @commands.command()
     @commands.max_concurrency(1, commands.BucketType.guild, wait=True)
+    @commands.cooldown(1, 5, commands.BucketType.guild)
     async def latex(self, ctx: commands.Context, *, text: str) -> None:
         """Renders the text in latex and sends the image."""
         text = self._prepare_input(text)
