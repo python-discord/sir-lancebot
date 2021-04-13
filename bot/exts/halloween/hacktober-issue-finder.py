@@ -49,7 +49,7 @@ class HacktoberIssues(commands.Cog):
             embed = self.format_embed(issue)
         await ctx.send(embed=embed)
 
-    async def get_issues(self, ctx: commands.Context, option: str) -> Optional[Dict]:
+    async def get_issues(self, ctx: commands.Context, option: str) -> Optional[dict]:
         """Get a list of the python issues with the label 'hacktoberfest' from the Github api."""
         if option == "beginner":
             if (ctx.message.created_at - self.cache_timer_beginner).seconds <= 60:
