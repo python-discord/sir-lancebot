@@ -82,7 +82,5 @@ def setup(bot: commands.Bot) -> None:
     """Loads Stackoverflow Cog."""
     bot.add_cog(Stackoverflow(bot))
 
-# View icon made by Gregor Cresnar (https://www.flaticon.com/authors/gregor-cresnar) from www.flaticon.com, and edited
-# by me
-# Answer icon made by Prosymbols (https://www.flaticon.com/authors/prosymbols) from www.flaticon.com, and edited by me
+# Upvote and Comment icon taken from Reddit bot
 # Tag icon made by Freepik (https://www.flaticon.com/authors/freepik) from www.flaticon.com, and edited by me
