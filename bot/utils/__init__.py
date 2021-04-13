@@ -3,7 +3,7 @@ import contextlib
 import re
 import string
 from datetime import datetime
-from typing import Iterable, List
+from typing import Iterable
 
 import discord
 from discord.ext.commands import BadArgument, Context
@@ -31,7 +31,7 @@ def resolve_current_month() -> Month:
 
 
 async def disambiguate(
-        ctx: Context, entries: List[str], *, timeout: float = 30,
+        ctx: Context, entries: list[str], *, timeout: float = 30,
         entries_per_page: int = 20, empty: bool = False, embed: discord.Embed = None
 ) -> str:
     """

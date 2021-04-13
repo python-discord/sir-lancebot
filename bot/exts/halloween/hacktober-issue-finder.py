@@ -1,7 +1,7 @@
 import datetime
 import logging
 import random
-from typing import Dict, Optional
+from typing import Optional
 
 import aiohttp
 import discord
@@ -49,7 +49,7 @@ class HacktoberIssues(commands.Cog):
             embed = self.format_embed(issue)
         await ctx.send(embed=embed)
 
-    async def get_issues(self, ctx: commands.Context, option: str) -> Optional[Dict]:
+    async def get_issues(self, ctx: commands.Context, option: str) -> Optional[dict]:
         """Get a list of the python issues with the label 'hacktoberfest' from the Github api."""
         if option == "beginner":
             if (ctx.message.created_at - self.cache_timer_beginner).seconds <= 60:
@@ -95,7 +95,7 @@ class HacktoberIssues(commands.Cog):
                 return data
 
     @staticmethod
-    def format_embed(issue: Dict) -> discord.Embed:
+    def format_embed(issue: dict) -> discord.Embed:
         """Format the issue data into a embed."""
         title = issue["title"]
         issue_url = issue["url"].replace("api.", "").replace("/repos/", "/")

@@ -6,7 +6,6 @@ import math
 import random
 from itertools import product
 from pathlib import Path
-from typing import NamedTuple
 
 from PIL import Image
 from PIL.ImageDraw import ImageDraw
@@ -96,16 +95,13 @@ BOARD = {
 
 DEFAULT_SNAKE_COLOR: int = 0x15c7ea
 DEFAULT_BACKGROUND_COLOR: int = 0
-DEFAULT_IMAGE_DIMENSIONS: tuple[int] = (200, 200)
+DEFAULT_IMAGE_DIMENSIONS: tuple[int, int] = (200, 200)
 DEFAULT_SNAKE_LENGTH: int = 22
 DEFAULT_SNAKE_WIDTH: int = 8
-DEFAULT_SEGMENT_LENGTH_RANGE: tuple[int] = (7, 10)
-DEFAULT_IMAGE_MARGINS: tuple[int] = (50, 50)
+DEFAULT_SEGMENT_LENGTH_RANGE: tuple[int, int] = (7, 10)
+DEFAULT_IMAGE_MARGINS: tuple[int, int] = (50, 50)
 DEFAULT_TEXT: str = "snek\nit\nup"
-DEFAULT_TEXT_POSITION: tuple[int] = (
-    10,
-    10
-)
+DEFAULT_TEXT_POSITION: tuple[int, int] = (10, 10)
 DEFAULT_TEXT_COLOR: int = 0xf2ea15
 X = 0
 Y = 1
@@ -177,7 +173,7 @@ class PerlinNoiseFactory(object):
         # 1 dimension is special, since the only unit vector is trivial;
         # instead, use a slope between -1 and 1
         if self.dimension == 1:
-            return (random.uniform(-1, 1),)
+            return random.uniform(-1, 1),
 
         # Generate a random point on the surface of the unit n-hypersphere;
         # this is the same as a random unit vector in n dimensions.  Thanks
@@ -277,7 +273,7 @@ class PerlinNoiseFactory(object):
 
 def create_snek_frame(
         perlin_factory: PerlinNoiseFactory, perlin_lookup_vertical_shift: float = 0,
-        image_dimensions: NamedTuple[int] = DEFAULT_IMAGE_DIMENSIONS, image_margins: tuple[int] = DEFAULT_IMAGE_MARGINS,
+        image_dimensions: tuple[int] = DEFAULT_IMAGE_DIMENSIONS, image_margins: tuple[int] = DEFAULT_IMAGE_MARGINS,
         snake_length: int = DEFAULT_SNAKE_LENGTH,
         snake_color: int = DEFAULT_SNAKE_COLOR, bg_color: int = DEFAULT_BACKGROUND_COLOR,
         segment_length_range: tuple[int] = DEFAULT_SEGMENT_LENGTH_RANGE, snake_width: int = DEFAULT_SNAKE_WIDTH,

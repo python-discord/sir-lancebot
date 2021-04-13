@@ -219,7 +219,7 @@ class Extensions(commands.Cog):
 
         return msg
 
-    def manage(self, action: Action, ext: str) -> t.Tuple[str, t.Optional[str]]:
+    def manage(self, action: Action, ext: str) -> tuple[str, t.Optional[str]]:
         """Apply an action to an extension and return the status message and any error message."""
         verb = action.name.lower()
         error_msg = None

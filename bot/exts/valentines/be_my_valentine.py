@@ -2,7 +2,6 @@ import logging
 import random
 from json import load
 from pathlib import Path
-from typing import Tuple
 
 import discord
 from discord.ext import commands
@@ -148,7 +147,7 @@ class BeMyValentine(commands.Cog):
         else:
             await ctx.author.send(f"Your message has been sent to {user}")
 
-    def valentine_check(self, valentine_type: str) -> Tuple[str, str]:
+    def valentine_check(self, valentine_type: str) -> tuple[str, str]:
         """Return the appropriate Valentine type & title based on the invoking user's input."""
         if valentine_type is None:
             valentine, title = self.random_valentine()
@@ -168,13 +167,13 @@ class BeMyValentine(commands.Cog):
         return valentine, title
 
     @staticmethod
-    def random_emoji() -> Tuple[str, str]:
+    def random_emoji() -> tuple[str, str]:
         """Return two random emoji from the module-defined constants."""
         emoji_1 = random.choice(HEART_EMOJIS)
         emoji_2 = random.choice(HEART_EMOJIS)
         return emoji_1, emoji_2
 
-    def random_valentine(self) -> Tuple[str, str]:
+    def random_valentine(self) -> tuple[str, str]:
         """Grabs a random poem or a compliment (any message)."""
         valentine_poem = random.choice(self.valentines['valentine_poems'])
         valentine_compliment = random.choice(self.valentines['valentine_compliments'])

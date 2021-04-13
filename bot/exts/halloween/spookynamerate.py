@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from logging import getLogger
 from os import getenv
 from pathlib import Path
-from typing import Dict, Union
+from typing import Union
 
 from async_rediscache import RedisCache
 from discord import Embed, Reaction, TextChannel, User
@@ -370,7 +370,7 @@ class SpookyNameRate(Cog):
         return channel
 
     @staticmethod
-    def load_json(file: Path) -> Dict[str, str]:
+    def load_json(file: Path) -> dict[str, str]:
         """Loads a JSON file and returns its contents."""
         with file.open("r", encoding="utf-8") as f:
             return json.load(f)

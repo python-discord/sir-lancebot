@@ -2,7 +2,7 @@ import asyncio
 import logging
 from io import BytesIO
 from pathlib import Path
-from typing import Tuple, Union
+from typing import Union
 
 import discord
 from PIL import Image
@@ -25,7 +25,7 @@ class AvatarEasterifier(commands.Cog):
         self.bot = bot
 
     @staticmethod
-    def closest(x: Tuple[int, int, int]) -> Tuple[int, int, int]:
+    def closest(x: tuple[int, int, int]) -> tuple[int, int, int]:
         """
         Finds the closest easter colour to a given pixel.
 
@@ -33,7 +33,7 @@ class AvatarEasterifier(commands.Cog):
         """
         r1, g1, b1 = x
 
-        def distance(point: Tuple[int, int, int]) -> Tuple[int, int, int]:
+        def distance(point: tuple[int, int, int]) -> tuple[int, int, int]:
             """Finds the difference between a pastel colour and the original pixel colour."""
             r2, g2, b2 = point
             return ((r1 - r2)**2 + (g1 - g2)**2 + (b1 - b2)**2)

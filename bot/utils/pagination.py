@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from typing import Iterable, List, Optional, Tuple
+from typing import Iterable, Optional
 
 from discord import Embed, Member, Reaction
 from discord.abc import User
@@ -26,7 +26,14 @@ class EmptyPaginatorEmbed(Exception):
 class LinePaginator(Paginator):
     """A class that aids in paginating code blocks for Discord messages."""
 
-    def __init__(self, prefix: str = '```', suffix: str = '```', max_size: int = 2000, max_lines: int = None):
+    def __init__(
+            self,
+            prefix: str = '```',
+            suffix: str = '```',
+            max_size: int = 2000,
+            max_lines: int = None,
+            linesep: str = "\n"
+    ):
         """
         Overrides the Paginator.__init__ from inside discord.ext.commands.
 
@@ -35,10 +42,13 @@ class LinePaginator(Paginator):
         `max_size` and `max_lines` denote the maximum amount of codepoints and lines
         allowed per page.
         """
-        self.prefix = prefix
-        self.suffix = suffix
-        self.max_size = max_size - len(suffix)
-        self.max_lines = max_lines
+        super().__init__(
+            prefix,
+            suffix,
+            max_size - len(suffix),
+            linesep
+        )
+
         self._current_page = [prefix]
         self._linecount = 0
         self._count = len(prefix) + 1  # prefix + newline
@@ -300,7 +310,7 @@ class ImagePaginator(Paginator):
         self.images.append(image)
 
     @classmethod
-    async def paginate(cls, pages: List[Tuple[str, str]], ctx: Context, embed: Embed,
+    async def paginate(cls, pages: list[tuple[str, str]], ctx: Context, embed: Embed,
                        prefix: str = "", suffix: str = "", timeout: int = 300,
                        exception_on_empty_embed: bool = False):
         """
