@@ -64,8 +64,8 @@ async def disambiguate(
                                        empty=empty, max_size=6000, timeout=9000)
 
         # wait_for timeout will go to except instead of the wait_for thing as I expected
-        futures = [asyncio.ensure_future(coro1), asyncio.ensure_future(coro2)]
-        done, pending = await asyncio.wait(futures, return_when=asyncio.FIRST_COMPLETED, loop=ctx.bot.loop)
+        futures = [asyncio.create_task(coro1), asyncio.create_task(coro2)]
+        done, pending = await asyncio.wait(futures, return_when=asyncio.FIRST_COMPLETED)
 
         # :yert:
         result = list(done)[0].result()
