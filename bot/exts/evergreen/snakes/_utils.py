@@ -6,7 +6,7 @@ import math
 import random
 from itertools import product
 from pathlib import Path
-from typing import List, Tuple
+from typing import NamedTuple
 
 from PIL import Image
 from PIL.ImageDraw import ImageDraw
@@ -96,13 +96,13 @@ BOARD = {
 
 DEFAULT_SNAKE_COLOR: int = 0x15c7ea
 DEFAULT_BACKGROUND_COLOR: int = 0
-DEFAULT_IMAGE_DIMENSIONS: Tuple[int] = (200, 200)
+DEFAULT_IMAGE_DIMENSIONS: tuple[int] = (200, 200)
 DEFAULT_SNAKE_LENGTH: int = 22
 DEFAULT_SNAKE_WIDTH: int = 8
-DEFAULT_SEGMENT_LENGTH_RANGE: Tuple[int] = (7, 10)
-DEFAULT_IMAGE_MARGINS: Tuple[int] = (50, 50)
+DEFAULT_SEGMENT_LENGTH_RANGE: tuple[int] = (7, 10)
+DEFAULT_IMAGE_MARGINS: tuple[int] = (50, 50)
 DEFAULT_TEXT: str = "snek\nit\nup"
-DEFAULT_TEXT_POSITION: Tuple[int] = (
+DEFAULT_TEXT_POSITION: tuple[int] = (
     10,
     10
 )
@@ -112,7 +112,7 @@ Y = 1
 ANGLE_RANGE = math.pi * 2
 
 
-def get_resource(file: str) -> List[dict]:
+def get_resource(file: str) -> list[dict]:
     """Load Snake resources JSON."""
     with (SNAKE_RESOURCES / f"{file}.json").open(encoding="utf-8") as snakefile:
         return json.load(snakefile)
@@ -140,7 +140,7 @@ class PerlinNoiseFactory(object):
     Licensed under ISC
     """
 
-    def __init__(self, dimension: int, octaves: int = 1, tile: Tuple[int] = (), unbias: bool = False):
+    def __init__(self, dimension: int, octaves: int = 1, tile: tuple[int] = (), unbias: bool = False):
         """
         Create a new Perlin noise factory in the given number of dimensions.
 
@@ -168,7 +168,7 @@ class PerlinNoiseFactory(object):
 
         self.gradient = {}
 
-    def _generate_gradient(self) -> Tuple[float, ...]:
+    def _generate_gradient(self) -> tuple[float, ...]:
         """
         Generate a random unit vector at each grid point.
 
@@ -277,12 +277,12 @@ class PerlinNoiseFactory(object):
 
 def create_snek_frame(
         perlin_factory: PerlinNoiseFactory, perlin_lookup_vertical_shift: float = 0,
-        image_dimensions: Tuple[int] = DEFAULT_IMAGE_DIMENSIONS, image_margins: Tuple[int] = DEFAULT_IMAGE_MARGINS,
+        image_dimensions: NamedTuple[int] = DEFAULT_IMAGE_DIMENSIONS, image_margins: tuple[int] = DEFAULT_IMAGE_MARGINS,
         snake_length: int = DEFAULT_SNAKE_LENGTH,
         snake_color: int = DEFAULT_SNAKE_COLOR, bg_color: int = DEFAULT_BACKGROUND_COLOR,
-        segment_length_range: Tuple[int] = DEFAULT_SEGMENT_LENGTH_RANGE, snake_width: int = DEFAULT_SNAKE_WIDTH,
-        text: str = DEFAULT_TEXT, text_position: Tuple[int] = DEFAULT_TEXT_POSITION,
-        text_color: Tuple[int] = DEFAULT_TEXT_COLOR
+        segment_length_range: tuple[int] = DEFAULT_SEGMENT_LENGTH_RANGE, snake_width: int = DEFAULT_SNAKE_WIDTH,
+        text: str = DEFAULT_TEXT, text_position: tuple[int] = DEFAULT_TEXT_POSITION,
+        text_color: tuple[int] = DEFAULT_TEXT_COLOR
 ) -> Image:
     """
     Creates a single random snek frame using Perlin noise.
@@ -701,7 +701,7 @@ class SnakeAndLaddersGame:
         """Clean up the finished game object."""
         del self.snakes.active_sal[self.channel]
 
-    def _board_coordinate_from_index(self, index: int) -> Tuple[int, int]:
+    def _board_coordinate_from_index(self, index: int) -> tuple[int, int]:
         """Convert the tile number to the x/y coordinates for graphical purposes."""
         y_level = 9 - math.floor((index - 1) / 10)
         is_reversed = math.floor((index - 1) / 10) % 2 != 0

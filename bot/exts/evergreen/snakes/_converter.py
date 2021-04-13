@@ -1,7 +1,7 @@
 import json
 import logging
 import random
-from typing import Iterable, List
+from collections.abc import Iterable
 
 import discord
 from discord.ext.commands import Context, Converter
@@ -27,7 +27,7 @@ class Snake(Converter):
         if name == 'python':
             return 'Python (programming language)'
 
-        def get_potential(iterable: Iterable, *, threshold: int = 80) -> List[str]:
+        def get_potential(iterable: Iterable, *, threshold: int = 80) -> list[str]:
             nonlocal name
             potential = []
 
