@@ -2,7 +2,6 @@ import asyncio
 import hashlib
 import pathlib
 import re
-from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 
 import discord
@@ -81,10 +80,7 @@ class Latex(commands.Cog):
                 await ctx.send(file=discord.File(image_path))
                 return
 
-            with ThreadPoolExecutor() as pool:
-                image = await asyncio.get_running_loop().run_in_executor(
-                    pool, self._render, text, image_path
-                )
+            image = await asyncio.to_thread(self._render, text, image_path)
 
             await ctx.send(file=discord.File(image, "latex.png"))
 
