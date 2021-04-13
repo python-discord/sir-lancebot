@@ -27,7 +27,7 @@ class EasterFacts(commands.Cog):
         self.daily_fact_task = self.bot.loop.create_task(self.send_egg_fact_daily())
 
     @staticmethod
-    def load_json() -> dict:
+    def load_json() -> list[str]:
         """Load a list of easter egg facts from the resource JSON file."""
         p = Path("bot/resources/easter/easter_egg_facts.json")
         with p.open(encoding="utf8") as f:

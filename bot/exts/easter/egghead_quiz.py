@@ -3,7 +3,6 @@ import logging
 import random
 from json import load
 from pathlib import Path
-from typing import Union
 
 import discord
 from discord.ext import commands
@@ -96,13 +95,13 @@ class EggheadQuiz(commands.Cog):
         await ctx.send(content, embed=a_embed)
 
     @staticmethod
-    async def already_reacted(message: discord.Message, user: Union[discord.Member, discord.User]) -> bool:
+    async def already_reacted(message: discord.Message, user: discord.abc.User) -> bool:
         """Returns whether a given user has reacted more than once to a given message."""
         users = [u.id for reaction in [await r.users().flatten() for r in message.reactions] for u in reaction]
         return users.count(user.id) > 1  # Old reaction plus new reaction
 
     @commands.Cog.listener()
-    async def on_reaction_add(self, reaction: discord.Reaction, user: Union[discord.Member, discord.User]) -> None:
+    async def on_reaction_add(self, reaction: discord.Reaction, user: discord.abc.User) -> None:
         """Listener to listen specifically for reactions of quiz messages."""
         if user.bot:
             return

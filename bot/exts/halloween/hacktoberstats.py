@@ -3,7 +3,7 @@ import random
 import re
 from collections import Counter
 from datetime import datetime, timedelta
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 import aiohttp
 import discord
@@ -142,7 +142,7 @@ class HacktoberStats(commands.Cog):
             else:
                 await ctx.send(f"No valid Hacktoberfest PRs found for '{github_username}'")
 
-    async def build_embed(self, github_username: str, prs: list[dict]) -> discord.Embed:
+    async def build_embed(self, github_username: str, prs: list[dict[str, Any]]) -> discord.Embed:
         """Return a stats embed built from github_username's PRs."""
         logging.info(f"Building Hacktoberfest embed for GitHub user: '{github_username}'")
         in_review, accepted = await self._categorize_prs(prs)
@@ -189,7 +189,7 @@ class HacktoberStats(commands.Cog):
         return stats_embed
 
     @staticmethod
-    async def get_october_prs(github_username: str) -> Optional[list[dict]]:
+    async def get_october_prs(github_username: str) -> Optional[list[dict[str, Any]]]:
         """
         Query GitHub's API for PRs created during the month of October by github_username.
 
@@ -302,7 +302,7 @@ class HacktoberStats(commands.Cog):
         return outlist
 
     @staticmethod
-    async def _fetch_url(url: str, headers: dict) -> dict:
+    async def _fetch_url(url: str, headers: dict[str, Any]) -> dict:
         """Retrieve API response from URL."""
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers) as resp:
@@ -310,7 +310,7 @@ class HacktoberStats(commands.Cog):
         return jsonresp
 
     @staticmethod
-    def _has_label(pr: dict, labels: Union[list[str], str]) -> bool:
+    def _has_label(pr: dict[str, Any], labels: Union[list[str], str]) -> bool:
         """
         Check if a PR has label 'labels'.
 
@@ -327,7 +327,7 @@ class HacktoberStats(commands.Cog):
         return False
 
     @staticmethod
-    async def _is_accepted(pr: dict) -> bool:
+    async def _is_accepted(pr: dict[str, Any]) -> bool:
         """Check if a PR is merged, approved, or labelled hacktoberfest-accepted."""
         # checking for merge status
         query_url = f"https://api.github.com/repos/{pr['repo_shortname']}/pulls/"
@@ -382,7 +382,7 @@ class HacktoberStats(commands.Cog):
         return re.findall(exp, in_url)[0]
 
     @staticmethod
-    async def _categorize_prs(prs: list[dict]) -> tuple:
+    async def _categorize_prs(prs: list[dict[str, Any]]) -> tuple:
         """
         Categorize PRs into 'in_review' and 'accepted' and returns as a tuple.
 
@@ -405,7 +405,7 @@ class HacktoberStats(commands.Cog):
         return in_review, accepted
 
     @staticmethod
-    def _build_prs_string(prs: list[tuple], user: str) -> str:
+    def _build_prs_string(prs: list[dict[str, Any]], user: str) -> str:
         """
         Builds a discord embed compatible string for a list of PRs.
 
@@ -438,9 +438,9 @@ class HacktoberStats(commands.Cog):
             return "contributions"
 
     @staticmethod
-    def _author_mention_from_context(ctx: commands.Context) -> tuple:
+    def _author_mention_from_context(ctx: commands.Context) -> tuple[str]:
         """Return stringified Message author ID and mentionable string from commands.Context."""
-        author_id = str(ctx.message.author.id)
+        author_id = str(ctx.author.id)
         author_mention = ctx.message.author.mention
 
         return author_id, author_mention

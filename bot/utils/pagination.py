@@ -1,6 +1,7 @@
 import asyncio
 import logging
-from typing import Iterable, Optional
+from collections.abc import Iterable
+from typing import Optional
 
 from discord import Embed, Member, Reaction
 from discord.abc import User
