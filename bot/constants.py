@@ -111,6 +111,7 @@ class Channels(NamedTuple):
     voice_chat_0 = 412357430186344448
     voice_chat_1 = 799647045886541885
     staff_voice = 541638762007101470
+    reddit = int(environ.get("CHANNEL_REDDIT", 458224812528238616))
 
 
 class Categories(NamedTuple):
