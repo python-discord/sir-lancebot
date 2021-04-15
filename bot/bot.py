@@ -34,7 +34,7 @@ class Bot(commands.Bot):
         )
         self._guild_available = asyncio.Event()
         self.redis_session = redis_session
-
+        self.loop.create_task(self.check_channels())
         self.loop.create_task(self.send_log(self.name, "Connected!"))
 
     @property
@@ -70,6 +70,21 @@ class Bot(commands.Bot):
             context.command.reset_cooldown(context)
         else:
             await super().on_command_error(context, exception)
+
+    async def check_channels(self) -> None:
+        """Verifies that all channel constants refer to channels which exist."""
+        await self.wait_until_guild_available()
+
+        if constants.Client.debug:
+            log.info("Skipping Channels Check.")
+            return
+
+        all_channels_ids = [channel.id for channel in self.get_all_channels()]
+        for name, channel_id in vars(constants.Channels).items():
+            if name.startswith('_'):
+                continue
+            if channel_id not in all_channels_ids:
+                log.error(f'Channel "{name}" with ID {channel_id} missing')
 
     async def send_log(self, title: str, details: str = None, *, icon: str = None) -> None:
         """Send an embed message to the devlog channel."""

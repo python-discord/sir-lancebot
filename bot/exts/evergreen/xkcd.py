@@ -69,6 +69,8 @@ class XKCD(Cog):
                     return
 
         embed.title = f"XKCD comic #{info['num']}"
+        embed.description = info['alt']
+        embed.url = f"{BASE_URL}/{info['num']}"
 
         if info["img"][-3:] in ("jpg", "png", "gif"):
             embed.set_image(url=info["img"])
