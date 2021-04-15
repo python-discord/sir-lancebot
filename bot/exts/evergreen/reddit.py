@@ -86,11 +86,11 @@ class Reddit(Cog):
             author = data["author"]
 
             content_type = Emojis.reddit_post_text
-            if data["is_video"] is True or {"youtube", "youtu.be"}.issubset(set(data["url"].split("."))):
+            if data["is_video"] or {"youtube", "youtu.be"}.issubset(set(data["url"].split("."))):
                 # This means the content type in the post is a video.
                 content_type = f"{Emojis.reddit_post_video}"
 
-            elif any(data["url"].endswith(pic_format) for pic_format in ("jpg", "png", "gif")):
+            elif data["url"].endswith(("jpg", "png", "gif")):
                 # This means the content type in the post is an image.
                 content_type = f"{Emojis.reddit_post_photo}"
                 image_url = data["url"]
