@@ -4,14 +4,14 @@ on:
   workflow_run:
     workflows: ["Lint"]
     branches:
-      - master
+      - main
     types:
       - completed
 
 jobs:
   build:
     if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'
-    name: Build, Push, & Deploy Container
+    name: Build & Push
     runs-on: ubuntu-latest
 
     steps:
@@ -28,15 +28,6 @@ jobs:
         with:
           path: sir-lancebot
 
-      # Check out the private "kubernetes" repository in the `kubernetes`
-      # subdirectory using a GitHub Personal Access Token
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          repository: python-discord/kubernetes
-          token: ${{ secrets.REPO_TOKEN }}
-          path: kubernetes
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
@@ -45,7 +36,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
-          password: ${{ secrets.GHCR_TOKEN  }}
+          password: ${{ secrets.GITHUB_TOKEN  }}
 
       # Build and push the container to the GitHub Container
       # Repository. The container will be tagged as "latest"
@@ -63,6 +54,29 @@ jobs:
             ghcr.io/python-discord/sir-lancebot:${{ steps.sha_tag.outputs.tag }}
           build-args: |
             git_sha=${{ github.sha }}
+
+  deploy:
+    needs: build
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      # Create a commit SHA-based tag for the container repositories
+      - name: Create SHA Container Tag
+        id: sha_tag
+        run: |
+          tag=$(cut -c 1-7 <<< $GITHUB_SHA)
+          echo "::set-output name=tag::$tag"
+
+      # Check out the private "kubernetes" repository in the `kubernetes`
+      # subdirectory using a GitHub Personal Access Token
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          repository: python-discord/kubernetes
+          token: ${{ secrets.REPO_TOKEN }}
+          path: kubernetes
 
       - name: Authenticate with Kubernetes
         uses: azure/k8s-set-context@v1
