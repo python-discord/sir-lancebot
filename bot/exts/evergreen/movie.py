@@ -138,7 +138,7 @@ class Movie(Cog):
 
         return pages
 
-    async def get_movie(self, client: ClientSession, movie: int) -> dict:
+    async def get_movie(self, client: ClientSession, movie: int) -> dict[str, Any]:
         """Get Movie by movie ID from TMDB. Return result dictionary."""
         url = BASE_URL + f"movie/{movie}?" + urlencode(MOVIE_PARAMS)
 

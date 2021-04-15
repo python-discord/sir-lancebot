@@ -7,7 +7,6 @@ import re
 import string
 import textwrap
 import urllib
-from functools import partial
 from io import BytesIO
 from typing import Any
 
@@ -995,8 +994,7 @@ class Snakes(Cog):
 
             stream.seek(0)
 
-            func = partial(self._generate_card, stream, content)
-            final_buffer = await self.bot.loop.run_in_executor(None, func)
+            final_buffer = await asyncio.to_thread(self._generate_card, stream, content)
 
         # Send it!
         await ctx.send(

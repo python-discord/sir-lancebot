@@ -1,7 +1,7 @@
 import asyncio
 import random
-import typing
 from functools import partial
+from typing import Optional, Union
 
 import discord
 import emojis
@@ -13,8 +13,8 @@ from bot.constants import Emojis
 NUMBERS = list(Emojis.number_emojis.values())
 CROSS_EMOJI = Emojis.incident_unactioned
 
-Coordinate = typing.Optional[tuple[int, int]]
-EMOJI_CHECK = typing.Union[discord.Emoji, str]
+Coordinate = Optional[tuple[int, int]]
+EMOJI_CHECK = Union[discord.Emoji, str]
 
 
 class Game:
@@ -25,7 +25,7 @@ class Game:
             bot: commands.Bot,
             channel: discord.TextChannel,
             player1: discord.Member,
-            player2: typing.Optional[discord.Member],
+            player2: Optional[discord.Member],
             tokens: list[str],
             size: int = 7
     ) -> None:
@@ -195,7 +195,7 @@ class AI:
                     break
         return possible_coords
 
-    def check_ai_win(self, coord_list: list[Coordinate]) -> typing.Optional[Coordinate]:
+    def check_ai_win(self, coord_list: list[Coordinate]) -> Optional[Coordinate]:
         """
         Check AI win.
 
@@ -208,7 +208,7 @@ class AI:
             if self.game.check_win(coords, 2):
                 return coords
 
-    def check_player_win(self, coord_list: list[Coordinate]) -> typing.Optional[Coordinate]:
+    def check_player_win(self, coord_list: list[Coordinate]) -> Optional[Coordinate]:
         """
         Check Player win.
 
@@ -226,7 +226,7 @@ class AI:
         """Picks a random coordinate from the possible ones."""
         return random.choice(coord_list)
 
-    def play(self) -> typing.Union[Coordinate, bool]:
+    def play(self) -> Union[Coordinate, bool]:
         """
         Plays for the AI.
 
@@ -327,7 +327,7 @@ class ConnectFour(commands.Cog):
     @staticmethod
     def check_emojis(
             e1: EMOJI_CHECK, e2: EMOJI_CHECK
-    ) -> tuple[bool, typing.Optional[str]]:
+    ) -> tuple[bool, Optional[str]]:
         """Validate the emojis, the user put."""
         if isinstance(e1, str) and emojis.count(e1) != 1:
             return False, e1
@@ -338,7 +338,7 @@ class ConnectFour(commands.Cog):
     async def _play_game(
             self,
             ctx: commands.Context,
-            user: typing.Optional[discord.Member],
+            user: Optional[discord.Member],
             board_size: int,
             emoji1: str,
             emoji2: str

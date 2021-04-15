@@ -1,7 +1,7 @@
 import json
 import logging
 import random
-from typing import Iterable
+from collections.abc import Iterable
 
 import discord
 from discord.ext.commands import Context, Converter

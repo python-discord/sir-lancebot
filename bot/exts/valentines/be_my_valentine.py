@@ -24,7 +24,7 @@ class BeMyValentine(commands.Cog):
         self.valentines = self.load_json()
 
     @staticmethod
-    def load_json() -> dict:
+    def load_json() -> dict[str, list[str]]:
         """Load Valentines messages from the static resources."""
         p = Path("bot/resources/valentines/bemyvalentine_valentines.json")
         with p.open(encoding="utf8") as json_data:
@@ -49,7 +49,7 @@ class BeMyValentine(commands.Cog):
     async def add_role(self, ctx: commands.Context) -> None:
         """Adds the lovefest role."""
         user = ctx.author
-        role = discord.utils.get(ctx.guild.roles, id=Lovefest.role_id)
+        role = ctx.guild.get_role(Lovefest.role_id)
         if Lovefest.role_id not in [role.id for role in ctx.message.author.roles]:
             await user.add_roles(role)
             await ctx.send("The Lovefest role has been added !")
@@ -60,7 +60,7 @@ class BeMyValentine(commands.Cog):
     async def remove_role(self, ctx: commands.Context) -> None:
         """Removes the lovefest role."""
         user = ctx.author
-        role = discord.utils.get(ctx.guild.roles, id=Lovefest.role_id)
+        role = ctx.guild.get_role(Lovefest.role_id)
         if Lovefest.role_id not in [role.id for role in ctx.message.author.roles]:
             await ctx.send("You dont have the lovefest role.")
         else:

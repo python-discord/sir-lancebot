@@ -1,5 +1,6 @@
 import logging
 import typing
+from collections.abc import Generator
 from dataclasses import dataclass
 from random import randint, random
 
@@ -87,7 +88,7 @@ class Minesweeper(commands.Cog):
         await invoke_help_command(ctx)
 
     @staticmethod
-    def get_neighbours(x: int, y: int) -> typing.Generator[tuple[int, int], None, None]:
+    def get_neighbours(x: int, y: int) -> Generator[tuple[int, int], None, None]:
         """Get all the neighbouring x and y including it self."""
         for x_ in [x - 1, x, x + 1]:
             for y_ in [y - 1, y, y + 1]:

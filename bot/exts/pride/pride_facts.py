@@ -28,7 +28,7 @@ class PrideFacts(commands.Cog):
         self.daily_fact_task = self.bot.loop.create_task(self.send_pride_fact_daily())
 
     @staticmethod
-    def load_facts() -> dict:
+    def load_facts() -> dict[str, list[str]]:
         """Loads a dictionary of years mapping to lists of facts."""
         with open(Path("bot/resources/pride/facts.json"), "r", encoding="utf8") as f:
             return json.load(f)

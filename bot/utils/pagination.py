@@ -1,6 +1,7 @@
 import asyncio
 import logging
-from typing import Iterable, Optional
+from collections.abc import Iterable
+from typing import Optional
 
 from discord import Embed, Member, Reaction
 from discord.abc import User
@@ -53,6 +54,7 @@ class LinePaginator(Paginator):
         self._linecount = 0
         self._count = len(prefix) + 1  # prefix + newline
         self._pages = []
+        self.max_lines = max_lines
 
     def add_line(self, line: str = '', *, empty: bool = False) -> None:
         """

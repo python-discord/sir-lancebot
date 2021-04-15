@@ -16,7 +16,7 @@ class DragNames(commands.Cog):
         self.names = self.load_names()
 
     @staticmethod
-    def load_names() -> list:
+    def load_names() -> list[str]:
         """Loads a list of drag queen names."""
         with open(Path("bot/resources/pride/drag_queen_names.json"), "r", encoding="utf8") as f:
             return json.load(f)

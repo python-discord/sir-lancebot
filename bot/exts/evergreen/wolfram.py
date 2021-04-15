@@ -1,6 +1,7 @@
 import logging
+from collections.abc import Callable
 from io import BytesIO
-from typing import Callable, Optional
+from typing import Optional
 from urllib import parse
 
 import arrow
@@ -51,7 +52,7 @@ async def send_embed(
     await ctx.send(embed=embed, file=f)
 
 
-def custom_cooldown(*ignore: list[int]) -> Callable:
+def custom_cooldown(*ignore: list[int]) -> Callable[[Context], bool]:
     """
     Implement per-user and per-guild cooldowns for requests to the Wolfram API.
 
@@ -102,7 +103,7 @@ def custom_cooldown(*ignore: list[int]) -> Callable:
     return check(predicate)
 
 
-async def get_pod_pages(ctx: Context, bot: commands.Bot, query: str) -> Optional[list[tuple]]:
+async def get_pod_pages(ctx: Context, bot: commands.Bot, query: str) -> Optional[list[tuple[str]]]:
     """Get the Wolfram API pod pages for the provided query."""
     async with ctx.channel.typing():
         url_str = parse.urlencode({

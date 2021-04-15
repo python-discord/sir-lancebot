@@ -2,8 +2,9 @@ import functools
 import json
 import logging
 import random
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Callable, Iterable, Union
+from typing import Callable, Union
 
 from discord import Embed, Message
 from discord.ext import commands

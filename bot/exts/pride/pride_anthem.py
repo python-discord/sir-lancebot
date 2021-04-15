@@ -15,7 +15,7 @@ class PrideAnthem(commands.Cog):
         self.bot = bot
         self.anthems = self.load_vids()
 
-    def get_video(self, genre: str = None) -> dict:
+    def get_video(self, genre: str = None) -> dict[str, str]:
         """
         Picks a random anthem from the list.
 
@@ -32,7 +32,7 @@ class PrideAnthem(commands.Cog):
                 log.info("No videos for that genre.")
 
     @staticmethod
-    def load_vids() -> list:
+    def load_vids() -> list[dict[str, str]]:
         """Loads a list of videos from the resources folder as dictionaries."""
         with open(Path("bot/resources/pride/anthems.json"), "r", encoding="utf8") as f:
             anthems = json.load(f)

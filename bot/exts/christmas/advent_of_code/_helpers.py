@@ -5,7 +5,7 @@ import json
 import logging
 import math
 import operator
-import typing
+from typing import Any, Optional, Union
 
 import aiohttp
 import discord
@@ -70,7 +70,7 @@ class FetchingLeaderboardFailed(Exception):
     """Raised when one or more leaderboards could not be fetched at all."""
 
 
-def leaderboard_sorting_function(entry: typing.Tuple[str, dict]) -> typing.Tuple[int, int]:
+def leaderboard_sorting_function(entry: tuple[str, dict[str, int]]) -> tuple[int, int]:
     """
     Provide a sorting value for our leaderboard.
 
@@ -81,7 +81,7 @@ def leaderboard_sorting_function(entry: typing.Tuple[str, dict]) -> typing.Tuple
     return result["score"], result["star_2"] + result["star_1"]
 
 
-def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
+def _parse_raw_leaderboard_data(raw_leaderboard_data: dict[str, Any]) -> dict:
     """
     Parse the leaderboard data received from the AoC website.
 
@@ -154,7 +154,7 @@ def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
     return {"daily_stats": daily_stats, "leaderboard": sorted_leaderboard}
 
 
-def _format_leaderboard(leaderboard: typing.Dict[str, dict]) -> str:
+def _format_leaderboard(leaderboard: dict[str, dict[str, Union[str, int]]]) -> str:
     """Format the leaderboard using the AOC_TABLE_TEMPLATE."""
     leaderboard_lines = [HEADER]
     for rank, data in enumerate(leaderboard.values(), start=1):
@@ -170,7 +170,7 @@ def _format_leaderboard(leaderboard: typing.Dict[str, dict]) -> str:
     return "\n".join(leaderboard_lines)
 
 
-async def _leaderboard_request(url: str, board: int, cookies: dict) -> typing.Optional[dict]:
+async def _leaderboard_request(url: str, board: int, cookies: dict[str, Any]) -> Optional[dict]:
     """Make a leaderboard request using the specified session cookie."""
     async with aiohttp.request("GET", url, headers=AOC_REQUEST_HEADER, cookies=cookies) as resp:
         # The Advent of Code website redirects silently with a 200 response if a
@@ -187,7 +187,7 @@ async def _leaderboard_request(url: str, board: int, cookies: dict) -> typing.Op
         return await resp.json()
 
 
-async def _fetch_leaderboard_data() -> typing.Dict[str, typing.Any]:
+async def _fetch_leaderboard_data() -> dict[str, Any]:
     """Fetch data for all leaderboards and return a pooled result."""
     year = AdventOfCode.year
 
@@ -304,7 +304,7 @@ async def fetch_leaderboard(invalidate_cache: bool = False) -> dict:
     return cached_leaderboard
 
 
-def get_summary_embed(leaderboard: dict) -> discord.Embed:
+def get_summary_embed(leaderboard: dict[str, Any]) -> discord.Embed:
     """Get an embed with the current summary stats of the leaderboard."""
     leaderboard_url = leaderboard['full_leaderboard_url']
     refresh_minutes = AdventOfCode.leaderboard_cache_expiry_seconds // 60
@@ -332,7 +332,7 @@ def get_summary_embed(leaderboard: dict) -> discord.Embed:
     return aoc_embed
 
 
-async def get_public_join_code(author: discord.Member) -> typing.Optional[str]:
+async def get_public_join_code(author: discord.Member) -> Optional[str]:
     """
     Get the join code for one of the non-staff leaderboards.
 

@@ -1,7 +1,8 @@
 import logging
 import math
 import random
-from typing import Iterable, Union
+from collections.abc import Iterable
+from typing import Union
 
 from discord import Embed, Message
 from discord.ext import commands

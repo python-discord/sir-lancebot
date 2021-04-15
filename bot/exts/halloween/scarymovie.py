@@ -1,6 +1,7 @@
 import logging
 import random
 from os import environ
+from typing import Any
 
 import aiohttp
 from discord import Embed
@@ -29,7 +30,7 @@ class ScaryMovie(commands.Cog):
         await ctx.send(embed=movie_details)
 
     @staticmethod
-    async def select_movie() -> dict:
+    async def select_movie() -> dict[str, Any]:
         """Selects a random movie and returns a JSON of movie details from TMDb."""
         url = 'https://api.themoviedb.org/4/discover/movie'
         params = {
@@ -62,7 +63,7 @@ class ScaryMovie(commands.Cog):
             return await selection.json()
 
     @staticmethod
-    async def format_metadata(movie: dict) -> Embed:
+    async def format_metadata(movie: dict[str, Any]) -> Embed:
         """Formats raw TMDb data to be embedded in Discord chat."""
         # Build the relevant URLs.
         movie_id = movie.get("id")

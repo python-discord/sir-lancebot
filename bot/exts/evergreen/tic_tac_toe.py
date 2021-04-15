@@ -1,6 +1,7 @@
 import asyncio
 import random
 import typing as t
+from collections.abc import Callable
 
 import discord
 from discord.ext.commands import Cog, Context, check, group, guild_only
@@ -227,14 +228,14 @@ class Game:
         self.over = True
 
 
-def is_channel_free() -> t.Callable:
+def is_channel_free() -> Callable[[Context], bool]:
     """Check is channel where command will be invoked free."""
     async def predicate(ctx: Context) -> bool:
         return all(game.channel != ctx.channel for game in ctx.cog.games if not game.over)
     return check(predicate)
 
 
-def is_requester_free() -> t.Callable:
+def is_requester_free() -> Callable[[Context], bool]:
     """Check is requester not already in any game."""
     async def predicate(ctx: Context) -> bool:
         return all(
