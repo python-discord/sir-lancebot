@@ -5,7 +5,7 @@ from collections import defaultdict
 from datetime import datetime
 from typing import List, Optional, Tuple
 
-from discord import Color, Embed, Emoji
+from discord import Color, Embed, PartialEmoji
 from discord.ext import commands
 
 from bot.constants import Colours, ERROR_REPLIES
@@ -71,7 +71,7 @@ class Emojis(commands.Cog):
         return embed, msg
 
     @commands.group(name="emoji", invoke_without_command=True)
-    async def emoji_group(self, ctx: commands.Context, emoji: Optional[Emoji]) -> None:
+    async def emoji_group(self, ctx: commands.Context, emoji: Optional[PartialEmoji]) -> None:
         """A group of commands related to emojis."""
         if emoji is not None:
             await ctx.invoke(self.info_command, emoji)
@@ -103,7 +103,7 @@ class Emojis(commands.Cog):
         await LinePaginator.paginate(lines=msg, ctx=ctx, embed=embed)
 
     @emoji_group.command(name="info", aliases=("i",))
-    async def info_command(self, ctx: commands.Context, emoji: Emoji) -> None:
+    async def info_command(self, ctx: commands.Context, emoji: PartialEmoji) -> None:
         """Returns relevant information about a Discord Emoji."""
         emoji_information = Embed(
             title=f"Emoji Information: {emoji.name}",
