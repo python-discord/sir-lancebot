@@ -47,7 +47,7 @@ class PfpModify(commands.Cog):
         Fetches a member and handles errors.
 
         This helper funciton is required as the member cache doesn't always have the most up to date
-        profile picture. THis can lead to errors if the image is delted from the Discord CDN.
+        profile picture. This can lead to errors if the image is delted from the Discord CDN.
         """
         try:
             member = await self.bot.get_guild(Client.guild).fetch_member(member_id)
