@@ -7,6 +7,9 @@ from PIL import Image
 from discord.ext import commands
 
 
+MAX_SQUARES = 193_600
+
+
 class Splitify(commands.Cog):
     """Splits your avatar in x squares!"""
 
@@ -77,20 +80,16 @@ class Splitify(commands.Cog):
         return new_image
 
     @commands.command(name='splitify')
-    async def splitify_command(self, ctx: commands.Context, squares: int) -> None:
+    async def splitify_command(self, ctx: commands.Context, squares: int = 16) -> None:
         """Splits your avatar in x squares, randomizes them and stitches them back into a new image!"""
         async with ctx.typing():
-            squares = int(squares)
-
             if squares < 1:
                 raise commands.BadArgument('Squares must be a `positive number`:exclamation:')
 
             if not math.sqrt(squares).is_integer():
                 raise commands.BadArgument('Squares must be a `perfect square`:exclamation:')
 
-            max_squares = 193_600
-
-            if squares > max_squares:
+            if squares > MAX_SQUARES:
                 raise commands.BadArgument('Number of squares cannot be higher than `193,600` :nerd:')
 
             author = ctx.author
@@ -110,7 +109,7 @@ class Splitify(commands.Cog):
             if squares == 1:
                 title = 'Hooh... that was a lot of work'
                 description = 'I present to you... Yourself!'
-            elif squares == max_squares:
+            elif squares == MAX_SQUARES:
                 title = 'Testing the limits I see...'
                 description = 'What a masterpiece. :star:'
             else:
