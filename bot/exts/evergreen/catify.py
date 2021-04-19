@@ -16,7 +16,7 @@ class Catify(commands.Cog):
     async def catify(self, ctx: commands.Context, *string: Optional[str]) -> None:
         """Catifies your nickname or a given string."""
         if string == ():
-            display_name = ctx.author.name
+            display_name = ctx.author.display_name
             if len(display_name) >= 28:
                 await ctx.send("Your username is too long to be catified! Please change it.")
             else:
