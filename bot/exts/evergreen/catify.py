@@ -39,6 +39,6 @@ class Catify(commands.Cog):
                 await ctx.channel.send(string)
 
 
-def setup(bot: commands.Bot):
+def setup(bot: commands.Bot) -> None:
     """Loads the catify cog."""
     bot.add_cog(Catify(bot))
