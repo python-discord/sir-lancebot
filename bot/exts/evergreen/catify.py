@@ -14,11 +14,15 @@ class Catify(commands.Cog):
 
     @commands.command(aliases=["ᓚᘏᗢify", "ᓚᘏᗢ"])
     async def catify(self, ctx: commands.Context, *, text: Optional[str]) -> None:
-        """Catifies your nickname or a given string."""
-        if text == ():
+        """
+        Convert the provided text into a cat themed sentence.
+        
+        If no text is given then the users nickname is edited.
+        """
+        if len(text) == 0:
             display_name = ctx.author.display_name
             if len(display_name) >= 28:
-                await ctx.send("Your username is too long to be catified! Please change it.")
+                await ctx.send("Your nickname is too long to be catified! Please change it.")
             else:
                 display_name += f" | {random.choice(Cats.cats)}"
                 await ctx.send(f"Your catified username is: `{display_name}`")
@@ -29,7 +33,7 @@ class Catify(commands.Cog):
                 if "cat" in name:
                     string_list[index] = string_list[index].replace("cat", random.choice(Cats.cats))
 
-            for _i in range(random.randint(1, len(string_list)//2)):
+            for _i in range(random.randint(1, len(string_list) // 2)):
                 # insert cat at random index
                 string_list.insert(random.randint(0, len(string_list)-1), random.choice(Cats.cats))
 
