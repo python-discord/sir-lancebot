@@ -21,7 +21,7 @@ class Catify(commands.Cog):
         """
         if not text:
             display_name = ctx.author.display_name
-            if len(display_name) >= 28:
+            if len(display_name) >= 26:
                 await ctx.send("Your nickname is too long to be catified! Please change it.")
             else:
                 display_name += f" | {random.choice(Cats.cats)}"
