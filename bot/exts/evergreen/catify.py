@@ -16,7 +16,7 @@ class Catify(commands.Cog):
     async def catify(self, ctx: commands.Context, *, text: Optional[str]) -> None:
         """
         Convert the provided text into a cat themed sentence.
-        
+
         If no text is given then the users nickname is edited.
         """
         if len(text) == 0:
