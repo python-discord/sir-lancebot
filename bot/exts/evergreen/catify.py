@@ -30,7 +30,7 @@ class Catify(commands.Cog):
                 if "cat" in name:
                     string_list[index] = string_list[index].replace("cat", random.choice(Cats.cats))
 
-            for _i in range(random.randint(1, len(string_list)//2)):
+            for _i in range(random.randint(1, len(string_list) // 2)):
                 # insert cat at random index
                 string_list.insert(random.randint(0, len(string_list)-1), random.choice(Cats.cats))
 
