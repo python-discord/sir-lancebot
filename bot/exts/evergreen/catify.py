@@ -19,7 +19,7 @@ class Catify(commands.Cog):
 
         If no text is given then the users nickname is edited.
         """
-        if len(text) == 0:
+        if not text:
             display_name = ctx.author.display_name
             if len(display_name) >= 28:
                 await ctx.send("Your nickname is too long to be catified! Please change it.")
