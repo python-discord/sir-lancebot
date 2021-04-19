@@ -14,7 +14,11 @@ class Catify(commands.Cog):
 
     @commands.command(aliases=["ᓚᘏᗢify", "ᓚᘏᗢ"])
     async def catify(self, ctx: commands.Context, *string: Optional[str]) -> None:
-        """Catifies your nickname or a given string."""
+        """
+        Convert the provided text into a cat themed sentence.
+        
+        If no text is given then the users nickname is edited.
+        """
         if len(string) == 0:
             display_name = ctx.author.display_name
             if len(display_name) >= 28:
