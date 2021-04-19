@@ -58,16 +58,21 @@ class Stackoverflow(commands.Cog):
                       url=SEARCH_URL.format(query=encoded_search_query),
                       description=f"Here are the top {len(top5)} results:",
                       color=Colours.orange)
-        for item in top5:
-            embed.add_field(
-                name=f"{unescape(item['title'])}",
-                value=(f"[{Emojis.stackoverflow_upvote} {item['score']}    "
-                       f"{Emojis.stackoverflow_views} {item['view_count']}     "
-                       f"{Emojis.stackoverflow_ans} {item['answer_count']}   "
-                       f"{Emojis.stackoverflow_tag} {', '.join(item['tags'][:3])}]"
-                       f"({item['link']})"),
-                inline=False)
-        embed.set_footer(text="View the original link for more results.")
+        try:
+            for item in top5:
+                embed.add_field(
+                    name=f"{unescape(item['title'])}",
+                    value=(f"[{Emojis.stackoverflow_upvote} {item['score']} "
+                           f"{Emojis.stackoverflow_views} {item['view_count']} "
+                           f"{Emojis.stackoverflow_ans} {item['answer_count']} "
+                           f"{Emojis.stackoverflow_tag} {', '.join(item['tags'][:3])}]"
+                           f"({item['link']})"),
+                    inline=False)
+            embed.set_footer(text="View the original link for more results.")
+        except KeyError:
+            logger.error(f'Data not found for stack overflow question "{search_query}" ')
+            await ctx.send(embed=ERR_EMBED)
+            return
         try:
             await ctx.send(embed=embed)
         except HTTPException:
