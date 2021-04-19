@@ -14,7 +14,7 @@ class Catify(commands.Cog):
 
     @commands.command(aliases=["ᓚᘏᗢify", "ᓚᘏᗢ"])
     async def catify(self, ctx: commands.Context, *string: Optional[str]) -> None:
-        """Catifies a string or username."""
+        """Catifies your nickname or a given string."""
         if string == ():
             username = ctx.author.name
             if len(username) >= 28:
