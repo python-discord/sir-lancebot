@@ -10,6 +10,7 @@ from discord.ext.commands.cooldowns import BucketType
 
 from bot.constants import Channels, Colours, Lovefest, Month
 from bot.utils.decorators import in_month
+from bot.utils.extensions import invoke_help_command
 
 log = logging.getLogger(__name__)
 
@@ -43,7 +44,7 @@ class BeMyValentine(commands.Cog):
         2) use the command \".lovefest unsub\" to get rid of the lovefest role.
         """
         if not ctx.invoked_subcommand:
-            await ctx.send_help(ctx.command)
+            await invoke_help_command(ctx)
 
     @lovefest_role.command(name="sub")
     async def add_role(self, ctx: commands.Context) -> None:

@@ -99,33 +99,18 @@ class Cats:
 
 
 class Channels(NamedTuple):
-    admins = 365960823622991872
     advent_of_code = int(environ.get("AOC_CHANNEL_ID", 782715290437943306))
     advent_of_code_commands = int(environ.get("AOC_COMMANDS_CHANNEL_ID", 607247579608121354))
-    announcements = int(environ.get("CHANNEL_ANNOUNCEMENTS", 354619224620138496))
-    big_brother_logs = 468507907357409333
     bot = 267659945086812160
-    checkpoint_test = 422077681434099723
     organisation = 551789653284356126
-    devalerts = 460181980097675264
     devlog = int(environ.get("CHANNEL_DEVLOG", 622895325144940554))
     dev_contrib = 635950537262759947
-    dev_branding = 753252897059373066
-    helpers = 385474242440986624
-    message_log = 467752170159079424
-    mod_alerts = 473092532147060736
-    modlog = 282638479504965634
     mod_meta = 775412552795947058
     mod_tools = 775413915391098921
     off_topic_0 = 291284109232308226
     off_topic_1 = 463035241142026251
     off_topic_2 = 463035268514185226
-    python = 267624335836053506
-    reddit = 458224812528238616
     community_bot_commands = int(environ.get("CHANNEL_COMMUNITY_BOT_COMMANDS", 607247579608121354))
-    staff_lounge = 464905259261755392
-    verification = 352442727016693763
-    python_discussion = 267624335836053506
     hacktoberfest_2020 = 760857070781071431
     voice_chat_0 = 412357430186344448
     voice_chat_1 = 799647045886541885
@@ -163,6 +148,9 @@ class Colours:
     soft_orange = 0xf9cb54
     soft_red = 0xcd6d6d
     yellow = 0xf9f586
+    python_blue = 0x4B8BBE
+    python_yellow = 0xFFD43B
+    grass_green = 0x66ff00
 
 
 class Emojis:
@@ -170,7 +158,7 @@ class Emojis:
     christmas_tree = "\U0001F384"
     check = "\u2611"
     envelope = "\U0001F4E8"
-    trashcan = "<:trashcan:637136429717389331>"
+    trashcan = environ.get("TRASHCAN_EMOJI", "<:trashcan:637136429717389331>")
     ok_hand = ":ok_hand:"
     hand_raised = "\U0001f64b"
 
@@ -185,6 +173,7 @@ class Emojis:
     issue_closed = "<:IssueClosed:629695470570307614>"
     pull_request = "<:PROpen:629695470175780875>"
     pull_request_closed = "<:PRClosed:629695470519713818>"
+    pull_request_draft = "<:PRDraft:829755345425399848>"
     merge = "<:PRMerged:629695470570176522>"
 
     number_emojis = {
@@ -250,20 +239,10 @@ if Client.month_override is not None:
 
 class Roles(NamedTuple):
     admin = int(environ.get("BOT_ADMIN_ROLE_ID", 267628507062992896))
-    announcements = 463658397560995840
-    champion = 430492892331769857
-    contributor = 295488872404484098
-    devops = 409416496733880320
-    jammer = 423054537079783434
     moderator = 267629731250176001
-    muted = 277914926603829249
     owner = 267627879762755584
-    verified = 352427296948486144
     helpers = int(environ.get("ROLE_HELPERS", 267630620367257601))
-    rockstars = 458226413825294336
     core_developers = 587606783669829632
-    events_lead = 778361735739998228
-    everyone_role = 267624335836053506
 
 
 class Tokens(NamedTuple):
@@ -276,6 +255,7 @@ class Tokens(NamedTuple):
     igdb_client_id = environ.get("IGDB_CLIENT_ID")
     igdb_client_secret = environ.get("IGDB_CLIENT_SECRET")
     github = environ.get("GITHUB_TOKEN")
+    unsplash_access_key = environ.get("UNSPLASH_KEY")
 
 
 class Wolfram(NamedTuple):

@@ -3,6 +3,8 @@ from http import HTTPStatus
 import discord
 from discord.ext import commands
 
+from bot.utils.extensions import invoke_help_command
+
 HTTP_DOG_URL = "https://httpstatusdogs.com/img/{code}.jpg"
 HTTP_CAT_URL = "https://http.cat/{code}.jpg"
 
@@ -17,7 +19,7 @@ class HTTPStatusCodes(commands.Cog):
     async def http_status_group(self, ctx: commands.Context) -> None:
         """Group containing dog and cat http status code commands."""
         if not ctx.invoked_subcommand:
-            await ctx.send_help(ctx.command)
+            await invoke_help_command(ctx)
 
     @http_status_group.command(name='cat')
     async def http_cat(self, ctx: commands.Context, code: int) -> None:
