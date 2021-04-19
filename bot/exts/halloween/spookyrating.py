@@ -7,20 +7,20 @@ from pathlib import Path
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
 with Path("bot/resources/halloween/spooky_rating.json").open(encoding="utf8") as file:
-    SPOOKY_DATA = json.load(file)
-    SPOOKY_DATA = sorted((int(key), value) for key, value in SPOOKY_DATA.items())
+    data = json.load(file)
+    SPOOKY_DATA = sorted((int(key), value) for key, value in data.items())
 
 
 class SpookyRating(commands.Cog):
     """A cog for calculating one's spooky rating."""
 
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
+    def __init__(self):
         self.local_random = random.Random()
 
     @commands.command()
@@ -61,6 +61,6 @@ class SpookyRating(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
-    """Spooky Rating Cog load."""
-    bot.add_cog(SpookyRating(bot))
+def setup(bot: Bot) -> None:
+    """Load the Spooky Rating Cog."""
+    bot.add_cog(SpookyRating())

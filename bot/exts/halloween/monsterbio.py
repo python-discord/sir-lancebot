@@ -6,6 +6,7 @@ from pathlib import Path
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Colours
 
 log = logging.getLogger(__name__)
@@ -16,9 +17,6 @@ with open(Path("bot/resources/halloween/monster.json"), "r", encoding="utf8") as
 
 class MonsterBio(commands.Cog):
     """A cog that generates a spooky monster biography."""
-
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
 
     def generate_name(self, seeded_random: random.Random) -> str:
         """Generates a name (for either monster species or monster name)."""
@@ -50,6 +48,6 @@ class MonsterBio(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
-    """Monster bio Cog load."""
-    bot.add_cog(MonsterBio(bot))
+def setup(bot: Bot) -> None:
+    """Load the Monster Bio Cog."""
+    bot.add_cog(MonsterBio())

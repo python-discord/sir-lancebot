@@ -23,9 +23,8 @@ class MonsterSurvey(Cog):
     Users may change their vote, but only their current vote will be counted.
     """
 
-    def __init__(self, bot: Bot):
+    def __init__(self):
         """Initializes values for the bot to use within the voting commands."""
-        self.bot = bot
         self.registry_location = os.path.join(os.getcwd(), 'bot', 'resources', 'halloween', 'monstersurvey.json')
         with open(self.registry_location, 'r', encoding="utf8") as jason:
             self.voter_registry = json.load(jason)
@@ -201,4 +200,5 @@ class MonsterSurvey(Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Monster survey Cog load."""
+    """Load the Monster Survey Cog."""
+    bot.add_cog(MonsterSurvey())

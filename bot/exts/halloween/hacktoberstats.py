@@ -5,11 +5,11 @@ from collections import Counter
 from datetime import datetime, timedelta
 from typing import List, Optional, Tuple, Union
 
-import aiohttp
 import discord
 from async_rediscache import RedisCache
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Channels, Month, NEGATIVE_REPLIES, Tokens, WHITELISTED_CHANNELS
 from bot.utils.decorators import in_month, whitelist_override
 
@@ -39,7 +39,7 @@ class HacktoberStats(commands.Cog):
     # Stores mapping of user IDs and GitHub usernames
     linked_accounts = RedisCache()
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @in_month(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)
@@ -83,15 +83,15 @@ class HacktoberStats(commands.Cog):
         if github_username:
             if await self.linked_accounts.contains(author_id):
                 old_username = await self.linked_accounts.get(author_id)
-                logging.info(f"{author_id} has changed their github link from '{old_username}' to '{github_username}'")
+                log.info(f"{author_id} has changed their github link from '{old_username}' to '{github_username}'")
                 await ctx.send(f"{author_mention}, your GitHub username has been updated to: '{github_username}'")
             else:
-                logging.info(f"{author_id} has added a github link to '{github_username}'")
+                log.info(f"{author_id} has added a github link to '{github_username}'")
                 await ctx.send(f"{author_mention}, your GitHub username has been added")
 
             await self.linked_accounts.set(author_id, github_username)
         else:
-            logging.info(f"{author_id} tried to link a GitHub account but didn't provide a username")
+            log.info(f"{author_id} tried to link a GitHub account but didn't provide a username")
             await ctx.send(f"{author_mention}, a GitHub username is required to link your account")
 
     @in_month(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)
@@ -157,7 +157,7 @@ class HacktoberStats(commands.Cog):
 
         stats_embed = discord.Embed(
             title=f"{github_username}'s Hacktoberfest",
-            color=discord.Color(0x9c4af7),
+            color=0x9c4af7,
             description=(
                 f"{github_username} has made {n} valid "
                 f"{self._contributionator(n)} in "
@@ -188,8 +188,7 @@ class HacktoberStats(commands.Cog):
         logging.info(f"Hacktoberfest PR built for GitHub user '{github_username}'")
         return stats_embed
 
-    @staticmethod
-    async def get_october_prs(github_username: str) -> Optional[List[dict]]:
+    async def get_october_prs(self, github_username: str) -> Optional[List[dict]]:
         """
         Query GitHub's API for PRs created during the month of October by github_username.
 
@@ -212,7 +211,7 @@ class HacktoberStats(commands.Cog):
         Otherwise, return empty list.
         None will be returned when the GitHub user was not found.
         """
-        logging.info(f"Fetching Hacktoberfest Stats for GitHub user: '{github_username}'")
+        log.info(f"Fetching Hacktoberfest Stats for GitHub user: '{github_username}'")
         base_url = "https://api.github.com/search/issues?q="
         action_type = "pr"
         is_query = "public"
@@ -228,24 +227,24 @@ class HacktoberStats(commands.Cog):
             f"+created:{date_range}"
             f"&per_page={per_page}"
         )
-        logging.debug(f"GitHub query URL generated: {query_url}")
+        log.logProcesses.debug(f"GitHub query URL generated: {query_url}")
 
-        jsonresp = await HacktoberStats._fetch_url(query_url, REQUEST_HEADERS)
-        if "message" in jsonresp.keys():
+        jsonresp = await self._fetch_url(query_url, REQUEST_HEADERS)
+        if "message" in jsonresp:
             # One of the parameters is invalid, short circuit for now
             api_message = jsonresp["errors"][0]["message"]
 
             # Ignore logging non-existent users or users we do not have permission to see
             if api_message == GITHUB_NONEXISTENT_USER_MESSAGE:
-                logging.debug(f"No GitHub user found named '{github_username}'")
+                log.debug(f"No GitHub user found named '{github_username}'")
                 return
             else:
-                logging.error(f"GitHub API request for '{github_username}' failed with message: {api_message}")
+                log.error(f"GitHub API request for '{github_username}' failed with message: {api_message}")
             return []  # No October PRs were found due to error
 
         if jsonresp["total_count"] == 0:
             # Short circuit if there aren't any PRs
-            logging.info(f"No October PRs found for GitHub user: '{github_username}'")
+            log.info(f"No October PRs found for GitHub user: '{github_username}'")
             return []
 
         logging.info(f"Found {len(jsonresp['items'])} Hacktoberfest PRs for GitHub user: '{github_username}'")
@@ -253,20 +252,20 @@ class HacktoberStats(commands.Cog):
         oct3 = datetime(int(CURRENT_YEAR), 10, 3, 23, 59, 59, tzinfo=None)
         hackto_topics = {}  # cache whether each repo has the appropriate topic (bool values)
         for item in jsonresp["items"]:
-            shortname = HacktoberStats._get_shortname(item["repository_url"])
+            shortname = self._get_shortname(item["repository_url"])
             itemdict = {
                 "repo_url": f"https://www.github.com/{shortname}",
                 "repo_shortname": shortname,
                 "created_at": datetime.strptime(
-                    item["created_at"], r"%Y-%m-%dT%H:%M:%SZ"
+                    item["created_at"], "%Y-%m-%dT%H:%M:%SZ"
                 ),
                 "number": item["number"]
             }
 
             # If the PR has 'invalid' or 'spam' labels, the PR must be
             # either merged or approved for it to be included
-            if HacktoberStats._has_label(item, ["invalid", "spam"]):
-                if not await HacktoberStats._is_accepted(itemdict):
+            if self._has_label(item, ["invalid", "spam"]):
+                if not await self._is_accepted(itemdict):
                     continue
 
             # PRs before oct 3 no need to check for topics
@@ -277,21 +276,20 @@ class HacktoberStats(commands.Cog):
                 continue
 
             # Checking PR's labels for "hacktoberfest-accepted"
-            if HacktoberStats._has_label(item, "hacktoberfest-accepted"):
+            if self._has_label(item, "hacktoberfest-accepted"):
                 outlist.append(itemdict)
                 continue
 
             # No need to query GitHub if repo topics are fetched before already
-            if shortname in hackto_topics.keys():
-                if hackto_topics[shortname]:
-                    outlist.append(itemdict)
-                    continue
+            if hackto_topics.get(shortname):
+                outlist.append(itemdict)
+                continue
             # Fetch topics for the PR's repo
             topics_query_url = f"https://api.github.com/repos/{shortname}/topics"
-            logging.debug(f"Fetching repo topics for {shortname} with url: {topics_query_url}")
-            jsonresp2 = await HacktoberStats._fetch_url(topics_query_url, GITHUB_TOPICS_ACCEPT_HEADER)
+            log.debug(f"Fetching repo topics for {shortname} with url: {topics_query_url}")
+            jsonresp2 = await self._fetch_url(topics_query_url, GITHUB_TOPICS_ACCEPT_HEADER)
             if jsonresp2.get("names") is None:
-                logging.error(f"Error fetching topics for {shortname}: {jsonresp2['message']}")
+                log.error(f"Error fetching topics for {shortname}: {jsonresp2['message']}")
                 continue  # Assume the repo doesn't have the `hacktoberfest` topic if API  request errored
 
             # PRs after oct 3 that doesn't have 'hacktoberfest-accepted' label
@@ -301,12 +299,10 @@ class HacktoberStats(commands.Cog):
                 outlist.append(itemdict)
         return outlist
 
-    @staticmethod
-    async def _fetch_url(url: str, headers: dict) -> dict:
+    async def _fetch_url(self, url: str, headers: dict) -> dict:
         """Retrieve API response from URL."""
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers=headers) as resp:
-                jsonresp = await resp.json()
+        async with self.bot.http_session.get(url, headers=headers) as resp:
+            jsonresp = await resp.json()
         return jsonresp
 
     @staticmethod
@@ -319,40 +315,36 @@ class HacktoberStats(commands.Cog):
         """
         if not pr.get("labels"):  # if PR has no labels
             return False
-        if (isinstance(labels, str)) and (any(label["name"].casefold() == labels for label in pr["labels"])):
+        if isinstance(labels, str) and any(label["name"].casefold() == labels for label in pr["labels"]):
             return True
         for item in labels:
             if any(label["name"].casefold() == item for label in pr["labels"]):
                 return True
         return False
 
-    @staticmethod
-    async def _is_accepted(pr: dict) -> bool:
+    async def _is_accepted(self, pr: dict) -> bool:
         """Check if a PR is merged, approved, or labelled hacktoberfest-accepted."""
         # checking for merge status
-        query_url = f"https://api.github.com/repos/{pr['repo_shortname']}/pulls/"
-        query_url += str(pr["number"])
-        jsonresp = await HacktoberStats._fetch_url(query_url, REQUEST_HEADERS)
+        query_url = f"https://api.github.com/repos/{pr['repo_shortname']}/pulls/{pr['number']}"
+        jsonresp = await self._fetch_url(query_url, REQUEST_HEADERS)
 
-        if "message" in jsonresp.keys():
-            logging.error(
-                f"Error fetching PR stats for #{pr['number']} in repo {pr['repo_shortname']}:\n"
-                f"{jsonresp['message']}"
-            )
+        if message := jsonresp.get("message"):
+            log.error(f"Error fetching PR stats for #{pr['number']} in repo {pr['repo_shortname']}:\n{message}")
             return False
-        if ("merged" in jsonresp.keys()) and jsonresp["merged"]:
+
+        if jsonresp.get("merged"):
             return True
 
         # checking for the label, using `jsonresp` which has the label information
-        if HacktoberStats._has_label(jsonresp, "hacktoberfest-accepted"):
+        if self._has_label(jsonresp, "hacktoberfest-accepted"):
             return True
 
         # checking approval
         query_url += "/reviews"
-        jsonresp2 = await HacktoberStats._fetch_url(query_url, REQUEST_HEADERS)
+        jsonresp2 = await self._fetch_url(query_url, REQUEST_HEADERS)
         if isinstance(jsonresp2, dict):
             # if API request is unsuccessful it will be a dict with the error in 'message'
-            logging.error(
+            log.error(
                 f"Error fetching PR reviews for #{pr['number']} in repo {pr['repo_shortname']}:\n"
                 f"{jsonresp2['message']}"
             )
@@ -363,9 +355,8 @@ class HacktoberStats(commands.Cog):
 
         # loop through reviews and check for approval
         for item in jsonresp2:
-            if "status" in item.keys():
-                if item['status'] == "APPROVED":
-                    return True
+            if item.get('status') == "APPROVED":
+                return True
         return False
 
     @staticmethod
@@ -381,8 +372,7 @@ class HacktoberStats(commands.Cog):
         exp = r"https?:\/\/api.github.com\/repos\/([/\-\_\.\w]+)"
         return re.findall(exp, in_url)[0]
 
-    @staticmethod
-    async def _categorize_prs(prs: List[dict]) -> tuple:
+    async def _categorize_prs(self, prs: List[dict]) -> tuple:
         """
         Categorize PRs into 'in_review' and 'accepted' and returns as a tuple.
 
@@ -399,7 +389,7 @@ class HacktoberStats(commands.Cog):
         for pr in prs:
             if (pr['created_at'] + timedelta(REVIEW_DAYS)) > now:
                 in_review.append(pr)
-            elif (pr['created_at'] <= oct3) or await HacktoberStats._is_accepted(pr):
+            elif (pr['created_at'] <= oct3) or await self._is_accepted(pr):
                 accepted.append(pr)
 
         return in_review, accepted
@@ -438,14 +428,14 @@ class HacktoberStats(commands.Cog):
             return "contributions"
 
     @staticmethod
-    def _author_mention_from_context(ctx: commands.Context) -> Tuple:
+    def _author_mention_from_context(ctx: commands.Context) -> Tuple[str, str]:
         """Return stringified Message author ID and mentionable string from commands.Context."""
-        author_id = str(ctx.message.author.id)
-        author_mention = ctx.message.author.mention
+        author_id = str(ctx.author.id)
+        author_mention = ctx.author.mention
 
         return author_id, author_mention
 
 
-def setup(bot: commands.Bot) -> None:
-    """Hacktoberstats Cog load."""
+def setup(bot: Bot) -> None:
+    """Load the Hacktober Stats Cog."""
     bot.add_cog(HacktoberStats(bot))

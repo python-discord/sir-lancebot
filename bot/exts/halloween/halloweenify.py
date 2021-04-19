@@ -6,16 +6,15 @@ from random import choice
 import discord
 from discord.errors import Forbidden
 from discord.ext import commands
-from discord.ext.commands.cooldowns import BucketType
+from discord.ext.commands import BucketType
+
+from bot.bot import Bot
 
 log = logging.getLogger(__name__)
 
 
 class Halloweenify(commands.Cog):
     """A cog to change a invokers nickname to a spooky one!"""
-
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
 
     @commands.cooldown(1, 300, BucketType.user)
     @commands.command()
@@ -61,6 +60,6 @@ class Halloweenify(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
-    """Halloweenify Cog load."""
-    bot.add_cog(Halloweenify(bot))
+def setup(bot: Bot) -> None:
+    """Load the Halloweenify Cog."""
+    bot.add_cog(Halloweenify())

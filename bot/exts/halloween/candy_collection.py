@@ -6,6 +6,7 @@ import discord
 from async_rediscache import RedisCache
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Channels, Month
 from bot.utils.decorators import in_month
 
@@ -40,7 +41,7 @@ class CandyCollection(commands.Cog):
     candy_messages = RedisCache()
     skull_messages = RedisCache()
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @in_month(Month.OCTOBER)
@@ -60,15 +61,15 @@ class CandyCollection(commands.Cog):
         # do random check for skull first as it has the lower chance
         if random.randint(1, ADD_SKULL_REACTION_CHANCE) == 1:
             await self.skull_messages.set(message.id, "skull")
-            return await message.add_reaction(EMOJIS['SKULL'])
+            await message.add_reaction(EMOJIS["SKULL"])
         # check for the candy chance next
-        if random.randint(1, ADD_CANDY_REACTION_CHANCE) == 1:
+        elif random.randint(1, ADD_CANDY_REACTION_CHANCE) == 1:
             await self.candy_messages.set(message.id, "candy")
-            return await message.add_reaction(EMOJIS['CANDY'])
+            await message.add_reaction(EMOJIS["CANDY"])
 
     @in_month(Month.OCTOBER)
     @commands.Cog.listener()
-    async def on_reaction_add(self, reaction: discord.Reaction, user: discord.Member) -> None:
+    async def on_reaction_add(self, reaction: discord.Reaction, user: Union[discord.User, discord.Member]) -> None:
         """Add/remove candies from a person if the reaction satisfies criteria."""
         message = reaction.message
         # check to ensure the reactor is human
@@ -81,7 +82,7 @@ class CandyCollection(commands.Cog):
 
         # if its not a candy or skull, and it is one of 10 most recent messages,
         # proceed to add a skull/candy with higher chance
-        if str(reaction.emoji) not in (EMOJIS['SKULL'], EMOJIS['CANDY']):
+        if str(reaction.emoji) not in (EMOJIS["SKULL"], EMOJIS["CANDY"]):
             recent_message_ids = map(
                 lambda m: m.id,
                 await self.hacktober_channel.history(limit=10).flatten()
@@ -90,14 +91,14 @@ class CandyCollection(commands.Cog):
                 await self.reacted_msg_chance(message)
             return
 
-        if await self.candy_messages.get(message.id) == "candy" and str(reaction.emoji) == EMOJIS['CANDY']:
+        if await self.candy_messages.get(message.id) == "candy" and str(reaction.emoji) == EMOJIS["CANDY"]:
             await self.candy_messages.delete(message.id)
             if await self.candy_records.contains(user.id):
                 await self.candy_records.increment(user.id)
             else:
                 await self.candy_records.set(user.id, 1)
 
-        elif await self.skull_messages.get(message.id) == "skull" and str(reaction.emoji) == EMOJIS['SKULL']:
+        elif await self.skull_messages.get(message.id) == "skull" and str(reaction.emoji) == EMOJIS["SKULL"]:
             await self.skull_messages.delete(message.id)
 
             if prev_record := await self.candy_records.get(user.id):
@@ -124,11 +125,11 @@ class CandyCollection(commands.Cog):
         """
         if random.randint(1, ADD_SKULL_EXISTING_REACTION_CHANCE) == 1:
             await self.skull_messages.set(message.id, "skull")
-            return await message.add_reaction(EMOJIS['SKULL'])
+            await message.add_reaction(EMOJIS['SKULL'])
 
-        if random.randint(1, ADD_CANDY_EXISTING_REACTION_CHANCE) == 1:
+        elif random.randint(1, ADD_CANDY_EXISTING_REACTION_CHANCE) == 1:
             await self.candy_messages.set(message.id, "candy")
-            return await message.add_reaction(EMOJIS['CANDY'])
+            await message.add_reaction(EMOJIS["CANDY"])
 
     @property
     def hacktober_channel(self) -> discord.TextChannel:
@@ -141,8 +142,10 @@ class CandyCollection(commands.Cog):
     ) -> None:
         """Send a spooky message."""
         e = discord.Embed(colour=author.colour)
-        e.set_author(name="Ghosts and Ghouls and Jack o' lanterns at night; "
-                          f"I took {candies} candies and quickly took flight.")
+        e.set_author(
+            name="Ghosts and Ghouls and Jack o' lanterns at night; "
+            f"I took {candies} candies and quickly took flight."
+        )
         await channel.send(embed=e)
 
     @staticmethod
@@ -173,7 +176,7 @@ class CandyCollection(commands.Cog):
             return '\n'.join(
                 f"{EMOJIS['MEDALS'][index]} <@{record[0]}>: {record[1]}"
                 for index, record in enumerate(top_five)
-            ) if top_five else 'No Candies'
+            ) if top_five else "No Candies"
 
         e = discord.Embed(colour=discord.Colour.blurple())
         e.add_field(
@@ -191,6 +194,6 @@ class CandyCollection(commands.Cog):
         await ctx.send(embed=e)
 
 
-def setup(bot: commands.Bot) -> None:
-    """Candy Collection game Cog load."""
+def setup(bot: Bot) -> None:
+    """Load the Candy Collection Cog."""
     bot.add_cog(CandyCollection(bot))

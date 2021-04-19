@@ -8,6 +8,8 @@ from typing import Tuple
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
+
 log = logging.getLogger(__name__)
 
 SPOOKY_EMOJIS = [
@@ -20,16 +22,15 @@ SPOOKY_EMOJIS = [
     "\N{SKULL AND CROSSBONES}",
     "\N{SPIDER WEB}",
 ]
-PUMPKIN_ORANGE = discord.Color(0xFF7518)
+PUMPKIN_ORANGE = 0xFF7518
 INTERVAL = timedelta(hours=6).total_seconds()
 
 
 class HalloweenFacts(commands.Cog):
     """A Cog for displaying interesting facts about Halloween."""
 
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
-        with open(Path("bot/resources/halloween/halloween_facts.json"), "r", encoding="utf8") as file:
+    def __init__(self):
+        with Path("bot/resources/halloween/halloween_facts.json").open("r", encoding="utf8") as file:
             self.halloween_facts = json.load(file)
         self.facts = list(enumerate(self.halloween_facts))
         random.shuffle(self.facts)
@@ -53,6 +54,6 @@ class HalloweenFacts(commands.Cog):
         return discord.Embed(title=title, description=fact, color=PUMPKIN_ORANGE)
 
 
-def setup(bot: commands.Bot) -> None:
-    """Halloween facts Cog load."""
-    bot.add_cog(HalloweenFacts(bot))
+def setup(bot: Bot) -> None:
+    """Load the Halloween Facts Cog."""
+    bot.add_cog(HalloweenFacts())

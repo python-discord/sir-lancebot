@@ -12,8 +12,9 @@ from async_rediscache import RedisCache
 from discord import Embed, Reaction, TextChannel, User
 from discord.colour import Colour
 from discord.ext import tasks
-from discord.ext.commands import Bot, Cog, Context, group
+from discord.ext.commands import Cog, Context, group
 
+from bot.bot import Bot
 from bot.constants import Channels, Client, Colours, Month
 from bot.utils.decorators import InMonthCheckFailure
 
@@ -34,7 +35,7 @@ ADDED_MESSAGES = [
 ]
 PING = "<@{id}>"
 
-EMOJI_MESSAGE = "\n".join([f"- {emoji} {val}" for emoji, val in EMOJIS_VAL.items()])
+EMOJI_MESSAGE = "\n".join(f"- {emoji} {val}" for emoji, val in EMOJIS_VAL.items())
 HELP_MESSAGE_DICT = {
     "title": "Spooky Name Rate",
     "description": f"Help for the `{Client.prefix}spookynamerate` command",
@@ -137,14 +138,12 @@ class SpookyNameRate(Cog):
     async def add_name(self, ctx: Context, *, name: str) -> None:
         """Use this command to add/register your spookified name."""
         if self.poll:
-            logger.info(f"{ctx.message.author} tried to add a name, but the poll had already started.")
+            logger.info(f"{ctx.author} tried to add a name, but the poll had already started.")
             await ctx.send("Sorry, the poll has started! You can try and participate in the next round though!")
             return
 
-        message = ctx.message
-
         for data in (json.loads(user_data) for _, user_data in await self.messages.items()):
-            if data["author"] == message.author.id:
+            if data["author"] == ctx.author.id:
                 await ctx.send(
                     "But you have already added an entry! Type "
                     f"`{self.bot.command_prefix}spookynamerate "
@@ -156,14 +155,14 @@ class SpookyNameRate(Cog):
                 await ctx.send("TOO LATE. Someone has already added this name.")
                 return
 
-        msg = await (await self.get_channel()).send(f"{message.author.mention} added the name {name!r}!")
+        msg = await (await self.get_channel()).send(f"{ctx.author.mention} added the name {name!r}!")
 
         await self.messages.set(
             msg.id,
             json.dumps(
                 {
                     "name": name,
-                    "author": message.author.id,
+                    "author": ctx.author.id,
                     "score": 0,
                 }
             ),
@@ -172,7 +171,7 @@ class SpookyNameRate(Cog):
         for emoji in EMOJIS_VAL:
             await msg.add_reaction(emoji)
 
-        logger.info(f"{message.author} added the name {name!r}")
+        logger.info(f"{ctx.author} added the name {name!r}")
 
     @spooky_name_rate.command(name="delete")
     async def delete_name(self, ctx: Context) -> None:
@@ -185,7 +184,7 @@ class SpookyNameRate(Cog):
 
             if ctx.author.id == data["author"]:
                 await self.messages.delete(message_id)
-                await ctx.send(f'Name deleted successfully ({data["name"]!r})!')
+                await ctx.send(f"Name deleted successfully ({data['name']!r})!")
                 return
 
         await ctx.send(
@@ -397,5 +396,5 @@ class SpookyNameRate(Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Loads the SpookyNameRate Cog."""
+    """Load the SpookyNameRate Cog."""
     bot.add_cog(SpookyNameRate(bot))
