@@ -35,9 +35,6 @@ TOPICS = {
 class ConvoStarters(commands.Cog):
     """Evergreen conversation topics."""
 
-    def __init__(self, bot: Bot):
-        self.bot = bot
-
     @commands.command()
     @whitelist_override(channels=ALL_ALLOWED_CHANNELS)
     async def topic(self, ctx: commands.Context) -> None:

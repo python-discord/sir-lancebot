@@ -79,7 +79,7 @@ GamesDict = typing.Dict[int, Game]
 class Minesweeper(commands.Cog):
     """Play a game of Minesweeper."""
 
-    def __init__(self, bot: Bot) -> None:
+    def __init__(self, _bot: Bot) -> None:
         self.games: GamesDict = {}  # Store the currently running games
 
     @commands.group(name='minesweeper', aliases=('ms',), invoke_without_command=True)

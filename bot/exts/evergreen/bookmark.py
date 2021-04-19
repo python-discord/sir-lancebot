@@ -14,9 +14,6 @@ log = logging.getLogger(__name__)
 class Bookmark(commands.Cog):
     """Creates personal bookmarks by relaying a message link to the user's DMs."""
 
-    def __init__(self, bot: Bot):
-        self.bot = bot
-
     @commands.command(name="bookmark", aliases=("bm", "pin"))
     async def bookmark(
         self,

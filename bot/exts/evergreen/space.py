@@ -39,7 +39,6 @@ class Space(Cog):
     """Space Cog contains commands, that show images, facts or other information about space."""
 
     def __init__(self, bot: Bot):
-        self.bot = bot
         self.http_session = bot.http_session
 
         self.rovers = {}

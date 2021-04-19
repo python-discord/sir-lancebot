@@ -13,9 +13,6 @@ log = logging.getLogger(__name__)
 class Uptime(commands.Cog):
     """A cog for posting the bot's uptime."""
 
-    def __init__(self, bot: Bot):
-        self.bot = bot
-
     @commands.command(name="uptime")
     async def uptime(self, ctx: commands.Context) -> None:
         """Responds with the uptime of the bot."""

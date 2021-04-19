@@ -51,7 +51,6 @@ class Movie(Cog):
     """Movie Cog contains movies command that grab random movies from TMDB."""
 
     def __init__(self, bot: Bot):
-        self.bot = bot
         self.http_session: ClientSession = bot.http_session
 
     @group(name='movies', aliases=['movie'], invoke_without_command=True)

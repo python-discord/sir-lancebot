@@ -18,9 +18,6 @@ log = logging.getLogger(__name__)
 class CommandErrorHandler(commands.Cog):
     """A error handler for the PythonDiscord server."""
 
-    def __init__(self, bot: Bot):
-        self.bot = bot
-
     @staticmethod
     def revert_cooldown_counter(command: commands.Command, message: Message) -> None:
         """Undoes the last cooldown counter for user-error cases."""

@@ -15,9 +15,6 @@ with Path('bot/resources/evergreen/speedrun_links.json').open(encoding="utf8") a
 class Speedrun(commands.Cog):
     """Commands about the video game speedrunning community."""
 
-    def __init__(self, bot: Bot):
-        self.bot = bot
-
     @commands.command(name="speedrun")
     async def get_speedrun(self, ctx: commands.Context) -> None:
         """Sends a link to a video of a random speedrun."""

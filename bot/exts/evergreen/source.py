@@ -32,9 +32,6 @@ class SourceConverter(commands.Converter):
 class BotSource(commands.Cog):
     """Displays information about the bot's source code."""
 
-    def __init__(self, bot: Bot):
-        self.bot = bot
-
     @commands.command(name="source", aliases=("src",))
     async def source_command(self, ctx: commands.Context, *, source_item: SourceConverter = None) -> None:
         """Display information and a GitHub link to the source code of a command, tag, or cog."""

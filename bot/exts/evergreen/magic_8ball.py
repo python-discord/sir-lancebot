@@ -13,8 +13,7 @@ log = logging.getLogger(__name__)
 class Magic8ball(commands.Cog):
     """A Magic 8ball command to respond to a user's question."""
 
-    def __init__(self, bot: Bot):
-        self.bot = bot
+    def __init__(self, _bot: Bot):
         with open(Path("bot/resources/evergreen/magic8ball.json"), "r", encoding="utf8") as file:
             self.answers = json.load(file)
 

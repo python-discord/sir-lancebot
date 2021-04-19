@@ -15,9 +15,6 @@ COLORS = itertools.cycle([Colours.python_blue, Colours.python_yellow])
 class PythonFacts(commands.Cog):
     """Sends a random fun fact about Python."""
 
-    def __init__(self, bot: Bot) -> None:
-        self.bot = bot
-
     @commands.command(name='pythonfact', aliases=['pyfact'])
     async def get_python_fact(self, ctx: commands.Context) -> None:
         """Sends a Random fun fact about Python."""

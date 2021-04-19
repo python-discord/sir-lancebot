@@ -20,9 +20,6 @@ log = logging.getLogger(__name__)
 class Emojis(commands.Cog):
     """A collection of commands related to emojis in the server."""
 
-    def __init__(self, bot: Bot):
-        self.bot = bot
-
     @staticmethod
     def embed_builder(emoji: dict) -> Tuple[Embed, List[str]]:
         """Generates an embed with the emoji names and count."""
