@@ -1,9 +1,10 @@
 import random
 from typing import Optional
 
+from discord import Embed
 from discord.ext import commands
 
-from bot.constants import Cats
+from bot.constants import Cats, Colours, NEGATIVE_REPLIES
 
 
 class Catify(commands.Cog):
@@ -22,8 +23,23 @@ class Catify(commands.Cog):
         if not text:
             display_name = ctx.author.display_name
             if len(display_name) >= 26:
-                await ctx.send("Your nickname is too long to be catified! Please change it.")
+                embed = Embed(
+                    title=random.choice(NEGATIVE_REPLIES),
+                    description="Your nickname is too long to be catified! Please change it to be under 26 characters.",
+                    color=Colours.soft_red
+                )
+                await ctx.send(embed=embed)
+                return
+
             else:
+                if len(text) > 2000 - 2000//3:
+                    embed = Embed(
+                        title=random.choice(NEGATIVE_REPLIES),
+                        description="Submitted text was too large! Please submit something under 2000 characters.",
+                        color=Colours.soft_red
+                    )
+                    await ctx.send(embed=embed)
+                    return
                 display_name += f" | {random.choice(Cats.cats)}"
                 await ctx.send(f"Your catified username is: `{display_name}`")
                 await ctx.author.edit(nick=display_name)
@@ -33,13 +49,13 @@ class Catify(commands.Cog):
                 if "cat" in name:
                     string_list[index] = string_list[index].replace("cat", random.choice(Cats.cats))
 
-            for _i in range(random.randint(1, len(string_list) // 2)):
-                # insert cat at random index
-                string_list.insert(random.randint(0, len(string_list)-1), random.choice(Cats.cats))
+        string_len = l if (l := len(string_list)//3) != 0 else len(string_list)
 
-                text = " ".join(string_list)
-
-            await ctx.channel.send(text)
+        for _ in range(random.randint(1, string_len)):
+            # insert cat at random index
+            string_list.insert(random.randint(0, len(string_list)), random.choice(Cats.cats))
+        text = " ".join(string_list)
+        await ctx.channel.send(f">>> {text}")
 
 
 def setup(bot: commands.Bot) -> None:
