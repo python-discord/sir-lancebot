@@ -301,5 +301,5 @@ class TriviaQuiz(commands.Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Load the cog."""
+    """Load the TriviaQuiz cog."""
     bot.add_cog(TriviaQuiz(bot))

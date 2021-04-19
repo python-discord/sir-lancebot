@@ -30,5 +30,5 @@ class PythonFacts(commands.Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Load PythonFacts Cog."""
+    """Load the PythonFacts Cog."""
     bot.add_cog(PythonFacts(bot))

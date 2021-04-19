@@ -44,5 +44,5 @@ class TimedCommands(commands.Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Cog load."""
+    """Load the Timed cog."""
     bot.add_cog(TimedCommands(bot))

@@ -29,5 +29,5 @@ class Magic8ball(commands.Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Magic 8ball Cog load."""
+    """Load the Magic8Ball cog."""
     bot.add_cog(Magic8ball(bot))

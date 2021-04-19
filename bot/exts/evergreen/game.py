@@ -471,7 +471,7 @@ class Games(Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Add/Load Games cog."""
+    """Load the Games cog."""
     # Check does IGDB API key exist, if not, log warning and don't load cog
     if not Tokens.igdb_client_id:
         logger.warning("No IGDB client ID. Not loading Games cog.")

@@ -271,5 +271,5 @@ class Issues(commands.Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Cog Retrieves Issues From Github."""
+    """Load the Issues cog."""
     bot.add_cog(Issues(bot))

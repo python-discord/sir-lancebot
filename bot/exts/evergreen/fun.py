@@ -241,5 +241,5 @@ class Fun(Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Fun Cog load."""
+    """Load the Fun cog."""
     bot.add_cog(Fun(bot))

@@ -125,5 +125,5 @@ class Reddit(commands.Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Load the Cog."""
+    """Load the Reddit cog."""
     bot.add_cog(Reddit(bot))

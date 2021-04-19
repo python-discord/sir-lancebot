@@ -172,5 +172,5 @@ class GithubInfo(commands.Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Adding the cog to the bot."""
+    """Load the GithubInfo cog."""
     bot.add_cog(GithubInfo(bot))

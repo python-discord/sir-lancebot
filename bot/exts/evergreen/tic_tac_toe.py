@@ -323,5 +323,5 @@ class TicTacToe(Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Load TicTacToe Cog."""
+    """Load the TicTacToe cog."""
     bot.add_cog(TicTacToe(bot))

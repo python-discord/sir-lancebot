@@ -242,7 +242,7 @@ class Space(Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Load Space Cog."""
+    """Load the Space cog."""
     if not Tokens.nasa:
         logger.warning("Can't find NASA API key. Not loading Space Cog.")
         return

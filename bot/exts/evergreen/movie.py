@@ -199,5 +199,5 @@ class Movie(Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Load Movie Cog."""
+    """Load the Movie Cog."""
     bot.add_cog(Movie(bot))

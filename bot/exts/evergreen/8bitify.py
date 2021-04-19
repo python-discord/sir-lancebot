@@ -53,5 +53,5 @@ class EightBitify(commands.Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Cog load."""
+    """Cog the EightBitify load."""
     bot.add_cog(EightBitify(bot))
