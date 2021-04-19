@@ -36,7 +36,7 @@ class Catify(commands.Cog):
 
                 string = " ".join(string_list)
 
-                await ctx.channel.send(string)
+            await ctx.channel.send(string)
 
 
 def setup(bot: commands.Bot) -> None:
