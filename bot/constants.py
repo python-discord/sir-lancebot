@@ -94,7 +94,7 @@ class Branding:
 
 
 class Cats:
-    cats = ["ᓚᘏᗢ"]
+    cats = ["ᓚᘏᗢ", "ᘡᘏᗢ", "🐈"]
 
 
 class Channels(NamedTuple):

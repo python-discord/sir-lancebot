@@ -26,14 +26,13 @@ class Catify(commands.Cog):
         else:
             string = " ".join(string)
             string_list = string.split()
-            print(len(string_list))
             for index, name in enumerate(string_list):
                 if "cat" in name:
-                    string_list[index] = string_list[index].replace("cat", 'ᓚᘏᗢ')
+                    string_list[index] = string_list[index].replace("cat", random.choice(Cats.cats))
 
             for _i in range(random.randint(1, len(string_list)//3)):
                 # insert cat at random index
-                string_list.insert(random.randint(0, len(string_list)-1), "ᓚᘏᗢ")
+                string_list.insert(random.randint(0, len(string_list)-1), random.choice(Cats.cats))
 
                 string = " ".join(string_list)
 
