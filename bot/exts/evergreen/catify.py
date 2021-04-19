@@ -16,13 +16,13 @@ class Catify(commands.Cog):
     async def catify(self, ctx: commands.Context, *string: Optional[str]) -> None:
         """Catifies your nickname or a given string."""
         if string == ():
-            username = ctx.author.name
-            if len(username) >= 28:
+            display_name = ctx.author.name
+            if len(display_name) >= 28:
                 await ctx.send("Your username is too long to be catified! Please change it.")
             else:
-                username += f" | {random.choice(Cats.cats)}"
-                await ctx.send(f"Your catified username is: `{username}`")
-                await ctx.author.edit(nick=username)
+                display_name += f" | {random.choice(Cats.cats)}"
+                await ctx.send(f"Your catified username is: `{display_name}`")
+                await ctx.author.edit(nick=display_name)
         else:
             string = " ".join(string)
             string_list = string.split()
@@ -30,7 +30,7 @@ class Catify(commands.Cog):
                 if "cat" in name:
                     string_list[index] = string_list[index].replace("cat", random.choice(Cats.cats))
 
-            for _i in range(random.randint(1, len(string_list)//3)):
+            for _i in range(random.randint(1, len(string_list)//2)):
                 # insert cat at random index
                 string_list.insert(random.randint(0, len(string_list)-1), random.choice(Cats.cats))
 
