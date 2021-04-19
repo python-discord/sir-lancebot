@@ -1,5 +1,7 @@
+import asyncio
 import math
 import random
+from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 
 import discord
@@ -9,16 +11,49 @@ from discord.ext import commands
 
 MAX_SQUARES = 193_600
 
+EXECUTOR = ThreadPoolExecutor(10)
+
 
 class Splitify(commands.Cog):
-    """Splits your avatar in x squares!"""
+    """Makes your avatar splitified!"""
 
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
     @staticmethod
     def split_image(img: Image, squares: int) -> list:
-        """Splits the image into x squares."""
+        """
+        Splits the image into x squares.
+
+        Explanation:
+
+        1. I get the width and the height of the Image passed to the function.
+
+        2. I get the root of a number of squares (number of squares) passed, which I call xy. Reason: if let's say 25
+        squares (number of squares) were passed, that is the total squares (split pieces) that the image is supposed to
+        be split into. As we know, a 2D shape has a height and a width, and in this case I think of it as rows and
+        columns. Rows multiplied by columns is equal to the passed squares (number of squares). To get rows and columns,
+        since in this case, each square (split piece) is identical, rows are equal to columns and I treat the image as a
+        square-shaped, I get the root out of the squares (number of squares) passed.
+
+        3. Now width and height are both of the original Image, Discord PFP, so when it comes to forming the squares
+        (splitpieces), I divide the original image's height and width by the xy. In a case of 25 squares
+        (number ofsquares) passed, xy would be 5, so if an image was 250x300, x_frac would be 50 and y_frac - 60. Note:
+        x_frac stands for a fracture of width. The reason I called it so is because it is shorter to use x for width in
+        mind and then I just used half of the word fracture, same applies to y_frac, just height instead of width.
+        x_frac and y_frac are width and height of a single square (split piece)
+
+        4. With left, top, right, bottom, = 0, 0, x_frac, y_frac, I set these variables to create the initial square
+        (split piece). Explanation: all of these 4 variables start at the top left corner of the Image, by adding value
+        to right and bottom, I am creating the initial square (split piece).
+
+        5. In the for loop, I keep adding those squares (split pieces) in row and once (index + 1) % xy == 0 is True, I
+        add to top and bottom to lower them and reset right and left to recreate the initial space between them, forming
+        a square (split piece), I also add the newly created square (split piece) into the new_imgs list where I store
+        them. I keep repeating this process till all 25 squares get added to the list.
+
+        6. I return new_imgs, a list of squares (split pieces).
+        """
         width, heigth = img.size
 
         xy = math.sqrt(squares)
@@ -47,19 +82,54 @@ class Splitify(commands.Cog):
 
     @staticmethod
     def join_images(imgs: list) -> Image:
-        """Stitches all the image squares into a new image."""
-        random.shuffle(imgs)
-        img_sizes = [img.size for img in imgs]
+        """
+        Stitches all the image squares into a new image.
 
-        single_wdith = img_sizes[0][0]
-        single_height = img_sizes[0][1]
+        Explanation:
+
+        1. I shuffle passed imgs. Reason: to randomize the squares (split pieces).
+
+        2. I get a single square (split piece) out of the list and define single_width as the square's width and
+        single_height as the square's height.
+
+        3. I get the root of type integer of the number of imgs (split pieces) in the list and call it multiplier. I
+        then proceed to calculate total height and width of the new image that I am creating using the same multiplier.
+
+        4. I then define new_img as the image that I am creating, using the previously obtained total_width and
+        total_height.
+
+        5. Now I define width_multiplier as well as height with values of 0. These will be used to correctly position
+        squares (split pieces) onto the new_img canvas.
+
+        6. Similar to how in the split_image function, I get the root of number of imgs (split pieces) in the list. In
+        split_image function, it was the passed squares (number of squares) instead of a number of imgs in the list that
+        I got the square of here.
+
+        7. In the for loop, as I iterate, I multiply single_width by width_multiplier to correctly position a square
+        (split piece) width wise. I then proceed to paste the newly positioned square (split piece) onto the new_img. I
+        increase the width_multiplier by 1 every iteration so the image wouldn't get pasted in the same spot and the
+        positioning would move accordingly. I make sure to increase the width_multiplier before the check, which checks
+        if the end of a row has been reached, - (index + 1) % pieces == 0, so after it, if it was True, width_multiplier
+        would have been reset to 0 (start of the row). If the check returns True, the height gets increased by a single
+        square's (split piece) height to lower the positioning height wise and, as I just mentioned, the
+        width_multiplier gets reset to 0 and width will then be calculated from the start of the new row. The for loop
+        finishes once all the squares (split pieces) were positioned accordingly.
+
+        8. Finally, I return the new_img, the randomized squares (split pieces) stitched back into the format of the
+        original image - user's PFP.
+        """
+        random.shuffle(imgs)
+        single_img = imgs[0]
+
+        single_wdith = single_img.size[0]
+        single_height = single_img.size[1]
 
         multiplier = int(math.sqrt(len(imgs)))
 
         total_width = multiplier * single_wdith
         total_height = multiplier * single_height
 
-        new_image = Image.new('RGBA', (total_width, total_height), (250, 250, 250))
+        new_img = Image.new('RGBA', (total_width, total_height), (250, 250, 250))
 
         width_multiplier = 0
         height = 0
@@ -69,7 +139,7 @@ class Splitify(commands.Cog):
         for index, img in enumerate(imgs):
             width = single_wdith * width_multiplier
 
-            new_image.paste(img, (width, height))
+            new_img.paste(img, (width, height))
 
             width_multiplier += 1
 
@@ -77,11 +147,25 @@ class Splitify(commands.Cog):
                 width_multiplier = 0
                 height += single_height
 
-        return new_image
+        return new_img
+
+    def splitify(self, img_bytes: BytesIO, squares: int) -> BytesIO:
+        """Executor for image processing."""
+        avatar = Image.open(BytesIO(img_bytes))
+        avatar = avatar.convert('RGBA').resize((1024, 1024))
+
+        img_squares = self.split_image(avatar, squares)
+        new_img = self.join_images(img_squares)
+
+        bufferedio = BytesIO()
+        new_img.save(bufferedio, format='PNG')
+        bufferedio.seek(0)
+
+        return bufferedio
 
     @commands.command(name='splitify')
     async def splitify_command(self, ctx: commands.Context, squares: int = 16) -> None:
-        """Splits your avatar in x squares, randomizes them and stitches them back into a new image!"""
+        """Splits your avatar into x squares, randomizes them and stitches them back into a new image!"""
         async with ctx.typing():
             if squares < 1:
                 raise commands.BadArgument('Squares must be a `positive number`:exclamation:')
@@ -92,17 +176,9 @@ class Splitify(commands.Cog):
             if squares > MAX_SQUARES:
                 raise commands.BadArgument('Number of squares cannot be higher than `193,600` :nerd:')
 
-            author = ctx.author
-            image_bytes = await author.avatar_url.read()
-            avatar = Image.open(BytesIO(image_bytes))
-            avatar = avatar.convert('RGBA').resize((1024, 1024))
-
-            img_squares = self.split_image(avatar, squares)
-            new_img = self.join_images(img_squares)
-
-            bufferedio = BytesIO()
-            new_img.save(bufferedio, format='PNG')
-            bufferedio.seek(0)
+            img_bytes = await ctx.author.avatar_url.read()
+            loop = asyncio.get_event_loop()
+            bufferedio = await loop.run_in_executor(EXECUTOR, self.splitify, img_bytes, squares)
 
             file = discord.File(bufferedio, filename='splitifed.png')
 
@@ -116,8 +192,10 @@ class Splitify(commands.Cog):
                 title = 'Your splitified avatar'
                 description = 'Here is your avatar. I think it looks a bit *puzzly*'
 
-            embed = discord.Embed(title=title,
-                                  description=description)
+            embed = discord.Embed(
+                title=title,
+                description=description
+            )
 
             embed.set_image(url='attachment://splitifed.png')
             embed.set_footer(text=f'Made by {ctx.author.display_name}', icon_url=ctx.author.avatar_url)
