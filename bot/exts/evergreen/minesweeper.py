@@ -38,7 +38,7 @@ class CoordinateConverter(commands.Converter):
     async def convert(self, ctx: commands.Context, coordinate: str) -> typing.Tuple[int, int]:
         """Take in a coordinate string and turn it into an (x, y) tuple."""
         if not 2 <= len(coordinate) <= 3:
-            raise commands.BadArgument('Invalid co-ordinate provided')
+            raise commands.BadArgument('Invalid co-ordinate provided.')
 
         coordinate = coordinate.lower()
         if coordinate[0].isalpha():
@@ -149,7 +149,7 @@ class Minesweeper(commands.Cog):
                 f"Close the game with `{Client.prefix}ms end`\n"
             )
         except discord.errors.Forbidden:
-            log.debug(f"{ctx.author.name} ({ctx.author.id}) has disabled DMs from server members")
+            log.debug(f"{ctx.author.name} ({ctx.author.id}) has disabled DMs from server members.")
             await ctx.send(f":x: {ctx.author.mention}, please enable DMs to play minesweeper.")
             return
 
@@ -159,7 +159,7 @@ class Minesweeper(commands.Cog):
         dm_msg = await ctx.author.send(f"Here's your board!\n{self.format_for_discord(revealed_board)}")
 
         if ctx.guild:
-            await ctx.send(f"{ctx.author.mention} is playing Minesweeper")
+            await ctx.send(f"{ctx.author.mention} is playing Minesweeper.")
             chat_msg = await ctx.send(f"Here's their board!\n{self.format_for_discord(revealed_board)}")
         else:
             chat_msg = None
@@ -248,7 +248,7 @@ class Minesweeper(commands.Cog):
         """
         Reveal one square.
 
-        return is True if the game ended, breaking the loop in `reveal_command` and deleting the game
+        return is True if the game ended, breaking the loop in `reveal_command` and deleting the game.
         """
         revealed[y][x] = board[y][x]
         if board[y][x] == "bomb":
@@ -286,7 +286,7 @@ class Minesweeper(commands.Cog):
         game = self.games[ctx.author.id]
         game.revealed = game.board
         await self.update_boards(ctx)
-        new_msg = f":no_entry: Game canceled :no_entry:\n{game.dm_msg.content}"
+        new_msg = f":no_entry: Game canceled. :no_entry:\n{game.dm_msg.content}"
         await game.dm_msg.edit(content=new_msg)
         if game.activated_on_server:
             await game.chat_msg.edit(content=new_msg)

@@ -355,7 +355,7 @@ class ConnectFour(commands.Cog):
             self.games.remove(game)
         except Exception:
             # End the game in the event of an unforeseen error so the players aren't stuck in a game
-            await ctx.send(f"{ctx.author.mention} {user.mention if user else ''} An error occurred. Game failed")
+            await ctx.send(f"{ctx.author.mention} {user.mention if user else ''} An error occurred. Game failed.")
             if game in self.games:
                 self.games.remove(game)
             raise

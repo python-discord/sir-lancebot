@@ -87,7 +87,7 @@ class Emojis(commands.Cog):
         if not ctx.guild.emojis:
             await ctx.send("No emojis found.")
             return
-        log.trace(f"Emoji Category {'' if category_query else 'not '}provided by the user")
+        log.trace(f"Emoji Category {'' if category_query else 'not '}provided by the user.")
         for emoji in ctx.guild.emojis:
             emoji_category = emoji.name.split("_")[0]
 

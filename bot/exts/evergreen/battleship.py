@@ -238,7 +238,7 @@ class Game:
         square = None
         turn_message = await self.turn.user.send(
             "It's your turn! Type the square you want to fire at. Format it like this: A1\n"
-            "Type `surrender` to give up"
+            "Type `surrender` to give up."
         )
         await self.next.user.send("Their turn", delete_after=3.0)
         while True:
@@ -382,7 +382,7 @@ class Battleship(commands.Cog):
             return await ctx.send("You're already playing a game!")
 
         if ctx.author in self.waiting:
-            return await ctx.send("You've already sent out a request for a player 2")
+            return await ctx.send("You've already sent out a request for a player 2.")
 
         announcement = await ctx.send(
             "**Battleship**: A new game is about to start!\n"
@@ -426,7 +426,7 @@ class Battleship(commands.Cog):
             self.games.remove(game)
         except Exception:
             # End the game in the event of an unforseen error so the players aren't stuck in a game
-            await ctx.send(f"{ctx.author.mention} {user.mention} An error occurred. Game failed")
+            await ctx.send(f"{ctx.author.mention} {user.mention} An error occurred. Game failed.")
             self.games.remove(game)
             raise
 

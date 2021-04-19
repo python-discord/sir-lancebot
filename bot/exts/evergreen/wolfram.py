@@ -56,7 +56,7 @@ def custom_cooldown(*ignore: List[int]) -> Callable:
     """
     Implement per-user and per-guild cooldowns for requests to the Wolfram API.
 
-    A list of roles may be provided to ignore the per-user cooldown
+    A list of roles may be provided to ignore the per-user cooldown.
     """
     async def predicate(ctx: Context) -> bool:
         if ctx.invoked_with == 'help':
@@ -189,11 +189,11 @@ class Wolfram(Cog):
             image_url = "attachment://image.png"
 
             if status == 501:
-                message = "Failed to get response"
+                message = "Failed to get response."
                 footer = ""
                 color = Colours.soft_red
             elif status == 400:
-                message = "No input found"
+                message = "No input found."
                 footer = ""
                 color = Colours.soft_red
             elif status == 403:
@@ -269,12 +269,12 @@ class Wolfram(Cog):
                 response_text = await response.text()
 
             if status == 501:
-                message = "Failed to get response"
+                message = "Failed to get response."
                 color = Colours.soft_red
             elif status == 400:
-                message = "No input found"
+                message = "No input found."
                 color = Colours.soft_red
-            elif response_text == "Error 1: Invalid appid":
+            elif response_text == "Error 1: Invalid appid.":
                 message = "Wolfram API key is invalid or missing."
                 color = Colours.soft_red
             else:

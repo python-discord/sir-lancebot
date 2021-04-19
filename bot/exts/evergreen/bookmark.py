@@ -29,7 +29,7 @@ class Bookmark(commands.Cog):
         # Prevent users from bookmarking a message in a channel they don't have access to
         permissions = ctx.author.permissions_in(target_message.channel)
         if not permissions.read_messages:
-            log.info(f"{ctx.author} tried to bookmark a message in #{target_message.channel} but has no permissions")
+            log.info(f"{ctx.author} tried to bookmark a message in #{target_message.channel} but has no permissions.")
             embed = discord.Embed(
                 title=random.choice(ERROR_REPLIES),
                 color=Colours.soft_red,
@@ -52,7 +52,7 @@ class Bookmark(commands.Cog):
         except discord.Forbidden:
             error_embed = discord.Embed(
                 title=random.choice(ERROR_REPLIES),
-                description=f"{ctx.author.mention}, please enable your DMs to receive the bookmark",
+                description=f"{ctx.author.mention}, please enable your DMs to receive the bookmark.",
                 colour=Colours.soft_red
             )
             await ctx.send(embed=error_embed)
