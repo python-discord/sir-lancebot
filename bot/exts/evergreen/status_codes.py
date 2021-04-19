@@ -3,6 +3,7 @@ from http import HTTPStatus
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.utils.extensions import invoke_help_command
 
 HTTP_DOG_URL = "https://httpstatusdogs.com/img/{code}.jpg"
@@ -12,7 +13,7 @@ HTTP_CAT_URL = "https://http.cat/{code}.jpg"
 class HTTPStatusCodes(commands.Cog):
     """Commands that give HTTP statuses described and visualized by cats and dogs."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @commands.group(name="http_status", aliases=("status", "httpstatus"))
@@ -68,6 +69,6 @@ class HTTPStatusCodes(commands.Cog):
             await ctx.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load the HTTPStatusCodes cog."""
     bot.add_cog(HTTPStatusCodes(bot))

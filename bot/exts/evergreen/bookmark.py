@@ -4,6 +4,7 @@ import random
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Colours, ERROR_REPLIES, Emojis, Icons
 from bot.utils.converters import WrappedMessageConverter
 
@@ -13,7 +14,7 @@ log = logging.getLogger(__name__)
 class Bookmark(commands.Cog):
     """Creates personal bookmarks by relaying a message link to the user's DMs."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @commands.command(name="bookmark", aliases=("bm", "pin"))
@@ -60,6 +61,6 @@ class Bookmark(commands.Cog):
             await ctx.message.add_reaction(Emojis.envelope)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load the Bookmark cog."""
     bot.add_cog(Bookmark(bot))

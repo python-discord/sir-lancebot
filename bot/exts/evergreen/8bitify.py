@@ -4,11 +4,13 @@ import discord
 from PIL import Image
 from discord.ext import commands
 
+from bot.bot import Bot
+
 
 class EightBitify(commands.Cog):
     """Make your avatar 8bit!"""
 
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
     @staticmethod
@@ -50,6 +52,6 @@ class EightBitify(commands.Cog):
         await ctx.send(file=file, embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Cog load."""
     bot.add_cog(EightBitify(bot))

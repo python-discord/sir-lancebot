@@ -5,6 +5,7 @@ from dateutil.relativedelta import relativedelta
 from discord.ext import commands
 
 from bot import start_time
+from bot.bot import Bot
 
 log = logging.getLogger(__name__)
 
@@ -12,7 +13,7 @@ log = logging.getLogger(__name__)
 class Uptime(commands.Cog):
     """A cog for posting the bot's uptime."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @commands.command(name="uptime")
@@ -28,6 +29,6 @@ class Uptime(commands.Cog):
         await ctx.send(f"I started up {uptime_string}.")
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Uptime Cog load."""
     bot.add_cog(Uptime(bot))

@@ -5,6 +5,7 @@ import discord
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
 
+from bot.bot import Bot
 from bot.utils.pagination import ImagePaginator
 
 log = logging.getLogger(__name__)
@@ -13,7 +14,7 @@ log = logging.getLogger(__name__)
 class Reddit(commands.Cog):
     """Fetches reddit posts."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     async def fetch(self, url: str) -> dict:
@@ -123,6 +124,6 @@ class Reddit(commands.Cog):
         await ImagePaginator.paginate(pages, ctx, embed)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load the Cog."""
     bot.add_cog(Reddit(bot))

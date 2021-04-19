@@ -3,6 +3,7 @@ import itertools
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Colours
 
 with open('bot/resources/evergreen/python_facts.txt') as file:
@@ -14,7 +15,7 @@ COLORS = itertools.cycle([Colours.python_blue, Colours.python_yellow])
 class PythonFacts(commands.Cog):
     """Sends a random fun fact about Python."""
 
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
     @commands.command(name='pythonfact', aliases=['pyfact'])
@@ -28,6 +29,6 @@ class PythonFacts(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load PythonFacts Cog."""
     bot.add_cog(PythonFacts(bot))

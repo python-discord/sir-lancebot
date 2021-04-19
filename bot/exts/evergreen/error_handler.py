@@ -7,6 +7,7 @@ from discord import Embed, Message
 from discord.ext import commands
 from sentry_sdk import push_scope
 
+from bot.bot import Bot
 from bot.constants import Channels, Colours, ERROR_REPLIES, NEGATIVE_REPLIES
 from bot.utils.decorators import InChannelCheckFailure, InMonthCheckFailure
 from bot.utils.exceptions import UserNotPlayingError
@@ -17,7 +18,7 @@ log = logging.getLogger(__name__)
 class CommandErrorHandler(commands.Cog):
     """A error handler for the PythonDiscord server."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @staticmethod
@@ -135,6 +136,6 @@ class CommandErrorHandler(commands.Cog):
             log.exception(f"Unhandled command error: {str(error)}", exc_info=error)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Error handler Cog load."""
     bot.add_cog(CommandErrorHandler(bot))

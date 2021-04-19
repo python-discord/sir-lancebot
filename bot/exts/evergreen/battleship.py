@@ -9,6 +9,7 @@ from functools import partial
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Colours
 
 log = logging.getLogger(__name__)
@@ -95,7 +96,7 @@ class Game:
 
     def __init__(
         self,
-        bot: commands.Bot,
+        bot: Bot,
         channel: discord.TextChannel,
         player1: discord.Member,
         player2: discord.Member
@@ -321,7 +322,7 @@ class Game:
 class Battleship(commands.Cog):
     """Play the classic game Battleship!"""
 
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: Bot) -> None:
         self.bot = bot
         self.games: typing.List[Game] = []
         self.waiting: typing.List[discord.Member] = []
@@ -438,6 +439,6 @@ class Battleship(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Cog load."""
     bot.add_cog(Battleship(bot))

@@ -7,6 +7,7 @@ import discord
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
 
+from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES
 from bot.exts.utils.extensions import invoke_help_command
 
@@ -18,7 +19,7 @@ GITHUB_API_URL = "https://api.github.com"
 class GithubInfo(commands.Cog):
     """Fetches info from GitHub."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     async def fetch_data(self, url: str) -> dict:
@@ -170,6 +171,6 @@ class GithubInfo(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Adding the cog to the bot."""
     bot.add_cog(GithubInfo(bot))

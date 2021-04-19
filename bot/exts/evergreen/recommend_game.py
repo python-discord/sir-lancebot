@@ -6,6 +6,8 @@ from random import shuffle
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
+
 log = logging.getLogger(__name__)
 game_recs = []
 
@@ -20,7 +22,7 @@ shuffle(game_recs)
 class RecommendGame(commands.Cog):
     """Commands related to recommending games."""
 
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: Bot) -> None:
         self.bot = bot
         self.index = 0
 
@@ -45,6 +47,6 @@ class RecommendGame(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Loads the RecommendGame cog."""
     bot.add_cog(RecommendGame(bot))

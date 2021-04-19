@@ -8,6 +8,7 @@ import discord
 from discord.ext import commands
 from fuzzywuzzy import fuzz
 
+from bot.bot import Bot
 from bot.constants import Roles
 
 
@@ -23,7 +24,7 @@ WRONG_ANS_RESPONSE = [
 class TriviaQuiz(commands.Cog):
     """A cog for all quiz commands."""
 
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: Bot) -> None:
         self.bot = bot
         self.questions = self.load_questions()
         self.game_status = {}  # A variable to store the game status: either running or not running.
@@ -299,6 +300,6 @@ class TriviaQuiz(commands.Cog):
         await channel.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load the cog."""
     bot.add_cog(TriviaQuiz(bot))

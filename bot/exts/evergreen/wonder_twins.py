@@ -2,7 +2,9 @@ import random
 from pathlib import Path
 
 import yaml
-from discord.ext.commands import Bot, Cog, Context, command
+from discord.ext.commands import Cog, Context, command
+
+from bot.bot import Bot
 
 
 class WonderTwins(Cog):

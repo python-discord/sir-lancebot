@@ -7,6 +7,7 @@ from dataclasses import dataclass
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import (
     Categories,
     Channels,
@@ -91,7 +92,7 @@ class IssueState:
 class Issues(commands.Cog):
     """Cog that allows users to retrieve issues from GitHub."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
         self.repos = []
 
@@ -269,6 +270,6 @@ class Issues(commands.Cog):
         await message.channel.send(embed=resp)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Cog Retrieves Issues From Github."""
     bot.add_cog(Issues(bot))

@@ -5,13 +5,15 @@ from pathlib import Path
 
 from discord.ext import commands
 
+from bot.bot import Bot
+
 log = logging.getLogger(__name__)
 
 
 class Magic8ball(commands.Cog):
     """A Magic 8ball command to respond to a user's question."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
         with open(Path("bot/resources/evergreen/magic8ball.json"), "r", encoding="utf8") as file:
             self.answers = json.load(file)
@@ -26,6 +28,6 @@ class Magic8ball(commands.Cog):
             await ctx.send("Usage: .8ball <question> (minimum length of 3 eg: `will I win?`)")
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Magic 8ball Cog load."""
     bot.add_cog(Magic8ball(bot))

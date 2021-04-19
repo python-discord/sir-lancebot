@@ -9,6 +9,8 @@ import discord
 import matplotlib.pyplot as plt
 from discord.ext import commands
 
+from bot.bot import Bot
+
 # configure fonts and colors for matplotlib
 plt.rcParams.update(
     {
@@ -89,6 +91,6 @@ class Latex(commands.Cog):
             await ctx.send(file=discord.File(image, "latex.png"))
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load the Latex Cog."""
     bot.add_cog(Latex(bot))

@@ -6,6 +6,7 @@ from random import randint, random
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Client
 from bot.utils.exceptions import UserNotPlayingError
 from bot.utils.extensions import invoke_help_command
@@ -78,7 +79,7 @@ GamesDict = typing.Dict[int, Game]
 class Minesweeper(commands.Cog):
     """Play a game of Minesweeper."""
 
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: Bot) -> None:
         self.games: GamesDict = {}  # Store the currently running games
 
     @commands.group(name='minesweeper', aliases=('ms',), invoke_without_command=True)
@@ -292,6 +293,6 @@ class Minesweeper(commands.Cog):
         del self.games[ctx.author.id]
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load the Minesweeper cog."""
     bot.add_cog(Minesweeper(bot))

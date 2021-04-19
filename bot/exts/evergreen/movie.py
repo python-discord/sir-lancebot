@@ -6,8 +6,9 @@ from urllib.parse import urlencode
 
 from aiohttp import ClientSession
 from discord import Embed
-from discord.ext.commands import Bot, Cog, Context, group
+from discord.ext.commands import Cog, Context, group
 
+from bot.bot import Bot
 from bot.constants import Tokens
 from bot.utils.extensions import invoke_help_command
 from bot.utils.pagination import ImagePaginator
