@@ -18,7 +18,7 @@ class Catify(commands.Cog):
         if string == ():
             username = ctx.author.name
             if len(username) >= 28:
-                return await ctx.send("Your username is too long to be catified! Please change it.")
+                await ctx.send("Your username is too long to be catified! Please change it.")
             else:
                 username += f" | {random.choice(Cats.cats)}"
                 await ctx.send(f"Your catified username is: `{username}`")
