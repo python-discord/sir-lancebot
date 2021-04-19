@@ -93,6 +93,10 @@ class Branding:
     cycle_frequency = int(environ.get("CYCLE_FREQUENCY", 3))  # 0: never, 1: every day, 2: every other day, ...
 
 
+class Cats:
+    cats = ["ᓚᘏᗢ"]
+
+
 class Channels(NamedTuple):
     admins = 365960823622991872
     advent_of_code = int(environ.get("AOC_CHANNEL_ID", 782715290437943306))
