@@ -8,6 +8,7 @@ from typing import Dict, NamedTuple
 __all__ = (
     "AdventOfCode",
     "Branding",
+    "Cats",
     "Channels",
     "Categories",
     "Client",
