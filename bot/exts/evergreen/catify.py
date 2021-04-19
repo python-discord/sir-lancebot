@@ -32,7 +32,7 @@ class Catify(commands.Cog):
                 return
 
             else:
-                if len(text) > 2000 - 2000//3:
+                if len(text) > 2000 - 2000 // 3:
                     embed = Embed(
                         title=random.choice(NEGATIVE_REPLIES),
                         description="Submitted text was too large! Please submit something under 2000 characters.",
@@ -49,7 +49,7 @@ class Catify(commands.Cog):
                 if "cat" in name:
                     string_list[index] = string_list[index].replace("cat", random.choice(Cats.cats))
 
-        string_len = l if (l := len(string_list)//3) != 0 else len(string_list)
+        string_len = l if (l := len(string_list) // 3) != 0 else len(string_list)
 
         for _ in range(random.randint(1, string_len)):
             # insert cat at random index
