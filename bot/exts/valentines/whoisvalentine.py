@@ -33,7 +33,7 @@ class ValentineFacts(commands.Cog):
                 'facial_reconstruction.jpg/1024px-Saint_Valentine_-_facial_reconstruction.jpg'
         )
 
-        await ctx.channel.send(embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command()
     async def valentine_fact(self, ctx: commands.Context) -> None:
@@ -44,7 +44,7 @@ class ValentineFacts(commands.Cog):
             color=Colours.pink
         )
 
-        await ctx.channel.send(embed=embed)
+        await ctx.send(embed=embed)
 
 
 def setup(bot: commands.Bot) -> None:

@@ -423,7 +423,7 @@ class Snakes(Cog):
         try:
             reaction, user = await ctx.bot.wait_for("reaction_add", timeout=45.0, check=predicate)
         except asyncio.TimeoutError:
-            await ctx.channel.send(f"You took too long. The correct answer was **{options[answer]}**.")
+            await ctx.send(f"You took too long. The correct answer was **{options[answer]}**.")
             await message.clear_reactions()
             return
 
@@ -720,7 +720,7 @@ class Snakes(Cog):
         snake_image = utils.snakes[snake_name]
 
         # Hatch the snake
-        message = await ctx.channel.send(embed=Embed(description="Hatching your snake :snake:..."))
+        message = await ctx.send(embed=Embed(description="Hatching your snake :snake:..."))
         await asyncio.sleep(1)
 
         for stage in utils.stages:
@@ -737,7 +737,7 @@ class Snakes(Cog):
             text=" Owner: {0}#{1}".format(ctx.message.author.name, ctx.message.author.discriminator)
         )
 
-        await ctx.channel.send(embed=my_snake_embed)
+        await ctx.send(embed=my_snake_embed)
 
     @snakes_group.command(name='movie')
     async def movie_command(self, ctx: Context) -> None:
@@ -800,9 +800,9 @@ class Snakes(Cog):
         embed.set_thumbnail(url="https://i.imgur.com/LtFtC8H.png")
 
         try:
-            await ctx.channel.send(embed=embed)
+            await ctx.send(embed=embed)
         except HTTPException as err:
-            await ctx.channel.send("An error occurred while fetching a snake-related movie!")
+            await ctx.send("An error occurred while fetching a snake-related movie!")
             raise err from None
 
     @snakes_group.command(name='quiz')
@@ -828,7 +828,7 @@ class Snakes(Cog):
             )
         )
 
-        quiz = await ctx.channel.send("", embed=embed)
+        quiz = await ctx.send("", embed=embed)
         await self._validate_answer(ctx, quiz, answer, options)
 
     @snakes_group.command(name='name', aliases=('name_gen',))
@@ -964,7 +964,7 @@ class Snakes(Cog):
             )
         )
 
-        await ctx.channel.send(embed=embed)
+        await ctx.send(embed=embed)
 
     @snakes_group.command(name='card')
     async def card_command(self, ctx: Context, *, name: Snake = None) -> None:
@@ -1018,7 +1018,7 @@ class Snakes(Cog):
             color=SNAKE_COLOR,
             description=question
         )
-        await ctx.channel.send(embed=embed)
+        await ctx.send(embed=embed)
 
     @snakes_group.command(name='snakify')
     async def snakify_command(self, ctx: Context, *, message: str = None) -> None:
@@ -1059,7 +1059,7 @@ class Snakes(Cog):
             )
             embed.description = f"*{self._snakify(message)}*"
 
-            await ctx.channel.send(embed=embed)
+            await ctx.send(embed=embed)
 
     @snakes_group.command(name='video', aliases=('get_video',))
     async def video_command(self, ctx: Context, *, search: str = None) -> None:
@@ -1095,7 +1095,7 @@ class Snakes(Cog):
         if len(data) > 0:
             num = random.randint(0, len(data) - 1)
             youtube_base_url = 'https://www.youtube.com/watch?v='
-            await ctx.channel.send(
+            await ctx.send(
                 content=f"{youtube_base_url}{data[num]['id']['videoId']}"
             )
         else:
@@ -1120,7 +1120,7 @@ class Snakes(Cog):
 
         # Embed and send
         embed.description = zen_quote
-        await ctx.channel.send(
+        await ctx.send(
             embed=embed
         )
     # endregion

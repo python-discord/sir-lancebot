@@ -78,7 +78,7 @@ class MyValenstate(commands.Cog):
         )
         embed.add_field(name=embed_title, value=embed_text)
         embed.set_image(url=STATES[valenstate]["flag"])
-        await ctx.channel.send(embed=embed)
+        await ctx.send(embed=embed)
 
 
 def setup(bot: commands.Bot) -> None:
