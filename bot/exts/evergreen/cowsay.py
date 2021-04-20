@@ -1,5 +1,10 @@
+from random import choice
+
 from cowsay import get_output_string
+from discord import Embed
 from discord.ext import commands
+
+from bot.constants import Colours, NEGATIVE_REPLIES
 
 
 class Cowsay(commands.Cog):
@@ -34,7 +39,16 @@ class Cowsay(commands.Cog):
         """
         text = text.lower()
         character = character.lower()
-        msgbody = get_output_string(character, text)
+        try:
+            msgbody = get_output_string(character, text)
+        except BaseException:
+            embed = Embed(
+                title=choice(NEGATIVE_REPLIES),
+                description="That is an invalid character! Please enter a valid one.",
+                color=Colours.soft_red
+            )
+            await ctx.send(embed=embed)
+            return
         await ctx.send(f"```\n{msgbody}\n```")
 
 
