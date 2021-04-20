@@ -34,7 +34,7 @@ class Cowsay(commands.Cog):
         """
         text = text.lower()
         character = character.lower()
-        msgbody = cowsay.get_output_string(character, text)
+        msgbody = get_output_string(character, text)
         for character in msgbody:
             if character == " ":
                 character += ""
