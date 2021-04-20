@@ -7,7 +7,7 @@ from pathlib import Path
 import discord
 from discord.ext import commands
 
-from bot.constants import Colours
+from bot.constants import Colours, NEGATIVE_REPLIES
 
 log = logging.getLogger(__name__)
 
@@ -35,6 +35,17 @@ class EasterRiddle(commands.Cog):
         """
         if self.current_channel:
             return await ctx.send(f"A riddle is already being solved in {self.current_channel.mention}!")
+
+        # Don't let users start in a DM
+        if not ctx.guild:
+            await ctx.send(
+                embed=discord.Embed(
+                    title=random.choice(NEGATIVE_REPLIES),
+                    description="You can't start riddles in DMs",
+                    colour=discord.Colour.red()
+                )
+            )
+            return
 
         self.current_channel = ctx.message.channel
 

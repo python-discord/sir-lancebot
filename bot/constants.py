@@ -8,6 +8,7 @@ from typing import Dict, NamedTuple
 __all__ = (
     "AdventOfCode",
     "Branding",
+    "Cats",
     "Channels",
     "Categories",
     "Client",
@@ -93,6 +94,10 @@ class Branding:
     cycle_frequency = int(environ.get("CYCLE_FREQUENCY", 3))  # 0: never, 1: every day, 2: every other day, ...
 
 
+class Cats:
+    cats = ["ᓚᘏᗢ", "ᘡᘏᗢ", "🐈", "ᓕᘏᗢ", "ᓇᘏᗢ", "ᓂᘏᗢ", "ᘣᘏᗢ", "ᕦᘏᗢ", "ᕂᘏᗢ"]
+
+
 class Channels(NamedTuple):
     advent_of_code = int(environ.get("AOC_CHANNEL_ID", 782715290437943306))
     advent_of_code_commands = int(environ.get("AOC_COMMANDS_CHANNEL_ID", 607247579608121354))
@@ -153,7 +158,7 @@ class Emojis:
     christmas_tree = "\U0001F384"
     check = "\u2611"
     envelope = "\U0001F4E8"
-    trashcan = "<:trashcan:637136429717389331>"
+    trashcan = environ.get("TRASHCAN_EMOJI", "<:trashcan:637136429717389331>")
     ok_hand = ":ok_hand:"
     hand_raised = "\U0001f64b"
 
@@ -168,6 +173,7 @@ class Emojis:
     issue_closed = "<:IssueClosed:629695470570307614>"
     pull_request = "<:PROpen:629695470175780875>"
     pull_request_closed = "<:PRClosed:629695470519713818>"
+    pull_request_draft = "<:PRDraft:829755345425399848>"
     merge = "<:PRMerged:629695470570176522>"
 
     number_emojis = {
