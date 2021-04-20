@@ -8,6 +8,7 @@ from discord.ext import commands
 from discord.ext.commands import BucketType, Context
 
 from bot import constants
+from bot.bot import Bot
 from bot.constants import Categories, Channels, Colours, ERROR_REPLIES
 from bot.utils.decorators import whitelist_override
 
@@ -33,7 +34,7 @@ HEADERS = {'User-Agent': 'curl/7.68.0'}
 class CheatSheet(commands.Cog):
     """Commands that sends a result of a cht.sh search in code blocks."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @staticmethod
@@ -102,6 +103,6 @@ class CheatSheet(commands.Cog):
                 await ctx.send(content=description)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load the CheatSheet cog."""
     bot.add_cog(CheatSheet(bot))

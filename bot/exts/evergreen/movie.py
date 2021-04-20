@@ -6,8 +6,9 @@ from urllib.parse import urlencode
 
 from aiohttp import ClientSession
 from discord import Embed
-from discord.ext.commands import Bot, Cog, Context, group
+from discord.ext.commands import Cog, Context, group
 
+from bot.bot import Bot
 from bot.constants import Tokens
 from bot.utils.extensions import invoke_help_command
 from bot.utils.pagination import ImagePaginator
@@ -50,7 +51,6 @@ class Movie(Cog):
     """Movie Cog contains movies command that grab random movies from TMDB."""
 
     def __init__(self, bot: Bot):
-        self.bot = bot
         self.http_session: ClientSession = bot.http_session
 
     @group(name='movies', aliases=['movie'], invoke_without_command=True)
@@ -198,5 +198,5 @@ class Movie(Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Load Movie Cog."""
+    """Load the Movie Cog."""
     bot.add_cog(Movie(bot))

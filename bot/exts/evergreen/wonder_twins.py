@@ -2,15 +2,15 @@ import random
 from pathlib import Path
 
 import yaml
-from discord.ext.commands import Bot, Cog, Context, command
+from discord.ext.commands import Cog, Context, command
+
+from bot.bot import Bot
 
 
 class WonderTwins(Cog):
     """Cog for a Wonder Twins inspired command."""
 
-    def __init__(self, bot: Bot):
-        self.bot = bot
-
+    def __init__(self, _bot: Bot):
         with open(Path.cwd() / "bot" / "resources" / "evergreen" / "wonder_twins.yaml", "r", encoding="utf-8") as f:
             info = yaml.load(f, Loader=yaml.FullLoader)
             self.water_types = info["water_types"]

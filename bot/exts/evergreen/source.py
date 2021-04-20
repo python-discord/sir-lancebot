@@ -5,6 +5,7 @@ from typing import Optional, Tuple, Union
 from discord import Embed
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Source
 
 SourceType = Union[commands.Command, commands.Cog, str, commands.ExtensionNotLoaded]
@@ -30,9 +31,6 @@ class SourceConverter(commands.Converter):
 
 class BotSource(commands.Cog):
     """Displays information about the bot's source code."""
-
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
 
     @commands.command(name="source", aliases=("src",))
     async def source_command(self, ctx: commands.Context, *, source_item: SourceConverter = None) -> None:
@@ -104,6 +102,6 @@ class BotSource(commands.Cog):
         return embed
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load the BotSource cog."""
     bot.add_cog(BotSource(bot))

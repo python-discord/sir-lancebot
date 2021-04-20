@@ -87,5 +87,5 @@ class XKCD(Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Loading the XKCD cog."""
+    """Load the XKCD cog."""
     bot.add_cog(XKCD(bot))

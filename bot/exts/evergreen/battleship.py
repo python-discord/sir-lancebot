@@ -9,6 +9,7 @@ from functools import partial
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Colours
 
 log = logging.getLogger(__name__)
@@ -95,7 +96,7 @@ class Game:
 
     def __init__(
         self,
-        bot: commands.Bot,
+        bot: Bot,
         channel: discord.TextChannel,
         player1: discord.Member,
         player2: discord.Member
@@ -237,7 +238,7 @@ class Game:
         square = None
         turn_message = await self.turn.user.send(
             "It's your turn! Type the square you want to fire at. Format it like this: A1\n"
-            "Type `surrender` to give up"
+            "Type `surrender` to give up."
         )
         await self.next.user.send("Their turn", delete_after=3.0)
         while True:
@@ -321,7 +322,7 @@ class Game:
 class Battleship(commands.Cog):
     """Play the classic game Battleship!"""
 
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: Bot) -> None:
         self.bot = bot
         self.games: typing.List[Game] = []
         self.waiting: typing.List[discord.Member] = []
@@ -381,7 +382,7 @@ class Battleship(commands.Cog):
             return await ctx.send("You're already playing a game!")
 
         if ctx.author in self.waiting:
-            return await ctx.send("You've already sent out a request for a player 2")
+            return await ctx.send("You've already sent out a request for a player 2.")
 
         announcement = await ctx.send(
             "**Battleship**: A new game is about to start!\n"
@@ -425,7 +426,7 @@ class Battleship(commands.Cog):
             self.games.remove(game)
         except Exception:
             # End the game in the event of an unforseen error so the players aren't stuck in a game
-            await ctx.send(f"{ctx.author.mention} {user.mention} An error occurred. Game failed")
+            await ctx.send(f"{ctx.author.mention} {user.mention} An error occurred. Game failed.")
             self.games.remove(game)
             raise
 
@@ -438,6 +439,6 @@ class Battleship(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
-    """Cog load."""
+def setup(bot: Bot) -> None:
+    """Load the Battleship cog"""
     bot.add_cog(Battleship(bot))

@@ -4,6 +4,7 @@ import yaml
 from discord import Color, Embed
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import WHITELISTED_CHANNELS
 from bot.utils.decorators import whitelist_override
 from bot.utils.randomization import RandomCycle
@@ -34,9 +35,6 @@ TOPICS = {
 class ConvoStarters(commands.Cog):
     """Evergreen conversation topics."""
 
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
-
     @commands.command()
     @whitelist_override(channels=ALL_ALLOWED_CHANNELS)
     async def topic(self, ctx: commands.Context) -> None:
@@ -66,6 +64,6 @@ class ConvoStarters(commands.Cog):
             await ctx.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
-    """Conversation starters Cog load."""
+def setup(bot: Bot) -> None:
+    """Load the ConvoStarters cog."""
     bot.add_cog(ConvoStarters(bot))

@@ -9,6 +9,7 @@ from discord import Embed
 from discord.ext import commands
 from discord.ext.commands import BucketType, Cog, Context, check, group
 
+from bot.bot import Bot
 from bot.constants import Colours, STAFF_ROLES, Wolfram
 from bot.utils.pagination import ImagePaginator
 
@@ -55,7 +56,7 @@ def custom_cooldown(*ignore: List[int]) -> Callable:
     """
     Implement per-user and per-guild cooldowns for requests to the Wolfram API.
 
-    A list of roles may be provided to ignore the per-user cooldown
+    A list of roles may be provided to ignore the per-user cooldown.
     """
     async def predicate(ctx: Context) -> bool:
         if ctx.invoked_with == 'help':
@@ -102,7 +103,7 @@ def custom_cooldown(*ignore: List[int]) -> Callable:
     return check(predicate)
 
 
-async def get_pod_pages(ctx: Context, bot: commands.Bot, query: str) -> Optional[List[Tuple]]:
+async def get_pod_pages(ctx: Context, bot: Bot, query: str) -> Optional[List[Tuple]]:
     """Get the Wolfram API pod pages for the provided query."""
     async with ctx.channel.typing():
         url_str = parse.urlencode({
@@ -162,7 +163,7 @@ async def get_pod_pages(ctx: Context, bot: commands.Bot, query: str) -> Optional
 class Wolfram(Cog):
     """Commands for interacting with the Wolfram|Alpha API."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @group(name="wolfram", aliases=("wolf", "wa"), invoke_without_command=True)
@@ -188,11 +189,11 @@ class Wolfram(Cog):
             image_url = "attachment://image.png"
 
             if status == 501:
-                message = "Failed to get response"
+                message = "Failed to get response."
                 footer = ""
                 color = Colours.soft_red
             elif status == 400:
-                message = "No input found"
+                message = "No input found."
                 footer = ""
                 color = Colours.soft_red
             elif status == 403:
@@ -268,12 +269,12 @@ class Wolfram(Cog):
                 response_text = await response.text()
 
             if status == 501:
-                message = "Failed to get response"
+                message = "Failed to get response."
                 color = Colours.soft_red
             elif status == 400:
-                message = "No input found"
+                message = "No input found."
                 color = Colours.soft_red
-            elif response_text == "Error 1: Invalid appid":
+            elif response_text == "Error 1: Invalid appid.":
                 message = "Wolfram API key is invalid or missing."
                 color = Colours.soft_red
             else:
@@ -283,6 +284,6 @@ class Wolfram(Cog):
             await send_embed(ctx, message, color)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load the Wolfram cog."""
     bot.add_cog(Wolfram(bot))

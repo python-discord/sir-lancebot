@@ -246,8 +246,7 @@ def is_requester_free() -> t.Callable:
 class TicTacToe(Cog):
     """TicTacToe cog contains tic-tac-toe game commands."""
 
-    def __init__(self, bot: Bot):
-        self.bot = bot
+    def __init__(self, _bot: Bot):
         self.games: t.List[Game] = []
 
     @guild_only()
@@ -323,5 +322,5 @@ class TicTacToe(Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Load TicTacToe Cog."""
+    """Load the TicTacToe cog."""
     bot.add_cog(TicTacToe(bot))

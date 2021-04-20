@@ -7,9 +7,10 @@ from typing import Callable, Iterable, Tuple, Union
 
 from discord import Embed, Message
 from discord.ext import commands
-from discord.ext.commands import BadArgument, Bot, Cog, Context, MessageConverter, clean_content
+from discord.ext.commands import BadArgument, Cog, Context, MessageConverter, clean_content
 
 from bot import utils
+from bot.bot import Bot
 from bot.constants import Client, Colours, Emojis
 
 log = logging.getLogger(__name__)
@@ -239,6 +240,6 @@ class Fun(Cog):
         return Embed.from_dict(embed_dict)
 
 
-def setup(bot: commands.Bot) -> None:
-    """Fun Cog load."""
+def setup(bot: Bot) -> None:
+    """Load the Fun cog."""
     bot.add_cog(Fun(bot))

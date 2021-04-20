@@ -8,6 +8,7 @@ from typing import List, Optional, Tuple
 from discord import Color, Embed, Emoji
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Colours, ERROR_REPLIES
 from bot.utils.extensions import invoke_help_command
 from bot.utils.pagination import LinePaginator
@@ -18,9 +19,6 @@ log = logging.getLogger(__name__)
 
 class Emojis(commands.Cog):
     """A collection of commands related to emojis in the server."""
-
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
 
     @staticmethod
     def embed_builder(emoji: dict) -> Tuple[Embed, List[str]]:
@@ -86,7 +84,7 @@ class Emojis(commands.Cog):
         if not ctx.guild.emojis:
             await ctx.send("No emojis found.")
             return
-        log.trace(f"Emoji Category {'' if category_query else 'not '}provided by the user")
+        log.trace(f"Emoji Category {'' if category_query else 'not '}provided by the user.")
         for emoji in ctx.guild.emojis:
             emoji_category = emoji.name.split("_")[0]
 
@@ -120,6 +118,6 @@ class Emojis(commands.Cog):
         await ctx.send(embed=emoji_information)
 
 
-def setup(bot: commands.Bot) -> None:
-    """Add the Emojis cog into the bot."""
+def setup(bot: Bot) -> None:
+    """Load the Emojis cog."""
     bot.add_cog(Emojis(bot))

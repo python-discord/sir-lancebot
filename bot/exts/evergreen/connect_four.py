@@ -8,6 +8,7 @@ import emojis
 from discord.ext import commands
 from discord.ext.commands import guild_only
 
+from bot.bot import Bot
 from bot.constants import Emojis
 
 NUMBERS = list(Emojis.number_emojis.values())
@@ -22,7 +23,7 @@ class Game:
 
     def __init__(
             self,
-            bot: commands.Bot,
+            bot: Bot,
             channel: discord.TextChannel,
             player1: discord.Member,
             player2: typing.Optional[discord.Member],
@@ -180,7 +181,7 @@ class Game:
 class AI:
     """The Computer Player for Single-Player games."""
 
-    def __init__(self, bot: commands.Bot, game: Game) -> None:
+    def __init__(self, bot: Bot, game: Game) -> None:
         self.game = game
         self.mention = bot.user.mention
 
@@ -255,7 +256,7 @@ class AI:
 class ConnectFour(commands.Cog):
     """Connect Four. The Classic Vertical Four-in-a-row Game!"""
 
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: Bot) -> None:
         self.bot = bot
         self.games: typing.List[Game] = []
         self.waiting: typing.List[discord.Member] = []
@@ -354,7 +355,7 @@ class ConnectFour(commands.Cog):
             self.games.remove(game)
         except Exception:
             # End the game in the event of an unforeseen error so the players aren't stuck in a game
-            await ctx.send(f"{ctx.author.mention} {user.mention if user else ''} An error occurred. Game failed")
+            await ctx.send(f"{ctx.author.mention} {user.mention if user else ''} An error occurred. Game failed.")
             if game in self.games:
                 self.games.remove(game)
             raise
@@ -445,6 +446,6 @@ class ConnectFour(commands.Cog):
         await self._play_game(ctx, None, board_size, str(emoji1), str(emoji2))
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load ConnectFour Cog."""
     bot.add_cog(ConnectFour(bot))

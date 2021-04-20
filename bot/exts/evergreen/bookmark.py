@@ -4,6 +4,7 @@ import random
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Colours, ERROR_REPLIES, Emojis, Icons
 from bot.utils.converters import WrappedMessageConverter
 
@@ -12,9 +13,6 @@ log = logging.getLogger(__name__)
 
 class Bookmark(commands.Cog):
     """Creates personal bookmarks by relaying a message link to the user's DMs."""
-
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
 
     @commands.command(name="bookmark", aliases=("bm", "pin"))
     async def bookmark(
@@ -28,7 +26,7 @@ class Bookmark(commands.Cog):
         # Prevent users from bookmarking a message in a channel they don't have access to
         permissions = ctx.author.permissions_in(target_message.channel)
         if not permissions.read_messages:
-            log.info(f"{ctx.author} tried to bookmark a message in #{target_message.channel} but has no permissions")
+            log.info(f"{ctx.author} tried to bookmark a message in #{target_message.channel} but has no permissions.")
             embed = discord.Embed(
                 title=random.choice(ERROR_REPLIES),
                 color=Colours.soft_red,
@@ -51,7 +49,7 @@ class Bookmark(commands.Cog):
         except discord.Forbidden:
             error_embed = discord.Embed(
                 title=random.choice(ERROR_REPLIES),
-                description=f"{ctx.author.mention}, please enable your DMs to receive the bookmark",
+                description=f"{ctx.author.mention}, please enable your DMs to receive the bookmark.",
                 colour=Colours.soft_red
             )
             await ctx.send(embed=error_embed)
@@ -60,6 +58,6 @@ class Bookmark(commands.Cog):
             await ctx.message.add_reaction(Emojis.envelope)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load the Bookmark cog."""
     bot.add_cog(Bookmark(bot))

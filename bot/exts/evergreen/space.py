@@ -39,7 +39,6 @@ class Space(Cog):
     """Space Cog contains commands, that show images, facts or other information about space."""
 
     def __init__(self, bot: Bot):
-        self.bot = bot
         self.http_session = bot.http_session
 
         self.rovers = {}
@@ -242,7 +241,7 @@ class Space(Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Load Space Cog."""
+    """Load the Space cog."""
     if not Tokens.nasa:
         logger.warning("Can't find NASA API key. Not loading Space Cog.")
         return

@@ -1,13 +1,14 @@
 from discord import Embed
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Colours
 
 
 class Ping(commands.Cog):
     """Ping the bot to see its latency and state."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @commands.command(name="ping")
@@ -22,6 +23,6 @@ class Ping(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
-    """Cog load."""
+def setup(bot: Bot) -> None:
+    """Load the Ping cog."""
     bot.add_cog(Ping(bot))
