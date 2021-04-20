@@ -62,7 +62,6 @@ class Catify(commands.Cog):
 
         for _ in range(random.randint(1, string_len)):
             randcheck = random.randint(0, 5)
-            print(randcheck)
             # insert cat at random index
             if randcheck == 5:
                 string_list.insert(random.randint(0, len(string_list)), f"**{random.choice(Cats.cats)}**")
