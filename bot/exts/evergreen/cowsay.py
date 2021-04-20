@@ -1,4 +1,4 @@
-import cowsay
+from cowsay import get_output_string
 from discord.ext import commands
 
 
@@ -34,7 +34,7 @@ class Cowsay(commands.Cog):
         """
         text = text.lower()
         character = character.lower()
-        msgbody = cowsay.get_output_string(character, text)
+        msgbody = get_output_string(character, text)
         await ctx.send(f"```\n{msgbody}\n```")
 
 
