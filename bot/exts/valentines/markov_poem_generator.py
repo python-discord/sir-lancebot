@@ -62,7 +62,7 @@ class Cache:
     def __init__(self, word: str):
         self.word = word
 
-    def __enter__(self):
+    def __enter__(self) -> Tuple[Dict[str, Set[str]], str]:
         self.word = self.word.replace("'", "e")  # Sometimes ' replaces e
         return self.cache, self.word
 
@@ -308,6 +308,7 @@ class MarkovPoemGenerator(commands.Cog):
         rhyme_set = set()
 
         async def _get_line_and_rhyme_set() -> Tuple[str, Set[str]]:
+            """Returns a random sentence and its associated rhyme set."""
             line = await self._get_sentence()
 
             rhyme_set = await self._get_rhyme_set(
@@ -352,7 +353,7 @@ class MarkovPoemGenerator(commands.Cog):
 
         for unit in scheme:
             # `last_line` means last line of a rhyme group
-            is_last_line = True if unit_count[unit] == 1 else False
+            is_last_line = unit_count[unit] == 1
 
             # Create new stanza
             if unit == "/":
@@ -408,7 +409,7 @@ class MarkovPoemGenerator(commands.Cog):
         elapsed_time = elapsed_time.seconds
 
         poem_embed = Embed(
-            title="A Markov Poem For " + str(ctx.author.name),
+            title=f"A Markov Poem For {ctx.author.name}",
             color=Colours.soft_red
         )
 
@@ -479,7 +480,7 @@ class MarkovPoemGenerator(commands.Cog):
         elif isinstance(error, RhymeAPIUnresponsive):
             error.handled = True
             embed = Embed(
-                title="Uh oh... Markov Poem can\'t give you a poem...",
+                title="Uh oh... Markov Poem can't give you a poem...",
                 color=Colours.soft_red,
                 description=f"""
                     I am sorry {ctx.author.mention}, but it looks like the API
@@ -491,7 +492,7 @@ class MarkovPoemGenerator(commands.Cog):
         elif isinstance(error, MakeShortSentenceRanOut):
             error.handled = True
             embed = Embed(
-                title="Uh oh... Markov Poem can\'t give you a poem...",
+                title="Uh oh... Markov Poem can't give you a poem...",
                 color=Colours.soft_red,
                 description=f"""
                     Apologies {ctx.author.mention},
