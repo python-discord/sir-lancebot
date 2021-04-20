@@ -1,7 +1,7 @@
 import random
 from typing import Optional
 
-from discord import Embed
+from discord import AllowedMentions, Embed
 from discord.ext import commands
 
 from bot.constants import Cats, Colours, NEGATIVE_REPLIES
@@ -69,7 +69,10 @@ class Catify(commands.Cog):
                 string_list.insert(random.randint(0, len(string_list)), random.choice(Cats.cats))
 
         text = " ".join(string_list)
-        await ctx.channel.send(f">>> {text}")
+        await ctx.channel.send(
+            f">>> {text}",
+            allowed_mentions=AllowedMentions.none()
+        )
 
 
 def setup(bot: commands.Bot) -> None:
