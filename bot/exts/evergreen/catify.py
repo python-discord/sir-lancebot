@@ -27,7 +27,10 @@ class Catify(commands.Cog):
             if len(display_name) > 26:
                 embed = Embed(
                     title=random.choice(NEGATIVE_REPLIES),
-                    description="Your nickname is too long to be catified! Please change it to be under 26 characters.",
+                    description=(
+                        "Your display name is too long to be catified! "
+                        "Please change it to be under 26 characters."
+                    ),
                     color=Colours.soft_red
                 )
                 await ctx.send(embed=embed)
@@ -36,7 +39,7 @@ class Catify(commands.Cog):
             else:
                 display_name += f" | {random.choice(Cats.cats)}"
 
-                await ctx.send(f"Your catified username is: `{display_name}`")
+                await ctx.send(f"Your catified nickname is: `{display_name}`", allowed_mentions=AllowedMentions.none())
 
                 with suppress(Forbidden):
                     await ctx.author.edit(nick=display_name)
