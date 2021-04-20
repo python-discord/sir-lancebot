@@ -16,11 +16,9 @@ class Catify(commands.Cog):
     @commands.command(aliases=["ᓚᘏᗢify", "ᓚᘏᗢ"])
     async def catify(self, ctx: commands.Context, *, text: Optional[str]) -> None:
         """
-        Converts the provided text into its cat-themed equivalent by interspersing
-        cats into the string randomly, while also changing any substring "cat" into
-        a random cat and vice versa.
+        Convert the provided text into a cat themed sentence by interspercing cats throughout text.
 
-        If no text is given then the user's nickname is edited.
+        If no text is given then the users nickname is edited.
         """
         if not text:
             display_name = ctx.author.display_name
