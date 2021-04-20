@@ -49,8 +49,7 @@ class Catify(commands.Cog):
             string_list = text.split()
             for index, name in enumerate(string_list):
                 if "cat" in name:
-                    randcheck = random.randint(0, 5)
-                    if randcheck == 5:
+                    if random.randint(0, 5) == 5:
                         string_list[index] = string_list[index].replace("cat", f"**{random.choice(Cats.cats)}**")
                     else:
                         string_list[index] = string_list[index].replace("cat", random.choice(Cats.cats))
@@ -61,9 +60,8 @@ class Catify(commands.Cog):
         string_len = len(string_list) // 3 or len(string_list)
 
         for _ in range(random.randint(1, string_len)):
-            randcheck = random.randint(0, 5)
             # insert cat at random index
-            if randcheck == 5:
+            if random.randint(0, 5) == 5:
                 string_list.insert(random.randint(0, len(string_list)), f"**{random.choice(Cats.cats)}**")
             else:
                 string_list.insert(random.randint(0, len(string_list)), random.choice(Cats.cats))
