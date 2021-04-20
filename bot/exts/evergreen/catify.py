@@ -45,7 +45,7 @@ class Catify(commands.Cog):
                 )
                 await ctx.send(embed=embed)
                 return
-
+            text = text.lower()
             string_list = text.split()
             for index, name in enumerate(string_list):
                 if "cat" in name:
