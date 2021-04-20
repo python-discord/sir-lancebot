@@ -35,9 +35,6 @@ class Cowsay(commands.Cog):
         text = text.lower()
         character = character.lower()
         msgbody = cowsay.get_output_string(character, text)
-        for character in msgbody:
-            if character == " ":
-                character += ""
         await ctx.send(f"```\n{msgbody}\n```")
 
 
