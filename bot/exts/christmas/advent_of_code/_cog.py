@@ -124,7 +124,7 @@ class AdventOfCode(commands.Cog):
     @whitelist_override(channels=AOC_WHITELIST)
     async def about_aoc(self, ctx: commands.Context) -> None:
         """Respond with an explanation of all things Advent of Code."""
-        await ctx.send("", embed=self.cached_about_aoc)
+        await ctx.send(embed=self.cached_about_aoc)
 
     @adventofcode_group.command(name="join", aliases=("j",), brief="Learn how to join the leaderboard (via DM)")
     @whitelist_override(channels=AOC_WHITELIST)
@@ -135,7 +135,7 @@ class AdventOfCode(commands.Cog):
             await ctx.send(f"The Python Discord leaderboard for {current_year} is not yet available!")
             return
 
-        author = ctx.message.author
+        author = ctx.author
         log.info(f"{author.name} ({author.id}) has requested a PyDis AoC leaderboard code")
 
         if AocConfig.staff_leaderboard_id and any(r.id == Roles.helpers for r in author.roles):

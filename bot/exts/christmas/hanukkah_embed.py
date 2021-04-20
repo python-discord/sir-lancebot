@@ -5,6 +5,7 @@ from typing import List
 from discord import Embed
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Colours, Month
 from bot.utils.decorators import in_month
 
@@ -14,7 +15,7 @@ log = logging.getLogger(__name__)
 class HanukkahEmbed(commands.Cog):
     """A cog that returns information about Hanukkah festival."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
         self.url = ("https://www.hebcal.com/hebcal/?v=1&cfg=json&maj=on&min=on&mod=on&nx=on&"
                     "year=now&month=x&ss=on&mf=on&c=on&geo=geoname&geonameid=3448439&m=50&s=on")
@@ -60,17 +61,18 @@ class HanukkahEmbed(commands.Cog):
         if day in self.hanukkah_days and month in self.hanukkah_months and year in self.hanukkah_years:
             if int(day) == hanukkah_start_day:
                 now = datetime.datetime.utcnow()
-                now = str(now)
-                hours = int(now[11:13]) + 4  # using only hours
+                hours = now.hour + 4  # using only hours
                 hanukkah_start_hour = 18
                 if hours < hanukkah_start_hour:
                     embed.description = (f"Hanukkah hasnt started yet, "
                                          f"it will start in about {hanukkah_start_hour-hours} hour/s.")
-                    return await ctx.send(embed=embed)
+                    await ctx.send(embed=embed)
+                    return
                 elif hours > hanukkah_start_hour:
                     embed.description = (f'It is the starting day of Hanukkah ! '
                                          f'Its been {hours-hanukkah_start_hour} hours hanukkah started !')
-                    return await ctx.send(embed=embed)
+                    await ctx.send(embed=embed)
+                    return
             festival_day = self.hanukkah_days.index(day)
             number_suffixes = ['st', 'nd', 'rd', 'th']
             suffix = ''
@@ -108,6 +110,6 @@ class HanukkahEmbed(commands.Cog):
             self.hanukkah_years.append(date[0:4])
 
 
-def setup(bot: commands.Bot) -> None:
-    """Cog load."""
+def setup(bot: Bot) -> None:
+    """Load the Hanukkah Embed Cog."""
     bot.add_cog(HanukkahEmbed(bot))

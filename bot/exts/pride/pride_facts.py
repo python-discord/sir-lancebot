@@ -15,8 +15,6 @@ from bot.utils.decorators import seasonal_task
 
 log = logging.getLogger(__name__)
 
-Sendable = Union[commands.Context, discord.TextChannel]
-
 
 class PrideFacts(commands.Cog):
     """Provides a new fact every day during the Pride season!"""
@@ -44,7 +42,7 @@ class PrideFacts(commands.Cog):
     async def send_random_fact(self, ctx: commands.Context) -> None:
         """Provides a fact from any previous day, or today."""
         now = datetime.utcnow()
-        previous_years_facts = (self.facts[x] for x in self.facts.keys() if int(x) < now.year)
+        previous_years_facts = (y for x, y in self.facts.items() if int(x) < now.year)
         current_year_facts = self.facts.get(str(now.year), [])[:now.day]
         previous_facts = current_year_facts + [x for y in previous_years_facts for x in y]
         try:
@@ -52,7 +50,7 @@ class PrideFacts(commands.Cog):
         except IndexError:
             await ctx.send("No facts available")
 
-    async def send_select_fact(self, target: Sendable, _date: Union[str, datetime]) -> None:
+    async def send_select_fact(self, target: discord.abc.Messageable, _date: Union[str, datetime]) -> None:
         """Provides the fact for the specified day, if the day is today, or is in the past."""
         now = datetime.utcnow()
         if isinstance(_date, str):
@@ -76,7 +74,7 @@ class PrideFacts(commands.Cog):
             await target.send("The fact for the selected day is not yet available.")
 
     @commands.command(name="pridefact", aliases=["pridefacts"])
-    async def pridefact(self, ctx: commands.Context) -> None:
+    async def pridefact(self, ctx: commands.Context, option: str = None) -> None:
         """
         Sends a message with a pride fact of the day.
 
@@ -85,15 +83,15 @@ class PrideFacts(commands.Cog):
         If a date is given as an argument, and the date is in the past, the fact from that day
         will be provided.
         """
-        message_body = ctx.message.content[len(ctx.invoked_with) + 2:]
-        if message_body == "":
+        if not option:
             await self.send_select_fact(ctx, datetime.utcnow())
-        elif message_body.lower().startswith("rand"):
+        elif option.lower().startswith("rand"):
             await self.send_random_fact(ctx)
         else:
-            await self.send_select_fact(ctx, message_body)
+            await self.send_select_fact(ctx, option)
 
-    def make_embed(self, fact: str) -> discord.Embed:
+    @staticmethod
+    def make_embed(fact: str) -> discord.Embed:
         """Makes a nice embed for the fact to be sent."""
         return discord.Embed(
             colour=Colours.pink,

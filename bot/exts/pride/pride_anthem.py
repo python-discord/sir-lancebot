@@ -2,8 +2,11 @@ import json
 import logging
 import random
 from pathlib import Path
+from typing import Optional
 
 from discord.ext import commands
+
+from bot.bot import Bot
 
 log = logging.getLogger(__name__)
 
@@ -11,11 +14,10 @@ log = logging.getLogger(__name__)
 class PrideAnthem(commands.Cog):
     """Embed a random youtube video for a gay anthem!"""
 
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
+    def __init__(self):
         self.anthems = self.load_vids()
 
-    def get_video(self, genre: str = None) -> dict:
+    def get_video(self, genre: Optional[str] = None) -> dict:
         """
         Picks a random anthem from the list.
 
@@ -52,6 +54,6 @@ class PrideAnthem(commands.Cog):
             await ctx.send("I couldn't find a video, sorry!")
 
 
-def setup(bot: commands.Bot) -> None:
-    """Cog loader for pride anthem."""
-    bot.add_cog(PrideAnthem(bot))
+def setup(bot: Bot) -> None:
+    """Load the Pride Anthem Cog."""
+    bot.add_cog(PrideAnthem())
