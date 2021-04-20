@@ -58,7 +58,7 @@ class Catify(commands.Cog):
                     if element in name:
                         string_list[index] = string_list[index].replace(element, "cat")
 
-        string_len = l if (l := len(string_list) // 3) != 0 else len(string_list)
+        string_len = len(string_list) // 3 or len(string_list)
 
         for _ in range(random.randint(1, string_len)):
             randcheck = random.randint(0, 5)
