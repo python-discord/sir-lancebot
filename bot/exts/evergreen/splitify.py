@@ -15,7 +15,7 @@ EXECUTOR = ThreadPoolExecutor(10)
 
 
 class Splitify(commands.Cog):
-    """Makes your avatar splitified!"""
+    """Splitifies your avatar!"""
 
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
@@ -134,7 +134,7 @@ class Splitify(commands.Cog):
         width_multiplier = 0
         height = 0
 
-        pieces = math.sqrt(len(imgs))
+        squares = math.sqrt(len(imgs))
 
         for index, img in enumerate(imgs):
             width = single_wdith * width_multiplier
@@ -143,14 +143,14 @@ class Splitify(commands.Cog):
 
             width_multiplier += 1
 
-            if (index + 1) % pieces == 0:
+            if (index + 1) % squares == 0:
                 width_multiplier = 0
                 height += single_height
 
         return new_img
 
     def splitify(self, img_bytes: BytesIO, squares: int) -> BytesIO:
-        """Executor for image processing."""
+        """Seperate function run from an executor which splitifies an image."""
         avatar = Image.open(BytesIO(img_bytes))
         avatar = avatar.convert('RGBA').resize((1024, 1024))
 
