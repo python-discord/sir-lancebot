@@ -49,7 +49,11 @@ class Catify(commands.Cog):
             string_list = text.split()
             for index, name in enumerate(string_list):
                 if "cat" in name:
-                    string_list[index] = string_list[index].replace("cat", random.choice(Cats.cats))
+                    randcheck = random.randint(0, 5)
+                    if randcheck == 5:
+                        string_list[index] = string_list[index].replace("cat", f"**{random.choice(Cats.cats)}**")
+                    else:
+                        string_list[index] = string_list[index].replace("cat", random.choice(Cats.cats))
                 for element in Cats.cats:
                     if element in name:
                         string_list[index] = string_list[index].replace(element, "cat")
@@ -57,8 +61,13 @@ class Catify(commands.Cog):
         string_len = l if (l := len(string_list) // 3) != 0 else len(string_list)
 
         for _ in range(random.randint(1, string_len)):
+            randcheck = random.randint(0, 5)
+            print(randcheck)
             # insert cat at random index
-            string_list.insert(random.randint(0, len(string_list)), random.choice(Cats.cats))
+            if randcheck == 5:
+                string_list.insert(random.randint(0, len(string_list)), f"**{random.choice(Cats.cats)}**")
+            else:
+                string_list.insert(random.randint(0, len(string_list)), random.choice(Cats.cats))
 
         text = " ".join(string_list)
         await ctx.channel.send(f">>> {text}")
