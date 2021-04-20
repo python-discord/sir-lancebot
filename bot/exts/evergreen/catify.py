@@ -45,7 +45,7 @@ class Catify(commands.Cog):
                 )
                 await ctx.send(embed=embed)
                 return
-            text = text.lower()
+
             string_list = text.split()
             for index, name in enumerate(string_list):
                 if "cat" in name:
@@ -56,7 +56,7 @@ class Catify(commands.Cog):
                 for element in Cats.cats:
                     if element in name:
                         string_list[index] = name.replace(element, "cat")
-
+                  
         string_len = len(string_list) // 3 or len(string_list)
 
         for _ in range(random.randint(1, string_len)):
