@@ -23,7 +23,7 @@ class Catify(commands.Cog):
         if not text:
             display_name = ctx.author.display_name
 
-            if len(display_name) >= 26:
+            if len(display_name) > 26:
                 embed = Embed(
                     title=random.choice(NEGATIVE_REPLIES),
                     description="Your nickname is too long to be catified! Please change it to be under 26 characters.",
