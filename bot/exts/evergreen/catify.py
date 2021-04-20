@@ -1,7 +1,8 @@
 import random
+from contextlib import suppress
 from typing import Optional
 
-from discord import AllowedMentions, Embed
+from discord import AllowedMentions, Embed, Forbidden
 from discord.ext import commands
 
 from bot.constants import Cats, Colours, NEGATIVE_REPLIES
@@ -34,8 +35,11 @@ class Catify(commands.Cog):
 
             else:
                 display_name += f" | {random.choice(Cats.cats)}"
+
                 await ctx.send(f"Your catified username is: `{display_name}`")
-                await ctx.author.edit(nick=display_name)
+
+                with suppress(Forbidden):
+                    await ctx.author.edit(nick=display_name)
         else:
             if len(text) >= 1500:
                 embed = Embed(
@@ -50,27 +54,27 @@ class Catify(commands.Cog):
             for index, name in enumerate(string_list):
                 if "cat" in name:
                     if random.randint(0, 5) == 5:
-                        string_list[index] = string_list[index].replace("cat", f"**{random.choice(Cats.cats)}**")
+                        string_list[index] = name.replace("cat", f"**{random.choice(Cats.cats)}**")
                     else:
-                        string_list[index] = string_list[index].replace("cat", random.choice(Cats.cats))
+                        string_list[index] = name.replace("cat", random.choice(Cats.cats))
                 for element in Cats.cats:
                     if element in name:
-                        string_list[index] = string_list[index].replace(element, "cat")
+                        string_list[index] = name.replace(element, "cat")
 
-        string_len = len(string_list) // 3 or len(string_list)
+            string_len = len(string_list) // 3 or len(string_list)
 
-        for _ in range(random.randint(1, string_len)):
-            # insert cat at random index
-            if random.randint(0, 5) == 5:
-                string_list.insert(random.randint(0, len(string_list)), f"**{random.choice(Cats.cats)}**")
-            else:
-                string_list.insert(random.randint(0, len(string_list)), random.choice(Cats.cats))
+            for _ in range(random.randint(1, string_len)):
+                # insert cat at random index
+                if random.randint(0, 5) == 5:
+                    string_list.insert(random.randint(0, len(string_list)), f"**{random.choice(Cats.cats)}**")
+                else:
+                    string_list.insert(random.randint(0, len(string_list)), random.choice(Cats.cats))
 
-        text = " ".join(string_list)
-        await ctx.send(
-            f">>> {text}",
-            allowed_mentions=AllowedMentions.none()
-        )
+            text = " ".join(string_list)
+            await ctx.send(
+                f">>> {text}",
+                allowed_mentions=AllowedMentions.none()
+            )
 
 
 def setup(bot: commands.Bot) -> None:
