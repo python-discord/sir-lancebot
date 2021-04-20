@@ -50,12 +50,12 @@ class Catify(commands.Cog):
             for index, name in enumerate(string_list):
                 if "cat" in name:
                     if random.randint(0, 5) == 5:
-                        string_list[index] = string_list[index].replace("cat", f"**{random.choice(Cats.cats)}**")
+                        string_list[index] = name.replace("cat", f"**{random.choice(Cats.cats)}**")
                     else:
-                        string_list[index] = string_list[index].replace("cat", random.choice(Cats.cats))
+                        string_list[index] = name.replace("cat", random.choice(Cats.cats))
                 for element in Cats.cats:
                     if element in name:
-                        string_list[index] = string_list[index].replace(element, "cat")
+                        string_list[index] = name.replace(element, "cat")
 
         string_len = len(string_list) // 3 or len(string_list)
 
