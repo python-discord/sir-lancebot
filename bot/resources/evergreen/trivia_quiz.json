@@ -2,36 +2,51 @@
   "retro": [
     {
       "id": 1,
-      "hints": ["It is not a mainline Mario Game, although the plumber is present.", "It is not a mainline Zelda Game, although Link is present."],
+      "hints": [
+        "It is not a mainline Mario Game, although the plumber is present.",
+        "It is not a mainline Zelda Game, although Link is present."
+      ],
       "question": "What is the best selling game on the Nintendo GameCube?",
       "answer": "Super Smash Bros"
     },
     {
       "id": 2,
-      "hints": ["It was released before the 90's.", "It was released after 1980."],
+      "hints": [
+        "It was released before the 90's.",
+        "It was released after 1980."
+      ],
       "question": "What year was Tetris released?",
       "answer": "1984"
     },
     {
       "id": 3,
-      "hints": ["The occupation was in construction", "He appeared as this kind of worker in 1981's Donkey Kong"],
+      "hints": [
+        "The occupation was in construction",
+        "He appeared as this kind of worker in 1981's Donkey Kong"
+      ],
       "question": "What was Mario's original occupation?",
       "answer": "Carpenter"
     },
     {
       "id": 4,
-      "hints": ["It was revealed in the Nintendo Character Guide in 1993.", "His last name has to do with eating Mario's enemies."],
+      "hints": [
+        "It was revealed in the Nintendo Character Guide in 1993.",
+        "His last name has to do with eating Mario's enemies."
+      ],
       "question": "What is Yoshi's (from Mario Bros.) full name?",
       "answer": "Yoshisaur Munchakoopas"
     },
     {
       "id": 5,
-      "hints": ["The game was released in 1990.", "It was released on the SNES."],
+      "hints": [
+        "The game was released in 1990.",
+        "It was released on the SNES."
+      ],
       "question": "What was the first game Yoshi appeared in?",
       "answer": "Super Mario World"
     }
   ],
-  "general":[
+  "general": [
     {
       "id": 100,
       "question": "Name \"the land of a thousand lakes\"",
@@ -114,7 +129,7 @@
       "id": 113,
       "question": "What's the name of the tallest waterfall in the world.",
       "answer": "Angel Falls",
-      "info": "Angel Falls (Salto Ángel) in Venezuela is the highest waterfall in the world. The falls are 3230 feet in height, with an uninterrupted drop of 2647 feet. Angel Falls is located on a tributary of the Rio Caroni."
+      "info": "Angel Falls (Salto \u00c1ngel) in Venezuela is the highest waterfall in the world. The falls are 3230 feet in height, with an uninterrupted drop of 2647 feet. Angel Falls is located on a tributary of the Rio Caroni."
     },
     {
       "id": 114,
@@ -180,7 +195,7 @@
       "id": 124,
       "question": "When did the Second World War end?",
       "answer": "1945",
-      "info": "World War 2 ended with the unconditional surrender of the Axis powers. On 8 May 1945, the Allies accepted Germany's surrender, about a week after Adolf Hitler had committed suicide. VE Day – Victory in Europe celebrates the end of the Second World War on 8 May 1945."
+      "info": "World War 2 ended with the unconditional surrender of the Axis powers. On 8 May 1945, the Allies accepted Germany's surrender, about a week after Adolf Hitler had committed suicide. VE Day \u2013 Victory in Europe celebrates the end of the Second World War on 8 May 1945."
     },
     {
       "id": 125,
@@ -190,63 +205,69 @@
     },
     {
       "id": 126,
-      "question": "What's the name of the largest river in the world?",
-      "answer": "Nile",
-      "info": "The Nile, which is about 6,650 km (4,130 mi) long, is an \"international\" river as its drainage basin covers eleven countries, namely, Tanzania, Uganda, Rwanda, Burundi, the Democratic Republic of the Congo, Kenya, Ethiopia, Eritrea, South Sudan, Republic of the Sudan and Egypt."
-    },
-    {
-      "id": 127,
       "question": "Which is the smallest planet in the Solar System?",
       "answer": "Mercury",
       "info": "Mercury is the smallest planet in our solar system. It's just a little bigger than Earth's moon. It is the closest planet to the sun, but it's actually not the hottest. Venus is hotter."
     },
     {
-      "id": 128,
+      "id": 127,
       "question": "What is the smallest country?",
       "answer": "Vatican City",
       "info": "With an area of 0.17 square miles (0.44 km2) and a population right around 1,000, Vatican City is the smallest country in the world, both in terms of size and population."
     },
     {
-      "id": 129,
+      "id": 128,
       "question": "What's the name of the largest bird?",
       "answer": "Ostrich",
       "info": "The largest living bird, a member of the Struthioniformes, is the ostrich (Struthio camelus), from the plains of Africa and Arabia. A large male ostrich can reach a height of 2.8 metres (9.2 feet) and weigh over 156 kilograms (344 pounds)."
     },
     {
-      "id": 130,
+      "id": 129,
       "question": "What does the acronym GPRS stand for?",
       "answer": "General Packet Radio Service",
       "info": "General Packet Radio Service (GPRS) is a packet-based mobile data service on the global system for mobile communications (GSM) of 3G and 2G cellular communication systems. It is a non-voice, high-speed and useful packet-switching technology intended for GSM networks."
     },
     {
-      "id": 131,
+      "id": 130,
       "question": "In what country is the Ebro river located?",
       "answer": "Spain",
       "info": "The Ebro river is located in Spain. It is 930 kilometers long and it's the second longest river that ends on the Mediterranean Sea."
     },
     {
-      "id": 132,
+      "id": 131,
       "question": "What year was the IBM PC model 5150 introduced into the market?",
       "answer": "1981",
       "info": "The IBM PC was introduced into the market in 1981. It used the Intel 8088, with a clock speed of 4.77 MHz, along with the MDA and CGA as a video card."
     },
     {
-      "id": 133,
+      "id": 132,
       "question": "What's the world's largest urban area?",
       "answer": "Tokyo",
       "info": "Tokyo is the most populated city in the world, with a population of 37 million people. It is located in Japan."
     },
     {
-      "id": 134,
+      "id": 133,
       "question": "How many planets are there in the Solar system?",
       "answer": "8",
       "info": "In the Solar system, there are 8 planets: Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus and Neptune. Pluto isn't considered a planet in the Solar System anymore."
     },
     {
-      "id": 135,
+      "id": 134,
       "question": "What is the capital of Iraq?",
       "answer": "Baghdad",
       "info": "Baghdad is the capital of Iraq. It has a population of 7 million people."
+    },
+    {
+      "id": 135,
+      "question": "The United Nations headquarters is located at which city?",
+      "answer": "New York",
+      "info": "The United Nations is headquartered in New York City in a complex designed by a board of architects led by Wallace Harrison and built by the architectural firm Harrison & Abramovitz. The complex has served as the official headquarters of the United Nations since its completion in 1951."
+    },
+    {
+      "id": 136,
+      "question": "At what year did Christopher Columbus discover America?",
+      "answer": "1492",
+      "info": "The explorer Christopher Columbus made four trips across the Atlantic Ocean from Spain: in 1492, 1493, 1498 and 1502. He was determined to find a direct water route west from Europe to Asia, but he never did. Instead, he stumbled upon the Americas"
     }
   ]
 }
