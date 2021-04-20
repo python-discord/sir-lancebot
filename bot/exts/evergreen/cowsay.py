@@ -1,4 +1,4 @@
-import cowsay
+from cowsay import get_output_string
 from discord.ext import commands
 
 
