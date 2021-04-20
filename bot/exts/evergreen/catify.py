@@ -18,14 +18,13 @@ class Catify(commands.Cog):
         """
         Converts the provided text into its cat-themed equivalent by interspersing
         cats into the string randomly, while also changing any substring "cat" into
-        any cat in bot.constants.Cats.cats and vice versa.
+        a random cat and vice versa.
 
         If no text is given then the user's nickname is edited.
         """
-        
         if not text:
             display_name = ctx.author.display_name
-            
+
             if len(display_name) >= 26:
                 embed = Embed(
                     title=random.choice(NEGATIVE_REPLIES),
@@ -38,7 +37,7 @@ class Catify(commands.Cog):
             else:
                 display_name += f" | {random.choice(Cats.cats)}"
                 await ctx.send(f"Your catified username is: `{display_name}`")
-                await ctx.author.edit(nick=display_name)        
+                await ctx.author.edit(nick=display_name)
         else:
             if len(text) >= 1500:
                 embed = Embed(
@@ -48,7 +47,7 @@ class Catify(commands.Cog):
                 )
                 await ctx.send(embed=embed)
                 return
-            
+
             string_list = text.split()
             for index, name in enumerate(string_list):
                 if "cat" in name:
@@ -62,7 +61,7 @@ class Catify(commands.Cog):
         for _ in range(random.randint(1, string_len)):
             # insert cat at random index
             string_list.insert(random.randint(0, len(string_list)), random.choice(Cats.cats))
-            
+
         text = " ".join(string_list)
         await ctx.channel.send(f">>> {text}")
 
