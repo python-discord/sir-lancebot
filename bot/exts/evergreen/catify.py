@@ -69,7 +69,7 @@ class Catify(commands.Cog):
                 string_list.insert(random.randint(0, len(string_list)), random.choice(Cats.cats))
 
         text = " ".join(string_list)
-        await ctx.channel.send(f">>> {text}")
+        await ctx.send(f">>> {text}")
 
 
 def setup(bot: commands.Bot) -> None:
