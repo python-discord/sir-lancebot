@@ -53,11 +53,11 @@ class Catify(commands.Cog):
             string_list = text.split()
             for index, name in enumerate(string_list):
                 name = name.lower()
-                if "cat" in text:
+                if "cat" in name:
                     if random.randint(0, 5) == 5:
-                        string_list[index] = text.replace("cat", f"**{random.choice(Cats.cats)}**")
+                        string_list[index] = name.replace("cat", f"**{random.choice(Cats.cats)}**")
                     else:
-                        string_list[index] = text.replace("cat", random.choice(Cats.cats))
+                        string_list[index] = name.replace("cat", random.choice(Cats.cats))
                 for element in Cats.cats:
                     if element in name:
                         string_list[index] = name.replace(element, "cat")
