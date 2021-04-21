@@ -32,6 +32,7 @@ class Cowsay(commands.Cog):
             )
             await ctx.send(embed=embed)
             return
+            
         try:
             msgbody = get_output_string(character, text)
         except Exception:
