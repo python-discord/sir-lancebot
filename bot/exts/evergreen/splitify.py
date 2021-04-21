@@ -26,32 +26,32 @@ class Splitify(commands.Cog):
 
         Explanation:
 
-        1. I get the width and the height of the Image passed to the function.
+        1. It gets the width and the height of the Image passed to the function.
 
-        2. I get the root of a number of squares (number of squares) passed, which I call xy. Reason: if let's say 25
-        squares (number of squares) were passed, that is the total squares (split pieces) that the image is supposed to
-        be split into. As we know, a 2D shape has a height and a width, and in this case I think of it as rows and
-        columns. Rows multiplied by columns is equal to the passed squares (number of squares). To get rows and columns,
-        since in this case, each square (split piece) is identical, rows are equal to columns and I treat the image as a
-        square-shaped, I get the root out of the squares (number of squares) passed.
+        2. It gets the root of a number of squares (number of squares) passed, which is called xy. Reason: if let's say
+        25 squares (number of squares) were passed, that is the total squares (split pieces) that the image is supposed
+        to be split into. As it is known, a 2D shape has a height and a width, and in this case the program thinks of it
+        as rows and columns. Rows multiplied by columns is equal to the passed squares (number of squares). To get rows
+        and columns, since in this case, each square (split piece) is identical, rows are equal to columns and the
+        program treats the image as a square-shaped, it gets the root out of the squares (number of squares) passed.
 
         3. Now width and height are both of the original Image, Discord PFP, so when it comes to forming the squares
-        (splitpieces), I divide the original image's height and width by the xy. In a case of 25 squares
+        (splitpieces), the program divides the original image's height and width by the xy. In a case of 25 squares
         (number ofsquares) passed, xy would be 5, so if an image was 250x300, x_frac would be 50 and y_frac - 60. Note:
-        x_frac stands for a fracture of width. The reason I called it so is because it is shorter to use x for width in
-        mind and then I just used half of the word fracture, same applies to y_frac, just height instead of width.
-        x_frac and y_frac are width and height of a single square (split piece)
+        x_frac stands for a fracture of width. The reason it's called that is because it is shorter to use x for width
+        in mind and then it's just half of the word fracture, same applies to y_frac, just height instead of width.
+        x_frac and y_frac are width and height of a single square (split piece).
 
-        4. With left, top, right, bottom, = 0, 0, x_frac, y_frac, I set these variables to create the initial square
-        (split piece). Explanation: all of these 4 variables start at the top left corner of the Image, by adding value
-        to right and bottom, I am creating the initial square (split piece).
+        4. With left, top, right, bottom, = 0, 0, x_frac, y_frac, the program sets these variables to create the initial
+        square (split piece). Explanation: all of these 4 variables start at the top left corner of the Image, by adding
+        value to right and bottom, it's creating the initial square (split piece).
 
-        5. In the for loop, I keep adding those squares (split pieces) in row and once (index + 1) % xy == 0 is True, I
-        add to top and bottom to lower them and reset right and left to recreate the initial space between them, forming
-        a square (split piece), I also add the newly created square (split piece) into the new_imgs list where I store
-        them. I keep repeating this process till all 25 squares get added to the list.
+        5. In the for loop, it keeps adding those squares (split pieces) in a row and once (index + 1) % xy == 0 is
+        True, it adds to top and bottom to lower them and reset right and left to recreate the initial space between
+        them, forming a square (split piece), it also adds the newly created square (split piece) into the new_imgs list
+        where it stores them. The program keeps repeating this process till all 25 squares get added to the list.
 
-        6. I return new_imgs, a list of squares (split pieces).
+        6. It returns new_imgs, a list of squares (split pieces).
         """
         width, heigth = img.size
 
@@ -86,35 +86,37 @@ class Splitify(commands.Cog):
 
         Explanation:
 
-        1. I shuffle passed imgs. Reason: to randomize the squares (split pieces).
+        1. It shuffles passed imgs. Reason: to randomize the squares (split pieces).
 
-        2. I get a single square (split piece) out of the list and define single_width as the square's width and
-        single_height as the square's height.
+        2. The program gets a single square (split piece) out of the list and defines single_width as the square's width
+        and single_height as the square's height.
 
-        3. I get the root of type integer of the number of imgs (split pieces) in the list and call it multiplier. I
-        then proceed to calculate total height and width of the new image that I am creating using the same multiplier.
+        3. It gets the root of type integer of the number of imgs (split pieces) in the list and calls it multiplier.
+        Program then proceeds to calculate total height and width of the new image that it's creating using the same
+        multiplier.
 
-        4. I then define new_img as the image that I am creating, using the previously obtained total_width and
-        total_height.
+        4. The program then defines new_img as the image that it's creating, using the previously obtained total_width
+        and total_height.
 
-        5. Now I define width_multiplier as well as height with values of 0. These will be used to correctly position
+        5. Now it defines width_multiplier as well as height with values of 0. These will be used to correctly position
         squares (split pieces) onto the new_img canvas.
 
-        6. Similar to how in the split_image function, I get the root of number of imgs (split pieces) in the list. In
-        split_image function, it was the passed squares (number of squares) instead of a number of imgs in the list that
-        I got the square of here.
+        6. Similar to how in the split_image function, the program gets the root of number of imgs (split pieces) in the
+        list. In split_image function, it was the passed squares (number of squares) instead of a number of imgs in the
+        list that it got the square of here.
 
-        7. In the for loop, as I iterate, I multiply single_width by width_multiplier to correctly position a square
-        (split piece) width wise. I then proceed to paste the newly positioned square (split piece) onto the new_img. I
-        increase the width_multiplier by 1 every iteration so the image wouldn't get pasted in the same spot and the
-        positioning would move accordingly. I make sure to increase the width_multiplier before the check, which checks
-        if the end of a row has been reached, - (index + 1) % pieces == 0, so after it, if it was True, width_multiplier
-        would have been reset to 0 (start of the row). If the check returns True, the height gets increased by a single
-        square's (split piece) height to lower the positioning height wise and, as I just mentioned, the
-        width_multiplier gets reset to 0 and width will then be calculated from the start of the new row. The for loop
-        finishes once all the squares (split pieces) were positioned accordingly.
+        7. In the for loop, as it iterates, the program multiplies single_width by width_multiplier to correctly
+        position a square (split piece) width wise. It then proceeds to paste the newly positioned square (split piece)
+        onto the new_img. The program increases the width_multiplier by 1 every iteration so the image wouldn't get
+        pasted in the same spot and the positioning would move accordingly. It makes sure to increase the
+        width_multiplier before the check, which checks if the end of a row has been reached, -
+        (index + 1) % pieces == 0, so after it, if it was True, width_multiplier would have been reset to 0 (start of
+        the row). If the check returns True, the height gets increased by a single square's (split piece) height to
+        lower the positioning height wise and, as I just mentioned, the width_multiplier gets reset to 0 and width will
+        then be calculated from the start of the new row. The for loop finishes once all the squares (split pieces) were
+        positioned accordingly.
 
-        8. Finally, I return the new_img, the randomized squares (split pieces) stitched back into the format of the
+        8. Finally, it returns the new_img, the randomized squares (split pieces) stitched back into the format of the
         original image - user's PFP.
         """
         random.shuffle(imgs)
