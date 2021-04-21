@@ -13,7 +13,13 @@ class Cowsay(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @commands.command(aliases=["cow"], help=f"{char_names.join()}")
+    @commands.command(
+        aliases=["cow"],
+        help=f"""
+        Generates a cowsay string and sends it. The available characters for cowsay are:
+
+        {', '.join(char_names)}"""
+    )
     async def cowsay(self, ctx: commands.Context, character: str = "Cow", *, text: str = None) -> None:
         """
         Generates some cowsay ASCII art and sends it in Discord.
@@ -32,7 +38,7 @@ class Cowsay(commands.Cog):
             )
             await ctx.send(embed=embed)
             return
-            
+
         try:
             msgbody = get_output_string(character, text)
         except Exception:
