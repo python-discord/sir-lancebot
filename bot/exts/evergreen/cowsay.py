@@ -1,6 +1,6 @@
 import random
 
-from cowsay import get_output_string, char_names
+from cowsay import char_names, get_output_string
 from discord import Embed
 from discord.ext import commands
 
