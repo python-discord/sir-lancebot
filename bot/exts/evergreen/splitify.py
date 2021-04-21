@@ -1,4 +1,3 @@
-import asyncio
 import math
 import random
 from concurrent.futures import ThreadPoolExecutor
@@ -21,7 +20,7 @@ class Splitify(commands.Cog):
         self.bot = bot
 
     @staticmethod
-    def split_image(img: Image, squares: int) -> list:
+    def split_image(img: Image.Image, squares: int) -> list:
         """
         Splits the image into x squares.
 
@@ -81,7 +80,7 @@ class Splitify(commands.Cog):
         return new_imgs
 
     @staticmethod
-    def join_images(imgs: list) -> Image:
+    def join_images(imgs: list) -> Image.Image:
         """
         Stitches all the image squares into a new image.
 
@@ -177,8 +176,7 @@ class Splitify(commands.Cog):
                 raise commands.BadArgument('Number of squares cannot be higher than `193,600` :nerd:')
 
             img_bytes = await ctx.author.avatar_url.read()
-            loop = asyncio.get_event_loop()
-            bufferedio = await loop.run_in_executor(EXECUTOR, self.splitify, img_bytes, squares)
+            bufferedio = await self.bot.loop.run_in_executor(EXECUTOR, self.splitify, img_bytes, squares)
 
             file = discord.File(bufferedio, filename='splitifed.png')
 
