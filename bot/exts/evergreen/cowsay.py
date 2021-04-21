@@ -21,7 +21,6 @@ class Cowsay(commands.Cog):
         There are multiple character options to choose from. Here is a list:
 
         Cow
-        Trex
         Dragon
         Cheese
         Beavis
@@ -39,9 +38,17 @@ class Cowsay(commands.Cog):
         """
         text = text.lower()
         character = character.lower()
+        if len(text) >= 150:
+            embed = Embed(
+                title=choice(NEGATIVE_REPLIES),
+                description="The given text is too long! Please submit something under 150 characters.",
+                color=Colours.soft_red
+            )
+            await ctx.send(embed=embed)
+            return
         try:
             msgbody = get_output_string(character, text)
-        except BaseException:
+        except Exception:
             embed = Embed(
                 title=choice(NEGATIVE_REPLIES),
                 description="That is an invalid character! Please enter a valid one.",
