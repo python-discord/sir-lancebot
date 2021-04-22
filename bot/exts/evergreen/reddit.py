@@ -54,7 +54,7 @@ class Reddit(commands.Cog):
         if not posts:
             return await ctx.send('No posts available!')
 
-        if posts[1]["data"]["over_18"] is True:
+        if posts[0]["data"]["over_18"] is True:
             return await ctx.send(
                 "You cannot access this Subreddit as it is ment for those who "
                 "are 18 years or older."
@@ -63,7 +63,7 @@ class Reddit(commands.Cog):
         embed_titles = ""
 
         # Chooses k unique random elements from a population sequence or set.
-        random_posts = random.sample(posts, k=5)
+        random_posts = random.sample(posts, k=min(len(posts), 5))
 
         # -----------------------------------------------------------
         # This code below is bound of change when the emojis are added.
