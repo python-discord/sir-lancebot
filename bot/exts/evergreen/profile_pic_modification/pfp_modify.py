@@ -1,7 +1,9 @@
 import asyncio
 import json
 import logging
+import string
 import typing as t
+import unicodedata
 from concurrent.futures import ThreadPoolExecutor
 
 import discord
@@ -34,6 +36,23 @@ async def in_executor(func: t.Callable, *args) -> t.Any:
     log.trace(f"Running {func.__name__} in an executor.")
     loop = asyncio.get_event_loop()
     return await loop.run_in_executor(_EXECUTOR, func, *args)
+
+
+def file_safe_name(effect: str, display_name: str) -> str:
+    """Returns a file safe filename based on the given effect and display name."""
+    valid_filename_chars = f"-_.() {string.ascii_letters}{string.digits}"
+
+    file_name = FILENAME_STRING.format(effect=effect, author=display_name)
+
+    # Replace spaces
+    file_name = file_name.replace(" ", "_")
+
+    # Normalize unicode characters
+    cleaned_filename = unicodedata.normalize('NFKD', file_name).encode('ASCII', 'ignore').decode()
+
+    # Remove invalid filename characters
+    cleaned_filename = ''.join(c for c in cleaned_filename if c in valid_filename_chars)
+    return cleaned_filename
 
 
 class PfpModify(commands.Cog):
@@ -76,10 +95,7 @@ class PfpModify(commands.Cog):
                 return
 
             image_bytes = await member.avatar_url.read()
-            file_name = FILENAME_STRING.format(
-                effect="eightbit_avatar",
-                author=member.display_name
-            )
+            file_name = file_safe_name("eightbit_avatar", member.display_name)
 
             file = await in_executor(
                 PfpEffects.apply_effect,
@@ -135,10 +151,7 @@ class PfpModify(commands.Cog):
                 ctx.send = send_message  # Reassigns ctx.send
 
             image_bytes = await member.avatar_url_as(size=256).read()
-            file_name = FILENAME_STRING.format(
-                effect="easterified_avatar",
-                author=member.display_name
-            )
+            file_name = file_safe_name("easterified_avatar", member.display_name)
 
             file = await in_executor(
                 PfpEffects.apply_effect,
@@ -167,10 +180,7 @@ class PfpModify(commands.Cog):
     ) -> None:
         """Gets and sends the image in an embed. Used by the pride commands."""
         async with ctx.typing():
-            file_name = FILENAME_STRING.format(
-                effect="pride_avatar",
-                author=ctx.author.display_name
-            )
+            file_name = file_safe_name("pride_avatar", ctx.author.display_name)
 
             file = await in_executor(
                 PfpEffects.apply_effect,
@@ -280,10 +290,8 @@ class PfpModify(commands.Cog):
         async with ctx.typing():
             image_bytes = await member.avatar_url.read()
 
-            file_name = FILENAME_STRING.format(
-                effect="spooky_avatar",
-                author=member.display_name
-            )
+            file_name = file_safe_name("spooky_avatar", member.display_name)
+
             file = await in_executor(
                 PfpEffects.apply_effect,
                 image_bytes,
