@@ -22,7 +22,7 @@ class Bookmark(commands.Cog):
         self.bot = bot
 
     @staticmethod
-    def build_bookmark_dm(target_message: WrappedMessageConverter, title: str) -> discord.Embed:
+    def build_bookmark_dm(target_message: discord.Message, title: str) -> discord.Embed:
         """Builds the embed to DM the bookmark requester."""
         embed = discord.Embed(
             title=title,
@@ -51,7 +51,7 @@ class Bookmark(commands.Cog):
         self,
         channel: discord.TextChannel,
         user: discord.Member,
-        target_message: WrappedMessageConverter,
+        target_message: discord.Message,
         title: str
     ) -> None:
         """Sends the bookmark DM, or sends an error embed when a user bookmarks a message."""
@@ -67,7 +67,7 @@ class Bookmark(commands.Cog):
     @staticmethod
     async def send_reaction_embed(
         channel: discord.TextChannel,
-        target_message: WrappedMessageConverter
+        target_message: discord.Message
     ) -> discord.Message:
         """Sends an embed, with a reaction, so users can react to bookmark the message too."""
         message = await channel.send(
