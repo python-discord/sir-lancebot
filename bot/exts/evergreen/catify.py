@@ -6,6 +6,7 @@ from discord import AllowedMentions, Embed, Forbidden
 from discord.ext import commands
 
 from bot.constants import Cats, Colours, NEGATIVE_REPLIES
+from bot.utils import helpers
 
 
 class Catify(commands.Cog):
@@ -74,7 +75,7 @@ class Catify(commands.Cog):
                 else:
                     string_list.insert(random.randint(0, len(string_list)), random.choice(Cats.cats))
 
-            text = " ".join(string_list)
+            text = helpers.suppress_links(" ".join(string_list))
             await ctx.send(
                 f">>> {text}",
                 allowed_mentions=AllowedMentions.none()
