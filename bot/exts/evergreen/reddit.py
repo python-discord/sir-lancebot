@@ -56,7 +56,7 @@ class Reddit(commands.Cog):
 
         if posts[0]["data"]["over_18"] is True:
             return await ctx.send(
-                "You cannot access this Subreddit as it is ment for those who "
+                "You cannot access this Subreddit as it is meant for those who "
                 "are 18 years or older."
             )
 
