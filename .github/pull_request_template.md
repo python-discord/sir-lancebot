@@ -1,6 +1,6 @@
 ## Relevant Issues
 <!--
-Linking an issue approved by a Core Developer, which will have the "approved" label, is mandatory.
+It is mandatory to link to an issue that has been approved by a Core Developer, indicated by an "approved" label.
 Issues can be skipped with explicit core dev approval, but you have to link the discussion.
 -->
 
