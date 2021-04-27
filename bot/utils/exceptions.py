@@ -1,4 +1,4 @@
 class UserNotPlayingError(Exception):
-    """Will raised when user try to use game commands when not playing."""
+    """Will be raised when the users try to use game commands when they are not playing."""
 
     pass
