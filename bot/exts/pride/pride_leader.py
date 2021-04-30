@@ -25,13 +25,6 @@ class PrideLeader(commands.Cog):
         with PRIDE_LEADERS_RESOURCE.open(encoding="utf8") as data:
             self.pride = json.load(data)
 
-    def name_verifier(self, leader_name: str) -> Optional[str]:
-        """Verify leader name whether it is present in resources or not."""
-        leader_name = leader_name.title()
-        if leader_name in self.pride:
-            return leader_name
-        log.trace(f"Got a Invalid pride leader: {leader_name}")
-
     def invalid_embed_generate(self, pride_leader: str) -> discord.Embed:
         """
         Generates Invalid Embed.
@@ -112,8 +105,10 @@ class PrideLeader(commands.Cog):
         if not pride_leader_name:
             leader = random.choice([name for name in self.pride])
         else:
-            leader = self.name_verifier(pride_leader_name)
+            leader = self.pride.get(pride_leader_name.title())
             if not leader:
+                log.trace(f"Got a Invalid pride leader: {pride_leader_name}")
+
                 embed = self.invalid_embed_generate(pride_leader_name)
                 await ctx.send(embed=embed)
                 return
