@@ -33,7 +33,17 @@ class PrideLeader(commands.Cog):
         log.trace(f"Got a Invalid pride leader: {leader_name}")
 
     def invalid_embed_generate(self, pride_leader: str) -> discord.Embed:
-        """Generates Invalid Embed."""
+        """
+        Generates Invalid Embed.
+
+        The invalid embed contains a list of closely matched names of the invalid pride
+        leader the user gave. If no closely matched names are found it would list all
+        the available pride leader names.
+
+        Wikipedia is a useful place to learn about pride leaders and we don't have all
+        the pride leaders, so the bot would add a field containing the wikipedia
+        command to execute.
+        """
         embed = discord.Embed(
             color=constants.Colours.soft_red
         )
