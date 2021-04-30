@@ -22,7 +22,7 @@ _EXECUTOR = ThreadPoolExecutor(10)
 
 FILENAME_STRING = "{effect}_{author}.png"
 
-with open('bot/resources/pride/gender_options.json') as f:
+with open("bot/resources/pride/gender_options.json") as f:
     GENDER_OPTIONS = json.load(f)
 
 
@@ -48,10 +48,10 @@ def file_safe_name(effect: str, display_name: str) -> str:
     file_name = file_name.replace(" ", "_")
 
     # Normalize unicode characters
-    cleaned_filename = unicodedata.normalize('NFKD', file_name).encode('ASCII', 'ignore').decode()
+    cleaned_filename = unicodedata.normalize("NFKD", file_name).encode("ASCII", "ignore").decode()
 
     # Remove invalid filename characters
-    cleaned_filename = ''.join(c for c in cleaned_filename if c in valid_filename_chars)
+    cleaned_filename = "".join(c for c in cleaned_filename if c in valid_filename_chars)
     return cleaned_filename
 
 
@@ -79,7 +79,7 @@ class AvatarModify(commands.Cog):
 
         return member
 
-    @commands.group(aliases=('avatar_mod', 'pfp_mod'))
+    @commands.group(aliases=("avatar_mod", "pfp_mod"))
     async def avatar_modify(self, ctx: commands.Context) -> None:
         """Groups all of the pfp modifying commands to allow a single concurrency limit."""
         if not ctx.invoked_subcommand:
@@ -114,7 +114,7 @@ class AvatarModify(commands.Cog):
 
         await ctx.send(embed=embed, file=file)
 
-    @avatar_modify.command(aliases=["easterify"], root_aliases=("easterify", "avatareasterify"))
+    @avatar_modify.command(aliases=("easterify",), root_aliases=("easterify", "avatareasterify"))
     async def avatareasterify(self, ctx: commands.Context, *colours: t.Union[discord.Colour, str]) -> None:
         """
         This "Easterifies" the user's avatar.
@@ -200,7 +200,7 @@ class AvatarModify(commands.Cog):
             await ctx.send(file=file, embed=embed)
 
     @avatar_modify.group(
-        aliases=["avatarpride", "pridepfp", "prideprofile"],
+        aliases=("avatarpride", "pridepfp", "prideprofile"),
         root_aliases=("prideavatar", "avatarpride", "pridepfp", "prideprofile"),
         invoke_without_command=True
     )
@@ -272,12 +272,11 @@ class AvatarModify(commands.Cog):
         await ctx.send(embed=embed)
 
     @avatar_modify.command(
-        name='spookyavatar',
-        aliases=('savatar', 'spookify'),
-        root_aliases=('spookyavatar', 'spookify', 'savatar'),
-        brief='Spookify an user\'s avatar.'
+        aliases=("savatar", "spookify"),
+        root_aliases=("spookyavatar", "spookify", "savatar"),
+        brief="Spookify an user's avatar."
     )
-    async def spooky_avatar(self, ctx: commands.Context, member: discord.Member = None) -> None:
+    async def spookyavatar(self, ctx: commands.Context, member: discord.Member = None) -> None:
         """This "spookifies" the given user's avatar, with a random *spooky* effect."""
         if member is None:
             member = ctx.author
