@@ -79,7 +79,7 @@ class AvatarModify(commands.Cog):
 
         return member
 
-    @commands.group(aliases=("avatar_mod", "pfp_mod"))
+    @commands.group(aliases=("avatar_mod", "pfp_mod", "avatarmod", "pfpmod"))
     async def avatar_modify(self, ctx: commands.Context) -> None:
         """Groups all of the pfp modifying commands to allow a single concurrency limit."""
         if not ctx.invoked_subcommand:
