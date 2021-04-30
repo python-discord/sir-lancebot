@@ -12,7 +12,7 @@ from discord.ext import commands
 from discord.ext.commands.errors import BadArgument
 
 from bot.constants import Client, Colours, Emojis
-from bot.exts.evergreen.profile_pic_modification._effects import PfpEffects
+from bot.exts.evergreen.avatar_modification._effects import PfpEffects
 from bot.utils.extensions import invoke_help_command
 from bot.utils.halloween import spookifications
 
@@ -55,8 +55,8 @@ def file_safe_name(effect: str, display_name: str) -> str:
     return cleaned_filename
 
 
-class PfpModify(commands.Cog):
-    """Various commands for users to change their own profile picture."""
+class AvatarModify(commands.Cog):
+    """Various commands for users to apply affects to their own avatars."""
 
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
@@ -79,13 +79,13 @@ class PfpModify(commands.Cog):
 
         return member
 
-    @commands.group()
-    async def pfp_modify(self, ctx: commands.Context) -> None:
+    @commands.group(aliases=('avatar_mod', 'pfp_mod'))
+    async def avatar_modify(self, ctx: commands.Context) -> None:
         """Groups all of the pfp modifying commands to allow a single concurrency limit."""
         if not ctx.invoked_subcommand:
             await invoke_help_command(ctx)
 
-    @pfp_modify.command(name="8bitify", root_aliases=("8bitify",))
+    @avatar_modify.command(name="8bitify", root_aliases=("8bitify",))
     async def eightbit_command(self, ctx: commands.Context) -> None:
         """Pixelates your avatar and changes the palette to an 8bit one."""
         async with ctx.typing():
@@ -114,7 +114,7 @@ class PfpModify(commands.Cog):
 
         await ctx.send(embed=embed, file=file)
 
-    @pfp_modify.command(aliases=["easterify"], root_aliases=("easterify", "avatareasterify"))
+    @avatar_modify.command(aliases=["easterify"], root_aliases=("easterify", "avatareasterify"))
     async def avatareasterify(self, ctx: commands.Context, *colours: t.Union[discord.Colour, str]) -> None:
         """
         This "Easterifies" the user's avatar.
@@ -199,7 +199,7 @@ class PfpModify(commands.Cog):
             embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=ctx.author.avatar_url)
             await ctx.send(file=file, embed=embed)
 
-    @pfp_modify.group(
+    @avatar_modify.group(
         aliases=["avatarpride", "pridepfp", "prideprofile"],
         root_aliases=("prideavatar", "avatarpride", "pridepfp", "prideprofile"),
         invoke_without_command=True
@@ -271,7 +271,7 @@ class PfpModify(commands.Cog):
         )
         await ctx.send(embed=embed)
 
-    @pfp_modify.command(
+    @avatar_modify.command(
         name='spookyavatar',
         aliases=('savatar', 'spookify'),
         root_aliases=('spookyavatar', 'spookify', 'savatar'),
@@ -312,4 +312,4 @@ class PfpModify(commands.Cog):
 
 def setup(bot: commands.Bot) -> None:
     """Load the PfpModify cog."""
-    bot.add_cog(PfpModify(bot))
+    bot.add_cog(AvatarModify(bot))
