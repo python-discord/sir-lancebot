@@ -40,7 +40,7 @@ async def in_executor(func: t.Callable, *args) -> t.Any:
 
 def file_safe_name(effect: str, display_name: str) -> str:
     """Returns a file safe filename based on the given effect and display name."""
-    valid_filename_chars = f"-_.() {string.ascii_letters}{string.digits}"
+    valid_filename_chars = f"-_. {string.ascii_letters}{string.digits}"
 
     file_name = FILENAME_STRING.format(effect=effect, author=display_name)
 
