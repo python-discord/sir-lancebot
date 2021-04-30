@@ -46,6 +46,11 @@ class CommandErrorHandler(commands.Cog):
             logging.debug(f"Command {ctx.command} had its error already handled locally; ignoring.")
             return
 
+        parent_command = ""
+        if subctx := getattr(ctx, "subcontext", None):
+            parent_command = f"{ctx.command} "
+            ctx = subctx
+
         error = getattr(error, 'original', error)
         logging.debug(
             f"Error Encountered: {type(error).__name__} - {str(error)}, "
@@ -63,8 +68,9 @@ class CommandErrorHandler(commands.Cog):
 
         if isinstance(error, commands.UserInputError):
             self.revert_cooldown_counter(ctx.command, ctx.message)
+            usage = f"```{ctx.prefix}{parent_command}{ctx.command} {ctx.command.signature}```"
             embed = self.error_embed(
-                f"Your input was invalid: {error}\n\nUsage:\n```{ctx.prefix}{ctx.command} {ctx.command.signature}```"
+                f"Your input was invalid: {error}\n\nUsage:{usage}"
             )
             await ctx.send(embed=embed)
             return
@@ -95,7 +101,7 @@ class CommandErrorHandler(commands.Cog):
             self.revert_cooldown_counter(ctx.command, ctx.message)
             embed = self.error_embed(
                 "The argument you provided was invalid: "
-                f"{error}\n\nUsage:\n```{ctx.prefix}{ctx.command} {ctx.command.signature}```"
+                f"{error}\n\nUsage:\n```{ctx.prefix}{parent_command}{ctx.command} {ctx.command.signature}```"
             )
             await ctx.send(embed=embed)
             return

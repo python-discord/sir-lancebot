@@ -10,6 +10,8 @@ import discord
 from PIL import Image
 from discord.ext import commands
 
+from bot.utils import helpers
+
 log = logging.getLogger(__name__)
 
 with open(Path("bot/resources/evergreen/html_colours.json"), encoding="utf8") as f:
@@ -65,7 +67,7 @@ class EggDecorating(commands.Cog):
             if value:
                 colours[idx] = discord.Colour(value)
             else:
-                invalid.append(colour)
+                invalid.append(helpers.suppress_links(colour))
 
         if len(invalid) > 1:
             return await ctx.send(f"Sorry, I don't know these colours: {' '.join(invalid)}")
