@@ -7,6 +7,8 @@ from typing import List, Union
 
 from discord.ext import commands
 
+from bot.bot import Bot
+
 log = logging.getLogger(__name__)
 
 with Path("bot/resources/easter/bunny_names.json").open("r", encoding="utf8") as f:
@@ -15,9 +17,6 @@ with Path("bot/resources/easter/bunny_names.json").open("r", encoding="utf8") as
 
 class BunnyNameGenerator(commands.Cog):
     """Generate a random bunny name, or bunnify your Discord username!"""
-
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
 
     def find_separators(self, displayname: str) -> Union[List[str], None]:
         """Check if Discord name contains spaces so we can bunnify an individual word in the name."""
@@ -87,6 +86,6 @@ class BunnyNameGenerator(commands.Cog):
         await ctx.send(bunnified_name)
 
 
-def setup(bot: commands.Bot) -> None:
-    """Bunny Name Generator Cog load."""
+def setup(bot: Bot) -> None:
+    """Load the Bunny Name Generator Cog."""
     bot.add_cog(BunnyNameGenerator(bot))

@@ -3,6 +3,7 @@ import logging
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Colours
 from bot.constants import Tokens
 
@@ -12,7 +13,7 @@ log = logging.getLogger(__name__)
 class EarthPhotos(commands.Cog):
     """This cog contains the command for earth photos."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @commands.command(aliases=["earth"])
@@ -55,7 +56,7 @@ class EarthPhotos(commands.Cog):
             await ctx.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load the Earth Photos cog."""
     if not Tokens.unsplash_access_key:
         log.warning("No Unsplash access key found. Cog not loading.")

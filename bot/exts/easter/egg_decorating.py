@@ -10,6 +10,7 @@ import discord
 from PIL import Image
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.utils import helpers
 
 log = logging.getLogger(__name__)
@@ -32,9 +33,6 @@ IRREPLACEABLE = [
 
 class EggDecorating(commands.Cog):
     """Decorate some easter eggs!"""
-
-    def __init__(self, bot: commands.Bot) -> None:
-        self.bot = bot
 
     @staticmethod
     def replace_invalid(colour: str) -> Union[int, None]:
@@ -115,6 +113,6 @@ class EggDecorating(commands.Cog):
         return new_im
 
 
-def setup(bot: commands.bot) -> None:
-    """Egg decorating Cog load."""
+def setup(bot: Bot) -> None:
+    """Load the Egg decorating Cog."""
     bot.add_cog(EggDecorating(bot))

@@ -7,6 +7,7 @@ from pathlib import Path
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES
 
 log = logging.getLogger(__name__)
@@ -20,7 +21,7 @@ TIMELIMIT = 10
 class EasterRiddle(commands.Cog):
     """This cog contains the command for the Easter quiz!"""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
         self.winners = set()
         self.correct = ""
@@ -106,6 +107,6 @@ class EasterRiddle(commands.Cog):
             self.winners.add(message.author.mention)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Easter Riddle Cog load."""
     bot.add_cog(EasterRiddle(bot))

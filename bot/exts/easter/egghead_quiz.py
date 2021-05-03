@@ -8,6 +8,7 @@ from typing import Union
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Colours
 
 log = logging.getLogger(__name__)
@@ -31,8 +32,7 @@ TIMELIMIT = 30
 class EggheadQuiz(commands.Cog):
     """This cog contains the command for the Easter quiz!"""
 
-    def __init__(self, bot: commands.Bot) -> None:
-        self.bot = bot
+    def __init__(self) -> None:
         self.quiz_messages = {}
 
     @commands.command(aliases=["eggheadquiz", "easterquiz"])
@@ -114,6 +114,6 @@ class EggheadQuiz(commands.Cog):
             return await reaction.message.remove_reaction(reaction, user)
 
 
-def setup(bot: commands.Bot) -> None:
-    """Egghead Quiz Cog load."""
-    bot.add_cog(EggheadQuiz(bot))
+def setup(bot: Bot) -> None:
+    """Load the Egghead Quiz Cog."""
+    bot.add_cog(EggheadQuiz())

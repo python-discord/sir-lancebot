@@ -4,6 +4,8 @@ from json import load
 
 from discord.ext import commands
 
+from bot.bot import Bot
+
 log = logging.getLogger(__name__)
 
 with open("bot/resources/easter/april_fools_vids.json", encoding="utf-8") as f:
@@ -23,6 +25,6 @@ class AprilFoolVideos(commands.Cog):
         await ctx.send(f"Check out this April Fools' video by {channel}.\n\n{url}")
 
 
-def setup(bot: commands.Bot) -> None:
-    """April Fools' Cog load."""
-    bot.add_cog(AprilFoolVideos(bot))
+def setup(bot: Bot) -> None:
+    """Load the April Fools' Cog."""
+    bot.add_cog(AprilFoolVideos())
