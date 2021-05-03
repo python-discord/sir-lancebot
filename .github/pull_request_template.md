@@ -1,30 +1,20 @@
 ## Relevant Issues
-<!-- List relevant issue tickets here. -->
-<!-- Say "Closes #0" for issues that the PR resolves, replacing 0 with the issue number. -->
+<!--
+It is mandatory to link to an issue that has been approved by a Core Developer, indicated by an "approved" label.
+Issues can be skipped with explicit core dev approval, but you have to link the discussion.
+-->
+
+<!-- Link the issue by typing: "Closes #<number>" (Closes #0 to close issue 0 for example). -->
 
 
 ## Description
-<!-- Describe how you've implemented your changes. -->
-
-
-## Reasoning
-<!-- Outline the reasoning for how it's been implemented. -->
-
-
-## Screenshots
-<!-- Remove this section if the changes don't impact anything user-facing. -->
-<!-- You can add images by just copy pasting them directly in the editor. -->
-
-
-## Additional Details
-<!-- Delete this section if not applicable. -->
-
+<!-- Describe what changes you made, and how you've implemented them. -->
 
 ## Did you:
 <!-- These are required when contributing. -->
 <!-- Replace [ ] with [x] to mark items as done. -->
 
 - [ ] Join the [**Python Discord Community**](https://discord.gg/python)?
-- [ ] If dependencies have been added or updated, run `pipenv lock`?
-- [ ] **Lint your code** (`pipenv run lint`)?
-- [ ] Set the PR to **allow edits from contributors**?
+- [ ] Read all the comments in this template?
+- [ ] Ensure there is an issue open, or link relevant discord discussions?
+- [ ] Read the [contributing guidelines](https://pythondiscord.com/pages/contributing/contributing-guidelines/)?

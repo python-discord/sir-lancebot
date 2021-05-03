@@ -2,11 +2,15 @@ import asyncio
 import logging
 import logging.handlers
 import os
+from functools import partial, partialmethod
 from pathlib import Path
 
 import arrow
+from discord.ext import commands
 
+from bot.command import Command
 from bot.constants import Client
+from bot.group import Group
 
 
 # Configure the "TRACE" logging level (e.g. "log.trace(message)")
@@ -56,6 +60,7 @@ if root.handlers:
 logging.getLogger("discord").setLevel(logging.ERROR)
 logging.getLogger("websockets").setLevel(logging.ERROR)
 logging.getLogger("PIL").setLevel(logging.ERROR)
+logging.getLogger("matplotlib").setLevel(logging.ERROR)
 
 # Setup new logging configuration
 logging.basicConfig(
@@ -70,3 +75,12 @@ logging.getLogger().info('Logging initialization complete')
 # On Windows, the selector event loop is required for aiodns.
 if os.name == "nt":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
+
+# Monkey-patch discord.py decorators to use the both the Command and Group subclasses which supports root aliases.
+# Must be patched before any cogs are added.
+commands.command = partial(commands.command, cls=Command)
+commands.GroupMixin.command = partialmethod(commands.GroupMixin.command, cls=Command)
+
+commands.group = partial(commands.group, cls=Group)
+commands.GroupMixin.group = partialmethod(commands.GroupMixin.group, cls=Group)

@@ -12,6 +12,7 @@ from discord.ext.commands import BadArgument, Cog, Context, MessageConverter, cl
 from bot import utils
 from bot.bot import Bot
 from bot.constants import Client, Colours, Emojis
+from bot.utils import helpers
 
 log = logging.getLogger(__name__)
 
@@ -84,6 +85,7 @@ class Fun(Cog):
         if embed is not None:
             embed = Fun._convert_embed(conversion_func, embed)
         converted_text = conversion_func(text)
+        converted_text = helpers.suppress_links(converted_text)
         # Don't put >>> if only embed present
         if converted_text:
             converted_text = f">>> {converted_text.lstrip('> ')}"
@@ -102,6 +104,7 @@ class Fun(Cog):
         if embed is not None:
             embed = Fun._convert_embed(conversion_func, embed)
         converted_text = conversion_func(text)
+        converted_text = helpers.suppress_links(converted_text)
         # Don't put >>> if only embed present
         if converted_text:
             converted_text = f">>> {converted_text.lstrip('> ')}"
