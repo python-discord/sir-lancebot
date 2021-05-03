@@ -30,4 +30,4 @@ class DragNames(commands.Cog):
 
 def setup(bot: Bot) -> None:
     """Load the Drag Queen Cog."""
-    bot.add_cog(DragNames(bot))
+    bot.add_cog(DragNames())
