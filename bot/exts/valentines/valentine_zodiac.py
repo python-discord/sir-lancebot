@@ -9,6 +9,7 @@ from typing import Tuple, Union
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Colours
 
 log = logging.getLogger(__name__)
@@ -20,8 +21,7 @@ HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_hea
 class ValentineZodiac(commands.Cog):
     """A Cog that returns a counter compatible zodiac sign to the given user's zodiac sign."""
 
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
+    def __init__(self):
         self.zodiacs, self.zodiac_fact = self.load_comp_json()
 
     @staticmethod
@@ -141,6 +141,6 @@ class ValentineZodiac(commands.Cog):
         log.trace("Embed from date successfully sent.")
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Valentine zodiac Cog load."""
-    bot.add_cog(ValentineZodiac(bot))
+    bot.add_cog(ValentineZodiac())

@@ -6,6 +6,7 @@ from pathlib import Path
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Colours
 
 log = logging.getLogger(__name__)
@@ -18,9 +19,6 @@ with open(Path("bot/resources/valentines/date_ideas.json"), "r", encoding="utf8"
 
 class SaveTheDate(commands.Cog):
     """A cog that gives random suggestion for a Valentine's date."""
-
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
 
     @commands.command()
     async def savethedate(self, ctx: commands.Context) -> None:
@@ -36,6 +34,6 @@ class SaveTheDate(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Save the date Cog Load."""
-    bot.add_cog(SaveTheDate(bot))
+    bot.add_cog(SaveTheDate())

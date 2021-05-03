@@ -7,6 +7,7 @@ from random import choice
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Colours
 
 log = logging.getLogger(__name__)
@@ -46,7 +47,7 @@ class MyValenstate(commands.Cog):
         """Find the vacation spot(s) with the most matching characters to the invoking user."""
         eq_chars = collections.defaultdict(int)
         if name is None:
-            author = ctx.message.author.name.lower().replace(' ', '')
+            author = ctx.author.name.lower().replace(' ', '')
         else:
             author = name.lower().replace(' ', '')
 
@@ -60,7 +61,7 @@ class MyValenstate(commands.Cog):
 
         embed_title = "But there are more!"
         if len(matches) > 1:
-            leftovers = f"{', '.join(matches[:len(matches)-2])}, and {matches[len(matches)-1]}"
+            leftovers = f"{', '.join(matches[:-2])}, and {matches[-1]}"
             embed_text = f"You have {len(matches)} more matches, these being {leftovers}."
         elif len(matches) == 1:
             embed_title = "But there's another one!"
@@ -81,6 +82,6 @@ class MyValenstate(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Valenstate Cog load."""
     bot.add_cog(MyValenstate(bot))

@@ -6,6 +6,8 @@ from urllib import parse
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
+
 TMDB_API_KEY = environ.get("TMDB_API_KEY")
 
 log = logging.getLogger(__name__)
@@ -59,6 +61,6 @@ class RomanceMovieFinder(commands.Cog):
                 await ctx.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Romance movie Cog load."""
     bot.add_cog(RomanceMovieFinder(bot))

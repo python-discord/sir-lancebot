@@ -8,6 +8,7 @@ import discord
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
 
+from bot.bot import Bot
 from bot.constants import Channels, Colours, Lovefest, Month
 from bot.utils.decorators import in_month
 from bot.utils.extensions import invoke_help_command
@@ -50,7 +51,7 @@ class BeMyValentine(commands.Cog):
     async def add_role(self, ctx: commands.Context) -> None:
         """Adds the lovefest role."""
         user = ctx.author
-        role = discord.utils.get(ctx.guild.roles, id=Lovefest.role_id)
+        role = ctx.guild.get_role(Lovefest.role_id)
         if Lovefest.role_id not in [role.id for role in ctx.message.author.roles]:
             await user.add_roles(role)
             await ctx.send("The Lovefest role has been added !")
@@ -61,12 +62,12 @@ class BeMyValentine(commands.Cog):
     async def remove_role(self, ctx: commands.Context) -> None:
         """Removes the lovefest role."""
         user = ctx.author
-        role = discord.utils.get(ctx.guild.roles, id=Lovefest.role_id)
-        if Lovefest.role_id not in [role.id for role in ctx.message.author.roles]:
+        role = ctx.guild.get_role(Lovefest.role_id)
+        if role not in ctx.author.roles:
             await ctx.send("You dont have the lovefest role.")
         else:
             await user.remove_roles(role)
-            await ctx.send("The lovefest role has been successfully removed !")
+            await ctx.send("The lovefest role has been successfully removed!")
 
     @commands.cooldown(1, 1800, BucketType.user)
     @commands.group(name='bemyvalentine', invoke_without_command=True)
@@ -196,6 +197,6 @@ class BeMyValentine(commands.Cog):
         return valentine_compliment
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Be my Valentine Cog load."""
     bot.add_cog(BeMyValentine(bot))

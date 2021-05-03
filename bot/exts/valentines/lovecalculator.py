@@ -11,6 +11,8 @@ from discord import Member
 from discord.ext import commands
 from discord.ext.commands import BadArgument, Cog, clean_content
 
+from bot.bot import Bot
+
 log = logging.getLogger(__name__)
 
 with Path("bot/resources/valentines/love_matches.json").open(encoding="utf8") as file:
@@ -20,9 +22,6 @@ with Path("bot/resources/valentines/love_matches.json").open(encoding="utf8") as
 
 class LoveCalculator(Cog):
     """A cog for calculating the love between two people."""
-
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
 
     @commands.command(aliases=('love_calculator', 'love_calc'))
     @commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
@@ -93,6 +92,6 @@ class LoveCalculator(Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Love calculator Cog load."""
-    bot.add_cog(LoveCalculator(bot))
+    bot.add_cog(LoveCalculator())

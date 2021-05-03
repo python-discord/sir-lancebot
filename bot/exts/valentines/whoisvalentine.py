@@ -6,6 +6,7 @@ from random import choice
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Colours
 
 log = logging.getLogger(__name__)
@@ -16,9 +17,6 @@ with open(Path("bot/resources/valentines/valentine_facts.json"), "r", encoding="
 
 class ValentineFacts(commands.Cog):
     """A Cog for displaying facts about Saint Valentine."""
-
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
 
     @commands.command(aliases=('whoisvalentine', 'saint_valentine'))
     async def who_is_valentine(self, ctx: commands.Context) -> None:
@@ -47,6 +45,6 @@ class ValentineFacts(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Who is Valentine Cog load."""
-    bot.add_cog(ValentineFacts(bot))
+    bot.add_cog(ValentineFacts())
