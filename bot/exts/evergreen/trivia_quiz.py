@@ -62,10 +62,11 @@ class TriviaQuiz(commands.Cog):
 
         # Stop game if running.
         if self.game_status[ctx.channel.id] is True:
-            return await ctx.send(
+            await ctx.send(
                 f"Game is already running..."
                 f"do `{self.bot.command_prefix}quiz stop`"
             )
+            return
 
         # Send embed showing available categories if inputted category is invalid.
         if category is None:

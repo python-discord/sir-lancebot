@@ -54,7 +54,8 @@ class EggDecorating(commands.Cog):
         Discord colour names, HTML colour names, XKCD colour names and hex values are accepted.
         """
         if len(colours) < 2:
-            return await ctx.send("You must include at least 2 colours!")
+            await ctx.send("You must include at least 2 colours!")
+            return
 
         invalid = []
         colours = list(colours)
@@ -68,9 +69,11 @@ class EggDecorating(commands.Cog):
                 invalid.append(helpers.suppress_links(colour))
 
         if len(invalid) > 1:
-            return await ctx.send(f"Sorry, I don't know these colours: {' '.join(invalid)}")
+            await ctx.send(f"Sorry, I don't know these colours: {' '.join(invalid)}")
+            return
         elif len(invalid) == 1:
-            return await ctx.send(f"Sorry, I don't know the colour {invalid[0]}!")
+            await ctx.send(f"Sorry, I don't know the colour {invalid[0]}!")
+            return
 
         async with ctx.typing():
             # Expand list to 8 colours

@@ -51,15 +51,18 @@ class Reddit(commands.Cog):
         try:
             posts = data["data"]["children"]
         except KeyError:
-            return await ctx.send('Subreddit not found!')
+            await ctx.send('Subreddit not found!')
+            return
         if not posts:
-            return await ctx.send('No posts available!')
+            await ctx.send('No posts available!')
+            return
 
         if posts[0]["data"]["over_18"] is True:
-            return await ctx.send(
+            await ctx.send(
                 "You cannot access this Subreddit as it is meant for those who "
                 "are 18 years or older."
             )
+            return
 
         embed_titles = ""
 

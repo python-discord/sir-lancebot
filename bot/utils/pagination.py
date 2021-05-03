@@ -79,7 +79,7 @@ class LinePaginator(Paginator):
                        prefix: str = "", suffix: str = "", max_lines: Optional[int] = None,
                        max_size: int = 500, empty: bool = True, restrict_to_user: User = None,
                        timeout: int = 300, footer_text: str = None, url: str = None,
-                       exception_on_empty_embed: bool = False):
+                       exception_on_empty_embed: bool = False) -> None:
         """
         Use a paginator and set of reactions to provide pagination over a set of lines.
 
@@ -157,7 +157,8 @@ class LinePaginator(Paginator):
                 log.trace(f"Setting embed url to '{url}'")
 
             log.debug("There's less than two pages, so we won't paginate - sending single page on its own")
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
+            return
         else:
             if footer_text:
                 embed.set_footer(text=f"{footer_text} (Page {current_page + 1}/{len(paginator.pages)})")
@@ -302,7 +303,7 @@ class ImagePaginator(Paginator):
     @classmethod
     async def paginate(cls, pages: List[Tuple[str, str]], ctx: Context, embed: Embed,
                        prefix: str = "", suffix: str = "", timeout: int = 300,
-                       exception_on_empty_embed: bool = False):
+                       exception_on_empty_embed: bool = False) -> None:
         """
         Use a paginator and set of reactions to provide pagination over a set of title/image pairs.
 
@@ -352,7 +353,8 @@ class ImagePaginator(Paginator):
             embed.set_image(url=image)
 
         if len(paginator.pages) <= 1:
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
+            return
 
         embed.set_footer(text=f"Page {current_page + 1}/{len(paginator.pages)}")
         message = await ctx.send(embed=embed)

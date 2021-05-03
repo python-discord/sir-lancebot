@@ -35,7 +35,8 @@ class EasterRiddle(commands.Cog):
         The duration of the hint interval can be configured by changing the TIMELIMIT constant in this file.
         """
         if self.current_channel:
-            return await ctx.send(f"A riddle is already being solved in {self.current_channel.mention}!")
+            await ctx.send(f"A riddle is already being solved in {self.current_channel.mention}!")
+            return
 
         # Don't let users start in a DM
         if not ctx.guild:

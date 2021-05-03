@@ -643,7 +643,8 @@ class Snakes(Cog):
                 data = await self._get_snek(name)
 
             if data.get('error'):
-                return await ctx.send('Could not fetch data from Wikipedia.')
+                await ctx.send('Could not fetch data from Wikipedia.')
+                return
 
             description = data["info"]
 
@@ -900,7 +901,8 @@ class Snakes(Cog):
             color=SNAKE_COLOR
         )
 
-        return await ctx.send(embed=embed)
+        await ctx.send(embed=embed)
+        return
 
     @snakes_group.command(name='sal')
     @locked()

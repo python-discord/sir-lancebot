@@ -379,10 +379,12 @@ class Battleship(commands.Cog):
         Make sure you have your DMs open so that the bot can message you.
         """
         if self.already_playing(ctx.author):
-            return await ctx.send("You're already playing a game!")
+            await ctx.send("You're already playing a game!")
+            return
 
         if ctx.author in self.waiting:
-            return await ctx.send("You've already sent out a request for a player 2.")
+            await ctx.send("You've already sent out a request for a player 2.")
+            return
 
         announcement = await ctx.send(
             "**Battleship**: A new game is about to start!\n"
@@ -402,12 +404,14 @@ class Battleship(commands.Cog):
         except asyncio.TimeoutError:
             self.waiting.remove(ctx.author)
             await announcement.delete()
-            return await ctx.send(f"{ctx.author.mention} Seems like there's no one here to play...")
+            await ctx.send(f"{ctx.author.mention} Seems like there's no one here to play...")
+            return
 
         if str(reaction.emoji) == CROSS_EMOJI:
             self.waiting.remove(ctx.author)
             await announcement.delete()
-            return await ctx.send(f"{ctx.author.mention} Game cancelled.")
+            await ctx.send(f"{ctx.author.mention} Game cancelled.")
+            return
 
         await announcement.delete()
         self.waiting.remove(ctx.author)
