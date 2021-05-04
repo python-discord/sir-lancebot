@@ -10,7 +10,7 @@ from async_rediscache import RedisCache
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Channels, Month, NEGATIVE_REPLIES, Tokens, WHITELISTED_CHANNELS
+from bot.constants import Channels, Colours, Month, NEGATIVE_REPLIES, Tokens, WHITELISTED_CHANNELS
 from bot.utils.decorators import in_month, whitelist_override
 
 log = logging.getLogger(__name__)
@@ -157,7 +157,7 @@ class HacktoberStats(commands.Cog):
 
         stats_embed = discord.Embed(
             title=f"{github_username}'s Hacktoberfest",
-            color=0x9c4af7,
+            color=Colours.purple,
             description=(
                 f"{github_username} has made {n} valid "
                 f"{self._contributionator(n)} in "
@@ -227,7 +227,7 @@ class HacktoberStats(commands.Cog):
             f"+created:{date_range}"
             f"&per_page={per_page}"
         )
-        log.logProcesses.debug(f"GitHub query URL generated: {query_url}")
+        log.debug(f"GitHub query URL generated: {query_url}")
 
         jsonresp = await self._fetch_url(query_url, REQUEST_HEADERS)
         if "message" in jsonresp:
