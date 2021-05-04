@@ -19,9 +19,6 @@ with open(Path("bot/resources/valentines/valenstates.json"), "r", encoding="utf8
 class MyValenstate(commands.Cog):
     """A Cog to find your most likely Valentine's vacation destination."""
 
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
-
     def levenshtein(self, source: str, goal: str) -> int:
         """Calculates the Levenshtein Distance between source and goal."""
         if len(source) < len(goal):
@@ -83,5 +80,5 @@ class MyValenstate(commands.Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Valenstate Cog load."""
-    bot.add_cog(MyValenstate(bot))
+    """Load the Valenstate Cog."""
+    bot.add_cog(MyValenstate())

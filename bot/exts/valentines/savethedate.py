@@ -35,5 +35,5 @@ class SaveTheDate(commands.Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Save the date Cog Load."""
+    """Load the Save the date Cog."""
     bot.add_cog(SaveTheDate())

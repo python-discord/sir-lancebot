@@ -118,4 +118,4 @@ class EggDecorating(commands.Cog):
 
 def setup(bot: Bot) -> None:
     """Load the Egg decorating Cog."""
-    bot.add_cog(EggDecorating(bot))
+    bot.add_cog(EggDecorating())

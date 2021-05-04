@@ -12,9 +12,6 @@ log = logging.getLogger(__name__)
 class TimeLeft(commands.Cog):
     """A Cog that tells you how long left until Hacktober is over!"""
 
-    def __init__(self, bot: Bot):
-        self.bot = bot
-
     def in_hacktober(self) -> bool:
         """Return True if the current time is within Hacktoberfest."""
         _, end, start = self.load_date()
@@ -68,4 +65,4 @@ class TimeLeft(commands.Cog):
 
 def setup(bot: Bot) -> None:
     """Load the Time Left Cog."""
-    bot.add_cog(TimeLeft(bot))
+    bot.add_cog(TimeLeft())

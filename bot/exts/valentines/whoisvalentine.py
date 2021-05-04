@@ -46,5 +46,5 @@ class ValentineFacts(commands.Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Who is Valentine Cog load."""
+    """Load the Who is Valentine Cog."""
     bot.add_cog(ValentineFacts())

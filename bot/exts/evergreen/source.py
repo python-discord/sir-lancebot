@@ -104,4 +104,4 @@ class BotSource(commands.Cog):
 
 def setup(bot: Bot) -> None:
     """Load the BotSource cog."""
-    bot.add_cog(BotSource(bot))
+    bot.add_cog(BotSource())

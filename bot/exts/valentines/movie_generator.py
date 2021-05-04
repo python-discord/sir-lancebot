@@ -16,7 +16,7 @@ log = logging.getLogger(__name__)
 class RomanceMovieFinder(commands.Cog):
     """A Cog that returns a random romance movie suggestion to a user."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @commands.command(name="romancemovie")
@@ -62,5 +62,5 @@ class RomanceMovieFinder(commands.Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Romance movie Cog load."""
+    """Load the Romance movie Cog."""
     bot.add_cog(RomanceMovieFinder(bot))

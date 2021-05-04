@@ -21,7 +21,7 @@ HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_hea
 class BeMyValentine(commands.Cog):
     """A cog that sends Valentines to other users!"""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
         self.valentines = self.load_json()
 
@@ -198,5 +198,5 @@ class BeMyValentine(commands.Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Be my Valentine Cog load."""
+    """Load the Be my Valentine Cog."""
     bot.add_cog(BeMyValentine(bot))

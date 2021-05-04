@@ -66,4 +66,4 @@ class ConvoStarters(commands.Cog):
 
 def setup(bot: Bot) -> None:
     """Load the ConvoStarters cog."""
-    bot.add_cog(ConvoStarters(bot))
+    bot.add_cog(ConvoStarters())

@@ -60,4 +60,4 @@ class Bookmark(commands.Cog):
 
 def setup(bot: Bot) -> None:
     """Load the Bookmark cog."""
-    bot.add_cog(Bookmark(bot))
+    bot.add_cog(Bookmark())

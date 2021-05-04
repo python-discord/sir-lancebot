@@ -5,15 +5,13 @@ from typing import Optional
 from discord import AllowedMentions, Embed, Forbidden
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Cats, Colours, NEGATIVE_REPLIES
 from bot.utils import helpers
 
 
 class Catify(commands.Cog):
     """Cog for the catify command."""
-
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
 
     @commands.command(aliases=["ᓚᘏᗢify", "ᓚᘏᗢ"])
     async def catify(self, ctx: commands.Context, *, text: Optional[str]) -> None:
@@ -82,6 +80,6 @@ class Catify(commands.Cog):
             )
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Loads the catify cog."""
-    bot.add_cog(Catify(bot))
+    bot.add_cog(Catify())

@@ -120,4 +120,4 @@ class Emojis(commands.Cog):
 
 def setup(bot: Bot) -> None:
     """Load the Emojis cog."""
-    bot.add_cog(Emojis(bot))
+    bot.add_cog(Emojis())

@@ -11,6 +11,7 @@ from aiohttp import client_exceptions
 from discord.ext import commands
 from discord.ext.commands.errors import BadArgument
 
+from bot.bot import Bot
 from bot.constants import Client, Colours, Emojis
 from bot.exts.evergreen.avatar_modification._effects import PfpEffects
 from bot.utils.extensions import invoke_help_command
@@ -58,7 +59,7 @@ def file_safe_name(effect: str, display_name: str) -> str:
 class AvatarModify(commands.Cog):
     """Various commands for users to apply affects to their own avatars."""
 
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
     async def _fetch_member(self, member_id: int) -> t.Optional[discord.Member]:
@@ -309,6 +310,6 @@ class AvatarModify(commands.Cog):
             await ctx.send(file=file, embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load the PfpModify cog."""
     bot.add_cog(AvatarModify(bot))

@@ -23,4 +23,4 @@ class Speedrun(commands.Cog):
 
 def setup(bot: Bot) -> None:
     """Load the Speedrun cog."""
-    bot.add_cog(Speedrun(bot))
+    bot.add_cog(Speedrun())

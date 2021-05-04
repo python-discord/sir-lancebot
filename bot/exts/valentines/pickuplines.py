@@ -38,5 +38,5 @@ class PickupLine(commands.Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Pickup lines Cog load."""
+    """Load the Pickup lines Cog."""
     bot.add_cog(PickupLine())
