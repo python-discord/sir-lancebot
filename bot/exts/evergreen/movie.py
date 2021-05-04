@@ -53,7 +53,7 @@ class Movie(Cog):
     def __init__(self, bot: Bot):
         self.http_session: ClientSession = bot.http_session
 
-    @group(name='movies', aliases=['movie'], invoke_without_command=True)
+    @group(name="movies", aliases=["movie"], invoke_without_command=True)
     async def movies(self, ctx: Context, genre: str = "", amount: int = 5) -> None:
         """
         Get random movies by specifying genre. Also support amount parameter, that define how much movies will be shown.
@@ -89,7 +89,7 @@ class Movie(Cog):
 
         # Get movies list from TMDB, check if results key in result. When not, raise error.
         movies = await self.get_movies_list(self.http_session, MovieGenres[genre].value, page)
-        if 'results' not in movies.keys():
+        if "results" not in movies.keys():
             err_msg = f"There is problem while making TMDB API request. Response Code: {result['status_code']}, " \
                       f"{result['status_message']}."
             await ctx.send(err_msg)
@@ -101,7 +101,7 @@ class Movie(Cog):
 
         await ImagePaginator.paginate(pages, ctx, embed)
 
-    @movies.command(name='genres', aliases=['genre', 'g'])
+    @movies.command(name="genres", aliases=["genre", "g"])
     async def genres(self, ctx: Context) -> None:
         """Show all currently available genres for .movies command."""
         await ctx.send(f"Current available genres: {', '.join('`' + genre.name + '`' for genre in MovieGenres)}")
@@ -130,7 +130,7 @@ class Movie(Cog):
         pages = []
 
         for i in range(amount):
-            movie_id = movies['results'][i]['id']
+            movie_id = movies["results"][i]["id"]
             movie = await self.get_movie(client, movie_id)
 
             page, img = await self.create_page(movie)
@@ -151,7 +151,7 @@ class Movie(Cog):
 
         # Add title + tagline (if not empty)
         text += f"**{movie['title']}**\n"
-        if movie['tagline']:
+        if movie["tagline"]:
             text += f"{movie['tagline']}\n\n"
         else:
             text += "\n"
@@ -162,8 +162,8 @@ class Movie(Cog):
 
         text += "__**Production Information**__\n"
 
-        companies = movie['production_companies']
-        countries = movie['production_countries']
+        companies = movie["production_companies"]
+        countries = movie["production_countries"]
 
         text += f"**Made by:** {', '.join(company['name'] for company in companies)}\n"
         text += f"**Made in:** {', '.join(country['name'] for country in countries)}\n\n"
@@ -173,8 +173,8 @@ class Movie(Cog):
         budget = f"{movie['budget']:,d}" if movie['budget'] else "?"
         revenue = f"{movie['revenue']:,d}" if movie['revenue'] else "?"
 
-        if movie['runtime'] is not None:
-            duration = divmod(movie['runtime'], 60)
+        if movie["runtime"] is not None:
+            duration = divmod(movie["runtime"], 60)
         else:
             duration = ("?", "?")
 
@@ -182,7 +182,7 @@ class Movie(Cog):
         text += f"**Revenue:** ${revenue}\n"
         text += f"**Duration:** {f'{duration[0]} hour(s) {duration[1]} minute(s)'}\n\n"
 
-        text += movie['overview']
+        text += movie["overview"]
 
         img = f"http://image.tmdb.org/t/p/w200{movie['poster_path']}"
 

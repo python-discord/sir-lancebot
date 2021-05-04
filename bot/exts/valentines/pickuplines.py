@@ -25,14 +25,14 @@ class PickupLine(commands.Cog):
 
         Note that most of them are very cheesy.
         """
-        random_line = random.choice(pickup_lines['lines'])
+        random_line = random.choice(pickup_lines["lines"])
         embed = discord.Embed(
-            title=':cheese: Your pickup line :cheese:',
-            description=random_line['line'],
+            title=":cheese: Your pickup line :cheese:",
+            description=random_line["line"],
             color=Colours.pink
         )
         embed.set_thumbnail(
-            url=random_line.get('image', pickup_lines['placeholder'])
+            url=random_line.get("image", pickup_lines["placeholder"])
         )
         await ctx.send(embed=embed)
 

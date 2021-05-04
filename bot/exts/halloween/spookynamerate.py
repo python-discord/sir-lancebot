@@ -81,7 +81,7 @@ class SpookyNameRate(Cog):
     # The data cache stores small information such as the current name that is going on and whether it is the first time
     # the bot is running
     data = RedisCache()
-    debug = getenv('SPOOKYNAMERATE_DEBUG', False)  # Enable if you do not want to limit the commands to October or if
+    debug = getenv("SPOOKYNAMERATE_DEBUG", False)  # Enable if you do not want to limit the commands to October or if
     # you do not want to wait till 12 UTC. Note: if debug is enabled and you run `.cogs reload spookynamerate`, it
     # will automatically start the scoring and announcing the result (without waiting for 12, so do not expect it to.).
     # Also, it won't wait for the two hours (when the poll closes).

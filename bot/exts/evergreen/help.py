@@ -22,14 +22,14 @@ from bot.utils.pagination import (
 DELETE_EMOJI = Emojis.trashcan
 
 REACTIONS = {
-    FIRST_EMOJI: 'first',
-    LEFT_EMOJI: 'back',
-    RIGHT_EMOJI: 'next',
-    LAST_EMOJI: 'end',
-    DELETE_EMOJI: 'stop',
+    FIRST_EMOJI: "first",
+    LEFT_EMOJI: "back",
+    RIGHT_EMOJI: "next",
+    LAST_EMOJI: "end",
+    DELETE_EMOJI: "stop",
 }
 
-Cog = namedtuple('Cog', ['name', 'description', 'commands'])
+Cog = namedtuple("Cog", ["name", "description", "commands"])
 
 log = logging.getLogger(__name__)
 
@@ -87,7 +87,7 @@ class HelpSession:
 
         # set the query details for the session
         if command:
-            query_str = ' '.join(command)
+            query_str = " ".join(command)
             self.query = self._get_query(query_str)
             self.description = self.query.description or self.query.help
         else:
@@ -191,7 +191,7 @@ class HelpSession:
         self.reset_timeout()
 
         # Run relevant action method
-        action = getattr(self, f'do_{REACTIONS[emoji]}', None)
+        action = getattr(self, f"do_{REACTIONS[emoji]}", None)
         if action:
             await action()
 
@@ -234,11 +234,11 @@ class HelpSession:
         if cmd.cog:
             try:
                 if cmd.cog.category:
-                    return f'**{cmd.cog.category}**'
+                    return f"**{cmd.cog.category}**"
             except AttributeError:
                 pass
 
-            return f'**{cmd.cog_name}**'
+            return f"**{cmd.cog_name}**"
         else:
             return "**\u200bNo Category:**"
 
@@ -262,47 +262,47 @@ class HelpSession:
 
                 # if default is not an empty string or None
                 if show_default:
-                    results.append(f'[{name}={param.default}]')
+                    results.append(f"[{name}={param.default}]")
                 else:
-                    results.append(f'[{name}]')
+                    results.append(f"[{name}]")
 
             # if variable length argument
             elif param.kind == param.VAR_POSITIONAL:
-                results.append(f'[{name}...]')
+                results.append(f"[{name}...]")
 
             # if required
             else:
-                results.append(f'<{name}>')
+                results.append(f"<{name}>")
 
         return f"{cmd.name} {' '.join(results)}"
 
     async def build_pages(self) -> None:
         """Builds the list of content pages to be paginated through in the help message, as a list of str."""
         # Use LinePaginator to restrict embed line height
-        paginator = LinePaginator(prefix='', suffix='', max_lines=self._max_lines)
+        paginator = LinePaginator(prefix="", suffix="", max_lines=self._max_lines)
 
         prefix = constants.Client.prefix
 
         # show signature if query is a command
         if isinstance(self.query, commands.Command):
             signature = self._get_command_params(self.query)
-            parent = self.query.full_parent_name + ' ' if self.query.parent else ''
-            paginator.add_line(f'**```{prefix}{parent}{signature}```**')
+            parent = self.query.full_parent_name + " " if self.query.parent else ""
+            paginator.add_line(f"**```{prefix}{parent}{signature}```**")
 
             aliases = [f"`{alias}`" if not parent else f"`{parent} {alias}`" for alias in self.query.aliases]
             aliases += [f"`{alias}`" for alias in getattr(self.query, "root_aliases", ())]
             aliases = ", ".join(sorted(aliases))
             if aliases:
-                paginator.add_line(f'**Can also use:** {aliases}\n')
+                paginator.add_line(f"**Can also use:** {aliases}\n")
 
             if not await self.query.can_run(self._ctx):
-                paginator.add_line('***You cannot run this command.***\n')
+                paginator.add_line("***You cannot run this command.***\n")
 
         if isinstance(self.query, Cog):
-            paginator.add_line(f'**{self.query.name}**')
+            paginator.add_line(f"**{self.query.name}**")
 
         if self.description:
-            paginator.add_line(f'*{self.description}*')
+            paginator.add_line(f"*{self.description}*")
 
         # list all children commands of the queried object
         if isinstance(self.query, (commands.GroupMixin, Cog)):
@@ -319,13 +319,13 @@ class HelpSession:
                 return
 
             if isinstance(self.query, Cog):
-                grouped = (('**Commands:**', self.query.commands),)
+                grouped = (("**Commands:**", self.query.commands),)
 
             elif isinstance(self.query, commands.Command):
-                grouped = (('**Subcommands:**', self.query.commands),)
+                grouped = (("**Subcommands:**", self.query.commands),)
 
                 # don't show prefix for subcommands
-                prefix = ''
+                prefix = ""
 
             # otherwise sort and organise all commands into categories
             else:
@@ -347,7 +347,7 @@ class HelpSession:
                         continue
 
                     # see if the user can run the command
-                    strikeout = ''
+                    strikeout = ""
 
                     # Patch to make the !help command work outside of #bot-commands again
                     # This probably needs a proper rewrite, but this will make it work in
@@ -361,16 +361,16 @@ class HelpSession:
                         # skip if we don't show commands they can't run
                         if self._only_can_run:
                             continue
-                        strikeout = '~~'
+                        strikeout = "~~"
 
                     signature = self._get_command_params(command)
                     info = f"{strikeout}**`{prefix}{signature}`**{strikeout}"
 
                     # handle if the command has no docstring
                     if command.short_doc:
-                        cat_cmds.append(f'{info}\n*{command.short_doc}*')
+                        cat_cmds.append(f"{info}\n*{command.short_doc}*")
                     else:
-                        cat_cmds.append(f'{info}\n*No details provided.*')
+                        cat_cmds.append(f"{info}\n*No details provided.*")
 
                 # state var for if the category should be added next
                 print_cat = 1
@@ -379,7 +379,7 @@ class HelpSession:
                 for details in cat_cmds:
 
                     # keep details together, paginating early if it won't fit
-                    lines_adding = len(details.split('\n')) + print_cat
+                    lines_adding = len(details.split("\n")) + print_cat
                     if paginator._linecount + lines_adding > self._max_lines:
                         paginator._linecount = 0
                         new_page = True
@@ -390,7 +390,7 @@ class HelpSession:
 
                     if print_cat:
                         if new_page:
-                            paginator.add_line('')
+                            paginator.add_line("")
                         paginator.add_line(category)
                         print_cat = 0
 
@@ -412,7 +412,7 @@ class HelpSession:
 
         page_count = len(self._pages)
         if page_count > 1:
-            embed.set_footer(text=f'Page {self._current_page+1} / {page_count}')
+            embed.set_footer(text=f"Page {self._current_page+1} / {page_count}")
 
         return embed
 
@@ -496,7 +496,7 @@ class HelpSession:
 class Help(DiscordCog):
     """Custom Embed Pagination Help feature."""
 
-    @commands.command('help')
+    @commands.command("help")
     async def new_help(self, ctx: Context, *commands) -> None:
         """Shows Command Help."""
         try:
@@ -507,8 +507,8 @@ class Help(DiscordCog):
             embed.title = str(error)
 
             if error.possible_matches:
-                matches = '\n'.join(error.possible_matches.keys())
-                embed.description = f'**Did you mean:**\n`{matches}`'
+                matches = "\n".join(error.possible_matches.keys())
+                embed.description = f"**Did you mean:**\n`{matches}`"
 
             await ctx.send(embed=embed)
 
@@ -519,7 +519,7 @@ def unload(bot: Bot) -> None:
 
     This is run if the cog raises an exception on load, or if the extension is unloaded.
     """
-    bot.remove_command('help')
+    bot.remove_command("help")
     bot.add_command(bot._old_help)
 
 
@@ -534,8 +534,8 @@ def setup(bot: Bot) -> None:
     If an exception is raised during the loading of the cog, `unload` will be called in order to
     reinstate the original help command.
     """
-    bot._old_help = bot.get_command('help')
-    bot.remove_command('help')
+    bot._old_help = bot.get_command("help")
+    bot.remove_command("help")
 
     try:
         bot.add_cog(Help())

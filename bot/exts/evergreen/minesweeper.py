@@ -38,7 +38,7 @@ class CoordinateConverter(commands.Converter):
     async def convert(self, ctx: commands.Context, coordinate: str) -> typing.Tuple[int, int]:
         """Take in a coordinate string and turn it into an (x, y) tuple."""
         if not 2 <= len(coordinate) <= 3:
-            raise commands.BadArgument('Invalid co-ordinate provided.')
+            raise commands.BadArgument("Invalid co-ordinate provided.")
 
         coordinate = coordinate.lower()
         if coordinate[0].isalpha():
@@ -51,7 +51,7 @@ class CoordinateConverter(commands.Converter):
         if not digit.isdigit():
             raise commands.BadArgument
 
-        x = ord(letter) - ord('a')
+        x = ord(letter) - ord("a")
         y = int(digit) - 1
 
         if (not 0 <= x <= 9) or (not 0 <= y <= 9):
@@ -82,7 +82,7 @@ class Minesweeper(commands.Cog):
     def __init__(self, _bot: Bot) -> None:
         self.games: GamesDict = {}  # Store the currently running games
 
-    @commands.group(name='minesweeper', aliases=('ms',), invoke_without_command=True)
+    @commands.group(name="minesweeper", aliases=("ms",), invoke_without_command=True)
     async def minesweeper_group(self, ctx: commands.Context) -> None:
         """Commands for Playing Minesweeper."""
         await invoke_help_command(ctx)

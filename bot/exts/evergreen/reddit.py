@@ -21,18 +21,18 @@ class Reddit(commands.Cog):
         """Send a get request to the reddit API and get json response."""
         session = self.bot.http_session
         params = {
-            'limit': 50
+            "limit": 50
         }
         headers = {
-            'User-Agent': 'Iceman'
+            "User-Agent": "Iceman"
         }
 
         async with session.get(url=url, params=params, headers=headers) as response:
             return await response.json()
 
-    @commands.command(name='reddit')
+    @commands.command(name="reddit")
     @commands.cooldown(1, 10, BucketType.user)
-    async def get_reddit(self, ctx: commands.Context, subreddit: str = 'python', sort: str = "hot") -> None:
+    async def get_reddit(self, ctx: commands.Context, subreddit: str = "python", sort: str = "hot") -> None:
         """
         Fetch reddit posts by using this command.
 
@@ -46,15 +46,15 @@ class Reddit(commands.Cog):
             await ctx.send(f"Invalid sorting: {sort}\nUsing default sorting: `Hot`")
             sort = "hot"
 
-        data = await self.fetch(f'https://www.reddit.com/r/{subreddit}/{sort}/.json')
+        data = await self.fetch(f"https://www.reddit.com/r/{subreddit}/{sort}/.json")
 
         try:
             posts = data["data"]["children"]
         except KeyError:
-            await ctx.send('Subreddit not found!')
+            await ctx.send("Subreddit not found!")
             return
         if not posts:
-            await ctx.send('No posts available!')
+            await ctx.send("No posts available!")
             return
 
         if posts[0]["data"]["over_18"] is True:
@@ -106,12 +106,12 @@ class Reddit(commands.Cog):
                 post_stats = f"{image_emoji} "
                 image_url = post_url
 
-            votes = f'{upvote_emoji}{post["data"]["ups"]}'
-            comments = f'{comment_emoji}\u2002{ post["data"]["num_comments"]}'
+            votes = f"{upvote_emoji}{post['data']['ups']}"
+            comments = f"{comment_emoji}\u2002{ post['data']['num_comments']}"
             post_stats += (
                 f"\u2002{votes}\u2003"
                 f"{comments}"
-                f'\u2003{user_emoji}\u2002{post["data"]["author"]}\n'
+                f"\u2003{user_emoji}\u2002{post['data']['author']}\n"
             )
             embed_titles += f"{post_stats}\n"
             page_text = f"**[{post_title}]({post_url})**\n{post_stats}\n{post['data']['selftext'][0:200]}"

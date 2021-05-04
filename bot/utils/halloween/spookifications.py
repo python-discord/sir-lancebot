@@ -13,16 +13,16 @@ def inversion(im: Image) -> Image:
 
     Returns an inverted image when supplied with an Image object.
     """
-    im = im.convert('RGB')
+    im = im.convert("RGB")
     inv = ImageOps.invert(im)
     return inv
 
 
 def pentagram(im: Image) -> Image:
     """Adds pentagram to the image."""
-    im = im.convert('RGB')
+    im = im.convert("RGB")
     wt, ht = im.size
-    penta = Image.open('bot/resources/halloween/bloody-pentagram.png')
+    penta = Image.open("bot/resources/halloween/bloody-pentagram.png")
     penta = penta.resize((wt, ht))
     im.paste(penta, (0, 0), penta)
     return im
@@ -35,9 +35,9 @@ def bat(im: Image) -> Image:
     The bat silhoutte is of a size at least one-fifths that of the original image and may be rotated
     up to 90 degrees anti-clockwise.
     """
-    im = im.convert('RGB')
+    im = im.convert("RGB")
     wt, ht = im.size
-    bat = Image.open('bot/resources/halloween/bat-clipart.png')
+    bat = Image.open("bot/resources/halloween/bat-clipart.png")
     bat_size = randint(wt//10, wt//7)
     rot = randint(0, 90)
     bat = bat.resize((bat_size, bat_size))

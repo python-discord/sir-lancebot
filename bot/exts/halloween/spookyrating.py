@@ -46,16 +46,16 @@ class SpookyRating(commands.Cog):
         _, data = SPOOKY_DATA[index]
 
         embed = discord.Embed(
-            title=data['title'],
-            description=f'{who} scored {spooky_percent}%!',
+            title=data["title"],
+            description=f"{who} scored {spooky_percent}%!",
             color=Colours.orange
         )
         embed.add_field(
-            name='A whisper from Satan',
-            value=data['text']
+            name="A whisper from Satan",
+            value=data["text"]
         )
         embed.set_thumbnail(
-            url=data['image']
+            url=data["image"]
         )
 
         await ctx.send(embed=embed)

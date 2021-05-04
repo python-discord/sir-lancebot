@@ -158,7 +158,7 @@ class Issues(commands.Cog):
 
         issue_url = json_data.get("html_url")
 
-        return IssueState(repository, number, issue_url, json_data.get('title', ''), emoji)
+        return IssueState(repository, number, issue_url, json_data.get("title", ""), emoji)
 
     @staticmethod
     def format_embed(
@@ -177,7 +177,7 @@ class Issues(commands.Cog):
 
         resp = discord.Embed(
             colour=Colours.bright_green,
-            description='\n'.join(description_list)
+            description="\n".join(description_list)
         )
 
         embed_url = f"https://github.com/{user}/{repository}" if repository else f"https://github.com/{user}"

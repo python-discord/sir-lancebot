@@ -22,11 +22,11 @@ EMOJIS = dict(
     CANDY="\N{CANDY}",
     SKULL="\N{SKULL}",
     MEDALS=(
-        '\N{FIRST PLACE MEDAL}',
-        '\N{SECOND PLACE MEDAL}',
-        '\N{THIRD PLACE MEDAL}',
-        '\N{SPORTS MEDAL}',
-        '\N{SPORTS MEDAL}',
+        "\N{FIRST PLACE MEDAL}",
+        "\N{SECOND PLACE MEDAL}",
+        "\N{THIRD PLACE MEDAL}",
+        "\N{SPORTS MEDAL}",
+        "\N{SPORTS MEDAL}",
     ),
 )
 
@@ -106,7 +106,7 @@ class CandyCollection(commands.Cog):
                 await self.candy_records.decrement(user.id, lost)
 
                 if lost == prev_record:
-                    await CandyCollection.send_spook_msg(user, message.channel, 'all of your')
+                    await CandyCollection.send_spook_msg(user, message.channel, "all of your")
                 else:
                     await CandyCollection.send_spook_msg(user, message.channel, lost)
             else:
@@ -125,7 +125,7 @@ class CandyCollection(commands.Cog):
         """
         if random.randint(1, ADD_SKULL_EXISTING_REACTION_CHANCE) == 1:
             await self.skull_messages.set(message.id, "skull")
-            await message.add_reaction(EMOJIS['SKULL'])
+            await message.add_reaction(EMOJIS["SKULL"])
 
         elif random.randint(1, ADD_CANDY_EXISTING_REACTION_CHANCE) == 1:
             await self.candy_messages.set(message.id, "candy")
@@ -173,7 +173,7 @@ class CandyCollection(commands.Cog):
             )
             top_five = top_sorted[:5]
 
-            return '\n'.join(
+            return "\n".join(
                 f"{EMOJIS['MEDALS'][index]} <@{record[0]}>: {record[1]}"
                 for index, record in enumerate(top_five)
             ) if top_five else "No Candies"
@@ -185,7 +185,7 @@ class CandyCollection(commands.Cog):
             inline=False
         )
         e.add_field(
-            name='\u200b',
+            name="\u200b",
             value="Candies will randomly appear on messages sent. "
                   "\nHit the candy when it appears as fast as possible to get the candy! "
                   "\nBut beware the ghosts...",

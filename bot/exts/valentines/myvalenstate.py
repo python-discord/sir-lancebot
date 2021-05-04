@@ -47,12 +47,12 @@ class MyValenstate(commands.Cog):
         """Find the vacation spot(s) with the most matching characters to the invoking user."""
         eq_chars = collections.defaultdict(int)
         if name is None:
-            author = ctx.author.name.lower().replace(' ', '')
+            author = ctx.author.name.lower().replace(" ", "")
         else:
-            author = name.lower().replace(' ', '')
+            author = name.lower().replace(" ", "")
 
         for state in STATES.keys():
-            lower_state = state.lower().replace(' ', '')
+            lower_state = state.lower().replace(" ", "")
             eq_chars[state] = self.levenshtein(author, lower_state)
 
         matches = [x for x, y in eq_chars.items() if y == min(eq_chars.values())]
@@ -73,8 +73,8 @@ class MyValenstate(commands.Cog):
                          " you better"
 
         embed = discord.Embed(
-            title=f'Your Valenstate is {valenstate} \u2764',
-            description=f'{STATES[valenstate]["text"]}',
+            title=f"Your Valenstate is {valenstate} \u2764",
+            description=f"{STATES[valenstate]['text']}",
             colour=Colours.pink
         )
         embed.add_field(name=embed_title, value=embed_text)

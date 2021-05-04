@@ -176,7 +176,7 @@ class Games(Cog):
                             "Invalid OAuth credentials. Unloading Games cog. "
                             f"OAuth response message: {result['message']}"
                         )
-                        self.bot.remove_cog('Games')
+                        self.bot.remove_cog("Games")
 
                     return
 
@@ -260,7 +260,7 @@ class Games(Cog):
                 display_possibilities = "`, `".join(p[1] for p in possibilities)
                 await ctx.send(
                     f"Invalid genre `{genre}`. "
-                    f"{f'Maybe you meant `{display_possibilities}`?' if display_possibilities else ''}"
+                    f"Maybe you meant `{display_possibilities}`?" if display_possibilities else ''
                 )
                 return
             elif len(possibilities) == 1:

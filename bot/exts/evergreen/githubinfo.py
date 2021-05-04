@@ -27,14 +27,14 @@ class GithubInfo(commands.Cog):
         async with self.bot.http_session.get(url) as r:
             return await r.json()
 
-    @commands.group(name='github', aliases=('gh', 'git'))
+    @commands.group(name="github", aliases=("gh", "git"))
     @commands.cooldown(1, 10, BucketType.user)
     async def github_group(self, ctx: commands.Context) -> None:
         """Commands for finding information related to GitHub."""
         if ctx.invoked_subcommand is None:
             await invoke_help_command(ctx)
 
-    @github_group.command(name='user', aliases=('userinfo',))
+    @github_group.command(name="user", aliases=("userinfo",))
     async def github_user_info(self, ctx: commands.Context, username: str) -> None:
         """Fetches a user's GitHub information."""
         async with ctx.typing():
@@ -51,31 +51,31 @@ class GithubInfo(commands.Cog):
                 await ctx.send(embed=embed)
                 return
 
-            org_data = await self.fetch_data(user_data['organizations_url'])
+            org_data = await self.fetch_data(user_data["organizations_url"])
             orgs = [f"[{org['login']}](https://github.com/{org['login']})" for org in org_data]
-            orgs_to_add = ' | '.join(orgs)
+            orgs_to_add = " | ".join(orgs)
 
-            gists = user_data['public_gists']
+            gists = user_data["public_gists"]
 
             # Forming blog link
-            if user_data['blog'].startswith("http"):  # Blog link is complete
-                blog = user_data['blog']
-            elif user_data['blog']:  # Blog exists but the link is not complete
+            if user_data["blog"].startswith("http"):  # Blog link is complete
+                blog = user_data["blog"]
+            elif user_data["blog"]:  # Blog exists but the link is not complete
                 blog = f"https://{user_data['blog']}"
             else:
                 blog = "No website link available"
 
             embed = discord.Embed(
                 title=f"`{user_data['login']}`'s GitHub profile info",
-                description=f"```{user_data['bio']}```\n" if user_data['bio'] is not None else "",
+                description=f"```{user_data['bio']}```\n" if user_data["bio"] is not None else "",
                 colour=discord.Colour.blurple(),
-                url=user_data['html_url'],
-                timestamp=datetime.strptime(user_data['created_at'], "%Y-%m-%dT%H:%M:%SZ")
+                url=user_data["html_url"],
+                timestamp=datetime.strptime(user_data["created_at"], "%Y-%m-%dT%H:%M:%SZ")
             )
-            embed.set_thumbnail(url=user_data['avatar_url'])
+            embed.set_thumbnail(url=user_data["avatar_url"])
             embed.set_footer(text="Account created at")
 
-            if user_data['type'] == "User":
+            if user_data["type"] == "User":
 
                 embed.add_field(
                     name="Followers",
@@ -91,7 +91,7 @@ class GithubInfo(commands.Cog):
                 value=f"[{user_data['public_repos']}]({user_data['html_url']}?tab=repositories)"
             )
 
-            if user_data['type'] == "User":
+            if user_data["type"] == "User":
                 embed.add_field(name="Gists", value=f"[{gists}](https://gist.github.com/{quote(username, safe='')})")
 
                 embed.add_field(
@@ -109,8 +109,8 @@ class GithubInfo(commands.Cog):
 
         The repository should look like `user/reponame` or `user reponame`.
         """
-        repo = '/'.join(repo)
-        if repo.count('/') != 1:
+        repo = "/".join(repo)
+        if repo.count("/") != 1:
             embed = discord.Embed(
                 title=random.choice(NEGATIVE_REPLIES),
                 description="The repository should look like `user/reponame` or `user reponame`.",
@@ -135,10 +135,10 @@ class GithubInfo(commands.Cog):
                 return
 
         embed = discord.Embed(
-            title=repo_data['name'],
+            title=repo_data["name"],
             description=repo_data["description"],
             colour=discord.Colour.blurple(),
-            url=repo_data['html_url']
+            url=repo_data["html_url"]
         )
 
         # If it's a fork, then it will have a parent key
@@ -148,7 +148,7 @@ class GithubInfo(commands.Cog):
         except KeyError:
             log.debug("Repository is not a fork.")
 
-        repo_owner = repo_data['owner']
+        repo_owner = repo_data["owner"]
 
         embed.set_author(
             name=repo_owner["login"],
@@ -156,8 +156,8 @@ class GithubInfo(commands.Cog):
             icon_url=repo_owner["avatar_url"]
         )
 
-        repo_created_at = datetime.strptime(repo_data['created_at'], "%Y-%m-%dT%H:%M:%SZ").strftime("%d/%m/%Y")
-        last_pushed = datetime.strptime(repo_data['pushed_at'], "%Y-%m-%dT%H:%M:%SZ").strftime("%d/%m/%Y at %H:%M")
+        repo_created_at = datetime.strptime(repo_data["created_at"], "%Y-%m-%dT%H:%M:%SZ").strftime("%d/%m/%Y")
+        last_pushed = datetime.strptime(repo_data["pushed_at"], "%Y-%m-%dT%H:%M:%SZ").strftime("%d/%m/%Y at %H:%M")
 
         embed.set_footer(
             text=(

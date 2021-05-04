@@ -18,17 +18,17 @@ with open(Path("bot/resources/valentines/valentine_facts.json"), "r", encoding="
 class ValentineFacts(commands.Cog):
     """A Cog for displaying facts about Saint Valentine."""
 
-    @commands.command(aliases=('whoisvalentine', 'saint_valentine'))
+    @commands.command(aliases=("whoisvalentine", "saint_valentine"))
     async def who_is_valentine(self, ctx: commands.Context) -> None:
         """Displays info about Saint Valentine."""
         embed = discord.Embed(
             title="Who is Saint Valentine?",
-            description=FACTS['whois'],
+            description=FACTS["whois"],
             color=Colours.pink
         )
         embed.set_thumbnail(
-            url='https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Saint_Valentine_-_'
-                'facial_reconstruction.jpg/1024px-Saint_Valentine_-_facial_reconstruction.jpg'
+            url="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Saint_Valentine_-_"
+                "facial_reconstruction.jpg/1024px-Saint_Valentine_-_facial_reconstruction.jpg"
         )
 
         await ctx.send(embed=embed)
@@ -37,8 +37,8 @@ class ValentineFacts(commands.Cog):
     async def valentine_fact(self, ctx: commands.Context) -> None:
         """Shows a random fact about Valentine's Day."""
         embed = discord.Embed(
-            title=choice(FACTS['titles']),
-            description=choice(FACTS['text']),
+            title=choice(FACTS["titles"]),
+            description=choice(FACTS["text"]),
             color=Colours.pink
         )
 

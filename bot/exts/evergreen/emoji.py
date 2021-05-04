@@ -46,9 +46,9 @@ class Emojis(commands.Cog):
                 else:
                     emoji_info = f"There is **{len(category_emojis)}** emoji in the **{category_name}** category."
                 if emoji_choice.animated:
-                    msg.append(f'<a:{emoji_choice.name}:{emoji_choice.id}> {emoji_info}')
+                    msg.append(f"<a:{emoji_choice.name}:{emoji_choice.id}> {emoji_info}")
                 else:
-                    msg.append(f'<:{emoji_choice.name}:{emoji_choice.id}> {emoji_info}')
+                    msg.append(f"<:{emoji_choice.name}:{emoji_choice.id}> {emoji_info}")
         return embed, msg
 
     @staticmethod
@@ -64,7 +64,7 @@ class Emojis(commands.Cog):
         for emoji in emojis:
             emoji_dict[emoji.name.split("_")[0]].append(emoji)
 
-        error_comp = ', '.join(emoji_dict)
+        error_comp = ", ".join(emoji_dict)
         msg.append(f"These are the valid emoji categories:\n```{error_comp}```")
         return embed, msg
 

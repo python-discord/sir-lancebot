@@ -53,7 +53,7 @@ class XKCD(Cog):
             await ctx.send(embed=embed)
             return
 
-        comic = randint(1, self.latest_comic_info['num']) if comic is None else comic.group(0)
+        comic = randint(1, self.latest_comic_info["num"]) if comic is None else comic.group(0)
 
         if comic == "latest":
             info = self.latest_comic_info
@@ -69,7 +69,7 @@ class XKCD(Cog):
                     return
 
         embed.title = f"XKCD comic #{info['num']}"
-        embed.description = info['alt']
+        embed.description = info["alt"]
         embed.url = f"{BASE_URL}/{info['num']}"
 
         if info["img"][-3:] in ("jpg", "png", "gif"):

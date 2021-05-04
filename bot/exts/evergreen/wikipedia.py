@@ -20,7 +20,7 @@ WIKI_THUMBNAIL = (
     "https://upload.wikimedia.org/wikipedia/en/thumb/8/80/Wikipedia-logo-v2.svg"
     "/330px-Wikipedia-logo-v2.svg.png"
 )
-WIKI_SNIPPET_REGEX = r'(<!--.*?-->|<[^>]*>)'
+WIKI_SNIPPET_REGEX = r"(<!--.*?-->|<[^>]*>)"
 WIKI_SEARCH_RESULT = (
     "**[{name}]({url})**\n"
     "{description}\n"
@@ -39,18 +39,18 @@ class WikipediaSearch(commands.Cog):
         async with self.bot.http_session.get(url=url) as resp:
             if resp.status == 200:
                 raw_data = await resp.json()
-                number_of_results = raw_data['query']['searchinfo']['totalhits']
+                number_of_results = raw_data["query"]["searchinfo"]["totalhits"]
 
                 if number_of_results:
-                    results = raw_data['query']['search']
+                    results = raw_data["query"]["search"]
                     lines = []
 
                     for article in results:
                         line = WIKI_SEARCH_RESULT.format(
-                            name=article['title'],
+                            name=article["title"],
                             description=unescape(
                                 re.sub(
-                                    WIKI_SNIPPET_REGEX, '', article['snippet']
+                                    WIKI_SNIPPET_REGEX, "", article["snippet"]
                                 )
                             ),
                             url=f"https://en.wikipedia.org/?curid={article['pageid']}"

@@ -21,7 +21,7 @@ class EarthPhotos(commands.Cog):
         """Returns a random photo of earth, sourced from Unsplash."""
         async with ctx.typing():
             async with self.bot.http_session.get(
-                    'https://api.unsplash.com/photos/random',
+                    "https://api.unsplash.com/photos/random",
                     params={"query": "planet_earth", "client_id": Tokens.unsplash_access_key}
             ) as r:
                 jsondata = await r.json()

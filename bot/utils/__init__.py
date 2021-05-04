@@ -43,12 +43,12 @@ async def disambiguate(
     or if the user makes an invalid choice.
     """
     if len(entries) == 0:
-        raise BadArgument('No matches found.')
+        raise BadArgument("No matches found.")
 
     if len(entries) == 1:
         return entries[0]
 
-    choices = (f'{index}: {entry}' for index, entry in enumerate(entries, start=1))
+    choices = (f"{index}: {entry}" for index, entry in enumerate(entries, start=1))
 
     def check(message: discord.Message) -> bool:
         return (message.content.isdigit()
@@ -59,7 +59,7 @@ async def disambiguate(
         if embed is None:
             embed = discord.Embed()
 
-        coro1 = ctx.bot.wait_for('message', check=check, timeout=timeout)
+        coro1 = ctx.bot.wait_for("message", check=check, timeout=timeout)
         coro2 = LinePaginator.paginate(choices, ctx, embed=embed, max_lines=entries_per_page,
                                        empty=empty, max_size=6000, timeout=9000)
 
@@ -74,7 +74,7 @@ async def disambiguate(
         if result is None:
             for coro in pending:
                 coro.cancel()
-            raise BadArgument('Canceled.')
+            raise BadArgument("Canceled.")
 
         # Pagination was not initiated, only one page
         if result.author == ctx.bot.user:
@@ -85,7 +85,7 @@ async def disambiguate(
         for coro in pending:
             coro.cancel()
     except asyncio.TimeoutError:
-        raise BadArgument('Timed out.')
+        raise BadArgument("Timed out.")
 
     # Guaranteed to not error because of isdigit() in check
     index = int(result.content)
@@ -93,7 +93,7 @@ async def disambiguate(
     try:
         return entries[index - 1]
     except IndexError:
-        raise BadArgument('Invalid choice.')
+        raise BadArgument("Invalid choice.")
 
 
 def replace_many(
@@ -139,7 +139,7 @@ def replace_many(
             return replacement
 
         # Clean punctuation from word so string methods work
-        cleaned_word = word.translate(str.maketrans('', '', string.punctuation))
+        cleaned_word = word.translate(str.maketrans("", "", string.punctuation))
         if cleaned_word.isupper():
             return replacement.upper()
         elif cleaned_word[0].isupper():

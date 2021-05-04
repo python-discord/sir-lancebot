@@ -55,8 +55,8 @@ class Game:
     async def print_grid(self) -> None:
         """Formats and outputs the Connect Four grid to the channel."""
         title = (
-            f'Connect 4: {self.player1.display_name}'
-            f' VS {self.bot.user.display_name if isinstance(self.player2, AI) else self.player2.display_name}'
+            f"Connect 4: {self.player1.display_name}"
+            f" VS {self.bot.user.display_name if isinstance(self.player2, AI) else self.player2.display_name}"
         )
 
         rows = [" ".join(self.tokens[s] for s in row) for row in self.grid]
@@ -67,7 +67,7 @@ class Game:
         if self.message:
             await self.message.edit(embed=embed)
         else:
-            self.message = await self.channel.send(content='Loading...')
+            self.message = await self.channel.send(content="Loading...")
             for emoji in self.unicode_numbers:
                 await self.message.add_reaction(emoji)
             await self.message.add_reaction(CROSS_EMOJI)

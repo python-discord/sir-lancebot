@@ -24,11 +24,11 @@ Unknown cheat sheet. Please try to reformulate your query.
 If the problem persists send a message in <#{Channels.dev_contrib}>
 """
 
-URL = 'https://cheat.sh/python/{search}'
+URL = "https://cheat.sh/python/{search}"
 ESCAPE_TT = str.maketrans({"`": "\\`"})
 ANSI_RE = re.compile(r"\x1b\[.*?m")
 # We need to pass headers as curl otherwise it would default to aiohttp which would return raw html.
-HEADERS = {'User-Agent': 'curl/7.68.0'}
+HEADERS = {"User-Agent": "curl/7.68.0"}
 
 
 class CheatSheet(commands.Cog):

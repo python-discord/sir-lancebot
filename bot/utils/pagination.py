@@ -26,7 +26,7 @@ class EmptyPaginatorEmbed(Exception):
 class LinePaginator(Paginator):
     """A class that aids in paginating code blocks for Discord messages."""
 
-    def __init__(self, prefix: str = '```', suffix: str = '```', max_size: int = 2000, max_lines: int = None):
+    def __init__(self, prefix: str = "```", suffix: str = "```", max_size: int = 2000, max_lines: int = None):
         """
         Overrides the Paginator.__init__ from inside discord.ext.commands.
 
@@ -44,7 +44,7 @@ class LinePaginator(Paginator):
         self._count = len(prefix) + 1  # prefix + newline
         self._pages = []
 
-    def add_line(self, line: str = '', *, empty: bool = False) -> None:
+    def add_line(self, line: str = "", *, empty: bool = False) -> None:
         """
         Adds a line to the current page.
 
@@ -56,7 +56,7 @@ class LinePaginator(Paginator):
         If `empty` is True, an empty line will be placed after the a given `line`.
         """
         if len(line) > self.max_size - len(self.prefix) - 2:
-            raise RuntimeError('Line exceeds maximum page size %s' % (self.max_size - len(self.prefix) - 2))
+            raise RuntimeError("Line exceeds maximum page size %s" % (self.max_size - len(self.prefix) - 2))
 
         if self.max_lines is not None:
             if self._linecount >= self.max_lines:
@@ -71,7 +71,7 @@ class LinePaginator(Paginator):
         self._current_page.append(line)
 
         if empty:
-            self._current_page.append('')
+            self._current_page.append("")
             self._count += 1
 
     @classmethod

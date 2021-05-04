@@ -269,7 +269,7 @@ def whitelist_check(**default_kwargs: t.Container[int]) -> t.Callable[[Context],
                 channels.update(channel.id for channel in category.text_channels)
 
         if channels:
-            channels_str = ', '.join(f"<#{c_id}>" for c_id in channels)
+            channels_str = ", ".join(f"<#{c_id}>" for c_id in channels)
             message = f"Sorry, but you may only use this command within {channels_str}."
         else:
             message = "Sorry, but you may not use this command."

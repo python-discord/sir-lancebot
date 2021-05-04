@@ -138,7 +138,7 @@ class HacktoberStats(commands.Cog):
 
             if prs:
                 stats_embed = await self.build_embed(github_username, prs)
-                await ctx.send('Here are some stats!', embed=stats_embed)
+                await ctx.send("Here are some stats!", embed=stats_embed)
             else:
                 await ctx.send(f"No valid Hacktoberfest PRs found for '{github_username}'")
 
@@ -355,7 +355,7 @@ class HacktoberStats(commands.Cog):
 
         # loop through reviews and check for approval
         for item in jsonresp2:
-            if item.get('status') == "APPROVED":
+            if item.get("status") == "APPROVED":
                 return True
         return False
 
@@ -387,9 +387,9 @@ class HacktoberStats(commands.Cog):
         in_review = []
         accepted = []
         for pr in prs:
-            if (pr['created_at'] + timedelta(REVIEW_DAYS)) > now:
+            if (pr["created_at"] + timedelta(REVIEW_DAYS)) > now:
                 in_review.append(pr)
-            elif (pr['created_at'] <= oct3) or await self._is_accepted(pr):
+            elif (pr["created_at"] <= oct3) or await self._is_accepted(pr):
                 accepted.append(pr)
 
         return in_review, accepted

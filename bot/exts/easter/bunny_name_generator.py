@@ -20,7 +20,7 @@ class BunnyNameGenerator(commands.Cog):
 
     def find_separators(self, displayname: str) -> Union[List[str], None]:
         """Check if Discord name contains spaces so we can bunnify an individual word in the name."""
-        new_name = re.split(r'[_.\s]', displayname)
+        new_name = re.split(r"[_.\s]", displayname)
         if displayname not in new_name:
             return new_name
 
@@ -33,11 +33,11 @@ class BunnyNameGenerator(commands.Cog):
         Only the most recently matched pattern will apply the changes.
         """
         expressions = [
-            (r'a.+y', 'patchy'),
-            (r'e.+y', 'ears'),
-            (r'i.+y', 'ditsy'),
-            (r'o.+y', 'oofy'),
-            (r'u.+y', 'uffy'),
+            ("a.+y", "patchy"),
+            ("e.+y", "ears"),
+            ("i.+y", "ditsy"),
+            ("o.+y", "oofy"),
+            ("u.+y", "uffy"),
         ]
 
         for exp, vowel_sub in expressions:
@@ -47,7 +47,7 @@ class BunnyNameGenerator(commands.Cog):
 
     def append_name(self, displayname: str) -> str:
         """Adds a suffix to the end of the Discord name."""
-        extensions = ['foot', 'ear', 'nose', 'tail']
+        extensions = ["foot", "ear", "nose", "tail"]
         suffix = random.choice(extensions)
         appended_name = displayname + suffix
 
@@ -74,7 +74,7 @@ class BunnyNameGenerator(commands.Cog):
         unmatched_name = self.append_name(username)
 
         if spaces_in_name is not None:
-            replacements = ['Cotton', 'Fluff', 'Floof' 'Bounce', 'Snuffle', 'Nibble', 'Cuddle', 'Velvetpaw', 'Carrot']
+            replacements = ["Cotton", "Fluff", "Floof" "Bounce", "Snuffle", "Nibble", "Cuddle", "Velvetpaw", "Carrot"]
             word_to_replace = random.choice(spaces_in_name)
             substitute = random.choice(replacements)
             bunnified_name = username.replace(word_to_replace, substitute)

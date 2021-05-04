@@ -37,7 +37,7 @@ class MonsterBio(commands.Cog):
                 continue
 
             options = seeded_random.sample(TEXT_OPTIONS[key], value)
-            words[key] = ' '.join(options)
+            words[key] = " ".join(options)
 
         embed = discord.Embed(
             title=f"{name}'s Biography",

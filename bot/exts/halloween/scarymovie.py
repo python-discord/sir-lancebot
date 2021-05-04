@@ -47,7 +47,7 @@ class ScaryMovie(commands.Cog):
             total_pages = data.get("total_pages")
 
         # Get movie details from one random result on a random page
-        params['page'] = random.randint(1, total_pages)
+        params["page"] = random.randint(1, total_pages)
         async with self.bot.http_session.get(url=url, params=params, headers=headers) as response:
             data = await response.json()
             selection_id = random.choice(data.get("results")).get("id")
@@ -71,26 +71,26 @@ class ScaryMovie(commands.Cog):
 
         # Get cast names
         cast = []
-        for actor in movie.get('credits', {}).get('cast', [])[:3]:
-            cast.append(actor.get('name'))
+        for actor in movie.get("credits", {}).get("cast", [])[:3]:
+            cast.append(actor.get("name"))
 
         # Get director name
-        director = movie.get('credits', {}).get('crew', [])
+        director = movie.get("credits", {}).get("crew", [])
         if director:
-            director = director[0].get('name')
+            director = director[0].get("name")
 
         # Determine the spookiness rating
-        rating = ''
-        rating_count = movie.get('vote_average', 0) / 2
+        rating = ""
+        rating_count = movie.get("vote_average", 0) / 2
 
         for _ in range(int(rating_count)):
-            rating += ':skull:'
+            rating += ":skull:"
         if (rating_count % 1) >= .5:
-            rating += ':bat:'
+            rating += ":bat:"
 
         # Try to get year of release and runtime
-        year = movie.get('release_date', [])[:4]
-        runtime = movie.get('runtime')
+        year = movie.get("release_date", [])[:4]
+        runtime = movie.get("runtime")
         runtime = f"{runtime} minutes" if runtime else None
 
         # Not all these attributes will always be present

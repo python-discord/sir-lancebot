@@ -83,7 +83,7 @@ class BotSource(commands.Cog):
         url, location, first_line = self.get_source_link(source_object)
 
         if isinstance(source_object, commands.Command):
-            if source_object.cog_name == 'Help':
+            if source_object.cog_name == "Help":
                 title = "Help Command"
                 description = source_object.__doc__.splitlines()[1]
             else:

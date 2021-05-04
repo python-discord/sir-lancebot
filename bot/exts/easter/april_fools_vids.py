@@ -15,7 +15,7 @@ with open("bot/resources/easter/april_fools_vids.json", encoding="utf-8") as f:
 class AprilFoolVideos(commands.Cog):
     """A cog for April Fools' that gets a random April Fools' video from Youtube."""
 
-    @commands.command(name='fool')
+    @commands.command(name="fool")
     async def april_fools(self, ctx: commands.Context) -> None:
         """Get a random April Fools' video from Youtube."""
         video = random.choice(ALL_VIDS)

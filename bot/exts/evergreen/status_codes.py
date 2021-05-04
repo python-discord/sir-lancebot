@@ -22,10 +22,10 @@ class HTTPStatusCodes(commands.Cog):
         if not ctx.invoked_subcommand:
             await invoke_help_command(ctx)
 
-    @http_status_group.command(name='cat')
+    @http_status_group.command(name="cat")
     async def http_cat(self, ctx: commands.Context, code: int) -> None:
         """Sends an embed with an image of a cat, portraying the status code."""
-        embed = discord.Embed(title=f'**Status: {code}**')
+        embed = discord.Embed(title=f"**Status: {code}**")
         url = HTTP_CAT_URL.format(code=code)
 
         try:
@@ -37,18 +37,18 @@ class HTTPStatusCodes(commands.Cog):
                     raise NotImplementedError
 
         except ValueError:
-            embed.set_footer(text='Inputted status code does not exist.')
+            embed.set_footer(text="Inputted status code does not exist.")
 
         except NotImplementedError:
-            embed.set_footer(text='Inputted status code is not implemented by http.cat yet.')
+            embed.set_footer(text="Inputted status code is not implemented by http.cat yet.")
 
         finally:
             await ctx.send(embed=embed)
 
-    @http_status_group.command(name='dog')
+    @http_status_group.command(name="dog")
     async def http_dog(self, ctx: commands.Context, code: int) -> None:
         """Sends an embed with an image of a dog, portraying the status code."""
-        embed = discord.Embed(title=f'**Status: {code}**')
+        embed = discord.Embed(title=f"**Status: {code}**")
         url = HTTP_DOG_URL.format(code=code)
 
         try:
@@ -60,10 +60,10 @@ class HTTPStatusCodes(commands.Cog):
                     raise NotImplementedError
 
         except ValueError:
-            embed.set_footer(text='Inputted status code does not exist.')
+            embed.set_footer(text="Inputted status code does not exist.")
 
         except NotImplementedError:
-            embed.set_footer(text='Inputted status code is not implemented by httpstatusdogs.com yet.')
+            embed.set_footer(text="Inputted status code is not implemented by httpstatusdogs.com yet.")
 
         finally:
             await ctx.send(embed=embed)

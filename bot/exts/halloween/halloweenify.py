@@ -34,8 +34,8 @@ class Halloweenify(commands.Cog):
             embed.colour = discord.Colour.dark_orange()
             embed.title = "Not spooky enough?"
             embed.description = (
-                f"**{ctx.author.display_name}** wasn\'t spooky enough for you? That\'s understandable, "
-                f"{ctx.author.display_name} isn\'t scary at all! "
+                f"**{ctx.author.display_name}** wasn't spooky enough for you? That's understandable, "
+                f"{ctx.author.display_name} isn't scary at all! "
                 "Let me think of something better. Hmm... I got it!\n\n "
             )
             embed.set_image(url=image)

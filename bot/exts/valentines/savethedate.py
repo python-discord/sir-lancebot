@@ -23,7 +23,7 @@ class SaveTheDate(commands.Cog):
     @commands.command()
     async def savethedate(self, ctx: commands.Context) -> None:
         """Gives you ideas for what to do on a date with your valentine."""
-        random_date = random.choice(VALENTINES_DATES['ideas'])
+        random_date = random.choice(VALENTINES_DATES["ideas"])
         emoji_1 = random.choice(HEART_EMOJIS)
         emoji_2 = random.choice(HEART_EMOJIS)
         embed = discord.Embed(

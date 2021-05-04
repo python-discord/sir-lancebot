@@ -70,7 +70,7 @@ class BeMyValentine(commands.Cog):
             await ctx.send("The lovefest role has been successfully removed!")
 
     @commands.cooldown(1, 1800, BucketType.user)
-    @commands.group(name='bemyvalentine', invoke_without_command=True)
+    @commands.group(name="bemyvalentine", invoke_without_command=True)
     async def send_valentine(
         self, ctx: commands.Context, user: discord.Member, *, valentine_type: str = None
     ) -> None:
@@ -102,14 +102,14 @@ class BeMyValentine(commands.Cog):
         valentine, title = self.valentine_check(valentine_type)
 
         embed = discord.Embed(
-            title=f'{emoji_1} {title} {user.display_name} {emoji_2}',
-            description=f'{valentine} \n **{emoji_2}From {ctx.author}{emoji_1}**',
+            title=f"{emoji_1} {title} {user.display_name} {emoji_2}",
+            description=f"{valentine} \n **{emoji_2}From {ctx.author}{emoji_1}**",
             color=Colours.pink
         )
         await channel.send(user.mention, embed=embed)
 
     @commands.cooldown(1, 1800, BucketType.user)
-    @send_valentine.command(name='secret')
+    @send_valentine.command(name="secret")
     async def anonymous(
         self, ctx: commands.Context, user: discord.Member, *, valentine_type: str = None
     ) -> None:
@@ -137,8 +137,8 @@ class BeMyValentine(commands.Cog):
         valentine, title = self.valentine_check(valentine_type)
 
         embed = discord.Embed(
-            title=f'{emoji_1}{title} {user.display_name}{emoji_2}',
-            description=f'{valentine} \n **{emoji_2}From anonymous{emoji_1}**',
+            title=f"{emoji_1}{title} {user.display_name}{emoji_2}",
+            description=f"{valentine} \n **{emoji_2}From anonymous{emoji_1}**",
             color=Colours.pink
         )
         await ctx.message.delete()
@@ -154,18 +154,18 @@ class BeMyValentine(commands.Cog):
         if valentine_type is None:
             valentine, title = self.random_valentine()
 
-        elif valentine_type.lower() in ['p', 'poem']:
+        elif valentine_type.lower() in ["p", "poem"]:
             valentine = self.valentine_poem()
-            title = 'A poem dedicated to'
+            title = "A poem dedicated to"
 
-        elif valentine_type.lower() in ['c', 'compliment']:
+        elif valentine_type.lower() in ["c", "compliment"]:
             valentine = self.valentine_compliment()
-            title = 'A compliment for'
+            title = "A compliment for"
 
         else:
             # in this case, the user decides to type his own valentine.
             valentine = valentine_type
-            title = 'A message for'
+            title = "A message for"
         return valentine, title
 
     @staticmethod
@@ -177,23 +177,23 @@ class BeMyValentine(commands.Cog):
 
     def random_valentine(self) -> Tuple[str, str]:
         """Grabs a random poem or a compliment (any message)."""
-        valentine_poem = random.choice(self.valentines['valentine_poems'])
-        valentine_compliment = random.choice(self.valentines['valentine_compliments'])
+        valentine_poem = random.choice(self.valentines["valentine_poems"])
+        valentine_compliment = random.choice(self.valentines["valentine_compliments"])
         random_valentine = random.choice([valentine_compliment, valentine_poem])
         if random_valentine == valentine_poem:
-            title = 'A poem dedicated to'
+            title = "A poem dedicated to"
         else:
-            title = 'A compliment for '
+            title = "A compliment for "
         return random_valentine, title
 
     def valentine_poem(self) -> str:
         """Grabs a random poem."""
-        valentine_poem = random.choice(self.valentines['valentine_poems'])
+        valentine_poem = random.choice(self.valentines["valentine_poems"])
         return valentine_poem
 
     def valentine_compliment(self) -> str:
         """Grabs a random compliment."""
-        valentine_compliment = random.choice(self.valentines['valentine_compliments'])
+        valentine_compliment = random.choice(self.valentines["valentine_compliments"])
         return valentine_compliment
 
 

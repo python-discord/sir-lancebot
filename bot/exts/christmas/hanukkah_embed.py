@@ -28,15 +28,15 @@ class HanukkahEmbed(commands.Cog):
         hanukkah_dates = []
         async with self.bot.http_session.get(self.url) as response:
             json_data = await response.json()
-        festivals = json_data['items']
+        festivals = json_data["items"]
         for festival in festivals:
-            if festival['title'].startswith('Chanukah'):
-                date = festival['date']
+            if festival["title"].startswith("Chanukah"):
+                date = festival["date"]
                 hanukkah_dates.append(date)
         return hanukkah_dates
 
     @in_month(Month.DECEMBER)
-    @commands.command(name='hanukkah', aliases=['chanukah'])
+    @commands.command(name="hanukkah", aliases=["chanukah"])
     async def hanukkah_festival(self, ctx: commands.Context) -> None:
         """Tells you about the Hanukkah Festivaltime of festival, festival day, etc)."""
         hanukkah_dates = await self.get_hanukkah_dates()
@@ -56,7 +56,7 @@ class HanukkahEmbed(commands.Cog):
         month = str(today.month)
         year = str(today.year)
         embed = Embed()
-        embed.title = 'Hanukkah'
+        embed.title = "Hanukkah"
         embed.colour = Colours.blue
         if day in self.hanukkah_days and month in self.hanukkah_months and year in self.hanukkah_years:
             if int(day) == hanukkah_start_day:
@@ -69,13 +69,13 @@ class HanukkahEmbed(commands.Cog):
                     await ctx.send(embed=embed)
                     return
                 elif hours > hanukkah_start_hour:
-                    embed.description = (f'It is the starting day of Hanukkah ! '
-                                         f'Its been {hours-hanukkah_start_hour} hours hanukkah started !')
+                    embed.description = (f"It is the starting day of Hanukkah ! "
+                                         f"Its been {hours-hanukkah_start_hour} hours hanukkah started !")
                     await ctx.send(embed=embed)
                     return
             festival_day = self.hanukkah_days.index(day)
-            number_suffixes = ['st', 'nd', 'rd', 'th']
-            suffix = ''
+            number_suffixes = ["st", "nd", "rd", "th"]
+            suffix = ""
             if int(festival_day) == 1:
                 suffix = number_suffixes[0]
             if int(festival_day) == 2:
@@ -84,19 +84,19 @@ class HanukkahEmbed(commands.Cog):
                 suffix = number_suffixes[2]
             if int(festival_day) > 3:
                 suffix = number_suffixes[3]
-            message = ''
+            message = ""
             for _ in range(1, festival_day + 1):
-                message += ':menorah:'
-            embed.description = f'It is the {festival_day}{suffix} day of Hanukkah ! \n {message}'
+                message += ":menorah:"
+            embed.description = f"It is the {festival_day}{suffix} day of Hanukkah ! \n {message}"
             await ctx.send(embed=embed)
         else:
             if today < hanukkah_start:
-                festival_starting_month = hanukkah_start.strftime('%B')
+                festival_starting_month = hanukkah_start.strftime("%B")
                 embed.description = (f"Hanukkah has not started yet. "
                                      f"Hanukkah will start at sundown on {hanukkah_start_day}th "
                                      f"of {festival_starting_month}.")
             else:
-                festival_end_month = hanukkah_end.strftime('%B')
+                festival_end_month = hanukkah_end.strftime("%B")
                 embed.description = (f"Looks like you missed Hanukkah !"
                                      f"Hanukkah ended on {hanukkah_end_day}th of {festival_end_month}.")
 

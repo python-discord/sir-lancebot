@@ -59,7 +59,7 @@ def custom_cooldown(*ignore: List[int]) -> Callable:
     A list of roles may be provided to ignore the per-user cooldown.
     """
     async def predicate(ctx: Context) -> bool:
-        if ctx.invoked_with == 'help':
+        if ctx.invoked_with == "help":
             # if the invoked command is help we don't want to increase the ratelimits since it's not actually
             # invoking the command/making a request, so instead just check if the user/guild are on cooldown.
             guild_cooldown = not guildcd.get_bucket(ctx.message).get_tokens() == 0  # if guild is on cooldown
@@ -118,7 +118,7 @@ async def get_pod_pages(ctx: Context, bot: Bot, query: str) -> Optional[List[Tup
         request_url = QUERY.format(request="query", data=url_str)
 
         async with bot.http_session.get(request_url) as response:
-            json = await response.json(content_type='text/plain')
+            json = await response.json(content_type="text/plain")
 
         result = json["queryresult"]
 

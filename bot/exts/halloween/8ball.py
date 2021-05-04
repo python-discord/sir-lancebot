@@ -17,7 +17,7 @@ with Path("bot/resources/halloween/responses.json").open("r", encoding="utf8") a
 class SpookyEightBall(commands.Cog):
     """Spooky Eightball answers."""
 
-    @commands.command(aliases=('spooky8ball',))
+    @commands.command(aliases=("spooky8ball",))
     async def spookyeightball(self, ctx: commands.Context, *, question: str) -> None:
         """Responds with a random response to a question."""
         choice = random.choice(RESPONSES["responses"])

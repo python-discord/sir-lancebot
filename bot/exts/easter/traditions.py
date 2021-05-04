@@ -16,7 +16,7 @@ with open(Path("bot/resources/easter/traditions.json"), "r", encoding="utf8") as
 class Traditions(commands.Cog):
     """A cog which allows users to get a random easter tradition or custom from a random country."""
 
-    @commands.command(aliases=('eastercustoms',))
+    @commands.command(aliases=("eastercustoms",))
     async def easter_tradition(self, ctx: commands.Context) -> None:
         """Responds with a random tradition or custom."""
         random_country = random.choice(list(traditions))

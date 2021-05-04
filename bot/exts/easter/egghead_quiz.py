@@ -18,12 +18,12 @@ with open(Path("bot/resources/easter/egghead_questions.json"), "r", encoding="ut
 
 
 EMOJIS = [
-    '\U0001f1e6', '\U0001f1e7', '\U0001f1e8', '\U0001f1e9', '\U0001f1ea',
-    '\U0001f1eb', '\U0001f1ec', '\U0001f1ed', '\U0001f1ee', '\U0001f1ef',
-    '\U0001f1f0', '\U0001f1f1', '\U0001f1f2', '\U0001f1f3', '\U0001f1f4',
-    '\U0001f1f5', '\U0001f1f6', '\U0001f1f7', '\U0001f1f8', '\U0001f1f9',
-    '\U0001f1fa', '\U0001f1fb', '\U0001f1fc', '\U0001f1fd', '\U0001f1fe',
-    '\U0001f1ff'
+    "\U0001f1e6", "\U0001f1e7", "\U0001f1e8", "\U0001f1e9", "\U0001f1ea",
+    "\U0001f1eb", "\U0001f1ec", "\U0001f1ed", "\U0001f1ee", "\U0001f1ef",
+    "\U0001f1f0", "\U0001f1f1", "\U0001f1f2", "\U0001f1f3", "\U0001f1f4",
+    "\U0001f1f5", "\U0001f1f6", "\U0001f1f7", "\U0001f1f8", "\U0001f1f9",
+    "\U0001f1fa", "\U0001f1fb", "\U0001f1fc", "\U0001f1fd", "\U0001f1fe",
+    "\U0001f1ff"
 ]  # Regional Indicators A-Z (used for voting)
 
 TIMELIMIT = 30

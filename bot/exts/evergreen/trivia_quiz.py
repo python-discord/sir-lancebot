@@ -129,7 +129,7 @@ class TriviaQuiz(commands.Cog):
                 )
 
             try:
-                msg = await self.bot.wait_for('message', check=check, timeout=10)
+                msg = await self.bot.wait_for("message", check=check, timeout=10)
             except asyncio.TimeoutError:
                 # In case of TimeoutError and the game has been stopped, then do nothing.
                 if self.game_status[ctx.channel.id] is False:
