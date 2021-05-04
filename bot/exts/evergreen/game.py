@@ -260,7 +260,7 @@ class Games(Cog):
                 display_possibilities = "`, `".join(p[1] for p in possibilities)
                 await ctx.send(
                     f"Invalid genre `{genre}`. "
-                    f"Maybe you meant `{display_possibilities}`?" if display_possibilities else ''
+                    f"{f'Maybe you meant `{display_possibilities}`?' if display_possibilities else ''}"
                 )
                 return
             elif len(possibilities) == 1:
