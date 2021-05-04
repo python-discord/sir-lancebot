@@ -829,7 +829,7 @@ class Snakes(Cog):
             )
         )
 
-        quiz = await ctx.send("", embed=embed)
+        quiz = await ctx.send(embed=embed)
         await self._validate_answer(ctx, quiz, answer, options)
 
     @snakes_group.command(name='name', aliases=('name_gen',))
