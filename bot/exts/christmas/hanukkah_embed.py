@@ -65,24 +65,24 @@ class HanukkahEmbed(commands.Cog):
                 hanukkah_start_hour = 18
                 if hours < hanukkah_start_hour:
                     embed.description = (f"Hanukkah hasnt started yet, "
-                                         f"it will start in about {hanukkah_start_hour-hours} hour/s.")
+                                         f"it will start in about {hanukkah_start_hour - hours} hour/s.")
                     await ctx.send(embed=embed)
                     return
                 elif hours > hanukkah_start_hour:
                     embed.description = (f"It is the starting day of Hanukkah ! "
-                                         f"Its been {hours-hanukkah_start_hour} hours hanukkah started !")
+                                         f"Its been {hours - hanukkah_start_hour} hours hanukkah started !")
                     await ctx.send(embed=embed)
                     return
             festival_day = self.hanukkah_days.index(day)
             number_suffixes = ["st", "nd", "rd", "th"]
             suffix = ""
-            if int(festival_day) == 1:
+            if festival_day == 1:
                 suffix = number_suffixes[0]
-            if int(festival_day) == 2:
+            if festival_day == 2:
                 suffix = number_suffixes[1]
-            if int(festival_day) == 3:
+            if festival_day == 3:
                 suffix = number_suffixes[2]
-            if int(festival_day) > 3:
+            if festival_day > 3:
                 suffix = number_suffixes[3]
             message = ""
             for _ in range(1, festival_day + 1):
