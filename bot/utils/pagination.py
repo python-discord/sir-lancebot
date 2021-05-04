@@ -283,7 +283,7 @@ class ImagePaginator(Paginator):
         self.images = []
         self._pages = []
 
-    def add_line(self, line: str = '', *, empty: bool = False) -> None:
+    def add_line(self, line: str = "", *, empty: bool = False) -> None:
         """
         Adds a line to each page, usually just 1 line in this context.
 

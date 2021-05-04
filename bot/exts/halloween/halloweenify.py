@@ -26,8 +26,8 @@ class Halloweenify(commands.Cog):
 
             # Choose a random character from our list we loaded above and set apart the nickname and image url.
             character = choice(data["characters"])
-            nickname = ''.join([nickname for nickname in character])
-            image = ''.join([character[nickname] for nickname in character])
+            nickname = "".join([nickname for nickname in character])
+            image = "".join([character[nickname] for nickname in character])
 
             # Build up a Embed
             embed = discord.Embed()

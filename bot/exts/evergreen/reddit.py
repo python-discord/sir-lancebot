@@ -84,7 +84,7 @@ class Reddit(commands.Cog):
 
         for i, post in enumerate(random_posts, start=1):
             post_title = post["data"]["title"][0:50]
-            post_url = post['data']['url']
+            post_url = post["data"]["url"]
             if post_title == "":
                 post_title = "No Title."
             elif post_title == post_url:

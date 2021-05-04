@@ -64,7 +64,7 @@ logging.getLogger("matplotlib").setLevel(logging.ERROR)
 
 # Setup new logging configuration
 logging.basicConfig(
-    format='%(asctime)s - %(name)s %(levelname)s: %(message)s',
+    format="%(asctime)s - %(name)s %(levelname)s: %(message)s",
     datefmt="%D %H:%M:%S",
     level=logging.TRACE if Client.debug else logging.DEBUG,
     handlers=[console_handler, file_handler],
