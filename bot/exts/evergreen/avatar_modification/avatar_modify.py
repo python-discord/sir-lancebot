@@ -365,5 +365,5 @@ class AvatarModify(commands.Cog):
 
 
 def setup(bot: commands.Bot) -> None:
-    """Load the PfpModify cog."""
+    """Load the AvatarModify cog."""
     bot.add_cog(AvatarModify(bot))
