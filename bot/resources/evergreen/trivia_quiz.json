@@ -273,12 +273,12 @@
   "math": [
     {
       "id": 201,
-      "question": "What is the highest power of a biquadratic polynomial",
+      "question": "What is the highest power of a biquadratic polynomial?",
       "answer": "4"
     },
     {
       "id": 202,
-      "question": "What is the formula for surface area of a sphere",
+      "question": "What is the formula for surface area of a sphere?",
       "answer": [
         "4pir^2",
         "4πr^2"
@@ -286,43 +286,58 @@
     },
     {
       "id": 203,
-      "question": 203,
-      "answer": 203
+      "question": "Which theorem states that hypotenuse2 = base2 + height2?",
+      "answer": [
+        "Pythagorean",
+        "Pythagorean's",
+        "Pythagorean's theorem"
+      ]
     },
     {
       "id": 204,
-      "question": 204,
-      "answer": 204
+      "question": "Which trigonometric function is defined as hypotenuse/opposite?",
+      "answer": [
+        "cosecant",
+        "cosec",
+        "csc"
+      ]
     },
     {
       "id": 205,
-      "question": 205,
-      "answer": 205
+      "question": "Does the harmonic series converge or diverge?",
+      "answer": "diverge"
     },
     {
       "id": 206,
-      "question": 206,
-      "answer": 206
+      "question": "How many quadrants are there in a cartesian plane?",
+      "answer": "4"
     },
     {
       "id": 207,
-      "question": 207,
-      "answer": 207
+      "question": "What is the (0,0) coordinate in a cartesian plane termed as?",
+      "answer": [
+        "origin",
+        "the origin"
+      ]
     },
     {
       "id": 208,
-      "question": 208,
-      "answer": 208
+      "question": "What's the following formula that finds the area of a triangle called?",
+      "img_url": "https://www.gstatic.com/education/formulas2/355397047/en/heron_s_formula.svg"
+      "answer": [
+        "Heron's formula",
+        "Hero's formula"
+      ]
     },
     {
       "id": 209,
-      "question": 209,
-      "answer": 209
+      "question": "DYNAMIC QUESTION, TO BE DETERMINED",
+      "answer": "DYNAMIC QUESTION, TO BE DETERMINED"
     },
     {
       "id": 210,
-      "question": 210,
-      "answer": 210
+      "question": "DYNAMIC QUESTION, TO BE DETERMINED",
+      "answer": "DYNAMIC QUESTION, TO BE DETERMINED"
     },
     {
       "id": 211,
