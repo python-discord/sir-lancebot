@@ -225,7 +225,7 @@ class Games(Cog):
                 self.genres[genre_name] = genre
 
     @group(name="games", aliases=["game"], invoke_without_command=True)
-    async def games(self, ctx: Context, amount: Optional[int] = 5, *, genre: Optional[str] = None) -> None:
+    async def games(self, ctx: Context, amount: Optional[int] = 5, *, genre: Optional[str]) -> None:
         """
         Get random game(s) by genre from IGDB. Use .games genres command to get all available genres.
 

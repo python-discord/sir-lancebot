@@ -66,7 +66,7 @@ class Space(Cog):
         await invoke_help_command(ctx)
 
     @space.command(name="apod")
-    async def apod(self, ctx: Context, date: Optional[str] = None) -> None:
+    async def apod(self, ctx: Context, date: Optional[str]) -> None:
         """
         Get Astronomy Picture of Day from NASA API. Date is optional parameter, what formatting is YYYY-MM-DD.
 
@@ -99,7 +99,7 @@ class Space(Cog):
         )
 
     @space.command(name="nasa")
-    async def nasa(self, ctx: Context, *, search_term: Optional[str] = None) -> None:
+    async def nasa(self, ctx: Context, *, search_term: Optional[str]) -> None:
         """Get random NASA information/facts + image. Support `search_term` parameter for more specific search."""
         params = {
             "media_type": "image"
@@ -124,7 +124,7 @@ class Space(Cog):
         )
 
     @space.command(name="epic")
-    async def epic(self, ctx: Context, date: Optional[str] = None) -> None:
+    async def epic(self, ctx: Context, date: Optional[str]) -> None:
         """Get one of latest random image of earth from NASA EPIC API. Support date parameter, format is YYYY-MM-DD."""
         if date:
             try:
@@ -160,8 +160,8 @@ class Space(Cog):
     async def mars(
         self,
         ctx: Context,
-        date: Optional[DateConverter] = None,
-        rover: Optional[str] = "curiosity"
+        date: Optional[DateConverter],
+        rover: str = "curiosity"
     ) -> None:
         """
         Get random Mars image by date. Support both SOL (martian solar day) and earth date and rovers.
