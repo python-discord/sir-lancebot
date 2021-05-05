@@ -313,7 +313,7 @@ class AvatarModify(commands.Cog):
 
             await ctx.send(file=file, embed=embed)
 
-    @avatar_modify.command(name='mosaic', root_aliases=('mosaic',))
+    @avatar_modify.command(name="mosaic", root_aliases=("mosaic",))
     async def mosaic_command(self, ctx: commands.Context, squares: int = 16) -> None:
         """Splits your avatar into x squares, randomizes them and stitches them back into a new image!"""
         async with ctx.typing():
@@ -343,14 +343,14 @@ class AvatarModify(commands.Cog):
             )
 
             if squares == 1:
-                title = 'Hooh... that was a lot of work'
-                description = 'I present to you... Yourself!'
+                title = "Hooh... that was a lot of work"
+                description = "I present to you... Yourself!"
             elif squares == MAX_SQUARES:
-                title = 'Testing the limits I see...'
-                description = 'What a masterpiece. :star:'
+                title = "Testing the limits I see..."
+                description = "What a masterpiece. :star:"
             else:
-                title = 'Your mosaic avatar'
-                description = 'Here is your avatar. I think it looks a bit *puzzling*'
+                title = "Your mosaic avatar"
+                description = "Here is your avatar. I think it looks a bit *puzzling*"
 
             embed = discord.Embed(
                 title=title,
@@ -358,8 +358,8 @@ class AvatarModify(commands.Cog):
                 colour=Colours.blue
             )
 
-            embed.set_image(url=f'attachment://{file_name}')
-            embed.set_footer(text=f'Made by {ctx.author.display_name}', icon_url=ctx.author.avatar_url)
+            embed.set_image(url=f"attachment://{file_name}")
+            embed.set_footer(text=f"Made by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
 
             await ctx.send(file=file, embed=embed)
 
