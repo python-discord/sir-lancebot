@@ -317,6 +317,11 @@ class AvatarModify(commands.Cog):
     async def mosaic_command(self, ctx: commands.Context, squares: int = 16) -> None:
         """Splits your avatar into x squares, randomizes them and stitches them back into a new image!"""
         async with ctx.typing():
+            member = await self._fetch_member(ctx.author.id)
+            if not member:
+                await ctx.send(f"{Emojis.cross_mark} Could not get member info.")
+                return
+
             if squares < 1:
                 raise commands.BadArgument("Squares must be a positive number")
 
@@ -327,7 +332,8 @@ class AvatarModify(commands.Cog):
                 raise commands.BadArgument(f"Number of squares cannot be higher than {MAX_SQUARES:,}.")
 
             file_name = file_safe_name("mosaic_avatar", ctx.author.display_name)
-            img_bytes = await ctx.author.avatar_url.read()
+
+            img_bytes = await member.avatar_url.read()
 
             file = await in_executor(
                 PfpEffects.mosaic_effect,
@@ -348,7 +354,8 @@ class AvatarModify(commands.Cog):
 
             embed = discord.Embed(
                 title=title,
-                description=description
+                description=description,
+                colour=Colours.blue
             )
 
             embed.set_image(url=f'attachment://{file_name}')
