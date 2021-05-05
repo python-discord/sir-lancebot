@@ -84,7 +84,7 @@ class MonsterSurvey(Cog):
                     value="Which monster has the most votes? This command will tell you.",
                     inline=False
                 )
-                default_embed.set_footer(text=f"Monsters choices are: {', '.join(self.voter_registry.keys())}")
+                default_embed.set_footer(text=f"Monsters choices are: {', '.join(self.voter_registry)}")
 
             await ctx.send(embed=default_embed)
 
