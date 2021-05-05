@@ -331,8 +331,8 @@
     },
     {
       "id": 212,
-      "question": 212,
-      "answer": 212
+      "question": "DYNAMIC QUESTION, TO BE DETERMINED",
+      "answer": "DYNAMIC QUESTION, TO BE DETERMINED"
     },
     {
       "id": 213,
@@ -346,8 +346,8 @@
     },
     {
       "id": 215,
-      "question": 215,
-      "answer": 215
+      "question": "DYNAMIC QUESTION, TO BE DETERMINED",
+      "answer": "DYNAMIC QUESTION, TO BE DETERMINED"
     },
     {
       "id": 216,
@@ -357,7 +357,11 @@
     {
       "id": 217,
       "question": "What is the natural log of -1 (use i for imaginary number)?",
-      "answer": "pi*i, pii, πi"
+      "answer": [
+        "pi*i",
+        "pii",
+        "πi"
+      ]
     },
     {
       "id": 218,
