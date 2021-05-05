@@ -73,15 +73,17 @@ class HacktoberIssues(commands.Cog):
         log.debug(f"making api request to url: {url}")
         async with self.bot.http_session.get(url, headers=REQUEST_HEADERS) as response:
             if response.status != 200:
-                log.error(f"expected 200 status (got {response.status}) from the GitHub api.")
-                await ctx.send(f"ERROR: expected 200 status (got {response.status}) from the GitHub api.")
-                await ctx.send(await response.text())
+                log.error(f"expected 200 status (got {response.status}) by the GitHub api.")
+                await ctx.send(
+                    f"ERROR: expected 200 status (got {response.status}) by the GitHub api.\n"
+                    f"{await response.text()}"
+                )
                 return None
             data = await response.json()
 
             if len(data["items"]) == 0:
-                log.error(f"no issues returned from GitHub api. with url: {response.url}")
-                await ctx.send(f"ERROR: no issues returned from GitHub api. with url: {response.url}")
+                log.error(f"no issues returned by GitHub API, with url: {response.url}")
+                await ctx.send(f"ERROR: no issues returned by GitHub API, with url: {response.url}")
                 return None
 
             if option == "beginner":

@@ -302,8 +302,7 @@ class HacktoberStats(commands.Cog):
     async def _fetch_url(self, url: str, headers: dict) -> dict:
         """Retrieve API response from URL."""
         async with self.bot.http_session.get(url, headers=headers) as resp:
-            jsonresp = await resp.json()
-        return jsonresp
+            return await resp.json()
 
     @staticmethod
     def _has_label(pr: dict, labels: Union[List[str], str]) -> bool:
