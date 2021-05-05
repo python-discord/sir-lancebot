@@ -269,5 +269,160 @@
       "answer": "1492",
       "info": "The explorer Christopher Columbus made four trips across the Atlantic Ocean from Spain: in 1492, 1493, 1498 and 1502. He was determined to find a direct water route west from Europe to Asia, but he never did. Instead, he stumbled upon the Americas"
     }
+  ],
+  "math": [
+    {
+      "id": 201,
+      "question": "What is the highest power of a biquadratic polynomial",
+      "answer": "4"
+    },
+    {
+      "id": 202,
+      "question": "What is the formula for surface area of a sphere",
+      "answer": [
+        "4pir^2",
+        "4πr^2"
+      ]
+    },
+    {
+      "id": 203,
+      "question": 203,
+      "answer": 203
+    },
+    {
+      "id": 204,
+      "question": 204,
+      "answer": 204
+    },
+    {
+      "id": 205,
+      "question": 205,
+      "answer": 205
+    },
+    {
+      "id": 206,
+      "question": 206,
+      "answer": 206
+    },
+    {
+      "id": 207,
+      "question": 207,
+      "answer": 207
+    },
+    {
+      "id": 208,
+      "question": 208,
+      "answer": 208
+    },
+    {
+      "id": 209,
+      "question": 209,
+      "answer": 209
+    },
+    {
+      "id": 210,
+      "question": 210
+      "answer": 210
+    },
+    {
+      "id": 211,
+      "question": 211,
+      "answer": 211
+    },
+    {
+      "id": 212,
+      "question": 212,
+      "answer": 212
+    },
+    {
+      "id": 213,
+      "question": 213,
+      "answer": 213
+    },
+    {
+      "id": 214,
+      "question": 214,
+      "answer": 214
+    },
+    {
+      "id": 215,
+      "question": 215,
+      "answer": 215
+    },
+    {
+      "id": 216,
+      "question": 216,
+      "answer": 216
+    },
+    {
+      "id": 217,
+      "question": 217,
+      "answer": 217
+    },
+    {
+      "id": 218,
+      "question": 218,
+      "answer": 218
+    },
+    {
+      "id": 219,
+      "question": 219,
+      "answer": 219
+    },
+    {
+      "id": 220,
+      "question": 220,
+      "answer": 220
+    },
+    {
+      "id": 221,
+      "question": 221,
+      "answer": 221
+    },
+    {
+      "id": 222,
+      "question": 222,
+      "answer": 222
+    },
+    {
+      "id": 223,
+      "question": 223,
+      "answer": 223
+    },
+    {
+      "id": 224,
+      "question": 224
+      "answer": 224
+    },
+    {
+      "id": 225,
+      "question": 225,
+      "answer": 225
+    },
+    {
+      "id": 226,
+      "question": 226,
+      "answer": 226
+    },
+    {
+      "id": 227,
+      "question": 227,
+      "answer": 227
+    },
+    {
+      "id": 228,
+      "question": 228,
+      "answer": 228
+    },
+    {
+      "id": 229,
+      "question": 229,
+      "answer": 229
+    },
+    {
+      "id": 230,
+      "question": 230,
+      "answer": 230
+    }
   ]
 }
