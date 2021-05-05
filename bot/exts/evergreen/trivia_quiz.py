@@ -32,8 +32,8 @@ class TriviaQuiz(commands.Cog):
         self.player_scores = {}  # A variable to store all player's scores for a bot session.
         self.game_player_scores = {}  # A variable to store temporary game player's scores.
         self.categories = {
-            "general": "Test your general knowledge"
-            # "retro": "Questions related to retro gaming."
+            "general": "Test your general knowledge",
+            "retro": "Questions related to retro gaming."
         }
 
     @staticmethod
@@ -61,10 +61,12 @@ class TriviaQuiz(commands.Cog):
 
         # Stop game if running.
         if self.game_status[ctx.channel.id] is True:
-            return await ctx.send(
-                f"Game is already running..."
+            await ctx.send(
+                "Game is already running..."
                 f"do `{self.bot.command_prefix}quiz stop`"
             )
+
+            return
 
         # Send embed showing available categories if inputted category is invalid.
         if category is None:
@@ -138,7 +140,7 @@ class TriviaQuiz(commands.Cog):
                     hint_no += 1
                     if "hints" in question_dict:
                         hints = question_dict["hints"]
-                        await ctx.send(f"**Hint #{hint_no+1}\n**{hints[hint_no]}")
+                        await ctx.send(f"**Hint #{hint_no}\n**{hints[hint_no-1]}")
                     else:
                         await ctx.send(f"{30 - hint_no * 10}s left!")
 
@@ -163,7 +165,7 @@ class TriviaQuiz(commands.Cog):
                     break
 
                 # Reduce points by 25 for every hint/time alert that has been sent.
-                points = 100 - 25*hint_no
+                points = 100 - 25 * hint_no
                 if msg.author in self.game_player_scores[ctx.channel.id]:
                     self.game_player_scores[ctx.channel.id][msg.author] += points
                 else:
@@ -287,7 +289,12 @@ class TriviaQuiz(commands.Cog):
     async def send_answer(channel: discord.TextChannel, question_dict: dict) -> None:
         """Send the correct answer of a question to the game channel."""
         answer = question_dict["answer"]
-        info = question_dict["info"]
+
+        if "info" in question_dict:
+            info = question_dict["info"]
+        else:
+            info = ""
+
         embed = discord.Embed(color=discord.Colour.red())
         embed.title = f"The correct answer is **{answer}**\n"
         embed.description = ""
@@ -302,3 +309,4 @@ class TriviaQuiz(commands.Cog):
 def setup(bot: commands.Bot) -> None:
     """Load the cog."""
     bot.add_cog(TriviaQuiz(bot))
+
