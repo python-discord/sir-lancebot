@@ -44,6 +44,27 @@
       ],
       "question": "What was the first game Yoshi appeared in?",
       "answer": "Super Mario World"
+    },
+    {
+      "id": 6,
+      "hints": [
+        "They were used alternatively to playing cards.",
+        "They generally have handdrawn nature images on them."
+      ],
+      "question": "What did Nintendo make before video games and toys?",
+      "answer": [
+        "Hanafuda",
+        "Hanafuda Cards"
+      ]
+    },
+    {
+      "id": 7,
+      "hints": [
+        "Before being Nintendo's main competitor in home gaming, they were successful in arcades.",
+        "Their first console was called the Master System."
+      ],
+      "question": "Who was Nintendo's biggest competitor in 1990?",
+      "answer": "Sega"
     }
   ],
   "general": [
@@ -273,12 +294,12 @@
   "math": [
     {
       "id": 201,
-      "question": "What is the highest power of a biquadratic polynomial",
+      "question": "What is the highest power of a biquadratic polynomial?",
       "answer": "4"
     },
     {
       "id": 202,
-      "question": "What is the formula for surface area of a sphere",
+      "question": "What is the formula for surface area of a sphere?",
       "answer": [
         "4pir^2",
         "4πr^2"
@@ -286,93 +307,112 @@
     },
     {
       "id": 203,
-      "question": 203,
-      "answer": 203
+      "question": "Which theorem states that hypotenuse2 = base2 + height2?",
+      "answer": [
+        "Pythagorean",
+        "Pythagorean's",
+        "Pythagorean's theorem"
+      ]
     },
     {
       "id": 204,
-      "question": 204,
-      "answer": 204
+      "question": "Which trigonometric function is defined as hypotenuse/opposite?",
+      "answer": [
+        "cosecant",
+        "cosec",
+        "csc"
+      ]
     },
     {
       "id": 205,
-      "question": 205,
-      "answer": 205
+      "question": "Does the harmonic series converge or diverge?",
+      "answer": "diverge"
     },
     {
       "id": 206,
-      "question": 206,
-      "answer": 206
+      "question": "How many quadrants are there in a cartesian plane?",
+      "answer": "4"
     },
     {
       "id": 207,
-      "question": 207,
-      "answer": 207
+      "question": "What is the (0,0) coordinate in a cartesian plane termed as?",
+      "answer": [
+        "origin",
+        "the origin"
+      ]
     },
     {
       "id": 208,
-      "question": 208,
-      "answer": 208
+      "question": "What's the following formula that finds the area of a triangle called?",
+      "img_url": "https://www.gstatic.com/education/formulas2/355397047/en/heron_s_formula.svg",
+      "answer": [
+        "Heron's formula",
+        "Hero's formula"
+      ]
     },
     {
       "id": 209,
-      "question": 209,
-      "answer": 209
+      "question": "DYNAMIC QUESTION, TO BE DETERMINED",
+      "answer": "DYNAMIC QUESTION, TO BE DETERMINED"
     },
     {
       "id": 210,
-      "question": 210,
-      "answer": 210
+      "question": "DYNAMIC QUESTION, TO BE DETERMINED",
+      "answer": "DYNAMIC QUESTION, TO BE DETERMINED"
     },
     {
       "id": 211,
-      "question": 211,
-      "answer": 211
+      "question": "What is the bottom number on a fraction called?",
+      "answer": "Denominator"
     },
     {
       "id": 212,
-      "question": 212,
-      "answer": 212
+      "question": "DYNAMIC QUESTION, TO BE DETERMINED",
+      "answer": "DYNAMIC QUESTION, TO BE DETERMINED"
     },
     {
       "id": 213,
-      "question": 213,
-      "answer": 213
+      "question": "What is the term used to describe two triangles that have equal corresponding sides and angle measures?",
+      "answer": "Congruent"
     },
     {
       "id": 214,
-      "question": 214,
-      "answer": 214
+      "question": "⅓πr2h is the volume of which 3 dimensional figure?",
+      "answer": "Cone"
     },
     {
       "id": 215,
-      "question": 215,
-      "answer": 215
+      "question": "DYNAMIC QUESTION, TO BE DETERMINED",
+      "answer": "DYNAMIC QUESTION, TO BE DETERMINED"
     },
     {
       "id": 216,
-      "question": 216,
-      "answer": 216
+      "question": "In set builder notation, {p/q | q ≠ 0, p & q ∈ Z} represents what?",
+      "answer": "Rational Numbers"
     },
     {
       "id": 217,
-      "question": 217,
-      "answer": 217
+      "question": "What is the natural log of -1 (use i for imaginary number)?",
+      "answer": [
+        "pi*i",
+        "pii",
+        "πi"
+      ]
     },
     {
       "id": 218,
-      "question": 218,
-      "answer": 218
+      "question": "When is the *inaugural* World Maths Day (format your answer in MM/DD)?",
+      "answer": "03/13"
     },
     {
       "id": 219,
-      "question": 219,
-      "answer": 219
+      "question": "As the Fibonacci sequence extends to infinity, what's the ratio of each number `n` and its preceding number `n-1` approaching?",
+      "answer": "Golden Ratio"
     },
     {
       "id": 220,
-      "question": 220,
-      "answer": 220
+      "question": "0, 1, 1, 2, 3, 5, 8, 13, 21, 34 are numbers of which sequence?",
+      "answer": "Fibonacci"
     },
     {
       "id": 221,
@@ -390,7 +430,7 @@
     {
       "id": 223,
       "question": "In statistics, what does this formula represent?",
-      "img_url": "https://www.gstatic.com/education/formulas2/355397047/en/population_standard_deviation.svg"
+      "img_url": "https://www.gstatic.com/education/formulas2/355397047/en/population_standard_deviation.svg",
       "answer": "standard deviation"
     },
     {
@@ -427,7 +467,7 @@
     {
       "id": 229,
       "question": "What is this triangle called?",
-      "img_url": "https://wikimedia.org/api/rest_v1/media/math/render/svg/23050fcb53d6083d9e42043bebf2863fa9746043"
+      "img_url": "https://wikimedia.org/api/rest_v1/media/math/render/svg/23050fcb53d6083d9e42043bebf2863fa9746043",
       "answer": [
         "Pascal's triangle",
         "Pascal"
