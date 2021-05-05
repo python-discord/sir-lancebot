@@ -3,7 +3,6 @@ import random
 
 import discord
 from discord.ext import commands
-from discord.ext.commands.cooldowns import BucketType
 
 from bot.bot import Bot
 from bot.utils.pagination import ImagePaginator
@@ -31,7 +30,7 @@ class Reddit(commands.Cog):
             return await response.json()
 
     @commands.command(name="reddit")
-    @commands.cooldown(1, 10, BucketType.user)
+    @commands.cooldown(1, 10, commands.BucketType.user)
     async def get_reddit(self, ctx: commands.Context, subreddit: str = "python", sort: str = "hot") -> None:
         """
         Fetch reddit posts by using this command.

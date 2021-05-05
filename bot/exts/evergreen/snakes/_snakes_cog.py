@@ -9,15 +9,15 @@ import textwrap
 import urllib
 from functools import partial
 from io import BytesIO
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
-import aiohttp
 import async_timeout
 from PIL import Image, ImageDraw, ImageFont
 from discord import Colour, Embed, File, Member, Message, Reaction
 from discord.errors import HTTPException
-from discord.ext.commands import Bot, Cog, CommandError, Context, bot_has_permissions, group
+from discord.ext.commands import Cog, CommandError, Context, bot_has_permissions, group
 
+from bot.bot import Bot
 from bot.constants import ERROR_REPLIES, Tokens
 from bot.exts.evergreen.snakes import _utils as utils
 from bot.exts.evergreen.snakes._converter import Snake
@@ -275,13 +275,13 @@ class Snakes(Cog):
 
         return message
 
-    async def _fetch(self, session: aiohttp.ClientSession, url: str, params: dict = None) -> dict:
+    async def _fetch(self, url: str, params: Optional[dict] = None) -> dict:
         """Asynchronous web request helper method."""
         if params is None:
             params = {}
 
         async with async_timeout.timeout(10):
-            async with session.get(url, params=params) as response:
+            async with self.bot.http_session.get(url, params=params) as response:
                 return await response.json()
 
     def _get_random_long_message(self, messages: List[str], retries: int = 10) -> str:
@@ -309,96 +309,95 @@ class Snakes(Cog):
         """
         snake_info = {}
 
-        async with aiohttp.ClientSession() as session:
-            params = {
-                "format": "json",
-                "action": "query",
-                "list": "search",
-                "srsearch": name,
-                "utf8": "",
-                "srlimit": "1",
-            }
+        params = {
+            "format": "json",
+            "action": "query",
+            "list": "search",
+            "srsearch": name,
+            "utf8": "",
+            "srlimit": "1",
+        }
 
-            json = await self._fetch(session, URL, params=params)
+        json = await self._fetch(URL, params=params)
 
-            # Wikipedia does have a error page
-            try:
-                pageid = json["query"]["search"][0]["pageid"]
-            except KeyError:
-                # Wikipedia error page ID(?)
-                pageid = 41118
-            except IndexError:
-                return None
+        # Wikipedia does have a error page
+        try:
+            pageid = json["query"]["search"][0]["pageid"]
+        except KeyError:
+            # Wikipedia error page ID(?)
+            pageid = 41118
+        except IndexError:
+            return None
 
-            params = {
-                "format": "json",
-                "action": "query",
-                "prop": "extracts|images|info",
-                "exlimit": "max",
-                "explaintext": "",
-                "inprop": "url",
-                "pageids": pageid
-            }
+        params = {
+            "format": "json",
+            "action": "query",
+            "prop": "extracts|images|info",
+            "exlimit": "max",
+            "explaintext": "",
+            "inprop": "url",
+            "pageids": pageid
+        }
 
-            json = await self._fetch(session, URL, params=params)
+        json = await self._fetch(URL, params=params)
 
-            # Constructing dict - handle exceptions later
-            try:
-                snake_info["title"] = json["query"]["pages"][f"{pageid}"]["title"]
-                snake_info["extract"] = json["query"]["pages"][f"{pageid}"]["extract"]
-                snake_info["images"] = json["query"]["pages"][f"{pageid}"]["images"]
-                snake_info["fullurl"] = json["query"]["pages"][f"{pageid}"]["fullurl"]
-                snake_info["pageid"] = json["query"]["pages"][f"{pageid}"]["pageid"]
-            except KeyError:
-                snake_info["error"] = True
+        # Constructing dict - handle exceptions later
+        try:
+            snake_info["title"] = json["query"]["pages"][f"{pageid}"]["title"]
+            snake_info["extract"] = json["query"]["pages"][f"{pageid}"]["extract"]
+            snake_info["images"] = json["query"]["pages"][f"{pageid}"]["images"]
+            snake_info["fullurl"] = json["query"]["pages"][f"{pageid}"]["fullurl"]
+            snake_info["pageid"] = json["query"]["pages"][f"{pageid}"]["pageid"]
+        except KeyError:
+            snake_info["error"] = True
 
-            if snake_info["images"]:
-                i_url = "https://commons.wikimedia.org/wiki/Special:FilePath/"
-                image_list = []
-                map_list = []
-                thumb_list = []
+        if snake_info["images"]:
+            i_url = "https://commons.wikimedia.org/wiki/Special:FilePath/"
+            image_list = []
+            map_list = []
+            thumb_list = []
 
-                # Wikipedia has arbitrary images that are not snakes
-                banned = [
-                    "Commons-logo.svg",
-                    "Red%20Pencil%20Icon.png",
-                    "distribution",
-                    "The%20Death%20of%20Cleopatra%20arthur.jpg",
-                    "Head%20of%20holotype",
-                    "locator",
-                    "Woma.png",
-                    "-map.",
-                    ".svg",
-                    "ange.",
-                    "Adder%20(PSF).png"
-                ]
+            # Wikipedia has arbitrary images that are not snakes
+            banned = [
+                "Commons-logo.svg",
+                "Red%20Pencil%20Icon.png",
+                "distribution",
+                "The%20Death%20of%20Cleopatra%20arthur.jpg",
+                "Head%20of%20holotype",
+                "locator",
+                "Woma.png",
+                "-map.",
+                ".svg",
+                "ange.",
+                "Adder%20(PSF).png"
+            ]
 
-                for image in snake_info["images"]:
-                    # Images come in the format of `File:filename.extension`
-                    file, sep, filename = image["title"].partition(":")
-                    filename = filename.replace(" ", "%20")  # Wikipedia returns good data!
+            for image in snake_info["images"]:
+                # Images come in the format of `File:filename.extension`
+                file, sep, filename = image["title"].partition(":")
+                filename = filename.replace(" ", "%20")  # Wikipedia returns good data!
 
-                    if not filename.startswith("Map"):
-                        if any(ban in filename for ban in banned):
-                            pass
-                        else:
-                            image_list.append(f"{i_url}{filename}")
-                            thumb_list.append(f"{i_url}{filename}?width=100")
+                if not filename.startswith("Map"):
+                    if any(ban in filename for ban in banned):
+                        pass
                     else:
-                        map_list.append(f"{i_url}{filename}")
+                        image_list.append(f"{i_url}{filename}")
+                        thumb_list.append(f"{i_url}{filename}?width=100")
+                else:
+                    map_list.append(f"{i_url}{filename}")
 
-            snake_info["image_list"] = image_list
-            snake_info["map_list"] = map_list
-            snake_info["thumb_list"] = thumb_list
-            snake_info["name"] = name
+        snake_info["image_list"] = image_list
+        snake_info["map_list"] = map_list
+        snake_info["thumb_list"] = thumb_list
+        snake_info["name"] = name
 
-            match = self.wiki_brief.match(snake_info["extract"])
-            info = match.group(1) if match else None
+        match = self.wiki_brief.match(snake_info["extract"])
+        info = match.group(1) if match else None
 
-            if info:
-                info = info.replace("\n", "\n\n")  # Give us some proper paragraphs.
+        if info:
+            info = info.replace("\n", "\n\n")  # Give us some proper paragraphs.
 
-            snake_info["info"] = info
+        snake_info["info"] = info
 
         return snake_info
 

@@ -72,13 +72,13 @@ class Movie(Cog):
         # Capitalize genre for getting data from Enum, get random page, send help when genre don't exist.
         genre = genre.capitalize()
         try:
-            result = await self.get_movies_list(self.http_session, MovieGenres[genre].value, 1)
+            result = await self.get_movies_data(self.http_session, MovieGenres[genre].value, 1)
         except KeyError:
             await invoke_help_command(ctx)
             return
 
         # Check if "results" is in result. If not, throw error.
-        if "results" not in result.keys():
+        if "results" not in result:
             err_msg = f"There is problem while making TMDB API request. Response Code: {result['status_code']}, " \
                       f"{result['status_message']}."
             await ctx.send(err_msg)
@@ -88,8 +88,8 @@ class Movie(Cog):
         page = random.randint(1, result["total_pages"])
 
         # Get movies list from TMDB, check if results key in result. When not, raise error.
-        movies = await self.get_movies_list(self.http_session, MovieGenres[genre].value, page)
-        if "results" not in movies.keys():
+        movies = await self.get_movies_data(self.http_session, MovieGenres[genre].value, page)
+        if "results" not in movies:
             err_msg = f"There is problem while making TMDB API request. Response Code: {result['status_code']}, " \
                       f"{result['status_message']}."
             await ctx.send(err_msg)
@@ -106,7 +106,7 @@ class Movie(Cog):
         """Show all currently available genres for .movies command."""
         await ctx.send(f"Current available genres: {', '.join('`' + genre.name + '`' for genre in MovieGenres)}")
 
-    async def get_movies_list(self, client: ClientSession, genre_id: str, page: int) -> Dict[str, Any]:
+    async def get_movies_data(self, client: ClientSession, genre_id: str, page: int) -> List[Dict[str, Any]]:
         """Return JSON of TMDB discover request."""
         # Define params of request
         params = {

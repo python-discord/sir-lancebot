@@ -5,7 +5,6 @@ from urllib.parse import quote
 
 import discord
 from discord.ext import commands
-from discord.ext.commands.cooldowns import BucketType
 
 from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES
@@ -28,7 +27,7 @@ class GithubInfo(commands.Cog):
             return await r.json()
 
     @commands.group(name="github", aliases=("gh", "git"))
-    @commands.cooldown(1, 10, BucketType.user)
+    @commands.cooldown(1, 10, commands.BucketType.user)
     async def github_group(self, ctx: commands.Context) -> None:
         """Commands for finding information related to GitHub."""
         if ctx.invoked_subcommand is None:

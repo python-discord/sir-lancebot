@@ -7,5 +7,5 @@ log = logging.getLogger(__name__)
 
 
 def setup(bot: Bot) -> None:
-    """Snakes Cog load."""
+    """Load the Snakes Cog."""
     bot.add_cog(Snakes(bot))
