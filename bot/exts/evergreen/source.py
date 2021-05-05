@@ -1,32 +1,13 @@
 import inspect
 from pathlib import Path
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple
 
 from discord import Embed
 from discord.ext import commands
 
 from bot.bot import Bot
 from bot.constants import Source
-
-SourceType = Union[commands.Command, commands.Cog, str, commands.ExtensionNotLoaded]
-
-
-class SourceConverter(commands.Converter):
-    """Convert an argument into a help command, tag, command, or cog."""
-
-    async def convert(self, ctx: commands.Context, argument: str) -> SourceType:
-        """Convert argument into source object."""
-        cog = ctx.bot.get_cog(argument)
-        if cog:
-            return cog
-
-        cmd = ctx.bot.get_command(argument)
-        if cmd:
-            return cmd
-
-        raise commands.BadArgument(
-            f"Unable to convert `{argument}` to valid command or Cog."
-        )
+from bot.utils.converters import SourceConverter, SourceType
 
 
 class BotSource(commands.Cog):

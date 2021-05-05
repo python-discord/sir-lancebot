@@ -1,15 +1,16 @@
 import logging
 import random
 from datetime import date, datetime
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional
 from urllib.parse import urlencode
 
 from discord import Embed
 from discord.ext import tasks
-from discord.ext.commands import BadArgument, Cog, Context, Converter, group
+from discord.ext.commands import Cog, Context, group
 
 from bot.bot import Bot
 from bot.constants import Tokens
+from bot.utils.converters import DateConverter
 from bot.utils.extensions import invoke_help_command
 
 logger = logging.getLogger(__name__)
@@ -19,20 +20,6 @@ NASA_IMAGES_BASE_URL = "https://images-api.nasa.gov"
 NASA_EPIC_BASE_URL = "https://epic.gsfc.nasa.gov"
 
 APOD_MIN_DATE = date(1995, 6, 16)
-
-
-class DateConverter(Converter):
-    """Parse SOL or earth date (in format YYYY-MM-DD) into `int` or `datetime`. When invalid input, raise error."""
-
-    async def convert(self, ctx: Context, argument: str) -> Union[int, datetime]:
-        """Parse date (SOL or earth) into `datetime` or `int`. When invalid value, raise error."""
-        if argument.isdigit():
-            return int(argument)
-        try:
-            date = datetime.strptime(argument, "%Y-%m-%d")
-        except ValueError:
-            raise BadArgument(f"Can't convert `{argument}` to `datetime` in format `YYYY-MM-DD` or `int` in SOL.")
-        return date
 
 
 class Space(Cog):

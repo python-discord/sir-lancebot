@@ -8,6 +8,7 @@ from discord.ext import commands
 
 from bot.bot import Bot
 from bot.constants import Client
+from bot.utils.converters import CoordinateConverter
 from bot.utils.exceptions import UserNotPlayingError
 from bot.utils.extensions import invoke_help_command
 
@@ -30,33 +31,6 @@ MESSAGE_MAPPING = {
 }
 
 log = logging.getLogger(__name__)
-
-
-class CoordinateConverter(commands.Converter):
-    """Converter for Coordinates."""
-
-    async def convert(self, ctx: commands.Context, coordinate: str) -> typing.Tuple[int, int]:
-        """Take in a coordinate string and turn it into an (x, y) tuple."""
-        if not 2 <= len(coordinate) <= 3:
-            raise commands.BadArgument("Invalid co-ordinate provided.")
-
-        coordinate = coordinate.lower()
-        if coordinate[0].isalpha():
-            digit = coordinate[1:]
-            letter = coordinate[0]
-        else:
-            digit = coordinate[:-1]
-            letter = coordinate[-1]
-
-        if not digit.isdigit():
-            raise commands.BadArgument
-
-        x = ord(letter) - ord("a")
-        y = int(digit) - 1
-
-        if (not 0 <= x <= 9) or (not 0 <= y <= 9):
-            raise commands.BadArgument
-        return x, y
 
 
 GameBoard = typing.List[typing.List[typing.Union[str, int]]]
