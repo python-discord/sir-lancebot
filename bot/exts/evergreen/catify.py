@@ -16,6 +16,7 @@ class Catify(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=["ᓚᘏᗢify", "ᓚᘏᗢ"])
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def catify(self, ctx: commands.Context, *, text: Optional[str]) -> None:
         """
         Convert the provided text into a cat themed sentence by interspercing cats throughout text.
