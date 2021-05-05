@@ -376,52 +376,66 @@
     },
     {
       "id": 221,
-      "question": "prime numbers only have __ factors.",
-      "answer": "2, two"
+      "question": "Prime numbers only have __ factors.",
+      "answer": [
+        "2",
+        "two"
+      ]
     },
     {
       "id": 222,
-      "question": " in probability, the ________ ______ of an experiment or random trial is the set of all possible outcomes of it",
+      "question": "In probability, the ________ ______ of an experiment or random trial is the set of all possible outcomes of it.",
       "answer": "sample space"
     },
     {
       "id": 223,
-      "question": "in statistics, what does this formula (shows formula) represent",
+      "question": "In statistics, what does this formula represent?",
+      "img_url": "https://www.gstatic.com/education/formulas2/355397047/en/population_standard_deviation.svg"
       "answer": "standard deviation"
     },
     {
       "id": 224,
-      "question": "“hexakosioihexekontahexaphobia” is the fear of which number",
+      "question": "\"Hexakosioihexekontahexaphobia\" is the fear of which number?",
       "answer": "666"
     },
     {
       "id": 225,
-      "question": "prove or disprove the Riemann Hypothesis",
-      "answer": "no solution, easter egg lol"
+      "question": "Prove or disprove the Riemann Hypothesis",
+      "answer": ""
     },
     {
       "id": 226,
-      "question": 226,
-      "answer": 226
+      "question": "DYNAMIC QUESTION, TO BE DETERMINED",
+      "answer": "DYNAMIC QUESTION, TO BE DETERMINED"
     },
     {
       "id": 227,
-      "question": "what is the only number in the entire number system which can be spelled with the same number of letters as itself",
-      "answer": "4, four"
+      "question": "What is the only number in the entire number system which can be spelled with the same number of letters as itself?",
+      "answer": [
+        "4",
+        "four"
+      ]
     },
     {
       "id": 228,
-      "question": "1/100th of a second is also termed as what",
-      "answer": "a jiffy, jiffy"
+      "question": "1/100th of a second is also termed as what?",
+      "answer": [
+        "a jiffy",
+        "jiffy"
+      ]
     },
     {
       "id": 229,
-      "question": "what is this triangle called (shows pascal’s triangle)",
-      "answer": "Pascal’s Triangle, Pascal"
+      "question": "What is this triangle called?",
+      "img_url": "https://wikimedia.org/api/rest_v1/media/math/render/svg/23050fcb53d6083d9e42043bebf2863fa9746043"
+      "answer": [
+        "Pascal's triangle",
+        "Pascal"
+      ]
     },
     {
       "id": 230,
-      "question": "6a2 is the surface area of which 3 dimensional figure",
+      "question": "6a^2 is the surface area of which 3 dimensional figure?",
       "answer": "cube"
     }
   ]
