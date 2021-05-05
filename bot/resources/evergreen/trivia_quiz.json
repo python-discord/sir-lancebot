@@ -300,7 +300,7 @@
     {
       "id": 202,
       "question": "What is the formula for surface area of a sphere?",
-      "answer": "4pi2^2, 4πr^2"
+      "answer": "4pir^2, 4πr^2"
     },
     {
       "id": 203,
