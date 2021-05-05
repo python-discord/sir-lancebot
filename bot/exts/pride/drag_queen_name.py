@@ -19,7 +19,7 @@ class DragNames(commands.Cog):
     @staticmethod
     def load_names() -> list:
         """Loads a list of drag queen names."""
-        with open(Path("bot/resources/pride/drag_queen_names.json"), "r", encoding="utf8") as f:
+        with Path("bot/resources/pride/drag_queen_names.json").open(encoding="utf8") as f:
             return json.load(f)
 
     @commands.command(name="dragname", aliases=["dragqueenname", "queenme"])
@@ -29,5 +29,5 @@ class DragNames(commands.Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Load the Drag Queen Cog."""
+    """Load the Drag Names Cog."""
     bot.add_cog(DragNames())

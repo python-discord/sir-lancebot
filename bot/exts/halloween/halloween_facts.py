@@ -33,7 +33,6 @@ class HalloweenFacts(commands.Cog):
         with Path("bot/resources/halloween/halloween_facts.json").open("r", encoding="utf8") as file:
             self.halloween_facts = json.load(file)
         self.facts = list(enumerate(self.halloween_facts))
-        random.shuffle(self.facts)
 
     def random_fact(self) -> Tuple[int, str]:
         """Return a random fact from the loaded facts."""

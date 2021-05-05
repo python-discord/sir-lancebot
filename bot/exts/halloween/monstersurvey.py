@@ -1,6 +1,6 @@
 import json
 import logging
-import os
+import pathlib
 
 from discord import Embed
 from discord.ext import commands
@@ -25,24 +25,24 @@ class MonsterSurvey(Cog):
 
     def __init__(self):
         """Initializes values for the bot to use within the voting commands."""
-        self.registry_location = os.path.join(os.getcwd(), "bot", "resources", "halloween", "monstersurvey.json")
-        with open(self.registry_location, "r", encoding="utf8") as jason:
-            self.voter_registry = json.load(jason)
+        self.registry_path = pathlib.Path("bot", "resources", "halloween", "monstersurvey.json")
+        with self.registry_path.open(encoding="utf8") as data:
+            self.voter_registry = json.load(data)
 
     def json_write(self) -> None:
         """Write voting results to a local JSON file."""
         log.info("Saved Monster Survey Results")
-        with open(self.registry_location, "w", encoding="utf8") as jason:
-            json.dump(self.voter_registry, jason, indent=2)
+        with self.registry_path.open("w", encoding="utf8") as data:
+            json.dump(self.voter_registry, data, indent=2)
 
     def cast_vote(self, id: int, monster: str) -> None:
         """
-        Cast a user"s vote for the specified monster.
+        Cast a user's vote for the specified monster.
 
         If the user has already voted, their existing vote is removed.
         """
         vr = self.voter_registry
-        for m in vr.keys():
+        for m in vr:
             if id not in vr[m]["votes"] and m == monster:
                 vr[m]["votes"].append(id)
             else:
