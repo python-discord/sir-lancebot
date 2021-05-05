@@ -112,7 +112,7 @@ class Space(Cog):
 
     @space.command(name="epic")
     async def epic(self, ctx: Context, date: Optional[str]) -> None:
-        """Get one of latest random image of earth from NASA EPIC API. Support date parameter, format is YYYY-MM-DD."""
+        """Get a random image of the Earth from the NASA EPIC API. Support date parameter, format is YYYY-MM-DD."""
         if date:
             try:
                 show_date = datetime.strptime(date, "%Y-%m-%d").date().isoformat()
