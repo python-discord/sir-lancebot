@@ -44,6 +44,27 @@
       ],
       "question": "What was the first game Yoshi appeared in?",
       "answer": "Super Mario World"
+    },
+    {
+      "id": 6,
+      "hints": [
+        "They were used alternatively to playing cards.",
+        "They generally have handdrawn nature images on them."
+      ],
+      "question": "What did Nintendo make before video games and toys?",
+      "answer": [
+        "Hanafuda",
+        "Hanafuda Cards"
+      ]
+    },
+    {
+      "id": 7,
+      "hints": [
+        "Before being Nintendo's main competitor in home gaming, they were successful in arcades.",
+        "Their first console was called the Master System."
+      ],
+      "question": "Who was Nintendo's biggest competitor in 1990?",
+      "answer": "Sega"
     }
   ],
   "general": [
