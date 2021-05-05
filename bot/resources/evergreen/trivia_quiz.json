@@ -417,10 +417,7 @@
     {
       "id": 221,
       "question": "Prime numbers only have __ factors.",
-      "answer": [
-        "2",
-        "two"
-      ]
+      "answer": "2, two"
     },
     {
       "id": 222,
@@ -451,10 +448,8 @@
     {
       "id": 227,
       "question": "What is the only number in the entire number system which can be spelled with the same number of letters as itself?",
-      "answer": [
-        "4",
-        "four"
-      ]
+      "answer": "4, four"
+      
     },
     {
       "id": 228,
