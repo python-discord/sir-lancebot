@@ -52,10 +52,7 @@
         "They generally have handdrawn nature images on them."
       ],
       "question": "What did Nintendo make before video games and toys?",
-      "answer": [
-        "Hanafuda",
-        "Hanafuda Cards"
-      ]
+      "answer": "Hanafuda, Hanafuda cards"
     },
     {
       "id": 7,
@@ -295,7 +292,7 @@
     {
       "id": 201,
       "question": "What is the highest power of a biquadratic polynomial?",
-      "answer": "4"
+      "answer": "4, four"
     },
     {
       "id": 202,
@@ -305,7 +302,7 @@
     {
       "id": 203,
       "question": "Which theorem states that hypotenuse2 = base2 + height2?",
-      "answer": "Pythagorean, Pythagorean's, Pythagorean's theorem"
+      "answer": "Pythagorean's, Pythagorean's theorem"
     },
     {
       "id": 204,
@@ -320,28 +317,30 @@
     {
       "id": 206,
       "question": "How many quadrants are there in a cartesian plane?",
-      "answer": "4"
+      "answer": "4, four"
     },
     {
       "id": 207,
       "question": "What is the (0,0) coordinate in a cartesian plane termed as?",
-      "answer": "the origin, origin"
+      "answer": "origin"
     },
     {
       "id": 208,
       "question": "What's the following formula that finds the area of a triangle called?",
       "img_url": "https://wikimedia.org/api/rest_v1/media/math/render/png/d22b8566e8187542966e8d166e72e93746a1a6fc",
-      "answer": "Heron's formula, Hero's formula"
+      "answer": "Heron's formula"
     },
     {
       "id": 209,
-      "question": "DYNAMIC QUESTION, TO BE DETERMINED",
-      "answer": "DYNAMIC QUESTION, TO BE DETERMINED"
+      "dynamic_id": 201,
+      "question": "Solve the following system of linear equations (format your answer like this <x> & <y>):\n{}x + {}y = {},\n{}x + {}y = {}",
+      "answer": "{} & {}"
     },
     {
       "id": 210,
-      "question": "DYNAMIC QUESTION, TO BE DETERMINED",
-      "answer": "DYNAMIC QUESTION, TO BE DETERMINED"
+      "dynamic_id": 202,
+      "question": "What's {} + {} mod {} congruent to?",
+      "answer": "{}"
     },
     {
       "id": 211,
@@ -350,8 +349,9 @@
     },
     {
       "id": 212,
-      "question": "DYNAMIC QUESTION, TO BE DETERMINED",
-      "answer": "DYNAMIC QUESTION, TO BE DETERMINED"
+      "dynamic_id": 203,
+      "question": "How many vertices are on a {}gonal prism?",
+      "answer": "{}"
     },
     {
       "id": 213,
@@ -365,13 +365,14 @@
     },
     {
       "id": 215,
-      "question": "DYNAMIC QUESTION, TO BE DETERMINED",
-      "answer": "DYNAMIC QUESTION, TO BE DETERMINED"
+      "dynamic_id": 204,
+      "question": "Find the square root of -{}.",
+      "answer": "{}i"
     },
     {
       "id": 216,
       "question": "In set builder notation, {p/q | q ≠ 0, p & q ∈ Z} represents what?",
-      "answer": "Rational Numbers, Q"
+      "answer": "Rational Numbers"
     },
     {
       "id": 217,
@@ -421,8 +422,9 @@
     },
     {
       "id": 226,
-      "question": "DYNAMIC QUESTION, TO BE DETERMINED",
-      "answer": "DYNAMIC QUESTION, TO BE DETERMINED"
+      "dynamic_id": 205,
+      "question": "BASE TWO QUESTION: Calculate {} {} {}",
+      "answer": "{}"
     },
     {
       "id": 227,
@@ -433,7 +435,7 @@
     {
       "id": 228,
       "question": "1/100th of a second is also termed as what?",
-      "answer": "a jiffy, jiffy"
+      "answer": "jiffy"
     },
     {
       "id": 229,
@@ -451,7 +453,7 @@
     {
       "id": 301,
       "question": "The three main components of a normal atom are: protons, neutrons, and…",
-      "answer": "electron, electrons"
+      "answer": "electrons"
     },
     {
       "id": 302,
@@ -501,7 +503,7 @@
     {
       "id": 311,
       "question": "How does one call the direct phase transition from gas to solid?",
-      "answer": "deposition, desublimation"
+      "answer": "deposition"
     },
     {
       "id": 312,
@@ -526,12 +528,12 @@
     {
       "id": 316,
       "question": "Which cell organelle is nicknamed \"the powerhouse of the cell\"?",
-      "answer": "the mitochondria, mitochondria"
+      "answer": "mitochondria"
     },
     {
       "id": 317,
       "question": "Which vascular tissue transports water and minerals from the roots to the rest of a plant?",
-      "answer": "the xylem, xylem"
+      "answer": "xylem"
     },
     {
       "id": 318,
@@ -586,7 +588,7 @@
     {
       "id": 328,
       "question": "Which law states that the global entropy in a closed system can only increase?",
-      "answer": "the second law of thermodynamics, second law of thermodynamics"
+      "answer": "second law of thermodynamics"
     },
     {
       "id": 329,
