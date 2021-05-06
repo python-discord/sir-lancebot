@@ -11,14 +11,110 @@ from fuzzywuzzy import fuzz
 from bot.constants import Roles
 from bot.constants import NEGATIVE_REPLIES
 
-from typing import Optional
+from typing import Optional, List, Tuple
 
 logger = logging.getLogger(__name__)
+
+VARIATION_TOLERANCE = 83
 
 WRONG_ANS_RESPONSE = [
     "No one answered correctly!",
     "Better luck next time...",
 ]
+
+N_PREFIX_STARTS_AT = 5
+N_PREFIXES = [
+    "penta", "hexa", "hepta", "octa", "nona",
+    "deca", "hendeca", "dodeca", "trideca", "tetradeca",
+]
+
+
+def linear_system(q_format: str, a_format: str) -> Tuple[str, str]:
+    x, y = random.randint(2, 5), random.randint(2, 5)
+    answer = a_format.format(x, y)
+
+    nums = [i for i in range(1, 6)]
+    coeffs = [nums.pop(random.randint(0, len(nums) - 1)) for _ in range(4)]
+
+    question = q_format.format(
+        coeffs[0],
+        coeffs[1],
+        (
+            coeffs[0] * x + coeffs[1] * y
+        ),
+        coeffs[2],
+        coeffs[3],
+        (
+            coeffs[2] * x + coeffs[3] * y
+        ),
+    )
+
+    return question, answer
+
+
+def mod_arith(q_format: str, a_format: str) -> Tuple[str, str]:
+    quotient, m, b = random.randint(30, 40), random.randint(10, 20), random.randint(200, 350)
+    ans = random.randint(0, 9)  # max 9 because min mod 10
+    a = quotient * m + ans - b
+
+    question = q_format.format(a, b, m)
+    answer = a_format.format(ans)
+
+    return question, answer
+
+
+def ngonal_prism(q_format: str, a_format: str) -> Tuple[str, str]:
+    n = random.randint(0, len(N_PREFIXES) - 1)
+
+    question = q_format.format(N_PREFIXES[n])
+    answer = a_format.format((n + N_PREFIX_STARTS_AT) * 2)
+
+    return question, answer
+
+
+def imag_sqrt(q_format: str, a_format: str) -> Tuple[str, str]:
+    ans_coeff = random.randint(3, 10)
+
+    question = q_format.format(ans_coeff ** 2)
+    answer = a_format.format(ans_coeff)
+
+    return question, answer
+
+
+def binary_calc(q_format: str, a_format: str) -> Tuple[str, str]:
+    a = random.randint(15, 20)
+    b = random.randint(10, a)
+    oper = random.choice(
+        (
+            ("+", lambda x, y: x + y),
+            ("-", lambda x, y: x - y),
+            ("*", lambda x, y: x * y),
+        )
+    )
+
+    if oper[0] == "*":
+        a -= 5
+        b -= 5
+
+    question = q_format.format(
+        bin(a)[2:],
+        oper[0],
+        bin(b)[2:],
+    )
+    answer = a_format.format(
+        bin(oper[1](a, b))[2:]
+    )
+
+    return question, answer
+
+
+DYNAMIC_QUESTIONS_FORMAT_FUNCS = {
+    201: linear_system,
+    202: mod_arith,
+    203: ngonal_prism,
+    204: imag_sqrt,
+    205: binary_calc,
+}
 
 
 class TriviaQuiz(commands.Cog):
@@ -151,8 +247,18 @@ class TriviaQuiz(commands.Cog):
                         done_question.append(question_dict["id"])
                         break
 
-                q = question_dict["question"]
-                answers = question_dict["answer"].split(", ")
+                if "dynamic_id" not in question_dict:
+                    q = question_dict["question"]
+                    answers = question_dict["answer"].split(", ")
+                else:
+                    q, answers = DYNAMIC_QUESTIONS_FORMAT_FUNCS[
+                        question_dict["dynamic_id"]
+                    ](
+                        question_dict["question"],
+                        question_dict["answer"],
+                    )
+
+                    answers = [answers]
 
                 embed = discord.Embed(
                     colour=discord.Colour.gold(),
@@ -168,7 +274,7 @@ class TriviaQuiz(commands.Cog):
             # A function to check whether user input is the correct answer(close to the right answer)
             def check(m: discord.Message) -> bool:
                 return m.channel == ctx.channel and any(
-                    fuzz.ratio(answer.lower(), m.content.lower()) > 85
+                    fuzz.ratio(answer.lower(), m.content.lower()) > VARIATION_TOLERANCE
                     for answer in answers
                 )
 
@@ -202,7 +308,7 @@ class TriviaQuiz(commands.Cog):
 
                     response = random.choice(WRONG_ANS_RESPONSE)
                     await ctx.send(response)
-                    await self.send_answer(ctx.channel, question_dict)
+                    await self.send_answer(ctx.channel, answers, question_dict)
                     await asyncio.sleep(1)
 
                     hint_no = 0  # init hint_no = 0 so that 2 hints/time alerts can be sent for the new question.
@@ -235,7 +341,7 @@ class TriviaQuiz(commands.Cog):
                     f"{msg.author.mention} got the correct answer :tada: {points} points!"
                 )
 
-                await self.send_answer(ctx.channel, question_dict)
+                await self.send_answer(ctx.channel, answers, question_dict)
                 await self.send_score(
                     ctx.channel, self.game_player_scores[ctx.channel.id]
                 )
@@ -376,10 +482,13 @@ class TriviaQuiz(commands.Cog):
         return embed
 
     @staticmethod
-    async def send_answer(channel: discord.TextChannel, question_dict: dict) -> None:
-        """Send the correct answer of a question to the game channel."""
-        answer = question_dict["answer"]
+    async def send_answer(
+            channel: discord.TextChannel,
+            answers: List[str],
+            question_dict: dict,
+    ) -> None:
 
+        """Send the correct answer of a question to the game channel."""
         if "info" in question_dict:
             info = question_dict["info"]
         else:
@@ -387,7 +496,7 @@ class TriviaQuiz(commands.Cog):
 
         embed = discord.Embed(
             color=discord.Colour.red(),
-            title=f"The correct answer is/are **{answer}**\n",
+            title=f"The correct answer is/are **{', '.join(answers)}**\n",
             description="",
         )
 
