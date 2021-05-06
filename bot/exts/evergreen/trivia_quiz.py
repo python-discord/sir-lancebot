@@ -9,6 +9,9 @@ from discord.ext import commands
 from fuzzywuzzy import fuzz
 
 from bot.constants import Roles
+from bot.constants import NEGATIVE_REPLIES
+
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -28,16 +31,29 @@ class TriviaQuiz(commands.Cog):
         self.game_owners = {}  # A variable to store the person's ID who started the quiz game in a channel.
 
         self.questions = self.load_questions()
-        self.question_limit = 4
+        self.question_limit = 7
 
         self.player_scores = {}  # A variable to store all player's scores for a bot session.
         self.game_player_scores = {}  # A variable to store temporary game player's scores.
 
         self.categories = {
-            "general": "Test your general knowledge",
+            "general": "Test your general knowledge.",
             "retro": "Questions related to retro gaming.",
-            "math": "General questions about mathematics ranging from grade 8 to grade 12",
+            "math": "General questions about mathematics ranging from grade 8 to grade 12.",
+            "science": "Put your understanding of science to the test!",
         }
+
+    @commands.command()
+    async def test(self, ctx: commands.Context) -> None:
+        embed = discord.Embed(
+            title="yeet",
+            description="yeet",
+        )
+
+        print("yeet")
+        embed.set_image(url="")
+
+        await ctx.send(embed=embed)
 
     @staticmethod
     def load_questions() -> dict:
@@ -49,14 +65,19 @@ class TriviaQuiz(commands.Cog):
             return questions
 
     @commands.group(name="quiz", aliases=["trivia"], invoke_without_command=True)
-    async def quiz_game(self, ctx: commands.Context, category: str = None) -> None:
+    async def quiz_game(self, ctx: commands.Context, category: Optional[str], questions: Optional[int]) -> None:
         """
         Start a quiz!
 
         Questions for the quiz can be selected from the following categories:
-        - general : Test your general knowledge. (default)
+        - general: Test your general knowledge. (default)
+        - retro: Questions related to retro gaming.
+        - math: General questions about mathematics ranging from grade 8 to grade 12.
+        - science: Put your understanding of science to the test!
+
         (More to come!)
         """
+
         if ctx.channel.id not in self.game_status:
             self.game_status[ctx.channel.id] = False
 
@@ -82,6 +103,30 @@ class TriviaQuiz(commands.Cog):
             await ctx.send(embed=embed)
             return
 
+        topic = self.questions[category]
+        topic_length = len(topic)
+
+        if questions:
+            if questions > topic_length:
+                await ctx.send(
+                    embed=self.make_error_embed(
+                        f"This category only has {topic_length} questions. "
+                        "Please input a lower value!"
+                    )
+                )
+                return
+
+            elif questions < 1:
+                await ctx.send(
+                    embed=self.make_error_embed(
+                        "Please do at least one question."
+                    )
+                )
+                return
+
+            else:
+                self.question_limit = questions - 1
+
         # Start game if not running.
         if self.game_status[ctx.channel.id] is False:
             self.game_owners[ctx.channel.id] = ctx.author
@@ -90,8 +135,6 @@ class TriviaQuiz(commands.Cog):
 
             await ctx.send(embed=start_embed)  # send an embed with the rules
             await asyncio.sleep(1)
-
-        topic = self.questions[category]
 
         done_question = []
         hint_no = 0
@@ -211,15 +254,14 @@ class TriviaQuiz(commands.Cog):
 
                 await asyncio.sleep(2)
 
-    @staticmethod
-    def make_start_embed(category: str) -> discord.Embed:
+    def make_start_embed(self, category: str) -> discord.Embed:
         """Generate a starting/introduction embed for the quiz."""
         start_embed = discord.Embed(
             colour=discord.Colour.red(),
             title="Quiz game starting!",
             description=(
-                "Each game consists of 5 questions.\n"
-                "**Rules:**\nNo cheating and have fun!\n"
+                f"Each game consists of {self.question_limit + 1} questions.\n"
+                "**Rules: **No cheating and have fun!\n"
                 f"**Category**: {category}"
             ),
         )
@@ -233,6 +275,17 @@ class TriviaQuiz(commands.Cog):
 
         return start_embed
 
+    @staticmethod
+    def make_error_embed(desc: str) -> discord.Embed:
+        """Generate an error embed with the given description."""
+        error_embed = discord.Embed(
+            colour=discord.Colour.red(),
+            title=random.choice(NEGATIVE_REPLIES),
+            description=desc,
+        )
+
+        return error_embed
+
     @quiz_game.command(name="stop")
     async def stop_quiz(self, ctx: commands.Context) -> None:
         """
@@ -245,8 +298,8 @@ class TriviaQuiz(commands.Cog):
             if ctx.author == self.game_owners[ctx.channel.id] or any(
                 Roles.moderator == role.id for role in ctx.author.roles
             ):
+
                 await ctx.send("Quiz stopped.")
-                
                 await self.declare_winner(
                     ctx.channel, self.game_player_scores[ctx.channel.id]
                 )
@@ -254,6 +307,7 @@ class TriviaQuiz(commands.Cog):
                 self.game_status[ctx.channel.id] = False
                 del self.game_owners[ctx.channel.id]
                 self.game_player_scores[ctx.channel.id] = {}
+
             else:
                 await ctx.send(
                     f"{ctx.author.mention}, you are not authorised to stop this game :ghost:!"
