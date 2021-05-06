@@ -322,14 +322,11 @@ class AvatarModify(commands.Cog):
                 await ctx.send(f"{Emojis.cross_mark} Could not get member info.")
                 return
 
-            if squares < 1:
-                raise commands.BadArgument("Squares must be a positive number")
+            if 1 <= squares <= MAX_SQUARES:
+                raise commands.BadArgument(f"Squares must be a positive number less than or equal to {MAX_SQUARES:,}.")
 
             if not math.sqrt(squares).is_integer():
-                raise commands.BadArgument("Squares must be a perfect square")
-
-            if squares > MAX_SQUARES:
-                raise commands.BadArgument(f"Number of squares cannot be higher than {MAX_SQUARES:,}.")
+                raise commands.BadArgument("The number of squares must be a perfect square.")
 
             file_name = file_safe_name("mosaic_avatar", ctx.author.display_name)
 
