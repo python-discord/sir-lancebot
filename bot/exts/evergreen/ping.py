@@ -1,6 +1,5 @@
-from dateutil.relativedelta import relativedelta
-
 import arrow
+from dateutil.relativedelta import relativedelta
 from discord import Embed
 from discord.ext import commands
 
@@ -25,6 +24,7 @@ class Ping(commands.Cog):
 
         await ctx.send(embed=embed)
 
+    # Originally made in 70d2170a0a6594561d59c7d080c4280f1ebcd70b by lemon & gdude2002
     @commands.command(name="uptime")
     async def uptime(self, ctx: commands.Context) -> None:
         """Responds with the uptime of the bot."""
