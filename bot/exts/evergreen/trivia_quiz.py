@@ -43,18 +43,6 @@ class TriviaQuiz(commands.Cog):
             "science": "Put your understanding of science to the test!",
         }
 
-    @commands.command()
-    async def test(self, ctx: commands.Context) -> None:
-        embed = discord.Embed(
-            title="yeet",
-            description="yeet",
-        )
-
-        print("yeet")
-        embed.set_image(url="")
-
-        await ctx.send(embed=embed)
-
     @staticmethod
     def load_questions() -> dict:
         """Load the questions from the JSON file."""
