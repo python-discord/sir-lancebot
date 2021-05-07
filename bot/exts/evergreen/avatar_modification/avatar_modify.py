@@ -66,7 +66,7 @@ class AvatarModify(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    async def _fetch_user(self, user_id: int) -> t.Optional[discord.Member]:
+    async def _fetch_user(self, user_id: int) -> t.Optional[discord.User]:
         """
         Fetches a user and handles errors.
 
