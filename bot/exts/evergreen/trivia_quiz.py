@@ -9,10 +9,11 @@ from discord.ext import commands
 from fuzzywuzzy import fuzz
 
 from bot.constants import Roles
+from bot.constants import NEGATIVE_REPLIES
 
+from typing import Optional, List, Tuple
 
 logger = logging.getLogger(__name__)
-
 
 WRONG_ANS_RESPONSE = [
     "No one answered correctly!",
