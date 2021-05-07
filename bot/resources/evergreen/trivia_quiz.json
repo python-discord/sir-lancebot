@@ -435,7 +435,7 @@
     {
       "id": 228,
       "question": "1/100th of a second is also termed as what?",
-      "answer": "jiffy"
+      "answer": "a jiffy, jiffy"
     },
     {
       "id": 229,
@@ -487,18 +487,22 @@
     },
     {
       "id": 308,
-      "question": "DYNAMIC QUESTION, TO BE DETERMINED",
-      "answer": "DYNAMIC QUESTION, TO BE DETERMINED"
+      "dynamic_id": 301,
+      "question": "What is the {} planet of our Solar System?",
+      "answer": "{}"
     },
     {
       "id": 309,
-      "question": "DYNAMIC QUESTION, TO BE DETERMINED",
-      "answer": "DYNAMIC QUESTION, TO BE DETERMINED"
+      "dynamic_id": 302,
+      "question": "In the biological taxonomic hierarchy, what is placed directly above {}?",
+      "answer": "{}"
     },
     {
       "id": 310,
-      "question": "DYNAMIC QUESTION, TO BE DETERMINED",
-      "answer": "DYNAMIC QUESTION, TO BE DETERMINED"
+      "dynamic_id": 303,
+      "question": "How does one describe the unit {} in SI base units?\n**IMPORTANT:** use * for multiplication, ^ for exponentiation, and place your base units in this order: m - kg - s - A",
+      "img_url": "https://i.imgur.com/NRzU6tf.png",
+      "answer": "{}"
     },
     {
       "id": 311,
@@ -533,7 +537,7 @@
     {
       "id": 317,
       "question": "Which vascular tissue transports water and minerals from the roots to the rest of a plant?",
-      "answer": "xylem"
+      "answer": "the xylem, xylem"
     },
     {
       "id": 318,
@@ -593,7 +597,7 @@
     {
       "id": 329,
       "question": "Which particle is emitted during the beta decay of a radioactive element?",
-      "answer": "an electron, electron"
+      "answer": "an electron, the electron, electron"
     },
     {
       "id": 330,
