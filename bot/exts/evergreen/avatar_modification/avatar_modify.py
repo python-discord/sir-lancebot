@@ -351,7 +351,7 @@ class AvatarModify(commands.Cog):
                 description = "What a masterpiece. :star:"
             else:
                 title = "Your mosaic avatar"
-                description = f"Here is your avatar. I think it looks a bit *puzzling*\nMade with {squares} squares"
+                description = f"Here is your avatar. I think it looks a bit *puzzling*\nMade with {squares} squares."
 
             embed = discord.Embed(
                 title=title,
