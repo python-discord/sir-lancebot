@@ -101,5 +101,5 @@ class PrideFacts(commands.Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Cog loader for pride facts."""
+    """Load the Pride Facts Cog."""
     bot.add_cog(PrideFacts(bot))

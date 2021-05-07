@@ -61,7 +61,7 @@ class LoveCalculator(Cog):
 
         # Make sure user didn't provide something silly such as 10 spaces
         if not (who and whom):
-            raise BadArgument("Arguments be non-empty strings.")
+            raise BadArgument("Arguments must be non-empty strings.")
 
         # Hash inputs to guarantee consistent results (hashing algorithm choice arbitrary)
         #

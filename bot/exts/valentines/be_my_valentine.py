@@ -6,7 +6,6 @@ from typing import Tuple
 
 import discord
 from discord.ext import commands
-from discord.ext.commands.cooldowns import BucketType
 
 from bot.bot import Bot
 from bot.constants import Channels, Colours, Lovefest, Month
@@ -69,7 +68,7 @@ class BeMyValentine(commands.Cog):
             await user.remove_roles(role)
             await ctx.send("The lovefest role has been successfully removed!")
 
-    @commands.cooldown(1, 1800, BucketType.user)
+    @commands.cooldown(1, 1800, commands.BucketType.user)
     @commands.group(name="bemyvalentine", invoke_without_command=True)
     async def send_valentine(
         self, ctx: commands.Context, user: discord.Member, *, valentine_type: str = None
@@ -108,7 +107,7 @@ class BeMyValentine(commands.Cog):
         )
         await channel.send(user.mention, embed=embed)
 
-    @commands.cooldown(1, 1800, BucketType.user)
+    @commands.cooldown(1, 1800, commands.BucketType.user)
     @send_valentine.command(name="secret")
     async def anonymous(
         self, ctx: commands.Context, user: discord.Member, *, valentine_type: str = None
