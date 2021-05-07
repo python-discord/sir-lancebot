@@ -44,6 +44,24 @@
       ],
       "question": "What was the first game Yoshi appeared in?",
       "answer": "Super Mario World"
+    },
+    {
+      "id": 6,
+      "hints": [
+        "They were used alternatively to playing cards.",
+        "They generally have handdrawn nature images on them."
+      ],
+      "question": "What did Nintendo make before video games and toys?",
+      "answer": "Hanafuda, Hanafuda cards"
+    },
+    {
+      "id": 7,
+      "hints": [
+        "Before being Nintendo's main competitor in home gaming, they were successful in arcades.",
+        "Their first console was called the Master System."
+      ],
+      "question": "Who was Nintendo's biggest competitor in 1990?",
+      "answer": "Sega"
     }
   ],
   "general": [
@@ -268,6 +286,319 @@
       "question": "At what year did Christopher Columbus discover America?",
       "answer": "1492",
       "info": "The explorer Christopher Columbus made four trips across the Atlantic Ocean from Spain: in 1492, 1493, 1498 and 1502. He was determined to find a direct water route west from Europe to Asia, but he never did. Instead, he stumbled upon the Americas"
+    }
+  ],
+  "math": [
+    {
+      "id": 201,
+      "question": "What is the highest power of a biquadratic polynomial?",
+      "answer": "4, four"
+    },
+    {
+      "id": 202,
+      "question": "What is the formula for surface area of a sphere?",
+      "answer": "4pir^2, 4πr^2"
+    },
+    {
+      "id": 203,
+      "question": "Which theorem states that hypotenuse2 = base2 + height2?",
+      "answer": "Pythagorean's, Pythagorean's theorem"
+    },
+    {
+      "id": 204,
+      "question": "Which trigonometric function is defined as hypotenuse/opposite?",
+      "answer": "cosecant, cosec, csc"
+    },
+    {
+      "id": 205,
+      "question": "Does the harmonic series converge or diverge?",
+      "answer": "diverge"
+    },
+    {
+      "id": 206,
+      "question": "How many quadrants are there in a cartesian plane?",
+      "answer": "4, four"
+    },
+    {
+      "id": 207,
+      "question": "What is the (0,0) coordinate in a cartesian plane termed as?",
+      "answer": "origin"
+    },
+    {
+      "id": 208,
+      "question": "What's the following formula that finds the area of a triangle called?",
+      "img_url": "https://wikimedia.org/api/rest_v1/media/math/render/png/d22b8566e8187542966e8d166e72e93746a1a6fc",
+      "answer": "Heron's formula"
+    },
+    {
+      "id": 209,
+      "dynamic_id": 201,
+      "question": "Solve the following system of linear equations (format your answer like this <x> & <y>):\n{}x + {}y = {},\n{}x + {}y = {}",
+      "answer": "{} & {}"
+    },
+    {
+      "id": 210,
+      "dynamic_id": 202,
+      "question": "What's {} + {} mod {} congruent to?",
+      "answer": "{}"
+    },
+    {
+      "id": 211,
+      "question": "What is the bottom number on a fraction called?",
+      "answer": "denominator"
+    },
+    {
+      "id": 212,
+      "dynamic_id": 203,
+      "question": "How many vertices are on a {}gonal prism?",
+      "answer": "{}"
+    },
+    {
+      "id": 213,
+      "question": "What is the term used to describe two triangles that have equal corresponding sides and angle measures?",
+      "answer": "congruent"
+    },
+    {
+      "id": 214,
+      "question": "⅓πr2h is the volume of which 3 dimensional figure?",
+      "answer": "cone"
+    },
+    {
+      "id": 215,
+      "dynamic_id": 204,
+      "question": "Find the square root of -{}.",
+      "answer": "{}i"
+    },
+    {
+      "id": 216,
+      "question": "In set builder notation, {p/q | q ≠ 0, p & q ∈ Z} represents what?",
+      "answer": "Rational Numbers"
+    },
+    {
+      "id": 217,
+      "question": "What is the natural log of -1 (use i for imaginary number)?",
+      "answer": "pi*i, pii, πi"
+    },
+    {
+      "id": 218,
+      "question": "When is the *inaugural* World Maths Day (format your answer in MM/DD)?",
+      "answer": "03/13"
+    },
+    {
+      "id": 219,
+      "question": "As the Fibonacci sequence extends to infinity, what's the ratio of each number `n` and its preceding number `n-1` approaching?",
+      "answer": "Golden Ratio"
+    },
+    {
+      "id": 220,
+      "question": "0, 1, 1, 2, 3, 5, 8, 13, 21, 34 are numbers of which sequence?",
+      "answer": "Fibonacci"
+    },
+    {
+      "id": 221,
+      "question": "Prime numbers only have __ factors.",
+      "answer": "2, two"
+    },
+    {
+      "id": 222,
+      "question": "In probability, the ________ ______ of an experiment or random trial is the set of all possible outcomes of it.",
+      "answer": "sample space"
+    },
+    {
+      "id": 223,
+      "question": "In statistics, what does this formula represent?",
+      "img_url": "https://www.statisticshowto.com/wp-content/uploads/2013/11/sample-standard-deviation.jpg",
+      "answer": "sample standard deviation, standard deviation of a sample"
+    },
+    {
+      "id": 224,
+      "question": "\"Hexakosioihexekontahexaphobia\" is the fear of which number?",
+      "answer": "666"
+    },
+    {
+      "id": 225,
+      "question": "Prove or disprove the Riemann Hypothesis",
+      "answer": ""
+    },
+    {
+      "id": 226,
+      "dynamic_id": 205,
+      "question": "BASE TWO QUESTION: Calculate {} {} {}",
+      "answer": "{}"
+    },
+    {
+      "id": 227,
+      "question": "What is the only number in the entire number system which can be spelled with the same number of letters as itself?",
+      "answer": "4, four"
+
+    },
+    {
+      "id": 228,
+      "question": "1/100th of a second is also termed as what?",
+      "answer": "jiffy"
+    },
+    {
+      "id": 229,
+      "question": "What is this triangle called?",
+      "img_url": "https://cdn.askpython.com/wp-content/uploads/2020/07/Pascals-triangle.png",
+      "answer": "Pascal's triangle, Pascal"
+    },
+    {
+      "id": 230,
+      "question": "6a^2 is the surface area of which 3 dimensional figure?",
+      "answer": "cube"
+    }
+  ],
+  "science": [
+    {
+      "id": 301,
+      "question": "The three main components of a normal atom are: protons, neutrons, and…",
+      "answer": "electrons"
+    },
+    {
+      "id": 302,
+      "question": "As of 2021, how many elements are there in the Periodic Table?",
+      "answer": "118"
+    },
+    {
+      "id": 303,
+      "question": "What is the universal force discovered by Newton that causes objects with mass to attract each other called?",
+      "answer": "gravity"
+    },
+    {
+      "id": 304,
+      "question": "What do you call an organism composed of only one cell?",
+      "answer": "unicellular, single-celled"
+    },
+    {
+      "id": 305,
+      "question": "The Heisenberg’s Uncertainty Principle states that the position and ________ of a quantum object can’t be both exactly measured at the same time.",
+      "answer": "velocity, momentum"
+    },
+    {
+      "id": 306,
+      "question": "A ____________ reaction is the one wherein an atom or a set of atoms is/are replaced by another atom or a set of atoms",
+      "answer": "displacement, exchange"
+    },
+    {
+      "id": 307,
+      "question": "What is the process by which green plants and certain other organisms transform light energy into chemical energy?",
+      "answer": "photosynthesis"
+    },
+    {
+      "id": 308,
+      "question": "DYNAMIC QUESTION, TO BE DETERMINED",
+      "answer": "DYNAMIC QUESTION, TO BE DETERMINED"
+    },
+    {
+      "id": 309,
+      "question": "DYNAMIC QUESTION, TO BE DETERMINED",
+      "answer": "DYNAMIC QUESTION, TO BE DETERMINED"
+    },
+    {
+      "id": 310,
+      "question": "DYNAMIC QUESTION, TO BE DETERMINED",
+      "answer": "DYNAMIC QUESTION, TO BE DETERMINED"
+    },
+    {
+      "id": 311,
+      "question": "How does one call the direct phase transition from gas to solid?",
+      "answer": "deposition"
+    },
+    {
+      "id": 312,
+      "question": "What is the intermolecular force caused by temporary and induced dipoles?",
+      "answer": "LDF, London dispersion, London dispersion force"
+    },
+    {
+      "id": 313,
+      "question": "What is the force that causes objects to float in fluids called?",
+      "answer": "buoyancy"
+    },
+    {
+      "id": 314,
+      "question": "About how many neurons are in the human brain? (A. 1 billion, B. 10 billion, C. 100 billion, D. 300 billion)",
+      "answer": "C, 100 billion, 100 bil"
+    },
+    {
+      "id": 315,
+      "question": "What is the name of our galaxy group in which the Milky Way resides?",
+      "answer": "Local Group"
+    },
+    {
+      "id": 316,
+      "question": "Which cell organelle is nicknamed \"the powerhouse of the cell\"?",
+      "answer": "mitochondria"
+    },
+    {
+      "id": 317,
+      "question": "Which vascular tissue transports water and minerals from the roots to the rest of a plant?",
+      "answer": "xylem"
+    },
+    {
+      "id": 318,
+      "question": "Who discovered the theories of relativity?",
+      "answer": "Albert Einstein, Einstein"
+    },
+    {
+      "id": 319,
+      "question": "In particle physics, the hypothetical isolated elementary particle with only one magnetic pole is termed as...",
+      "answer": "magnetic monopole"
+    },
+    {
+      "id": 320,
+      "question": "How does one describe a chemical reaction wherein heat is released?",
+      "answer": "exothermic"
+    },
+    {
+      "id": 321,
+      "question": "What range of frequency are the average human ears capable of hearing (A. 10Hz-10kHz, B. 20Hz-20kHz, C. 20Hz-2000Hz, D. 10kHz-20kHz)?",
+      "answer": "B, 20Hz-20kHz"
+    },
+    {
+      "id": 322,
+      "question": "What is the process used to separate substances with different polarity in a mixture, using a stationary and mobile phase?",
+      "answer": "chromatography"
+    },
+    {
+      "id": 323,
+      "question": "Which law states that the current through a conductor between two points is directly proportional to the voltage across the two points?",
+      "answer": "Ohm's law"
+    },
+    {
+      "id": 324,
+      "question": "The type of rock that is formed by the accumulation or deposition of mineral or organic particles at the Earth's surface, followed by cementation, is called...",
+      "answer": "sedimentary, sedimentary rock"
+    },
+    {
+      "id": 325,
+      "question": "Is the Richter scale (common earthquake scale) linear or logarithmic?",
+      "answer": "logarithmic"
+    },
+    {
+      "id": 326,
+      "question": "What type of image is formed by a convex mirror?",
+      "answer": "virtual image, virtual"
+    },
+    {
+      "id": 327,
+      "question": "How does one call the branch of physics that deals with the study of mechanical waves in gases, liquids, and solids including topics such as vibration, sound, ultrasound and infrasound",
+      "answer": "acoustics"
+    },
+    {
+      "id": 328,
+      "question": "Which law states that the global entropy in a closed system can only increase?",
+      "answer": "second law of thermodynamics"
+    },
+    {
+      "id": 329,
+      "question": "Which particle is emitted during the beta decay of a radioactive element?",
+      "answer": "an electron, electron"
+    },
+    {
+      "id": 330,
+      "question": "When DNA is unzipped, two strands are formed. What are they called (separate both answers by the word \"and\")?",
+      "answer": "leading and lagging, leading strand and lagging strand"
     }
   ]
 }
