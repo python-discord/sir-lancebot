@@ -51,7 +51,7 @@ class BeMyValentine(commands.Cog):
         """Adds the lovefest role."""
         user = ctx.author
         role = ctx.guild.get_role(Lovefest.role_id)
-        if Lovefest.role_id not in [role.id for role in ctx.message.author.roles]:
+        if role not in ctx.author.roles:
             await user.add_roles(role)
             await ctx.send("The Lovefest role has been added !")
         else:
