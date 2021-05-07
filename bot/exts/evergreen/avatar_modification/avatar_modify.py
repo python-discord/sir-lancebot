@@ -101,7 +101,7 @@ class AvatarModify(commands.Cog):
                 await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
                 return
 
-            image_bytes = await user.avatar_url.read()
+            image_bytes = await user.avatar_url_as(size=1024).read()
             file_name = file_safe_name("eightbit_avatar", ctx.author.display_name)
 
             file = await in_executor(
@@ -232,7 +232,7 @@ class AvatarModify(commands.Cog):
             if not user:
                 await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
                 return
-            image_bytes = await user.avatar_url.read()
+            image_bytes = await user.avatar_url_as(size=1024).read()
             await self.send_pride_image(ctx, image_bytes, pixels, flag, option)
 
     @prideavatar.command()
@@ -294,7 +294,7 @@ class AvatarModify(commands.Cog):
             return
 
         async with ctx.typing():
-            image_bytes = await user.avatar_url.read()
+            image_bytes = await user.avatar_url_as(size=1024).read()
 
             file_name = file_safe_name("spooky_avatar", member.display_name)
 
@@ -334,7 +334,7 @@ class AvatarModify(commands.Cog):
 
             file_name = file_safe_name("mosaic_avatar", ctx.author.display_name)
 
-            img_bytes = await user.avatar_url.read()
+            img_bytes = await user.avatar_url_as(size=1024).read()
 
             file = await in_executor(
                 PfpEffects.mosaic_effect,
