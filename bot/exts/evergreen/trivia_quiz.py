@@ -553,9 +553,9 @@ class TriviaQuiz(commands.Cog):
 
     @staticmethod
     async def send_answer(
-            channel: discord.TextChannel,
-            answers: List[str],
-            question_dict: dict,
+        channel: discord.TextChannel,
+        answers: List[str],
+        question_dict: dict,
     ) -> None:
         """Send the correct answer of a question to the game channel."""
         if "info" in question_dict:
