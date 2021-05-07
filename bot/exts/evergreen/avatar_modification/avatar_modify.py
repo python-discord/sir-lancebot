@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import math
 import string
 import typing as t
 import unicodedata
@@ -23,11 +24,15 @@ _EXECUTOR = ThreadPoolExecutor(10)
 
 FILENAME_STRING = "{effect}_{author}.png"
 
+MAX_SQUARES = 10_000
+
+T = t.TypeVar("T")
+
 with open("bot/resources/pride/gender_options.json") as f:
     GENDER_OPTIONS = json.load(f)
 
 
-async def in_executor(func: t.Callable, *args) -> t.Any:
+async def in_executor(func: t.Callable[..., T], *args) -> T:
     """
     Runs the given synchronus function `func` in an executor.
 
@@ -309,7 +314,56 @@ class AvatarModify(commands.Cog):
 
             await ctx.send(file=file, embed=embed)
 
+    @avatar_modify.command(name="mosaic", root_aliases=("mosaic",))
+    async def mosaic_command(self, ctx: commands.Context, squares: int = 16) -> None:
+        """Splits your avatar into x squares, randomizes them and stitches them back into a new image!"""
+        async with ctx.typing():
+            member = await self._fetch_member(ctx.author.id)
+            if not member:
+                await ctx.send(f"{Emojis.cross_mark} Could not get member info.")
+                return
+
+            if not 1 <= squares <= MAX_SQUARES:
+                raise commands.BadArgument(f"Squares must be a positive number less than or equal to {MAX_SQUARES:,}.")
+
+            sqrt = math.sqrt(squares)
+
+            if not sqrt.is_integer():
+                squares = math.ceil(sqrt) ** 2  # Get the next perfect square
+
+            file_name = file_safe_name("mosaic_avatar", ctx.author.display_name)
+
+            img_bytes = await member.avatar_url.read()
+
+            file = await in_executor(
+                PfpEffects.mosaic_effect,
+                img_bytes,
+                squares,
+                file_name
+            )
+
+            if squares == 1:
+                title = "Hooh... that was a lot of work"
+                description = "I present to you... Yourself!"
+            elif squares == MAX_SQUARES:
+                title = "Testing the limits I see..."
+                description = "What a masterpiece. :star:"
+            else:
+                title = "Your mosaic avatar"
+                description = "Here is your avatar. I think it looks a bit *puzzling*"
+
+            embed = discord.Embed(
+                title=title,
+                description=description,
+                colour=Colours.blue
+            )
+
+            embed.set_image(url=f"attachment://{file_name}")
+            embed.set_footer(text=f"Made by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
+
+            await ctx.send(file=file, embed=embed)
+
 
 def setup(bot: Bot) -> None:
-    """Load the PfpModify cog."""
+    """Load the AvatarModify cog."""
     bot.add_cog(AvatarModify(bot))
