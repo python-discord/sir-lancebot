@@ -325,8 +325,10 @@ class AvatarModify(commands.Cog):
             if 1 <= squares <= MAX_SQUARES:
                 raise commands.BadArgument(f"Squares must be a positive number less than or equal to {MAX_SQUARES:,}.")
 
-            if not math.sqrt(squares).is_integer():
-                raise commands.BadArgument("The number of squares must be a perfect square.")
+            sqrt = math.sqrt(squares)
+
+            if not sqrt.is_integer():
+                squares = math.ceil(sqrt) ** 2  # Get the next perfect square
 
             file_name = file_safe_name("mosaic_avatar", ctx.author.display_name)
 
