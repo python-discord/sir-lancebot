@@ -322,7 +322,7 @@ class AvatarModify(commands.Cog):
                 await ctx.send(f"{Emojis.cross_mark} Could not get member info.")
                 return
 
-            if 1 <= squares <= MAX_SQUARES:
+            if not 1 <= squares <= MAX_SQUARES:
                 raise commands.BadArgument(f"Squares must be a positive number less than or equal to {MAX_SQUARES:,}.")
 
             sqrt = math.sqrt(squares)
