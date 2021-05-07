@@ -8,10 +8,10 @@ import discord
 from discord.ext import commands
 from fuzzywuzzy import fuzz
 
-from bot.constants import Roles
-from bot.constants import NEGATIVE_REPLIES
+from typing import List, Optional, Tuple
 
-from typing import Optional, List, Tuple
+from bot.constants import NEGATIVE_REPLIES
+from bot.constants import Roles
 
 logger = logging.getLogger(__name__)
 
@@ -60,6 +60,7 @@ UNITS_TO_BASE_UNITS = {
 
 
 def linear_system(q_format: str, a_format: str) -> Tuple[str, str]:
+    """Generates a system of linear equations with two unknowns."""
     x, y = random.randint(2, 5), random.randint(2, 5)
     answer = a_format.format(x, y)
 
@@ -83,6 +84,7 @@ def linear_system(q_format: str, a_format: str) -> Tuple[str, str]:
 
 
 def mod_arith(q_format: str, a_format: str) -> Tuple[str, str]:
+    """Generate a basic modular arithmetic question."""
     quotient, m, b = random.randint(30, 40), random.randint(10, 20), random.randint(200, 350)
     ans = random.randint(0, 9)  # max 9 because min mod 10
     a = quotient * m + ans - b
@@ -94,6 +96,7 @@ def mod_arith(q_format: str, a_format: str) -> Tuple[str, str]:
 
 
 def ngonal_prism(q_format: str, a_format: str) -> Tuple[str, str]:
+    """Generate a question regarding vertices on n-gonal prisms."""
     n = random.randint(0, len(N_PREFIXES) - 1)
 
     question = q_format.format(N_PREFIXES[n])
@@ -103,6 +106,7 @@ def ngonal_prism(q_format: str, a_format: str) -> Tuple[str, str]:
 
 
 def imag_sqrt(q_format: str, a_format: str) -> Tuple[str, str]:
+    """Generates a negative square root question."""
     ans_coeff = random.randint(3, 10)
 
     question = q_format.format(ans_coeff ** 2)
@@ -112,6 +116,7 @@ def imag_sqrt(q_format: str, a_format: str) -> Tuple[str, str]:
 
 
 def binary_calc(q_format: str, a_format: str) -> Tuple[str, str]:
+    """Generates a binary calculation question."""
     a = random.randint(15, 20)
     b = random.randint(10, a)
     oper = random.choice(
@@ -139,6 +144,7 @@ def binary_calc(q_format: str, a_format: str) -> Tuple[str, str]:
 
 
 def solar_system(q_format: str, a_format: str) -> Tuple[str, str]:
+    """Generates a question on the planets of the Solar System."""
     planet = random.choice(PLANETS)
 
     question = q_format.format(planet[0])
@@ -148,6 +154,7 @@ def solar_system(q_format: str, a_format: str) -> Tuple[str, str]:
 
 
 def taxonomic_rank(q_format: str, a_format: str) -> Tuple[str, str]:
+    """Generates a question on taxonomic classification."""
     level = random.randint(0, len(TAXONOMIC_HIERARCHY) - 2)
 
     question = q_format.format(TAXONOMIC_HIERARCHY[level])
@@ -157,6 +164,7 @@ def taxonomic_rank(q_format: str, a_format: str) -> Tuple[str, str]:
 
 
 def base_units_convert(q_format: str, a_format: str) -> Tuple[str, str]:
+    """Generates a SI base units conversion question."""
     unit = random.choice(list(UNITS_TO_BASE_UNITS.keys()))
 
     question = q_format.format(
@@ -203,18 +211,6 @@ class TriviaQuiz(commands.Cog):
             "science": "Put your understanding of science to the test!",
         }
 
-    @commands.command()
-    async def test(self, ctx: commands.Context) -> None:
-        embed = discord.Embed(
-            title="yeet",
-            description="yeet",
-        )
-
-        print("yeet")
-        embed.set_image(url="")
-
-        await ctx.send(embed=embed)
-
     @staticmethod
     def load_questions() -> dict:
         """Load the questions from the JSON file."""
@@ -237,7 +233,6 @@ class TriviaQuiz(commands.Cog):
 
         (More to come!)
         """
-
         if ctx.channel.id not in self.game_status:
             self.game_status[ctx.channel.id] = False
 
@@ -563,7 +558,6 @@ class TriviaQuiz(commands.Cog):
             answers: List[str],
             question_dict: dict,
     ) -> None:
-
         """Send the correct answer of a question to the game channel."""
         if "info" in question_dict:
             info = question_dict["info"]
