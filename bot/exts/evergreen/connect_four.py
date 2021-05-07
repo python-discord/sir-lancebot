@@ -277,8 +277,10 @@ class ConnectFour(commands.Cog):
             return False
 
         if not self.min_board_size <= board_size <= self.max_board_size:
-            await ctx.send(f"{board_size} is not a valid board size. A valid board size is "
-                           f"between `{self.min_board_size}` and `{self.max_board_size}`.")
+            await ctx.send(
+                f"{board_size} is not a valid board size. A valid board size is "
+                f"between `{self.min_board_size}` and `{self.max_board_size}`."
+            )
             return False
 
         return True

@@ -69,7 +69,7 @@ logging.basicConfig(
     level=logging.TRACE if Client.debug else logging.DEBUG,
     handlers=[console_handler, file_handler],
 )
-logging.getLogger().info('Logging initialization complete')
+logging.getLogger().info("Logging initialization complete")
 
 
 # On Windows, the selector event loop is required for aiodns.

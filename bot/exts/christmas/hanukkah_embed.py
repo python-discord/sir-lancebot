@@ -17,8 +17,10 @@ class HanukkahEmbed(commands.Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.url = ("https://www.hebcal.com/hebcal/?v=1&cfg=json&maj=on&min=on&mod=on&nx=on&"
-                    "year=now&month=x&ss=on&mf=on&c=on&geo=geoname&geonameid=3448439&m=50&s=on")
+        self.url = (
+            "https://www.hebcal.com/hebcal/?v=1&cfg=json&maj=on&min=on&mod=on&nx=on&"
+            "year=now&month=x&ss=on&mf=on&c=on&geo=geoname&geonameid=3448439&m=50&s=on"
+        )
         self.hanukkah_days = []
         self.hanukkah_months = []
         self.hanukkah_years = []
@@ -64,13 +66,17 @@ class HanukkahEmbed(commands.Cog):
                 hours = now.hour + 4  # using only hours
                 hanukkah_start_hour = 18
                 if hours < hanukkah_start_hour:
-                    embed.description = (f"Hanukkah hasnt started yet, "
-                                         f"it will start in about {hanukkah_start_hour - hours} hour/s.")
+                    embed.description = (
+                        f"Hanukkah hasnt started yet, "
+                        f"it will start in about {hanukkah_start_hour - hours} hour/s."
+                    )
                     await ctx.send(embed=embed)
                     return
                 elif hours > hanukkah_start_hour:
-                    embed.description = (f"It is the starting day of Hanukkah ! "
-                                         f"Its been {hours - hanukkah_start_hour} hours hanukkah started !")
+                    embed.description = (
+                        f"It is the starting day of Hanukkah ! "
+                        f"Its been {hours - hanukkah_start_hour} hours hanukkah started !"
+                    )
                     await ctx.send(embed=embed)
                     return
             festival_day = self.hanukkah_days.index(day)
@@ -87,18 +93,22 @@ class HanukkahEmbed(commands.Cog):
             message = ""
             for _ in range(1, festival_day + 1):
                 message += ":menorah:"
-            embed.description = f"It is the {festival_day}{suffix} day of Hanukkah ! \n {message}"
+            embed.description = f"It is the {festival_day}{suffix} day of Hanukkah!\n{message}"
             await ctx.send(embed=embed)
         else:
             if today < hanukkah_start:
                 festival_starting_month = hanukkah_start.strftime("%B")
-                embed.description = (f"Hanukkah has not started yet. "
-                                     f"Hanukkah will start at sundown on {hanukkah_start_day}th "
-                                     f"of {festival_starting_month}.")
+                embed.description = (
+                    f"Hanukkah has not started yet. "
+                    f"Hanukkah will start at sundown on {hanukkah_start_day}th "
+                    f"of {festival_starting_month}."
+                )
             else:
                 festival_end_month = hanukkah_end.strftime("%B")
-                embed.description = (f"Looks like you missed Hanukkah !"
-                                     f"Hanukkah ended on {hanukkah_end_day}th of {festival_end_month}.")
+                embed.description = (
+                    f"Looks like you missed Hanukkah !"
+                    f"Hanukkah ended on {hanukkah_end_day}th of {festival_end_month}."
+                )
 
             await ctx.send(embed=embed)
 

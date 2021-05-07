@@ -335,13 +335,14 @@ class Games(Cog):
             return
         await ctx.send("Successfully refreshed genres.")
 
-    async def get_games_list(self,
-                             amount: int,
-                             genre: Optional[str] = None,
-                             sort: Optional[str] = None,
-                             additional_body: str = "",
-                             offset: int = 0
-                             ) -> List[Dict[str, Any]]:
+    async def get_games_list(
+        self,
+        amount: int,
+        genre: Optional[str] = None,
+        sort: Optional[str] = None,
+        additional_body: str = "",
+        offset: int = 0
+    ) -> List[Dict[str, Any]]:
         """
         Get list of games from IGDB API by parameters that is provided.
 

@@ -191,8 +191,11 @@ class PerlinNoiseFactory(object):
     def get_plain_noise(self, *point) -> float:
         """Get plain noise for a single point, without taking into account either octaves or tiling."""
         if len(point) != self.dimension:
-            raise ValueError("Expected {0} values, got {1}".format(
-                self.dimension, len(point)))
+            raise ValueError(
+                "Expected {0} values, got {1}".format(
+                    self.dimension, len(point)
+                )
+            )
 
         # Build a list of the (min, max) bounds in each dimension
         grid_coords = []

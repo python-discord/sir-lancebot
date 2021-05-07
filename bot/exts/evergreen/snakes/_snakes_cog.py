@@ -497,9 +497,11 @@ class Snakes(Cog):
         for i in range(0, 10):
             page_guess_list.append(f"{HOLE_EMOJI} {HOLE_EMOJI} {HOLE_EMOJI} {HOLE_EMOJI}")
             page_result_list.append(f"{CROSS_EMOJI} {CROSS_EMOJI} {CROSS_EMOJI} {CROSS_EMOJI}")
-            board.append(f"`{i+1:02d}` "
-                         f"{page_guess_list[i]} - "
-                         f"{page_result_list[i]}")
+            board.append(
+                f"`{i+1:02d}` "
+                f"{page_guess_list[i]} - "
+                f"{page_result_list[i]}"
+            )
             board.append(EMPTY_UNICODE)
         antidote_embed.add_field(name="10 guesses remaining", value="\n".join(board))
         board_id = await ctx.send(embed=antidote_embed)  # Display board
@@ -667,8 +669,14 @@ class Snakes(Cog):
             )
 
             emoji = "https://emojipedia-us.s3.amazonaws.com/thumbs/60/google/3/snake_1f40d.png"
-            image = next((url for url in data["image_list"]
-                          if url.endswith(self.valid_image_extensions)), emoji)
+
+            _iter = (
+                url
+                for url in data["image_list"]
+                if url.endswith(self.valid_image_extensions)
+            )
+            image = next(_iter, emoji)
+
             embed.set_image(url=image)
 
             await ctx.send(embed=embed)
@@ -693,8 +701,12 @@ class Snakes(Cog):
 
                 data = await self._get_snek(snake)
 
-                image = next((url for url in data["image_list"]
-                              if url.endswith(self.valid_image_extensions)), None)
+                _iter = (
+                    url
+                    for url in data["image_list"]
+                    if url.endswith(self.valid_image_extensions)
+                )
+                image = next(_iter, None)
 
             embed = Embed(
                 title="Which of the following is the snake in the image?",
