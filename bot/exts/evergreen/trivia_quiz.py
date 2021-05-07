@@ -3,12 +3,11 @@ import json
 import logging
 import random
 from pathlib import Path
+from typing import List, Optional, Tuple
 
 import discord
 from discord.ext import commands
 from fuzzywuzzy import fuzz
-
-from typing import List, Optional, Tuple
 
 from bot.constants import NEGATIVE_REPLIES
 from bot.constants import Roles
