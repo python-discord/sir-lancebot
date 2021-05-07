@@ -15,10 +15,170 @@ from typing import Optional, List, Tuple
 
 logger = logging.getLogger(__name__)
 
+VARIATION_TOLERANCE = 83
+
 WRONG_ANS_RESPONSE = [
     "No one answered correctly!",
-    "Better luck next time"
+    "Better luck next time...",
 ]
+
+N_PREFIX_STARTS_AT = 5
+N_PREFIXES = [
+    "penta", "hexa", "hepta", "octa", "nona",
+    "deca", "hendeca", "dodeca", "trideca", "tetradeca",
+]
+
+PLANETS = [
+    ("1st", "Mercury"),
+    ("2nd", "Venus"),
+    ("3rd", "Earth"),
+    ("4th", "Mars"),
+    ("5th", "Jupiter"),
+    ("6th", "Saturn"),
+    ("7th", "Uranus"),
+    ("8th", "Neptune"),
+]
+
+TAXONOMIC_HIERARCHY = [
+    "species", "genus", "family", "order",
+    "class", "phylum", "kingdom", "domain",
+]
+
+UNITS_TO_BASE_UNITS = {
+    "hertz": ("(unit of frequency)", "s^-1"),
+    "newton": ("(unit of force)", "m*kg*s^-2"),
+    "pascal": ("(unit of pressure & stress)", "m^-1*kg*s^-2"),
+    "joule": ("(unit of energy & quantity of heat)", "m^2*kg*s^-2"),
+    "watt": ("(unit of power)", "m^2*kg*s^-3"),
+    "coulomb": ("(unit of electric charge & quantity of electricity)", "s*A"),
+    "volt": ("(unit of voltage & electromotive force)", "m^2*kg*s^-3*A^-1"),
+    "farad": ("(unit of capacitance)", "m^-2*kg^-1*s^4*A^2"),
+    "ohm": ("(unit of electric resistance)", "m^2*kg*s^-3*A^-2"),
+    "weber": ("(unit of magnetic flux)", "m^2*kg*s^-2*A^-1"),
+    "tesla": ("(unit of magnetic flux density)", "kg*s^-2*A^-1"),
+}
+
+
+def linear_system(q_format: str, a_format: str) -> Tuple[str, str]:
+    x, y = random.randint(2, 5), random.randint(2, 5)
+    answer = a_format.format(x, y)
+
+    nums = [i for i in range(1, 6)]
+    coeffs = [nums.pop(random.randint(0, len(nums) - 1)) for _ in range(4)]
+
+    question = q_format.format(
+        coeffs[0],
+        coeffs[1],
+        (
+            coeffs[0] * x + coeffs[1] * y
+        ),
+        coeffs[2],
+        coeffs[3],
+        (
+            coeffs[2] * x + coeffs[3] * y
+        ),
+    )
+
+    return question, answer
+
+
+def mod_arith(q_format: str, a_format: str) -> Tuple[str, str]:
+    quotient, m, b = random.randint(30, 40), random.randint(10, 20), random.randint(200, 350)
+    ans = random.randint(0, 9)  # max 9 because min mod 10
+    a = quotient * m + ans - b
+
+    question = q_format.format(a, b, m)
+    answer = a_format.format(ans)
+
+    return question, answer
+
+
+def ngonal_prism(q_format: str, a_format: str) -> Tuple[str, str]:
+    n = random.randint(0, len(N_PREFIXES) - 1)
+
+    question = q_format.format(N_PREFIXES[n])
+    answer = a_format.format((n + N_PREFIX_STARTS_AT) * 2)
+
+    return question, answer
+
+
+def imag_sqrt(q_format: str, a_format: str) -> Tuple[str, str]:
+    ans_coeff = random.randint(3, 10)
+
+    question = q_format.format(ans_coeff ** 2)
+    answer = a_format.format(ans_coeff)
+
+    return question, answer
+
+
+def binary_calc(q_format: str, a_format: str) -> Tuple[str, str]:
+    a = random.randint(15, 20)
+    b = random.randint(10, a)
+    oper = random.choice(
+        (
+            ("+", lambda x, y: x + y),
+            ("-", lambda x, y: x - y),
+            ("*", lambda x, y: x * y),
+        )
+    )
+
+    if oper[0] == "*":
+        a -= 5
+        b -= 5
+
+    question = q_format.format(
+        bin(a)[2:],
+        oper[0],
+        bin(b)[2:],
+    )
+    answer = a_format.format(
+        bin(oper[1](a, b))[2:]
+    )
+
+    return question, answer
+
+
+def solar_system(q_format: str, a_format: str) -> Tuple[str, str]:
+    planet = random.choice(PLANETS)
+
+    question = q_format.format(planet[0])
+    answer = a_format.format(planet[1])
+
+    return question, answer
+
+
+def taxonomic_rank(q_format: str, a_format: str) -> Tuple[str, str]:
+    level = random.randint(0, len(TAXONOMIC_HIERARCHY) - 2)
+
+    question = q_format.format(TAXONOMIC_HIERARCHY[level])
+    answer = a_format.format(TAXONOMIC_HIERARCHY[level + 1])
+
+    return question, answer
+
+
+def base_units_convert(q_format: str, a_format: str) -> Tuple[str, str]:
+    unit = random.choice(list(UNITS_TO_BASE_UNITS.keys()))
+
+    question = q_format.format(
+        unit + " " + UNITS_TO_BASE_UNITS[unit][0]
+    )
+    answer = a_format.format(
+        UNITS_TO_BASE_UNITS[unit][1]
+    )
+
+    return question, answer
+
+
+DYNAMIC_QUESTIONS_FORMAT_FUNCS = {
+    201: linear_system,
+    202: mod_arith,
+    203: ngonal_prism,
+    204: imag_sqrt,
+    205: binary_calc,
+    301: solar_system,
+    302: taxonomic_rank,
+    303: base_units_convert,
+}
 
 
 class TriviaQuiz(commands.Cog):
@@ -412,7 +572,7 @@ class TriviaQuiz(commands.Cog):
 
         embed = discord.Embed(
             color=discord.Colour.red(),
-            title=f"The correct answer is/are **{', '.join(answers)}**\n",
+            title=f"The correct answer is/are **`{', '.join(answers)}`**\n",
             description="",
         )
 
