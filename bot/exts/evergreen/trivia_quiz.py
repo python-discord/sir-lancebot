@@ -539,6 +539,7 @@ class TriviaQuiz(commands.Cog):
         embed = discord.Embed(
             color=Colours.bright_green,
             title=f"The correct answer {word} **`{', '.join(answers)}`**\n",
+            description="",
         )
 
         if info != "":
