@@ -1,8 +1,8 @@
 import asyncio
 import json
 import logging
-import random
 import operator
+import random
 from pathlib import Path
 from typing import List, Optional, Tuple
 
