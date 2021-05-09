@@ -63,8 +63,7 @@ def linear_system(q_format: str, a_format: str) -> Tuple[str, str]:
     x, y = random.randint(2, 5), random.randint(2, 5)
     answer = a_format.format(x, y)
 
-    nums = [i for i in range(1, 6)]
-    coeffs = [nums.pop(random.randint(0, len(nums) - 1)) for _ in range(4)]
+    coeffs = random.sample(range(1, 6), 4)
 
     question = q_format.format(
         coeffs[0],
