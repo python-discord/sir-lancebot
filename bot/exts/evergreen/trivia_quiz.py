@@ -61,7 +61,7 @@ UNITS_TO_BASE_UNITS = {
 
 
 def linear_system(q_format: str, a_format: str) -> Tuple[str, str]:
-    """Generates a system of linear equations with two unknowns."""
+    """Generate a system of linear equations with two unknowns."""
     x, y = random.randint(2, 5), random.randint(2, 5)
     answer = a_format.format(x, y)
 
@@ -106,7 +106,7 @@ def ngonal_prism(q_format: str, a_format: str) -> Tuple[str, str]:
 
 
 def imag_sqrt(q_format: str, a_format: str) -> Tuple[str, str]:
-    """Generates a negative square root question."""
+    """Generate a negative square root question."""
     ans_coeff = random.randint(3, 10)
 
     question = q_format.format(ans_coeff ** 2)
@@ -116,7 +116,7 @@ def imag_sqrt(q_format: str, a_format: str) -> Tuple[str, str]:
 
 
 def binary_calc(q_format: str, a_format: str) -> Tuple[str, str]:
-    """Generates a binary calculation question."""
+    """Generate a binary calculation question."""
     a = random.randint(15, 20)
     b = random.randint(10, a)
     oper = random.choice(
@@ -144,7 +144,7 @@ def binary_calc(q_format: str, a_format: str) -> Tuple[str, str]:
 
 
 def solar_system(q_format: str, a_format: str) -> Tuple[str, str]:
-    """Generates a question on the planets of the Solar System."""
+    """Generate a question on the planets of the Solar System."""
     planet = random.choice(PLANETS)
 
     question = q_format.format(planet[0])
@@ -154,7 +154,7 @@ def solar_system(q_format: str, a_format: str) -> Tuple[str, str]:
 
 
 def taxonomic_rank(q_format: str, a_format: str) -> Tuple[str, str]:
-    """Generates a question on taxonomic classification."""
+    """Generate a question on taxonomic classification."""
     level = random.randint(0, len(TAXONOMIC_HIERARCHY) - 2)
 
     question = q_format.format(TAXONOMIC_HIERARCHY[level])
@@ -164,7 +164,7 @@ def taxonomic_rank(q_format: str, a_format: str) -> Tuple[str, str]:
 
 
 def base_units_convert(q_format: str, a_format: str) -> Tuple[str, str]:
-    """Generates a SI base units conversion question."""
+    """Generate a SI base units conversion question."""
     unit = random.choice(list(UNITS_TO_BASE_UNITS.keys()))
 
     question = q_format.format(
@@ -556,5 +556,5 @@ class TriviaQuiz(commands.Cog):
 
 
 def setup(bot: commands.Bot) -> None:
-    """Load the cog."""
+    """Load the TriviaQuiz cog."""
     bot.add_cog(TriviaQuiz(bot))
