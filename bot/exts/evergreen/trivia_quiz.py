@@ -441,6 +441,7 @@ class TriviaQuiz(commands.Cog):
     async def stop_quiz(self, ctx: commands.Context) -> None:
         """
         Stop a quiz game if its running in the channel.
+
         Note: Only mods or the owner of the quiz can stop it.
         """
         if self.game_status[ctx.channel.id] is True:
