@@ -88,7 +88,7 @@ def linear_system(q_format: str, a_format: str) -> QAndA:
 def mod_arith(q_format: str, a_format: str) -> QAndA:
     """Generate a basic modular arithmetic question."""
     quotient, m, b = random.randint(30, 40), random.randint(10, 20), random.randint(200, 350)
-    ans = random.randint(0, 9)  # max 9 because min mod 10
+    ans = random.randint(0, 9)  # max remainder is 9, since the minimum modulus is 10
     a = quotient * m + ans - b
 
     question = q_format.format(a, b, m)
@@ -133,11 +133,7 @@ def binary_calc(q_format: str, a_format: str) -> QAndA:
         a -= 5
         b -= 5
 
-    question = q_format.format(
-        a,
-        oper[0],
-        b,
-    )
+    question = q_format.format(a, oper[0], b)
     answer = a_format.format(oper[1](a, b))
 
     return question, answer
@@ -165,7 +161,7 @@ def taxonomic_rank(q_format: str, a_format: str) -> QAndA:
 
 def base_units_convert(q_format: str, a_format: str) -> QAndA:
     """Generate a SI base units conversion question."""
-    unit = random.choice(list(UNITS_TO_BASE_UNITS.keys()))
+    unit = random.choice(list(UNITS_TO_BASE_UNITS))
 
     question = q_format.format(
         unit + " " + UNITS_TO_BASE_UNITS[unit][0]
@@ -405,7 +401,7 @@ class TriviaQuiz(commands.Cog):
     def make_start_embed(self, category: str) -> discord.Embed:
         """Generate a starting/introduction embed for the quiz."""
         start_embed = discord.Embed(
-            colour=discord.Colour.red(),
+            colour=Colours.blue,
             title="Quiz game starting!",
             description=(
                 f"Each game consists of {self.question_limit + 1} questions.\n"
@@ -538,9 +534,11 @@ class TriviaQuiz(commands.Cog):
         """Send the correct answer of a question to the game channel."""
         info = question_dict.get("info", "")
 
+        word = "is" if len(answers) == 1 else "are"
+
         embed = discord.Embed(
             color=Colours.bright_green,
-            title=f"The correct answer is/are **`{', '.join(answers)}`**\n",
+            title=f"The correct answer {word} **`{', '.join(answers)}`**\n",
         )
 
         if info != "":
