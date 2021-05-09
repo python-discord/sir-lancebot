@@ -131,12 +131,12 @@ def binary_calc(q_format: str, a_format: str) -> Tuple[str, str]:
         b -= 5
 
     question = q_format.format(
-        bin(a)[2:],
+        a,
         oper[0],
-        bin(b)[2:],
+        b,
     )
     answer = a_format.format(
-        bin(oper[1](a, b))[2:]
+        oper[1](a, b)
     )
 
     return question, answer
