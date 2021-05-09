@@ -151,6 +151,7 @@ class Colours:
     python_blue = 0x4B8BBE
     python_yellow = 0xFFD43B
     grass_green = 0x66ff00
+    gold = 0xE6C200
 
     easter_like_colours = [
         (255, 247, 0),
