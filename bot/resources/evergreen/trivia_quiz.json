@@ -423,8 +423,8 @@
     {
       "id": 226,
       "dynamic_id": 205,
-      "question": "BASE TWO QUESTION: Calculate {} {} {}",
-      "answer": "{}"
+      "question": "BASE TWO QUESTION: Calculate {:b} {} {:b}",
+      "answer": "{:b}"
     },
     {
       "id": 227,
