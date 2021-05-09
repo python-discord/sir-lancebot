@@ -224,11 +224,13 @@ class TriviaQuiz(commands.Cog):
     async def quiz_game(self, ctx: commands.Context, category: Optional[str], questions: Optional[int]) -> None:
         """
         Start a quiz!
+
         Questions for the quiz can be selected from the following categories:
         - general: Test your general knowledge. (default)
         - retro: Questions related to retro gaming.
         - math: General questions about mathematics ranging from grade 8 to grade 12.
         - science: Put your understanding of science to the test!
+
         (More to come!)
         """
         if ctx.channel.id not in self.game_status:
