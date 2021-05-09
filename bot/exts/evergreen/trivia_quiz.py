@@ -563,7 +563,6 @@ class TriviaQuiz(commands.Cog):
         embed = discord.Embed(
             color=discord.Colour.red(),
             title=f"The correct answer is/are **`{', '.join(answers)}`**\n",
-            description="",
         )
 
         if info != "":
