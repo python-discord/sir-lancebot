@@ -16,6 +16,8 @@ from bot.constants import Roles
 
 logger = logging.getLogger(__name__)
 
+QAndA = Tuple[str, str]
+
 VARIATION_TOLERANCE = 83
 
 WRONG_ANS_RESPONSE = [
@@ -60,7 +62,7 @@ UNITS_TO_BASE_UNITS = {
 }
 
 
-def linear_system(q_format: str, a_format: str) -> Tuple[str, str]:
+def linear_system(q_format: str, a_format: str) -> QAndA:
     """Generate a system of linear equations with two unknowns."""
     x, y = random.randint(2, 5), random.randint(2, 5)
     answer = a_format.format(x, y)
@@ -83,7 +85,7 @@ def linear_system(q_format: str, a_format: str) -> Tuple[str, str]:
     return question, answer
 
 
-def mod_arith(q_format: str, a_format: str) -> Tuple[str, str]:
+def mod_arith(q_format: str, a_format: str) -> QAndA:
     """Generate a basic modular arithmetic question."""
     quotient, m, b = random.randint(30, 40), random.randint(10, 20), random.randint(200, 350)
     ans = random.randint(0, 9)  # max 9 because min mod 10
@@ -95,7 +97,7 @@ def mod_arith(q_format: str, a_format: str) -> Tuple[str, str]:
     return question, answer
 
 
-def ngonal_prism(q_format: str, a_format: str) -> Tuple[str, str]:
+def ngonal_prism(q_format: str, a_format: str) -> QAndA:
     """Generate a question regarding vertices on n-gonal prisms."""
     n = random.randint(0, len(N_PREFIXES) - 1)
 
@@ -105,7 +107,7 @@ def ngonal_prism(q_format: str, a_format: str) -> Tuple[str, str]:
     return question, answer
 
 
-def imag_sqrt(q_format: str, a_format: str) -> Tuple[str, str]:
+def imag_sqrt(q_format: str, a_format: str) -> QAndA:
     """Generate a negative square root question."""
     ans_coeff = random.randint(3, 10)
 
@@ -115,7 +117,7 @@ def imag_sqrt(q_format: str, a_format: str) -> Tuple[str, str]:
     return question, answer
 
 
-def binary_calc(q_format: str, a_format: str) -> Tuple[str, str]:
+def binary_calc(q_format: str, a_format: str) -> QAndA:
     """Generate a binary calculation question."""
     a = random.randint(15, 20)
     b = random.randint(10, a)
@@ -136,14 +138,12 @@ def binary_calc(q_format: str, a_format: str) -> Tuple[str, str]:
         oper[0],
         b,
     )
-    answer = a_format.format(
-        oper[1](a, b)
-    )
+    answer = a_format.format(oper[1](a, b))
 
     return question, answer
 
 
-def solar_system(q_format: str, a_format: str) -> Tuple[str, str]:
+def solar_system(q_format: str, a_format: str) -> QAndA:
     """Generate a question on the planets of the Solar System."""
     planet = random.choice(PLANETS)
 
@@ -153,7 +153,7 @@ def solar_system(q_format: str, a_format: str) -> Tuple[str, str]:
     return question, answer
 
 
-def taxonomic_rank(q_format: str, a_format: str) -> Tuple[str, str]:
+def taxonomic_rank(q_format: str, a_format: str) -> QAndA:
     """Generate a question on taxonomic classification."""
     level = random.randint(0, len(TAXONOMIC_HIERARCHY) - 2)
 
@@ -163,7 +163,7 @@ def taxonomic_rank(q_format: str, a_format: str) -> Tuple[str, str]:
     return question, answer
 
 
-def base_units_convert(q_format: str, a_format: str) -> Tuple[str, str]:
+def base_units_convert(q_format: str, a_format: str) -> QAndA:
     """Generate a SI base units conversion question."""
     unit = random.choice(list(UNITS_TO_BASE_UNITS.keys()))
 
@@ -216,9 +216,7 @@ class TriviaQuiz(commands.Cog):
         """Load the questions from the JSON file."""
         p = Path("bot", "resources", "evergreen", "trivia_quiz.json")
 
-        with p.open(encoding="utf8") as json_data:
-            questions = json.load(json_data)
-            return questions
+        return json.loads(p.read_text())
 
     @commands.group(name="quiz", aliases=["trivia"], invoke_without_command=True)
     async def quiz_game(self, ctx: commands.Context, category: Optional[str], questions: Optional[int]) -> None:
@@ -274,7 +272,7 @@ class TriviaQuiz(commands.Cog):
             elif questions < 1:
                 await ctx.send(
                     embed=self.make_error_embed(
-                        "Please do at least one question."
+                        "You must choose to complete at least one question."
                     )
                 )
                 return
@@ -283,7 +281,7 @@ class TriviaQuiz(commands.Cog):
                 self.question_limit = questions - 1
 
         # Start game if not running.
-        if self.game_status[ctx.channel.id] is False:
+        if not self.game_status[ctx.channel.id]:
             self.game_owners[ctx.channel.id] = ctx.author
             self.game_status[ctx.channel.id] = True
             start_embed = self.make_start_embed(category)
@@ -338,23 +336,21 @@ class TriviaQuiz(commands.Cog):
                 if img_url := question_dict.get("image_url"):
                     embed.set_image(url=img_url)
 
-                await ctx.send(embed=embed)  # Send question embed.
+                await ctx.send(embed=embed)
 
-            # A function to check whether user input is the correct answer(close to the right answer)
-            def check(m: discord.Message) -> bool:
+            def contains_correct_answer(m: discord.Message) -> bool:
                 return m.channel == ctx.channel and any(
                     fuzz.ratio(answer.lower(), m.content.lower()) > VARIATION_TOLERANCE
                     for answer in answers
                 )
 
             try:
-                msg = await self.bot.wait_for("message", check=check, timeout=10)
+                msg = await self.bot.wait_for("message", check=contains_correct_answer, timeout=10)
             except asyncio.TimeoutError:
                 # In case of TimeoutError and the game has been stopped, then do nothing.
-                if self.game_status[ctx.channel.id] is False:
+                if not self.game_status[ctx.channel.id]:
                     break
 
-                # if number of hints sent or time alerts sent is less than 2, then send one.
                 if hint_no < 2:
                     hint_no += 1
 
@@ -385,7 +381,6 @@ class TriviaQuiz(commands.Cog):
                 if self.game_status[ctx.channel.id] is False:
                     break
 
-                # Reduce points by 25 for every hint/time alert that has been sent.
                 points = 100 - 25 * hint_no
                 if msg.author in self.game_player_scores[ctx.channel.id]:
                     self.game_player_scores[ctx.channel.id][msg.author] += points
@@ -471,13 +466,13 @@ class TriviaQuiz(commands.Cog):
 
     @staticmethod
     async def send_score(channel: discord.TextChannel, player_data: dict) -> None:
-        """A function which sends the score."""
+        """Send the score."""
         if len(player_data) == 0:
             await channel.send("No one has made it onto the leaderboard yet.")
             return
 
         embed = discord.Embed(
-            colour=discord.Colour.blue(),
+            colour=Colours.blue,
             title="Score Board",
             description="",
         )
@@ -519,7 +514,7 @@ class TriviaQuiz(commands.Cog):
     def category_embed(self) -> discord.Embed:
         """Build an embed showing all available trivia categories."""
         embed = discord.Embed(
-            colour=discord.Colour.blue(),
+            colour=Colours.blue,
             title="The available question categories are:",
             description="",
         )
@@ -544,7 +539,7 @@ class TriviaQuiz(commands.Cog):
         info = question_dict.get("info", "")
 
         embed = discord.Embed(
-            color=discord.Colour.red(),
+            color=Colours.bright_green,
             title=f"The correct answer is/are **`{', '.join(answers)}`**\n",
         )
 
