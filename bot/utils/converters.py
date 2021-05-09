@@ -37,7 +37,7 @@ class CoordinateConverter(commands.Converter):
             digit = coordinate[:-1]
             letter = coordinate[-1]
 
-        if not digit.isdigit():
+        if not digit.isdecimal():
             raise commands.BadArgument
 
         x = ord(letter) - ord("a")
@@ -76,7 +76,7 @@ class DateConverter(commands.Converter):
     @staticmethod
     async def convert(ctx: commands.Context, argument: str) -> Union[int, datetime]:
         """Parse date (SOL or earth) into `datetime` or `int`. When invalid value, raise error."""
-        if argument.isdigit():
+        if argument.isdecimal():
             return int(argument)
         try:
             date = datetime.strptime(argument, "%Y-%m-%d")

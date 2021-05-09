@@ -51,7 +51,7 @@ async def disambiguate(
     choices = (f"{index}: {entry}" for index, entry in enumerate(entries, start=1))
 
     def check(message: discord.Message) -> bool:
-        return (message.content.isdigit()
+        return (message.content.isdecimal()
                 and message.author == ctx.author
                 and message.channel == ctx.channel)
 
@@ -87,7 +87,7 @@ async def disambiguate(
     except asyncio.TimeoutError:
         raise BadArgument("Timed out.")
 
-    # Guaranteed to not error because of isdigit() in check
+    # Guaranteed to not error because of isdecimal() in check
     index = int(result.content)
 
     try:
