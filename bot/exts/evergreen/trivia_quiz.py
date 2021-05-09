@@ -336,8 +336,8 @@ class TriviaQuiz(commands.Cog):
                     description=q,
                 )
 
-                if "img_url" in question_dict:
-                    embed.set_image(url=question_dict["img_url"])
+                if img_url := question_dict.get("image_url"):
+                    embed.set_image(url=img_url)
 
                 await ctx.send(embed=embed)  # Send question embed.
 
