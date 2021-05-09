@@ -10,6 +10,7 @@ import discord
 from discord.ext import commands
 from fuzzywuzzy import fuzz
 
+from bot.constants import Colours
 from bot.constants import NEGATIVE_REPLIES
 from bot.constants import Roles
 
@@ -443,7 +444,7 @@ class TriviaQuiz(commands.Cog):
     def make_error_embed(desc: str) -> discord.Embed:
         """Generate an error embed with the given description."""
         error_embed = discord.Embed(
-            colour=discord.Colour.red(),
+            colour=Colours.soft_red,
             title=random.choice(NEGATIVE_REPLIES),
             description=desc,
         )
