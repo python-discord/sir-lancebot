@@ -328,7 +328,7 @@ class TriviaQuiz(commands.Cog):
                     answers = [answers]
 
                 embed = discord.Embed(
-                    colour=discord.Colour.gold(),
+                    colour=Colours.gold,
                     title=f"Question #{len(done_question)}",
                     description=question,
                 )
