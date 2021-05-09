@@ -224,13 +224,11 @@ class TriviaQuiz(commands.Cog):
     async def quiz_game(self, ctx: commands.Context, category: Optional[str], questions: Optional[int]) -> None:
         """
         Start a quiz!
-
         Questions for the quiz can be selected from the following categories:
         - general: Test your general knowledge. (default)
         - retro: Questions related to retro gaming.
         - math: General questions about mathematics ranging from grade 8 to grade 12.
         - science: Put your understanding of science to the test!
-
         (More to come!)
         """
         if ctx.channel.id not in self.game_status:
@@ -299,9 +297,7 @@ class TriviaQuiz(commands.Cog):
             # Exit quiz if number of questions for a round are already sent.
             if len(done_question) > self.question_limit and hint_no == 0:
                 await ctx.send("The round has ended.")
-                await self.declare_winner(
-                    ctx.channel, self.game_player_scores[ctx.channel.id]
-                )
+                await self.declare_winner(ctx.channel, self.game_player_scores[ctx.channel.id])
 
                 self.game_status[ctx.channel.id] = False
                 del self.game_owners[ctx.channel.id]
@@ -319,12 +315,12 @@ class TriviaQuiz(commands.Cog):
                         break
 
                 if "dynamic_id" not in question_dict:
-                    q = question_dict["question"]
+                    question = question_dict["question"]
                     answers = question_dict["answer"].split(", ")
                 else:
-                    q, answers = DYNAMIC_QUESTIONS_FORMAT_FUNCS[
-                        question_dict["dynamic_id"]
-                    ](
+                    format_func = DYNAMIC_QUESTIONS_FORMAT_FUNCS[question_dict["dynamic_id"]]
+
+                    question, answers = format_func(
                         question_dict["question"],
                         question_dict["answer"],
                     )
@@ -334,7 +330,7 @@ class TriviaQuiz(commands.Cog):
                 embed = discord.Embed(
                     colour=discord.Colour.gold(),
                     title=f"Question #{len(done_question)}",
-                    description=q,
+                    description=question,
                 )
 
                 if img_url := question_dict.get("image_url"):
@@ -363,10 +359,7 @@ class TriviaQuiz(commands.Cog):
                     if "hints" in question_dict:
                         hints = question_dict["hints"]
 
-                        await ctx.send(
-                            f"**Hint #{hint_no}\n**"
-                            f"{hints[hint_no - 1]}"
-                        )
+                        await ctx.send(f"**Hint #{hint_no}\n**{hints[hint_no - 1]}")
                     else:
                         await ctx.send(f"{30 - hint_no * 10}s left!")
 
@@ -384,10 +377,7 @@ class TriviaQuiz(commands.Cog):
 
                     hint_no = 0  # init hint_no = 0 so that 2 hints/time alerts can be sent for the new question.
 
-                    await self.send_score(
-                        ctx.channel, self.game_player_scores[ctx.channel.id]
-                    )
-
+                    await self.send_score(ctx.channel, self.game_player_scores[ctx.channel.id])
                     await asyncio.sleep(2)
             else:
                 if self.game_status[ctx.channel.id] is False:
@@ -408,14 +398,10 @@ class TriviaQuiz(commands.Cog):
 
                 hint_no = 0
 
-                await ctx.send(
-                    f"{msg.author.mention} got the correct answer :tada: {points} points!"
-                )
+                await ctx.send(f"{msg.author.mention} got the correct answer :tada: {points} points!")
 
                 await self.send_answer(ctx.channel, answers, question_dict)
-                await self.send_score(
-                    ctx.channel, self.game_player_scores[ctx.channel.id]
-                )
+                await self.send_score(ctx.channel, self.game_player_scores[ctx.channel.id])
 
                 await asyncio.sleep(2)
 
@@ -455,7 +441,6 @@ class TriviaQuiz(commands.Cog):
     async def stop_quiz(self, ctx: commands.Context) -> None:
         """
         Stop a quiz game if its running in the channel.
-
         Note: Only mods or the owner of the quiz can stop it.
         """
         if self.game_status[ctx.channel.id] is True:
@@ -465,18 +450,14 @@ class TriviaQuiz(commands.Cog):
             ):
 
                 await ctx.send("Quiz stopped.")
-                await self.declare_winner(
-                    ctx.channel, self.game_player_scores[ctx.channel.id]
-                )
+                await self.declare_winner(ctx.channel, self.game_player_scores[ctx.channel.id])
 
                 self.game_status[ctx.channel.id] = False
                 del self.game_owners[ctx.channel.id]
                 self.game_player_scores[ctx.channel.id] = {}
 
             else:
-                await ctx.send(
-                    f"{ctx.author.mention}, you are not authorised to stop this game :ghost:!"
-                )
+                await ctx.send(f"{ctx.author.mention}, you are not authorised to stop this game :ghost:!")
         else:
             await ctx.send("No quiz running.")
 
@@ -540,9 +521,7 @@ class TriviaQuiz(commands.Cog):
             description="",
         )
 
-        embed.set_footer(
-            text="If a category is not chosen, a random one will be selected."
-        )
+        embed.set_footer(text="If a category is not chosen, a random one will be selected.")
 
         for cat, description in self.categories.items():
             embed.description += (
