@@ -557,10 +557,7 @@ class TriviaQuiz(commands.Cog):
         question_dict: dict,
     ) -> None:
         """Send the correct answer of a question to the game channel."""
-        if "info" in question_dict:
-            info = question_dict["info"]
-        else:
-            info = ""
+        info = question_dict.get("info", "")
 
         embed = discord.Embed(
             color=discord.Colour.red(),
