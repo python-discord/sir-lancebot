@@ -2,6 +2,7 @@ import asyncio
 import json
 import logging
 import random
+import operator
 from pathlib import Path
 from typing import List, Optional, Tuple
 
@@ -119,9 +120,9 @@ def binary_calc(q_format: str, a_format: str) -> Tuple[str, str]:
     b = random.randint(10, a)
     oper = random.choice(
         (
-            ("+", lambda x, y: x + y),
-            ("-", lambda x, y: x - y),
-            ("*", lambda x, y: x * y),
+            ("+", operator.add),
+            ("-", operator.sub),
+            ("*", operator.mul),
         )
     )
 
