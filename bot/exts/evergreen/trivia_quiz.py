@@ -432,7 +432,7 @@ class TriviaQuiz(commands.Cog):
 
         start_embed.set_footer(
             text=(
-                "Points for each question reduces by 25 after 10s or after a hint."
+                "Points for each question reduces by 25 after 10s or after a hint. "
                 "Total time is 30s per question"
             )
         )
