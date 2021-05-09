@@ -8,6 +8,7 @@ from typing import Dict, NamedTuple
 __all__ = (
     "AdventOfCode",
     "Branding",
+    "Cats",
     "Channels",
     "Categories",
     "Client",
@@ -94,6 +95,10 @@ class Branding:
     cycle_frequency = int(environ.get("CYCLE_FREQUENCY", 3))  # 0: never, 1: every day, 2: every other day, ...
 
 
+class Cats:
+    cats = ["ᓚᘏᗢ", "ᘡᘏᗢ", "🐈", "ᓕᘏᗢ", "ᓇᘏᗢ", "ᓂᘏᗢ", "ᘣᘏᗢ", "ᕦᘏᗢ", "ᕂᘏᗢ"]
+
+
 class Channels(NamedTuple):
     advent_of_code = int(environ.get("AOC_CHANNEL_ID", 782715290437943306))
     advent_of_code_commands = int(environ.get("AOC_COMMANDS_CHANNEL_ID", 607247579608121354))
@@ -149,8 +154,25 @@ class Colours:
     python_yellow = 0xFFD43B
     grass_green = 0x66ff00
 
+    easter_like_colours = [
+        (255, 247, 0),
+        (255, 255, 224),
+        (0, 255, 127),
+        (189, 252, 201),
+        (255, 192, 203),
+        (255, 160, 122),
+        (181, 115, 220),
+        (221, 160, 221),
+        (200, 162, 200),
+        (238, 130, 238),
+        (135, 206, 235),
+        (0, 204, 204),
+        (64, 224, 208),
+    ]
+
 
 class Emojis:
+    cross_mark = "\u274C"
     star = "\u2B50"
     christmas_tree = "\U0001F384"
     check = "\u2611"
