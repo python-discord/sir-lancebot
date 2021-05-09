@@ -242,7 +242,7 @@ class TriviaQuiz(commands.Cog):
         # Stop game if running.
         if self.game_status[ctx.channel.id] is True:
             await ctx.send(
-                "Game is already running..."
+                "Game is already running... "
                 f"do `{self.bot.command_prefix}quiz stop`"
             )
 
