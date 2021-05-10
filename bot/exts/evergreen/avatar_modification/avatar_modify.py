@@ -10,10 +10,9 @@ from concurrent.futures import ThreadPoolExecutor
 import discord
 from aiohttp import client_exceptions
 from discord.ext import commands
-from discord.ext.commands.errors import BadArgument
 
 from bot.bot import Bot
-from bot.constants import Client, Colours, Emojis
+from bot.constants import Colours, Emojis
 from bot.exts.evergreen.avatar_modification._effects import PfpEffects
 from bot.utils.extensions import invoke_help_command
 from bot.utils.halloween import spookifications
@@ -67,23 +66,25 @@ class AvatarModify(commands.Cog):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
-    async def _fetch_member(self, member_id: int) -> t.Optional[discord.Member]:
+    async def _fetch_user(self, user_id: int) -> t.Optional[discord.User]:
         """
-        Fetches a member and handles errors.
+        Fetches a user and handles errors.
 
-        This helper funciton is required as the member cache doesn't always have the most up to date
+        This helper function is required as the member cache doesn't always have the most up to date
         profile picture. This can lead to errors if the image is delted from the Discord CDN.
+        fetch_member can't be used due to the avatar url being part of the user object, and
+        some weird caching that D.py does
         """
         try:
-            member = await self.bot.get_guild(Client.guild).fetch_member(member_id)
+            user = await self.bot.fetch_user(user_id)
         except discord.errors.NotFound:
-            log.debug(f"Member {member_id} left the guild before we could get their pfp.")
+            log.debug(f"User {user_id} could not be found.")
             return None
         except discord.HTTPException:
-            log.exception(f"Exception while trying to retrieve member {member_id} from Discord.")
+            log.exception(f"Exception while trying to retrieve user {user_id} from Discord.")
             return None
 
-        return member
+        return user
 
     @commands.group(aliases=("avatar_mod", "pfp_mod", "avatarmod", "pfpmod"))
     async def avatar_modify(self, ctx: commands.Context) -> None:
@@ -95,13 +96,13 @@ class AvatarModify(commands.Cog):
     async def eightbit_command(self, ctx: commands.Context) -> None:
         """Pixelates your avatar and changes the palette to an 8bit one."""
         async with ctx.typing():
-            member = await self._fetch_member(ctx.author.id)
-            if not member:
-                await ctx.send(f"{Emojis.cross_mark} Could not get member info.")
+            user = await self._fetch_user(ctx.author.id)
+            if not user:
+                await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
                 return
 
-            image_bytes = await member.avatar_url.read()
-            file_name = file_safe_name("eightbit_avatar", member.display_name)
+            image_bytes = await user.avatar_url_as(size=1024).read()
+            file_name = file_safe_name("eightbit_avatar", ctx.author.display_name)
 
             file = await in_executor(
                 PfpEffects.apply_effect,
@@ -116,7 +117,7 @@ class AvatarModify(commands.Cog):
             )
 
             embed.set_image(url=f"attachment://{file_name}")
-            embed.set_footer(text=f"Made by {member.display_name}.", icon_url=member.avatar_url)
+            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=user.avatar_url)
 
         await ctx.send(embed=embed, file=file)
 
@@ -141,9 +142,9 @@ class AvatarModify(commands.Cog):
                 return args[0]
 
         async with ctx.typing():
-            member = await self._fetch_member(ctx.author.id)
-            if not member:
-                await ctx.send(f"{Emojis.cross_mark} Could not get member info.")
+            user = await self._fetch_user(ctx.author.id)
+            if not user:
+                await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
                 return
 
             egg = None
@@ -156,8 +157,8 @@ class AvatarModify(commands.Cog):
                     return
                 ctx.send = send_message  # Reassigns ctx.send
 
-            image_bytes = await member.avatar_url_as(size=256).read()
-            file_name = file_safe_name("easterified_avatar", member.display_name)
+            image_bytes = await user.avatar_url_as(size=256).read()
+            file_name = file_safe_name("easterified_avatar", ctx.author.display_name)
 
             file = await in_executor(
                 PfpEffects.apply_effect,
@@ -172,7 +173,7 @@ class AvatarModify(commands.Cog):
                 description="Here is your lovely avatar, all bright and colourful\nwith Easter pastel colours. Enjoy :D"
             )
             embed.set_image(url=f"attachment://{file_name}")
-            embed.set_footer(text=f"Made by {member.display_name}.", icon_url=member.avatar_url)
+            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=user.avatar_url)
 
         await ctx.send(file=file, embed=embed)
 
@@ -227,11 +228,11 @@ class AvatarModify(commands.Cog):
             return
 
         async with ctx.typing():
-            member = await self._fetch_member(ctx.author.id)
-            if not member:
-                await ctx.send(f"{Emojis.cross_mark} Could not get member info.")
+            user = await self._fetch_user(ctx.author.id)
+            if not user:
+                await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
                 return
-            image_bytes = await member.avatar_url_as(size=1024).read()
+            image_bytes = await user.avatar_url_as(size=1024).read()
             await self.send_pride_image(ctx, image_bytes, pixels, flag, option)
 
     @prideavatar.command()
@@ -259,9 +260,9 @@ class AvatarModify(commands.Cog):
                         return
                     image_bytes = await response.read()
             except client_exceptions.ClientConnectorError:
-                raise BadArgument("Cannot connect to provided URL!")
+                raise commands.BadArgument("Cannot connect to provided URL!")
             except client_exceptions.InvalidURL:
-                raise BadArgument("Invalid URL!")
+                raise commands.BadArgument("Invalid URL!")
 
             await self.send_pride_image(ctx, image_bytes, pixels, flag, option)
 
@@ -287,13 +288,13 @@ class AvatarModify(commands.Cog):
         if member is None:
             member = ctx.author
 
-        member = await self._fetch_member(member.id)
-        if not member:
-            await ctx.send(f"{Emojis.cross_mark} Could not get member info.")
+        user = await self._fetch_user(member.id)
+        if not user:
+            await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
             return
 
         async with ctx.typing():
-            image_bytes = await member.avatar_url.read()
+            image_bytes = await user.avatar_url_as(size=1024).read()
 
             file_name = file_safe_name("spooky_avatar", member.display_name)
 
@@ -318,9 +319,9 @@ class AvatarModify(commands.Cog):
     async def mosaic_command(self, ctx: commands.Context, squares: int = 16) -> None:
         """Splits your avatar into x squares, randomizes them and stitches them back into a new image!"""
         async with ctx.typing():
-            member = await self._fetch_member(ctx.author.id)
-            if not member:
-                await ctx.send(f"{Emojis.cross_mark} Could not get member info.")
+            user = await self._fetch_user(ctx.author.id)
+            if not user:
+                await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
                 return
 
             if not 1 <= squares <= MAX_SQUARES:
@@ -333,7 +334,7 @@ class AvatarModify(commands.Cog):
 
             file_name = file_safe_name("mosaic_avatar", ctx.author.display_name)
 
-            img_bytes = await member.avatar_url.read()
+            img_bytes = await user.avatar_url_as(size=1024).read()
 
             file = await in_executor(
                 PfpEffects.mosaic_effect,
@@ -350,7 +351,7 @@ class AvatarModify(commands.Cog):
                 description = "What a masterpiece. :star:"
             else:
                 title = "Your mosaic avatar"
-                description = "Here is your avatar. I think it looks a bit *puzzling*"
+                description = f"Here is your avatar. I think it looks a bit *puzzling*\nMade with {squares} squares."
 
             embed = discord.Embed(
                 title=title,
@@ -359,7 +360,7 @@ class AvatarModify(commands.Cog):
             )
 
             embed.set_image(url=f"attachment://{file_name}")
-            embed.set_footer(text=f"Made by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
+            embed.set_footer(text=f"Made by {ctx.author.display_name}", icon_url=user.avatar_url)
 
             await ctx.send(file=file, embed=embed)
 
