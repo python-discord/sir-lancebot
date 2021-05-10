@@ -288,16 +288,18 @@ class Roles(NamedTuple):
 
 
 class Tokens(NamedTuple):
-    giphy = environ.get("GIPHY_TOKEN")
     aoc_session_cookie = environ.get("AOC_SESSION_COOKIE")
-    omdb = environ.get("OMDB_API_KEY")
-    youtube = environ.get("YOUTUBE_API_KEY")
-    tmdb = environ.get("TMDB_API_KEY")
-    nasa = environ.get("NASA_API_KEY")
+    giphy = environ.get("GIPHY_TOKEN")
+    github = environ.get("GITHUB_TOKEN")
     igdb_client_id = environ.get("IGDB_CLIENT_ID")
     igdb_client_secret = environ.get("IGDB_CLIENT_SECRET")
-    github = environ.get("GITHUB_TOKEN")
+    lastfm_api_key = environ.get("LASTFM_API_KEY")
+    lastfm_client_secret = environ.get("LASTFM_CLIENT_SECRET")
+    nasa = environ.get("NASA_API_KEY")
+    omdb = environ.get("OMDB_API_KEY")
+    tmdb = environ.get("TMDB_API_KEY")
     unsplash_access_key = environ.get("UNSPLASH_KEY")
+    youtube = environ.get("YOUTUBE_API_KEY")
 
 
 class Wolfram(NamedTuple):
