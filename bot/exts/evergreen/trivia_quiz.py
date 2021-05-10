@@ -370,8 +370,9 @@ class TriviaQuiz(commands.Cog):
                     await self.send_answer(
                         ctx.channel,
                         answers,
+                        False,
                         question_dict,
-                        self.question_limit - len(done_question) + 1
+                        self.question_limit - len(done_question) + 1,
                     )
                     await asyncio.sleep(1)
 
@@ -402,8 +403,9 @@ class TriviaQuiz(commands.Cog):
                 await self.send_answer(
                     ctx.channel,
                     answers,
+                    True,
                     question_dict,
-                    self.question_limit - len(done_question) + 1
+                    self.question_limit - len(done_question) + 1,
                 )
                 await self.send_score(ctx.channel, self.game_player_scores[ctx.channel.id])
 
@@ -540,6 +542,7 @@ class TriviaQuiz(commands.Cog):
     async def send_answer(
         channel: discord.TextChannel,
         answers: List[str],
+        answer_is_correct: bool,
         question_dict: dict,
         q_left: int,
     ) -> None:
@@ -550,14 +553,20 @@ class TriviaQuiz(commands.Cog):
 
         embed = discord.Embed(
             color=Colours.bright_green,
-            title=f"The correct answer {word} **`{', '.join(answers)}`**\n",
+            title=(
+                "You got it! " if answer_is_correct else ""
+                f"The correct answer {word} **`{', '.join(answers)}`**\n"
+            ),
             description="",
         )
 
         if info != "":
             embed.description += f"**Information**\n{info}\n\n"
 
-        embed.description += f"Let's move to the next question.\nRemaining questions: {q_left}"
+        embed.description += (
+            "Let's move to the next question." if q_left > 0 else ""
+            f"\nRemaining questions: {q_left}"
+        )
         await channel.send(embed=embed)
 
 
