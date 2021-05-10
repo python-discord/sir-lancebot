@@ -27,7 +27,7 @@ class Ping(commands.Cog):
     # Originally made in 70d2170a0a6594561d59c7d080c4280f1ebcd70b by lemon & gdude2002
     @commands.command(name="uptime")
     async def uptime(self, ctx: commands.Context) -> None:
-        """Responds with the uptime of the bot."""
+        """Get the current uptime of the bot."""
         difference = relativedelta(start_time - arrow.utcnow())
         uptime_string = start_time.shift(
             seconds=-difference.seconds,
