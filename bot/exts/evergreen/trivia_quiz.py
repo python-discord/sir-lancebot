@@ -366,7 +366,7 @@ class TriviaQuiz(commands.Cog):
 
                     response = random.choice(WRONG_ANS_RESPONSE)
                     await ctx.send(response)
-                    await self.send_answer(ctx.channel, answers, question_dict, len(done_question))
+                    await self.send_answer(ctx.channel, answers, question_dict, self.question_limit - len(done_question))
                     await asyncio.sleep(1)
 
                     hint_no = 0  # init hint_no = 0 so that 2 hints/time alerts can be sent for the new question.
@@ -393,7 +393,7 @@ class TriviaQuiz(commands.Cog):
 
                 await ctx.send(f"{msg.author.mention} got the correct answer :tada: {points} points!")
 
-                await self.send_answer(ctx.channel, answers, question_dict, len(done_question))
+                await self.send_answer(ctx.channel, answers, question_dict, self.question_limit - len(done_question))
                 await self.send_score(ctx.channel, self.game_player_scores[ctx.channel.id])
 
                 await asyncio.sleep(2)
