@@ -288,6 +288,7 @@ class PfpEffects:
 
     @staticmethod
     def half_effect(img_bytes: bytes, file_name: str) -> discord.File:
+        """Function to crop an image in half"""
         avatar = Image.open(BytesIO(img_bytes))
         avatar = avatar.convert('RGBA').resize((1024, 1024))
 
