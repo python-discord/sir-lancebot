@@ -114,7 +114,7 @@ class InternalEval(commands.Cog):
         """Evaluate the `code` in the current evaluation context."""
         context_vars = {
             "message": ctx.message,
-            "author": ctx.message.author,
+            "author": ctx.author,
             "channel": ctx.channel,
             "guild": ctx.guild,
             "ctx": ctx,

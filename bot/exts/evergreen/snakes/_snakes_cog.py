@@ -746,7 +746,7 @@ class Snakes(Cog):
         my_snake_embed = Embed(description=":tada: Congrats! You hatched: **{0}**".format(snake_name))
         my_snake_embed.set_thumbnail(url=snake_image)
         my_snake_embed.set_footer(
-            text=" Owner: {0}#{1}".format(ctx.message.author.name, ctx.message.author.discriminator)
+            text=" Owner: {0}#{1}".format(ctx.author.name, ctx.author.discriminator)
         )
 
         await ctx.send(embed=my_snake_embed)
@@ -1046,14 +1046,14 @@ class Snakes(Cog):
         """
         with ctx.typing():
             embed = Embed()
-            user = ctx.message.author
+            user = ctx.author
 
             if not message:
 
                 # Get a random message from the users history
                 messages = []
                 async for message in ctx.channel.history(limit=500).filter(
-                        lambda msg: msg.author == ctx.message.author  # Message was sent by author.
+                        lambda msg: msg.author == ctx.author  # Message was sent by author.
                 ):
                     messages.append(message.content)
 

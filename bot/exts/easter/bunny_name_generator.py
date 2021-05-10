@@ -62,7 +62,7 @@ class BunnyNameGenerator(commands.Cog):
     @commands.command()
     async def bunnifyme(self, ctx: commands.Context) -> None:
         """Gets your Discord username and bunnifies it."""
-        username = ctx.message.author.display_name
+        username = ctx.author.display_name
 
         # If name contains spaces or other separators, get the individual words to randomly bunnify
         spaces_in_name = self.find_separators(username)

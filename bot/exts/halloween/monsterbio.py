@@ -26,7 +26,7 @@ class MonsterBio(commands.Cog):
     @commands.command(brief="Sends your monster bio!")
     async def monsterbio(self, ctx: commands.Context) -> None:
         """Sends a description of a monster."""
-        seeded_random = random.Random(ctx.message.author.id)  # Seed a local Random instance rather than the system one
+        seeded_random = random.Random(ctx.author.id)  # Seed a local Random instance rather than the system one
 
         name = self.generate_name(seeded_random)
         species = self.generate_name(seeded_random)
