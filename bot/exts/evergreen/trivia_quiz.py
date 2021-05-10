@@ -195,7 +195,7 @@ class TriviaQuiz(commands.Cog):
         self.game_owners = {}  # A variable to store the person's ID who started the quiz game in a channel.
 
         self.questions = self.load_questions()
-        self.question_limit = 7
+        self.question_limit = 6
 
         self.player_scores = {}  # A variable to store all player's scores for a bot session.
         self.game_player_scores = {}  # A variable to store temporary game player's scores.
@@ -366,7 +366,7 @@ class TriviaQuiz(commands.Cog):
 
                     response = random.choice(WRONG_ANS_RESPONSE)
                     await ctx.send(response)
-                    await self.send_answer(ctx.channel, answers, question_dict)
+                    await self.send_answer(ctx.channel, answers, question_dict, len(done_question))
                     await asyncio.sleep(1)
 
                     hint_no = 0  # init hint_no = 0 so that 2 hints/time alerts can be sent for the new question.
@@ -393,7 +393,7 @@ class TriviaQuiz(commands.Cog):
 
                 await ctx.send(f"{msg.author.mention} got the correct answer :tada: {points} points!")
 
-                await self.send_answer(ctx.channel, answers, question_dict)
+                await self.send_answer(ctx.channel, answers, question_dict, len(done_question))
                 await self.send_score(ctx.channel, self.game_player_scores[ctx.channel.id])
 
                 await asyncio.sleep(2)
@@ -530,6 +530,7 @@ class TriviaQuiz(commands.Cog):
         channel: discord.TextChannel,
         answers: List[str],
         question_dict: dict,
+        q_left: int,
     ) -> None:
         """Send the correct answer of a question to the game channel."""
         info = question_dict.get("info", "")
@@ -545,7 +546,7 @@ class TriviaQuiz(commands.Cog):
         if info != "":
             embed.description += f"**Information**\n{info}\n\n"
 
-        embed.description += "Let's move to the next question.\nRemaining questions: "
+        embed.description += f"Let's move to the next question.\nRemaining questions: {q_left}"
         await channel.send(embed=embed)
 
 
