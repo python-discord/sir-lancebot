@@ -75,9 +75,7 @@ def linear_system(q_format: str, a_format: str) -> QAndA:
         coeffs[0] * x + coeffs[1] * y,
         coeffs[2],
         coeffs[3],
-        (
-            coeffs[2] * x + coeffs[3] * y
-        ),
+        coeffs[2] * x + coeffs[3] * y,
     )
 
     return question, answer
