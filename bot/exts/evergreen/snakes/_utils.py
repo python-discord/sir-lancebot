@@ -192,9 +192,7 @@ class PerlinNoiseFactory(object):
         """Get plain noise for a single point, without taking into account either octaves or tiling."""
         if len(point) != self.dimension:
             raise ValueError(
-                "Expected {0} values, got {1}".format(
-                    self.dimension, len(point)
-                )
+                f"Expected {self.dimension} values, got {len(point)}"
             )
 
         # Build a list of the (min, max) bounds in each dimension

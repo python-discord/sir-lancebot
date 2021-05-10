@@ -2,9 +2,8 @@
 import asyncio
 import itertools
 import logging
-from collections import namedtuple
 from contextlib import suppress
-from typing import Union
+from typing import List, NamedTuple, Union
 
 from discord import Colour, Embed, HTTPException, Message, Reaction, User
 from discord.ext import commands
@@ -29,7 +28,14 @@ REACTIONS = {
     DELETE_EMOJI: "stop",
 }
 
-Cog = namedtuple("Cog", ["name", "description", "commands"])
+
+class Cog(NamedTuple):
+    """Show information about a Cog's name, description and commands."""
+
+    name: str
+    description: str
+    commands: List[Command]
+
 
 log = logging.getLogger(__name__)
 

@@ -151,21 +151,17 @@ class BeMyValentine(commands.Cog):
     def valentine_check(self, valentine_type: str) -> Tuple[str, str]:
         """Return the appropriate Valentine type & title based on the invoking user's input."""
         if valentine_type is None:
-            valentine, title = self.random_valentine()
+            return self.random_valentine()
 
         elif valentine_type.lower() in ["p", "poem"]:
-            valentine = self.valentine_poem()
-            title = "A poem dedicated to"
+            return self.valentine_poem(), "A poem dedicated to"
 
         elif valentine_type.lower() in ["c", "compliment"]:
-            valentine = self.valentine_compliment()
-            title = "A compliment for"
+            return self.valentine_compliment(), "A compliment for"
 
         else:
             # in this case, the user decides to type his own valentine.
-            valentine = valentine_type
-            title = "A message for"
-        return valentine, title
+            return valentine_type, "A message for"
 
     @staticmethod
     def random_emoji() -> Tuple[str, str]:
@@ -187,13 +183,11 @@ class BeMyValentine(commands.Cog):
 
     def valentine_poem(self) -> str:
         """Grabs a random poem."""
-        valentine_poem = random.choice(self.valentines["valentine_poems"])
-        return valentine_poem
+        return random.choice(self.valentines["valentine_poems"])
 
     def valentine_compliment(self) -> str:
         """Grabs a random compliment."""
-        valentine_compliment = random.choice(self.valentines["valentine_compliments"])
-        return valentine_compliment
+        return random.choice(self.valentines["valentine_compliments"])
 
 
 def setup(bot: Bot) -> None:

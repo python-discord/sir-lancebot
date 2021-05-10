@@ -23,6 +23,7 @@ class BunnyNameGenerator(commands.Cog):
         new_name = re.split(r"[_.\s]", displayname)
         if displayname not in new_name:
             return new_name
+        return None
 
     def find_vowels(self, displayname: str) -> str:
         """
