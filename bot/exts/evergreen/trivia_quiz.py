@@ -125,6 +125,7 @@ def binary_calc(q_format: str, a_format: str) -> QAndA:
         )
     )
 
+    # if the operator is multiplication, lower the values of the two operands to make it easier
     if oper[0] == "*":
         a -= 5
         b -= 5
@@ -264,7 +265,8 @@ class TriviaQuiz(commands.Cog):
             elif questions < 1:
                 await ctx.send(
                     embed=self.make_error_embed(
-                        "You must choose to complete at least one question."
+                        "You must choose to complete at least one question. "
+                        "(or enter 0 for the default value of 7 questions)"
                     )
                 )
                 return
@@ -471,7 +473,7 @@ class TriviaQuiz(commands.Cog):
 
     @staticmethod
     async def send_score(channel: discord.TextChannel, player_data: dict) -> None:
-        """Send the score."""
+        """Send the current scores of players in the game channel."""
         if len(player_data) == 0:
             await channel.send("No one has made it onto the leaderboard yet.")
             return
