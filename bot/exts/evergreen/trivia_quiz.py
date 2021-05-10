@@ -216,11 +216,13 @@ class TriviaQuiz(commands.Cog):
     async def quiz_game(self, ctx: commands.Context, category: Optional[str], questions: Optional[int]) -> None:
         """
         Start a quiz!
+
         Questions for the quiz can be selected from the following categories:
         - general: Test your general knowledge. (default)
         - retro: Questions related to retro gaming.
         - math: General questions about mathematics ranging from grade 8 to grade 12.
         - science: Put your understanding of science to the test!
+
         (More to come!)
         """
         if ctx.channel.id not in self.game_status:
@@ -450,6 +452,7 @@ class TriviaQuiz(commands.Cog):
     async def stop_quiz(self, ctx: commands.Context) -> None:
         """
         Stop a quiz game if its running in the channel.
+
         Note: Only mods or the owner of the quiz can stop it.
         """
         if self.game_status[ctx.channel.id] is True:
@@ -556,8 +559,8 @@ class TriviaQuiz(commands.Cog):
         embed = discord.Embed(
             color=Colours.bright_green,
             title=(
-                ("You got it! " if answer_is_correct else "") +
-                f"The correct answer {word} **`{', '.join(answers)}`**\n"
+                ("You got it! " if answer_is_correct else "")
+                + f"The correct answer {word} **`{', '.join(answers)}`**\n"
             ),
             description="",
         )
@@ -566,8 +569,8 @@ class TriviaQuiz(commands.Cog):
             embed.description += f"**Information**\n{info}\n\n"
 
         embed.description += (
-            ("Let's move to the next question." if q_left > 0 else "") +
-            f"\nRemaining questions: {q_left}"
+            ("Let's move to the next question." if q_left > 0 else "")
+            + f"\nRemaining questions: {q_left}"
         )
         await channel.send(embed=embed)
 
