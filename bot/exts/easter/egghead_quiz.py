@@ -64,7 +64,7 @@ class EggheadQuiz(commands.Cog):
 
         del self.quiz_messages[msg.id]
 
-        msg = await ctx.channel.fetch_message(msg.id)  # Refreshes message
+        msg = await ctx.fetch_message(msg.id)  # Refreshes message
 
         total_no = sum([len(await r.users().flatten()) for r in msg.reactions]) - len(valid_emojis)  # - bot's reactions
 

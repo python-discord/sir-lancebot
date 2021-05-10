@@ -1052,7 +1052,7 @@ class Snakes(Cog):
 
                 # Get a random message from the users history
                 messages = []
-                async for message in ctx.channel.history(limit=500).filter(
+                async for message in ctx.history(limit=500).filter(
                         lambda msg: msg.author == ctx.author  # Message was sent by author.
                 ):
                     messages.append(message.content)

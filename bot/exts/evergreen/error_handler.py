@@ -125,10 +125,7 @@ class CommandErrorHandler(commands.Cog):
             scope.set_extra("full_message", ctx.message.content)
 
             if ctx.guild is not None:
-                scope.set_extra(
-                    "jump_to",
-                    f"https://discordapp.com/channels/{ctx.guild.id}/{ctx.channel.id}/{ctx.message.id}"
-                )
+                scope.set_extra("jump_to", ctx.message.jump_url)
 
             log.exception(f"Unhandled command error: {str(error)}", exc_info=error)
 

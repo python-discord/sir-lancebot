@@ -105,7 +105,7 @@ def custom_cooldown(*ignore: List[int]) -> Callable:
 
 async def get_pod_pages(ctx: Context, bot: Bot, query: str) -> Optional[List[Tuple]]:
     """Get the Wolfram API pod pages for the provided query."""
-    async with ctx.channel.typing():
+    async with ctx.typing():
         url_str = parse.urlencode({
             "input": query,
             "appid": APPID,
@@ -180,7 +180,7 @@ class Wolfram(Cog):
         query = QUERY.format(request="simple", data=url_str)
 
         # Give feedback that the bot is working.
-        async with ctx.channel.typing():
+        async with ctx.typing():
             async with self.bot.http_session.get(query) as response:
                 status = response.status
                 image_bytes = await response.read()
@@ -263,7 +263,7 @@ class Wolfram(Cog):
         query = QUERY.format(request="result", data=url_str)
 
         # Give feedback that the bot is working.
-        async with ctx.channel.typing():
+        async with ctx.typing():
             async with self.bot.http_session.get(query) as response:
                 status = response.status
                 response_text = await response.text()
