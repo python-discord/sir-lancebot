@@ -4,7 +4,7 @@ import logging
 import operator
 import random
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Callable, List, Optional, Tuple
 
 import discord
 from discord.ext import commands
@@ -18,7 +18,8 @@ logger = logging.getLogger(__name__)
 
 QAndA = Tuple[str, str]
 
-VARIATION_TOLERANCE = 83
+STANDARD_VARIATION_TOLERANCE = 83
+DYNAMICALLY_GEN_VARIATION_TOLERANCE = 95
 
 WRONG_ANS_RESPONSE = [
     "No one answered correctly!",
@@ -215,13 +216,11 @@ class TriviaQuiz(commands.Cog):
     async def quiz_game(self, ctx: commands.Context, category: Optional[str], questions: Optional[int]) -> None:
         """
         Start a quiz!
-
         Questions for the quiz can be selected from the following categories:
         - general: Test your general knowledge. (default)
         - retro: Questions related to retro gaming.
         - math: General questions about mathematics ranging from grade 8 to grade 12.
         - science: Put your understanding of science to the test!
-
         (More to come!)
         """
         if ctx.channel.id not in self.game_status:
@@ -311,6 +310,8 @@ class TriviaQuiz(commands.Cog):
                 if "dynamic_id" not in question_dict:
                     question = question_dict["question"]
                     answers = question_dict["answer"].split(", ")
+
+                    var_tol = STANDARD_VARIATION_TOLERANCE
                 else:
                     format_func = DYNAMIC_QUESTIONS_FORMAT_FUNCS[question_dict["dynamic_id"]]
 
@@ -318,8 +319,9 @@ class TriviaQuiz(commands.Cog):
                         question_dict["question"],
                         question_dict["answer"],
                     )
-
                     answers = [answers]
+
+                    var_tol = DYNAMICALLY_GEN_VARIATION_TOLERANCE
 
                 embed = discord.Embed(
                     colour=Colours.gold,
@@ -327,19 +329,22 @@ class TriviaQuiz(commands.Cog):
                     description=question,
                 )
 
-                if img_url := question_dict.get("image_url"):
+                if img_url := question_dict.get("img_url"):
                     embed.set_image(url=img_url)
 
                 await ctx.send(embed=embed)
 
-            def contains_correct_answer(m: discord.Message) -> bool:
-                return m.channel == ctx.channel and any(
-                    fuzz.ratio(answer.lower(), m.content.lower()) > VARIATION_TOLERANCE
-                    for answer in answers
-                )
+            def check_func(variation_tolerance: int) -> Callable[[discord.Message], bool]:
+                def contains_correct_answer(m: discord.Message) -> bool:
+                    return m.channel == ctx.channel and any(
+                        fuzz.ratio(answer.lower(), m.content.lower()) > variation_tolerance
+                        for answer in answers
+                    )
+
+                return contains_correct_answer
 
             try:
-                msg = await self.bot.wait_for("message", check=contains_correct_answer, timeout=10)
+                msg = await self.bot.wait_for("message", check=check_func(var_tol), timeout=10)
             except asyncio.TimeoutError:
                 # In case of TimeoutError and the game has been stopped, then do nothing.
                 if not self.game_status[ctx.channel.id]:
@@ -445,7 +450,6 @@ class TriviaQuiz(commands.Cog):
     async def stop_quiz(self, ctx: commands.Context) -> None:
         """
         Stop a quiz game if its running in the channel.
-
         Note: Only mods or the owner of the quiz can stop it.
         """
         if self.game_status[ctx.channel.id] is True:
@@ -552,7 +556,7 @@ class TriviaQuiz(commands.Cog):
         embed = discord.Embed(
             color=Colours.bright_green,
             title=(
-                "You got it! " if answer_is_correct else ""
+                ("You got it! " if answer_is_correct else "") +
                 f"The correct answer {word} **`{', '.join(answers)}`**\n"
             ),
             description="",
@@ -562,7 +566,7 @@ class TriviaQuiz(commands.Cog):
             embed.description += f"**Information**\n{info}\n\n"
 
         embed.description += (
-            "Let's move to the next question." if q_left > 0 else ""
+            ("Let's move to the next question." if q_left > 0 else "") +
             f"\nRemaining questions: {q_left}"
         )
         await channel.send(embed=embed)
