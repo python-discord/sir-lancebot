@@ -364,6 +364,34 @@ class AvatarModify(commands.Cog):
 
             await ctx.send(file=file, embed=embed)
 
+    @avatar_modify.command(name="half", root_aliases=("half",))
+    async def half_command(self, ctx: commands.Context, member: discord.Member = None) -> None:
+        """Cuts a members profile picture in half!"""
+        if member is None:
+            member = ctx.author
+
+        async with ctx.typing():
+            file_name = file_safe_name("half_avatar", member.display_name)
+
+            img_bytes = await member.avatar_url_as(size=1024).read()
+
+            file = await in_executor(
+                PfpEffects.half_effect,
+                img_bytes,
+                file_name
+            )
+
+            embed = discord.Embed(
+                title="Here is half of a gem",
+                description="Absolutely stunning..?",
+                colour=Colours.blue
+            )
+
+            embed.set_image(url=f"attachment://{file_name}")
+            embed.set_footer(text=f"Made by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
+
+            await ctx.send(file=file, embed=embed)
+
 
 def setup(bot: commands.Bot) -> None:
     """Load the AvatarModify cog."""
