@@ -285,3 +285,16 @@ class PfpEffects:
         bufferedio.seek(0)
 
         return discord.File(bufferedio, filename=file_name)
+
+    @staticmethod
+    def half_effect(img_bytes: bytes, file_name: str) -> discord.File:
+        avatar = Image.open(BytesIO(img_bytes))
+        avatar = avatar.convert('RGBA').resize((1024, 1024))
+
+        new_img = ImageOps.crop(avatar, (0, 0, 512, 0))
+
+        bufferedio = BytesIO()
+        new_img.save(bufferedio, format='PNG')
+        bufferedio.seek(0)
+
+        return discord.File(bufferedio, filename=file_name)
