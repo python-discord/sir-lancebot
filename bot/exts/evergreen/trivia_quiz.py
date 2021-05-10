@@ -371,7 +371,7 @@ class TriviaQuiz(commands.Cog):
                         ctx.channel,
                         answers,
                         question_dict,
-                        self.question_limit - len(done_question)
+                        self.question_limit - len(done_question) + 1
                     )
                     await asyncio.sleep(1)
 
@@ -403,7 +403,7 @@ class TriviaQuiz(commands.Cog):
                     ctx.channel,
                     answers,
                     question_dict,
-                    self.question_limit - len(done_question)
+                    self.question_limit - len(done_question) + 1
                 )
                 await self.send_score(ctx.channel, self.game_player_scores[ctx.channel.id])
 
