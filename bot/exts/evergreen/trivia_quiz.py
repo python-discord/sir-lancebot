@@ -381,7 +381,7 @@ class TriviaQuiz(commands.Cog):
                     )
                     await asyncio.sleep(1)
 
-                    hint_no = 0  # init hint_no = 0 so that 2 hints/time alerts can be sent for the new question.
+                    hint_no = 0  # Reset the hint counter so that on the next round, it's in the initial state
 
                     await self.send_score(ctx.channel, self.game_player_scores[ctx.channel.id])
                     await asyncio.sleep(2)
