@@ -10,9 +10,7 @@ import discord
 from discord.ext import commands
 from fuzzywuzzy import fuzz
 
-from bot.constants import Colours
-from bot.constants import NEGATIVE_REPLIES
-from bot.constants import Roles
+from bot.constants import Colours, NEGATIVE_REPLIES, Roles
 
 logger = logging.getLogger(__name__)
 
@@ -210,7 +208,7 @@ class TriviaQuiz(commands.Cog):
         """Load the questions from the JSON file."""
         p = Path("bot", "resources", "evergreen", "trivia_quiz.json")
 
-        return json.loads(p.read_text())
+        return json.loads(p.read_text(encoding="utf-8"))
 
     @commands.group(name="quiz", aliases=["trivia"], invoke_without_command=True)
     async def quiz_game(self, ctx: commands.Context, category: Optional[str], questions: Optional[int]) -> None:
