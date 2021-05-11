@@ -301,7 +301,7 @@
     },
     {
       "id": 203,
-      "question": "Which theorem states that hypotenuse^2 = base^2 + height^2?",
+      "question": "Which theorem states that hypotenuse2 = base2 + height2?",
       "answer": "Pythagorean's, Pythagorean's theorem"
     },
     {
@@ -360,7 +360,7 @@
     },
     {
       "id": 214,
-      "question": "⅓πr2h is the volume of which 3 dimensional figure?",
+      "question": "⅓πr^2h is the volume of which 3 dimensional figure?",
       "answer": "cone"
     },
     {
@@ -452,7 +452,7 @@
   "science": [
     {
       "id": 301,
-      "question": "The three main components of a normal atom are: protons, neutrons, and…",
+      "question": "The three main components of a normal atom are: protons, neutrons, and...",
       "answer": "electrons"
     },
     {
@@ -472,7 +472,7 @@
     },
     {
       "id": 305,
-      "question": "The Heisenberg’s Uncertainty Principle states that the position and ________ of a quantum object can’t be both exactly measured at the same time.",
+      "question": "The Heisenberg's Uncertainty Principle states that the position and ________ of a quantum object can't be both exactly measured at the same time.",
       "answer": "velocity, momentum"
     },
     {
@@ -500,9 +500,9 @@
     {
       "id": 310,
       "dynamic_id": 303,
-      "question": "How does one describe the unit {} in SI base units?\n**IMPORTANT:** use * for multiplication, ^ for exponentiation, and place your base units in this order: m - kg - s - A",
+      "question": "How does one describe the unit {} in SI base units?\n**IMPORTANT:** enclose answer in backticks, use \\* for multiplication, ^ for exponentiation, and place your base units in this order: m - kg - s - A",
       "img_url": "https://i.imgur.com/NRzU6tf.png",
-      "answer": "{}"
+      "answer": "`{}`"
     },
     {
       "id": 311,
