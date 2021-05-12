@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 
 QAndA = Tuple[str, str]
 
+DEFAULT_QUESTION_LIMIT = 6
 STANDARD_VARIATION_TOLERANCE = 83
 DYNAMICALLY_GEN_VARIATION_TOLERANCE = 95
 
@@ -191,7 +192,7 @@ class TriviaQuiz(commands.Cog):
         self.game_owners = {}  # A variable to store the person's ID who started the quiz game in a channel.
 
         self.questions = self.load_questions()
-        self.question_limit = 6
+        self.question_limit = 0
 
         self.player_scores = {}  # A variable to store all player's scores for a bot session.
         self.game_player_scores = {}  # A variable to store temporary game player's scores.
@@ -251,7 +252,9 @@ class TriviaQuiz(commands.Cog):
         topic = self.questions[category]
         topic_length = len(topic)
 
-        if questions:
+        if questions is None:
+            self.question_limit = DEFAULT_QUESTION_LIMIT
+        else:
             if questions > topic_length:
                 await ctx.send(
                     embed=self.make_error_embed(
@@ -265,7 +268,7 @@ class TriviaQuiz(commands.Cog):
                 await ctx.send(
                     embed=self.make_error_embed(
                         "You must choose to complete at least one question. "
-                        "(or enter 0 for the default value of 7 questions)"
+                        "(or enter nothing for the default value of 7 questions)"
                     )
                 )
                 return
