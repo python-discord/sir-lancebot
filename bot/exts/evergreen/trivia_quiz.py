@@ -423,7 +423,7 @@ class TriviaQuiz(commands.Cog):
             colour=Colours.blue,
             title="Quiz game starting!",
             description=(
-                f"Each game consists of {self.question_limit + 1} questions.\n"
+                f"This game consists of {self.question_limit + 1} questions.\n"
                 "**Rules: **No cheating and have fun!\n"
                 f"**Category**: {category}"
             ),
@@ -555,13 +555,13 @@ class TriviaQuiz(commands.Cog):
         """Send the correct answer of a question to the game channel."""
         info = question_dict.get("info", "")
 
-        word = "is" if len(answers) == 1 else "are"
+        plurality = " is" if len(answers) == 1 else "s are"
 
         embed = discord.Embed(
             color=Colours.bright_green,
             title=(
                 ("You got it! " if answer_is_correct else "")
-                + f"The correct answer {word} **`{', '.join(answers)}`**\n"
+                + f"The correct answer{word} **`{', '.join(answers)}`**\n"
             ),
             description="",
         )
