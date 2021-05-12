@@ -561,7 +561,7 @@ class TriviaQuiz(commands.Cog):
             color=Colours.bright_green,
             title=(
                 ("You got it! " if answer_is_correct else "")
-                + f"The correct answer{word} **`{', '.join(answers)}`**\n"
+                + f"The correct answer{plurality} **`{', '.join(answers)}`**\n"
             ),
             description="",
         )
