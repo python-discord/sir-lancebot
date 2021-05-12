@@ -268,7 +268,7 @@ class TriviaQuiz(commands.Cog):
                 await ctx.send(
                     embed=self.make_error_embed(
                         "You must choose to complete at least one question. "
-                        "(or enter nothing for the default value of 7 questions)"
+                        f"(or enter nothing for the default value of {DEFAULT_QUESTION_LIMIT + 1} questions)"
                     )
                 )
                 return
