@@ -49,7 +49,8 @@ class Music(Cog):
             for position, track
             in enumerate(top_tracks_data["tracks"]["track"], start=1)
         ]
-        pages: List[Tuple[str, str]] = [("\n".join(page), "") for page in utils.paginate(top_tracks, 10)]
+        paginated_pages: List[List[str]] = await utils.async_paginate(top_tracks, 10)
+        pages: List[Tuple[str, str]] = [("\n".join(page), "") for page in paginated_pages]
         result_count: int = len(top_tracks)
         embed = Embed(
             title=f":trophy: :musical_note: Top {result_count} Music Track{'' if result_count == 1 else 's'}",
