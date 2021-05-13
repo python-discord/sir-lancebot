@@ -287,22 +287,9 @@ class HelpSession:
         # Use LinePaginator to restrict embed line height
         paginator = LinePaginator(prefix="", suffix="", max_lines=self._max_lines)
 
-        prefix = constants.Client.prefix
-
         # show signature if query is a command
         if isinstance(self.query, commands.Command):
-            signature = self._get_command_params(self.query)
-            parent = self.query.full_parent_name + " " if self.query.parent else ""
-            paginator.add_line(f"**```{prefix}{parent}{signature}```**")
-
-            aliases = [f"`{alias}`" if not parent else f"`{parent} {alias}`" for alias in self.query.aliases]
-            aliases += [f"`{alias}`" for alias in getattr(self.query, "root_aliases", ())]
-            aliases = ", ".join(sorted(aliases))
-            if aliases:
-                paginator.add_line(f"**Can also use:** {aliases}\n")
-
-            if not await self.query.can_run(self._ctx):
-                paginator.add_line("***You cannot run this command.***\n")
+            await self._add_command_signature(paginator)
 
         if isinstance(self.query, Cog):
             paginator.add_line(f"**{self.query.name}**")
@@ -312,97 +299,112 @@ class HelpSession:
 
         # list all children commands of the queried object
         if isinstance(self.query, (commands.GroupMixin, Cog)):
-
-            # remove hidden commands if session is not wanting hiddens
-            if not self._show_hidden:
-                filtered = [c for c in self.query.commands if not c.hidden]
-            else:
-                filtered = self.query.commands
-
-            # if after filter there are no commands, finish up
-            if not filtered:
-                self._pages = paginator.pages
-                return
-
-            if isinstance(self.query, Cog):
-                grouped = (("**Commands:**", self.query.commands),)
-
-            elif isinstance(self.query, commands.Command):
-                grouped = (("**Subcommands:**", self.query.commands),)
-
-                # don't show prefix for subcommands
-                prefix = ""
-
-            # otherwise sort and organise all commands into categories
-            else:
-                cat_sort = sorted(filtered, key=self._category_key)
-                grouped = itertools.groupby(cat_sort, key=self._category_key)
-
-            for category, cmds in grouped:
-                cmds = sorted(cmds, key=lambda c: c.name)
-
-                if len(cmds) == 0:
-                    continue
-
-                cat_cmds = []
-
-                for command in cmds:
-
-                    # skip if hidden and hide if session is set to
-                    if command.hidden and not self._show_hidden:
-                        continue
-
-                    # see if the user can run the command
-                    strikeout = ""
-
-                    # Patch to make the !help command work outside of #bot-commands again
-                    # This probably needs a proper rewrite, but this will make it work in
-                    # the mean time.
-                    try:
-                        can_run = await command.can_run(self._ctx)
-                    except CheckFailure:
-                        can_run = False
-
-                    if not can_run:
-                        # skip if we don't show commands they can't run
-                        if self._only_can_run:
-                            continue
-                        strikeout = "~~"
-
-                    signature = self._get_command_params(command)
-                    info = f"{strikeout}**`{prefix}{signature}`**{strikeout}"
-
-                    # handle if the command has no docstring
-                    if command.short_doc:
-                        cat_cmds.append(f"{info}\n*{command.short_doc}*")
-                    else:
-                        cat_cmds.append(f"{info}\n*No details provided.*")
-
-                # state var for if the category should be added next
-                print_cat = 1
-                new_page = True
-
-                for details in cat_cmds:
-
-                    # keep details together, paginating early if it won't fit
-                    lines_adding = len(details.split("\n")) + print_cat
-                    if paginator._linecount + lines_adding > self._max_lines:
-                        paginator._linecount = 0
-                        new_page = True
-                        paginator.close_page()
-
-                        # new page so print category title again
-                        print_cat = 1
-
-                    if print_cat:
-                        if new_page:
-                            paginator.add_line("")
-                        paginator.add_line(category)
-                        print_cat = 0
-
-                    paginator.add_line(details)
+            await self._list_child_commands(paginator)
 
         self._pages = paginator.pages
+
+    async def _add_command_signature(self, paginator: LinePaginator) -> None:
+        prefix = constants.Client.prefix
+
+        signature = self._get_command_params(self.query)
+        parent = self.query.full_parent_name + " " if self.query.parent else ""
+        paginator.add_line(f"**```{prefix}{parent}{signature}```**")
+        aliases = [f"`{alias}`" if not parent else f"`{parent} {alias}`" for alias in self.query.aliases]
+        aliases += [f"`{alias}`" for alias in getattr(self.query, "root_aliases", ())]
+        aliases = ", ".join(sorted(aliases))
+        if aliases:
+            paginator.add_line(f"**Can also use:** {aliases}\n")
+        if not await self.query.can_run(self._ctx):
+            paginator.add_line("***You cannot run this command.***\n")
+
+    async def _list_child_commands(self, paginator: LinePaginator) -> None:
+        # remove hidden commands if session is not wanting hiddens
+        if not self._show_hidden:
+            filtered = [c for c in self.query.commands if not c.hidden]
+        else:
+            filtered = self.query.commands
+
+        # if after filter there are no commands, finish up
+        if not filtered:
+            self._pages = paginator.pages
+            return
+
+        if isinstance(self.query, Cog):
+            grouped = (("**Commands:**", self.query.commands),)
+
+        elif isinstance(self.query, commands.Command):
+            grouped = (("**Subcommands:**", self.query.commands),)
+
+        # otherwise sort and organise all commands into categories
+        else:
+            cat_sort = sorted(filtered, key=self._category_key)
+            grouped = itertools.groupby(cat_sort, key=self._category_key)
+
+        for category, cmds in grouped:
+            await self._format_command_category(paginator, category, list(cmds))
+
+    async def _format_command_category(self, paginator: LinePaginator, category: str, cmds: List[Command]) -> None:
+        cmds = sorted(cmds, key=lambda c: c.name)
+        cat_cmds = []
+        for command in cmds:
+            cat_cmds += await self._format_command(command)
+
+        # state var for if the category should be added next
+        print_cat = 1
+        new_page = True
+
+        for details in cat_cmds:
+
+            # keep details together, paginating early if it won"t fit
+            lines_adding = len(details.split("\n")) + print_cat
+            if paginator._linecount + lines_adding > self._max_lines:
+                paginator._linecount = 0
+                new_page = True
+                paginator.close_page()
+
+                # new page so print category title again
+                print_cat = 1
+
+            if print_cat:
+                if new_page:
+                    paginator.add_line("")
+                paginator.add_line(category)
+                print_cat = 0
+
+            paginator.add_line(details)
+
+    async def _format_command(self, command: Command) -> List[str]:
+        # skip if hidden and hide if session is set to
+        if command.hidden and not self._show_hidden:
+            return []
+
+        # Patch to make the !help command work outside of #bot-commands again
+        # This probably needs a proper rewrite, but this will make it work in
+        # the mean time.
+        try:
+            can_run = await command.can_run(self._ctx)
+        except CheckFailure:
+            can_run = False
+
+        # see if the user can run the command
+        strikeout = ""
+        if not can_run:
+            # skip if we don't show commands they can't run
+            if self._only_can_run:
+                return []
+            strikeout = "~~"
+
+        if isinstance(self.query, commands.Command):
+            prefix = ""
+        else:
+            prefix = constants.Client.prefix
+
+        signature = self._get_command_params(command)
+        info = f"{strikeout}**`{prefix}{signature}`**{strikeout}"
+
+        # handle if the command has no docstring
+        short_doc = command.short_doc or "No details provided"
+        return [f"{info}\n*{short_doc}*"]
 
     def embed_page(self, page_number: int = 0) -> Embed:
         """Returns an Embed with the requested page formatted within."""
