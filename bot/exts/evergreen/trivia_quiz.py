@@ -63,7 +63,8 @@ UNITS_TO_BASE_UNITS = {
 
 @dataclass(frozen=True)
 class QuizEntry:
-    """Dataclass for a quiz entry (a question and a string containing answers separated by commas)"""
+    """Dataclass for a quiz entry (a question and a string containing answers separated by commas)."""
+    
     question: str
     answer: str
 
