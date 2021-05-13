@@ -21,11 +21,7 @@ class Cowsay(commands.Cog):
         {', '.join(char_names)}"""
     )
     async def cowsay(self, ctx: commands.Context, character: str = "Cow", *, text: str = None) -> None:
-        """
-        Generates some cowsay ASCII art and sends it in Discord.
-
-        There are multiple character options to choose from. Here is a list:
-        """
+        """Builds a cowsay string and sends it to Discord."""
         if not text:
             text = f"I'm a {character.lower()}"
         text = text.lower()
