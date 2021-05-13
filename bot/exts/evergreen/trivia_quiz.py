@@ -3,8 +3,9 @@ import json
 import logging
 import operator
 import random
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, List, Optional, Tuple
+from typing import Callable, List, Optional
 
 import discord
 from discord.ext import commands
@@ -13,8 +14,6 @@ from fuzzywuzzy import fuzz
 from bot.constants import Colours, NEGATIVE_REPLIES, Roles
 
 logger = logging.getLogger(__name__)
-
-QAndA = Tuple[str, str]
 
 DEFAULT_QUESTION_LIMIT = 6
 STANDARD_VARIATION_TOLERANCE = 83
@@ -62,7 +61,13 @@ UNITS_TO_BASE_UNITS = {
 }
 
 
-def linear_system(q_format: str, a_format: str) -> QAndA:
+@dataclass(frozen=True)
+class QuizEntry:
+    question: str
+    answer: str
+
+
+def linear_system(q_format: str, a_format: str) -> QuizEntry:
     """Generate a system of linear equations with two unknowns."""
     x, y = random.randint(2, 5), random.randint(2, 5)
     answer = a_format.format(x, y)
@@ -78,10 +83,10 @@ def linear_system(q_format: str, a_format: str) -> QAndA:
         coeffs[2] * x + coeffs[3] * y,
     )
 
-    return question, answer
+    return QuizEntry(question, answer)
 
 
-def mod_arith(q_format: str, a_format: str) -> QAndA:
+def mod_arith(q_format: str, a_format: str) -> QuizEntry:
     """Generate a basic modular arithmetic question."""
     quotient, m, b = random.randint(30, 40), random.randint(10, 20), random.randint(200, 350)
     ans = random.randint(0, 9)  # max remainder is 9, since the minimum modulus is 10
@@ -90,30 +95,30 @@ def mod_arith(q_format: str, a_format: str) -> QAndA:
     question = q_format.format(a, b, m)
     answer = a_format.format(ans)
 
-    return question, answer
+    return QuizEntry(question, answer)
 
 
-def ngonal_prism(q_format: str, a_format: str) -> QAndA:
+def ngonal_prism(q_format: str, a_format: str) -> QuizEntry:
     """Generate a question regarding vertices on n-gonal prisms."""
     n = random.randint(0, len(N_PREFIXES) - 1)
 
     question = q_format.format(N_PREFIXES[n])
     answer = a_format.format((n + N_PREFIX_STARTS_AT) * 2)
 
-    return question, answer
+    return QuizEntry(question, answer)
 
 
-def imag_sqrt(q_format: str, a_format: str) -> QAndA:
+def imag_sqrt(q_format: str, a_format: str) -> QuizEntry:
     """Generate a negative square root question."""
     ans_coeff = random.randint(3, 10)
 
     question = q_format.format(ans_coeff ** 2)
     answer = a_format.format(ans_coeff)
 
-    return question, answer
+    return QuizEntry(question, answer)
 
 
-def binary_calc(q_format: str, a_format: str) -> QAndA:
+def binary_calc(q_format: str, a_format: str) -> QuizEntry:
     """Generate a binary calculation question."""
     a = random.randint(15, 20)
     b = random.randint(10, a)
@@ -133,30 +138,30 @@ def binary_calc(q_format: str, a_format: str) -> QAndA:
     question = q_format.format(a, oper[0], b)
     answer = a_format.format(oper[1](a, b))
 
-    return question, answer
+    return QuizEntry(question, answer)
 
 
-def solar_system(q_format: str, a_format: str) -> QAndA:
+def solar_system(q_format: str, a_format: str) -> QuizEntry:
     """Generate a question on the planets of the Solar System."""
     planet = random.choice(PLANETS)
 
     question = q_format.format(planet[0])
     answer = a_format.format(planet[1])
 
-    return question, answer
+    return QuizEntry(question, answer)
 
 
-def taxonomic_rank(q_format: str, a_format: str) -> QAndA:
+def taxonomic_rank(q_format: str, a_format: str) -> QuizEntry:
     """Generate a question on taxonomic classification."""
     level = random.randint(0, len(TAXONOMIC_HIERARCHY) - 2)
 
     question = q_format.format(TAXONOMIC_HIERARCHY[level])
     answer = a_format.format(TAXONOMIC_HIERARCHY[level + 1])
 
-    return question, answer
+    return QuizEntry(question, answer)
 
 
-def base_units_convert(q_format: str, a_format: str) -> QAndA:
+def base_units_convert(q_format: str, a_format: str) -> QuizEntry:
     """Generate a SI base units conversion question."""
     unit = random.choice(list(UNITS_TO_BASE_UNITS))
 
@@ -167,7 +172,7 @@ def base_units_convert(q_format: str, a_format: str) -> QAndA:
         UNITS_TO_BASE_UNITS[unit][1]
     )
 
-    return question, answer
+    return QuizEntry(question, answer)
 
 
 DYNAMIC_QUESTIONS_FORMAT_FUNCS = {
@@ -231,7 +236,7 @@ class TriviaQuiz(commands.Cog):
             self.game_player_scores[ctx.channel.id] = {}
 
         # Stop game if running.
-        if self.game_status[ctx.channel.id] is True:
+        if self.game_status[ctx.channel.id]:
             await ctx.send(
                 "Game is already running... "
                 f"do `{self.bot.command_prefix}quiz stop`"
@@ -318,10 +323,12 @@ class TriviaQuiz(commands.Cog):
                 else:
                     format_func = DYNAMIC_QUESTIONS_FORMAT_FUNCS[question_dict["dynamic_id"]]
 
-                    question, answers = format_func(
+                    quiz_entry = format_func(
                         question_dict["question"],
                         question_dict["answer"],
                     )
+
+                    question, answers = quiz_entry.question, quiz_entry.answer
                     answers = [answers]
 
                     var_tol = DYNAMICALLY_GEN_VARIATION_TOLERANCE
@@ -492,7 +499,7 @@ class TriviaQuiz(commands.Cog):
             description="",
         )
 
-        sorted_dict = sorted(player_data.items(), key=lambda a: a[1], reverse=True)
+        sorted_dict = sorted(player_data.items(), key=operator.itemgetter(1), reverse=True)
         for item in sorted_dict:
             embed.description += f"{item[0]}: {item[1]}\n"
 
@@ -553,7 +560,7 @@ class TriviaQuiz(commands.Cog):
         q_left: int,
     ) -> None:
         """Send the correct answer of a question to the game channel."""
-        info = question_dict.get("info", "")
+        info = question_dict.get("info")
 
         plurality = " is" if len(answers) == 1 else "s are"
 
@@ -566,7 +573,7 @@ class TriviaQuiz(commands.Cog):
             description="",
         )
 
-        if info != "":
+        if info is not None:
             embed.description += f"**Information**\n{info}\n\n"
 
         embed.description += (
