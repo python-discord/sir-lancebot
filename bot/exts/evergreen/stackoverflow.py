@@ -23,7 +23,7 @@ ERR_EMBED = Embed(
 
 
 class Stackoverflow(commands.Cog):
-    """A cog which returns the top 5 results of a query from stackoverflow."""
+    """Contains command to interact with stackoverflow from discord."""
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
