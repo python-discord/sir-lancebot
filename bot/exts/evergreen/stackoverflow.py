@@ -6,6 +6,7 @@ from discord import Embed
 from discord.errors import HTTPException
 from discord.ext import commands
 
+from bot import bot
 from bot.constants import Colours, Emojis
 
 logger = logging.getLogger(__name__)
@@ -25,7 +26,7 @@ ERR_EMBED = Embed(
 class Stackoverflow(commands.Cog):
     """Contains command to interact with stackoverflow from discord."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: bot.Bot):
         self.bot = bot
 
     @commands.command(aliases=["so"])
@@ -82,7 +83,7 @@ class Stackoverflow(commands.Cog):
             await ctx.send(embed=search_query_too_long)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: bot.Bot) -> None:
     """Loads Stackoverflow Cog."""
     bot.add_cog(Stackoverflow(bot))
 
