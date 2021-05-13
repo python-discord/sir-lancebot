@@ -45,6 +45,7 @@ class Cowsay(commands.Cog):
             )
             await ctx.send(embed=embed)
             return
+        # These characters break the message limit, so we say no
         if character in ["dragon", "trex", "stegosaurus"]:
             embed = Embed(
                 title=random.choice(NEGATIVE_REPLIES),
