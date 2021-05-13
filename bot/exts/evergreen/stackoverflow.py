@@ -54,18 +54,22 @@ class Stackoverflow(commands.Cog):
             return
 
         top5 = data["items"][:5]
-        embed = Embed(title=f"Search results for {search_query!r} - Stackoverflow",
-                      url=SEARCH_URL.format(query=encoded_search_query),
-                      description=f"Here are the top {len(top5)} results:",
-                      color=Colours.orange)
+        embed = Embed(
+            title=f"Search results for {search_query!r} - Stackoverflow",
+            url=SEARCH_URL.format(query=encoded_search_query),
+            description=f"Here are the top {len(top5)} results:",
+            color=Colours.orange
+        )
         for item in top5:
             embed.add_field(
                 name=f"{unescape(item['title'])}",
-                value=(f"[{Emojis.stackoverflow_upvote} {item['score']}    "
-                       f"{Emojis.stackoverflow_views} {item['view_count']}     "
-                       f"{Emojis.stackoverflow_ans} {item['answer_count']}   "
-                       f"{Emojis.stackoverflow_tag} {', '.join(item['tags'][:3])}]"
-                       f"({item['link']})"),
+                value=(
+                    f"[{Emojis.stackoverflow_upvote} {item['score']}    "
+                    f"{Emojis.stackoverflow_views} {item['view_count']}     "
+                    f"{Emojis.stackoverflow_ans} {item['answer_count']}   "
+                    f"{Emojis.stackoverflow_tag} {', '.join(item['tags'][:3])}]"
+                    f"({item['link']})"
+                ),
                 inline=False)
         embed.set_footer(text="View the original link for more results.")
         try:
