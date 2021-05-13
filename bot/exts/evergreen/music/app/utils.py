@@ -29,5 +29,5 @@ async def async_paginate(items: Iterable, page_count: int = 1) -> List[List[Any]
             pages.append([])
             page_number += 1
         pages[page_number - 1].append(item)
-        await asyncio.sleep(0.0001)
+        await asyncio.sleep(0.01)
     return pages

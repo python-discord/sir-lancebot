@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Tuple
 from aiohttp import ClientSession
 from discord import Embed
 from discord.ext.commands import Bot, Cog, Context, group
+from discord.ext.commands.errors import BadArgument
 
 from bot.utils.extensions import invoke_help_command
 from bot.utils.pagination import ImagePaginator
@@ -22,8 +23,8 @@ class Music(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.http_session: ClientSession = bot.http_session
+        self.settings: api.LastFmApiSettings = api.settings
 
-    # Todo: Disallow mentions
     @group(name="music", aliases=[], invoke_without_command=True)
     async def music_command(self, ctx: Context) -> None:
         """
@@ -37,17 +38,23 @@ class Music(Cog):
     @music_command.command(name="toplist", aliases=["top", "list"])
     async def toplist(self, ctx: Context, count: int = 10) -> None:
         """Get the top tracks played on Last.fm."""
-        method: api.ApiMethod = api.settings.chart_methods["gettoptracks"]
+        method: api.ApiMethod = self.settings.chart_methods["gettoptracks"]
 
         parameters = {
             "method": str(method),
             "limit": count,
         }
-        top_tracks_data: Dict[str: Any] = await api.get_api_json_data(api.settings, self.http_session, **parameters)
+        try:
+            top_tracks_data: Dict[str: Any] = await api.get(
+                self.settings, self.http_session, **parameters,
+            )
+        except api.InvalidArgument as e:
+            raise BadArgument(str(e))
+
         top_tracks: List[str] = [
             f"{position}.  [{track['name']}]({track['url']}) ({track['artist']['name']})"
             for position, track
-            in enumerate(top_tracks_data["tracks"]["track"], start=1)
+            in enumerate(top_tracks_data[method.item_plural][method.item], start=1)
         ]
         paginated_pages: List[List[str]] = await utils.async_paginate(top_tracks, 10)
         pages: List[Tuple[str, str]] = [("\n".join(page), "") for page in paginated_pages]
