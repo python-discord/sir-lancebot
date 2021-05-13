@@ -62,7 +62,7 @@ class Stackoverflow(commands.Cog):
         )
         for item in top5:
             embed.add_field(
-                name=f"{unescape(item['title'])}",
+                name=unescape(item['title']),
                 value=(
                     f"[{Emojis.stackoverflow_upvote} {item['score']}    "
                     f"{Emojis.stackoverflow_views} {item['view_count']}     "
