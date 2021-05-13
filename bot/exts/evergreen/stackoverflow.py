@@ -2,8 +2,7 @@ import logging
 from html import unescape
 from urllib.parse import quote_plus
 
-from discord import Embed
-from discord.errors import HTTPException
+from discord import Embed, HTTPException
 from discord.ext import commands
 
 from bot import bot
