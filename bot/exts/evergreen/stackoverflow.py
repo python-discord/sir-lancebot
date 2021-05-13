@@ -16,7 +16,7 @@ ERR_EMBED = Embed(
     title="Error in fetching results from Stackoverflow",
     description=(
         "Sorry, there was en error while trying to fetch data from the Stackoverflow website. Please try again in some "
-        "time. If this issue persists, please contact the mods or send a message in #dev-contrib."
+        "time. If this issue persists, please contact the staff or send a message in #dev-contrib."
     ),
     color=Colours.soft_red
 )
