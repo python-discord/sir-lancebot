@@ -175,7 +175,7 @@ class Reddit(Cog):
             }
         )
 
-        if response.status == 204 and response.content_type == "application/json":
+        if response.status in [200, 204] and response.content_type == "application/json":
             self.access_token = None
         else:
             log.warning(f"Unable to revoke access token: status {response.status}.")
