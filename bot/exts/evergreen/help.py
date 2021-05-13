@@ -289,7 +289,9 @@ class HelpSession:
             parent = self.query.full_parent_name + ' ' if self.query.parent else ''
             paginator.add_line(f'**```{prefix}{parent}{signature}```**')
 
-            aliases = ', '.join(f'`{a}`' for a in self.query.aliases)
+            aliases = [f"`{alias}`" if not parent else f"`{parent} {alias}`" for alias in self.query.aliases]
+            aliases += [f"`{alias}`" for alias in getattr(self.query, "root_aliases", ())]
+            aliases = ", ".join(sorted(aliases))
             if aliases:
                 paginator.add_line(f'**Can also use:** {aliases}\n')
 

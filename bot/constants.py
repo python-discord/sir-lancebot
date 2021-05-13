@@ -8,6 +8,7 @@ from typing import Dict, NamedTuple
 __all__ = (
     "AdventOfCode",
     "Branding",
+    "Cats",
     "Channels",
     "Categories",
     "Client",
@@ -19,6 +20,7 @@ __all__ = (
     "Roles",
     "Tokens",
     "Wolfram",
+    "Reddit",
     "RedisConfig",
     "MODERATION_ROLES",
     "STAFF_ROLES",
@@ -93,6 +95,10 @@ class Branding:
     cycle_frequency = int(environ.get("CYCLE_FREQUENCY", 3))  # 0: never, 1: every day, 2: every other day, ...
 
 
+class Cats:
+    cats = ["ᓚᘏᗢ", "ᘡᘏᗢ", "🐈", "ᓕᘏᗢ", "ᓇᘏᗢ", "ᓂᘏᗢ", "ᘣᘏᗢ", "ᕦᘏᗢ", "ᕂᘏᗢ"]
+
+
 class Channels(NamedTuple):
     advent_of_code = int(environ.get("AOC_CHANNEL_ID", 782715290437943306))
     advent_of_code_commands = int(environ.get("AOC_COMMANDS_CHANNEL_ID", 607247579608121354))
@@ -110,6 +116,7 @@ class Channels(NamedTuple):
     voice_chat_0 = 412357430186344448
     voice_chat_1 = 799647045886541885
     staff_voice = 541638762007101470
+    reddit = int(environ.get("CHANNEL_REDDIT", 458224812528238616))
 
 
 class Categories(NamedTuple):
@@ -147,13 +154,30 @@ class Colours:
     python_yellow = 0xFFD43B
     grass_green = 0x66ff00
 
+    easter_like_colours = [
+        (255, 247, 0),
+        (255, 255, 224),
+        (0, 255, 127),
+        (189, 252, 201),
+        (255, 192, 203),
+        (255, 160, 122),
+        (181, 115, 220),
+        (221, 160, 221),
+        (200, 162, 200),
+        (238, 130, 238),
+        (135, 206, 235),
+        (0, 204, 204),
+        (64, 224, 208),
+    ]
+
 
 class Emojis:
+    cross_mark = "\u274C"
     star = "\u2B50"
     christmas_tree = "\U0001F384"
     check = "\u2611"
     envelope = "\U0001F4E8"
-    trashcan = "<:trashcan:637136429717389331>"
+    trashcan = environ.get("TRASHCAN_EMOJI", "<:trashcan:637136429717389331>")
     ok_hand = ":ok_hand:"
     hand_raised = "\U0001f64b"
 
@@ -168,6 +192,7 @@ class Emojis:
     issue_closed = "<:IssueClosed:629695470570307614>"
     pull_request = "<:PROpen:629695470175780875>"
     pull_request_closed = "<:PRClosed:629695470519713818>"
+    pull_request_draft = "<:PRDraft:829755345425399848>"
     merge = "<:PRMerged:629695470570176522>"
 
     number_emojis = {
@@ -193,6 +218,15 @@ class Emojis:
     status_idle = "<:status_idle:470326266625785866>"
     status_dnd = "<:status_dnd:470326272082313216>"
     status_offline = "<:status_offline:470326266537705472>"
+
+    # Reddit emojis
+    reddit = "<:reddit:676030265734332427>"
+    reddit_post_text = "<:reddit_post_text:676030265910493204>"
+    reddit_post_video = "<:reddit_post_video:676030265839190047>"
+    reddit_post_photo = "<:reddit_post_photo:676030265734201344>"
+    reddit_upvote = "<:reddit_upvote:755845219890757644>"
+    reddit_comments = "<:reddit_comments:755845255001014384>"
+    reddit_users = "<:reddit_users:755845303822974997>"
 
 
 class Icons:
@@ -268,6 +302,14 @@ class RedisConfig(NamedTuple):
 class Source:
     github = "https://github.com/python-discord/sir-lancebot"
     github_avatar_url = "https://avatars1.githubusercontent.com/u/9919"
+
+
+class Reddit:
+    subreddits = ["r/Python"]
+
+    client_id = environ.get("REDDIT_CLIENT_ID")
+    secret = environ.get("REDDIT_SECRET")
+    webhook = int(environ.get("REDDIT_WEBHOOK", 635408384794951680))
 
 
 # Default role combinations
