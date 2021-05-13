@@ -1,6 +1,7 @@
 import logging
 import random
-from json import load
+from json import loads
+from pathlib import Path
 
 from discord.ext import commands
 
@@ -8,8 +9,7 @@ from bot.bot import Bot
 
 log = logging.getLogger(__name__)
 
-with open("bot/resources/easter/april_fools_vids.json", encoding="utf-8") as f:
-    ALL_VIDS = load(f)
+ALL_VIDS = loads(Path("bot/resources/easter/april_fools_vids.json").read_text("utf-8"))
 
 
 class AprilFoolVideos(commands.Cog):

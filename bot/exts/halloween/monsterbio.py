@@ -11,8 +11,9 @@ from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
-with open(Path("bot/resources/halloween/monster.json"), "r", encoding="utf8") as f:
-    TEXT_OPTIONS = json.load(f)  # Data for a mad-lib style generation of text
+TEXT_OPTIONS = json.loads(
+    Path("bot/resources/halloween/monster.json").read_text("utf8")
+)  # Data for a mad-lib style generation of text
 
 
 class MonsterBio(commands.Cog):

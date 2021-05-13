@@ -6,6 +6,7 @@ import string
 import typing as t
 import unicodedata
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 
 import discord
 from aiohttp import client_exceptions
@@ -27,8 +28,7 @@ MAX_SQUARES = 10_000
 
 T = t.TypeVar("T")
 
-with open("bot/resources/pride/gender_options.json") as f:
-    GENDER_OPTIONS = json.load(f)
+GENDER_OPTIONS = json.loads(Path("bot/resources/pride/gender_options.json").read_text("utf8"))
 
 
 async def in_executor(func: t.Callable[..., T], *args) -> T:

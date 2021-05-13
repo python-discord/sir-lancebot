@@ -30,8 +30,7 @@ class HalloweenFacts(commands.Cog):
     """A Cog for displaying interesting facts about Halloween."""
 
     def __init__(self):
-        with Path("bot/resources/halloween/halloween_facts.json").open("r", encoding="utf8") as file:
-            self.halloween_facts = json.load(file)
+        self.halloween_facts = json.loads(Path("bot/resources/halloween/halloween_facts.json").read_text("utf8"))
         self.facts = list(enumerate(self.halloween_facts))
 
     def random_fact(self) -> Tuple[int, str]:

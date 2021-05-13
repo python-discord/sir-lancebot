@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import random
-from json import load
+from json import loads
 from pathlib import Path
 
 import discord
@@ -12,8 +12,7 @@ from bot.constants import Colours, NEGATIVE_REPLIES
 
 log = logging.getLogger(__name__)
 
-with Path("bot/resources/easter/easter_riddle.json").open("r", encoding="utf8") as f:
-    RIDDLE_QUESTIONS = load(f)
+RIDDLE_QUESTIONS = loads(Path("bot/resources/easter/easter_riddle.json").read_text("utf8"))
 
 TIMELIMIT = 10
 

@@ -63,13 +63,10 @@ class Snake(Converter):
         """Build list of snakes from the static snake resources."""
         # Get all the snakes
         if cls.snakes is None:
-            with (SNAKE_RESOURCES / "snake_names.json").open(encoding="utf8") as snakefile:
-                cls.snakes = json.load(snakefile)
-
+            cls.snakes = json.loads((SNAKE_RESOURCES / "snake_names.json").read_text("utf8"))
         # Get the special cases
         if cls.special_cases is None:
-            with (SNAKE_RESOURCES / "special_snakes.json").open(encoding="utf8") as snakefile:
-                special_cases = json.load(snakefile)
+            special_cases = json.loads((SNAKE_RESOURCES / "special_snakes.json").read_text("utf8"))
             cls.special_cases = {snake["name"].lower(): snake for snake in special_cases}
 
     @classmethod

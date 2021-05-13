@@ -3,6 +3,7 @@ import json
 import logging
 import random
 from pathlib import Path
+from typing import Dict
 
 import discord
 from discord.ext import commands
@@ -12,9 +13,8 @@ from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
-with Path("bot/resources/halloween/spooky_rating.json").open(encoding="utf8") as file:
-    data = json.load(file)
-    SPOOKY_DATA = sorted((int(key), value) for key, value in data.items())
+data: Dict[str, Dict[str, str]] = json.loads(Path("bot/resources/halloween/spooky_rating.json").read_text("utf8"))
+SPOOKY_DATA = sorted((int(key), value) for key, value in data.items())
 
 
 class SpookyRating(commands.Cog):

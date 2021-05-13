@@ -36,9 +36,7 @@ class PrideAnthem(commands.Cog):
     @staticmethod
     def load_vids() -> list:
         """Loads a list of videos from the resources folder as dictionaries."""
-        with open(Path("bot/resources/pride/anthems.json"), "r", encoding="utf8") as f:
-            anthems = json.load(f)
-        return anthems
+        return json.loads(Path("bot/resources/pride/anthems.json").read_text("utf8"))
 
     @commands.command(name="prideanthem", aliases=["anthem", "pridesong"])
     async def prideanthem(self, ctx: commands.Context, genre: str = None) -> None:

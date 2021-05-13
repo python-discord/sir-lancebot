@@ -7,9 +7,7 @@ from discord.ext import commands
 from bot.bot import Bot
 from bot.utils.randomization import RandomCycle
 
-
-with Path("bot/resources/easter/save_the_planet.json").open("r", encoding="utf8") as f:
-    EMBED_DATA = RandomCycle(json.load(f))
+EMBED_DATA = RandomCycle(json.loads(Path("bot/resources/easter/save_the_planet.json").read_text("utf8")))
 
 
 class SaveThePlanet(commands.Cog):

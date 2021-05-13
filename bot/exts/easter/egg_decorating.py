@@ -15,11 +15,9 @@ from bot.utils import helpers
 
 log = logging.getLogger(__name__)
 
-with open(Path("bot/resources/evergreen/html_colours.json"), encoding="utf8") as f:
-    HTML_COLOURS = json.load(f)
+HTML_COLOURS = json.loads(Path("bot/resources/evergreen/html_colours.json").read_text("utf8"))
 
-with open(Path("bot/resources/evergreen/xkcd_colours.json"), encoding="utf8") as f:
-    XKCD_COLOURS = json.load(f)
+XKCD_COLOURS = json.loads(Path("bot/resources/evergreen/xkcd_colours.json").read_text("utf8"))
 
 COLOURS = [
     (255, 0, 0, 255), (255, 128, 0, 255), (255, 255, 0, 255), (0, 255, 0, 255),

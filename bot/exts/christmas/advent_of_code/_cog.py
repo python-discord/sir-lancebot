@@ -279,8 +279,7 @@ class AdventOfCode(commands.Cog):
 
     def _build_about_embed(self) -> discord.Embed:
         """Build and return the informational "About AoC" embed from the resources file."""
-        with self.about_aoc_filepath.open("r", encoding="utf8") as f:
-            embed_fields = json.load(f)
+        embed_fields = json.loads(self.about_aoc_filepath.read_text("utf8"))
 
         about_embed = discord.Embed(
             title=self._base_url,

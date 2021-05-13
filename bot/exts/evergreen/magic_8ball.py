@@ -14,8 +14,7 @@ class Magic8ball(commands.Cog):
     """A Magic 8ball command to respond to a user's question."""
 
     def __init__(self):
-        with open(Path("bot/resources/evergreen/magic8ball.json"), "r", encoding="utf8") as file:
-            self.answers = json.load(file)
+        self.answers = json.loads(Path("bot/resources/evergreen/magic8ball.json").read_text("utf8"))
 
     @commands.command(name="8ball")
     async def output_answer(self, ctx: commands.Context, *, question: str) -> None:

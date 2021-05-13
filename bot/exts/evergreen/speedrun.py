@@ -8,8 +8,8 @@ from discord.ext import commands
 from bot.bot import Bot
 
 log = logging.getLogger(__name__)
-with Path("bot/resources/evergreen/speedrun_links.json").open(encoding="utf8") as file:
-    LINKS = json.load(file)
+
+LINKS = json.loads(Path("bot/resources/evergreen/speedrun_links.json").read_text("utf8"))
 
 
 class Speedrun(commands.Cog):

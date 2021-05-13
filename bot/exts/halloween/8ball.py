@@ -10,8 +10,7 @@ from bot.bot import Bot
 
 log = logging.getLogger(__name__)
 
-with Path("bot/resources/halloween/responses.json").open("r", encoding="utf8") as f:
-    RESPONSES = json.load(f)
+RESPONSES = json.loads(Path("bot/resources/halloween/responses.json").read_text("utf8"))
 
 
 class SpookyEightBall(commands.Cog):

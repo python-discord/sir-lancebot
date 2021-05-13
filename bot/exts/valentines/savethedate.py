@@ -1,6 +1,6 @@
 import logging
 import random
-from json import load
+from json import loads
 from pathlib import Path
 
 import discord
@@ -13,8 +13,7 @@ log = logging.getLogger(__name__)
 
 HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_heart:", ":two_hearts:"]
 
-with open(Path("bot/resources/valentines/date_ideas.json"), "r", encoding="utf8") as f:
-    VALENTINES_DATES = load(f)
+VALENTINES_DATES = loads(Path("bot/resources/valentines/date_ideas.json").read_text("utf8"))
 
 
 class SaveTheDate(commands.Cog):

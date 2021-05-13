@@ -1,6 +1,6 @@
 import logging
 import random
-from json import load
+from json import loads
 from pathlib import Path
 from typing import Tuple
 
@@ -28,9 +28,7 @@ class BeMyValentine(commands.Cog):
     def load_json() -> dict:
         """Load Valentines messages from the static resources."""
         p = Path("bot/resources/valentines/bemyvalentine_valentines.json")
-        with p.open(encoding="utf8") as json_data:
-            valentines = load(json_data)
-            return valentines
+        return loads(p.read_text("utf8"))
 
     @in_month(Month.FEBRUARY)
     @commands.group(name="lovefest")

@@ -1,6 +1,6 @@
 import logging
 import random
-from json import load
+from json import loads
 from pathlib import Path
 
 import discord
@@ -30,8 +30,7 @@ class EasterFacts(commands.Cog):
     def load_json() -> dict:
         """Load a list of easter egg facts from the resource JSON file."""
         p = Path("bot/resources/easter/easter_egg_facts.json")
-        with p.open(encoding="utf8") as f:
-            return load(f)
+        return loads(p.read_text("utf8"))
 
     @seasonal_task(Month.APRIL)
     async def send_egg_fact_daily(self) -> None:

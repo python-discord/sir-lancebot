@@ -41,9 +41,7 @@ class TriviaQuiz(commands.Cog):
     def load_questions() -> dict:
         """Load the questions from the JSON file."""
         p = Path("bot", "resources", "evergreen", "trivia_quiz.json")
-        with p.open(encoding="utf8") as json_data:
-            questions = json.load(json_data)
-            return questions
+        return json.loads(p.read_text("utf8"))
 
     @commands.group(name="quiz", aliases=["trivia"], invoke_without_command=True)
     async def quiz_game(self, ctx: commands.Context, category: str = None) -> None:

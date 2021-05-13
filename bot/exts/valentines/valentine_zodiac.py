@@ -29,14 +29,14 @@ class ValentineZodiac(commands.Cog):
         """Load zodiac compatibility from static JSON resource."""
         explanation_file = Path("bot/resources/valentines/zodiac_explanation.json")
         compatibility_file = Path("bot/resources/valentines/zodiac_compatibility.json")
-        with explanation_file.open(encoding="utf8") as json_data:
-            zodiac_fact = json.load(json_data)
-            for zodiac_data in zodiac_fact.values():
-                zodiac_data["start_at"] = datetime.fromisoformat(zodiac_data["start_at"])
-                zodiac_data["end_at"] = datetime.fromisoformat(zodiac_data["end_at"])
 
-        with compatibility_file.open(encoding="utf8") as json_data:
-            zodiacs = json.load(json_data)
+        zodiac_fact = json.loads(explanation_file.read_text("utf8"))
+
+        for zodiac_data in zodiac_fact.values():
+            zodiac_data["start_at"] = datetime.fromisoformat(zodiac_data["start_at"])
+            zodiac_data["end_at"] = datetime.fromisoformat(zodiac_data["end_at"])
+
+        zodiacs = json.loads(compatibility_file.read_text("utf8"))
 
         return zodiacs, zodiac_fact
 

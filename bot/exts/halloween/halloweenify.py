@@ -1,5 +1,5 @@
 import logging
-from json import load
+from json import loads
 from pathlib import Path
 from random import choice
 
@@ -21,8 +21,7 @@ class Halloweenify(commands.Cog):
     async def halloweenify(self, ctx: commands.Context) -> None:
         """Change your nickname into a much spookier one!"""
         async with ctx.typing():
-            with open(Path("bot/resources/halloween/halloweenify.json"), "r", encoding="utf8") as f:
-                data = load(f)
+            data = loads(Path("bot/resources/halloween/halloweenify.json").read_text("utf8"))
 
             # Choose a random character from our list we loaded above and set apart the nickname and image url.
             character = choice(data["characters"])

@@ -371,8 +371,7 @@ class SpookyNameRate(Cog):
     @staticmethod
     def load_json(file: Path) -> Dict[str, str]:
         """Loads a JSON file and returns its contents."""
-        with file.open("r", encoding="utf-8") as f:
-            return json.load(f)
+        return json.loads(file.read_text("utf8"))
 
     @staticmethod
     def in_allowed_month() -> bool:

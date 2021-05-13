@@ -114,8 +114,7 @@ ANGLE_RANGE = math.pi * 2
 
 def get_resource(file: str) -> List[dict]:
     """Load Snake resources JSON."""
-    with (SNAKE_RESOURCES / f"{file}.json").open(encoding="utf-8") as snakefile:
-        return json.load(snakefile)
+    return json.loads((SNAKE_RESOURCES / f"{file}.json").read_text("utf-8"))
 
 
 def smoothstep(t: float) -> float:
@@ -560,7 +559,7 @@ class SnakeAndLaddersGame:
         self.state = "roll"
         for user in self.players:
             self.round_has_rolled[user.id] = False
-        board_img = Image.open(str(SNAKE_RESOURCES / "snakes_and_ladders" / "board.jpg"))
+        board_img = Image.open(SNAKE_RESOURCES / "snakes_and_ladders" / "board.jpg")
         player_row_size = math.ceil(MAX_PLAYERS / 2)
 
         for i, player in enumerate(self.players):

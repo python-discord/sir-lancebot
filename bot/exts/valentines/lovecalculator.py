@@ -15,9 +15,8 @@ from bot.bot import Bot
 
 log = logging.getLogger(__name__)
 
-with Path("bot/resources/valentines/love_matches.json").open(encoding="utf8") as file:
-    LOVE_DATA = json.load(file)
-    LOVE_DATA = sorted((int(key), value) for key, value in LOVE_DATA.items())
+LOVE_DATA = json.loads(Path("bot/resources/valentines/love_matches.json").read_text("utf8"))
+LOVE_DATA = sorted((int(key), value) for key, value in LOVE_DATA.items())
 
 
 class LoveCalculator(Cog):
