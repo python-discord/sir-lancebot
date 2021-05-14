@@ -579,9 +579,13 @@ class Snakes(Cog):
             antidote_embed = Embed(color=SNAKE_COLOR, title="Antidote")
             antidote_embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
             antidote_embed.set_image(url="https://media.giphy.com/media/ceeN6U57leAhi/giphy.gif")
-            antidote_embed.add_field(name=EMPTY_UNICODE,
-                                     value=f"Sorry you didnt make the antidote in time.\n"
-                                           f"The formula was {' '.join(antidote_answer)}")
+            antidote_embed.add_field(
+                name=EMPTY_UNICODE,
+                value=(
+                    f"Sorry you didnt make the antidote in time.\n"
+                    f"The formula was {' '.join(antidote_answer)}"
+                )
+            )
             await board_id.edit(embed=antidote_embed)
 
         log.debug("Ending pagination and removing all reactions...")

@@ -374,8 +374,10 @@ class Games(Cog):
         release_date = dt.utcfromtimestamp(data["first_release_date"]).date() if "first_release_date" in data else "?"
 
         # Create Age Ratings value
-        rating = ", ".join(f"{AgeRatingCategories(age['category']).name} {AgeRatings(age['rating']).name}"
-                           for age in data["age_ratings"]) if "age_ratings" in data else "?"
+        rating = ", ".join(
+            f"{AgeRatingCategories(age['category']).name} {AgeRatings(age['rating']).name}"
+            for age in data["age_ratings"]
+        ) if "age_ratings" in data else "?"
 
         companies = [c["company"]["name"] for c in data["involved_companies"]] if "involved_companies" in data else "?"
 

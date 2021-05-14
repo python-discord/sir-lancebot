@@ -22,13 +22,13 @@ class Game:
     """A Connect 4 Game."""
 
     def __init__(
-            self,
-            bot: Bot,
-            channel: discord.TextChannel,
-            player1: discord.Member,
-            player2: typing.Optional[discord.Member],
-            tokens: typing.List[str],
-            size: int = 7
+        self,
+        bot: Bot,
+        channel: discord.TextChannel,
+        player1: discord.Member,
+        player2: typing.Optional[discord.Member],
+        tokens: typing.List[str],
+        size: int = 7
     ) -> None:
 
         self.bot = bot
@@ -286,20 +286,20 @@ class ConnectFour(commands.Cog):
         return True
 
     def get_player(
-            self,
-            ctx: commands.Context,
-            announcement: discord.Message,
-            reaction: discord.Reaction,
-            user: discord.Member
+        self,
+        ctx: commands.Context,
+        announcement: discord.Message,
+        reaction: discord.Reaction,
+        user: discord.Member
     ) -> bool:
         """Predicate checking the criteria for the announcement message."""
         if self.already_playing(ctx.author):  # If they've joined a game since requesting a player 2
             return True  # Is dealt with later on
 
         if (
-                user.id not in (ctx.me.id, ctx.author.id)
-                and str(reaction.emoji) == Emojis.hand_raised
-                and reaction.message.id == announcement.id
+            user.id not in (ctx.me.id, ctx.author.id)
+            and str(reaction.emoji) == Emojis.hand_raised
+            and reaction.message.id == announcement.id
         ):
             if self.already_playing(user):
                 self.bot.loop.create_task(ctx.send(f"{user.mention} You're already playing a game!"))
@@ -316,9 +316,9 @@ class ConnectFour(commands.Cog):
             return True
 
         if (
-                user.id == ctx.author.id
-                and str(reaction.emoji) == CROSS_EMOJI
-                and reaction.message.id == announcement.id
+            user.id == ctx.author.id
+            and str(reaction.emoji) == CROSS_EMOJI
+            and reaction.message.id == announcement.id
         ):
             return True
         return False
@@ -329,7 +329,7 @@ class ConnectFour(commands.Cog):
 
     @staticmethod
     def check_emojis(
-            e1: EMOJI_CHECK, e2: EMOJI_CHECK
+        e1: EMOJI_CHECK, e2: EMOJI_CHECK
     ) -> typing.Tuple[bool, typing.Optional[str]]:
         """Validate the emojis, the user put."""
         if isinstance(e1, str) and emojis.count(e1) != 1:
@@ -339,12 +339,12 @@ class ConnectFour(commands.Cog):
         return True, None
 
     async def _play_game(
-            self,
-            ctx: commands.Context,
-            user: typing.Optional[discord.Member],
-            board_size: int,
-            emoji1: str,
-            emoji2: str
+        self,
+        ctx: commands.Context,
+        user: typing.Optional[discord.Member],
+        board_size: int,
+        emoji1: str,
+        emoji2: str
     ) -> None:
         """Helper for playing a game of connect four."""
         self.tokens = [":white_circle:", str(emoji1), str(emoji2)]
@@ -369,11 +369,11 @@ class ConnectFour(commands.Cog):
         case_insensitive=True
     )
     async def connect_four(
-            self,
-            ctx: commands.Context,
-            board_size: int = 7,
-            emoji1: EMOJI_CHECK = "\U0001f535",
-            emoji2: EMOJI_CHECK = "\U0001f534"
+        self,
+        ctx: commands.Context,
+        board_size: int = 7,
+        emoji1: EMOJI_CHECK = "\U0001f535",
+        emoji2: EMOJI_CHECK = "\U0001f534"
     ) -> None:
         """
         Play the classic game of Connect Four with someone!
@@ -430,11 +430,11 @@ class ConnectFour(commands.Cog):
     @guild_only()
     @connect_four.command(aliases=["bot", "computer", "cpu"])
     async def ai(
-            self,
-            ctx: commands.Context,
-            board_size: int = 7,
-            emoji1: EMOJI_CHECK = "\U0001f535",
-            emoji2: EMOJI_CHECK = "\U0001f534"
+        self,
+        ctx: commands.Context,
+        board_size: int = 7,
+        emoji1: EMOJI_CHECK = "\U0001f535",
+        emoji2: EMOJI_CHECK = "\U0001f534"
     ) -> None:
         """Play Connect Four against a computer player."""
         check, emoji = self.check_emojis(emoji1, emoji2)

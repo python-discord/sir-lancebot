@@ -79,8 +79,10 @@ class Movie(Cog):
 
         # Check if "results" is in result. If not, throw error.
         if "results" not in result:
-            err_msg = f"There is problem while making TMDB API request. Response Code: {result['status_code']}, " \
-                      f"{result['status_message']}."
+            err_msg = (
+                f"There is problem while making TMDB API request. Response Code: {result['status_code']}, "
+                f"{result['status_message']}."
+            )
             await ctx.send(err_msg)
             logger.warning(err_msg)
 

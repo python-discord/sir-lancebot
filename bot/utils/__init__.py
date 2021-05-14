@@ -3,7 +3,7 @@ import contextlib
 import re
 import string
 from datetime import datetime
-from typing import Iterable, List
+from typing import Iterable, List, Optional
 
 import discord
 from discord.ext.commands import BadArgument, Context
@@ -31,8 +31,13 @@ def resolve_current_month() -> Month:
 
 
 async def disambiguate(
-        ctx: Context, entries: List[str], *, timeout: float = 30,
-        entries_per_page: int = 20, empty: bool = False, embed: discord.Embed = None
+    ctx: Context,
+    entries: List[str],
+    *,
+    timeout: float = 30,
+    entries_per_page: int = 20,
+    empty: bool = False,
+    embed: Optional[discord.Embed] = None
 ) -> str:
     """
     Has the user choose between multiple entries in case one could not be chosen automatically.

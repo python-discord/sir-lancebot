@@ -212,12 +212,12 @@ class Minesweeper(commands.Cog):
             return True
 
     async def reveal_one(
-            self,
-            ctx: commands.Context,
-            revealed: GameBoard,
-            board: GameBoard,
-            x: int,
-            y: int
+        self,
+        ctx: commands.Context,
+        revealed: GameBoard,
+        board: GameBoard,
+        x: int,
+        y: int
     ) -> bool:
         """
         Reveal one square.

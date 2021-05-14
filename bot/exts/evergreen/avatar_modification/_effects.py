@@ -251,7 +251,7 @@ class PfpEffects:
         total_width = multiplier * single_wdith
         total_height = multiplier * single_height
 
-        new_image = Image.new('RGBA', (total_width, total_height), (250, 250, 250))
+        new_image = Image.new("RGBA", (total_width, total_height), (250, 250, 250))
 
         width_multiplier = 0
         height = 0
@@ -275,13 +275,13 @@ class PfpEffects:
     def mosaic_effect(img_bytes: bytes, squares: int, file_name: str) -> discord.File:
         """Seperate function run from an executor which turns an image into a mosaic."""
         avatar = Image.open(BytesIO(img_bytes))
-        avatar = avatar.convert('RGBA').resize((1024, 1024))
+        avatar = avatar.convert("RGBA").resize((1024, 1024))
 
         img_squares = PfpEffects.split_image(avatar, squares)
         new_img = PfpEffects.join_images(img_squares)
 
         bufferedio = BytesIO()
-        new_img.save(bufferedio, format='PNG')
+        new_img.save(bufferedio, format="PNG")
         bufferedio.seek(0)
 
         return discord.File(bufferedio, filename=file_name)

@@ -54,8 +54,10 @@ class RomanceMovieFinder(commands.Cog):
                 embed.set_thumbnail(url="https://i.imgur.com/LtFtC8H.png")
                 await ctx.send(embed=embed)
             except KeyError:
-                warning_message = "A KeyError was raised while fetching information on the movie. The API service" \
-                                  " could be unavailable or the API key could be set incorrectly."
+                warning_message = (
+                    "A KeyError was raised while fetching information on the movie. The API service"
+                    " could be unavailable or the API key could be set incorrectly."
+                )
                 embed = discord.Embed(title=warning_message)
                 log.warning(warning_message)
                 await ctx.send(embed=embed)

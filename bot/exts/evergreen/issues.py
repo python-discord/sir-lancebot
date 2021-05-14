@@ -162,9 +162,9 @@ class Issues(commands.Cog):
 
     @staticmethod
     def format_embed(
-            results: t.List[t.Union[IssueState, FetchError]],
-            user: str,
-            repository: t.Optional[str] = None
+        results: t.List[t.Union[IssueState, FetchError]],
+        user: str,
+        repository: t.Optional[str] = None
     ) -> discord.Embed:
         """Take a list of IssueState or FetchError and format a Discord embed for them."""
         description_list = []
@@ -187,11 +187,11 @@ class Issues(commands.Cog):
     @whitelist_override(channels=WHITELISTED_CHANNELS, categories=WHITELISTED_CATEGORIES)
     @commands.command(aliases=("pr",))
     async def issue(
-            self,
-            ctx: commands.Context,
-            numbers: commands.Greedy[int],
-            repository: str = "sir-lancebot",
-            user: str = "python-discord"
+        self,
+        ctx: commands.Context,
+        numbers: commands.Greedy[int],
+        repository: str = "sir-lancebot",
+        user: str = "python-discord"
     ) -> None:
         """Command to retrieve issue(s) from a GitHub repository."""
         # Remove duplicates

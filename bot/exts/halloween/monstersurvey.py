@@ -71,7 +71,8 @@ class MonsterSurvey(Cog):
                 default_embed.add_field(
                     name=".monster show monster_name(optional)",
                     value="Show a specific monster. If none is listed, it will give you an error with valid choices.",
-                    inline=False)
+                    inline=False
+                )
                 default_embed.add_field(
                     name=".monster vote monster_name",
                     value="Vote for a specific monster. You get one vote, but can change it at any time.",
@@ -182,15 +183,17 @@ class MonsterSurvey(Cog):
             for rank, m in enumerate(top):
                 votes = len(vr[m]["votes"])
                 percentage = ((votes / total_votes) * 100) if total_votes > 0 else 0
-                embed.add_field(name=f"{rank+1}. {vr[m]['full_name']}",
-                                value=(
-                                    f"{votes} votes. {percentage:.1f}% of total votes.\n"
-                                    f"Vote for this monster by typing "
-                                    f"'.monster vote {m}'\n"
-                                    f"Get more information on this monster by typing "
-                                    f"'.monster show {m}'"
-                                ),
-                                inline=False)
+                embed.add_field(
+                    name=f"{rank+1}. {vr[m]['full_name']}",
+                    value=(
+                        f"{votes} votes. {percentage:.1f}% of total votes.\n"
+                        f"Vote for this monster by typing "
+                        f"'.monster vote {m}'\n"
+                        f"Get more information on this monster by typing "
+                        f"'.monster show {m}'"
+                    ),
+                    inline=False
+                )
 
             embed.set_footer(text="You can also vote by their rank number. '.monster vote {number}' ")
 

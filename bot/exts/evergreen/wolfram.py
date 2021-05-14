@@ -40,9 +40,11 @@ async def send_embed(
     """Generate & send a response embed with Wolfram as the author."""
     embed = Embed(colour=colour)
     embed.description = message_txt
-    embed.set_author(name="Wolfram Alpha",
-                     icon_url=WOLF_IMAGE,
-                     url="https://www.wolframalpha.com/")
+    embed.set_author(
+        name="Wolfram Alpha",
+        icon_url=WOLF_IMAGE,
+        url="https://www.wolframalpha.com/"
+    )
     if footer:
         embed.set_footer(text=footer)
 
@@ -222,9 +224,11 @@ class Wolfram(Cog):
             return
 
         embed = Embed()
-        embed.set_author(name="Wolfram Alpha",
-                         icon_url=WOLF_IMAGE,
-                         url="https://www.wolframalpha.com/")
+        embed.set_author(
+            name="Wolfram Alpha",
+            icon_url=WOLF_IMAGE,
+            url="https://www.wolframalpha.com/"
+        )
         embed.colour = Colours.soft_orange
 
         await ImagePaginator.paginate(pages, ctx, embed)
