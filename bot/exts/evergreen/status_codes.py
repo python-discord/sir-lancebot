@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from random import randint
+from random import choice
 
 import discord
 from discord.ext import commands
@@ -11,6 +11,7 @@ HTTP_CAT_URL = "https://http.cat/{code}.jpg"
 class HTTPStatusCodes(commands.Cog):
     """
     Commands that give HTTP statuses described and visualized by cats and dogs.
+
     Give a cat or dog visualization randomly if the option is not filled.
     """
 
@@ -19,16 +20,15 @@ class HTTPStatusCodes(commands.Cog):
 
     @commands.group(name="http_status", aliases=("status", "httpstatus"), invoke_without_command=True)
     async def http_status_group(self, ctx: commands.Context, code: int) -> None:
-        """Group containing dog and cat http status code commands."""
-        if not ctx.invoked_subcommand:
-            random = randint(0, 1)
-            if random == 0:
-                subcmd = self.bot.get_command("http_status cat")
-            else:
-                subcmd = self.bot.get_command("http_status dog")
+        """Randomize cat/dog picture output when a sub-command is not specified."""
+        subcmd = choice((self.http_cat, self.http_dog))
+        # if random == 0:
+        #     subcmd = self.bot.get_command("http_status cat")
+        # else:
+        #     subcmd = self.bot.get_command("http_status dog")
 
-            if await commands.Group.can_run(subcmd, ctx):
-                await subcmd(ctx, code)
+        if await subcmd.can_run(ctx):
+            await subcmd(ctx, code)
 
     @http_status_group.command(name='cat')
     async def http_cat(self, ctx: commands.Context, code: int) -> None:
