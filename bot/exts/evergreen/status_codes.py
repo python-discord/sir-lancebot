@@ -11,7 +11,6 @@ HTTP_CAT_URL = "https://http.cat/{code}.jpg"
 class HTTPStatusCodes(commands.Cog):
     """
     Commands that give HTTP statuses described and visualized by cats and dogs.
-
     Give a cat or dog visualization randomly if the option is not filled.
     """
 
