@@ -10,9 +10,9 @@ HTTP_CAT_URL = "https://http.cat/{code}.jpg"
 
 class HTTPStatusCodes(commands.Cog):
     """
-    Commands that give HTTP statuses described and visualized by cats and dogs.
+    Fetch an image depicting HTTP status codes as a dog or a cat.
 
-    Give a cat or dog visualization randomly if the option is not filled.
+    If neither animal is selected a cat or dog is chosen randomly for the given status code.
     """
 
     def __init__(self, bot: commands.Bot):
@@ -20,12 +20,8 @@ class HTTPStatusCodes(commands.Cog):
 
     @commands.group(name="http_status", aliases=("status", "httpstatus"), invoke_without_command=True)
     async def http_status_group(self, ctx: commands.Context, code: int) -> None:
-        """Randomize cat/dog picture output when a sub-command is not specified."""
+        """Choose a cat or dog randomly for the given status code."""
         subcmd = choice((self.http_cat, self.http_dog))
-        # if random == 0:
-        #     subcmd = self.bot.get_command("http_status cat")
-        # else:
-        #     subcmd = self.bot.get_command("http_status dog")
 
         if await subcmd.can_run(ctx):
             await subcmd(ctx, code)
