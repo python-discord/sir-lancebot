@@ -6,7 +6,7 @@ from typing import Optional
 
 import discord
 from aiohttp import AsyncResolver, ClientSession, TCPConnector
-from async_rediscache import RedisSession
+from async_rediscache import RedisCache, RedisSession
 from discord import DiscordException, Embed, Forbidden, Thread
 from discord.ext import commands
 from discord.ext.commands import Cog, when_mentioned_or
@@ -27,6 +27,11 @@ class Bot(commands.Bot):
     that the upload was successful. See the `mock_in_debug` decorator for further details.
     """
 
+    # This cache contains all the unloaded extensions
+    # The cache is default to "unloaded", which contains all the unloaded exts
+    # RedisCache["unloaded": str, str]
+    unloads_cache = RedisCache()
+
     name = constants.Client.name
 
     def __init__(self, redis_session: RedisSession, **kwargs):
@@ -38,6 +43,14 @@ class Bot(commands.Bot):
         self.redis_session = redis_session
         self.loop.create_task(self.check_channels())
         self.loop.create_task(self.send_log(self.name, "Connected!"))
+        self.loop.create_task(self.process_ext_not_found())
+
+    async def get_unloaded_extensions(self) -> None:
+        """Get all the unloaded extensions from cache."""
+        await self.unloads_cache.set("unloaded", 'bot.exts.evergreen.catify | bot.exts.evergreen.tmed | bot.exts.evergreen.uptim')
+        cache_dict = await self.unloads_cache.to_dict()
+        extensions = cache_dict.get("unloaded")
+        self.unloaded_extensions = [] if not extensions else extensions.split(" | ")
 
     @property
     def member(self) -> Optional[discord.Member]:
@@ -78,8 +91,16 @@ class Bot(commands.Bot):
 
         This only serves to make the info log, so that extensions don't have to.
         """
-        super().add_cog(cog)
-        log.info(f"Cog loaded: {cog.qualified_name}")
+        cog_name = ".".join((
+            cog.__repr__().split("object")[0].lower()[1::]
+        ).split(".")[:-1])
+
+        if cog_name in self.unloaded_extensions:
+            self.unloaded_extensions.remove(cog_name)
+            log.info(f"Skipping cog {cog.qualified_name}, found in unloaded cache.")
+        else:
+            super().add_cog(cog)
+            log.info(f"Cog loaded: {cog.qualified_name}")
 
     def add_command(self, command: commands.Command) -> None:
         """Add `command` as normal and then add its root aliases to the bot."""
@@ -197,6 +218,38 @@ class Bot(commands.Bot):
         for alias in getattr(command, "root_aliases", ()):
             self.all_commands.pop(alias, None)
 
+    async def process_ext_not_found(self) -> None:
+        """
+        Process extensions which are in unloaded cache but not found on the bot.
+
+        Send a message to #dev-alerts with the extensions, and remove them from the cache,
+        """
+        await self.wait_until_guild_available()
+
+        if not self.unloaded_extensions:
+            return
+
+        extensions_msg = '- ' + '\n- '.join(self.unloaded_extensions)
+        dev_alerts_channel = self.get_channel(constants.Channels.dev_alerts)
+        core_dev_role = discord.utils.get(
+            self.get_guild(constants.Client.guild).roles,
+            id=constants.Roles.core_developers
+        )
+        msg = (
+            f"\u26a0 {core_dev_role.mention}\n"
+            "The following extensions were found in the cache but not on the bot:\n"
+            f"```md\n{extensions_msg}\n```"
+            "\nClearing them from the cache."
+        )
+
+        unloaded = await self.unloads_cache.to_dict()
+        unloaded_list = list(
+            set(unloaded.get("unloaded").split(" | ")) - set(self.unloaded_extensions)
+        )
+        await self.unloads_cache.set("unloaded", " | ".join(unloaded_list))
+
+        await dev_alerts_channel.send(msg)
+
 
 _allowed_roles = [discord.Object(id_) for id_ in constants.MODERATION_ROLES]
 
@@ -225,3 +278,4 @@ bot = Bot(
     allowed_mentions=discord.AllowedMentions(everyone=False, roles=_allowed_roles),
     intents=_intents,
 )
+loop.run_until_complete(bot.get_unloaded_extensions())

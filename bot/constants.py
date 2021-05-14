@@ -107,6 +107,7 @@ class Channels(NamedTuple):
     organisation = 551789653284356126
     devlog = int(environ.get("CHANNEL_DEVLOG", 622895325144940554))
     dev_contrib = 635950537262759947
+    dev_alerts = int(environ.get("CHANNEL_DEVALERTS", 820712029245538314))
     mod_meta = 775412552795947058
     mod_tools = 775413915391098921
     off_topic_0 = 291284109232308226
@@ -284,7 +285,7 @@ class Roles(NamedTuple):
     moderator = 267629731250176001
     owner = 267627879762755584
     helpers = int(environ.get("ROLE_HELPERS", 267630620367257601))
-    core_developers = 587606783669829632
+    core_developers = 814190307319087172
 
 
 class Tokens(NamedTuple):

@@ -17,7 +17,6 @@ from bot.utils.pagination import LinePaginator
 
 log = logging.getLogger(__name__)
 
-
 UNLOAD_BLACKLIST = {f"{exts.__name__}.utils.extensions"}
 BASE_PATH_LEN = len(exts.__name__.split("."))
 
@@ -94,6 +93,15 @@ class Extensions(commands.Cog):
         if "*" in extensions or "**" in extensions:
             extensions = set(EXTENSIONS) - set(self.bot.extensions.keys())
 
+        # Remove extensions from unload extensions cache
+        cache_dict = await self.bot.unloads_cache.to_dict()
+        existing_value = cache_dict.get("unloaded")
+        if existing_value:
+            unloaded_list = list(
+                set(existing_value.split(" | ")) - set(extensions)
+            )
+            await self.bot.unloads_cache.set("unloaded", " | ".join(unloaded_list))
+
         msg = self.batch_manage(Action.LOAD, *extensions)
         await ctx.send(msg)
 
@@ -115,6 +123,15 @@ class Extensions(commands.Cog):
         else:
             if "*" in extensions or "**" in extensions:
                 extensions = set(self.bot.extensions.keys()) - UNLOAD_BLACKLIST
+
+            # Add the unload extensions to the unloaded cache
+            cache_dict = await self.bot.unloads_cache.to_dict()
+            existing_value = cache_dict.get("unloaded")
+            if existing_value:
+                unloaded_list = existing_value.split(" | ") + list(extensions)
+            else:
+                unloaded_list = extensions[:]
+            await self.bot.unloads_cache.set("unloaded", " | ".join(unloaded_list))
 
             msg = self.batch_manage(Action.UNLOAD, *extensions)
 
