@@ -91,4 +91,9 @@ class Latex(commands.Cog):
 
 def setup(bot: commands.Bot) -> None:
     """Load the Latex Cog."""
+    # As we have resource issues on this cog,
+    # we have it currently disabled while we fix it.
+    import logging
+    logging.info("Latex cog is currently disabled. It won't be loaded.")
+    return
     bot.add_cog(Latex(bot))
