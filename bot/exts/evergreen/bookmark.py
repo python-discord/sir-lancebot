@@ -96,7 +96,7 @@ class Bookmark(commands.Cog):
         """Send the author a link to `target_message` via DMs."""
         if not target_message:
             if not ctx.message.reference:
-                raise commands.UserInputError("You must either provide a message to bookmark, or reply to one.")
+                raise commands.UserInputError("You must either provide a valid message to bookmark, or reply to one.")
             target_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
 
         # Prevent users from bookmarking a message in a channel they don't have access to
