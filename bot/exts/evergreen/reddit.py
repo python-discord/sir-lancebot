@@ -99,7 +99,6 @@ class Reddit(Cog):
                 f"{content_type}\u2003{Emojis.reddit_upvote}{ups}\u2003{Emojis.reddit_comments}"
                 f"\u2002{comments}\u2003{Emojis.reddit_users}{author}\n\n"
             )
-            return
 
             if paginate:
                 post_page += f"**[{title}]({link})**\n\n"
