@@ -56,17 +56,21 @@ async def disambiguate(
     choices = (f"{index}: {entry}" for index, entry in enumerate(entries, start=1))
 
     def check(message: discord.Message) -> bool:
-        return (message.content.isdecimal()
-                and message.author == ctx.author
-                and message.channel == ctx.channel)
+        return (
+            message.content.isdecimal()
+            and message.author == ctx.author
+            and message.channel == ctx.channel
+        )
 
     try:
         if embed is None:
             embed = discord.Embed()
 
         coro1 = ctx.bot.wait_for("message", check=check, timeout=timeout)
-        coro2 = LinePaginator.paginate(choices, ctx, embed=embed, max_lines=entries_per_page,
-                                       empty=empty, max_size=6000, timeout=9000)
+        coro2 = LinePaginator.paginate(
+            choices, ctx, embed=embed, max_lines=entries_per_page,
+            empty=empty, max_size=6000, timeout=9000
+        )
 
         # wait_for timeout will go to except instead of the wait_for thing as I expected
         futures = [asyncio.ensure_future(coro1), asyncio.ensure_future(coro2)]
@@ -102,7 +106,7 @@ async def disambiguate(
 
 
 def replace_many(
-        sentence: str, replacements: dict, *, ignore_case: bool = False, match_case: bool = False
+    sentence: str, replacements: dict, *, ignore_case: bool = False, match_case: bool = False
 ) -> str:
     """
     Replaces multiple substrings in a string given a mapping of strings.
