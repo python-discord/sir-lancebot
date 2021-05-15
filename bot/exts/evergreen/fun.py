@@ -7,9 +7,10 @@ from typing import Callable, Iterable, Tuple, Union
 
 from discord import Embed, Message
 from discord.ext import commands
-from discord.ext.commands import BadArgument, Bot, Cog, Context, MessageConverter, clean_content
+from discord.ext.commands import BadArgument, Cog, Context, MessageConverter, clean_content
 
 from bot import utils
+from bot.bot import Bot
 from bot.constants import Client, Colours, Emojis
 from bot.utils import helpers
 
@@ -55,8 +56,7 @@ class Fun(Cog):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
-        with Path("bot/resources/evergreen/caesar_info.json").open("r", encoding="UTF-8") as f:
-            self._caesar_cipher_embed = json.load(f)
+        self._caesar_cipher_embed = json.loads(Path("bot/resources/evergreen/caesar_info.json").read_text("UTF-8"))
 
     @staticmethod
     def _get_random_die() -> str:
@@ -242,6 +242,6 @@ class Fun(Cog):
         return Embed.from_dict(embed_dict)
 
 
-def setup(bot: commands.Bot) -> None:
-    """Fun Cog load."""
+def setup(bot: Bot) -> None:
+    """Load the Fun cog."""
     bot.add_cog(Fun(bot))

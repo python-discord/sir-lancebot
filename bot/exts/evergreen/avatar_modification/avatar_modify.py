@@ -6,12 +6,13 @@ import string
 import typing as t
 import unicodedata
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 
 import discord
 from aiohttp import client_exceptions
 from discord.ext import commands
-from discord.ext.commands.errors import BadArgument
 
+from bot.bot import Bot
 from bot.constants import Colours, Emojis
 from bot.exts.evergreen.avatar_modification._effects import PfpEffects
 from bot.utils.extensions import invoke_help_command
@@ -27,13 +28,12 @@ MAX_SQUARES = 10_000
 
 T = t.TypeVar("T")
 
-with open("bot/resources/pride/gender_options.json") as f:
-    GENDER_OPTIONS = json.load(f)
+GENDER_OPTIONS = json.loads(Path("bot/resources/pride/gender_options.json").read_text("utf8"))
 
 
 async def in_executor(func: t.Callable[..., T], *args) -> T:
     """
-    Runs the given synchronus function `func` in an executor.
+    Runs the given synchronous function `func` in an executor.
 
     This is useful for running slow, blocking code within async
     functions, so that they don't block the bot.
@@ -63,7 +63,7 @@ def file_safe_name(effect: str, display_name: str) -> str:
 class AvatarModify(commands.Cog):
     """Various commands for users to apply affects to their own avatars."""
 
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
     async def _fetch_user(self, user_id: int) -> t.Optional[discord.User]:
@@ -71,7 +71,7 @@ class AvatarModify(commands.Cog):
         Fetches a user and handles errors.
 
         This helper function is required as the member cache doesn't always have the most up to date
-        profile picture. This can lead to errors if the image is delted from the Discord CDN.
+        profile picture. This can lead to errors if the image is deleted from the Discord CDN.
         fetch_member can't be used due to the avatar url being part of the user object, and
         some weird caching that D.py does
         """
@@ -260,9 +260,9 @@ class AvatarModify(commands.Cog):
                         return
                     image_bytes = await response.read()
             except client_exceptions.ClientConnectorError:
-                raise BadArgument("Cannot connect to provided URL!")
+                raise commands.BadArgument("Cannot connect to provided URL!")
             except client_exceptions.InvalidURL:
-                raise BadArgument("Invalid URL!")
+                raise commands.BadArgument("Invalid URL!")
 
             await self.send_pride_image(ctx, image_bytes, pixels, flag, option)
 
@@ -365,6 +365,6 @@ class AvatarModify(commands.Cog):
             await ctx.send(file=file, embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load the AvatarModify cog."""
     bot.add_cog(AvatarModify(bot))

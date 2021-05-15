@@ -14,7 +14,7 @@ class PfpEffects:
     """
     Implements various image modifying effects, for the PfpModify cog.
 
-    All of these fuctions are slow, and blocking, so they should be ran in executors.
+    All of these functions are slow, and blocking, so they should be ran in executors.
     """
 
     @staticmethod
@@ -102,7 +102,7 @@ class PfpEffects:
         Applies the easter effect to the given image.
 
         This is done by getting the closest "easter" colour to each pixel and changing the colour
-        to the half-way RGBvalue.
+        to the half-way RGB value.
 
         We also then add an overlay image on top in middle right, a chocolate bunny by default.
         """
@@ -251,7 +251,7 @@ class PfpEffects:
         total_width = multiplier * single_wdith
         total_height = multiplier * single_height
 
-        new_image = Image.new('RGBA', (total_width, total_height), (250, 250, 250))
+        new_image = Image.new("RGBA", (total_width, total_height), (250, 250, 250))
 
         width_multiplier = 0
         height = 0
@@ -273,15 +273,15 @@ class PfpEffects:
 
     @staticmethod
     def mosaic_effect(img_bytes: bytes, squares: int, file_name: str) -> discord.File:
-        """Seperate function run from an executor which turns an image into a mosaic."""
+        """Separate function run from an executor which turns an image into a mosaic."""
         avatar = Image.open(BytesIO(img_bytes))
-        avatar = avatar.convert('RGBA').resize((1024, 1024))
+        avatar = avatar.convert("RGBA").resize((1024, 1024))
 
         img_squares = PfpEffects.split_image(avatar, squares)
         new_img = PfpEffects.join_images(img_squares)
 
         bufferedio = BytesIO()
-        new_img.save(bufferedio, format='PNG')
+        new_img.save(bufferedio, format="PNG")
         bufferedio.seek(0)
 
         return discord.File(bufferedio, filename=file_name)
