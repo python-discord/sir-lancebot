@@ -61,8 +61,7 @@ class MyValenstate(commands.Cog):
             embed_text = f"You have {len(matches)} more matches, these being {leftovers}."
         elif len(matches) == 1:
             embed_title = "But there's another one!"
-            leftovers = str(matches)
-            embed_text = f"You have another match, this being {leftovers}."
+            embed_text = f"You have another match, this being {matches[0]}."
         else:
             embed_title = "You have a true match!"
             embed_text = "This state is your true Valenstate! There are no states that would suit" \
@@ -70,7 +69,7 @@ class MyValenstate(commands.Cog):
 
         embed = discord.Embed(
             title=f"Your Valenstate is {valenstate} \u2764",
-            description=f"{STATES[valenstate]['text']}",
+            description=STATES[valenstate]['text'],
             colour=Colours.pink
         )
         embed.add_field(name=embed_title, value=embed_text)
