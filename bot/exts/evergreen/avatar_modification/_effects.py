@@ -273,7 +273,7 @@ class PfpEffects:
 
     @staticmethod
     def mosaic_effect(img_bytes: bytes, squares: int, file_name: str) -> discord.File:
-        """Seperate function run from an executor which turns an image into a mosaic."""
+        """Separate function run from an executor which turns an image into a mosaic."""
         avatar = Image.open(BytesIO(img_bytes))
         avatar = avatar.convert("RGBA").resize((1024, 1024))
 
