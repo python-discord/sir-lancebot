@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import random
+import typing as t
 
 import discord
 from discord.ext import commands
@@ -88,11 +89,16 @@ class Bookmark(commands.Cog):
     async def bookmark(
         self,
         ctx: commands.Context,
-        target_message: WrappedMessageConverter,
+        target_message: t.Optional[WrappedMessageConverter],
         *,
         title: str = "Bookmark"
     ) -> None:
         """Send the author a link to `target_message` via DMs."""
+        if not target_message:
+            if not ctx.message.reference:
+                raise commands.UserInputError("You must either provide a message to bookmark, or reply to one.")
+            target_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+
         # Prevent users from bookmarking a message in a channel they don't have access to
         permissions = ctx.author.permissions_in(target_message.channel)
         if not permissions.read_messages:
