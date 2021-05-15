@@ -80,18 +80,8 @@ class HanukkahEmbed(commands.Cog):
                     return
             festival_day = self.hanukkah_days.index(day)
             number_suffixes = ["st", "nd", "rd", "th"]
-            suffix = ""
-            if festival_day == 1:
-                suffix = number_suffixes[0]
-            if festival_day == 2:
-                suffix = number_suffixes[1]
-            if festival_day == 3:
-                suffix = number_suffixes[2]
-            if festival_day > 3:
-                suffix = number_suffixes[3]
-            message = ""
-            for _ in range(1, festival_day + 1):
-                message += ":menorah:"
+            suffix = number_suffixes[festival_day - 1 if festival_day <= 3 else 3]
+            message = ":menorah:" * festival_day
             embed.description = f"It is the {festival_day}{suffix} day of Hanukkah!\n{message}"
             await ctx.send(embed=embed)
         else:
