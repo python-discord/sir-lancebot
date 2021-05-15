@@ -69,7 +69,7 @@ class MyValenstate(commands.Cog):
 
         embed = discord.Embed(
             title=f"Your Valenstate is {valenstate} \u2764",
-            description=STATES[valenstate]['text'],
+            description=STATES[valenstate]["text"],
             colour=Colours.pink
         )
         embed.add_field(name=embed_title, value=embed_text)
