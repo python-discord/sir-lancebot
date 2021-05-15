@@ -72,7 +72,7 @@ class PrideFacts(commands.Cog):
         else:
             await target.send("The fact for the selected day is not yet available.")
 
-    @commands.command(name="pridefact", aliases=["pridefacts"])
+    @commands.command(name="pridefact", aliases=("pridefacts",))
     async def pridefact(self, ctx: commands.Context, option: str = None) -> None:
         """
         Sends a message with a pride fact of the day.

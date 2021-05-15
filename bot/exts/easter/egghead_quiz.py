@@ -34,7 +34,7 @@ class EggheadQuiz(commands.Cog):
     def __init__(self) -> None:
         self.quiz_messages = {}
 
-    @commands.command(aliases=["eggheadquiz", "easterquiz"])
+    @commands.command(aliases=("eggheadquiz", "easterquiz"))
     async def eggquiz(self, ctx: commands.Context) -> None:
         """
         Gives a random quiz question, waits 30 seconds and then outputs the answer.

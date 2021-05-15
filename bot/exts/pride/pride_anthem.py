@@ -38,7 +38,7 @@ class PrideAnthem(commands.Cog):
         """Loads a list of videos from the resources folder as dictionaries."""
         return json.loads(Path("bot/resources/pride/anthems.json").read_text("utf8"))
 
-    @commands.command(name="prideanthem", aliases=["anthem", "pridesong"])
+    @commands.command(name="prideanthem", aliases=("anthem", "pridesong"))
     async def prideanthem(self, ctx: commands.Context, genre: str = None) -> None:
         """
         Sends a message with a video of a random pride anthem.

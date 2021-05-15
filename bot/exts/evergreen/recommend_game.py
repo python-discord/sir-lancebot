@@ -25,7 +25,7 @@ class RecommendGame(commands.Cog):
         self.bot = bot
         self.index = 0
 
-    @commands.command(name="recommendgame", aliases=["gamerec"])
+    @commands.command(name="recommendgame", aliases=("gamerec",))
     async def recommend_game(self, ctx: commands.Context) -> None:
         """Sends an Embed of a random game recommendation."""
         if self.index >= len(game_recs):

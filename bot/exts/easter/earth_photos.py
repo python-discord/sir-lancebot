@@ -16,7 +16,7 @@ class EarthPhotos(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @commands.command(aliases=["earth"])
+    @commands.command(aliases=("earth",))
     async def earth_photos(self, ctx: commands.Context) -> None:
         """Returns a random photo of earth, sourced from Unsplash."""
         async with ctx.typing():

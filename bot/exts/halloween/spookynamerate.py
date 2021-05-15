@@ -117,7 +117,7 @@ class SpookyNameRate(Cog):
         """Get help on the Spooky Name Rate game."""
         await ctx.send(embed=Embed.from_dict(HELP_MESSAGE_DICT))
 
-    @spooky_name_rate.command(name="list", aliases=["all", "entries"])
+    @spooky_name_rate.command(name="list", aliases=("all", "entries"))
     async def list_entries(self, ctx: Context) -> None:
         """Send all the entries up till now in a single embed."""
         await ctx.send(embed=await self.get_responses_list(final=False))
@@ -134,7 +134,7 @@ class SpookyNameRate(Cog):
             "add an entry."
         )
 
-    @spooky_name_rate.command(name="add", aliases=["register"])
+    @spooky_name_rate.command(name="add", aliases=("register",))
     async def add_name(self, ctx: Context, *, name: str) -> None:
         """Use this command to add/register your spookified name."""
         if self.poll:

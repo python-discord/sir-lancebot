@@ -15,7 +15,7 @@ COLORS = itertools.cycle([Colours.python_blue, Colours.python_yellow])
 class PythonFacts(commands.Cog):
     """Sends a random fun fact about Python."""
 
-    @commands.command(name="pythonfact", aliases=["pyfact"])
+    @commands.command(name="pythonfact", aliases=("pyfact",))
     async def get_python_fact(self, ctx: commands.Context) -> None:
         """Sends a Random fun fact about Python."""
         embed = discord.Embed(

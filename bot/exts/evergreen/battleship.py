@@ -434,7 +434,7 @@ class Battleship(commands.Cog):
             self.games.remove(game)
             raise
 
-    @battleship.command(name="ships", aliases=["boats"])
+    @battleship.command(name="ships", aliases=("boats",))
     async def battleship_ships(self, ctx: commands.Context) -> None:
         """Lists the ships that are found on the battleship grid."""
         embed = discord.Embed(colour=Colours.blue)

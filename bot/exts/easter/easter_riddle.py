@@ -26,7 +26,7 @@ class EasterRiddle(commands.Cog):
         self.correct = ""
         self.current_channel = None
 
-    @commands.command(aliases=["riddlemethis", "riddleme"])
+    @commands.command(aliases=("riddlemethis", "riddleme"))
     async def riddle(self, ctx: commands.Context) -> None:
         """
         Gives a random riddle, then provides 2 hints at certain intervals before revealing the answer.

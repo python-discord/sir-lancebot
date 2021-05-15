@@ -193,7 +193,7 @@ class Space(Cog):
             )
         )
 
-    @mars.command(name="dates", aliases=["d", "date", "rover", "rovers", "r"])
+    @mars.command(name="dates", aliases=("d", "date", "rover", "rovers", "r"))
     async def dates(self, ctx: Context) -> None:
         """Get current available rovers photo date ranges."""
         await ctx.send("\n".join(

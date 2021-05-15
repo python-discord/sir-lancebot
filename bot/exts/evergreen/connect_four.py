@@ -365,7 +365,7 @@ class ConnectFour(commands.Cog):
     @guild_only()
     @commands.group(
         invoke_without_command=True,
-        aliases=["4inarow", "connect4", "connectfour", "c4"],
+        aliases=("4inarow", "connect4", "connectfour", "c4"),
         case_insensitive=True
     )
     async def connect_four(
@@ -428,7 +428,7 @@ class ConnectFour(commands.Cog):
         await self._play_game(ctx, user, board_size, str(emoji1), str(emoji2))
 
     @guild_only()
-    @connect_four.command(aliases=["bot", "computer", "cpu"])
+    @connect_four.command(aliases=("bot", "computer", "cpu"))
     async def ai(
         self,
         ctx: commands.Context,

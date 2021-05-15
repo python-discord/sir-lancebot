@@ -21,7 +21,7 @@ class DragNames(commands.Cog):
         """Loads a list of drag queen names."""
         return json.loads(Path("bot/resources/pride/drag_queen_names.json").read_text("utf8"))
 
-    @commands.command(name="dragname", aliases=["dragqueenname", "queenme"])
+    @commands.command(name="dragname", aliases=("dragqueenname", "queenme"))
     async def dragname(self, ctx: commands.Context) -> None:
         """Sends a message with a drag queen name."""
         await ctx.send(random.choice(self.names))

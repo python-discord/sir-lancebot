@@ -13,7 +13,7 @@ from bot.utils import helpers
 class Catify(commands.Cog):
     """Cog for the catify command."""
 
-    @commands.command(aliases=["ᓚᘏᗢify", "ᓚᘏᗢ"])
+    @commands.command(aliases=("ᓚᘏᗢify", "ᓚᘏᗢ"))
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def catify(self, ctx: commands.Context, *, text: Optional[str]) -> None:
         """

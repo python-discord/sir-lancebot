@@ -38,7 +38,7 @@ class HanukkahEmbed(commands.Cog):
         return hanukkah_dates
 
     @in_month(Month.DECEMBER)
-    @commands.command(name="hanukkah", aliases=["chanukah"])
+    @commands.command(name="hanukkah", aliases=("chanukah",))
     async def hanukkah_festival(self, ctx: commands.Context) -> None:
         """Tells you about the Hanukkah Festivaltime of festival, festival day, etc)."""
         hanukkah_dates = await self.get_hanukkah_dates()

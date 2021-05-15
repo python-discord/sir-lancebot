@@ -116,7 +116,7 @@ class ValentineZodiac(commands.Cog):
         await ctx.send(embed=final_embed)
         log.trace("Embed from date successfully sent.")
 
-    @zodiac.command(name="partnerzodiac", aliases=["partner"])
+    @zodiac.command(name="partnerzodiac", aliases=("partner",))
     async def partner_zodiac(self, ctx: commands.Context, zodiac_sign: str) -> None:
         """Provides a random counter compatible zodiac sign to the given user's zodiac sign."""
         embed = discord.Embed()

@@ -224,7 +224,7 @@ class Games(Cog):
             else:
                 self.genres[genre_name] = genre
 
-    @group(name="games", aliases=["game"], invoke_without_command=True)
+    @group(name="games", aliases=("game",), invoke_without_command=True)
     async def games(self, ctx: Context, amount: Optional[int] = 5, *, genre: Optional[str]) -> None:
         """
         Get random game(s) by genre from IGDB. Use .games genres command to get all available genres.
@@ -277,7 +277,7 @@ class Games(Cog):
 
         await ImagePaginator.paginate(pages, ctx, Embed(title=f"Random {genre.title()} Games"))
 
-    @games.command(name="top", aliases=["t"])
+    @games.command(name="top", aliases=("t",))
     async def top(self, ctx: Context, amount: int = 10) -> None:
         """
         Get current Top games in IGDB.
@@ -294,19 +294,19 @@ class Games(Cog):
         pages = [await self.create_page(game) for game in games]
         await ImagePaginator.paginate(pages, ctx, Embed(title=f"Top {amount} Games"))
 
-    @games.command(name="genres", aliases=["genre", "g"])
+    @games.command(name="genres", aliases=("genre", "g"))
     async def genres(self, ctx: Context) -> None:
         """Get all available genres."""
         await ctx.send(f"Currently available genres: {', '.join(f'`{genre}`' for genre in self.genres)}")
 
-    @games.command(name="search", aliases=["s"])
+    @games.command(name="search", aliases=("s",))
     async def search(self, ctx: Context, *, search_term: str) -> None:
         """Find games by name."""
         lines = await self.search_games(search_term)
 
         await LinePaginator.paginate(lines, ctx, Embed(title=f"Game Search Results: {search_term}"), empty=False)
 
-    @games.command(name="company", aliases=["companies"])
+    @games.command(name="company", aliases=("companies",))
     async def company(self, ctx: Context, amount: int = 5) -> None:
         """
         Get random Game Companies companies from IGDB API.
@@ -325,7 +325,7 @@ class Games(Cog):
         await ImagePaginator.paginate(pages, ctx, Embed(title="Random Game Companies"))
 
     @with_role(*STAFF_ROLES)
-    @games.command(name="refresh", aliases=["r"])
+    @games.command(name="refresh", aliases=("r",))
     async def refresh_genres_command(self, ctx: Context) -> None:
         """Refresh .games command genres."""
         try:

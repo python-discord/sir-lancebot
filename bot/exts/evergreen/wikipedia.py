@@ -72,7 +72,7 @@ class WikipediaSearch(commands.Cog):
                 return
 
     @commands.cooldown(1, 10, commands.BucketType.user)
-    @commands.command(name="wikipedia", aliases=["wiki"])
+    @commands.command(name="wikipedia", aliases=("wiki",))
     async def wikipedia_search_command(self, ctx: commands.Context, *, search: str) -> None:
         """Sends paginated top 10 results of Wikipedia search.."""
         contents = await self.wiki_request(ctx.channel, search)

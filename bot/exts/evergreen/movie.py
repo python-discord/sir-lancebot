@@ -53,7 +53,7 @@ class Movie(Cog):
     def __init__(self, bot: Bot):
         self.http_session: ClientSession = bot.http_session
 
-    @group(name="movies", aliases=["movie"], invoke_without_command=True)
+    @group(name="movies", aliases=("movie",), invoke_without_command=True)
     async def movies(self, ctx: Context, genre: str = "", amount: int = 5) -> None:
         """
         Get random movies by specifying genre. Also support amount parameter, that define how much movies will be shown.
@@ -103,7 +103,7 @@ class Movie(Cog):
 
         await ImagePaginator.paginate(pages, ctx, embed)
 
-    @movies.command(name="genres", aliases=["genre", "g"])
+    @movies.command(name="genres", aliases=("genre", "g"))
     async def genres(self, ctx: Context) -> None:
         """Show all currently available genres for .movies command."""
         await ctx.send(f"Current available genres: {', '.join('`' + genre.name + '`' for genre in MovieGenres)}")

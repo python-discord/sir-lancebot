@@ -38,7 +38,7 @@ class WonderTwins(Cog):
             object_name = self.append_onto(adjective, object_name)
         return f"{object_name} of {water_type}"
 
-    @command(name="formof", aliases=["wondertwins", "wondertwin", "fo"])
+    @command(name="formof", aliases=("wondertwins", "wondertwin", "fo"))
     async def form_of(self, ctx: Context) -> None:
         """Command to send a Wonder Twins inspired phrase to the user invoking the command."""
         await ctx.send(f"Form of {self.format_phrase()}!")

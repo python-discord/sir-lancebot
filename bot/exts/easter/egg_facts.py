@@ -40,7 +40,7 @@ class EasterFacts(commands.Cog):
         channel = self.bot.get_channel(Channels.community_bot_commands)
         await channel.send(embed=self.make_embed())
 
-    @commands.command(name="eggfact", aliases=["fact"])
+    @commands.command(name="eggfact", aliases=("fact",))
     async def easter_facts(self, ctx: commands.Context) -> None:
         """Get easter egg facts."""
         embed = self.make_embed()
