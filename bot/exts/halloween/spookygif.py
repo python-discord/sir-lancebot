@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Tokens
+from bot.constants import Colours, Tokens
 
 log = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ class SpookyGif(commands.Cog):
                 data = await resp.json()
             url = data["data"]["image_url"]
 
-            embed = discord.Embed(title="A spooooky gif!", colour=0x9b59b6)
+            embed = discord.Embed(title="A spooooky gif!", colour=Colours.purple)
             embed.set_image(url=url)
 
         await ctx.send(embed=embed)

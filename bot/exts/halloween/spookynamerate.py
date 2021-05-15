@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from logging import getLogger
 from os import getenv
 from pathlib import Path
-from typing import Dict, Union
+from typing import Union
 
 from async_rediscache import RedisCache
 from discord import Embed, Reaction, TextChannel, User
@@ -65,6 +65,11 @@ HELP_MESSAGE_DICT = {
     ],
 }
 
+# The names are from https://www.mockaroo.com/
+NAMES = json.loads(Path("bot/resources/halloween/spookynamerate_names.json").read_text("utf8"))
+FIRST_NAMES = NAMES["first_names"]
+LAST_NAMES = NAMES["last_names"]
+
 
 class SpookyNameRate(Cog):
     """
@@ -88,14 +93,6 @@ class SpookyNameRate(Cog):
 
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
-
-        names_data = self.load_json(
-            Path("bot", "resources", "halloween", "spookynamerate_names.json")
-        )
-        self.first_names = names_data["first_names"]
-        self.last_names = names_data["last_names"]
-        # the names are from https://www.mockaroo.com/
-
         self.name = None
 
         self.bot.loop.create_task(self.load_vars())
@@ -302,7 +299,7 @@ class SpookyNameRate(Cog):
                 await self.messages.clear()  # reset the messages
 
         # send the next name
-        self.name = f"{random.choice(self.first_names)} {random.choice(self.last_names)}"
+        self.name = f"{random.choice(FIRST_NAMES)} {random.choice(LAST_NAMES)}"
         await self.data.set("name", self.name)
 
         await channel.send(
@@ -367,11 +364,6 @@ class SpookyNameRate(Cog):
         if not channel:
             logger.warning("Bot is unable to get the #seasonalbot-commands channel. Please check the channel ID.")
         return channel
-
-    @staticmethod
-    def load_json(file: Path) -> Dict[str, str]:
-        """Loads a JSON file and returns its contents."""
-        return json.loads(file.read_text("utf8"))
 
     @staticmethod
     def in_allowed_month() -> bool:
