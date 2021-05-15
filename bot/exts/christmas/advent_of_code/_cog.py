@@ -115,7 +115,7 @@ class AdventOfCode(commands.Cog):
                 delta_str = f"{delta.days} days"
 
             await ctx.send(
-                f"The Advent of Code event is not currently running. "
+                "The Advent of Code event is not currently running. "
                 f"The next event will start in {delta_str}."
             )
             return

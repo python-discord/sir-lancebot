@@ -67,14 +67,14 @@ class HanukkahEmbed(commands.Cog):
                 hanukkah_start_hour = 18
                 if hours < hanukkah_start_hour:
                     embed.description = (
-                        f"Hanukkah hasnt started yet, "
+                        "Hanukkah hasnt started yet, "
                         f"it will start in about {hanukkah_start_hour - hours} hour/s."
                     )
                     await ctx.send(embed=embed)
                     return
                 elif hours > hanukkah_start_hour:
                     embed.description = (
-                        f"It is the starting day of Hanukkah ! "
+                        "It is the starting day of Hanukkah ! "
                         f"Its been {hours - hanukkah_start_hour} hours hanukkah started !"
                     )
                     await ctx.send(embed=embed)
