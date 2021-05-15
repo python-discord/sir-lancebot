@@ -31,8 +31,8 @@ EmojiSet = typing.Dict[typing.Tuple[bool, bool], str]
 class Player:
     """Each player in the game - their messages for the boards and their current grid."""
 
-    user: discord.Member
-    board: discord.Message
+    user: typing.Optional[discord.Member]
+    board: typing.Optional[discord.Message]
     opponent_board: discord.Message
     grid: Grid
 
@@ -417,9 +417,9 @@ class Battleship(commands.Cog):
         self.waiting.remove(ctx.author)
         if self.already_playing(ctx.author):
             return
+        game = Game(self.bot, ctx.channel, ctx.author, user)
+        self.games.append(game)
         try:
-            game = Game(self.bot, ctx.channel, ctx.author, user)
-            self.games.append(game)
             await game.start_game()
             self.games.remove(game)
         except discord.Forbidden:

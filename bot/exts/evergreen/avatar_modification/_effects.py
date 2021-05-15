@@ -14,7 +14,7 @@ class PfpEffects:
     """
     Implements various image modifying effects, for the PfpModify cog.
 
-    All of these fuctions are slow, and blocking, so they should be ran in executors.
+    All of these functions are slow, and blocking, so they should be ran in executors.
     """
 
     @staticmethod
@@ -102,7 +102,7 @@ class PfpEffects:
         Applies the easter effect to the given image.
 
         This is done by getting the closest "easter" colour to each pixel and changing the colour
-        to the half-way RGBvalue.
+        to the half-way RGB value.
 
         We also then add an overlay image on top in middle right, a chocolate bunny by default.
         """

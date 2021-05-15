@@ -40,7 +40,8 @@ class EasterFacts(commands.Cog):
         embed = self.make_embed()
         await ctx.send(embed=embed)
 
-    def make_embed(self) -> discord.Embed:
+    @staticmethod
+    def make_embed() -> discord.Embed:
         """Makes a nice embed for the message to be sent."""
         return discord.Embed(
             colour=Colours.soft_red,

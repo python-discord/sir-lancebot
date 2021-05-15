@@ -48,7 +48,7 @@ class EasterRiddle(commands.Cog):
             )
             return
 
-        self.current_channel = ctx.message.channel
+        self.current_channel = ctx.channel
 
         random_question = random.choice(RIDDLE_QUESTIONS)
         question = random_question["question"]

@@ -17,14 +17,16 @@ BUNNY_NAMES = json.loads(Path("bot/resources/easter/bunny_names.json").read_text
 class BunnyNameGenerator(commands.Cog):
     """Generate a random bunny name, or bunnify your Discord username!"""
 
-    def find_separators(self, displayname: str) -> Union[List[str], None]:
+    @staticmethod
+    def find_separators(displayname: str) -> Union[List[str], None]:
         """Check if Discord name contains spaces so we can bunnify an individual word in the name."""
         new_name = re.split(r"[_.\s]", displayname)
         if displayname not in new_name:
             return new_name
         return None
 
-    def find_vowels(self, displayname: str) -> str:
+    @staticmethod
+    def find_vowels(displayname: str) -> str:
         """
         Finds vowels in the user's display name.
 
@@ -45,7 +47,8 @@ class BunnyNameGenerator(commands.Cog):
             if new_name != displayname:
                 return new_name
 
-    def append_name(self, displayname: str) -> str:
+    @staticmethod
+    def append_name(displayname: str) -> str:
         """Adds a suffix to the end of the Discord name."""
         extensions = ["foot", "ear", "nose", "tail"]
         suffix = random.choice(extensions)
