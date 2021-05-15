@@ -9,6 +9,8 @@ from bot.constants import Tokens
 
 log = logging.getLogger(__name__)
 
+API_URL = "https://api.unsplash.com/photos/random"
+
 
 class EarthPhotos(commands.Cog):
     """This cog contains the command for earth photos."""
@@ -21,7 +23,7 @@ class EarthPhotos(commands.Cog):
         """Returns a random photo of earth, sourced from Unsplash."""
         async with ctx.typing():
             async with self.bot.http_session.get(
-                    "https://api.unsplash.com/photos/random",
+                    API_URL,
                     params={"query": "planet_earth", "client_id": Tokens.unsplash_access_key}
             ) as r:
                 jsondata = await r.json()

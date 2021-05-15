@@ -10,6 +10,7 @@ with open("bot/resources/evergreen/python_facts.txt") as file:
     FACTS = itertools.cycle(list(file))
 
 COLORS = itertools.cycle([Colours.python_blue, Colours.python_yellow])
+PYFACTS_DISCUSSION = "https://github.com/python-discord/meta/discussions/93"
 
 
 class PythonFacts(commands.Cog):
@@ -25,7 +26,7 @@ class PythonFacts(commands.Cog):
         )
         embed.add_field(
             name="Suggestions",
-            value="Suggest more facts [here!](https://github.com/python-discord/meta/discussions/93)"
+            value=f"Suggest more facts [here!]({PYFACTS_DISCUSSION})"
         )
         await ctx.send(embed=embed)
 

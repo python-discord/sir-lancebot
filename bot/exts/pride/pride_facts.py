@@ -15,20 +15,15 @@ from bot.utils.decorators import seasonal_task
 
 log = logging.getLogger(__name__)
 
+FACTS = json.loads(Path("bot/resources/pride/facts.json").read_text("utf8"))
+
 
 class PrideFacts(commands.Cog):
     """Provides a new fact every day during the Pride season!"""
 
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.facts = self.load_facts()
-
         self.daily_fact_task = self.bot.loop.create_task(self.send_pride_fact_daily())
-
-    @staticmethod
-    def load_facts() -> dict:
-        """Loads a dictionary of years mapping to lists of facts."""
-        return json.loads(Path("bot/resources/pride/facts.json").read_text("utf8"))
 
     @seasonal_task(Month.JUNE)
     async def send_pride_fact_daily(self) -> None:
@@ -41,8 +36,8 @@ class PrideFacts(commands.Cog):
     async def send_random_fact(self, ctx: commands.Context) -> None:
         """Provides a fact from any previous day, or today."""
         now = datetime.utcnow()
-        previous_years_facts = (y for x, y in self.facts.items() if int(x) < now.year)
-        current_year_facts = self.facts.get(str(now.year), [])[:now.day]
+        previous_years_facts = (y for x, y in FACTS.items() if int(x) < now.year)
+        current_year_facts = FACTS.get(str(now.year), [])[:now.day]
         previous_facts = current_year_facts + [x for y in previous_years_facts for x in y]
         try:
             await ctx.send(embed=self.make_embed(random.choice(previous_facts)))

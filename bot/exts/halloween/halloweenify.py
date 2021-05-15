@@ -12,6 +12,8 @@ from bot.bot import Bot
 
 log = logging.getLogger(__name__)
 
+HALLOWEENIFY_DATA = loads(Path("bot/resources/halloween/halloweenify.json").read_text("utf8"))
+
 
 class Halloweenify(commands.Cog):
     """A cog to change a invokers nickname to a spooky one!"""
@@ -21,12 +23,10 @@ class Halloweenify(commands.Cog):
     async def halloweenify(self, ctx: commands.Context) -> None:
         """Change your nickname into a much spookier one!"""
         async with ctx.typing():
-            data = loads(Path("bot/resources/halloween/halloweenify.json").read_text("utf8"))
-
             # Choose a random character from our list we loaded above and set apart the nickname and image url.
-            character = choice(data["characters"])
-            nickname = "".join([nickname for nickname in character])
-            image = "".join([character[nickname] for nickname in character])
+            character = choice(HALLOWEENIFY_DATA["characters"])
+            nickname = "".join(nickname for nickname in character)
+            image = "".join(character[nickname] for nickname in character)
 
             # Build up a Embed
             embed = discord.Embed()

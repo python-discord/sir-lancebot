@@ -12,7 +12,7 @@ from bot.bot import Bot
 from bot.constants import Categories, Channels, Colours, ERROR_REPLIES
 from bot.utils.decorators import whitelist_override
 
-ERROR_MESSAGE = f"""\
+ERROR_MESSAGE = f"""
 Unknown cheat sheet. Please try to reformulate your query.
 
 **Examples**:

@@ -11,16 +11,17 @@ from bot.utils.decorators import in_month
 
 log = logging.getLogger(__name__)
 
+HEBCAL_URL = (
+    "https://www.hebcal.com/hebcal/?v=1&cfg=json&maj=on&min=on&mod=on&nx=on&"
+    "year=now&month=x&ss=on&mf=on&c=on&geo=geoname&geonameid=3448439&m=50&s=on"
+)
+
 
 class HanukkahEmbed(commands.Cog):
     """A cog that returns information about Hanukkah festival."""
 
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.url = (
-            "https://www.hebcal.com/hebcal/?v=1&cfg=json&maj=on&min=on&mod=on&nx=on&"
-            "year=now&month=x&ss=on&mf=on&c=on&geo=geoname&geonameid=3448439&m=50&s=on"
-        )
         self.hanukkah_days = []
         self.hanukkah_months = []
         self.hanukkah_years = []
@@ -28,7 +29,7 @@ class HanukkahEmbed(commands.Cog):
     async def get_hanukkah_dates(self) -> List[str]:
         """Gets the dates for hanukkah festival."""
         hanukkah_dates = []
-        async with self.bot.http_session.get(self.url) as response:
+        async with self.bot.http_session.get(HEBCAL_URL) as response:
             json_data = await response.json()
         festivals = json_data["items"]
         for festival in festivals:
@@ -57,9 +58,7 @@ class HanukkahEmbed(commands.Cog):
         day = str(today.day)
         month = str(today.month)
         year = str(today.year)
-        embed = Embed()
-        embed.title = "Hanukkah"
-        embed.colour = Colours.blue
+        embed = Embed(title="Hanukkah", colour=Colours.blue)
         if day in self.hanukkah_days and month in self.hanukkah_months and year in self.hanukkah_years:
             if int(day) == hanukkah_start_day:
                 now = datetime.datetime.utcnow()
@@ -74,8 +73,8 @@ class HanukkahEmbed(commands.Cog):
                     return
                 elif hours > hanukkah_start_hour:
                     embed.description = (
-                        "It is the starting day of Hanukkah ! "
-                        f"Its been {hours - hanukkah_start_hour} hours hanukkah started !"
+                        "It is the starting day of Hanukkah! "
+                        f"Its been {hours - hanukkah_start_hour} hours hanukkah started!"
                     )
                     await ctx.send(embed=embed)
                     return
@@ -106,7 +105,7 @@ class HanukkahEmbed(commands.Cog):
             else:
                 festival_end_month = hanukkah_end.strftime("%B")
                 embed.description = (
-                    f"Looks like you missed Hanukkah !"
+                    f"Looks like you missed Hanukkah!"
                     f"Hanukkah ended on {hanukkah_end_day}th of {festival_end_month}."
                 )
 

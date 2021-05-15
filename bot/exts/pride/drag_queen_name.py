@@ -9,22 +9,16 @@ from bot.bot import Bot
 
 log = logging.getLogger(__name__)
 
+NAMES = json.loads(Path("bot/resources/pride/drag_queen_names.json").read_text("utf8"))
+
 
 class DragNames(commands.Cog):
     """Gives a random drag queen name!"""
 
-    def __init__(self):
-        self.names = self.load_names()
-
-    @staticmethod
-    def load_names() -> list:
-        """Loads a list of drag queen names."""
-        return json.loads(Path("bot/resources/pride/drag_queen_names.json").read_text("utf8"))
-
     @commands.command(name="dragname", aliases=("dragqueenname", "queenme"))
     async def dragname(self, ctx: commands.Context) -> None:
         """Sends a message with a drag queen name."""
-        await ctx.send(random.choice(self.names))
+        await ctx.send(random.choice(NAMES))
 
 
 def setup(bot: Bot) -> None:

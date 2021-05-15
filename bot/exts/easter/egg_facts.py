@@ -12,6 +12,8 @@ from bot.utils.decorators import seasonal_task
 
 log = logging.getLogger(__name__)
 
+EGG_FACTS = loads(Path("bot/resources/easter/easter_egg_facts.json").read_text("utf8"))
+
 
 class EasterFacts(commands.Cog):
     """
@@ -22,15 +24,7 @@ class EasterFacts(commands.Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.facts = self.load_json()
-
         self.daily_fact_task = self.bot.loop.create_task(self.send_egg_fact_daily())
-
-    @staticmethod
-    def load_json() -> dict:
-        """Load a list of easter egg facts from the resource JSON file."""
-        p = Path("bot/resources/easter/easter_egg_facts.json")
-        return loads(p.read_text("utf8"))
 
     @seasonal_task(Month.APRIL)
     async def send_egg_fact_daily(self) -> None:
@@ -51,7 +45,7 @@ class EasterFacts(commands.Cog):
         return discord.Embed(
             colour=Colours.soft_red,
             title="Easter Egg Fact",
-            description=random.choice(self.facts)
+            description=random.choice(EGG_FACTS)
         )
 
 

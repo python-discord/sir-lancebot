@@ -8,6 +8,8 @@ from bot.constants import Tokens
 
 log = logging.getLogger(__name__)
 
+API_URL = "http://api.giphy.com/v1/gifs/random"
+
 
 class SpookyGif(commands.Cog):
     """A cog to fetch a random spooky gif from the web!"""
@@ -21,12 +23,11 @@ class SpookyGif(commands.Cog):
         async with ctx.typing():
             params = {"api_key": Tokens.giphy, "tag": "halloween", "rating": "g"}
             # Make a GET request to the Giphy API to get a random halloween gif.
-            async with self.bot.http_session.get("http://api.giphy.com/v1/gifs/random", params=params) as resp:
+            async with self.bot.http_session.get(API_URL, params=params) as resp:
                 data = await resp.json()
             url = data["data"]["image_url"]
 
-            embed = discord.Embed(colour=0x9b59b6)
-            embed.title = "A spooooky gif!"
+            embed = discord.Embed(title="A spooooky gif!", colour=0x9b59b6)
             embed.set_image(url=url)
 
         await ctx.send(embed=embed)
