@@ -318,8 +318,12 @@ class TicTacToe(Cog):
             await ctx.send("Game don't exist.")
             return
         game = self.games[game_id - 1]
-        await ctx.send(f"{game.winner} :trophy: vs {game.loser}")
-        await ctx.send(game.format_board())
+
+        embed = discord.Embed(
+            title=f"Match #{game_id} Game Board",
+            description=f"{game.winner} :trophy: vs {game.loser}\n\n{game.format_board()}"
+        )
+        await ctx.send(embed=embed)
 
 
 def setup(bot: Bot) -> None:
