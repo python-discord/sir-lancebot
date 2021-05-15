@@ -8,8 +8,7 @@ from discord.ext import commands
 class WrappedMessageConverter(commands.MessageConverter):
     """A converter that handles embed-suppressed links like <http://example.com>."""
 
-    @staticmethod
-    async def convert(ctx: commands.Context, argument: str) -> discord.Message:
+    async def convert(self, ctx: commands.Context, argument: str) -> discord.Message:
         """Wrap the commands.MessageConverter to handle <> delimited message links."""
         # It's possible to wrap a message in [<>] as well, and it's supported because its easy
         if argument.startswith("[") and argument.endswith("]"):
