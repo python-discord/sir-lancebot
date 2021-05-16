@@ -11,6 +11,7 @@ import discord
 from discord.ext import commands
 from fuzzywuzzy import fuzz
 
+from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES, Roles
 
 logger = logging.getLogger(__name__)
@@ -192,7 +193,7 @@ DYNAMIC_QUESTIONS_FORMAT_FUNCS = {
 class TriviaQuiz(commands.Cog):
     """A cog for all quiz commands."""
 
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
         self.game_status = {}  # A variable to store the game status: either running or not running.
@@ -243,7 +244,6 @@ class TriviaQuiz(commands.Cog):
                 "Game is already running... "
                 f"do `{self.bot.command_prefix}quiz stop`"
             )
-
             return
 
         # Send embed showing available categories if inputted category is invalid.
@@ -585,6 +585,6 @@ class TriviaQuiz(commands.Cog):
         await channel.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load the TriviaQuiz cog."""
     bot.add_cog(TriviaQuiz(bot))

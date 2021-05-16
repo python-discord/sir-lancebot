@@ -4,14 +4,13 @@ from typing import Tuple
 
 from discord.ext import commands
 
+from bot.bot import Bot
+
 log = logging.getLogger(__name__)
 
 
 class TimeLeft(commands.Cog):
     """A Cog that tells you how long left until Hacktober is over!"""
-
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
 
     def in_hacktober(self) -> bool:
         """Return True if the current time is within Hacktoberfest."""
@@ -64,6 +63,6 @@ class TimeLeft(commands.Cog):
             )
 
 
-def setup(bot: commands.Bot) -> None:
-    """Cog load."""
-    bot.add_cog(TimeLeft(bot))
+def setup(bot: Bot) -> None:
+    """Load the Time Left Cog."""
+    bot.add_cog(TimeLeft())
