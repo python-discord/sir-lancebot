@@ -32,7 +32,7 @@ class LinePaginator(Paginator):
             prefix: str = '```',
             suffix: str = '```',
             max_size: int = 2000,
-            max_lines: int = None,
+            max_lines: Optional[int] = None,
             linesep: str = "\n"
     ):
         """
