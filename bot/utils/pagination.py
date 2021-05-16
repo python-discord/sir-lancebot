@@ -27,7 +27,14 @@ class EmptyPaginatorEmbed(Exception):
 class LinePaginator(Paginator):
     """A class that aids in paginating code blocks for Discord messages."""
 
-    def __init__(self, prefix: str = "```", suffix: str = "```", max_size: int = 2000, max_lines: int = None):
+    def __init__(
+            self,
+            prefix: str = '```',
+            suffix: str = '```',
+            max_size: int = 2000,
+            max_lines: Optional[int] = None,
+            linesep: str = "\n"
+    ):
         """
         Overrides the Paginator.__init__ from inside discord.ext.commands.
 
@@ -36,9 +43,13 @@ class LinePaginator(Paginator):
         `max_size` and `max_lines` denote the maximum amount of codepoints and lines
         allowed per page.
         """
-        self.prefix = prefix
-        self.suffix = suffix
-        self.max_size = max_size - len(suffix)
+        super().__init__(
+            prefix,
+            suffix,
+            max_size - len(suffix),
+            linesep
+        )
+
         self.max_lines = max_lines
         self._current_page = [prefix]
         self._linecount = 0
