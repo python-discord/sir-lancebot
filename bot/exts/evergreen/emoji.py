@@ -8,7 +8,9 @@ from typing import List, Optional, Tuple
 from discord import Color, Embed, Emoji
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Colours, ERROR_REPLIES
+from bot.utils.extensions import invoke_help_command
 from bot.utils.pagination import LinePaginator
 from bot.utils.time import time_since
 
@@ -17,9 +19,6 @@ log = logging.getLogger(__name__)
 
 class Emojis(commands.Cog):
     """A collection of commands related to emojis in the server."""
-
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
 
     @staticmethod
     def embed_builder(emoji: dict) -> Tuple[Embed, List[str]]:
@@ -47,9 +46,9 @@ class Emojis(commands.Cog):
                 else:
                     emoji_info = f"There is **{len(category_emojis)}** emoji in the **{category_name}** category."
                 if emoji_choice.animated:
-                    msg.append(f'<a:{emoji_choice.name}:{emoji_choice.id}> {emoji_info}')
+                    msg.append(f"<a:{emoji_choice.name}:{emoji_choice.id}> {emoji_info}")
                 else:
-                    msg.append(f'<:{emoji_choice.name}:{emoji_choice.id}> {emoji_info}')
+                    msg.append(f"<:{emoji_choice.name}:{emoji_choice.id}> {emoji_info}")
         return embed, msg
 
     @staticmethod
@@ -65,7 +64,7 @@ class Emojis(commands.Cog):
         for emoji in emojis:
             emoji_dict[emoji.name.split("_")[0]].append(emoji)
 
-        error_comp = ', '.join(emoji_dict)
+        error_comp = ", ".join(emoji_dict)
         msg.append(f"These are the valid emoji categories:\n```{error_comp}```")
         return embed, msg
 
@@ -75,7 +74,7 @@ class Emojis(commands.Cog):
         if emoji is not None:
             await ctx.invoke(self.info_command, emoji)
         else:
-            await ctx.send_help(ctx.command)
+            await invoke_help_command(ctx)
 
     @emoji_group.command(name="count", aliases=("c",))
     async def count_command(self, ctx: commands.Context, *, category_query: str = None) -> None:
@@ -85,7 +84,7 @@ class Emojis(commands.Cog):
         if not ctx.guild.emojis:
             await ctx.send("No emojis found.")
             return
-        log.trace(f"Emoji Category {'' if category_query else 'not '}provided by the user")
+        log.trace(f"Emoji Category {'' if category_query else 'not '}provided by the user.")
         for emoji in ctx.guild.emojis:
             emoji_category = emoji.name.split("_")[0]
 
@@ -119,6 +118,6 @@ class Emojis(commands.Cog):
         await ctx.send(embed=emoji_information)
 
 
-def setup(bot: commands.Bot) -> None:
-    """Add the Emojis cog into the bot."""
-    bot.add_cog(Emojis(bot))
+def setup(bot: Bot) -> None:
+    """Load the Emojis cog."""
+    bot.add_cog(Emojis())

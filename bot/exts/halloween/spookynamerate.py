@@ -6,14 +6,15 @@ from datetime import datetime, timedelta
 from logging import getLogger
 from os import getenv
 from pathlib import Path
-from typing import Dict, Union
+from typing import Union
 
 from async_rediscache import RedisCache
 from discord import Embed, Reaction, TextChannel, User
 from discord.colour import Colour
 from discord.ext import tasks
-from discord.ext.commands import Bot, Cog, Context, group
+from discord.ext.commands import Cog, Context, group
 
+from bot.bot import Bot
 from bot.constants import Channels, Client, Colours, Month
 from bot.utils.decorators import InMonthCheckFailure
 
@@ -34,7 +35,7 @@ ADDED_MESSAGES = [
 ]
 PING = "<@{id}>"
 
-EMOJI_MESSAGE = "\n".join([f"- {emoji} {val}" for emoji, val in EMOJIS_VAL.items()])
+EMOJI_MESSAGE = "\n".join(f"- {emoji} {val}" for emoji, val in EMOJIS_VAL.items())
 HELP_MESSAGE_DICT = {
     "title": "Spooky Name Rate",
     "description": f"Help for the `{Client.prefix}spookynamerate` command",
@@ -64,6 +65,11 @@ HELP_MESSAGE_DICT = {
     ],
 }
 
+# The names are from https://www.mockaroo.com/
+NAMES = json.loads(Path("bot/resources/halloween/spookynamerate_names.json").read_text("utf8"))
+FIRST_NAMES = NAMES["first_names"]
+LAST_NAMES = NAMES["last_names"]
+
 
 class SpookyNameRate(Cog):
     """
@@ -80,21 +86,13 @@ class SpookyNameRate(Cog):
     # The data cache stores small information such as the current name that is going on and whether it is the first time
     # the bot is running
     data = RedisCache()
-    debug = getenv('SPOOKYNAMERATE_DEBUG', False)  # Enable if you do not want to limit the commands to October or if
+    debug = getenv("SPOOKYNAMERATE_DEBUG", False)  # Enable if you do not want to limit the commands to October or if
     # you do not want to wait till 12 UTC. Note: if debug is enabled and you run `.cogs reload spookynamerate`, it
     # will automatically start the scoring and announcing the result (without waiting for 12, so do not expect it to.).
     # Also, it won't wait for the two hours (when the poll closes).
 
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
-
-        names_data = self.load_json(
-            Path("bot", "resources", "halloween", "spookynamerate_names.json")
-        )
-        self.first_names = names_data["first_names"]
-        self.last_names = names_data["last_names"]
-        # the names are from https://www.mockaroo.com/
-
         self.name = None
 
         self.bot.loop.create_task(self.load_vars())
@@ -116,7 +114,7 @@ class SpookyNameRate(Cog):
         """Get help on the Spooky Name Rate game."""
         await ctx.send(embed=Embed.from_dict(HELP_MESSAGE_DICT))
 
-    @spooky_name_rate.command(name="list", aliases=["all", "entries"])
+    @spooky_name_rate.command(name="list", aliases=("all", "entries"))
     async def list_entries(self, ctx: Context) -> None:
         """Send all the entries up till now in a single embed."""
         await ctx.send(embed=await self.get_responses_list(final=False))
@@ -133,18 +131,16 @@ class SpookyNameRate(Cog):
             "add an entry."
         )
 
-    @spooky_name_rate.command(name="add", aliases=["register"])
+    @spooky_name_rate.command(name="add", aliases=("register",))
     async def add_name(self, ctx: Context, *, name: str) -> None:
         """Use this command to add/register your spookified name."""
         if self.poll:
-            logger.info(f"{ctx.message.author} tried to add a name, but the poll had already started.")
+            logger.info(f"{ctx.author} tried to add a name, but the poll had already started.")
             await ctx.send("Sorry, the poll has started! You can try and participate in the next round though!")
             return
 
-        message = ctx.message
-
         for data in (json.loads(user_data) for _, user_data in await self.messages.items()):
-            if data["author"] == message.author.id:
+            if data["author"] == ctx.author.id:
                 await ctx.send(
                     "But you have already added an entry! Type "
                     f"`{self.bot.command_prefix}spookynamerate "
@@ -156,14 +152,14 @@ class SpookyNameRate(Cog):
                 await ctx.send("TOO LATE. Someone has already added this name.")
                 return
 
-        msg = await (await self.get_channel()).send(f"{message.author.mention} added the name {name!r}!")
+        msg = await (await self.get_channel()).send(f"{ctx.author.mention} added the name {name!r}!")
 
         await self.messages.set(
             msg.id,
             json.dumps(
                 {
                     "name": name,
-                    "author": message.author.id,
+                    "author": ctx.author.id,
                     "score": 0,
                 }
             ),
@@ -172,7 +168,7 @@ class SpookyNameRate(Cog):
         for emoji in EMOJIS_VAL:
             await msg.add_reaction(emoji)
 
-        logger.info(f"{message.author} added the name {name!r}")
+        logger.info(f"{ctx.author} added the name {name!r}")
 
     @spooky_name_rate.command(name="delete")
     async def delete_name(self, ctx: Context) -> None:
@@ -185,7 +181,7 @@ class SpookyNameRate(Cog):
 
             if ctx.author.id == data["author"]:
                 await self.messages.delete(message_id)
-                await ctx.send(f'Name deleted successfully ({data["name"]!r})!')
+                await ctx.send(f"Name deleted successfully ({data['name']!r})!")
                 return
 
         await ctx.send(
@@ -303,7 +299,7 @@ class SpookyNameRate(Cog):
                 await self.messages.clear()  # reset the messages
 
         # send the next name
-        self.name = f"{random.choice(self.first_names)} {random.choice(self.last_names)}"
+        self.name = f"{random.choice(FIRST_NAMES)} {random.choice(LAST_NAMES)}"
         await self.data.set("name", self.name)
 
         await channel.send(
@@ -370,12 +366,6 @@ class SpookyNameRate(Cog):
         return channel
 
     @staticmethod
-    def load_json(file: Path) -> Dict[str, str]:
-        """Loads a JSON file and returns its contents."""
-        with file.open("r", encoding="utf-8") as f:
-            return json.load(f)
-
-    @staticmethod
     def in_allowed_month() -> bool:
         """Returns whether running in the limited month."""
         if SpookyNameRate.debug:
@@ -397,5 +387,5 @@ class SpookyNameRate(Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Loads the SpookyNameRate Cog."""
+    """Load the SpookyNameRate Cog."""
     bot.add_cog(SpookyNameRate(bot))

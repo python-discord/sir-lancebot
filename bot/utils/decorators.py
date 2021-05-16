@@ -11,7 +11,7 @@ from discord import Colour, Embed
 from discord.ext import commands
 from discord.ext.commands import CheckFailure, Command, Context
 
-from bot.constants import ERROR_REPLIES, Month
+from bot.constants import Channels, ERROR_REPLIES, Month, WHITELISTED_CHANNELS
 from bot.utils import human_months, resolve_current_month
 from bot.utils.checks import in_whitelist_check
 
@@ -253,6 +253,12 @@ def whitelist_check(**default_kwargs: t.Container[int]) -> t.Callable[[Context],
         channels = set(kwargs.get("channels") or {})
         categories = kwargs.get("categories")
 
+        # Only output override channels + community_bot_commands
+        if channels:
+            default_whitelist_channels = set(WHITELISTED_CHANNELS)
+            default_whitelist_channels.discard(Channels.community_bot_commands)
+            channels.difference_update(default_whitelist_channels)
+
         # Add all whitelisted category channels
         if categories:
             for category_id in categories:
@@ -260,10 +266,10 @@ def whitelist_check(**default_kwargs: t.Container[int]) -> t.Callable[[Context],
                 if category is None:
                     continue
 
-                [channels.add(channel.id) for channel in category.text_channels]
+                channels.update(channel.id for channel in category.text_channels)
 
         if channels:
-            channels_str = ', '.join(f"<#{c_id}>" for c_id in channels)
+            channels_str = ", ".join(f"<#{c_id}>" for c_id in channels)
             message = f"Sorry, but you may only use this command within {channels_str}."
         else:
             message = "Sorry, but you may not use this command."

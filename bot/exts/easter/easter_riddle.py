@@ -1,18 +1,18 @@
 import asyncio
 import logging
 import random
-from json import load
+from json import loads
 from pathlib import Path
 
 import discord
 from discord.ext import commands
 
-from bot.constants import Colours
+from bot.bot import Bot
+from bot.constants import Colours, NEGATIVE_REPLIES
 
 log = logging.getLogger(__name__)
 
-with Path("bot/resources/easter/easter_riddle.json").open("r", encoding="utf8") as f:
-    RIDDLE_QUESTIONS = load(f)
+RIDDLE_QUESTIONS = loads(Path("bot/resources/easter/easter_riddle.json").read_text("utf8"))
 
 TIMELIMIT = 10
 
@@ -20,13 +20,13 @@ TIMELIMIT = 10
 class EasterRiddle(commands.Cog):
     """This cog contains the command for the Easter quiz!"""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
         self.winners = set()
         self.correct = ""
         self.current_channel = None
 
-    @commands.command(aliases=["riddlemethis", "riddleme"])
+    @commands.command(aliases=("riddlemethis", "riddleme"))
     async def riddle(self, ctx: commands.Context) -> None:
         """
         Gives a random riddle, then provides 2 hints at certain intervals before revealing the answer.
@@ -34,9 +34,21 @@ class EasterRiddle(commands.Cog):
         The duration of the hint interval can be configured by changing the TIMELIMIT constant in this file.
         """
         if self.current_channel:
-            return await ctx.send(f"A riddle is already being solved in {self.current_channel.mention}!")
+            await ctx.send(f"A riddle is already being solved in {self.current_channel.mention}!")
+            return
 
-        self.current_channel = ctx.message.channel
+        # Don't let users start in a DM
+        if not ctx.guild:
+            await ctx.send(
+                embed=discord.Embed(
+                    title=random.choice(NEGATIVE_REPLIES),
+                    description="You can't start riddles in DMs",
+                    colour=discord.Colour.red()
+                )
+            )
+            return
+
+        self.current_channel = ctx.channel
 
         random_question = random.choice(RIDDLE_QUESTIONS)
         question = random_question["question"]
@@ -95,6 +107,6 @@ class EasterRiddle(commands.Cog):
             self.winners.add(message.author.mention)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Easter Riddle Cog load."""
     bot.add_cog(EasterRiddle(bot))

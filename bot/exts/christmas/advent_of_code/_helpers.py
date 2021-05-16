@@ -44,7 +44,7 @@ REQUIRED_CACHE_KEYS = (
 
 AOC_EMBED_THUMBNAIL = (
     "https://raw.githubusercontent.com/python-discord"
-    "/branding/master/seasonal/christmas/server_icons/festive_256.gif"
+    "/branding/main/seasonal/christmas/server_icons/festive_256.gif"
 )
 
 # Create an easy constant for the EST timezone
@@ -108,7 +108,7 @@ def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
     # star view. We need that per star view to compute rank scores per star.
     for member in raw_leaderboard_data.values():
         name = member["name"] if member["name"] else f"Anonymous #{member['id']}"
-        member_id = member['id']
+        member_id = member["id"]
         leaderboard[member_id] = {"name": name, "score": 0, "star_1": 0, "star_2": 0}
 
         # Iterate over all days for this participant
@@ -119,7 +119,7 @@ def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
                 leaderboard[member_id][f"star_{star}"] += 1
 
                 # Record completion datetime for this participant for this day/star
-                completion_time = datetime.datetime.fromtimestamp(int(data['get_star_ts']))
+                completion_time = datetime.datetime.fromtimestamp(int(data["get_star_ts"]))
                 star_results[(day, star)].append(
                     StarResult(member_id=member_id, completion_time=completion_time)
                 )
@@ -133,7 +133,7 @@ def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
         if day in AdventOfCode.ignored_days:
             continue
 
-        sorted_result = sorted(results, key=operator.attrgetter('completion_time'))
+        sorted_result = sorted(results, key=operator.attrgetter("completion_time"))
         for rank, star_result in enumerate(sorted_result):
             leaderboard[star_result.member_id]["score"] += max_score - rank
 
@@ -307,7 +307,7 @@ async def fetch_leaderboard(invalidate_cache: bool = False) -> dict:
 
 def get_summary_embed(leaderboard: dict) -> discord.Embed:
     """Get an embed with the current summary stats of the leaderboard."""
-    leaderboard_url = leaderboard['full_leaderboard_url']
+    leaderboard_url = leaderboard["full_leaderboard_url"]
     refresh_minutes = AdventOfCode.leaderboard_cache_expiry_seconds // 60
 
     aoc_embed = discord.Embed(

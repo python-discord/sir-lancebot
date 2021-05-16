@@ -4,14 +4,6 @@ FROM python:3.9-slim
 ENV PIP_NO_CACHE_DIR=false \
     POETRY_VIRTUALENVS_CREATE=false
 
-# Install git to be able to dowload git dependencies in the Pipfile
-RUN apt-get -y update \
-    && apt-get install -y \
-        ffmpeg \
-        gcc \
-        build-essential \
-    && rm -rf /var/lib/apt/lists/*
-
 # Install Poetry and add it to the path
 RUN pip install --user poetry
 ENV PATH="${PATH}:/root/.local/bin"

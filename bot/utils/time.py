@@ -3,7 +3,7 @@ import datetime
 from dateutil.relativedelta import relativedelta
 
 
-# All these functions are from https://github.com/python-discord/bot/blob/master/bot/utils/time.py
+# All these functions are from https://github.com/python-discord/bot/blob/main/bot/utils/time.py
 def _stringify_time_unit(value: int, unit: str) -> str:
     """
     Returns a string to represent a value and time unit, ensuring that it uses the right plural form of the unit.
