@@ -1,24 +1,21 @@
 import logging
 import random
-from json import load
+from json import loads
 from pathlib import Path
 
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
-with open(Path("bot/resources/valentines/pickup_lines.json"), "r", encoding="utf8") as f:
-    pickup_lines = load(f)
+PICKUP_LINES = loads(Path("bot/resources/valentines/pickup_lines.json").read_text("utf8"))
 
 
 class PickupLine(commands.Cog):
     """A cog that gives random cheesy pickup lines."""
-
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
 
     @commands.command()
     async def pickupline(self, ctx: commands.Context) -> None:
@@ -27,18 +24,18 @@ class PickupLine(commands.Cog):
 
         Note that most of them are very cheesy.
         """
-        random_line = random.choice(pickup_lines['lines'])
+        random_line = random.choice(PICKUP_LINES["lines"])
         embed = discord.Embed(
-            title=':cheese: Your pickup line :cheese:',
-            description=random_line['line'],
+            title=":cheese: Your pickup line :cheese:",
+            description=random_line["line"],
             color=Colours.pink
         )
         embed.set_thumbnail(
-            url=random_line.get('image', pickup_lines['placeholder'])
+            url=random_line.get("image", PICKUP_LINES["placeholder"])
         )
         await ctx.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
-    """Pickup lines Cog load."""
-    bot.add_cog(PickupLine(bot))
+def setup(bot: Bot) -> None:
+    """Load the Pickup lines Cog."""
+    bot.add_cog(PickupLine())

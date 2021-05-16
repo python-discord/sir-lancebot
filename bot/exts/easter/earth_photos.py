@@ -3,24 +3,27 @@ import logging
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Colours
 from bot.constants import Tokens
 
 log = logging.getLogger(__name__)
 
+API_URL = "https://api.unsplash.com/photos/random"
+
 
 class EarthPhotos(commands.Cog):
     """This cog contains the command for earth photos."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
-    @commands.command(aliases=["earth"])
+    @commands.command(aliases=("earth",))
     async def earth_photos(self, ctx: commands.Context) -> None:
         """Returns a random photo of earth, sourced from Unsplash."""
         async with ctx.typing():
             async with self.bot.http_session.get(
-                    'https://api.unsplash.com/photos/random',
+                    API_URL,
                     params={"query": "planet_earth", "client_id": Tokens.unsplash_access_key}
             ) as r:
                 jsondata = await r.json()
@@ -55,7 +58,7 @@ class EarthPhotos(commands.Cog):
             await ctx.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load the Earth Photos cog."""
     if not Tokens.unsplash_access_key:
         log.warning("No Unsplash access key found. Cog not loading.")

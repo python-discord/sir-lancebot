@@ -9,6 +9,8 @@ import discord
 import matplotlib.pyplot as plt
 from discord.ext import commands
 
+from bot.bot import Bot
+
 # configure fonts and colors for matplotlib
 plt.rcParams.update(
     {
@@ -89,6 +91,11 @@ class Latex(commands.Cog):
             await ctx.send(file=discord.File(image, "latex.png"))
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load the Latex Cog."""
-    bot.add_cog(Latex(bot))
+    # As we have resource issues on this cog,
+    # we have it currently disabled while we fix it.
+    import logging
+    logging.info("Latex cog is currently disabled. It won't be loaded.")
+    return
+    bot.add_cog(Latex())

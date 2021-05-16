@@ -5,16 +5,15 @@ from random import choice
 
 from discord.ext import commands
 
+from bot.bot import Bot
+
 log = logging.getLogger(__name__)
-with Path('bot/resources/evergreen/speedrun_links.json').open(encoding="utf8") as file:
-    LINKS = json.load(file)
+
+LINKS = json.loads(Path("bot/resources/evergreen/speedrun_links.json").read_text("utf8"))
 
 
 class Speedrun(commands.Cog):
     """Commands about the video game speedrunning community."""
-
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
 
     @commands.command(name="speedrun")
     async def get_speedrun(self, ctx: commands.Context) -> None:
@@ -22,6 +21,6 @@ class Speedrun(commands.Cog):
         await ctx.send(choice(LINKS))
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load the Speedrun cog."""
-    bot.add_cog(Speedrun(bot))
+    bot.add_cog(Speedrun())
