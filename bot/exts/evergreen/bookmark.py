@@ -97,7 +97,7 @@ class Bookmark(commands.Cog):
         if not target_message:
             if not ctx.message.reference:
                 raise commands.UserInputError("You must either provide a valid message to bookmark, or reply to one.")
-            target_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+            target_message = await ctx.fetch_message(ctx.message.reference.message_id)
 
         # Prevent users from bookmarking a message in a channel they don't have access to
         permissions = ctx.author.permissions_in(target_message.channel)
