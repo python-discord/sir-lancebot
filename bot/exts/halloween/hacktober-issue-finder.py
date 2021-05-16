@@ -3,10 +3,10 @@ import logging
 import random
 from typing import Dict, Optional
 
-import aiohttp
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Month, Tokens
 from bot.utils.decorators import in_month
 
@@ -25,7 +25,7 @@ if GITHUB_TOKEN := Tokens.github:
 class HacktoberIssues(commands.Cog):
     """Find a random hacktober python issue on GitHub."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
         self.cache_normal = None
         self.cache_timer_normal = datetime.datetime(1, 1, 1)
@@ -41,7 +41,7 @@ class HacktoberIssues(commands.Cog):
         If the command is run with beginner (`.hacktoberissues beginner`):
         It will also narrow it down to the "first good issue" label.
         """
-        with ctx.typing():
+        async with ctx.typing():
             issues = await self.get_issues(ctx, option)
             if issues is None:
                 return
@@ -59,40 +59,41 @@ class HacktoberIssues(commands.Cog):
             log.debug("using cache")
             return self.cache_normal
 
-        async with aiohttp.ClientSession() as session:
+        if option == "beginner":
+            url = URL + '+label:"good first issue"'
+            if self.cache_beginner is not None:
+                page = random.randint(1, min(1000, self.cache_beginner["total_count"]) // 100)
+                url += f"&page={page}"
+        else:
+            url = URL
+            if self.cache_normal is not None:
+                page = random.randint(1, min(1000, self.cache_normal["total_count"]) // 100)
+                url += f"&page={page}"
+
+        log.debug(f"making api request to url: {url}")
+        async with self.bot.http_session.get(url, headers=REQUEST_HEADERS) as response:
+            if response.status != 200:
+                log.error(f"expected 200 status (got {response.status}) by the GitHub api.")
+                await ctx.send(
+                    f"ERROR: expected 200 status (got {response.status}) by the GitHub api.\n"
+                    f"{await response.text()}"
+                )
+                return None
+            data = await response.json()
+
+            if len(data["items"]) == 0:
+                log.error(f"no issues returned by GitHub API, with url: {response.url}")
+                await ctx.send(f"ERROR: no issues returned by GitHub API, with url: {response.url}")
+                return None
+
             if option == "beginner":
-                url = URL + '+label:"good first issue"'
-                if self.cache_beginner is not None:
-                    page = random.randint(1, min(1000, self.cache_beginner["total_count"]) // 100)
-                    url += f"&page={page}"
+                self.cache_beginner = data
+                self.cache_timer_beginner = ctx.message.created_at
             else:
-                url = URL
-                if self.cache_normal is not None:
-                    page = random.randint(1, min(1000, self.cache_normal["total_count"]) // 100)
-                    url += f"&page={page}"
+                self.cache_normal = data
+                self.cache_timer_normal = ctx.message.created_at
 
-            log.debug(f"making api request to url: {url}")
-            async with session.get(url, headers=REQUEST_HEADERS) as response:
-                if response.status != 200:
-                    log.error(f"expected 200 status (got {response.status}) from the GitHub api.")
-                    await ctx.send(f"ERROR: expected 200 status (got {response.status}) from the GitHub api.")
-                    await ctx.send(await response.text())
-                    return None
-                data = await response.json()
-
-                if len(data["items"]) == 0:
-                    log.error(f"no issues returned from GitHub api. with url: {response.url}")
-                    await ctx.send(f"ERROR: no issues returned from GitHub api. with url: {response.url}")
-                    return None
-
-                if option == "beginner":
-                    self.cache_beginner = data
-                    self.cache_timer_beginner = ctx.message.created_at
-                else:
-                    self.cache_normal = data
-                    self.cache_timer_normal = ctx.message.created_at
-
-                return data
+            return data
 
     @staticmethod
     def format_embed(issue: Dict) -> discord.Embed:
@@ -103,7 +104,7 @@ class HacktoberIssues(commands.Cog):
         labels = [label["name"] for label in issue["labels"]]
 
         embed = discord.Embed(title=title)
-        embed.description = body[:500] + '...' if len(body) > 500 else body
+        embed.description = body[:500] + "..." if len(body) > 500 else body
         embed.add_field(name="labels", value="\n".join(labels))
         embed.url = issue_url
         embed.set_footer(text=issue_url)
@@ -111,6 +112,6 @@ class HacktoberIssues(commands.Cog):
         return embed
 
 
-def setup(bot: commands.Bot) -> None:
-    """Hacktober issue finder Cog Load."""
+def setup(bot: Bot) -> None:
+    """Load the HacktoberIssue finder."""
     bot.add_cog(HacktoberIssues(bot))

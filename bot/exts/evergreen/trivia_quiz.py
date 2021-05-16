@@ -8,6 +8,7 @@ import discord
 from discord.ext import commands
 from fuzzywuzzy import fuzz
 
+from bot.bot import Bot
 from bot.constants import Roles
 
 
@@ -23,7 +24,7 @@ WRONG_ANS_RESPONSE = [
 class TriviaQuiz(commands.Cog):
     """A cog for all quiz commands."""
 
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: Bot) -> None:
         self.bot = bot
         self.questions = self.load_questions()
         self.game_status = {}  # A variable to store the game status: either running or not running.
@@ -40,11 +41,9 @@ class TriviaQuiz(commands.Cog):
     def load_questions() -> dict:
         """Load the questions from the JSON file."""
         p = Path("bot", "resources", "evergreen", "trivia_quiz.json")
-        with p.open(encoding="utf8") as json_data:
-            questions = json.load(json_data)
-            return questions
+        return json.loads(p.read_text("utf8"))
 
-    @commands.group(name="quiz", aliases=["trivia"], invoke_without_command=True)
+    @commands.group(name="quiz", aliases=("trivia",), invoke_without_command=True)
     async def quiz_game(self, ctx: commands.Context, category: str = None) -> None:
         """
         Start a quiz!
@@ -61,10 +60,11 @@ class TriviaQuiz(commands.Cog):
 
         # Stop game if running.
         if self.game_status[ctx.channel.id] is True:
-            return await ctx.send(
+            await ctx.send(
                 f"Game is already running..."
                 f"do `{self.bot.command_prefix}quiz stop`"
             )
+            return
 
         # Send embed showing available categories if inputted category is invalid.
         if category is None:
@@ -127,7 +127,7 @@ class TriviaQuiz(commands.Cog):
                 )
 
             try:
-                msg = await self.bot.wait_for('message', check=check, timeout=10)
+                msg = await self.bot.wait_for("message", check=check, timeout=10)
             except asyncio.TimeoutError:
                 # In case of TimeoutError and the game has been stopped, then do nothing.
                 if self.game_status[ctx.channel.id] is False:
@@ -299,6 +299,6 @@ class TriviaQuiz(commands.Cog):
         await channel.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
-    """Load the cog."""
+def setup(bot: Bot) -> None:
+    """Load the TriviaQuiz cog."""
     bot.add_cog(TriviaQuiz(bot))
