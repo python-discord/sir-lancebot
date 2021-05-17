@@ -270,7 +270,7 @@ class TriviaQuiz(commands.Cog):
 
         return json.loads(p.read_text(encoding="utf-8"))
 
-    @commands.group(name="quiz", aliases=["trivia"], invoke_without_command=True)
+    @commands.group(name="quiz", aliases=("trivia", "triviaquiz"), invoke_without_command=True)
     async def quiz_game(self, ctx: commands.Context, category: Optional[str], questions: Optional[int]) -> None:
         """
         Start a quiz!
