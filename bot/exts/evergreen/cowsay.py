@@ -25,7 +25,7 @@ class Cowsay(commands.Cog):
 
         {', '.join(localcharnames)}"""
     )
-    async def cowsay(self, ctx: commands.Context, character: str = "Cow", *, text: str = None) -> None:
+    async def cowsay(self, ctx: commands.Context, character: str = "Cow", *, text: Optional[str]) -> None:
         """Builds a cowsay string and sends it to Discord."""
         if not text:
             text = f"I'm a {character.lower()}"
