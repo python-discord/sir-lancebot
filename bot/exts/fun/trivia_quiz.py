@@ -3,12 +3,12 @@ import json
 import logging
 import operator
 import random
+from typing import Callable, Optional
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Optional
 
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 from rapidfuzz import fuzz
 
 from bot.bot import Bot
@@ -25,41 +25,15 @@ WRONG_ANS_RESPONSE = [
     "Better luck next time...",
 ]
 
-N_PREFIX_STARTS_AT = 5
-N_PREFIXES = [
-    "penta", "hexa", "hepta", "octa", "nona",
-    "deca", "hendeca", "dodeca", "trideca", "tetradeca",
-]
+RULES = (
+    "No cheating and have fun!",
+    "Points for each question reduces by 25 after 10s or after a hint. Total time is 30s per question"
+)
 
-PLANETS = [
-    ("1st", "Mercury"),
-    ("2nd", "Venus"),
-    ("3rd", "Earth"),
-    ("4th", "Mars"),
-    ("5th", "Jupiter"),
-    ("6th", "Saturn"),
-    ("7th", "Uranus"),
-    ("8th", "Neptune"),
-]
-
-TAXONOMIC_HIERARCHY = [
-    "species", "genus", "family", "order",
-    "class", "phylum", "kingdom", "domain",
-]
-
-UNITS_TO_BASE_UNITS = {
-    "hertz": ("(unit of frequency)", "s^-1"),
-    "newton": ("(unit of force)", "m*kg*s^-2"),
-    "pascal": ("(unit of pressure & stress)", "m^-1*kg*s^-2"),
-    "joule": ("(unit of energy & quantity of heat)", "m^2*kg*s^-2"),
-    "watt": ("(unit of power)", "m^2*kg*s^-3"),
-    "coulomb": ("(unit of electric charge & quantity of electricity)", "s*A"),
-    "volt": ("(unit of voltage & electromotive force)", "m^2*kg*s^-3*A^-1"),
-    "farad": ("(unit of capacitance)", "m^-2*kg^-1*s^4*A^2"),
-    "ohm": ("(unit of electric resistance)", "m^2*kg*s^-3*A^-2"),
-    "weber": ("(unit of magnetic flux)", "m^2*kg*s^-2*A^-1"),
-    "tesla": ("(unit of magnetic flux density)", "kg*s^-2*A^-1"),
-}
+RANDOM_WIKI_URL = "https://en.wikipedia.org/api/rest_v1/page/random/summary"
+TRIVIA_QUIZ_ICON = (
+    "https://raw.githubusercontent.com/python-discord/branding/main/icons/trivia_quiz/trivia-quiz-dist.png"
+)
 
 
 @dataclass(frozen=True)
@@ -70,123 +44,156 @@ class QuizEntry:
     answer: str
 
 
-def linear_system(q_format: str, a_format: str) -> QuizEntry:
-    """Generate a system of linear equations with two unknowns."""
-    x, y = random.randint(2, 5), random.randint(2, 5)
-    answer = a_format.format(x, y)
+class DynamicQuestionGen:
+    """Class that contains functions to generate math/science questions for TriviaQuiz Cog."""
 
-    coeffs = random.sample(range(1, 6), 4)
+    N_PREFIX_STARTS_AT = 5
+    N_PREFIXES = [
+        "penta", "hexa", "hepta", "octa", "nona",
+        "deca", "hendeca", "dodeca", "trideca", "tetradeca",
+    ]
 
-    question = q_format.format(
-        coeffs[0],
-        coeffs[1],
-        coeffs[0] * x + coeffs[1] * y,
-        coeffs[2],
-        coeffs[3],
-        coeffs[2] * x + coeffs[3] * y,
-    )
+    PLANETS = [
+        ("1st", "Mercury"),
+        ("2nd", "Venus"),
+        ("3rd", "Earth"),
+        ("4th", "Mars"),
+        ("5th", "Jupiter"),
+        ("6th", "Saturn"),
+        ("7th", "Uranus"),
+        ("8th", "Neptune"),
+    ]
 
-    return QuizEntry(question, answer)
+    TAXONOMIC_HIERARCHY = [
+        "species", "genus", "family", "order",
+        "class", "phylum", "kingdom", "domain",
+    ]
 
+    UNITS_TO_BASE_UNITS = {
+        "hertz": ("(unit of frequency)", "s^-1"),
+        "newton": ("(unit of force)", "m*kg*s^-2"),
+        "pascal": ("(unit of pressure & stress)", "m^-1*kg*s^-2"),
+        "joule": ("(unit of energy & quantity of heat)", "m^2*kg*s^-2"),
+        "watt": ("(unit of power)", "m^2*kg*s^-3"),
+        "coulomb": ("(unit of electric charge & quantity of electricity)", "s*A"),
+        "volt": ("(unit of voltage & electromotive force)", "m^2*kg*s^-3*A^-1"),
+        "farad": ("(unit of capacitance)", "m^-2*kg^-1*s^4*A^2"),
+        "ohm": ("(unit of electric resistance)", "m^2*kg*s^-3*A^-2"),
+        "weber": ("(unit of magnetic flux)", "m^2*kg*s^-2*A^-1"),
+        "tesla": ("(unit of magnetic flux density)", "kg*s^-2*A^-1"),
+    }
 
-def mod_arith(q_format: str, a_format: str) -> QuizEntry:
-    """Generate a basic modular arithmetic question."""
-    quotient, m, b = random.randint(30, 40), random.randint(10, 20), random.randint(200, 350)
-    ans = random.randint(0, 9)  # max remainder is 9, since the minimum modulus is 10
-    a = quotient * m + ans - b
+    @staticmethod
+    def linear_system(q_format: str, a_format: str) -> QuizEntry:
+        """Generate a system of linear equations with two unknowns."""
+        x, y = random.randint(2, 5), random.randint(2, 5)
+        answer = a_format.format(x, y)
 
-    question = q_format.format(a, b, m)
-    answer = a_format.format(ans)
+        coeffs = random.sample(range(1, 6), 4)
 
-    return QuizEntry(question, answer)
-
-
-def ngonal_prism(q_format: str, a_format: str) -> QuizEntry:
-    """Generate a question regarding vertices on n-gonal prisms."""
-    n = random.randint(0, len(N_PREFIXES) - 1)
-
-    question = q_format.format(N_PREFIXES[n])
-    answer = a_format.format((n + N_PREFIX_STARTS_AT) * 2)
-
-    return QuizEntry(question, answer)
-
-
-def imag_sqrt(q_format: str, a_format: str) -> QuizEntry:
-    """Generate a negative square root question."""
-    ans_coeff = random.randint(3, 10)
-
-    question = q_format.format(ans_coeff ** 2)
-    answer = a_format.format(ans_coeff)
-
-    return QuizEntry(question, answer)
-
-
-def binary_calc(q_format: str, a_format: str) -> QuizEntry:
-    """Generate a binary calculation question."""
-    a = random.randint(15, 20)
-    b = random.randint(10, a)
-    oper = random.choice(
-        (
-            ("+", operator.add),
-            ("-", operator.sub),
-            ("*", operator.mul),
+        question = q_format.format(
+            coeffs[0],
+            coeffs[1],
+            coeffs[0] * x + coeffs[1] * y,
+            coeffs[2],
+            coeffs[3],
+            coeffs[2] * x + coeffs[3] * y,
         )
-    )
 
-    # if the operator is multiplication, lower the values of the two operands to make it easier
-    if oper[0] == "*":
-        a -= 5
-        b -= 5
+        return QuizEntry(question, answer)
 
-    question = q_format.format(a, oper[0], b)
-    answer = a_format.format(oper[1](a, b))
+    def mod_arith(self, q_format: str, a_format: str) -> QuizEntry:
+        """Generate a basic modular arithmetic question."""
+        quotient, m, b = random.randint(30, 40), random.randint(10, 20), random.randint(200, 350)
+        ans = random.randint(0, 9)  # max remainder is 9, since the minimum modulus is 10
+        a = quotient * m + ans - b
 
-    return QuizEntry(question, answer)
+        question = q_format.format(a, b, m)
+        answer = a_format.format(ans)
 
+        return QuizEntry(question, answer)
 
-def solar_system(q_format: str, a_format: str) -> QuizEntry:
-    """Generate a question on the planets of the Solar System."""
-    planet = random.choice(PLANETS)
+    def ngonal_prism(self, q_format: str, a_format: str) -> QuizEntry:
+        """Generate a question regarding vertices on n-gonal prisms."""
+        n = random.randint(0, len(self.N_PREFIXES) - 1)
 
-    question = q_format.format(planet[0])
-    answer = a_format.format(planet[1])
+        question = q_format.format(self.N_PREFIXES[n])
+        answer = a_format.format((n + self.N_PREFIX_STARTS_AT) * 2)
 
-    return QuizEntry(question, answer)
+        return QuizEntry(question, answer)
 
+    def imag_sqrt(self, q_format: str, a_format: str) -> QuizEntry:
+        """Generate a negative square root question."""
+        ans_coeff = random.randint(3, 10)
 
-def taxonomic_rank(q_format: str, a_format: str) -> QuizEntry:
-    """Generate a question on taxonomic classification."""
-    level = random.randint(0, len(TAXONOMIC_HIERARCHY) - 2)
+        question = q_format.format(ans_coeff ** 2)
+        answer = a_format.format(ans_coeff)
 
-    question = q_format.format(TAXONOMIC_HIERARCHY[level])
-    answer = a_format.format(TAXONOMIC_HIERARCHY[level + 1])
+        return QuizEntry(question, answer)
 
-    return QuizEntry(question, answer)
+    def binary_calc(self, q_format: str, a_format: str) -> QuizEntry:
+        """Generate a binary calculation question."""
+        a = random.randint(15, 20)
+        b = random.randint(10, a)
+        oper = random.choice(
+            (
+                ("+", operator.add),
+                ("-", operator.sub),
+                ("*", operator.mul),
+            )
+        )
 
+        # if the operator is multiplication, lower the values of the two operands to make it easier
+        if oper[0] == "*":
+            a -= 5
+            b -= 5
 
-def base_units_convert(q_format: str, a_format: str) -> QuizEntry:
-    """Generate a SI base units conversion question."""
-    unit = random.choice(list(UNITS_TO_BASE_UNITS))
+        question = q_format.format(a, oper[0], b)
+        answer = a_format.format(oper[1](a, b))
 
-    question = q_format.format(
-        unit + " " + UNITS_TO_BASE_UNITS[unit][0]
-    )
-    answer = a_format.format(
-        UNITS_TO_BASE_UNITS[unit][1]
-    )
+        return QuizEntry(question, answer)
 
-    return QuizEntry(question, answer)
+    def solar_system(self, q_format: str, a_format: str) -> QuizEntry:
+        """Generate a question on the planets of the Solar System."""
+        planet = random.choice(self.PLANETS)
+
+        question = q_format.format(planet[0])
+        answer = a_format.format(planet[1])
+
+        return QuizEntry(question, answer)
+
+    def taxonomic_rank(self, q_format: str, a_format: str) -> QuizEntry:
+        """Generate a question on taxonomic classification."""
+        level = random.randint(0, len(self.TAXONOMIC_HIERARCHY) - 2)
+
+        question = q_format.format(self.TAXONOMIC_HIERARCHY[level])
+        answer = a_format.format(self.TAXONOMIC_HIERARCHY[level + 1])
+
+        return QuizEntry(question, answer)
+
+    def base_units_convert(self, q_format: str, a_format: str) -> QuizEntry:
+        """Generate a SI base units conversion question."""
+        unit = random.choice(list(self.UNITS_TO_BASE_UNITS))
+
+        question = q_format.format(
+            unit + " " + self.UNITS_TO_BASE_UNITS[unit][0]
+        )
+        answer = a_format.format(
+            self.UNITS_TO_BASE_UNITS[unit][1]
+        )
+
+        return QuizEntry(question, answer)
 
 
 DYNAMIC_QUESTIONS_FORMAT_FUNCS = {
-    201: linear_system,
-    202: mod_arith,
-    203: ngonal_prism,
-    204: imag_sqrt,
-    205: binary_calc,
-    301: solar_system,
-    302: taxonomic_rank,
-    303: base_units_convert,
+    201: DynamicQuestionGen.linear_system,
+    202: DynamicQuestionGen.mod_arith,
+    203: DynamicQuestionGen.ngonal_prism,
+    204: DynamicQuestionGen.imag_sqrt,
+    205: DynamicQuestionGen.binary_calc,
+    301: DynamicQuestionGen.solar_system,
+    302: DynamicQuestionGen.taxonomic_rank,
+    303: DynamicQuestionGen.base_units_convert,
 }
 
 
@@ -212,7 +219,49 @@ class TriviaQuiz(commands.Cog):
             "science": "Put your understanding of science to the test!",
             "cs": "A large variety of computer science questions.",
             "python": "Trivia on our amazing language, Python!",
+            "wikipedia": "Guess the title of random wikipedia passages.",
         }
+
+        self.get_wiki_questions.start()
+
+    def cog_unload(self) -> None:
+        """Cancel `get_wiki_questions` task when Cog will unload."""
+        self.get_wiki_questions.cancel()
+
+    @tasks.loop(hours=1.0)
+    async def get_wiki_questions(self) -> None:
+        """Get 10 random questions from wikipedia and format them like the questions in resources/."""
+        wiki_questions = []
+        # trivia_quiz.json follows a pattern, every new category starts with the next century.
+        start_id = 501
+
+        while len(wiki_questions) != 10:
+            async with self.bot.http_session.get(url=RANDOM_WIKI_URL) as r:
+                if r.status != 200:
+                    continue
+
+                raw_data = await r.json()
+
+                if not all(c.isalnum() for c in raw_data["title"]):
+                    # If the title contains non alphabet/numerical(s) then
+                    # don't append it to the question and move on to the next.
+                    # Eg. "Knight's night tour" would be skipped.
+                    continue
+
+                formatted_data = {
+                    "id": start_id,
+                    "question": f"Guess the title of the Wikipedia article.\n\n"
+                                # Sometimes the wikipedia title is given in the extract,
+                                # giving away the answers, to remove then, they are replaced
+                                # with '[redacted]'.
+                                f"{raw_data['extract'].replace(raw_data['title'], '[redacted]')}",
+                    "answer": raw_data["title"],
+                    "info": raw_data["extract"]
+                }
+                start_id += 1
+                wiki_questions.append(formatted_data)
+
+        self.questions["wikipedia"] = wiki_questions.copy()
 
     @staticmethod
     def load_questions() -> dict:
@@ -233,6 +282,7 @@ class TriviaQuiz(commands.Cog):
         - science: Put your understanding of science to the test!
         - cs: A large variety of computer science questions.
         - python: Trivia on our amazing language, Python!
+        - wikipedia: Guess the title of random wikipedia passages.
 
         (More to come!)
         """
@@ -430,21 +480,21 @@ class TriviaQuiz(commands.Cog):
 
                 await asyncio.sleep(2)
 
-    def make_start_embed(self, category: str) -> discord.Embed:
+    @staticmethod
+    def make_start_embed(category: str) -> discord.Embed:
         """Generate a starting/introduction embed for the quiz."""
+        rules = "\n".join([f"{index}: {rule}" for index, rule in enumerate(RULES, start=1)])
+
         start_embed = discord.Embed(
-            colour=Colours.blue,
-            title="A quiz game is starting!",
+            title="Quiz game Starting!!",
             description=(
-                f"This game consists of {self.question_limit + 1} questions.\n\n"
-                "**Rules: **\n"
-                "1. Only enclose your answer in backticks when the question tells you to.\n"
-                "2. If the question specifies an answer format, follow it or else it won't be accepted.\n"
-                "3. You have 30s per question. Points for each question reduces by 25 after 10s or after a hint.\n"
-                "4. No cheating and have fun!\n\n"
-                f"**Category**: {category}"
+                "Each game consists of 5 questions.\n"
+                f"**Rules :**\n{rules}"
+                f"\n **Category** : {category}"
             ),
+            colour=Colours.blue
         )
+        start_embed.set_thumbnail(url=TRIVIA_QUIZ_ICON)
 
         return start_embed
 
@@ -503,6 +553,7 @@ class TriviaQuiz(commands.Cog):
             title="Score Board",
             description="",
         )
+        embed.set_thumbnail(url=TRIVIA_QUIZ_ICON)
 
         sorted_dict = sorted(player_data.items(), key=operator.itemgetter(1), reverse=True)
         for item in sorted_dict:
