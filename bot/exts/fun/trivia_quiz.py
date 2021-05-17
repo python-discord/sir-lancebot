@@ -585,8 +585,8 @@ class TriviaQuiz(commands.Cog):
                 winners_mention = winner.mention
 
             await channel.send(
-                f"Congratulations {winners_mention} :tada: "
-                f"You have won this quiz game with a grand total of {highest_points} points!"
+                f"{winners_mention} Congratulations"
+                f"on winning this quiz game with a grand total of {highest_points} points :tada:"
             )
 
     def category_embed(self) -> discord.Embed:
