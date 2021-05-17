@@ -347,13 +347,13 @@ class TriviaQuiz(commands.Cog):
             await ctx.send(embed=start_embed)  # send an embed with the rules
             await asyncio.sleep(5)
 
-        done_question = []
+        done_questions = []
         hint_no = 0
         answers = None
 
         while self.game_status[ctx.channel.id]:
             # Exit quiz if number of questions for a round are already sent.
-            if len(done_question) > self.question_limit and hint_no == 0:
+            if len(done_questions) > self.question_limit and hint_no == 0:
                 await ctx.send("The round has ended.")
                 await self.declare_winner(ctx.channel, self.game_player_scores[ctx.channel.id])
 
@@ -368,8 +368,8 @@ class TriviaQuiz(commands.Cog):
                 # Select a random question which has not been used yet.
                 while True:
                     question_dict = random.choice(topic)
-                    if question_dict["id"] not in done_question:
-                        done_question.append(question_dict["id"])
+                    if question_dict["id"] not in done_questions:
+                        done_questions.append(question_dict["id"])
                         break
 
                 if "dynamic_id" not in question_dict:
@@ -392,7 +392,7 @@ class TriviaQuiz(commands.Cog):
 
                 embed = discord.Embed(
                     colour=Colours.gold,
-                    title=f"Question #{len(done_question)}",
+                    title=f"Question #{len(done_questions)}",
                     description=question,
                 )
 
@@ -442,7 +442,7 @@ class TriviaQuiz(commands.Cog):
                         answers,
                         False,
                         question_dict,
-                        self.question_limit - len(done_question) + 1,
+                        self.question_limit - len(done_questions) + 1,
                     )
                     await asyncio.sleep(1)
 
@@ -475,7 +475,7 @@ class TriviaQuiz(commands.Cog):
                     answers,
                     True,
                     question_dict,
-                    self.question_limit - len(done_question) + 1,
+                    self.question_limit - len(done_questions) + 1,
                 )
                 await self.send_score(ctx.channel, self.game_player_scores[ctx.channel.id])
 
