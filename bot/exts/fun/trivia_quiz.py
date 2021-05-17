@@ -3,9 +3,10 @@ import json
 import logging
 import operator
 import random
-from typing import Callable, Optional
+from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Callable, Optional
 
 import discord
 from discord.ext import commands, tasks
@@ -209,7 +210,7 @@ class TriviaQuiz(commands.Cog):
         self.questions = self.load_questions()
         self.question_limit = 0
 
-        self.player_scores = {}  # A variable to store all player's scores for a bot session.
+        self.player_scores = defaultdict(int)  # A variable to store all player's scores for a bot session.
         self.game_player_scores = {}  # A variable to store temporary game player's scores.
 
         self.categories = {
