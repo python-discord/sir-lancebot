@@ -1,28 +1,28 @@
 import asyncio
 import logging
 import random
-from json import load
+from json import loads
 from pathlib import Path
 from typing import Union
 
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
-with open(Path("bot/resources/easter/egghead_questions.json"), "r", encoding="utf8") as f:
-    EGGHEAD_QUESTIONS = load(f)
+EGGHEAD_QUESTIONS = loads(Path("bot/resources/easter/egghead_questions.json").read_text("utf8"))
 
 
 EMOJIS = [
-    '\U0001f1e6', '\U0001f1e7', '\U0001f1e8', '\U0001f1e9', '\U0001f1ea',
-    '\U0001f1eb', '\U0001f1ec', '\U0001f1ed', '\U0001f1ee', '\U0001f1ef',
-    '\U0001f1f0', '\U0001f1f1', '\U0001f1f2', '\U0001f1f3', '\U0001f1f4',
-    '\U0001f1f5', '\U0001f1f6', '\U0001f1f7', '\U0001f1f8', '\U0001f1f9',
-    '\U0001f1fa', '\U0001f1fb', '\U0001f1fc', '\U0001f1fd', '\U0001f1fe',
-    '\U0001f1ff'
+    "\U0001f1e6", "\U0001f1e7", "\U0001f1e8", "\U0001f1e9", "\U0001f1ea",
+    "\U0001f1eb", "\U0001f1ec", "\U0001f1ed", "\U0001f1ee", "\U0001f1ef",
+    "\U0001f1f0", "\U0001f1f1", "\U0001f1f2", "\U0001f1f3", "\U0001f1f4",
+    "\U0001f1f5", "\U0001f1f6", "\U0001f1f7", "\U0001f1f8", "\U0001f1f9",
+    "\U0001f1fa", "\U0001f1fb", "\U0001f1fc", "\U0001f1fd", "\U0001f1fe",
+    "\U0001f1ff"
 ]  # Regional Indicators A-Z (used for voting)
 
 TIMELIMIT = 30
@@ -31,11 +31,10 @@ TIMELIMIT = 30
 class EggheadQuiz(commands.Cog):
     """This cog contains the command for the Easter quiz!"""
 
-    def __init__(self, bot: commands.Bot) -> None:
-        self.bot = bot
+    def __init__(self) -> None:
         self.quiz_messages = {}
 
-    @commands.command(aliases=["eggheadquiz", "easterquiz"])
+    @commands.command(aliases=("eggheadquiz", "easterquiz"))
     async def eggquiz(self, ctx: commands.Context) -> None:
         """
         Gives a random quiz question, waits 30 seconds and then outputs the answer.
@@ -64,7 +63,7 @@ class EggheadQuiz(commands.Cog):
 
         del self.quiz_messages[msg.id]
 
-        msg = await ctx.channel.fetch_message(msg.id)  # Refreshes message
+        msg = await ctx.fetch_message(msg.id)  # Refreshes message
 
         total_no = sum([len(await r.users().flatten()) for r in msg.reactions]) - len(valid_emojis)  # - bot's reactions
 
@@ -114,6 +113,6 @@ class EggheadQuiz(commands.Cog):
             return await reaction.message.remove_reaction(reaction, user)
 
 
-def setup(bot: commands.Bot) -> None:
-    """Egghead Quiz Cog load."""
-    bot.add_cog(EggheadQuiz(bot))
+def setup(bot: Bot) -> None:
+    """Load the Egghead Quiz Cog."""
+    bot.add_cog(EggheadQuiz())

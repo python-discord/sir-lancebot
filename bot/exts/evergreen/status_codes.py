@@ -4,6 +4,8 @@ from random import choice
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
+
 HTTP_DOG_URL = "https://httpstatusdogs.com/img/{code}.jpg"
 HTTP_CAT_URL = "https://http.cat/{code}.jpg"
 
@@ -15,7 +17,7 @@ class HTTPStatusCodes(commands.Cog):
     If neither animal is selected a cat or dog is chosen randomly for the given status code.
     """
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @commands.group(name="http_status", aliases=("status", "httpstatus"), invoke_without_command=True)
@@ -26,10 +28,10 @@ class HTTPStatusCodes(commands.Cog):
         if await subcmd.can_run(ctx):
             await subcmd(ctx, code)
 
-    @http_status_group.command(name='cat')
+    @http_status_group.command(name="cat")
     async def http_cat(self, ctx: commands.Context, code: int) -> None:
         """Sends an embed with an image of a cat, portraying the status code."""
-        embed = discord.Embed(title=f'**Status: {code}**')
+        embed = discord.Embed(title=f"**Status: {code}**")
         url = HTTP_CAT_URL.format(code=code)
 
         try:
@@ -41,18 +43,18 @@ class HTTPStatusCodes(commands.Cog):
                     raise NotImplementedError
 
         except ValueError:
-            embed.set_footer(text='Inputted status code does not exist.')
+            embed.set_footer(text="Inputted status code does not exist.")
 
         except NotImplementedError:
-            embed.set_footer(text='Inputted status code is not implemented by http.cat yet.')
+            embed.set_footer(text="Inputted status code is not implemented by http.cat yet.")
 
         finally:
             await ctx.send(embed=embed)
 
-    @http_status_group.command(name='dog')
+    @http_status_group.command(name="dog")
     async def http_dog(self, ctx: commands.Context, code: int) -> None:
         """Sends an embed with an image of a dog, portraying the status code."""
-        embed = discord.Embed(title=f'**Status: {code}**')
+        embed = discord.Embed(title=f"**Status: {code}**")
         url = HTTP_DOG_URL.format(code=code)
 
         try:
@@ -64,15 +66,15 @@ class HTTPStatusCodes(commands.Cog):
                     raise NotImplementedError
 
         except ValueError:
-            embed.set_footer(text='Inputted status code does not exist.')
+            embed.set_footer(text="Inputted status code does not exist.")
 
         except NotImplementedError:
-            embed.set_footer(text='Inputted status code is not implemented by httpstatusdogs.com yet.')
+            embed.set_footer(text="Inputted status code is not implemented by httpstatusdogs.com yet.")
 
         finally:
             await ctx.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load the HTTPStatusCodes cog."""
     bot.add_cog(HTTPStatusCodes(bot))

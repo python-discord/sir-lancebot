@@ -17,38 +17,38 @@ from bot.constants import Roles
 
 SNAKE_RESOURCES = Path("bot/resources/snakes").absolute()
 
-h1 = r'''```
+h1 = r"""```
         ----
        ------
      /--------\
      |--------|
      |--------|
       \------/
-        ----```'''
-h2 = r'''```
+        ----```"""
+h2 = r"""```
         ----
        ------
      /---\-/--\
      |-----\--|
      |--------|
       \------/
-        ----```'''
-h3 = r'''```
+        ----```"""
+h3 = r"""```
         ----
        ------
      /---\-/--\
      |-----\--|
      |-----/--|
       \----\-/
-        ----```'''
-h4 = r'''```
+        ----```"""
+h4 = r"""```
         -----
        -----  \
      /--|  /---\
      |--\  -\---|
      |--\--/--  /
       \------- /
-        ------```'''
+        ------```"""
 stages = [h1, h2, h3, h4]
 snakes = {
     "Baby Python": "https://i.imgur.com/SYOcmSa.png",
@@ -114,8 +114,7 @@ ANGLE_RANGE = math.pi * 2
 
 def get_resource(file: str) -> List[dict]:
     """Load Snake resources JSON."""
-    with (SNAKE_RESOURCES / f"{file}.json").open(encoding="utf-8") as snakefile:
-        return json.load(snakefile)
+    return json.loads((SNAKE_RESOURCES / f"{file}.json").read_text("utf-8"))
 
 
 def smoothstep(t: float) -> float:
@@ -191,8 +190,9 @@ class PerlinNoiseFactory(object):
     def get_plain_noise(self, *point) -> float:
         """Get plain noise for a single point, without taking into account either octaves or tiling."""
         if len(point) != self.dimension:
-            raise ValueError("Expected {0} values, got {1}".format(
-                self.dimension, len(point)))
+            raise ValueError(
+                f"Expected {self.dimension} values, got {len(point)}"
+            )
 
         # Build a list of the (min, max) bounds in each dimension
         grid_coords = []
@@ -321,7 +321,7 @@ def create_snek_frame(
         image_dimensions[Y] / 2 - (dimension_range[Y] / 2 + min_dimensions[Y])
     )
 
-    image = Image.new(mode='RGB', size=image_dimensions, color=bg_color)
+    image = Image.new(mode="RGB", size=image_dimensions, color=bg_color)
     draw = ImageDraw(image)
     for index in range(1, len(points)):
         point = points[index]
@@ -345,7 +345,7 @@ def create_snek_frame(
 def frame_to_png_bytes(image: Image) -> io.BytesIO:
     """Convert image to byte stream."""
     stream = io.BytesIO()
-    image.save(stream, format='PNG')
+    image.save(stream, format="PNG")
     stream.seek(0)
     return stream
 
@@ -373,7 +373,7 @@ class SnakeAndLaddersGame:
         self.snakes = snakes
         self.ctx = context
         self.channel = self.ctx.channel
-        self.state = 'booting'
+        self.state = "booting"
         self.started = False
         self.author = self.ctx.author
         self.players = []
@@ -413,7 +413,7 @@ class SnakeAndLaddersGame:
             "**Snakes and Ladders**: A new game is about to start!",
             file=File(
                 str(SNAKE_RESOURCES / "snakes_and_ladders" / "banner.jpg"),
-                filename='Snakes and Ladders.jpg'
+                filename="Snakes and Ladders.jpg"
             )
         )
         startup = await self.channel.send(
@@ -423,7 +423,7 @@ class SnakeAndLaddersGame:
         for emoji in STARTUP_SCREEN_EMOJI:
             await startup.add_reaction(emoji)
 
-        self.state = 'waiting'
+        self.state = "waiting"
 
         while not self.started:
             try:
@@ -460,7 +460,7 @@ class SnakeAndLaddersGame:
         self.players.append(user)
         self.player_tiles[user.id] = 1
 
-        avatar_bytes = await user.avatar_url_as(format='jpeg', size=PLAYER_ICON_IMAGE_SIZE).read()
+        avatar_bytes = await user.avatar_url_as(format="jpeg", size=PLAYER_ICON_IMAGE_SIZE).read()
         im = Image.open(io.BytesIO(avatar_bytes)).resize((BOARD_PLAYER_SIZE, BOARD_PLAYER_SIZE))
         self.avatar_images[user.id] = im
 
@@ -475,7 +475,7 @@ class SnakeAndLaddersGame:
             if user == p:
                 await self.channel.send(user.mention + " You are already in the game.", delete_after=10)
                 return
-        if self.state != 'waiting':
+        if self.state != "waiting":
             await self.channel.send(user.mention + " You cannot join at this time.", delete_after=10)
             return
         if len(self.players) is MAX_PLAYERS:
@@ -510,7 +510,7 @@ class SnakeAndLaddersGame:
                     delete_after=10
                 )
 
-                if self.state != 'waiting' and len(self.players) == 0:
+                if self.state != "waiting" and len(self.players) == 0:
                     await self.channel.send("**Snakes and Ladders**: The game has been surrendered!")
                     is_surrendered = True
                     self._destruct()
@@ -535,12 +535,12 @@ class SnakeAndLaddersGame:
             await self.channel.send(user.mention + " Only the author of the game can start it.", delete_after=10)
             return
 
-        if not self.state == 'waiting':
+        if not self.state == "waiting":
             await self.channel.send(user.mention + " The game cannot be started at this time.", delete_after=10)
             return
 
-        self.state = 'starting'
-        player_list = ', '.join(user.mention for user in self.players)
+        self.state = "starting"
+        player_list = ", ".join(user.mention for user in self.players)
         await self.channel.send("**Snakes and Ladders**: The game is starting!\nPlayers: " + player_list)
         await self.start_round()
 
@@ -556,10 +556,10 @@ class SnakeAndLaddersGame:
                 ))
             )
 
-        self.state = 'roll'
+        self.state = "roll"
         for user in self.players:
             self.round_has_rolled[user.id] = False
-        board_img = Image.open(str(SNAKE_RESOURCES / "snakes_and_ladders" / "board.jpg"))
+        board_img = Image.open(SNAKE_RESOURCES / "snakes_and_ladders" / "board.jpg")
         player_row_size = math.ceil(MAX_PLAYERS / 2)
 
         for i, player in enumerate(self.players):
@@ -574,8 +574,8 @@ class SnakeAndLaddersGame:
             board_img.paste(self.avatar_images[player.id],
                             box=(x_offset, y_offset))
 
-        board_file = File(frame_to_png_bytes(board_img), filename='Board.jpg')
-        player_list = '\n'.join((user.mention + ": Tile " + str(self.player_tiles[user.id])) for user in self.players)
+        board_file = File(frame_to_png_bytes(board_img), filename="Board.jpg")
+        player_list = "\n".join((user.mention + ": Tile " + str(self.player_tiles[user.id])) for user in self.players)
 
         # Store and send new messages
         temp_board = await self.channel.send(
@@ -644,7 +644,7 @@ class SnakeAndLaddersGame:
         if user.id not in self.player_tiles:
             await self.channel.send(user.mention + " You are not in the match.", delete_after=10)
             return
-        if self.state != 'roll':
+        if self.state != "roll":
             await self.channel.send(user.mention + " You may not roll at this time.", delete_after=10)
             return
         if self.round_has_rolled[user.id]:
@@ -673,7 +673,7 @@ class SnakeAndLaddersGame:
 
     async def _complete_round(self) -> None:
         """At the conclusion of a round check to see if there's been a winner."""
-        self.state = 'post_round'
+        self.state = "post_round"
 
         # check for winner
         winner = self._check_winner()
@@ -688,7 +688,7 @@ class SnakeAndLaddersGame:
 
     def _check_winner(self) -> Member:
         """Return a winning member if we're in the post-round state and there's a winner."""
-        if self.state != 'post_round':
+        if self.state != "post_round":
             return None
         return next((player for player in self.players if self.player_tiles[player.id] == 100),
                     None)

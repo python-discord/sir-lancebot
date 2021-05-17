@@ -4,13 +4,14 @@ from discord import Embed
 from discord.ext import commands
 
 from bot import start_time
+from bot.bot import Bot
 from bot.constants import Colours
 
 
 class Ping(commands.Cog):
     """Get info about the bot's ping and uptime."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @commands.command(name="ping")
@@ -39,6 +40,6 @@ class Ping(commands.Cog):
         await ctx.send(f"I started up {uptime_string}.")
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load the Ping cog."""
     bot.add_cog(Ping(bot))

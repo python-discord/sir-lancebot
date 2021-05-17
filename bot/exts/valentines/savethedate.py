@@ -1,31 +1,28 @@
 import logging
 import random
-from json import load
+from json import loads
 from pathlib import Path
 
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
 HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_heart:", ":two_hearts:"]
 
-with open(Path("bot/resources/valentines/date_ideas.json"), "r", encoding="utf8") as f:
-    VALENTINES_DATES = load(f)
+VALENTINES_DATES = loads(Path("bot/resources/valentines/date_ideas.json").read_text("utf8"))
 
 
 class SaveTheDate(commands.Cog):
     """A cog that gives random suggestion for a Valentine's date."""
 
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
-
     @commands.command()
     async def savethedate(self, ctx: commands.Context) -> None:
         """Gives you ideas for what to do on a date with your valentine."""
-        random_date = random.choice(VALENTINES_DATES['ideas'])
+        random_date = random.choice(VALENTINES_DATES["ideas"])
         emoji_1 = random.choice(HEART_EMOJIS)
         emoji_2 = random.choice(HEART_EMOJIS)
         embed = discord.Embed(
@@ -36,6 +33,6 @@ class SaveTheDate(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
-    """Save the date Cog Load."""
-    bot.add_cog(SaveTheDate(bot))
+def setup(bot: Bot) -> None:
+    """Load the Save the date Cog."""
+    bot.add_cog(SaveTheDate())

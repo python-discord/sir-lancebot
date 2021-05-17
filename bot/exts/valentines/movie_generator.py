@@ -6,6 +6,8 @@ from urllib import parse
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
+
 TMDB_API_KEY = environ.get("TMDB_API_KEY")
 
 log = logging.getLogger(__name__)
@@ -14,7 +16,7 @@ log = logging.getLogger(__name__)
 class RomanceMovieFinder(commands.Cog):
     """A Cog that returns a random romance movie suggestion to a user."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @commands.command(name="romancemovie")
@@ -52,13 +54,15 @@ class RomanceMovieFinder(commands.Cog):
                 embed.set_thumbnail(url="https://i.imgur.com/LtFtC8H.png")
                 await ctx.send(embed=embed)
             except KeyError:
-                warning_message = "A KeyError was raised while fetching information on the movie. The API service" \
-                                  " could be unavailable or the API key could be set incorrectly."
+                warning_message = (
+                    "A KeyError was raised while fetching information on the movie. The API service"
+                    " could be unavailable or the API key could be set incorrectly."
+                )
                 embed = discord.Embed(title=warning_message)
                 log.warning(warning_message)
                 await ctx.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
-    """Romance movie Cog load."""
+def setup(bot: Bot) -> None:
+    """Load the Romance movie Cog."""
     bot.add_cog(RomanceMovieFinder(bot))

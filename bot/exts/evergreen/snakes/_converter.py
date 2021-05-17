@@ -24,8 +24,8 @@ class Snake(Converter):
         await self.build_list()
         name = name.lower()
 
-        if name == 'python':
-            return 'Python (programming language)'
+        if name == "python":
+            return "Python (programming language)"
 
         def get_potential(iterable: Iterable, *, threshold: int = 80) -> List[str]:
             nonlocal name
@@ -47,12 +47,12 @@ class Snake(Converter):
         if name.lower() in self.special_cases:
             return self.special_cases.get(name.lower(), name.lower())
 
-        names = {snake['name']: snake['scientific'] for snake in self.snakes}
+        names = {snake["name"]: snake["scientific"] for snake in self.snakes}
         all_names = names.keys() | names.values()
         timeout = len(all_names) * (3 / 4)
 
         embed = discord.Embed(
-            title='Found multiple choices. Please choose the correct one.', colour=0x59982F)
+            title="Found multiple choices. Please choose the correct one.", colour=0x59982F)
         embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
 
         name = await disambiguate(ctx, get_potential(all_names), timeout=timeout, embed=embed)
@@ -63,14 +63,11 @@ class Snake(Converter):
         """Build list of snakes from the static snake resources."""
         # Get all the snakes
         if cls.snakes is None:
-            with (SNAKE_RESOURCES / "snake_names.json").open(encoding="utf8") as snakefile:
-                cls.snakes = json.load(snakefile)
-
+            cls.snakes = json.loads((SNAKE_RESOURCES / "snake_names.json").read_text("utf8"))
         # Get the special cases
         if cls.special_cases is None:
-            with (SNAKE_RESOURCES / "special_snakes.json").open(encoding="utf8") as snakefile:
-                special_cases = json.load(snakefile)
-            cls.special_cases = {snake['name'].lower(): snake for snake in special_cases}
+            special_cases = json.loads((SNAKE_RESOURCES / "special_snakes.json").read_text("utf8"))
+            cls.special_cases = {snake["name"].lower(): snake for snake in special_cases}
 
     @classmethod
     async def random(cls) -> str:
@@ -81,5 +78,5 @@ class Snake(Converter):
         so I can get it from here.
         """
         await cls.build_list()
-        names = [snake['scientific'] for snake in cls.snakes]
+        names = [snake["scientific"] for snake in cls.snakes]
         return random.choice(names)

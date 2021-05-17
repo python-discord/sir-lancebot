@@ -140,19 +140,20 @@ class Client(NamedTuple):
 
 
 class Colours:
-    blue = 0x0279fd
-    bright_green = 0x01d277
-    dark_green = 0x1f8b4c
-    orange = 0xe67e22
-    pink = 0xcf84e0
-    purple = 0xb734eb
-    soft_green = 0x68c290
-    soft_orange = 0xf9cb54
-    soft_red = 0xcd6d6d
-    yellow = 0xf9f586
+    blue = 0x0279FD
+    bright_green = 0x01D277
+    dark_green = 0x1F8B4C
+    orange = 0xE67E22
+    pink = 0xCF84E0
+    purple = 0xB734EB
+    soft_green = 0x68C290
+    soft_orange = 0xF9CB54
+    soft_red = 0xCD6D6D
+    yellow = 0xF9F586
     python_blue = 0x4B8BBE
     python_yellow = 0xFFD43B
-    grass_green = 0x66ff00
+    grass_green = 0x66FF00
+    gold = 0xE6C200
 
     easter_like_colours = [
         (255, 247, 0),
@@ -179,7 +180,7 @@ class Emojis:
     envelope = "\U0001F4E8"
     trashcan = environ.get("TRASHCAN_EMOJI", "<:trashcan:637136429717389331>")
     ok_hand = ":ok_hand:"
-    hand_raised = "\U0001f64b"
+    hand_raised = "\U0001F64B"
 
     dice_1 = "<:dice_1:755891608859443290>"
     dice_2 = "<:dice_2:755891608741740635>"
