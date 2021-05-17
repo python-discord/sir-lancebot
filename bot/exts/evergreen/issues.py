@@ -7,6 +7,7 @@ from dataclasses import dataclass
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import (
     Categories,
     Channels,
@@ -91,7 +92,7 @@ class IssueState:
 class Issues(commands.Cog):
     """Cog that allows users to retrieve issues from GitHub."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
         self.repos = []
 
@@ -157,13 +158,13 @@ class Issues(commands.Cog):
 
         issue_url = json_data.get("html_url")
 
-        return IssueState(repository, number, issue_url, json_data.get('title', ''), emoji)
+        return IssueState(repository, number, issue_url, json_data.get("title", ""), emoji)
 
     @staticmethod
     def format_embed(
-            results: t.List[t.Union[IssueState, FetchError]],
-            user: str,
-            repository: t.Optional[str] = None
+        results: t.List[t.Union[IssueState, FetchError]],
+        user: str,
+        repository: t.Optional[str] = None
     ) -> discord.Embed:
         """Take a list of IssueState or FetchError and format a Discord embed for them."""
         description_list = []
@@ -176,7 +177,7 @@ class Issues(commands.Cog):
 
         resp = discord.Embed(
             colour=Colours.bright_green,
-            description='\n'.join(description_list)
+            description="\n".join(description_list)
         )
 
         embed_url = f"https://github.com/{user}/{repository}" if repository else f"https://github.com/{user}"
@@ -186,11 +187,11 @@ class Issues(commands.Cog):
     @whitelist_override(channels=WHITELISTED_CHANNELS, categories=WHITELISTED_CATEGORIES)
     @commands.command(aliases=("pr",))
     async def issue(
-            self,
-            ctx: commands.Context,
-            numbers: commands.Greedy[int],
-            repository: str = "sir-lancebot",
-            user: str = "python-discord"
+        self,
+        ctx: commands.Context,
+        numbers: commands.Greedy[int],
+        repository: str = "sir-lancebot",
+        user: str = "python-discord"
     ) -> None:
         """Command to retrieve issue(s) from a GitHub repository."""
         # Remove duplicates
@@ -269,6 +270,6 @@ class Issues(commands.Cog):
         await message.channel.send(embed=resp)
 
 
-def setup(bot: commands.Bot) -> None:
-    """Cog Retrieves Issues From Github."""
+def setup(bot: Bot) -> None:
+    """Load the Issues cog."""
     bot.add_cog(Issues(bot))

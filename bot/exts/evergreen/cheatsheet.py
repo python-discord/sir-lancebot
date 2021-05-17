@@ -8,6 +8,7 @@ from discord.ext import commands
 from discord.ext.commands import BucketType, Context
 
 from bot import constants
+from bot.bot import Bot
 from bot.constants import Categories, Channels, Colours, ERROR_REPLIES
 from bot.utils.decorators import whitelist_override
 
@@ -23,17 +24,17 @@ Unknown cheat sheet. Please try to reformulate your query.
 If the problem persists send a message in <#{Channels.dev_contrib}>
 """
 
-URL = 'https://cheat.sh/python/{search}'
+URL = "https://cheat.sh/python/{search}"
 ESCAPE_TT = str.maketrans({"`": "\\`"})
 ANSI_RE = re.compile(r"\x1b\[.*?m")
 # We need to pass headers as curl otherwise it would default to aiohttp which would return raw html.
-HEADERS = {'User-Agent': 'curl/7.68.0'}
+HEADERS = {"User-Agent": "curl/7.68.0"}
 
 
 class CheatSheet(commands.Cog):
     """Commands that sends a result of a cht.sh search in code blocks."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @staticmethod
@@ -60,14 +61,18 @@ class CheatSheet(commands.Cog):
         body_space = min(1986 - len(url), 1000)
 
         if len(body_text) > body_space:
-            description = (f"**Result Of cht.sh**\n"
-                           f"```python\n{body_text[:body_space]}\n"
-                           f"... (truncated - too many lines)```\n"
-                           f"Full results: {url} ")
+            description = (
+                f"**Result Of cht.sh**\n"
+                f"```python\n{body_text[:body_space]}\n"
+                f"... (truncated - too many lines)```\n"
+                f"Full results: {url} "
+            )
         else:
-            description = (f"**Result Of cht.sh**\n"
-                           f"```python\n{body_text}```\n"
-                           f"{url}")
+            description = (
+                f"**Result Of cht.sh**\n"
+                f"```python\n{body_text}```\n"
+                f"{url}"
+            )
         return False, description
 
     @commands.command(
@@ -102,6 +107,6 @@ class CheatSheet(commands.Cog):
                 await ctx.send(content=description)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load the CheatSheet cog."""
     bot.add_cog(CheatSheet(bot))

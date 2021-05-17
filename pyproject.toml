@@ -1,9 +1,12 @@
-[[source]]
-url = "https://pypi.org/simple"
-verify_ssl = true
-name = "pypi"
+[tool.poetry]
+name = "sir-lancebot"
+version = "0.1.0"
+description = "A Discord bot designed as a fun and beginner-friendly learning environment for writing bot features and learning open-source."
+authors = ["Python Discord <info@pythondiscord.com>"]
+license = "MIT"
 
-[packages]
+[tool.poetry.dependencies]
+python = "^3.9"
 aiodns = "~=2.0"
 arrow = "~=0.14"
 beautifulsoup4 = "~=4.8"
@@ -12,13 +15,13 @@ pillow = "~=8.1"
 pytz = "~=2019.2"
 sentry-sdk = "~=0.19"
 PyYAML = "~=5.4"
-"discord.py" = "~=1.5.1"
+"discord.py" = "~=1.7.2"
 async-rediscache = {extras = ["fakeredis"], version = "~=0.1.4"}
 emojis = "~=0.6.0"
 matplotlib = "~=3.4.1"
 cowsay="~=4.0.0"
 
-[dev-packages]
+[tool.poetry.dev-dependencies]
 flake8 = "~=3.8"
 flake8-annotations = "~=2.3"
 flake8-bugbear = "~=20.1"
@@ -29,11 +32,14 @@ flake8-tidy-imports = "~=4.1"
 flake8-todo = "~=0.7"
 pep8-naming = "~=0.11"
 pre-commit = "~=2.1"
+taskipy = "^1.6.0"
+python-dotenv = "^0.15.0"
 
-[requires]
-python_version = "3.8"
-
-[scripts]
+[tool.taskipy.tasks]
 start = "python -m bot"
 lint = "pre-commit run --all-files"
 precommit = "pre-commit install"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

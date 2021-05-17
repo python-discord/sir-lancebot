@@ -114,7 +114,7 @@ class InternalEval(commands.Cog):
         """Evaluate the `code` in the current evaluation context."""
         context_vars = {
             "message": ctx.message,
-            "author": ctx.message.author,
+            "author": ctx.author,
             "channel": ctx.channel,
             "guild": ctx.guild,
             "ctx": ctx,
@@ -142,14 +142,14 @@ class InternalEval(commands.Cog):
         log.trace("Sending the formatted output back to the context")
         await self._send_output(ctx, eval_context.format_output())
 
-    @commands.group(name='internal', aliases=('int',))
+    @commands.group(name="internal", aliases=("int",))
     @with_role(Roles.admin)
     async def internal_group(self, ctx: commands.Context) -> None:
         """Internal commands. Top secret!"""
         if not ctx.invoked_subcommand:
             await invoke_help_command(ctx)
 
-    @internal_group.command(name='eval', aliases=('e',))
+    @internal_group.command(name="eval", aliases=("e",))
     @with_role(Roles.admin)
     async def eval(self, ctx: commands.Context, *, code: str) -> None:
         """Run eval in a REPL-like format."""
@@ -157,7 +157,7 @@ class InternalEval(commands.Cog):
             blocks = [block for block in match if block.group("block")]
 
             if len(blocks) > 1:
-                code = '\n'.join(block.group("code") for block in blocks)
+                code = "\n".join(block.group("code") for block in blocks)
             else:
                 match = match[0] if len(blocks) == 0 else blocks[0]
                 code, block, lang, delim = match.group("code", "block", "lang", "delim")
@@ -168,7 +168,7 @@ class InternalEval(commands.Cog):
         code = textwrap.dedent(code)
         await self._eval(ctx, code)
 
-    @internal_group.command(name='reset', aliases=("clear", "exit", "r", "c"))
+    @internal_group.command(name="reset", aliases=("clear", "exit", "r", "c"))
     @with_role(Roles.admin)
     async def reset(self, ctx: commands.Context) -> None:
         """Reset the context and locals of the eval session."""

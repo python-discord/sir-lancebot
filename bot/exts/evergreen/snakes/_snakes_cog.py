@@ -9,15 +9,15 @@ import textwrap
 import urllib
 from functools import partial
 from io import BytesIO
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
-import aiohttp
 import async_timeout
 from PIL import Image, ImageDraw, ImageFont
 from discord import Colour, Embed, File, Member, Message, Reaction
 from discord.errors import HTTPException
-from discord.ext.commands import Bot, Cog, CommandError, Context, bot_has_permissions, group
+from discord.ext.commands import Cog, CommandError, Context, bot_has_permissions, group
 
+from bot.bot import Bot
 from bot.constants import ERROR_REPLIES, Tokens
 from bot.exts.evergreen.snakes import _utils as utils
 from bot.exts.evergreen.snakes._converter import Snake
@@ -143,8 +143,8 @@ class Snakes(Cog):
     https://github.com/python-discord/code-jam-1
     """
 
-    wiki_brief = re.compile(r'(.*?)(=+ (.*?) =+)', flags=re.DOTALL)
-    valid_image_extensions = ('gif', 'png', 'jpeg', 'jpg', 'webp')
+    wiki_brief = re.compile(r"(.*?)(=+ (.*?) =+)", flags=re.DOTALL)
+    valid_image_extensions = ("gif", "png", "jpeg", "jpg", "webp")
 
     def __init__(self, bot: Bot):
         self.active_sal = {}
@@ -183,28 +183,28 @@ class Snakes(Cog):
         # Get the size of the snake icon, configure the height of the image box (yes, it changes)
         icon_width = 347  # Hardcoded, not much i can do about that
         icon_height = int((icon_width / snake.width) * snake.height)
-        frame_copies = icon_height // CARD['frame'].height + 1
+        frame_copies = icon_height // CARD["frame"].height + 1
         snake.thumbnail((icon_width, icon_height))
 
         # Get the dimensions of the final image
-        main_height = icon_height + CARD['top'].height + CARD['bottom'].height
-        main_width = CARD['frame'].width
+        main_height = icon_height + CARD["top"].height + CARD["bottom"].height
+        main_width = CARD["frame"].width
 
         # Start creating the foreground
         foreground = Image.new("RGBA", (main_width, main_height), (0, 0, 0, 0))
-        foreground.paste(CARD['top'], (0, 0))
+        foreground.paste(CARD["top"], (0, 0))
 
         # Generate the frame borders to the correct height
         for offset in range(frame_copies):
-            position = (0, CARD['top'].height + offset * CARD['frame'].height)
-            foreground.paste(CARD['frame'], position)
+            position = (0, CARD["top"].height + offset * CARD["frame"].height)
+            foreground.paste(CARD["frame"], position)
 
         # Add the image and bottom part of the image
-        foreground.paste(snake, (36, CARD['top'].height))  # Also hardcoded :(
-        foreground.paste(CARD['bottom'], (0, CARD['top'].height + icon_height))
+        foreground.paste(snake, (36, CARD["top"].height))  # Also hardcoded :(
+        foreground.paste(CARD["bottom"], (0, CARD["top"].height + icon_height))
 
         # Setup the background
-        back = random.choice(CARD['backs'])
+        back = random.choice(CARD["backs"])
         back_copies = main_height // back.height + 1
         full_image = Image.new("RGBA", (main_width, main_height), (0, 0, 0, 0))
 
@@ -216,11 +216,11 @@ class Snakes(Cog):
         full_image.paste(foreground, (0, 0), foreground)
 
         # Get the first two sentences of the info
-        description = '.'.join(content['info'].split(".")[:2]) + '.'
+        description = ".".join(content["info"].split(".")[:2]) + "."
 
         # Setup positioning variables
         margin = 36
-        offset = CARD['top'].height + icon_height + margin
+        offset = CARD["top"].height + icon_height + margin
 
         # Create blank rectangle image which will be behind the text
         rectangle = Image.new(
@@ -242,12 +242,12 @@ class Snakes(Cog):
         # Draw the text onto the final image
         draw = ImageDraw.Draw(full_image)
         for line in textwrap.wrap(description, 36):
-            draw.text([margin + 4, offset], line, font=CARD['font'])
-            offset += CARD['font'].getsize(line)[1]
+            draw.text([margin + 4, offset], line, font=CARD["font"])
+            offset += CARD["font"].getsize(line)[1]
 
         # Get the image contents as a BufferIO object
         buffer = BytesIO()
-        full_image.save(buffer, 'PNG')
+        full_image.save(buffer, "PNG")
         buffer.seek(0)
 
         return buffer
@@ -275,13 +275,13 @@ class Snakes(Cog):
 
         return message
 
-    async def _fetch(self, session: aiohttp.ClientSession, url: str, params: dict = None) -> dict:
+    async def _fetch(self, url: str, params: Optional[dict] = None) -> dict:
         """Asynchronous web request helper method."""
         if params is None:
             params = {}
 
         async with async_timeout.timeout(10):
-            async with session.get(url, params=params) as response:
+            async with self.bot.http_session.get(url, params=params) as response:
                 return await response.json()
 
     def _get_random_long_message(self, messages: List[str], retries: int = 10) -> str:
@@ -309,96 +309,95 @@ class Snakes(Cog):
         """
         snake_info = {}
 
-        async with aiohttp.ClientSession() as session:
-            params = {
-                'format': 'json',
-                'action': 'query',
-                'list': 'search',
-                'srsearch': name,
-                'utf8': '',
-                'srlimit': '1',
-            }
+        params = {
+            "format": "json",
+            "action": "query",
+            "list": "search",
+            "srsearch": name,
+            "utf8": "",
+            "srlimit": "1",
+        }
 
-            json = await self._fetch(session, URL, params=params)
+        json = await self._fetch(URL, params=params)
 
-            # Wikipedia does have a error page
-            try:
-                pageid = json["query"]["search"][0]["pageid"]
-            except KeyError:
-                # Wikipedia error page ID(?)
-                pageid = 41118
-            except IndexError:
-                return None
+        # Wikipedia does have a error page
+        try:
+            pageid = json["query"]["search"][0]["pageid"]
+        except KeyError:
+            # Wikipedia error page ID(?)
+            pageid = 41118
+        except IndexError:
+            return None
 
-            params = {
-                'format': 'json',
-                'action': 'query',
-                'prop': 'extracts|images|info',
-                'exlimit': 'max',
-                'explaintext': '',
-                'inprop': 'url',
-                'pageids': pageid
-            }
+        params = {
+            "format": "json",
+            "action": "query",
+            "prop": "extracts|images|info",
+            "exlimit": "max",
+            "explaintext": "",
+            "inprop": "url",
+            "pageids": pageid
+        }
 
-            json = await self._fetch(session, URL, params=params)
+        json = await self._fetch(URL, params=params)
 
-            # Constructing dict - handle exceptions later
-            try:
-                snake_info["title"] = json["query"]["pages"][f"{pageid}"]["title"]
-                snake_info["extract"] = json["query"]["pages"][f"{pageid}"]["extract"]
-                snake_info["images"] = json["query"]["pages"][f"{pageid}"]["images"]
-                snake_info["fullurl"] = json["query"]["pages"][f"{pageid}"]["fullurl"]
-                snake_info["pageid"] = json["query"]["pages"][f"{pageid}"]["pageid"]
-            except KeyError:
-                snake_info["error"] = True
+        # Constructing dict - handle exceptions later
+        try:
+            snake_info["title"] = json["query"]["pages"][f"{pageid}"]["title"]
+            snake_info["extract"] = json["query"]["pages"][f"{pageid}"]["extract"]
+            snake_info["images"] = json["query"]["pages"][f"{pageid}"]["images"]
+            snake_info["fullurl"] = json["query"]["pages"][f"{pageid}"]["fullurl"]
+            snake_info["pageid"] = json["query"]["pages"][f"{pageid}"]["pageid"]
+        except KeyError:
+            snake_info["error"] = True
 
-            if snake_info["images"]:
-                i_url = 'https://commons.wikimedia.org/wiki/Special:FilePath/'
-                image_list = []
-                map_list = []
-                thumb_list = []
+        if snake_info["images"]:
+            i_url = "https://commons.wikimedia.org/wiki/Special:FilePath/"
+            image_list = []
+            map_list = []
+            thumb_list = []
 
-                # Wikipedia has arbitrary images that are not snakes
-                banned = [
-                    'Commons-logo.svg',
-                    'Red%20Pencil%20Icon.png',
-                    'distribution',
-                    'The%20Death%20of%20Cleopatra%20arthur.jpg',
-                    'Head%20of%20holotype',
-                    'locator',
-                    'Woma.png',
-                    '-map.',
-                    '.svg',
-                    'ange.',
-                    'Adder%20(PSF).png'
-                ]
+            # Wikipedia has arbitrary images that are not snakes
+            banned = [
+                "Commons-logo.svg",
+                "Red%20Pencil%20Icon.png",
+                "distribution",
+                "The%20Death%20of%20Cleopatra%20arthur.jpg",
+                "Head%20of%20holotype",
+                "locator",
+                "Woma.png",
+                "-map.",
+                ".svg",
+                "ange.",
+                "Adder%20(PSF).png"
+            ]
 
-                for image in snake_info["images"]:
-                    # Images come in the format of `File:filename.extension`
-                    file, sep, filename = image["title"].partition(':')
-                    filename = filename.replace(" ", "%20")  # Wikipedia returns good data!
+            for image in snake_info["images"]:
+                # Images come in the format of `File:filename.extension`
+                file, sep, filename = image["title"].partition(":")
+                filename = filename.replace(" ", "%20")  # Wikipedia returns good data!
 
-                    if not filename.startswith('Map'):
-                        if any(ban in filename for ban in banned):
-                            pass
-                        else:
-                            image_list.append(f"{i_url}{filename}")
-                            thumb_list.append(f"{i_url}{filename}?width=100")
+                if not filename.startswith("Map"):
+                    if any(ban in filename for ban in banned):
+                        pass
                     else:
-                        map_list.append(f"{i_url}{filename}")
+                        image_list.append(f"{i_url}{filename}")
+                        thumb_list.append(f"{i_url}{filename}?width=100")
+                else:
+                    map_list.append(f"{i_url}{filename}")
 
-            snake_info["image_list"] = image_list
-            snake_info["map_list"] = map_list
-            snake_info["thumb_list"] = thumb_list
-            snake_info["name"] = name
+        snake_info["image_list"] = image_list
+        snake_info["map_list"] = map_list
+        snake_info["thumb_list"] = thumb_list
+        snake_info["name"] = name
 
-            match = self.wiki_brief.match(snake_info['extract'])
-            info = match.group(1) if match else None
+        match = self.wiki_brief.match(snake_info["extract"])
+        info = match.group(1) if match else None
 
-            if info:
-                info = info.replace("\n", "\n\n")  # Give us some proper paragraphs.
+        if info:
+            info = info.replace("\n", "\n\n")  # Give us some proper paragraphs.
 
-            snake_info["info"] = info
+        snake_info["info"] = info
 
         return snake_info
 
@@ -423,7 +422,7 @@ class Snakes(Cog):
         try:
             reaction, user = await ctx.bot.wait_for("reaction_add", timeout=45.0, check=predicate)
         except asyncio.TimeoutError:
-            await ctx.channel.send(f"You took too long. The correct answer was **{options[answer]}**.")
+            await ctx.send(f"You took too long. The correct answer was **{options[answer]}**.")
             await message.clear_reactions()
             return
 
@@ -438,13 +437,13 @@ class Snakes(Cog):
     # endregion
 
     # region: Commands
-    @group(name='snakes', aliases=('snake',), invoke_without_command=True)
+    @group(name="snakes", aliases=("snake",), invoke_without_command=True)
     async def snakes_group(self, ctx: Context) -> None:
         """Commands from our first code jam."""
         await invoke_help_command(ctx)
 
     @bot_has_permissions(manage_messages=True)
-    @snakes_group.command(name='antidote')
+    @snakes_group.command(name="antidote")
     @locked()
     async def antidote_command(self, ctx: Context) -> None:
         """
@@ -498,9 +497,11 @@ class Snakes(Cog):
         for i in range(0, 10):
             page_guess_list.append(f"{HOLE_EMOJI} {HOLE_EMOJI} {HOLE_EMOJI} {HOLE_EMOJI}")
             page_result_list.append(f"{CROSS_EMOJI} {CROSS_EMOJI} {CROSS_EMOJI} {CROSS_EMOJI}")
-            board.append(f"`{i+1:02d}` "
-                         f"{page_guess_list[i]} - "
-                         f"{page_result_list[i]}")
+            board.append(
+                f"`{i+1:02d}` "
+                f"{page_guess_list[i]} - "
+                f"{page_result_list[i]}"
+            )
             board.append(EMPTY_UNICODE)
         antidote_embed.add_field(name="10 guesses remaining", value="\n".join(board))
         board_id = await ctx.send(embed=antidote_embed)  # Display board
@@ -578,15 +579,19 @@ class Snakes(Cog):
             antidote_embed = Embed(color=SNAKE_COLOR, title="Antidote")
             antidote_embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
             antidote_embed.set_image(url="https://media.giphy.com/media/ceeN6U57leAhi/giphy.gif")
-            antidote_embed.add_field(name=EMPTY_UNICODE,
-                                     value=f"Sorry you didnt make the antidote in time.\n"
-                                           f"The formula was {' '.join(antidote_answer)}")
+            antidote_embed.add_field(
+                name=EMPTY_UNICODE,
+                value=(
+                    f"Sorry you didnt make the antidote in time.\n"
+                    f"The formula was {' '.join(antidote_answer)}"
+                )
+            )
             await board_id.edit(embed=antidote_embed)
 
         log.debug("Ending pagination and removing all reactions...")
         await board_id.clear_reactions()
 
-    @snakes_group.command(name='draw')
+    @snakes_group.command(name="draw")
     async def draw_command(self, ctx: Context) -> None:
         """
         Draws a random snek using Perlin noise.
@@ -621,10 +626,10 @@ class Snakes(Cog):
                 bg_color=bg_color
             )
             png_bytes = utils.frame_to_png_bytes(image_frame)
-            file = File(png_bytes, filename='snek.png')
+            file = File(png_bytes, filename="snek.png")
             await ctx.send(file=file)
 
-    @snakes_group.command(name='get')
+    @snakes_group.command(name="get")
     @bot_has_permissions(manage_messages=True)
     @locked()
     async def get_command(self, ctx: Context, *, name: Snake = None) -> None:
@@ -642,8 +647,9 @@ class Snakes(Cog):
             else:
                 data = await self._get_snek(name)
 
-            if data.get('error'):
-                return await ctx.send('Could not fetch data from Wikipedia.')
+            if data.get("error"):
+                await ctx.send("Could not fetch data from Wikipedia.")
+                return
 
             description = data["info"]
 
@@ -661,19 +667,25 @@ class Snakes(Cog):
 
             # Build and send the embed.
             embed = Embed(
-                title=data.get("title", data.get('name')),
+                title=data.get("title", data.get("name")),
                 description=description,
                 colour=0x59982F,
             )
 
-            emoji = 'https://emojipedia-us.s3.amazonaws.com/thumbs/60/google/3/snake_1f40d.png'
-            image = next((url for url in data['image_list']
-                          if url.endswith(self.valid_image_extensions)), emoji)
+            emoji = "https://emojipedia-us.s3.amazonaws.com/thumbs/60/google/3/snake_1f40d.png"
+
+            _iter = (
+                url
+                for url in data["image_list"]
+                if url.endswith(self.valid_image_extensions)
+            )
+            image = next(_iter, emoji)
+
             embed.set_image(url=image)
 
             await ctx.send(embed=embed)
 
-    @snakes_group.command(name='guess', aliases=('identify',))
+    @snakes_group.command(name="guess", aliases=("identify",))
     @locked()
     async def guess_command(self, ctx: Context) -> None:
         """
@@ -693,11 +705,15 @@ class Snakes(Cog):
 
                 data = await self._get_snek(snake)
 
-                image = next((url for url in data['image_list']
-                              if url.endswith(self.valid_image_extensions)), None)
+                _iter = (
+                    url
+                    for url in data["image_list"]
+                    if url.endswith(self.valid_image_extensions)
+                )
+                image = next(_iter, None)
 
             embed = Embed(
-                title='Which of the following is the snake in the image?',
+                title="Which of the following is the snake in the image?",
                 description="\n".join(
                     f"{'ABCD'[snakes.index(snake)]}: {snake}" for snake in snakes),
                 colour=SNAKE_COLOR
@@ -708,7 +724,7 @@ class Snakes(Cog):
         options = {f"{'abcd'[snakes.index(snake)]}": snake for snake in snakes}
         await self._validate_answer(ctx, guess, answer, options)
 
-    @snakes_group.command(name='hatch')
+    @snakes_group.command(name="hatch")
     async def hatch_command(self, ctx: Context) -> None:
         """
         Hatches your personal snake.
@@ -720,7 +736,7 @@ class Snakes(Cog):
         snake_image = utils.snakes[snake_name]
 
         # Hatch the snake
-        message = await ctx.channel.send(embed=Embed(description="Hatching your snake :snake:..."))
+        message = await ctx.send(embed=Embed(description="Hatching your snake :snake:..."))
         await asyncio.sleep(1)
 
         for stage in utils.stages:
@@ -734,12 +750,12 @@ class Snakes(Cog):
         my_snake_embed = Embed(description=":tada: Congrats! You hatched: **{0}**".format(snake_name))
         my_snake_embed.set_thumbnail(url=snake_image)
         my_snake_embed.set_footer(
-            text=" Owner: {0}#{1}".format(ctx.message.author.name, ctx.message.author.discriminator)
+            text=" Owner: {0}#{1}".format(ctx.author.name, ctx.author.discriminator)
         )
 
-        await ctx.channel.send(embed=my_snake_embed)
+        await ctx.send(embed=my_snake_embed)
 
-    @snakes_group.command(name='movie')
+    @snakes_group.command(name="movie")
     async def movie_command(self, ctx: Context) -> None:
         """
         Gets a random snake-related movie from TMDB.
@@ -800,12 +816,12 @@ class Snakes(Cog):
         embed.set_thumbnail(url="https://i.imgur.com/LtFtC8H.png")
 
         try:
-            await ctx.channel.send(embed=embed)
+            await ctx.send(embed=embed)
         except HTTPException as err:
-            await ctx.channel.send("An error occurred while fetching a snake-related movie!")
+            await ctx.send("An error occurred while fetching a snake-related movie!")
             raise err from None
 
-    @snakes_group.command(name='quiz')
+    @snakes_group.command(name="quiz")
     @locked()
     async def quiz_command(self, ctx: Context) -> None:
         """
@@ -828,10 +844,10 @@ class Snakes(Cog):
             )
         )
 
-        quiz = await ctx.channel.send("", embed=embed)
+        quiz = await ctx.send(embed=embed)
         await self._validate_answer(ctx, quiz, answer, options)
 
-    @snakes_group.command(name='name', aliases=('name_gen',))
+    @snakes_group.command(name="name", aliases=("name_gen",))
     async def name_command(self, ctx: Context, *, name: str = None) -> None:
         """
         Snakifies a username.
@@ -855,7 +871,7 @@ class Snakes(Cog):
         This was written by Iceman, and modified for inclusion into the bot by lemon.
         """
         snake_name = await self._get_snake_name()
-        snake_name = snake_name['name']
+        snake_name = snake_name["name"]
         snake_prefix = ""
 
         # Set aside every word in the snake name except the last.
@@ -900,9 +916,10 @@ class Snakes(Cog):
             color=SNAKE_COLOR
         )
 
-        return await ctx.send(embed=embed)
+        await ctx.send(embed=embed)
+        return
 
-    @snakes_group.command(name='sal')
+    @snakes_group.command(name="sal")
     @locked()
     async def sal_command(self, ctx: Context) -> None:
         """
@@ -921,7 +938,7 @@ class Snakes(Cog):
 
         await game.open_game()
 
-    @snakes_group.command(name='about')
+    @snakes_group.command(name="about")
     async def about_command(self, ctx: Context) -> None:
         """Show an embed with information about the event, its participants, and its winners."""
         contributors = [
@@ -964,9 +981,9 @@ class Snakes(Cog):
             )
         )
 
-        await ctx.channel.send(embed=embed)
+        await ctx.send(embed=embed)
 
-    @snakes_group.command(name='card')
+    @snakes_group.command(name="card")
     async def card_command(self, ctx: Context, *, name: Snake = None) -> None:
         """
         Create an interesting little card from a snake.
@@ -976,7 +993,7 @@ class Snakes(Cog):
         # Get the snake data we need
         if not name:
             name_obj = await self._get_snake_name()
-            name = name_obj['scientific']
+            name = name_obj["scientific"]
             content = await self._get_snek(name)
 
         elif isinstance(name, dict):
@@ -990,7 +1007,7 @@ class Snakes(Cog):
 
             stream = BytesIO()
             async with async_timeout.timeout(10):
-                async with self.bot.http_session.get(content['image_list'][0]) as response:
+                async with self.bot.http_session.get(content["image_list"][0]) as response:
                     stream.write(await response.read())
 
             stream.seek(0)
@@ -1001,10 +1018,10 @@ class Snakes(Cog):
         # Send it!
         await ctx.send(
             f"A wild {content['name'].title()} appears!",
-            file=File(final_buffer, filename=content['name'].replace(" ", "") + ".png")
+            file=File(final_buffer, filename=content["name"].replace(" ", "") + ".png")
         )
 
-    @snakes_group.command(name='fact')
+    @snakes_group.command(name="fact")
     async def fact_command(self, ctx: Context) -> None:
         """
         Gets a snake-related fact.
@@ -1018,9 +1035,9 @@ class Snakes(Cog):
             color=SNAKE_COLOR,
             description=question
         )
-        await ctx.channel.send(embed=embed)
+        await ctx.send(embed=embed)
 
-    @snakes_group.command(name='snakify')
+    @snakes_group.command(name="snakify")
     async def snakify_command(self, ctx: Context, *, message: str = None) -> None:
         """
         How would I talk if I were a snake?
@@ -1033,14 +1050,14 @@ class Snakes(Cog):
         """
         with ctx.typing():
             embed = Embed()
-            user = ctx.message.author
+            user = ctx.author
 
             if not message:
 
                 # Get a random message from the users history
                 messages = []
-                async for message in ctx.channel.history(limit=500).filter(
-                        lambda msg: msg.author == ctx.message.author  # Message was sent by author.
+                async for message in ctx.history(limit=500).filter(
+                        lambda msg: msg.author == ctx.author  # Message was sent by author.
                 ):
                     messages.append(message.content)
 
@@ -1059,9 +1076,9 @@ class Snakes(Cog):
             )
             embed.description = f"*{self._snakify(message)}*"
 
-            await ctx.channel.send(embed=embed)
+            await ctx.send(embed=embed)
 
-    @snakes_group.command(name='video', aliases=('get_video',))
+    @snakes_group.command(name="video", aliases=("get_video",))
     async def video_command(self, ctx: Context, *, search: str = None) -> None:
         """
         Gets a YouTube video about snakes.
@@ -1072,13 +1089,13 @@ class Snakes(Cog):
         """
         # Are we searching for anything specific?
         if search:
-            query = search + ' snake'
+            query = search + " snake"
         else:
             snake = await self._get_snake_name()
-            query = snake['name']
+            query = snake["name"]
 
         # Build the URL and make the request
-        url = 'https://www.googleapis.com/youtube/v3/search'
+        url = "https://www.googleapis.com/youtube/v3/search"
         response = await self.bot.http_session.get(
             url,
             params={
@@ -1094,14 +1111,14 @@ class Snakes(Cog):
         # Send the user a video
         if len(data) > 0:
             num = random.randint(0, len(data) - 1)
-            youtube_base_url = 'https://www.youtube.com/watch?v='
-            await ctx.channel.send(
+            youtube_base_url = "https://www.youtube.com/watch?v="
+            await ctx.send(
                 content=f"{youtube_base_url}{data[num]['id']['videoId']}"
             )
         else:
             log.warning(f"YouTube API error. Full response looks like {response}")
 
-    @snakes_group.command(name='zen')
+    @snakes_group.command(name="zen")
     async def zen_command(self, ctx: Context) -> None:
         """
         Gets a random quote from the Zen of Python, except as if spoken by a snake.
@@ -1120,7 +1137,7 @@ class Snakes(Cog):
 
         # Embed and send
         embed.description = zen_quote
-        await ctx.channel.send(
+        await ctx.send(
             embed=embed
         )
     # endregion
