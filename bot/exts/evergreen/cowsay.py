@@ -1,16 +1,21 @@
-import random
+from contextlib import suppress
 
 from cowsay import char_names, get_output_string
-from discord import Embed
+from discord import HTTPException
 from discord.ext import commands
 
-from bot.constants import Colours, NEGATIVE_REPLIES
+from bot.bot import Bot
+
+# Creates a local copy of char_names to filter out unsupported characters.
+localcharnames = list(char_names)
+for element in ["dragon", "trex", "stegosaurus", "turkey", "ghostbusters"]:
+    localcharnames.remove(element)
 
 
 class Cowsay(commands.Cog):
     """Cog for the cowsay command."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @commands.command(
@@ -18,45 +23,27 @@ class Cowsay(commands.Cog):
         help=f"""
         Generates a cowsay string and sends it. The available characters for cowsay are:
 
-        {', '.join(char_names)}"""
+        {', '.join(localcharnames)}"""
     )
     async def cowsay(self, ctx: commands.Context, character: str = "Cow", *, text: str = None) -> None:
         """Builds a cowsay string and sends it to Discord."""
         if not text:
             text = f"I'm a {character.lower()}"
-        text = text.lower()
         character = character.lower()
         if len(text) >= 150:
-            embed = Embed(
-                title=random.choice(NEGATIVE_REPLIES),
-                description="The given text is too long! Please submit something under 150 characters.",
-                color=Colours.soft_red
-            )
-            await ctx.send(embed=embed)
-            return
+            raise commands.BadArgument("The given text is too long! Please submit something under 150 characters.")
 
         try:
             msgbody = get_output_string(character, text)
         except Exception:
-            embed = Embed(
-                title=random.choice(NEGATIVE_REPLIES),
-                description="That is an invalid character! Please enter a valid one.",
-                color=Colours.soft_red
-            )
-            await ctx.send(embed=embed)
-            return
+            raise commands.BadArgument("That is an invalid character! Please enter a valid one.")
         # These characters break the message limit, so we say no
-        if character in ["dragon", "trex", "stegosaurus"]:
-            embed = Embed(
-                title=random.choice(NEGATIVE_REPLIES),
-                description="The given character is invalid! Please submit a valid character.",
-                color=Colours.soft_red
-            )
-            await ctx.send(embed=embed)
-            return
-        await ctx.send(f"```\n{msgbody}\n```")
+        if character in ["dragon", "trex", "stegosaurus", "turkey", "ghostbusters"]:
+            raise commands.BadArgument("The given character cannot be used! Please enter a valid character.")
+        with suppress(HTTPException):
+            await ctx.send(f"```\n{msgbody}\n```")
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Loads cowsay cog."""
     bot.add_cog(Cowsay(bot))
