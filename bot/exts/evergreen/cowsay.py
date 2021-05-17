@@ -7,7 +7,7 @@ from discord.ext import commands
 from bot.bot import Bot
 
 # Creates a local copy of char_names to filter out unsupported characters.
-localcharnames = list(char_names)
+LOCAL_CHAR_NAMES = list(char_names)
 for element in ["dragon", "trex", "stegosaurus", "turkey", "ghostbusters"]:
     localcharnames.remove(element)
 
