@@ -48,7 +48,7 @@ AOC_EMBED_THUMBNAIL = (
 )
 
 # Create an easy constant for the EST timezone
-EST = "America/Chicago"
+EST = "America/New_York"
 
 # Step size for the challenge countdown status
 COUNTDOWN_STEP = 60 * 5
