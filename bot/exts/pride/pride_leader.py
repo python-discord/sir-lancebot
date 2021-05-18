@@ -118,5 +118,5 @@ class PrideLeader(commands.Cog):
 
 
 def setup(bot: bot.Bot) -> None:
-    """Loads the Pride leader cog."""
+    """Load the Pride Leader Cog."""
     bot.add_cog(PrideLeader(bot))
