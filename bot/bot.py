@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import inspect
 import socket
 from contextlib import suppress
 from typing import Optional
@@ -47,7 +48,8 @@ class Bot(commands.Bot):
 
     async def get_unloaded_extensions(self) -> None:
         """Get all the unloaded extensions from cache."""
-        await self.unloads_cache.set("unloaded", 'bot.exts.evergreen.catify | bot.exts.evergreen.tmed | bot.exts.evergreen.uptim')
+        # For testing sir-lancebot#705
+        await self.unloads_cache.set("unloaded", 'bot.exts.evergreen.catify | bot.exts.evergreen.xkd')
         cache_dict = await self.unloads_cache.to_dict()
         extensions = cache_dict.get("unloaded")
         self.unloaded_extensions = [] if not extensions else extensions.split(" | ")
@@ -91,9 +93,7 @@ class Bot(commands.Bot):
 
         This only serves to make the info log, so that extensions don't have to.
         """
-        cog_name = ".".join((
-            cog.__repr__().split("object")[0].lower()[1::]
-        ).split(".")[:-1])
+        cog_name = inspect.getmodule(cog).__name__
 
         if cog_name in self.unloaded_extensions:
             self.unloaded_extensions.remove(cog_name)
