@@ -465,22 +465,24 @@ class TriviaQuiz(commands.Cog):
 
         Note: Only mods or the owner of the quiz can stop it.
         """
-        if self.game_status[ctx.channel.id] is True:
-            # Check if the author is the game starter or a moderator.
-            if ctx.author == self.game_owners[ctx.channel.id] or any(
-                Roles.moderator == role.id for role in ctx.author.roles
-            ):
+        try:
+            if self.game_status[ctx.channel.id]:
+                # Check if the author is the game starter or a moderator.
+                if ctx.author == self.game_owners[ctx.channel.id] or any(
+                    Roles.moderator == role.id for role in ctx.author.roles
+                ):
+                    self.game_status[ctx.channel.id] = False
+                    del self.game_owners[ctx.channel.id]
+                    self.game_player_scores[ctx.channel.id] = {}
 
-                await ctx.send("Quiz stopped.")
-                await self.declare_winner(ctx.channel, self.game_player_scores[ctx.channel.id])
+                    await ctx.send("Quiz stopped.")
+                    await self.declare_winner(ctx.channel, self.game_player_scores[ctx.channel.id])
 
-                self.game_status[ctx.channel.id] = False
-                del self.game_owners[ctx.channel.id]
-                self.game_player_scores[ctx.channel.id] = {}
-
+                else:
+                    await ctx.send(f"{ctx.author.mention}, you are not authorised to stop this game :ghost:!")
             else:
-                await ctx.send(f"{ctx.author.mention}, you are not authorised to stop this game :ghost:!")
-        else:
+                await ctx.send("No quiz running.")
+        except KeyError:
             await ctx.send("No quiz running.")
 
     @quiz_game.command(name="leaderboard")
