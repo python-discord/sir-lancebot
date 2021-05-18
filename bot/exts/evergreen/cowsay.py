@@ -44,5 +44,5 @@ class Cowsay(commands.Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Loads cowsay cog."""
+    """Load the Cowsay Cog."""
     bot.add_cog(Cowsay(bot))
