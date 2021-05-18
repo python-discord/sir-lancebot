@@ -28,6 +28,8 @@ class Cowsay(commands.Cog):
         if not text:
             text = f"I'm a {character.lower()}"
         character = character.lower()
+        if "```" in text:
+            raise commands.BadArgument("Please do not use codeblocks, it breaks the command.")
         if len(text) >= 150 and character != "beavis":
             raise commands.BadArgument("The given text is too long! Please submit something under 150 characters.")
         elif len(text) >= 100 and character == "beavis":
