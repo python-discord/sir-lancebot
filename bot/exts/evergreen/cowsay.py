@@ -28,16 +28,20 @@ class Cowsay(commands.Cog):
         if not text:
             text = f"I'm a {character.lower()}"
         character = character.lower()
-        if len(text) >= 150:
+        if len(text) >= 150 and character != "beavis":
             raise commands.BadArgument("The given text is too long! Please submit something under 150 characters.")
+        elif len(text) >= 100 and character == "beavis":
+            raise commands.BadArgument("The given text is too long! Please submit something under 100 characters.")
 
         if character not in SUPPORTED_CHAR_NAMES:
             raise commands.BadArgument("The given character cannot be used! Please enter a valid character.")
         else:
             msgbody = get_output_string(character, text)
 
-        with suppress(HTTPException):
+        try:
             await ctx.send(f"```\n{msgbody}\n```")
+        except HTTPException:
+            raise commands.BadArgument("The message given for the specified character was too long! Please use something shorter.")
 
 
 def setup(bot: Bot) -> None:
