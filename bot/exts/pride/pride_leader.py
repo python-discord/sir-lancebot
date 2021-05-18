@@ -23,8 +23,7 @@ class PrideLeader(commands.Cog):
     def __init__(self, bot: bot.Bot):
         self.bot = bot
 
-        with PRIDE_LEADERS_RESOURCE.open(encoding="utf8") as data:
-            self.pride = json.load(data)
+        self.pride = json.loads(PRIDE_LEADERS_RESOURCE.read_text("utf8"))
 
     def invalid_embed_generate(self, pride_leader: str) -> discord.Embed:
         """
@@ -104,7 +103,7 @@ class PrideLeader(commands.Cog):
         and if there is no pride leader given, return a random pride leader.
         """
         if not pride_leader_name:
-            leader = random.choice([name for name in self.pride])
+            leader = random.choice(list(self.pride))
         else:
             leader = self.pride.get(pride_leader_name.title())
             if not leader:
