@@ -24,9 +24,7 @@ class HTTPStatusCodes(commands.Cog):
     async def http_status_group(self, ctx: commands.Context, code: int) -> None:
         """Choose a cat or dog randomly for the given status code."""
         subcmd = choice((self.http_cat, self.http_dog))
-
-        if await subcmd.can_run(ctx):
-            await subcmd(ctx, code)
+        await subcmd(ctx, code)
 
     @http_status_group.command(name="cat")
     async def http_cat(self, ctx: commands.Context, code: int) -> None:
