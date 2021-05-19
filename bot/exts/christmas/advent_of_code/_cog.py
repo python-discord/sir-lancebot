@@ -3,6 +3,7 @@ import logging
 from datetime import datetime, timedelta
 from pathlib import Path
 
+import arrow
 import discord
 from discord.ext import commands
 
@@ -100,11 +101,11 @@ class AdventOfCode(commands.Cog):
     async def aoc_countdown(self, ctx: commands.Context) -> None:
         """Return time left until next day."""
         if not _helpers.is_in_advent():
-            datetime_now = datetime.now(_helpers.EST)
+            datetime_now = arrow.now(_helpers.EST)
 
             # Calculate the delta to this & next year's December 1st to see which one is closest and not in the past
-            this_year = datetime(datetime_now.year, 12, 1, tzinfo=_helpers.EST)
-            next_year = datetime(datetime_now.year + 1, 12, 1, tzinfo=_helpers.EST)
+            this_year = arrow.get(datetime(datetime_now.year, 12, 1), _helpers.EST)
+            next_year = arrow.get(datetime(datetime_now.year + 1, 12, 1), _helpers.EST)
             deltas = (dec_first - datetime_now for dec_first in (this_year, next_year))
             delta = min(delta for delta in deltas if delta >= timedelta())  # timedelta() gives 0 duration delta
 
