@@ -27,7 +27,7 @@ class Cowsay(commands.Cog):
         """Builds a cowsay string and sends it to Discord."""
         character = character.lower()
         if not text:
-            text = f"I'm a {character.lower()}"
+            text = f"I'm a {character}"
         if "```" in text:
             raise commands.BadArgument("Please do not use codeblocks, it breaks the command.")
         if len(text) >= 150 and character != "beavis":
