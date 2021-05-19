@@ -1,4 +1,3 @@
-from contextlib import suppress
 from typing import Optional
 
 from cowsay import char_names, get_output_string
@@ -7,7 +6,7 @@ from discord.ext import commands
 
 from bot.bot import Bot
 
-# Creates a local copy of char_names to filter out unsupported characters.
+# Creates a copy of supported cowsay character names to filter out characters which break the embed.
 SUPPORTED_CHAR_NAMES = list(char_names)
 for element in ["dragon", "trex", "stegosaurus", "turkey", "ghostbusters", "turtle"]:
     SUPPORTED_CHAR_NAMES.remove(element)
@@ -25,9 +24,9 @@ class Cowsay(commands.Cog):
     )
     async def cowsay(self, ctx: commands.Context, character: str = "Cow", *, text: Optional[str]) -> None:
         """Builds a cowsay string and sends it to Discord."""
-        if not text:
-            text = f"I'm a {character.lower()}"
         character = character.lower()
+        if not text:
+            text = f"I'm a {character}"
 
         if "```" in text:
             text = text[:1] + "\u200b" + text[1:]
@@ -47,7 +46,7 @@ class Cowsay(commands.Cog):
         try:
             await ctx.send(f"```\n{msgbody}\n```")
         except HTTPException:
-            raise commands.BadArgument("The message given for the specified character was too long! Please use something shorter.")
+            raise commands.BadArgument("The message given was too long! Please submit a shorter one.")
 
 
 def setup(bot: Bot) -> None:
