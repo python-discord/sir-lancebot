@@ -28,9 +28,7 @@ class Cowsay(commands.Cog):
         if not text:
             text = f"I'm a {character}"
 
-        if "```" in text:
-            text = text[:1] + "\u200b" + text[1:]
-            text = text[:-2] + "\u200b" + text[-2:]
+        text = text.replace("`", "`\u200b")
 
         if len(text) >= 150 and character != "beavis":
             raise commands.BadArgument("The given text is too long! Please submit something under 150 characters.")
