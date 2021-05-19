@@ -7,7 +7,7 @@ from discord.ext import commands
 
 from bot.bot import Bot
 
-# Creates a local copy of char_names to filter out unsupported characters.
+# Creates a copy of supported cowsay character names to filter out characters which break the embed.
 SUPPORTED_CHAR_NAMES = list(char_names)
 for element in ["dragon", "trex", "stegosaurus", "turkey", "ghostbusters", "turtle"]:
     SUPPORTED_CHAR_NAMES.remove(element)
