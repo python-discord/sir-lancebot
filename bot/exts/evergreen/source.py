@@ -33,7 +33,8 @@ class BotSource(commands.Cog):
         Raise BadArgument if `source_item` is a dynamically-created object (e.g. via internal eval).
         """
         if isinstance(source_item, commands.Command):
-            src = source_item.callback.__code__
+            callback = inspect.unwrap(source_item.callback)
+            src = callback.__code__
             filename = src.co_filename
         else:
             src = type(source_item)
@@ -64,12 +65,8 @@ class BotSource(commands.Cog):
         url, location, first_line = self.get_source_link(source_object)
 
         if isinstance(source_object, commands.Command):
-            if source_object.cog_name == "Help":
-                title = "Help Command"
-                description = source_object.__doc__.splitlines()[1]
-            else:
-                description = source_object.short_doc
-                title = f"Command: {source_object.qualified_name}"
+            description = source_object.short_doc
+            title = f"Command: {source_object.qualified_name}"
         else:
             title = f"Cog: {source_object.qualified_name}"
             description = source_object.description.splitlines()[0]
