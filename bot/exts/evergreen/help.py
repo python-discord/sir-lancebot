@@ -2,9 +2,8 @@
 import asyncio
 import itertools
 import logging
-from collections import namedtuple
 from contextlib import suppress
-from typing import Union
+from typing import List, NamedTuple, Union
 
 from discord import Colour, Embed, HTTPException, Message, Reaction, User
 from discord.ext import commands
@@ -22,14 +21,21 @@ from bot.utils.pagination import (
 DELETE_EMOJI = Emojis.trashcan
 
 REACTIONS = {
-    FIRST_EMOJI: 'first',
-    LEFT_EMOJI: 'back',
-    RIGHT_EMOJI: 'next',
-    LAST_EMOJI: 'end',
-    DELETE_EMOJI: 'stop',
+    FIRST_EMOJI: "first",
+    LEFT_EMOJI: "back",
+    RIGHT_EMOJI: "next",
+    LAST_EMOJI: "end",
+    DELETE_EMOJI: "stop",
 }
 
-Cog = namedtuple('Cog', ['name', 'description', 'commands'])
+
+class Cog(NamedTuple):
+    """Show information about a Cog's name, description and commands."""
+
+    name: str
+    description: str
+    commands: List[Command]
+
 
 log = logging.getLogger(__name__)
 
@@ -87,7 +93,7 @@ class HelpSession:
 
         # set the query details for the session
         if command:
-            query_str = ' '.join(command)
+            query_str = " ".join(command)
             self.query = self._get_query(query_str)
             self.description = self.query.description or self.query.help
         else:
@@ -191,7 +197,7 @@ class HelpSession:
         self.reset_timeout()
 
         # Run relevant action method
-        action = getattr(self, f'do_{REACTIONS[emoji]}', None)
+        action = getattr(self, f"do_{REACTIONS[emoji]}", None)
         if action:
             await action()
 
@@ -234,11 +240,11 @@ class HelpSession:
         if cmd.cog:
             try:
                 if cmd.cog.category:
-                    return f'**{cmd.cog.category}**'
+                    return f"**{cmd.cog.category}**"
             except AttributeError:
                 pass
 
-            return f'**{cmd.cog_name}**'
+            return f"**{cmd.cog_name}**"
         else:
             return "**\u200bNo Category:**"
 
@@ -262,139 +268,143 @@ class HelpSession:
 
                 # if default is not an empty string or None
                 if show_default:
-                    results.append(f'[{name}={param.default}]')
+                    results.append(f"[{name}={param.default}]")
                 else:
-                    results.append(f'[{name}]')
+                    results.append(f"[{name}]")
 
             # if variable length argument
             elif param.kind == param.VAR_POSITIONAL:
-                results.append(f'[{name}...]')
+                results.append(f"[{name}...]")
 
             # if required
             else:
-                results.append(f'<{name}>')
+                results.append(f"<{name}>")
 
         return f"{cmd.name} {' '.join(results)}"
 
     async def build_pages(self) -> None:
         """Builds the list of content pages to be paginated through in the help message, as a list of str."""
         # Use LinePaginator to restrict embed line height
-        paginator = LinePaginator(prefix='', suffix='', max_lines=self._max_lines)
-
-        prefix = constants.Client.prefix
+        paginator = LinePaginator(prefix="", suffix="", max_lines=self._max_lines)
 
         # show signature if query is a command
         if isinstance(self.query, commands.Command):
-            signature = self._get_command_params(self.query)
-            parent = self.query.full_parent_name + ' ' if self.query.parent else ''
-            paginator.add_line(f'**```{prefix}{parent}{signature}```**')
-
-            aliases = ', '.join(f'`{a}`' for a in self.query.aliases)
-            if aliases:
-                paginator.add_line(f'**Can also use:** {aliases}\n')
-
-            if not await self.query.can_run(self._ctx):
-                paginator.add_line('***You cannot run this command.***\n')
+            await self._add_command_signature(paginator)
 
         if isinstance(self.query, Cog):
-            paginator.add_line(f'**{self.query.name}**')
+            paginator.add_line(f"**{self.query.name}**")
 
         if self.description:
-            paginator.add_line(f'*{self.description}*')
+            paginator.add_line(f"*{self.description}*")
 
         # list all children commands of the queried object
         if isinstance(self.query, (commands.GroupMixin, Cog)):
-
-            # remove hidden commands if session is not wanting hiddens
-            if not self._show_hidden:
-                filtered = [c for c in self.query.commands if not c.hidden]
-            else:
-                filtered = self.query.commands
-
-            # if after filter there are no commands, finish up
-            if not filtered:
-                self._pages = paginator.pages
-                return
-
-            if isinstance(self.query, Cog):
-                grouped = (('**Commands:**', self.query.commands),)
-
-            elif isinstance(self.query, commands.Command):
-                grouped = (('**Subcommands:**', self.query.commands),)
-
-                # don't show prefix for subcommands
-                prefix = ''
-
-            # otherwise sort and organise all commands into categories
-            else:
-                cat_sort = sorted(filtered, key=self._category_key)
-                grouped = itertools.groupby(cat_sort, key=self._category_key)
-
-            for category, cmds in grouped:
-                cmds = sorted(cmds, key=lambda c: c.name)
-
-                if len(cmds) == 0:
-                    continue
-
-                cat_cmds = []
-
-                for command in cmds:
-
-                    # skip if hidden and hide if session is set to
-                    if command.hidden and not self._show_hidden:
-                        continue
-
-                    # see if the user can run the command
-                    strikeout = ''
-
-                    # Patch to make the !help command work outside of #bot-commands again
-                    # This probably needs a proper rewrite, but this will make it work in
-                    # the mean time.
-                    try:
-                        can_run = await command.can_run(self._ctx)
-                    except CheckFailure:
-                        can_run = False
-
-                    if not can_run:
-                        # skip if we don't show commands they can't run
-                        if self._only_can_run:
-                            continue
-                        strikeout = '~~'
-
-                    signature = self._get_command_params(command)
-                    info = f"{strikeout}**`{prefix}{signature}`**{strikeout}"
-
-                    # handle if the command has no docstring
-                    if command.short_doc:
-                        cat_cmds.append(f'{info}\n*{command.short_doc}*')
-                    else:
-                        cat_cmds.append(f'{info}\n*No details provided.*')
-
-                # state var for if the category should be added next
-                print_cat = 1
-                new_page = True
-
-                for details in cat_cmds:
-
-                    # keep details together, paginating early if it won't fit
-                    lines_adding = len(details.split('\n')) + print_cat
-                    if paginator._linecount + lines_adding > self._max_lines:
-                        paginator._linecount = 0
-                        new_page = True
-                        paginator.close_page()
-
-                        # new page so print category title again
-                        print_cat = 1
-
-                    if print_cat:
-                        if new_page:
-                            paginator.add_line('')
-                        paginator.add_line(category)
-                        print_cat = 0
-
-                    paginator.add_line(details)
+            await self._list_child_commands(paginator)
 
         self._pages = paginator.pages
+
+    async def _add_command_signature(self, paginator: LinePaginator) -> None:
+        prefix = constants.Client.prefix
+
+        signature = self._get_command_params(self.query)
+        parent = self.query.full_parent_name + " " if self.query.parent else ""
+        paginator.add_line(f"**```{prefix}{parent}{signature}```**")
+        aliases = [f"`{alias}`" if not parent else f"`{parent} {alias}`" for alias in self.query.aliases]
+        aliases += [f"`{alias}`" for alias in getattr(self.query, "root_aliases", ())]
+        aliases = ", ".join(sorted(aliases))
+        if aliases:
+            paginator.add_line(f"**Can also use:** {aliases}\n")
+        if not await self.query.can_run(self._ctx):
+            paginator.add_line("***You cannot run this command.***\n")
+
+    async def _list_child_commands(self, paginator: LinePaginator) -> None:
+        # remove hidden commands if session is not wanting hiddens
+        if not self._show_hidden:
+            filtered = [c for c in self.query.commands if not c.hidden]
+        else:
+            filtered = self.query.commands
+
+        # if after filter there are no commands, finish up
+        if not filtered:
+            self._pages = paginator.pages
+            return
+
+        if isinstance(self.query, Cog):
+            grouped = (("**Commands:**", self.query.commands),)
+
+        elif isinstance(self.query, commands.Command):
+            grouped = (("**Subcommands:**", self.query.commands),)
+
+        # otherwise sort and organise all commands into categories
+        else:
+            cat_sort = sorted(filtered, key=self._category_key)
+            grouped = itertools.groupby(cat_sort, key=self._category_key)
+
+        for category, cmds in grouped:
+            await self._format_command_category(paginator, category, list(cmds))
+
+    async def _format_command_category(self, paginator: LinePaginator, category: str, cmds: List[Command]) -> None:
+        cmds = sorted(cmds, key=lambda c: c.name)
+        cat_cmds = []
+        for command in cmds:
+            cat_cmds += await self._format_command(command)
+
+        # state var for if the category should be added next
+        print_cat = 1
+        new_page = True
+
+        for details in cat_cmds:
+
+            # keep details together, paginating early if it won"t fit
+            lines_adding = len(details.split("\n")) + print_cat
+            if paginator._linecount + lines_adding > self._max_lines:
+                paginator._linecount = 0
+                new_page = True
+                paginator.close_page()
+
+                # new page so print category title again
+                print_cat = 1
+
+            if print_cat:
+                if new_page:
+                    paginator.add_line("")
+                paginator.add_line(category)
+                print_cat = 0
+
+            paginator.add_line(details)
+
+    async def _format_command(self, command: Command) -> List[str]:
+        # skip if hidden and hide if session is set to
+        if command.hidden and not self._show_hidden:
+            return []
+
+        # Patch to make the !help command work outside of #bot-commands again
+        # This probably needs a proper rewrite, but this will make it work in
+        # the mean time.
+        try:
+            can_run = await command.can_run(self._ctx)
+        except CheckFailure:
+            can_run = False
+
+        # see if the user can run the command
+        strikeout = ""
+        if not can_run:
+            # skip if we don't show commands they can't run
+            if self._only_can_run:
+                return []
+            strikeout = "~~"
+
+        if isinstance(self.query, commands.Command):
+            prefix = ""
+        else:
+            prefix = constants.Client.prefix
+
+        signature = self._get_command_params(command)
+        info = f"{strikeout}**`{prefix}{signature}`**{strikeout}"
+
+        # handle if the command has no docstring
+        short_doc = command.short_doc or "No details provided"
+        return [f"{info}\n*{short_doc}*"]
 
     def embed_page(self, page_number: int = 0) -> Embed:
         """Returns an Embed with the requested page formatted within."""
@@ -410,7 +420,7 @@ class HelpSession:
 
         page_count = len(self._pages)
         if page_count > 1:
-            embed.set_footer(text=f'Page {self._current_page+1} / {page_count}')
+            embed.set_footer(text=f"Page {self._current_page+1} / {page_count}")
 
         return embed
 
@@ -494,7 +504,7 @@ class HelpSession:
 class Help(DiscordCog):
     """Custom Embed Pagination Help feature."""
 
-    @commands.command('help')
+    @commands.command("help")
     async def new_help(self, ctx: Context, *commands) -> None:
         """Shows Command Help."""
         try:
@@ -505,8 +515,8 @@ class Help(DiscordCog):
             embed.title = str(error)
 
             if error.possible_matches:
-                matches = '\n'.join(error.possible_matches.keys())
-                embed.description = f'**Did you mean:**\n`{matches}`'
+                matches = "\n".join(error.possible_matches.keys())
+                embed.description = f"**Did you mean:**\n`{matches}`"
 
             await ctx.send(embed=embed)
 
@@ -517,7 +527,7 @@ def unload(bot: Bot) -> None:
 
     This is run if the cog raises an exception on load, or if the extension is unloaded.
     """
-    bot.remove_command('help')
+    bot.remove_command("help")
     bot.add_command(bot._old_help)
 
 
@@ -532,8 +542,8 @@ def setup(bot: Bot) -> None:
     If an exception is raised during the loading of the cog, `unload` will be called in order to
     reinstate the original help command.
     """
-    bot._old_help = bot.get_command('help')
-    bot.remove_command('help')
+    bot._old_help = bot.get_command("help")
+    bot.remove_command("help")
 
     try:
         bot.add_cog(Help())

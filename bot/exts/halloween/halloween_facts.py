@@ -8,6 +8,8 @@ from typing import Tuple
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
+
 log = logging.getLogger(__name__)
 
 SPOOKY_EMOJIS = [
@@ -20,23 +22,19 @@ SPOOKY_EMOJIS = [
     "\N{SKULL AND CROSSBONES}",
     "\N{SPIDER WEB}",
 ]
-PUMPKIN_ORANGE = discord.Color(0xFF7518)
+PUMPKIN_ORANGE = 0xFF7518
 INTERVAL = timedelta(hours=6).total_seconds()
+
+FACTS = json.loads(Path("bot/resources/halloween/halloween_facts.json").read_text("utf8"))
+FACTS = list(enumerate(FACTS))
 
 
 class HalloweenFacts(commands.Cog):
     """A Cog for displaying interesting facts about Halloween."""
 
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
-        with open(Path("bot/resources/halloween/halloween_facts.json"), "r", encoding="utf8") as file:
-            self.halloween_facts = json.load(file)
-        self.facts = list(enumerate(self.halloween_facts))
-        random.shuffle(self.facts)
-
     def random_fact(self) -> Tuple[int, str]:
         """Return a random fact from the loaded facts."""
-        return random.choice(self.facts)
+        return random.choice(FACTS)
 
     @commands.command(name="spookyfact", aliases=("halloweenfact",), brief="Get the most recent Halloween fact")
     async def get_random_fact(self, ctx: commands.Context) -> None:
@@ -53,6 +51,6 @@ class HalloweenFacts(commands.Cog):
         return discord.Embed(title=title, description=fact, color=PUMPKIN_ORANGE)
 
 
-def setup(bot: commands.Bot) -> None:
-    """Halloween facts Cog load."""
-    bot.add_cog(HalloweenFacts(bot))
+def setup(bot: Bot) -> None:
+    """Load the Halloween Facts Cog."""
+    bot.add_cog(HalloweenFacts())

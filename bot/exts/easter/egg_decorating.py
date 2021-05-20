@@ -10,13 +10,14 @@ import discord
 from PIL import Image
 from discord.ext import commands
 
+from bot.bot import Bot
+from bot.utils import helpers
+
 log = logging.getLogger(__name__)
 
-with open(Path("bot/resources/evergreen/html_colours.json"), encoding="utf8") as f:
-    HTML_COLOURS = json.load(f)
+HTML_COLOURS = json.loads(Path("bot/resources/evergreen/html_colours.json").read_text("utf8"))
 
-with open(Path("bot/resources/evergreen/xkcd_colours.json"), encoding="utf8") as f:
-    XKCD_COLOURS = json.load(f)
+XKCD_COLOURS = json.loads(Path("bot/resources/evergreen/xkcd_colours.json").read_text("utf8"))
 
 COLOURS = [
     (255, 0, 0, 255), (255, 128, 0, 255), (255, 255, 0, 255), (0, 255, 0, 255),
@@ -31,9 +32,6 @@ IRREPLACEABLE = [
 class EggDecorating(commands.Cog):
     """Decorate some easter eggs!"""
 
-    def __init__(self, bot: commands.Bot) -> None:
-        self.bot = bot
-
     @staticmethod
     def replace_invalid(colour: str) -> Union[int, None]:
         """Attempts to match with HTML or XKCD colour names, returning the int value."""
@@ -43,10 +41,10 @@ class EggDecorating(commands.Cog):
             return int(XKCD_COLOURS[colour], 16)
         return None
 
-    @commands.command(aliases=["decorateegg"])
+    @commands.command(aliases=("decorateegg",))
     async def eggdecorate(
         self, ctx: commands.Context, *colours: Union[discord.Colour, str]
-    ) -> Union[Image.Image, discord.Message]:
+    ) -> Union[Image.Image, None]:
         """
         Picks a random egg design and decorates it using the given colours.
 
@@ -54,7 +52,8 @@ class EggDecorating(commands.Cog):
         Discord colour names, HTML colour names, XKCD colour names and hex values are accepted.
         """
         if len(colours) < 2:
-            return await ctx.send("You must include at least 2 colours!")
+            await ctx.send("You must include at least 2 colours!")
+            return
 
         invalid = []
         colours = list(colours)
@@ -65,12 +64,14 @@ class EggDecorating(commands.Cog):
             if value:
                 colours[idx] = discord.Colour(value)
             else:
-                invalid.append(colour)
+                invalid.append(helpers.suppress_links(colour))
 
         if len(invalid) > 1:
-            return await ctx.send(f"Sorry, I don't know these colours: {' '.join(invalid)}")
+            await ctx.send(f"Sorry, I don't know these colours: {' '.join(invalid)}")
+            return
         elif len(invalid) == 1:
-            return await ctx.send(f"Sorry, I don't know the colour {invalid[0]}!")
+            await ctx.send(f"Sorry, I don't know the colour {invalid[0]}!")
+            return
 
         async with ctx.typing():
             # Expand list to 8 colours
@@ -113,6 +114,6 @@ class EggDecorating(commands.Cog):
         return new_im
 
 
-def setup(bot: commands.bot) -> None:
-    """Egg decorating Cog load."""
-    bot.add_cog(EggDecorating(bot))
+def setup(bot: Bot) -> None:
+    """Load the Egg decorating Cog."""
+    bot.add_cog(EggDecorating())

@@ -9,6 +9,7 @@ from functools import partial
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Colours
 
 log = logging.getLogger(__name__)
@@ -30,8 +31,8 @@ EmojiSet = typing.Dict[typing.Tuple[bool, bool], str]
 class Player:
     """Each player in the game - their messages for the boards and their current grid."""
 
-    user: discord.Member
-    board: discord.Message
+    user: typing.Optional[discord.Member]
+    board: typing.Optional[discord.Message]
     opponent_board: discord.Message
     grid: Grid
 
@@ -95,7 +96,7 @@ class Game:
 
     def __init__(
         self,
-        bot: commands.Bot,
+        bot: Bot,
         channel: discord.TextChannel,
         player1: discord.Member,
         player2: discord.Member
@@ -227,7 +228,7 @@ class Game:
             if message.content.lower() == "surrender":
                 self.surrender = True
                 return True
-            self.match = re.match("([A-J]|[a-j]) ?((10)|[1-9])", message.content.strip())
+            self.match = re.fullmatch("([A-J]|[a-j]) ?((10)|[1-9])", message.content.strip())
             if not self.match:
                 self.bot.loop.create_task(message.add_reaction(CROSS_EMOJI))
             return bool(self.match)
@@ -237,7 +238,7 @@ class Game:
         square = None
         turn_message = await self.turn.user.send(
             "It's your turn! Type the square you want to fire at. Format it like this: A1\n"
-            "Type `surrender` to give up"
+            "Type `surrender` to give up."
         )
         await self.next.user.send("Their turn", delete_after=3.0)
         while True:
@@ -321,7 +322,7 @@ class Game:
 class Battleship(commands.Cog):
     """Play the classic game Battleship!"""
 
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: Bot) -> None:
         self.bot = bot
         self.games: typing.List[Game] = []
         self.waiting: typing.List[discord.Member] = []
@@ -378,10 +379,12 @@ class Battleship(commands.Cog):
         Make sure you have your DMs open so that the bot can message you.
         """
         if self.already_playing(ctx.author):
-            return await ctx.send("You're already playing a game!")
+            await ctx.send("You're already playing a game!")
+            return
 
         if ctx.author in self.waiting:
-            return await ctx.send("You've already sent out a request for a player 2")
+            await ctx.send("You've already sent out a request for a player 2.")
+            return
 
         announcement = await ctx.send(
             "**Battleship**: A new game is about to start!\n"
@@ -401,20 +404,22 @@ class Battleship(commands.Cog):
         except asyncio.TimeoutError:
             self.waiting.remove(ctx.author)
             await announcement.delete()
-            return await ctx.send(f"{ctx.author.mention} Seems like there's no one here to play...")
+            await ctx.send(f"{ctx.author.mention} Seems like there's no one here to play...")
+            return
 
         if str(reaction.emoji) == CROSS_EMOJI:
             self.waiting.remove(ctx.author)
             await announcement.delete()
-            return await ctx.send(f"{ctx.author.mention} Game cancelled.")
+            await ctx.send(f"{ctx.author.mention} Game cancelled.")
+            return
 
         await announcement.delete()
         self.waiting.remove(ctx.author)
         if self.already_playing(ctx.author):
             return
+        game = Game(self.bot, ctx.channel, ctx.author, user)
+        self.games.append(game)
         try:
-            game = Game(self.bot, ctx.channel, ctx.author, user)
-            self.games.append(game)
             await game.start_game()
             self.games.remove(game)
         except discord.Forbidden:
@@ -425,11 +430,11 @@ class Battleship(commands.Cog):
             self.games.remove(game)
         except Exception:
             # End the game in the event of an unforseen error so the players aren't stuck in a game
-            await ctx.send(f"{ctx.author.mention} {user.mention} An error occurred. Game failed")
+            await ctx.send(f"{ctx.author.mention} {user.mention} An error occurred. Game failed.")
             self.games.remove(game)
             raise
 
-    @battleship.command(name="ships", aliases=["boats"])
+    @battleship.command(name="ships", aliases=("boats",))
     async def battleship_ships(self, ctx: commands.Context) -> None:
         """Lists the ships that are found on the battleship grid."""
         embed = discord.Embed(colour=Colours.blue)
@@ -438,6 +443,6 @@ class Battleship(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
-    """Cog load."""
+def setup(bot: Bot) -> None:
+    """Load the Battleship Cog."""
     bot.add_cog(Battleship(bot))

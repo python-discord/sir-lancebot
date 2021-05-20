@@ -1,38 +1,17 @@
 import inspect
 from pathlib import Path
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple
 
 from discord import Embed
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Source
-
-SourceType = Union[commands.Command, commands.Cog, str, commands.ExtensionNotLoaded]
-
-
-class SourceConverter(commands.Converter):
-    """Convert an argument into a help command, tag, command, or cog."""
-
-    async def convert(self, ctx: commands.Context, argument: str) -> SourceType:
-        """Convert argument into source object."""
-        cog = ctx.bot.get_cog(argument)
-        if cog:
-            return cog
-
-        cmd = ctx.bot.get_command(argument)
-        if cmd:
-            return cmd
-
-        raise commands.BadArgument(
-            f"Unable to convert `{argument}` to valid command or Cog."
-        )
+from bot.utils.converters import SourceConverter, SourceType
 
 
 class BotSource(commands.Cog):
     """Displays information about the bot's source code."""
-
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
 
     @commands.command(name="source", aliases=("src",))
     async def source_command(self, ctx: commands.Context, *, source_item: SourceConverter = None) -> None:
@@ -54,7 +33,8 @@ class BotSource(commands.Cog):
         Raise BadArgument if `source_item` is a dynamically-created object (e.g. via internal eval).
         """
         if isinstance(source_item, commands.Command):
-            src = source_item.callback.__code__
+            callback = inspect.unwrap(source_item.callback)
+            src = callback.__code__
             filename = src.co_filename
         else:
             src = type(source_item)
@@ -85,12 +65,8 @@ class BotSource(commands.Cog):
         url, location, first_line = self.get_source_link(source_object)
 
         if isinstance(source_object, commands.Command):
-            if source_object.cog_name == 'Help':
-                title = "Help Command"
-                description = source_object.__doc__.splitlines()[1]
-            else:
-                description = source_object.short_doc
-                title = f"Command: {source_object.qualified_name}"
+            description = source_object.short_doc
+            title = f"Command: {source_object.qualified_name}"
         else:
             title = f"Cog: {source_object.qualified_name}"
             description = source_object.description.splitlines()[0]
@@ -104,6 +80,6 @@ class BotSource(commands.Cog):
         return embed
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load the BotSource cog."""
-    bot.add_cog(BotSource(bot))
+    bot.add_cog(BotSource())

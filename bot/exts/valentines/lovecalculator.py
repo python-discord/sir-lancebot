@@ -11,20 +11,18 @@ from discord import Member
 from discord.ext import commands
 from discord.ext.commands import BadArgument, Cog, clean_content
 
+from bot.bot import Bot
+
 log = logging.getLogger(__name__)
 
-with Path("bot/resources/valentines/love_matches.json").open(encoding="utf8") as file:
-    LOVE_DATA = json.load(file)
-    LOVE_DATA = sorted((int(key), value) for key, value in LOVE_DATA.items())
+LOVE_DATA = json.loads(Path("bot/resources/valentines/love_matches.json").read_text("utf8"))
+LOVE_DATA = sorted((int(key), value) for key, value in LOVE_DATA.items())
 
 
 class LoveCalculator(Cog):
     """A cog for calculating the love between two people."""
 
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
-
-    @commands.command(aliases=('love_calculator', 'love_calc'))
+    @commands.command(aliases=("love_calculator", "love_calc"))
     @commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
     async def love(self, ctx: commands.Context, who: Union[Member, str], whom: Union[Member, str] = None) -> None:
         """
@@ -62,7 +60,7 @@ class LoveCalculator(Cog):
 
         # Make sure user didn't provide something silly such as 10 spaces
         if not (who and whom):
-            raise BadArgument('Arguments be non-empty strings.')
+            raise BadArgument("Arguments must be non-empty strings.")
 
         # Hash inputs to guarantee consistent results (hashing algorithm choice arbitrary)
         #
@@ -79,20 +77,20 @@ class LoveCalculator(Cog):
         # We only need the dict, so we can ditch the first element
         _, data = LOVE_DATA[index]
 
-        status = random.choice(data['titles'])
+        status = random.choice(data["titles"])
         embed = discord.Embed(
             title=status,
-            description=f'{who} \N{HEAVY BLACK HEART} {whom} scored {love_percent}%!\n\u200b',
+            description=f"{who} \N{HEAVY BLACK HEART} {whom} scored {love_percent}%!\n\u200b",
             color=discord.Color.dark_magenta()
         )
         embed.add_field(
-            name='A letter from Dr. Love:',
-            value=data['text']
+            name="A letter from Dr. Love:",
+            value=data["text"]
         )
 
         await ctx.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
-    """Love calculator Cog load."""
-    bot.add_cog(LoveCalculator(bot))
+def setup(bot: Bot) -> None:
+    """Load the Love calculator Cog."""
+    bot.add_cog(LoveCalculator())

@@ -1,13 +1,13 @@
 import logging
 import random
-from json import load
+from json import loads
 from pathlib import Path
 from typing import Tuple
 
 import discord
 from discord.ext import commands
-from discord.ext.commands.cooldowns import BucketType
 
+from bot.bot import Bot
 from bot.constants import Channels, Colours, Lovefest, Month
 from bot.utils.decorators import in_month
 from bot.utils.extensions import invoke_help_command
@@ -20,7 +20,7 @@ HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_hea
 class BeMyValentine(commands.Cog):
     """A cog that sends Valentines to other users!"""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
         self.valentines = self.load_json()
 
@@ -28,9 +28,7 @@ class BeMyValentine(commands.Cog):
     def load_json() -> dict:
         """Load Valentines messages from the static resources."""
         p = Path("bot/resources/valentines/bemyvalentine_valentines.json")
-        with p.open(encoding="utf8") as json_data:
-            valentines = load(json_data)
-            return valentines
+        return loads(p.read_text("utf8"))
 
     @in_month(Month.FEBRUARY)
     @commands.group(name="lovefest")
@@ -50,8 +48,8 @@ class BeMyValentine(commands.Cog):
     async def add_role(self, ctx: commands.Context) -> None:
         """Adds the lovefest role."""
         user = ctx.author
-        role = discord.utils.get(ctx.guild.roles, id=Lovefest.role_id)
-        if Lovefest.role_id not in [role.id for role in ctx.message.author.roles]:
+        role = ctx.guild.get_role(Lovefest.role_id)
+        if role not in ctx.author.roles:
             await user.add_roles(role)
             await ctx.send("The Lovefest role has been added !")
         else:
@@ -61,15 +59,15 @@ class BeMyValentine(commands.Cog):
     async def remove_role(self, ctx: commands.Context) -> None:
         """Removes the lovefest role."""
         user = ctx.author
-        role = discord.utils.get(ctx.guild.roles, id=Lovefest.role_id)
-        if Lovefest.role_id not in [role.id for role in ctx.message.author.roles]:
+        role = ctx.guild.get_role(Lovefest.role_id)
+        if role not in ctx.author.roles:
             await ctx.send("You dont have the lovefest role.")
         else:
             await user.remove_roles(role)
-            await ctx.send("The lovefest role has been successfully removed !")
+            await ctx.send("The lovefest role has been successfully removed!")
 
-    @commands.cooldown(1, 1800, BucketType.user)
-    @commands.group(name='bemyvalentine', invoke_without_command=True)
+    @commands.cooldown(1, 1800, commands.BucketType.user)
+    @commands.group(name="bemyvalentine", invoke_without_command=True)
     async def send_valentine(
         self, ctx: commands.Context, user: discord.Member, *, valentine_type: str = None
     ) -> None:
@@ -101,14 +99,14 @@ class BeMyValentine(commands.Cog):
         valentine, title = self.valentine_check(valentine_type)
 
         embed = discord.Embed(
-            title=f'{emoji_1} {title} {user.display_name} {emoji_2}',
-            description=f'{valentine} \n **{emoji_2}From {ctx.author}{emoji_1}**',
+            title=f"{emoji_1} {title} {user.display_name} {emoji_2}",
+            description=f"{valentine} \n **{emoji_2}From {ctx.author}{emoji_1}**",
             color=Colours.pink
         )
         await channel.send(user.mention, embed=embed)
 
-    @commands.cooldown(1, 1800, BucketType.user)
-    @send_valentine.command(name='secret')
+    @commands.cooldown(1, 1800, commands.BucketType.user)
+    @send_valentine.command(name="secret")
     async def anonymous(
         self, ctx: commands.Context, user: discord.Member, *, valentine_type: str = None
     ) -> None:
@@ -136,8 +134,8 @@ class BeMyValentine(commands.Cog):
         valentine, title = self.valentine_check(valentine_type)
 
         embed = discord.Embed(
-            title=f'{emoji_1}{title} {user.display_name}{emoji_2}',
-            description=f'{valentine} \n **{emoji_2}From anonymous{emoji_1}**',
+            title=f"{emoji_1}{title} {user.display_name}{emoji_2}",
+            description=f"{valentine} \n **{emoji_2}From anonymous{emoji_1}**",
             color=Colours.pink
         )
         await ctx.message.delete()
@@ -151,21 +149,17 @@ class BeMyValentine(commands.Cog):
     def valentine_check(self, valentine_type: str) -> Tuple[str, str]:
         """Return the appropriate Valentine type & title based on the invoking user's input."""
         if valentine_type is None:
-            valentine, title = self.random_valentine()
+            return self.random_valentine()
 
-        elif valentine_type.lower() in ['p', 'poem']:
-            valentine = self.valentine_poem()
-            title = 'A poem dedicated to'
+        elif valentine_type.lower() in ["p", "poem"]:
+            return self.valentine_poem(), "A poem dedicated to"
 
-        elif valentine_type.lower() in ['c', 'compliment']:
-            valentine = self.valentine_compliment()
-            title = 'A compliment for'
+        elif valentine_type.lower() in ["c", "compliment"]:
+            return self.valentine_compliment(), "A compliment for"
 
         else:
             # in this case, the user decides to type his own valentine.
-            valentine = valentine_type
-            title = 'A message for'
-        return valentine, title
+            return valentine_type, "A message for"
 
     @staticmethod
     def random_emoji() -> Tuple[str, str]:
@@ -176,26 +170,24 @@ class BeMyValentine(commands.Cog):
 
     def random_valentine(self) -> Tuple[str, str]:
         """Grabs a random poem or a compliment (any message)."""
-        valentine_poem = random.choice(self.valentines['valentine_poems'])
-        valentine_compliment = random.choice(self.valentines['valentine_compliments'])
+        valentine_poem = random.choice(self.valentines["valentine_poems"])
+        valentine_compliment = random.choice(self.valentines["valentine_compliments"])
         random_valentine = random.choice([valentine_compliment, valentine_poem])
         if random_valentine == valentine_poem:
-            title = 'A poem dedicated to'
+            title = "A poem dedicated to"
         else:
-            title = 'A compliment for '
+            title = "A compliment for "
         return random_valentine, title
 
     def valentine_poem(self) -> str:
         """Grabs a random poem."""
-        valentine_poem = random.choice(self.valentines['valentine_poems'])
-        return valentine_poem
+        return random.choice(self.valentines["valentine_poems"])
 
     def valentine_compliment(self) -> str:
         """Grabs a random compliment."""
-        valentine_compliment = random.choice(self.valentines['valentine_compliments'])
-        return valentine_compliment
+        return random.choice(self.valentines["valentine_compliments"])
 
 
-def setup(bot: commands.Bot) -> None:
-    """Be my Valentine Cog load."""
+def setup(bot: Bot) -> None:
+    """Load the Be my Valentine Cog."""
     bot.add_cog(BeMyValentine(bot))

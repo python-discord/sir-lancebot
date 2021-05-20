@@ -4,11 +4,12 @@ import yaml
 from discord import Color, Embed
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import WHITELISTED_CHANNELS
 from bot.utils.decorators import whitelist_override
 from bot.utils.randomization import RandomCycle
 
-SUGGESTION_FORM = 'https://forms.gle/zw6kkJqv8U43Nfjg9'
+SUGGESTION_FORM = "https://forms.gle/zw6kkJqv8U43Nfjg9"
 
 with Path("bot/resources/evergreen/starter.yaml").open("r", encoding="utf8") as f:
     STARTERS = yaml.load(f, Loader=yaml.FullLoader)
@@ -24,18 +25,15 @@ with Path("bot/resources/evergreen/py_topics.yaml").open("r", encoding="utf8") a
     ALL_ALLOWED_CHANNELS = list(PY_TOPICS.keys()) + list(WHITELISTED_CHANNELS)
 
 # Putting all topics into one dictionary and shuffling lists to reduce same-topic repetitions.
-ALL_TOPICS = {'default': STARTERS, **PY_TOPICS}
+ALL_TOPICS = {"default": STARTERS, **PY_TOPICS}
 TOPICS = {
-    channel: RandomCycle(topics or ['No topics found for this channel.'])
+    channel: RandomCycle(topics or ["No topics found for this channel."])
     for channel, topics in ALL_TOPICS.items()
 }
 
 
 class ConvoStarters(commands.Cog):
     """Evergreen conversation topics."""
-
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
 
     @commands.command()
     @whitelist_override(channels=ALL_ALLOWED_CHANNELS)
@@ -48,7 +46,7 @@ class ConvoStarters(commands.Cog):
         Otherwise, a random conversation topic will be received by the user.
         """
         # No matter what, the form will be shown.
-        embed = Embed(description=f'Suggest more topics [here]({SUGGESTION_FORM})!', color=Color.blurple())
+        embed = Embed(description=f"Suggest more topics [here]({SUGGESTION_FORM})!", color=Color.blurple())
 
         try:
             # Fetching topics.
@@ -56,16 +54,16 @@ class ConvoStarters(commands.Cog):
 
         # If the channel isn't Python-related.
         except KeyError:
-            embed.title = f'**{next(TOPICS["default"])}**'
+            embed.title = f"**{next(TOPICS['default'])}**"
 
         # If the channel ID doesn't have any topics.
         else:
-            embed.title = f'**{next(channel_topics)}**'
+            embed.title = f"**{next(channel_topics)}**"
 
         finally:
             await ctx.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
-    """Conversation starters Cog load."""
-    bot.add_cog(ConvoStarters(bot))
+def setup(bot: Bot) -> None:
+    """Load the ConvoStarters cog."""
+    bot.add_cog(ConvoStarters())

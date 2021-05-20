@@ -9,6 +9,7 @@ from discord import Embed
 from discord.ext import commands
 from discord.ext.commands import BucketType, Cog, Context, check, group
 
+from bot.bot import Bot
 from bot.constants import Colours, STAFF_ROLES, Wolfram
 from bot.utils.pagination import ImagePaginator
 
@@ -39,9 +40,11 @@ async def send_embed(
     """Generate & send a response embed with Wolfram as the author."""
     embed = Embed(colour=colour)
     embed.description = message_txt
-    embed.set_author(name="Wolfram Alpha",
-                     icon_url=WOLF_IMAGE,
-                     url="https://www.wolframalpha.com/")
+    embed.set_author(
+        name="Wolfram Alpha",
+        icon_url=WOLF_IMAGE,
+        url="https://www.wolframalpha.com/"
+    )
     if footer:
         embed.set_footer(text=footer)
 
@@ -55,14 +58,15 @@ def custom_cooldown(*ignore: List[int]) -> Callable:
     """
     Implement per-user and per-guild cooldowns for requests to the Wolfram API.
 
-    A list of roles may be provided to ignore the per-user cooldown
+    A list of roles may be provided to ignore the per-user cooldown.
     """
     async def predicate(ctx: Context) -> bool:
-        if ctx.invoked_with == 'help':
+        if ctx.invoked_with == "help":
             # if the invoked command is help we don't want to increase the ratelimits since it's not actually
             # invoking the command/making a request, so instead just check if the user/guild are on cooldown.
             guild_cooldown = not guildcd.get_bucket(ctx.message).get_tokens() == 0  # if guild is on cooldown
-            if not any(r.id in ignore for r in ctx.author.roles):  # check user bucket if user is not ignored
+            # check the message is in a guild, and check user bucket if user is not ignored
+            if ctx.guild and not any(r.id in ignore for r in ctx.author.roles):
                 return guild_cooldown and not usercd.get_bucket(ctx.message).get_tokens() == 0
             return guild_cooldown
 
@@ -101,9 +105,9 @@ def custom_cooldown(*ignore: List[int]) -> Callable:
     return check(predicate)
 
 
-async def get_pod_pages(ctx: Context, bot: commands.Bot, query: str) -> Optional[List[Tuple]]:
+async def get_pod_pages(ctx: Context, bot: Bot, query: str) -> Optional[List[Tuple]]:
     """Get the Wolfram API pod pages for the provided query."""
-    async with ctx.channel.typing():
+    async with ctx.typing():
         url_str = parse.urlencode({
             "input": query,
             "appid": APPID,
@@ -116,7 +120,7 @@ async def get_pod_pages(ctx: Context, bot: commands.Bot, query: str) -> Optional
         request_url = QUERY.format(request="query", data=url_str)
 
         async with bot.http_session.get(request_url) as response:
-            json = await response.json(content_type='text/plain')
+            json = await response.json(content_type="text/plain")
 
         result = json["queryresult"]
 
@@ -161,7 +165,7 @@ async def get_pod_pages(ctx: Context, bot: commands.Bot, query: str) -> Optional
 class Wolfram(Cog):
     """Commands for interacting with the Wolfram|Alpha API."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @group(name="wolfram", aliases=("wolf", "wa"), invoke_without_command=True)
@@ -178,7 +182,7 @@ class Wolfram(Cog):
         query = QUERY.format(request="simple", data=url_str)
 
         # Give feedback that the bot is working.
-        async with ctx.channel.typing():
+        async with ctx.typing():
             async with self.bot.http_session.get(query) as response:
                 status = response.status
                 image_bytes = await response.read()
@@ -187,11 +191,11 @@ class Wolfram(Cog):
             image_url = "attachment://image.png"
 
             if status == 501:
-                message = "Failed to get response"
+                message = "Failed to get response."
                 footer = ""
                 color = Colours.soft_red
             elif status == 400:
-                message = "No input found"
+                message = "No input found."
                 footer = ""
                 color = Colours.soft_red
             elif status == 403:
@@ -220,9 +224,11 @@ class Wolfram(Cog):
             return
 
         embed = Embed()
-        embed.set_author(name="Wolfram Alpha",
-                         icon_url=WOLF_IMAGE,
-                         url="https://www.wolframalpha.com/")
+        embed.set_author(
+            name="Wolfram Alpha",
+            icon_url=WOLF_IMAGE,
+            url="https://www.wolframalpha.com/"
+        )
         embed.colour = Colours.soft_orange
 
         await ImagePaginator.paginate(pages, ctx, embed)
@@ -261,18 +267,18 @@ class Wolfram(Cog):
         query = QUERY.format(request="result", data=url_str)
 
         # Give feedback that the bot is working.
-        async with ctx.channel.typing():
+        async with ctx.typing():
             async with self.bot.http_session.get(query) as response:
                 status = response.status
                 response_text = await response.text()
 
             if status == 501:
-                message = "Failed to get response"
+                message = "Failed to get response."
                 color = Colours.soft_red
             elif status == 400:
-                message = "No input found"
+                message = "No input found."
                 color = Colours.soft_red
-            elif response_text == "Error 1: Invalid appid":
+            elif response_text == "Error 1: Invalid appid.":
                 message = "Wolfram API key is invalid or missing."
                 color = Colours.soft_red
             else:
@@ -282,6 +288,6 @@ class Wolfram(Cog):
             await send_embed(ctx, message, color)
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load the Wolfram cog."""
     bot.add_cog(Wolfram(bot))

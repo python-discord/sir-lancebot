@@ -58,7 +58,7 @@ class Player:
             )
 
         try:
-            react, _ = await self.ctx.bot.wait_for('reaction_add', timeout=30.0, check=check_for_move)
+            react, _ = await self.ctx.bot.wait_for("reaction_add", timeout=30.0, check=check_for_move)
         except asyncio.TimeoutError:
             return True, None
         else:
@@ -246,8 +246,7 @@ def is_requester_free() -> t.Callable:
 class TicTacToe(Cog):
     """TicTacToe cog contains tic-tac-toe game commands."""
 
-    def __init__(self, bot: Bot):
-        self.bot = bot
+    def __init__(self):
         self.games: t.List[Game] = []
 
     @guild_only()
@@ -323,5 +322,5 @@ class TicTacToe(Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Load TicTacToe Cog."""
-    bot.add_cog(TicTacToe(bot))
+    """Load the TicTacToe cog."""
+    bot.add_cog(TicTacToe())
