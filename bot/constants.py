@@ -22,6 +22,7 @@ __all__ = (
     "Wolfram",
     "Reddit",
     "RedisConfig",
+    "RedirectOutput",
     "MODERATION_ROLES",
     "STAFF_ROLES",
     "WHITELISTED_CHANNELS",
@@ -303,6 +304,10 @@ class RedisConfig(NamedTuple):
 class Source:
     github = "https://github.com/python-discord/sir-lancebot"
     github_avatar_url = "https://avatars1.githubusercontent.com/u/9919"
+
+
+class RedirectOutput:
+    delete_delay: int = 10
 
 
 class Reddit:

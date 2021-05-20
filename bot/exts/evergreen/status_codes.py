@@ -1,26 +1,30 @@
 from http import HTTPStatus
+from random import choice
 
 import discord
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.utils.extensions import invoke_help_command
 
 HTTP_DOG_URL = "https://httpstatusdogs.com/img/{code}.jpg"
 HTTP_CAT_URL = "https://http.cat/{code}.jpg"
 
 
 class HTTPStatusCodes(commands.Cog):
-    """Commands that give HTTP statuses described and visualized by cats and dogs."""
+    """
+    Fetch an image depicting HTTP status codes as a dog or a cat.
+
+    If neither animal is selected a cat or dog is chosen randomly for the given status code.
+    """
 
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @commands.group(name="http_status", aliases=("status", "httpstatus"))
-    async def http_status_group(self, ctx: commands.Context) -> None:
-        """Group containing dog and cat http status code commands."""
-        if not ctx.invoked_subcommand:
-            await invoke_help_command(ctx)
+    @commands.group(name="http_status", aliases=("status", "httpstatus"), invoke_without_command=True)
+    async def http_status_group(self, ctx: commands.Context, code: int) -> None:
+        """Choose a cat or dog randomly for the given status code."""
+        subcmd = choice((self.http_cat, self.http_dog))
+        await subcmd(ctx, code)
 
     @http_status_group.command(name="cat")
     async def http_cat(self, ctx: commands.Context, code: int) -> None:
