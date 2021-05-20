@@ -309,7 +309,7 @@ class Source:
 class RedirectOutput:
     delete_delay: int = 10
 
-      
+
 class Reddit:
     subreddits = ["r/Python"]
 
