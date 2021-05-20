@@ -22,6 +22,9 @@ QUESTION_MARK_ICON = "https://cdn.discordapp.com/emojis/512367613339369475.png"
 class CommandErrorHandler(commands.Cog):
     """A error handler for the PythonDiscord server."""
 
+    def __init__(self, bot: Bot) -> None:
+        self.bot = bot
+
     @staticmethod
     def revert_cooldown_counter(command: commands.Command, message: Message) -> None:
         """Undoes the last cooldown counter for user-error cases."""
@@ -166,4 +169,4 @@ class CommandErrorHandler(commands.Cog):
 
 def setup(bot: Bot) -> None:
     """Load the ErrorHandler cog."""
-    bot.add_cog(CommandErrorHandler())
+    bot.add_cog(CommandErrorHandler(bot))
