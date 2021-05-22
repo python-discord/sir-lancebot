@@ -1,3 +1,4 @@
+import time
 import arrow
 from dateutil.relativedelta import relativedelta
 from discord import Embed
@@ -14,16 +15,39 @@ class Ping(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @commands.command(name="ping")
-    async def ping(self, ctx: commands.Context) -> None:
+    @commands.command(name="ping", aliases=["Latency"])
+    async def ping(self, ctx):
         """Ping the bot to see its latency and state."""
-        embed = Embed(
-            title=":ping_pong: Pong!",
-            colour=Colours.bright_green,
-            description=f"Gateway Latency: {round(self.bot.latency * 1000)}ms",
-        )
+        msg = await ctx.message.reply("`Bot Latency...`")
+        times = []
+        embed = discord.Embed(
+                    title="More Information:",
+                    description="4 pings have been made and here are the results:", 
+                    colour=discord.Color.random()
+                )
 
-        await ctx.send(embed=embed)
+        for counter in range(4):
+            start = time.perf_counter()
+
+            await msg.edit(content=f"Trying Ping... {counter}/3")
+            end = time.perf_counter()
+            speed = round((end - start) * 1000)
+            times.append(speed)
+
+            if speed < 160:
+                # :green_circle: --> would also work
+                embed.add_field(
+                    name=f"Ping {counter}:", value=f"🟢 | {speed}ms", inline=True)
+
+            elif speed > 170:
+                # :yellow_circle: --> would also work
+                embed.add_field(
+                    name=f"Ping {counter}:", value=f"🟡 | {speed}ms", inline=True)
+
+            else:
+                embed.add_field(
+                    # :red_circle: --> would also work
+                    name=f"Ping {counter}:", value=f"🔴 | {speed}ms", inline=True)
 
     # Originally made in 70d2170a0a6594561d59c7d080c4280f1ebcd70b by lemon & gdude2002
     @commands.command(name="uptime")
