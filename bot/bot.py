@@ -1,6 +1,6 @@
 import asyncio
-import logging
 import inspect
+import logging
 import socket
 from contextlib import suppress
 from typing import Optional
@@ -231,10 +231,7 @@ class Bot(commands.Bot):
 
         extensions_msg = '- ' + '\n- '.join(self.unloaded_extensions)
         dev_alerts_channel = self.get_channel(constants.Channels.dev_alerts)
-        core_dev_role = discord.utils.get(
-            self.get_guild(constants.Client.guild).roles,
-            id=constants.Roles.core_developers
-        )
+        core_dev_role = self.get_guild(constants.Client.guild).get_role(constants.Roles.core_developers)
         msg = (
             f"\u26a0 {core_dev_role.mention}\n"
             "The following extensions were found in the cache but not on the bot:\n"

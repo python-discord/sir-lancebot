@@ -285,7 +285,7 @@ class Roles(NamedTuple):
     moderator = 267629731250176001
     owner = 267627879762755584
     helpers = int(environ.get("ROLE_HELPERS", 267630620367257601))
-    core_developers = 814190307319087172
+    core_developers = int(environ.get("ROLE_CORE_DEVELOPERS", 587606783669829632))
 
 
 class Tokens(NamedTuple):
