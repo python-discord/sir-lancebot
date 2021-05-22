@@ -16,7 +16,7 @@ class Ping(commands.Cog):
         self.bot = bot
 
     @commands.command(name="ping", aliases=["Latency"])
-    async def ping(self, ctx):
+    async def ping(self, ctx: commands.Context) -> None:
         """Ping the bot to see its latency and state."""
         msg = await ctx.message.reply("`Bot Latency...`")
         times = []
