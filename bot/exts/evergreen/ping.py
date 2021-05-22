@@ -6,7 +6,6 @@ from discord.ext import commands
 
 from bot import start_time
 from bot.bot import Bot
-from bot.constants import Colours
 
 
 class Ping(commands.Cog):
@@ -18,9 +17,9 @@ class Ping(commands.Cog):
     @commands.command(name="ping", aliases=["Latency"])
     async def ping(self, ctx: commands.Context) -> None:
         """Ping the bot to see its latency and state."""
-        msg = await ctx.message.reply("`Bot Latency...`")
+        msg = await ctx.send("`Bot Latency...`")
         times = []
-        embed = discord.Embed(
+        embed = Embed(
             title="More Information:",
             description="4 pings have been made and here are the results:",
             colour=discord.Color.random()
