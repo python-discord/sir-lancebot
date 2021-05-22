@@ -36,19 +36,18 @@ class Ping(commands.Cog):
 
             if speed < 160:
                 # :green_circle: --> would also work
-                embed.add_field(
-                    name=f"Ping {counter}:", value=f"🟢 | {speed}ms", inline=True)
+                embed.add_field(name=f"Ping {counter}:", value=f"🟢 | {speed}ms", inline=True)
 
             elif speed > 170:
                 # :yellow_circle: --> would also work
-                embed.add_field(
-                    name=f"Ping {counter}:", value=f"🟡 | {speed}ms", inline=True)
+                embed.add_field(name=f"Ping {counter}:", value=f"🟡 | {speed}ms", inline=True)
 
             else:
-                embed.add_field(
-                    # :red_circle: --> would also work
-                    name=f"Ping {counter}:", value=f"🔴 | {speed}ms", inline=True)
-
+                # :red_circle: --> would also work
+                embed.add_field(name=f"Ping {counter}:", value=f"🔴 | {speed}ms", inline=True)
+        
+        await ctx.send(embed=embed)
+        
     # Originally made in 70d2170a0a6594561d59c7d080c4280f1ebcd70b by lemon & gdude2002
     @commands.command(name="uptime")
     async def uptime(self, ctx: commands.Context) -> None:
