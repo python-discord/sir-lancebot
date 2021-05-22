@@ -3,6 +3,7 @@ import arrow
 from dateutil.relativedelta import relativedelta
 from discord import Embed
 from discord.ext import commands
+from discord import Color
 
 from bot import start_time
 from bot.bot import Bot
@@ -22,7 +23,7 @@ class Ping(commands.Cog):
         embed = Embed(
             title="More Information:",
             description="4 pings have been made and here are the results:",
-            colour=discord.Color.random()
+            colour=Color.random()
         )
 
         for counter in range(4):
