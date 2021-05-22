@@ -21,10 +21,10 @@ class Ping(commands.Cog):
         msg = await ctx.message.reply("`Bot Latency...`")
         times = []
         embed = discord.Embed(
-                    title="More Information:",
-                    description="4 pings have been made and here are the results:", 
-                    colour=discord.Color.random()
-                )
+            title="More Information:",
+            description="4 pings have been made and here are the results:",
+            colour=discord.Color.random()
+        )
 
         for counter in range(4):
             start = time.perf_counter()
@@ -36,18 +36,21 @@ class Ping(commands.Cog):
 
             if speed < 160:
                 # :green_circle: --> would also work
-                embed.add_field(name=f"Ping {counter}:", value=f"🟢 | {speed}ms", inline=True)
+                embed.add_field(
+                    name=f"Ping {counter}:", value=f"🟢 | {speed}ms", inline=True)
 
             elif speed > 170:
                 # :yellow_circle: --> would also work
-                embed.add_field(name=f"Ping {counter}:", value=f"🟡 | {speed}ms", inline=True)
+                embed.add_field(
+                    name=f"Ping {counter}:", value=f"🟡 | {speed}ms", inline=True)
 
             else:
                 # :red_circle: --> would also work
-                embed.add_field(name=f"Ping {counter}:", value=f"🔴 | {speed}ms", inline=True)
-        
+                embed.add_field(
+                    name=f"Ping {counter}:", value=f"🔴 | {speed}ms", inline=True)
+
         await ctx.send(embed=embed)
-        
+
     # Originally made in 70d2170a0a6594561d59c7d080c4280f1ebcd70b by lemon & gdude2002
     @commands.command(name="uptime")
     async def uptime(self, ctx: commands.Context) -> None:
