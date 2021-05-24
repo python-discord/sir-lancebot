@@ -1,4 +1,4 @@
-{
+
   "retro": [
     {
       "id": 1,
@@ -372,7 +372,7 @@
     {
       "id": 216,
       "question": "In set builder notation, {p/q | q ≠ 0, p & q ∈ Z} represents what?",
-      "answer": "Rational Numbers"
+      "answer": "rationals, Rational Numbers"
     },
     {
       "id": 217,
@@ -435,7 +435,7 @@
     {
       "id": 228,
       "question": "1/100th of a second is also termed as what?",
-      "answer": "a jiffy, jiffy"
+      "answer": "a jiffy, jiffy, centisecond"
     },
     {
       "id": 229,
@@ -603,6 +603,310 @@
       "id": 330,
       "question": "When DNA is unzipped, two strands are formed. What are they called (separate both answers by the word \"and\")?",
       "answer": "leading and lagging, leading strand and lagging strand"
+    }
+  ],
+  "cs": [
+    {
+      "id": 401,
+      "question": "What does HTML stand for?",
+      "answer": "Hyper Text Markup Language"
+    },
+    {
+      "id": 402,
+      "question": "What's ASCII's full name?",
+      "answer": "American Standard Code for Information Interchange"
+    },
+    {
+      "id": 403,
+      "question": "What does SASS stand for?",
+      "answer": "Syntactically Awesome Stylesheets, Syntactically Awesome Style Sheets"
+    },
+    {
+      "id": 404,
+      "question": "In neural networks, _______________ is an algorithm for supervised learning using gradient descent.",
+      "answer": "backpropagation"
+    },
+    {
+      "id": 405,
+      "question": "What is computing capable of performing exaFLOPS called?",
+      "answer": "exascale computing, exascale"
+    },
+    {
+      "id": 406,
+      "question": "In quantum computing, what is the full name of \"qubit\"?",
+      "answer": "quantum binary digit"
+    },
+    {
+      "id": 407,
+      "question": "Given that January 1, 1970 is the starting epoch of time_t in c time, and that time_t is stored as a signed 32-bit integer, when will unix time roll over (year)?",
+      "answer": "2038"
+    },
+    {
+      "id": 408,
+      "question": "What are the components of digital devices that make up logic gates called?",
+      "answer": "transistors"
+    },
+    {
+      "id": 409,
+      "question": "How many possible public IPv6 addresses are there (answer in 2^n)?",
+      "answer": "2^128"
+    },
+    {
+      "id": 410,
+      "question": "A hypothetical point in time at which technological growth becomes uncontrollable and irreversible, resulting in unforeseeable changes to human civilization is termed as...?",
+      "answer": "technological singularity, singularity"
+    },
+    {
+      "id": 411,
+      "question": "In cryptography, the practice of establishing a shared secret between two parties using public keys and private keys is called...?",
+      "answer": "key exchange"
+    },
+    {
+      "id": 412,
+      "question": "How many bits are in a TCP checksum header?",
+      "answer": "16, sixteen"
+    },
+    {
+      "id": 413,
+      "question": "Which protocol handles communication between email servers?",
+      "answer": "SMTP"
+    },
+    {
+      "id": 414,
+      "question": "Which port does SMTP use to communicate between email servers? (assuming its plaintext)",
+      "answer": "25"
+    },
+    {
+      "id": 415,
+      "question": "Which DNS record contains mail servers of a given domain?",
+      "answer": "MX, mail exchange"
+    },
+    {
+      "id": 416,
+      "question": "Which newline sequence does HTTP use?",
+      "answer": "CRLF, \\r\\n"
+    },
+    {
+      "id": 417,
+      "question": "What does one call the optimization technique used in CPU design that attempts to guess the outcome of a conditional operation and prepare for the most likely result?",
+      "answer": "branch prediction"
+    },
+    {
+      "id": 418,
+      "question": "Name a universal logic gate.",
+      "answer": "NAND, NOR"
+    },
+    {
+      "id": 419,
+      "question": "What is the mathematical formalism which functional programming was built on?",
+      "answer": "lambda calculus"
+    },
+    {
+      "id": 420,
+      "question": "Why is a DDoS attack different from a DoS attack (answer in letters - A. because the victim's server was indefinitely disrupted from the amount of traffic, B. because it also attacks the victim's confidentiality, C. because the attack had political purposes behind it, D. because the traffic flooding the victim originated from many different sources)?",
+      "answer": "D"
+    },
+    {
+      "id": 421,
+      "question": "What is a HTTP/1.1 feature that was superseded by HTTP/2 multiplexing and is unsupported in most browsers nowadays?",
+      "answer": "pipelining"
+    },
+    {
+      "id": 422,
+      "question": "Which of these languages is the oldest? Tcl, Smalltalk 80, haskell, standard ML, Java",
+      "answer": "Smalltalk 80"
+    },
+    {
+      "id": 423,
+      "question": "What is the name for unicode codepoints that do not fit into 16 bits",
+      "answer": "surrogates"
+    },
+    {
+      "id": 424,
+      "question": "Under what locale does making a string lowercase behave differently",
+      "answer": "Turkish"
+    },
+    {
+      "id": 425,
+      "question": "What does the \"a\" represent in a HSLA color value?",
+      "answer": "transparency, translucency, alpha value, alpha channel"
+    },
+    {
+      "id": 426,
+      "question": "What is the section of a GIF that is limited to 256 colors called?",
+      "answer": "image block"
+    },
+    {
+      "id": 427,
+      "question": "What is an interpreter capable of interpreting itself called?",
+      "answer": "metainterpreter"
+    },
+    {
+      "id": 428,
+      "question": "Due to what data storage medium did old programming languages, such as cobol, ignore all characters past the 72nd column?",
+      "answer": "punch cards"
+    },
+    {
+      "id": 429,
+      "question": "Which of these sorting algorithms is not stable? Counting sort, quick sort, insertion sort, tim sort, bubble sort",
+      "answer": "quick, quick sort"
+    },
+    {
+      "id": 430,
+      "question": "Which of these languages is the youngest? Lisp, Python, Java, Haskell, Prolog, Ruby, Perl",
+      "answer": "Java"
+    }
+  ],
+  "python": [
+    {
+      "id": 501,
+      "question": "Is it all objects (y/n)?",
+      "answer": "y, yes"
+    },
+    {
+      "id": 502,
+      "question": "Name the only non-dunder method of the builtin slice object.",
+      "answer": "indices"
+    },
+    {
+      "id": 503,
+      "question": "What exception, other than `StopIteration`, can you raise from a `__getitem__` dunder to indicate to an iterator that it should stop?",
+      "answer": "IndexError"
+    },
+    {
+      "id": 504,
+      "question": "What type does the `&` operator return given 2 `dict_keys` objects?",
+      "answer": "set"
+    },
+    {
+      "id": 505,
+      "question": "Can you pickle a running `list_iterator` (y/n)?",
+      "answer": "y, yes"
+    },
+    {
+      "id": 506,
+      "question": "What attribute of a closure contains the value closed over?",
+      "answer": "cell_contents"
+    },
+    {
+      "id": 507,
+      "question": "What name does a lambda function have?",
+      "answer": "<lambda>"
+    },
+    {
+      "id": 508,
+      "question": "What folder contains all special site builtins, such as help or credits?",
+      "answer": "_sitebuiltins"
+    },
+    {
+      "id": 509,
+      "question": "Which module when imported opens up a web browser tab that points to the classic 353 XKCD comic mentioning Python?",
+      "answer": "antigravity"
+    },
+    {
+      "id": 510,
+      "question": "Which attribute is the documentation string of a function/method/class stored in (answer should be enclosed in backticks!)?",
+      "answer": "`__doc__`"
+    },
+    {
+      "id": 511,
+      "question": "What is the official name of this operator `:=`, introduced in 3.8?",
+      "answer": "assignment-expression operator"
+    },
+    {
+      "id": 512,
+      "question": "When was Python first released?",
+      "answer": "1991"
+    },
+    {
+      "id": 513,
+      "question": "Where does the name Python come from?",
+      "answer": "Monty Python, Monty Python's Flying Circus"
+    },
+    {
+      "id": 514,
+      "question": "How is infinity represented in Python?",
+      "answer": "float(\"infinity\"), float('infinity'), float(\"inf\"), float('inf')"
+    },
+    {
+      "id": 515,
+      "question": "Which of these characters is valid python outside of string literals in some context? `@`, `$`, `?`",
+      "answer": "@"
+    },
+    {
+      "id": 516,
+      "question": "Which standard library module is designed for making simple parsers for languages like shell, as well as safe quoting of strings for use in a shell?",
+      "answer": "shlex"
+    },
+    {
+      "id": 517,
+      "question": "Which one of these protocols/abstract base classes does the builtin `range` object NOT implement? `Sequence`, `Iterable`, `Generator`",
+      "answer": "Generator"
+    },
+    {
+      "id": 518,
+      "question": "What decorator is used to allow a protocol to be checked at runtime?",
+      "answer": "runtime_checkable, typing.runtime_checkable"
+    },
+    {
+      "id": 519,
+      "question": "Does `numbers.Rational` include the builtin object float (y/n)",
+      "answer": "n, no"
+    },
+    {
+      "id": 520,
+      "question": "What is a package that doesn't have a `__init__` file called?",
+      "answer":"namespace package"
+    },
+    {
+      "id": 521,
+      "question": "What file extension is used by the site module to determine what to do at every start?",
+      "answer": ".pth"
+    },
+    {
+      "id": 522,
+      "question": "What is the garbage collection strategy used by cpython to collect everything but reference cycles?",
+      "answer": "reference counting, refcounting"
+    },
+    {
+      "id": 523,
+      "question": "What dunder method is used by the tuple constructor to optimize converting an iterator to a tuple (answer should be enclosed in backticks!)?",
+      "answer": "`__length_hint__`"
+    },
+    {
+      "id": 524,
+      "question": "Which protocol is used to pass self to methods when accessed on classes?",
+      "answer": "Descriptor"
+    },
+    {
+      "id": 525,
+      "question": "What class was added in a new standard library module for python 3.9?",
+      "answer": "TopologicalSorter"
+    },
+    {
+      "id": 526,
+      "question": "Which of these is not a generator method? `next`, `send`, `throw`, `close`",
+      "answer": "next"
+    },
+    {
+      "id": 527,
+      "question": "Is the `__aiter__` method async (y/n)?",
+      "answer": "n, no"
+    },
+    {
+      "id": 528,
+      "question": "What module is the function to set a function that runs for every line of python code present in?",
+      "answer": "sys"
+    },
+    {
+      "id": 529,
+      "question": "Which of these is an `Exception`? `NotImplemented`, `asyncio.CancelledError`, `StopIteration`",
+      "answer": "StopIteration"
+    },
+    {
+      "id": 530,
+      "question": "What type is the attribute of a frame object that contains the current local variables?",
+      "answer": "dict"
     }
   ]
 }
