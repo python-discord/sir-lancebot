@@ -216,8 +216,8 @@ class Extensions(commands.Cog):
         If only one extension is given, it is deferred to `manage()`.
         """
         if len(extensions) == 1:
-            msg, _ = await self.manage(action, extensions[0])
-            return msg
+            msg, error = await self.manage(action, extensions[0])
+            return msg, [] if error else [*extensions]
 
         verb = action.name.lower()
         failures = {}
