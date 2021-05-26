@@ -87,20 +87,22 @@ class Bot(commands.Bot):
         if self.redis_session:
             await self.redis_session.close()
 
+    async def load_extension(self, name, *, package=None):
+        """Load the extension only if it is not present in unloaded cache."""
+        if name in self.unloaded_extensions:
+            self.unloaded_extensions.remove(name)
+            log.info(f"Skipping cog {name}, found in unloaded cache.")
+        else:
+            super().load_extension(name, package=package)
+
     def add_cog(self, cog: commands.Cog) -> None:
         """
         Delegate to super to register `cog`.
 
         This only serves to make the info log, so that extensions don't have to.
         """
-        cog_name = inspect.getmodule(cog).__name__
-
-        if cog_name in self.unloaded_extensions:
-            self.unloaded_extensions.remove(cog_name)
-            log.info(f"Skipping cog {cog.qualified_name}, found in unloaded cache.")
-        else:
-            super().add_cog(cog)
-            log.info(f"Cog loaded: {cog.qualified_name}")
+        super().add_cog(cog)
+        log.info(f"Cog loaded: {cog.qualified_name}")
 
     def add_command(self, command: commands.Command) -> None:
         """Add `command` as normal and then add its root aliases to the bot."""
@@ -275,4 +277,3 @@ bot = Bot(
     allowed_mentions=discord.AllowedMentions(everyone=False, roles=_allowed_roles),
     intents=_intents,
 )
-loop.run_until_complete(bot.get_unloaded_extensions())
