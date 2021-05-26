@@ -92,17 +92,18 @@ class Extensions(commands.Cog):
 
         if "*" in extensions or "**" in extensions:
             extensions = set(EXTENSIONS) - set(self.bot.extensions.keys())
-
+        
+        msg, successful = await self.batch_manage(Action.LOAD, *extensions)
+        
         # Remove extensions from unload extensions cache
         cache_dict = await self.bot.unloads_cache.to_dict()
         existing_value = cache_dict.get("unloaded")
         if existing_value:
             unloaded_list = list(
-                set(existing_value.split(" | ")) - set(extensions)
+                set(existing_value.split(" | ")) - set(successful)
             )
             await self.bot.unloads_cache.set("unloaded", " | ".join(unloaded_list))
-
-        msg = await self.batch_manage(Action.LOAD, *extensions)
+            
         await ctx.send(msg)
 
     @extensions_group.command(name="unload", aliases=("ul",))
@@ -124,16 +125,16 @@ class Extensions(commands.Cog):
             if "*" in extensions or "**" in extensions:
                 extensions = set(self.bot.extensions.keys()) - UNLOAD_BLACKLIST
 
+            msg, successful = await self.batch_manage(Action.UNLOAD, *extensions)
+
             # Add the unload extensions to the unloaded cache
             cache_dict = await self.bot.unloads_cache.to_dict()
             existing_value = cache_dict.get("unloaded")
             if existing_value:
-                unloaded_list = existing_value.split(" | ") + list(extensions)
+                unloaded_list = existing_value.split(" | ") + list(successful)
             else:
-                unloaded_list = extensions[:]
+                unloaded_list = successful[:]
             await self.bot.unloads_cache.set("unloaded", " | ".join(unloaded_list))
-
-            msg = await self.batch_manage(Action.UNLOAD, *extensions)
 
         await ctx.send(msg)
 
@@ -208,7 +209,7 @@ class Extensions(commands.Cog):
 
         return categories
 
-    async def batch_manage(self, action: Action, *extensions: str) -> str:
+    async def batch_manage(self, action: Action, *extensions: str) -> tuple[str, list]:
         """
         Apply an action to multiple extensions and return a message with the results.
 
@@ -233,9 +234,10 @@ class Extensions(commands.Cog):
             failures = "\n".join(f"{ext}\n    {err}" for ext, err in failures.items())
             msg += f"\nFailures:```\n{failures}\n```"
 
-        log.debug(f"Batch {verb}ed extensions.")
+        successful = [ext for ext in extensions if ext not in failures]
+        log.debug(f"Batch {verb}ed extensions: {successful}")
 
-        return msg
+        return msg, successful
 
     async def manage(self, action: Action, ext: str) -> tuple[str, Optional[str]]:
         """Apply an action to an extension and return the status message and any error message."""
