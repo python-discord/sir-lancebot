@@ -92,9 +92,9 @@ class Extensions(commands.Cog):
 
         if "*" in extensions or "**" in extensions:
             extensions = set(EXTENSIONS) - set(self.bot.extensions.keys())
-        
+
         msg, successful = await self.batch_manage(Action.LOAD, *extensions)
-        
+
         # Remove extensions from unload extensions cache
         cache_dict = await self.bot.unloads_cache.to_dict()
         existing_value = cache_dict.get("unloaded")
@@ -103,7 +103,7 @@ class Extensions(commands.Cog):
                 set(existing_value.split(" | ")) - set(successful)
             )
             await self.bot.unloads_cache.set("unloaded", " | ".join(unloaded_list))
-            
+
         await ctx.send(msg)
 
     @extensions_group.command(name="unload", aliases=("ul",))

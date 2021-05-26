@@ -29,8 +29,8 @@ log = logging.getLogger(__name__)
 bot.add_check(whitelist_check(channels=WHITELISTED_CHANNELS, roles=STAFF_ROLES))
 
 
-async def load_extension():
-    """Load extensions from the bot"""
+async def load_extension() -> None:
+    """Load extensions from the bot."""
     for ext in walk_extensions():
         await bot.load_extension(ext)
 
