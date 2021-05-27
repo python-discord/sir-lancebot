@@ -86,7 +86,7 @@ class Bot(commands.Bot):
         if self.redis_session:
             await self.redis_session.close()
 
-    async def load_extension(self, name: str, *, package: Any = None) -> None:
+    def load_extension(self, name: str, *, package: Any = None) -> None:
         """Load the extension only if it is not present in unloaded cache."""
         if name in self.unloaded_extensions:
             self.unloaded_extensions.remove(name)
