@@ -231,14 +231,16 @@ class Bot(commands.Bot):
         if not self.unloaded_extensions:
             return
 
-        extensions_msg = "- " + "\n- ".join(self.unloaded_extensions)
+        cache_dict = await self.unloads_cache.to_dict()
+        extensions_msg = "\n- ".join(f"`{ext}`: {cache_dict.get(ext)}" for ext in self.unloaded_extensions)
+
         dev_alerts_channel = self.get_channel(constants.Channels.dev_alerts)
         core_dev_role = self.get_guild(constants.Client.guild).get_role(constants.Roles.core_developers)
         msg = (
             f"\u26a0 {core_dev_role.mention}\n"
-            "The following extensions were found in the cache but not on the bot:\n"
-            f"```md\n{extensions_msg}\n```"
-            "\nClearing them from the cache."
+            "The following extensions were found in the cache but not on the bot:\n\n"
+            f"- {extensions_msg}"
+            "\n\nClearing them from the cache."
         )
 
         for ext in self.unloaded_extensions:
