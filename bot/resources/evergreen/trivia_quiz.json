@@ -900,7 +900,7 @@
     },
     {
       "id": 529,
-      "question": "Which of these is an `Exception`? `NotImplemented`, `asyncio.CancelledError`, `StopIteration`",
+      "question": "Which of these is a subclass of `Exception`? `NotImplemented`, `asyncio.CancelledError`, `StopIteration`",
       "answer": "StopIteration"
     },
     {
