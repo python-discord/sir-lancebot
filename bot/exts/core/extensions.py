@@ -96,13 +96,8 @@ class Extensions(commands.Cog):
         msg, successful = self.batch_manage(Action.LOAD, *extensions)
 
         # Remove extensions from unload extensions cache
-        cache_dict = await self.bot.unloads_cache.to_dict()
-        existing_value = cache_dict.get("unloaded")
-        if existing_value:
-            unloaded_list = list(
-                set(existing_value.split(" | ")) - set(successful)
-            )
-            await self.bot.unloads_cache.set("unloaded", " | ".join(unloaded_list))
+        for ext in successful:
+            await self.bot.unloads_cache.delete(ext)
 
         await ctx.send(msg)
 
@@ -128,13 +123,8 @@ class Extensions(commands.Cog):
             msg, successful = self.batch_manage(Action.UNLOAD, *extensions)
 
             # Add the unload extensions to the unloaded cache
-            cache_dict = await self.bot.unloads_cache.to_dict()
-            existing_value = cache_dict.get("unloaded")
-            if existing_value:
-                unloaded_list = existing_value.split(" | ") + list(successful)
-            else:
-                unloaded_list = successful[:]
-            await self.bot.unloads_cache.set("unloaded", " | ".join(unloaded_list))
+            for ext in successful:
+                await self.bot.unloads_cache.set(ext, ctx.message.jump_url)
 
         await ctx.send(msg)
 

@@ -48,10 +48,11 @@ class Bot(commands.Bot):
     async def get_unloaded_extensions(self) -> None:
         """Get all the unloaded extensions from cache."""
         # For testing sir-lancebot#705
-        await self.unloads_cache.set("unloaded", "bot.exts.evergreen.catify | bot.exts.evergreen.xkd")
+        await self.unloads_cache.set("bot.exts.evergreen.catify", "https://dummy-msg-link.com")
+        await self.unloads_cache.set("bot.exts.evergreen.xkd", "https://dummy-msg-link.com")
+
         cache_dict = await self.unloads_cache.to_dict()
-        extensions = cache_dict.get("unloaded")
-        self.unloaded_extensions = [] if not extensions else extensions.split(" | ")
+        self.unloaded_extensions = list(cache_dict.keys()) or []
 
     @property
     def member(self) -> Optional[discord.Member]:
@@ -240,11 +241,8 @@ class Bot(commands.Bot):
             "\nClearing them from the cache."
         )
 
-        unloaded = await self.unloads_cache.to_dict()
-        unloaded_list = list(
-            set(unloaded.get("unloaded").split(" | ")) - set(self.unloaded_extensions)
-        )
-        await self.unloads_cache.set("unloaded", " | ".join(unloaded_list))
+        for ext in self.unloaded_extensions:
+            await self.unloads_cache.delete(ext)
 
         await dev_alerts_channel.send(msg)
 
