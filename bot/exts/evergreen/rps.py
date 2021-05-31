@@ -51,7 +51,7 @@ class Game:
             return await self.channel.send("Please make a move.")
         action = action.lower()
         if action not in choices and action not in short_choices:
-            return await self.channel.send(f"Invalid move. Please make from options: {' '.join(choices)}")
+            return await self.channel.send(f"Invalid move. Please make move from options: {' '.join(choices)}")
         bot_move = self.make_move()
         player_result = self.get_winner(action[0], bot_move[0])
         if player_result == 0:
