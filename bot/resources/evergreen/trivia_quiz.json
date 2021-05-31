@@ -795,7 +795,7 @@
     },
     {
       "id": 508,
-      "question": "What folder contains all special site builtins, such as help or credits?",
+      "question": "Which file contains all special site builtins, such as help or credits?",
       "answer": "_sitebuiltins"
     },
     {
