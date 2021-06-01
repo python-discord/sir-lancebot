@@ -15,6 +15,7 @@ from discord.ext.commands import Cog, Context, group
 from bot.bot import Bot
 from bot.constants import STAFF_ROLES, Tokens
 from bot.utils.decorators import with_role
+from bot.utils.extensions import invoke_help_command
 from bot.utils.pagination import ImagePaginator, LinePaginator
 
 # Base URL of IGDB API
@@ -175,7 +176,7 @@ class Games(Cog):
                             "Invalid OAuth credentials. Unloading Games cog. "
                             f"OAuth response message: {result['message']}"
                         )
-                        self.bot.remove_cog('Games')
+                        self.bot.remove_cog("Games")
 
                     return
 
@@ -223,8 +224,8 @@ class Games(Cog):
             else:
                 self.genres[genre_name] = genre
 
-    @group(name="games", aliases=["game"], invoke_without_command=True)
-    async def games(self, ctx: Context, amount: Optional[int] = 5, *, genre: Optional[str] = None) -> None:
+    @group(name="games", aliases=("game",), invoke_without_command=True)
+    async def games(self, ctx: Context, amount: Optional[int] = 5, *, genre: Optional[str]) -> None:
         """
         Get random game(s) by genre from IGDB. Use .games genres command to get all available genres.
 
@@ -234,7 +235,7 @@ class Games(Cog):
         """
         # When user didn't specified genre, send help message
         if genre is None:
-            await ctx.send_help("games")
+            await invoke_help_command(ctx)
             return
 
         # Capitalize genre for check
@@ -276,7 +277,7 @@ class Games(Cog):
 
         await ImagePaginator.paginate(pages, ctx, Embed(title=f"Random {genre.title()} Games"))
 
-    @games.command(name="top", aliases=["t"])
+    @games.command(name="top", aliases=("t",))
     async def top(self, ctx: Context, amount: int = 10) -> None:
         """
         Get current Top games in IGDB.
@@ -293,19 +294,19 @@ class Games(Cog):
         pages = [await self.create_page(game) for game in games]
         await ImagePaginator.paginate(pages, ctx, Embed(title=f"Top {amount} Games"))
 
-    @games.command(name="genres", aliases=["genre", "g"])
+    @games.command(name="genres", aliases=("genre", "g"))
     async def genres(self, ctx: Context) -> None:
         """Get all available genres."""
         await ctx.send(f"Currently available genres: {', '.join(f'`{genre}`' for genre in self.genres)}")
 
-    @games.command(name="search", aliases=["s"])
+    @games.command(name="search", aliases=("s",))
     async def search(self, ctx: Context, *, search_term: str) -> None:
         """Find games by name."""
         lines = await self.search_games(search_term)
 
         await LinePaginator.paginate(lines, ctx, Embed(title=f"Game Search Results: {search_term}"), empty=False)
 
-    @games.command(name="company", aliases=["companies"])
+    @games.command(name="company", aliases=("companies",))
     async def company(self, ctx: Context, amount: int = 5) -> None:
         """
         Get random Game Companies companies from IGDB API.
@@ -324,7 +325,7 @@ class Games(Cog):
         await ImagePaginator.paginate(pages, ctx, Embed(title="Random Game Companies"))
 
     @with_role(*STAFF_ROLES)
-    @games.command(name="refresh", aliases=["r"])
+    @games.command(name="refresh", aliases=("r",))
     async def refresh_genres_command(self, ctx: Context) -> None:
         """Refresh .games command genres."""
         try:
@@ -334,13 +335,14 @@ class Games(Cog):
             return
         await ctx.send("Successfully refreshed genres.")
 
-    async def get_games_list(self,
-                             amount: int,
-                             genre: Optional[str] = None,
-                             sort: Optional[str] = None,
-                             additional_body: str = "",
-                             offset: int = 0
-                             ) -> List[Dict[str, Any]]:
+    async def get_games_list(
+        self,
+        amount: int,
+        genre: Optional[str] = None,
+        sort: Optional[str] = None,
+        additional_body: str = "",
+        offset: int = 0
+    ) -> List[Dict[str, Any]]:
         """
         Get list of games from IGDB API by parameters that is provided.
 
@@ -372,8 +374,10 @@ class Games(Cog):
         release_date = dt.utcfromtimestamp(data["first_release_date"]).date() if "first_release_date" in data else "?"
 
         # Create Age Ratings value
-        rating = ", ".join(f"{AgeRatingCategories(age['category']).name} {AgeRatings(age['rating']).name}"
-                           for age in data["age_ratings"]) if "age_ratings" in data else "?"
+        rating = ", ".join(
+            f"{AgeRatingCategories(age['category']).name} {AgeRatings(age['rating']).name}"
+            for age in data["age_ratings"]
+        ) if "age_ratings" in data else "?"
 
         companies = [c["company"]["name"] for c in data["involved_companies"]] if "involved_companies" in data else "?"
 
@@ -470,7 +474,7 @@ class Games(Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Add/Load Games cog."""
+    """Load the Games cog."""
     # Check does IGDB API key exist, if not, log warning and don't load cog
     if not Tokens.igdb_client_id:
         logger.warning("No IGDB client ID. Not loading Games cog.")

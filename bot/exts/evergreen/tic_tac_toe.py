@@ -10,8 +10,8 @@ from bot.constants import Emojis
 from bot.utils.pagination import LinePaginator
 
 CONFIRMATION_MESSAGE = (
-    "{opponent}, {requester} wants to play Tic-Tac-Toe against you. React to this message with "
-    f"{Emojis.confirmation} to accept or with {Emojis.decline} to decline."
+    "{opponent}, {requester} wants to play Tic-Tac-Toe against you."
+    f"\nReact to this message with {Emojis.confirmation} to accept or with {Emojis.decline} to decline."
 )
 
 
@@ -58,7 +58,7 @@ class Player:
             )
 
         try:
-            react, _ = await self.ctx.bot.wait_for('reaction_add', timeout=30.0, check=check_for_move)
+            react, _ = await self.ctx.bot.wait_for("reaction_add", timeout=30.0, check=check_for_move)
         except asyncio.TimeoutError:
             return True, None
         else:
@@ -246,14 +246,13 @@ def is_requester_free() -> t.Callable:
 class TicTacToe(Cog):
     """TicTacToe cog contains tic-tac-toe game commands."""
 
-    def __init__(self, bot: Bot):
-        self.bot = bot
+    def __init__(self):
         self.games: t.List[Game] = []
 
     @guild_only()
     @is_channel_free()
     @is_requester_free()
-    @group(name="tictactoe", aliases=("ttt",), invoke_without_command=True)
+    @group(name="tictactoe", aliases=("ttt", "tic"), invoke_without_command=True)
     async def tic_tac_toe(self, ctx: Context, opponent: t.Optional[discord.User]) -> None:
         """Tic Tac Toe game. Play against friends or AI. Use reactions to add your mark to field."""
         if opponent == ctx.author:
@@ -276,6 +275,10 @@ class TicTacToe(Cog):
             )
         self.games.append(game)
         if opponent is not None:
+            if opponent.bot:  # check whether the opponent is a bot or not
+                await ctx.send("You can't play Tic-Tac-Toe with bots!")
+                return
+
             confirmed, msg = await game.get_confirmation()
 
             if not confirmed:
@@ -319,5 +322,5 @@ class TicTacToe(Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Load TicTacToe Cog."""
-    bot.add_cog(TicTacToe(bot))
+    """Load the TicTacToe cog."""
+    bot.add_cog(TicTacToe())

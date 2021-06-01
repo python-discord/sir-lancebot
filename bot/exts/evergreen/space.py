@@ -1,15 +1,17 @@
 import logging
 import random
 from datetime import date, datetime
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional
 from urllib.parse import urlencode
 
 from discord import Embed
 from discord.ext import tasks
-from discord.ext.commands import BadArgument, Cog, Context, Converter, group
+from discord.ext.commands import Cog, Context, group
 
 from bot.bot import Bot
 from bot.constants import Tokens
+from bot.utils.converters import DateConverter
+from bot.utils.extensions import invoke_help_command
 
 logger = logging.getLogger(__name__)
 
@@ -20,25 +22,10 @@ NASA_EPIC_BASE_URL = "https://epic.gsfc.nasa.gov"
 APOD_MIN_DATE = date(1995, 6, 16)
 
 
-class DateConverter(Converter):
-    """Parse SOL or earth date (in format YYYY-MM-DD) into `int` or `datetime`. When invalid input, raise error."""
-
-    async def convert(self, ctx: Context, argument: str) -> Union[int, datetime]:
-        """Parse date (SOL or earth) into `datetime` or `int`. When invalid value, raise error."""
-        if argument.isdigit():
-            return int(argument)
-        try:
-            date = datetime.strptime(argument, "%Y-%m-%d")
-        except ValueError:
-            raise BadArgument(f"Can't convert `{argument}` to `datetime` in format `YYYY-MM-DD` or `int` in SOL.")
-        return date
-
-
 class Space(Cog):
     """Space Cog contains commands, that show images, facts or other information about space."""
 
     def __init__(self, bot: Bot):
-        self.bot = bot
         self.http_session = bot.http_session
 
         self.rovers = {}
@@ -63,10 +50,10 @@ class Space(Cog):
     @group(name="space", invoke_without_command=True)
     async def space(self, ctx: Context) -> None:
         """Head command that contains commands about space."""
-        await ctx.send_help("space")
+        await invoke_help_command(ctx)
 
     @space.command(name="apod")
-    async def apod(self, ctx: Context, date: Optional[str] = None) -> None:
+    async def apod(self, ctx: Context, date: Optional[str]) -> None:
         """
         Get Astronomy Picture of Day from NASA API. Date is optional parameter, what formatting is YYYY-MM-DD.
 
@@ -99,7 +86,7 @@ class Space(Cog):
         )
 
     @space.command(name="nasa")
-    async def nasa(self, ctx: Context, *, search_term: Optional[str] = None) -> None:
+    async def nasa(self, ctx: Context, *, search_term: Optional[str]) -> None:
         """Get random NASA information/facts + image. Support `search_term` parameter for more specific search."""
         params = {
             "media_type": "image"
@@ -124,8 +111,8 @@ class Space(Cog):
         )
 
     @space.command(name="epic")
-    async def epic(self, ctx: Context, date: Optional[str] = None) -> None:
-        """Get one of latest random image of earth from NASA EPIC API. Support date parameter, format is YYYY-MM-DD."""
+    async def epic(self, ctx: Context, date: Optional[str]) -> None:
+        """Get a random image of the Earth from the NASA EPIC API. Support date parameter, format is YYYY-MM-DD."""
         if date:
             try:
                 show_date = datetime.strptime(date, "%Y-%m-%d").date().isoformat()
@@ -160,8 +147,8 @@ class Space(Cog):
     async def mars(
         self,
         ctx: Context,
-        date: Optional[DateConverter] = None,
-        rover: Optional[str] = "curiosity"
+        date: Optional[DateConverter],
+        rover: str = "curiosity"
     ) -> None:
         """
         Get random Mars image by date. Support both SOL (martian solar day) and earth date and rovers.
@@ -206,7 +193,7 @@ class Space(Cog):
             )
         )
 
-    @mars.command(name="dates", aliases=["d", "date", "rover", "rovers", "r"])
+    @mars.command(name="dates", aliases=("d", "date", "rover", "rovers", "r"))
     async def dates(self, ctx: Context) -> None:
         """Get current available rovers photo date ranges."""
         await ctx.send("\n".join(
@@ -241,7 +228,7 @@ class Space(Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Load Space Cog."""
+    """Load the Space cog."""
     if not Tokens.nasa:
         logger.warning("Can't find NASA API key. Not loading Space Cog.")
         return

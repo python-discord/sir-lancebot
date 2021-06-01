@@ -3,9 +3,12 @@ name: Lint
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   lint:
@@ -16,12 +19,8 @@ jobs:
       PIP_NO_CACHE_DIR: false
       PIP_USER: 1
 
-      # Hide the graphical elements from pipenv's output
-      PIPENV_HIDE_EMOJIS: 1
-      PIPENV_NOSPIN: 1
-
-      # Make sure pipenv does not try reuse an environment it's running in
-      PIPENV_IGNORE_VIRTUALENVS: 1
+      # Disable Poetry virtualenv creation
+      POETRY_VIRTUALENVS_CREATE: false
 
       # Specify explicit paths for python dependencies and the pre-commit
       # environment so we know which directories to cache
@@ -39,7 +38,7 @@ jobs:
         id: python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.8'
+          python-version: '3.9'
 
       # This step caches our Python dependencies. To make sure we
       # only restore a cache when the dependencies, the python version,
@@ -54,14 +53,14 @@ jobs:
           path: ${{ env.PYTHONUSERBASE }}
           key: "python-0-${{ runner.os }}-${{ env.PYTHONUSERBASE }}-\
           ${{ steps.python.outputs.python-version }}-\
-          ${{ hashFiles('./Pipfile', './Pipfile.lock') }}"
+          ${{ hashFiles('./pyproject.toml', './poetry.lock') }}"
 
       # Install our dependencies if we did not restore a dependency cache
-      - name: Install dependencies using pipenv
+      - name: Install dependencies using poetry
         if: steps.python_cache.outputs.cache-hit != 'true'
         run: |
-          pip install pipenv
-          pipenv install --dev --deploy --system
+          pip install poetry
+          poetry install --no-interaction --no-ansi
 
       # This step caches our pre-commit environment. To make sure we
       # do create a new environment when our pre-commit setup changes,

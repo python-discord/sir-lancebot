@@ -6,28 +6,26 @@ from pathlib import Path
 
 from discord.ext import commands
 
+from bot.bot import Bot
+
 log = logging.getLogger(__name__)
 
-with open(Path("bot/resources/halloween/responses.json"), "r", encoding="utf8") as f:
-    responses = json.load(f)
+RESPONSES = json.loads(Path("bot/resources/halloween/responses.json").read_text("utf8"))
 
 
 class SpookyEightBall(commands.Cog):
     """Spooky Eightball answers."""
 
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
-
-    @commands.command(aliases=('spooky8ball',))
+    @commands.command(aliases=("spooky8ball",))
     async def spookyeightball(self, ctx: commands.Context, *, question: str) -> None:
         """Responds with a random response to a question."""
-        choice = random.choice(responses['responses'])
+        choice = random.choice(RESPONSES["responses"])
         msg = await ctx.send(choice[0])
         if len(choice) > 1:
             await asyncio.sleep(random.randint(2, 5))
             await msg.edit(content=f"{choice[0]} \n{choice[1]}")
 
 
-def setup(bot: commands.Bot) -> None:
-    """Spooky Eight Ball Cog Load."""
-    bot.add_cog(SpookyEightBall(bot))
+def setup(bot: Bot) -> None:
+    """Load the Spooky Eight Ball Cog."""
+    bot.add_cog(SpookyEightBall())

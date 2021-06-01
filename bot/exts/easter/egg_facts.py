@@ -1,6 +1,6 @@
 import logging
 import random
-from json import load
+from json import loads
 from pathlib import Path
 
 import discord
@@ -12,6 +12,8 @@ from bot.utils.decorators import seasonal_task
 
 log = logging.getLogger(__name__)
 
+EGG_FACTS = loads(Path("bot/resources/easter/easter_egg_facts.json").read_text("utf8"))
+
 
 class EasterFacts(commands.Cog):
     """
@@ -22,16 +24,7 @@ class EasterFacts(commands.Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.facts = self.load_json()
-
         self.daily_fact_task = self.bot.loop.create_task(self.send_egg_fact_daily())
-
-    @staticmethod
-    def load_json() -> dict:
-        """Load a list of easter egg facts from the resource JSON file."""
-        p = Path("bot/resources/easter/easter_egg_facts.json")
-        with p.open(encoding="utf8") as f:
-            return load(f)
 
     @seasonal_task(Month.APRIL)
     async def send_egg_fact_daily(self) -> None:
@@ -41,21 +34,22 @@ class EasterFacts(commands.Cog):
         channel = self.bot.get_channel(Channels.community_bot_commands)
         await channel.send(embed=self.make_embed())
 
-    @commands.command(name='eggfact', aliases=['fact'])
+    @commands.command(name="eggfact", aliases=("fact",))
     async def easter_facts(self, ctx: commands.Context) -> None:
         """Get easter egg facts."""
         embed = self.make_embed()
         await ctx.send(embed=embed)
 
-    def make_embed(self) -> discord.Embed:
+    @staticmethod
+    def make_embed() -> discord.Embed:
         """Makes a nice embed for the message to be sent."""
         return discord.Embed(
             colour=Colours.soft_red,
             title="Easter Egg Fact",
-            description=random.choice(self.facts)
+            description=random.choice(EGG_FACTS)
         )
 
 
 def setup(bot: Bot) -> None:
-    """Easter Egg facts cog load."""
+    """Load the Easter Egg facts Cog."""
     bot.add_cog(EasterFacts(bot))
