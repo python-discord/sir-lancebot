@@ -1,16 +1,18 @@
-import random
-from bot.bot import Bot
-import discord
+from random import choice
+
+from discord import Member, TextChannel
 from discord.ext import commands
 from discord.ext.commands import guild_only
 
-choices = ['rock', 'paper', 'scissor']
-short_choices = ['r', 'p', 's']
-"""
-Instead of putting bunch of conditions to check winner,
-We can just manage this dictionary
-"""
-winner = {
+from bot.bot import Bot
+
+
+CHOICES = ['rock', 'paper', 'scissor']
+SHORT_CHOICES = ['r', 'p', 's']
+
+# Instead of putting bunch of conditions to check winner,
+# we can just manage this dictionary
+WINNER_DICT = {
     'r': {
         'r': 0,
         'p': -1,
@@ -29,70 +31,53 @@ winner = {
 }
 
 
-class Game:
-    """A Rock Paper Scissors Game."""
-    def __init__(
-        self,
-        channel: discord.TextChannel,
-    ) -> None:
-        self.channel = channel
+class RPS(commands.Cog):
+    """Rock Paper Scissor. The Classic Game!"""
 
     @staticmethod
-    def get_winner(action_one, action_two):
-        return winner[action_one][action_two]
+    def get_winner(action_one: str, action_two: str) -> int:
+        """Returns result of match from (-1, 0, 1) as (lost, tied, won)."""
+        return WINNER_DICT[action_one][action_two]
 
     @staticmethod
     def make_move() -> str:
-        """Return move"""
-        return random.choice(choices)
+        """Returns random move for bot from CHOICES."""
+        return choice(CHOICES)
 
-    async def game_start(self, player, action) -> None:
+    async def game_start(self, player: Member, channel: TextChannel, action: str) -> None:
+        """
+        Check action of player, draw a move and return result.
+
+        After checking if action of player is valid, make a random move.
+        And based on the move, compare moves of both player and bot and send approprite result.
+        """
         if not action:
-            return await self.channel.send("Please make a move.")
+            await channel.send("Please make a move.")
+            return
         action = action.lower()
-        if action not in choices and action not in short_choices:
-            return await self.channel.send(f"Invalid move. Please make move from options: {' '.join(choices)}")
+        if action not in CHOICES and action not in SHORT_CHOICES:
+            await channel.send(f"Invalid move. Please make move from options: {' '.join(CHOICES)}")
+            return
         bot_move = self.make_move()
         player_result = self.get_winner(action[0], bot_move[0])
         if player_result == 0:
             message_string = f"{player.mention} You and Sir Lancebot played {bot_move.upper()}, It's a tie."
-            return await self.channel.send(message_string)
+            await channel.send(message_string)
         elif player_result == 1:
-            return await self.channel.send(f"Sir Lancebot played {bot_move.upper()}! {player.mention} Won!")
+            await channel.send(f"Sir Lancebot played {bot_move.upper()}! {player.mention} Won!")
         else:
-            return await self.channel.send(f"Sir Lancebot played {bot_move.upper()}! {player.mention} Lost!")
-
-
-class RPS(commands.Cog):
-    """Rock Paper Scissor. The Classic Game!"""
-    """
-    def __init__(self, bot: Bot) -> None:
-        self.bot = bot
-    """
-    async def _play_game(
-        self,
-        ctx: commands.Context,
-        move: str
-    ) -> None:
-        """Helper for playing RPS."""
-        game = Game(ctx.channel)
-        await game.game_start(ctx.author, move)
+            await channel.send(f"Sir Lancebot played {bot_move.upper()}! {player.mention} Lost!")
 
     @guild_only()
-    @commands.group(
+    @commands.command(
         invoke_without_command=True,
         case_insensitive=True
     )
-    async def rps(
-        self,
-        ctx: commands.Context,
-        arg
-    ) -> None:
-        """
-        Play the classic game of Rock Paper Scisorr with your own sir lancebot!
-        """
-        await self._play_game(ctx, arg)
+    async def rps(self, ctx: commands.Context, move: str) -> None:
+        """Play the classic game of Rock Paper Scissor with your own sir-lancebot!"""
+        await self.game_start(ctx.author, ctx.channel, move)
 
 
 def setup(bot: Bot) -> None:
+    """Load RPS Cog."""
     bot.add_cog(RPS(bot))
