@@ -101,7 +101,7 @@ class PfpEffects:
         """
         Flips the image horizontally.
 
-        This is done by just using ImageOps.flip().
+        This is done by just using ImageOps.mirror().
         """
         image = ImageOps.mirror(image)
 
