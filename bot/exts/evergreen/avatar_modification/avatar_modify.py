@@ -121,12 +121,12 @@ class AvatarModify(commands.Cog):
 
         await ctx.send(embed=embed, file=file)
 
-    @avatar_modify.command(aliases=("flip", "mirror"))
+    @avatar_modify.command(name="reverse", root_aliases=("reverse",))
     async def reverse(self, ctx: commands.Context, *, text: t.Optional[str]) -> None:
         """Either flips your profile picture or the submitted text."""
         if not text:
             async with ctx.typing():
-                user = self._fetch_user(ctx.author.id)
+                user = await self._fetch_user(ctx.author.id)
                 image_bytes = await user.avatar_url_as(size=1024).read()
                 file_name = file_safe_name("reverse_avatar", ctx.author.display_name)
 
@@ -143,10 +143,11 @@ class AvatarModify(commands.Cog):
                 )
 
                 embed.set_image(url=f"attachment://{file_name}")
-                embed.set_footer(f"Made by {ctx.author.display_name}.", icon_url=user.avatar_url)
+                embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=user.avatar_url)
 
             await ctx.send(embed=embed, file=file)
-
+        else:
+            await ctx.send(f"> {text[::-1]}")
 
     @avatar_modify.command(aliases=("easterify",), root_aliases=("easterify", "avatareasterify"))
     async def avatareasterify(self, ctx: commands.Context, *colours: t.Union[discord.Colour, str]) -> None:
