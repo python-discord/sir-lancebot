@@ -147,7 +147,7 @@ class AvatarModify(commands.Cog):
 
             await ctx.send(embed=embed, file=file)
         else:
-            await ctx.send(f"> {text[::-1]}")
+            await ctx.send(f"> {text[::-1]}", allowed_mentions=discord.AllowedMentions.none())
 
     @avatar_modify.command(aliases=("easterify",), root_aliases=("easterify", "avatareasterify"))
     async def avatareasterify(self, ctx: commands.Context, *colours: t.Union[discord.Colour, str]) -> None:
