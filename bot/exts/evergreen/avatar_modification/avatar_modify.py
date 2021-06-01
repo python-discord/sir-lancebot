@@ -127,6 +127,9 @@ class AvatarModify(commands.Cog):
         if text is None:
             async with ctx.typing():
                 user = await self._fetch_user(ctx.author.id)
+                if not user:
+                    await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
+                    return
                 image_bytes = await user.avatar_url_as(size=1024).read()
                 file_name = file_safe_name("reverse_avatar", ctx.author.display_name)
 
