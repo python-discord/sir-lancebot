@@ -124,7 +124,7 @@ class AvatarModify(commands.Cog):
     @avatar_modify.command(name="reverse", root_aliases=("reverse",))
     async def reverse(self, ctx: commands.Context, *, text: t.Optional[str]) -> None:
         """Either flips your profile picture or the submitted text."""
-        if not text:
+        if text is None:
             async with ctx.typing():
                 user = await self._fetch_user(ctx.author.id)
                 image_bytes = await user.avatar_url_as(size=1024).read()
@@ -133,7 +133,7 @@ class AvatarModify(commands.Cog):
                 file = await in_executor(
                     PfpEffects.apply_effect,
                     image_bytes,
-                    PfpEffects.reverse_effect,
+                    PfpEffects.flip_effect,
                     file_name
                 )
 

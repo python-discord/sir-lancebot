@@ -97,13 +97,12 @@ class PfpEffects:
         return image.quantize()
 
     @staticmethod
-    def reverse_effect(image: Image.Image) -> Image.Image:
+    def flip_effect(image: Image.Image) -> Image.Image:
         """
         Flips the image horizontally.
 
         This is done by just using ImageOps.flip().
         """
-        image = image.resize((1024, 1024))
         image = ImageOps.mirror(image)
 
         return image
