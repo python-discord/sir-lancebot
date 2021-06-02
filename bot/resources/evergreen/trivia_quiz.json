@@ -372,7 +372,7 @@
     {
       "id": 216,
       "question": "In set builder notation, {p/q | q ≠ 0, p & q ∈ Z} represents what?",
-      "answer": "rationals, Rational Numbers"
+      "answer": "Rationals, Rational Numbers"
     },
     {
       "id": 217,
@@ -609,7 +609,7 @@
     {
       "id": 401,
       "question": "What does HTML stand for?",
-      "answer": "Hyper Text Markup Language"
+      "answer": "HyperText Markup Language"
     },
     {
       "id": 402,
@@ -668,7 +668,7 @@
     },
     {
       "id": 413,
-      "question": "Which protocol handles communication between email servers?",
+      "question": "What is the most popular protocol (as of 2021) that handles communication between email servers?",
       "answer": "SMTP"
     },
     {
@@ -713,17 +713,17 @@
     },
     {
       "id": 422,
-      "question": "Which of these languages is the oldest? Tcl, Smalltalk 80, haskell, standard ML, Java",
+      "question": "Which of these languages is the oldest? Tcl, Smalltalk 80, Haskell, Standard ML, Java",
       "answer": "Smalltalk 80"
     },
     {
       "id": 423,
-      "question": "What is the name for unicode codepoints that do not fit into 16 bits",
+      "question": "What is the name for unicode codepoints that do not fit into 16 bits?",
       "answer": "surrogates"
     },
     {
       "id": 424,
-      "question": "Under what locale does making a string lowercase behave differently",
+      "question": "Under what locale does making a string lowercase behave differently?",
       "answer": "Turkish"
     },
     {
