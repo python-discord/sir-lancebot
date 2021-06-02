@@ -54,12 +54,16 @@ class RPS(commands.Cog):
         if not action:
             await channel.send("Please make a move.")
             return
+
         action = action.lower()
+
         if action not in CHOICES and action not in SHORT_CHOICES:
             await channel.send(f"Invalid move. Please make move from options: {' '.join(CHOICES)}")
             return
+
         bot_move = self.make_move()
         player_result = self.get_winner(action[0], bot_move[0])
+
         if player_result == 0:
             message_string = f"{player.mention} You and Sir Lancebot played {bot_move.upper()}, It's a tie."
             await channel.send(message_string)
@@ -69,10 +73,7 @@ class RPS(commands.Cog):
             await channel.send(f"Sir Lancebot played {bot_move.upper()}! {player.mention} Lost!")
 
     @guild_only()
-    @commands.command(
-        invoke_without_command=True,
-        case_insensitive=True
-    )
+    @commands.command(case_insensitive=True)
     async def rps(self, ctx: commands.Context, move: str) -> None:
         """Play the classic game of Rock Paper Scissor with your own sir-lancebot!"""
         await self.game_start(ctx.author, ctx.channel, move)
