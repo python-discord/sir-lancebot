@@ -9,6 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import discord
+from PIL import UnidentifiedImageError
 from aiohttp import client_exceptions
 from discord.ext import commands
 
@@ -121,8 +122,9 @@ class AvatarModify(commands.Cog):
 
         await ctx.send(embed=embed, file=file)
 
-    @avatar_modify.group(name="reverse")
+    @avatar_modify.group(name="reverse", root_aliases=['reverse'])
     async def reverse(self, ctx: commands.Context) -> None:
+        """Group for the reverse commands."""
         if not ctx.invoked_subcommand:
             await invoke_help_command(ctx)
 
@@ -132,14 +134,48 @@ class AvatarModify(commands.Cog):
         await ctx.send(f"> {text[::-1]}", allowed_mentions=discord.AllowedMentions.none())
 
     @reverse.command(name="image")
-    async def image(self, ctx: commands.Context) -> None:
-        """Sends a reversed version of the users profile picture."""
+    async def photo(self, ctx: commands.Context) -> None:
+        """
+        Sends a reversed version of the users profile picture.
+
+        If an image is attached, the given image will be flipped.
+        """
         async with ctx.typing():
-            user = self._fetch_user(ctx.author.id)
+            user = await self._fetch_user(ctx.author.id)
             if not user:
                 await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
                 return
-            
+            if ctx.message.attachments:
+                url = str(ctx.message.attachments[0])
+                async with self.bot.http_session.get(url) as r:
+                    image_bytes = await r.read()
+                    filename = file_safe_name("reverse_image", ctx.author.display_name)
+
+                    try:
+                        file = await in_executor(
+                            PfpEffects.apply_effect,
+                            image_bytes,
+                            PfpEffects.flip_effect,
+                            filename
+                        )
+                    except UnidentifiedImageError:
+                        raise commands.BadArgument(
+                            "The attachment given is not an image. Please ensure you send an image."
+                        )
+                        return
+
+                    embed = discord.Embed(
+                        title="Your reversed image.",
+                        description="Here is your reversed image. I think it looks somewhat flipped."
+                    )
+
+                    embed.set_image(url=f"attachment://{filename}")
+                    embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=user.avatar_url)
+
+                    await ctx.send(embed=embed, file=file)
+
+                    return
+
             image_bytes = await user.avatar_url_as(size=1024).read()
             filename = file_safe_name("reverse_avatar", ctx.author.display_name)
 
@@ -151,11 +187,11 @@ class AvatarModify(commands.Cog):
             )
 
             embed = discord.Embed(
-                title="Your reversed avatar.", 
+                title="Your reversed avatar.",
                 description="Here is your reversed avatar. I think it is a spitting image of you."
             )
 
-            embed.set_image(f"attachment://{filename}")
+            embed.set_image(url=f"attachment://{filename}")
             embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=user.avatar_url)
 
             await ctx.send(embed=embed, file=file)
