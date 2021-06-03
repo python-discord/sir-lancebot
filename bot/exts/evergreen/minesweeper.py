@@ -6,8 +6,11 @@ from random import randint, random
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Client
+from bot.utils.converters import CoordinateConverter
 from bot.utils.exceptions import UserNotPlayingError
+from bot.utils.extensions import invoke_help_command
 
 MESSAGE_MAPPING = {
     0: ":stop_button:",
@@ -30,33 +33,6 @@ MESSAGE_MAPPING = {
 log = logging.getLogger(__name__)
 
 
-class CoordinateConverter(commands.Converter):
-    """Converter for Coordinates."""
-
-    async def convert(self, ctx: commands.Context, coordinate: str) -> typing.Tuple[int, int]:
-        """Take in a coordinate string and turn it into an (x, y) tuple."""
-        if not 2 <= len(coordinate) <= 3:
-            raise commands.BadArgument('Invalid co-ordinate provided')
-
-        coordinate = coordinate.lower()
-        if coordinate[0].isalpha():
-            digit = coordinate[1:]
-            letter = coordinate[0]
-        else:
-            digit = coordinate[:-1]
-            letter = coordinate[-1]
-
-        if not digit.isdigit():
-            raise commands.BadArgument
-
-        x = ord(letter) - ord('a')
-        y = int(digit) - 1
-
-        if (not 0 <= x <= 9) or (not 0 <= y <= 9):
-            raise commands.BadArgument
-        return x, y
-
-
 GameBoard = typing.List[typing.List[typing.Union[str, int]]]
 
 
@@ -77,13 +53,13 @@ GamesDict = typing.Dict[int, Game]
 class Minesweeper(commands.Cog):
     """Play a game of Minesweeper."""
 
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self) -> None:
         self.games: GamesDict = {}  # Store the currently running games
 
-    @commands.group(name='minesweeper', aliases=('ms',), invoke_without_command=True)
+    @commands.group(name="minesweeper", aliases=("ms",), invoke_without_command=True)
     async def minesweeper_group(self, ctx: commands.Context) -> None:
         """Commands for Playing Minesweeper."""
-        await ctx.send_help(ctx.command)
+        await invoke_help_command(ctx)
 
     @staticmethod
     def get_neighbours(x: int, y: int) -> typing.Generator[typing.Tuple[int, int], None, None]:
@@ -147,7 +123,7 @@ class Minesweeper(commands.Cog):
                 f"Close the game with `{Client.prefix}ms end`\n"
             )
         except discord.errors.Forbidden:
-            log.debug(f"{ctx.author.name} ({ctx.author.id}) has disabled DMs from server members")
+            log.debug(f"{ctx.author.name} ({ctx.author.id}) has disabled DMs from server members.")
             await ctx.send(f":x: {ctx.author.mention}, please enable DMs to play minesweeper.")
             return
 
@@ -157,7 +133,7 @@ class Minesweeper(commands.Cog):
         dm_msg = await ctx.author.send(f"Here's your board!\n{self.format_for_discord(revealed_board)}")
 
         if ctx.guild:
-            await ctx.send(f"{ctx.author.mention} is playing Minesweeper")
+            await ctx.send(f"{ctx.author.mention} is playing Minesweeper.")
             chat_msg = await ctx.send(f"Here's their board!\n{self.format_for_discord(revealed_board)}")
         else:
             chat_msg = None
@@ -236,17 +212,17 @@ class Minesweeper(commands.Cog):
             return True
 
     async def reveal_one(
-            self,
-            ctx: commands.Context,
-            revealed: GameBoard,
-            board: GameBoard,
-            x: int,
-            y: int
+        self,
+        ctx: commands.Context,
+        revealed: GameBoard,
+        board: GameBoard,
+        x: int,
+        y: int
     ) -> bool:
         """
         Reveal one square.
 
-        return is True if the game ended, breaking the loop in `reveal_command` and deleting the game
+        return is True if the game ended, breaking the loop in `reveal_command` and deleting the game.
         """
         revealed[y][x] = board[y][x]
         if board[y][x] == "bomb":
@@ -284,13 +260,13 @@ class Minesweeper(commands.Cog):
         game = self.games[ctx.author.id]
         game.revealed = game.board
         await self.update_boards(ctx)
-        new_msg = f":no_entry: Game canceled :no_entry:\n{game.dm_msg.content}"
+        new_msg = f":no_entry: Game canceled. :no_entry:\n{game.dm_msg.content}"
         await game.dm_msg.edit(content=new_msg)
         if game.activated_on_server:
             await game.chat_msg.edit(content=new_msg)
         del self.games[ctx.author.id]
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load the Minesweeper cog."""
-    bot.add_cog(Minesweeper(bot))
+    bot.add_cog(Minesweeper())

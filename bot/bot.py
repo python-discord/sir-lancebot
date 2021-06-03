@@ -64,6 +64,26 @@ class Bot(commands.Bot):
         super().add_cog(cog)
         log.info(f"Cog loaded: {cog.qualified_name}")
 
+    def add_command(self, command: commands.Command) -> None:
+        """Add `command` as normal and then add its root aliases to the bot."""
+        super().add_command(command)
+        self._add_root_aliases(command)
+
+    def remove_command(self, name: str) -> Optional[commands.Command]:
+        """
+        Remove a command/alias as normal and then remove its root aliases from the bot.
+
+        Individual root aliases cannot be removed by this function.
+        To remove them, either remove the entire command or manually edit `bot.all_commands`.
+        """
+        command = super().remove_command(name)
+        if command is None:
+            # Even if it's a root alias, there's no way to get the Bot instance to remove the alias.
+            return
+
+        self._remove_root_aliases(command)
+        return command
+
     async def on_command_error(self, context: commands.Context, exception: DiscordException) -> None:
         """Check command errors for UserInputError and reset the cooldown if thrown."""
         if isinstance(exception, commands.UserInputError):
@@ -74,11 +94,16 @@ class Bot(commands.Bot):
     async def check_channels(self) -> None:
         """Verifies that all channel constants refer to channels which exist."""
         await self.wait_until_guild_available()
-        all_channels = set(self.get_all_channels())
+
+        if constants.Client.debug:
+            log.info("Skipping Channels Check.")
+            return
+
+        all_channels_ids = [channel.id for channel in self.get_all_channels()]
         for name, channel_id in vars(constants.Channels).items():
-            if name.startswith('_'):
+            if name.startswith("_"):
                 continue
-            if channel_id not in all_channels:
+            if channel_id not in all_channels_ids:
                 log.error(f'Channel "{name}" with ID {channel_id} missing')
 
     async def send_log(self, title: str, details: str = None, *, icon: str = None) -> None:
@@ -133,6 +158,27 @@ class Bot(commands.Bot):
         gateway event before giving up and thus not populating the cache for unavailable guilds.
         """
         await self._guild_available.wait()
+
+    def _add_root_aliases(self, command: commands.Command) -> None:
+        """Recursively add root aliases for `command` and any of its subcommands."""
+        if isinstance(command, commands.Group):
+            for subcommand in command.commands:
+                self._add_root_aliases(subcommand)
+
+        for alias in getattr(command, "root_aliases", ()):
+            if alias in self.all_commands:
+                raise commands.CommandRegistrationError(alias, alias_conflict=True)
+
+            self.all_commands[alias] = command
+
+    def _remove_root_aliases(self, command: commands.Command) -> None:
+        """Recursively remove root aliases for `command` and any of its subcommands."""
+        if isinstance(command, commands.Group):
+            for subcommand in command.commands:
+                self._remove_root_aliases(subcommand)
+
+        for alias in getattr(command, "root_aliases", ()):
+            self.all_commands.pop(alias, None)
 
 
 _allowed_roles = [discord.Object(id_) for id_ in constants.MODERATION_ROLES]

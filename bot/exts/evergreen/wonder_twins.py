@@ -2,15 +2,15 @@ import random
 from pathlib import Path
 
 import yaml
-from discord.ext.commands import Bot, Cog, Context, command
+from discord.ext.commands import Cog, Context, command
+
+from bot.bot import Bot
 
 
 class WonderTwins(Cog):
     """Cog for a Wonder Twins inspired command."""
 
-    def __init__(self, bot: Bot):
-        self.bot = bot
-
+    def __init__(self):
         with open(Path.cwd() / "bot" / "resources" / "evergreen" / "wonder_twins.yaml", "r", encoding="utf-8") as f:
             info = yaml.load(f, Loader=yaml.FullLoader)
             self.water_types = info["water_types"]
@@ -38,7 +38,7 @@ class WonderTwins(Cog):
             object_name = self.append_onto(adjective, object_name)
         return f"{object_name} of {water_type}"
 
-    @command(name="formof", aliases=["wondertwins", "wondertwin", "fo"])
+    @command(name="formof", aliases=("wondertwins", "wondertwin", "fo"))
     async def form_of(self, ctx: Context) -> None:
         """Command to send a Wonder Twins inspired phrase to the user invoking the command."""
         await ctx.send(f"Form of {self.format_phrase()}!")
@@ -46,4 +46,4 @@ class WonderTwins(Cog):
 
 def setup(bot: Bot) -> None:
     """Load the WonderTwins cog."""
-    bot.add_cog(WonderTwins(bot))
+    bot.add_cog(WonderTwins())
