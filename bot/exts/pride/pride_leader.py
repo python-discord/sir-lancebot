@@ -52,12 +52,7 @@ class PrideLeader(commands.Cog):
             error_msg = "Did you mean?"
 
         embed.description = f"{error_msg}\n```{valid_names}```"
-        embed.add_field(
-            name="You can get information about the Pride Leader on the Wikipedia command",
-            value=f"Do `{constants.Client.prefix}wiki {pride_leader}`"
-                  f" in <#{constants.Channels.community_bot_commands}>",
-            inline=False
-        )
+        embed.set_footer(text="To add more pride leaders, feel free to open a pull request!")
 
         return embed
 
