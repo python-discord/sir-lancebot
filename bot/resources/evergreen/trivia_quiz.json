@@ -684,7 +684,7 @@
     {
       "id": 416,
       "question": "Which newline sequence does HTTP use?",
-      "answer": "CRLF, \\r\\n"
+      "answer": "carriage return line feed, CRLF, \\r\\n"
     },
     {
       "id": 417,
@@ -880,8 +880,8 @@
     },
     {
       "id": 525,
-      "question": "What class was added in a new standard library module for python 3.9?",
-      "answer": "TopologicalSorter"
+      "question": "Which year was Python 3 released?",
+      "answer": "2008"
     },
     {
       "id": 526,
