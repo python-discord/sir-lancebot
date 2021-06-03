@@ -101,7 +101,7 @@ class PrideLeader(commands.Cog):
         and if there is no pride leader given, return a random pride leader.
         """
         if not pride_leader_name:
-            leader = random.choice(list(PRIDE_RESOURCE))
+            pride_leader_name = random.choice(list(PRIDE_RESOURCE))
         else:
             leader = PRIDE_RESOURCE.get(pride_leader_name.title())
             if not leader:
@@ -111,7 +111,7 @@ class PrideLeader(commands.Cog):
                 await ctx.send(embed=embed)
                 return
 
-        embed = self.embed_builder(leader)
+        embed = self.embed_builder(pride_leader_name)
         await ctx.send(embed=embed)
 
 
