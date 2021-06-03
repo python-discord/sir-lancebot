@@ -13,7 +13,7 @@ from bot import constants
 
 log = logging.getLogger(__name__)
 
-PRIDE_LEADERS_RESOURCE = Path("bot/resources/pride/prideleader.json")
+PRIDE_RESOURCE = json.loads(Path("bot/resources/pride/prideleader.json").read_text("utf8"))
 MINIMUM_FUZZ_RATIO = 40
 
 
@@ -22,8 +22,6 @@ class PrideLeader(commands.Cog):
 
     def __init__(self, bot: bot.Bot):
         self.bot = bot
-
-        self.pride = json.loads(PRIDE_LEADERS_RESOURCE.read_text("utf8"))
 
     def invalid_embed_generate(self, pride_leader: str) -> discord.Embed:
         """
@@ -42,12 +40,12 @@ class PrideLeader(commands.Cog):
         )
         valid_names = []
         pride_leader = pride_leader.title()
-        for name in self.pride:
+        for name in PRIDE_RESOURCE:
             if fuzz.ratio(pride_leader, name) >= MINIMUM_FUZZ_RATIO:
                 valid_names.append(name)
 
         if not valid_names:
-            valid_names = ", ".join(self.pride)
+            valid_names = ", ".join(PRIDE_RESOURCE)
             error_msg = "Sorry your input didn't match any stored names, here is a list of available names:"
         else:
             valid_names = "\n".join(valid_names)
@@ -67,22 +65,22 @@ class PrideLeader(commands.Cog):
         """Generate an Embed with information about a pride leader."""
         embed = discord.Embed(
             title=leader_name,
-            description=self.pride[leader_name]["About"],
+            description=PRIDE_RESOURCE[leader_name]["About"],
             color=constants.Colours.blue
         )
         embed.add_field(
             name="Known for",
-            value=self.pride[leader_name]["Known for"],
+            value=PRIDE_RESOURCE[leader_name]["Known for"],
             inline=False
         )
         embed.add_field(
             name="D.O.B and Birth place",
-            value=self.pride[leader_name]["Born"],
+            value=PRIDE_RESOURCE[leader_name]["Born"],
             inline=False
         )
         embed.add_field(
             name="Awards and honors",
-            value=self.pride[leader_name]["Awards"],
+            value=PRIDE_RESOURCE[leader_name]["Awards"],
             inline=False
         )
         embed.add_field(
@@ -91,7 +89,7 @@ class PrideLeader(commands.Cog):
                   f" in <#{constants.Channels.community_bot_commands}>",
             inline=False
         )
-        embed.set_thumbnail(url=self.pride[leader_name]["url"])
+        embed.set_thumbnail(url=PRIDE_RESOURCE[leader_name]["url"])
         return embed
 
     @commands.command(aliases=("pl", "prideleader"))
@@ -103,9 +101,9 @@ class PrideLeader(commands.Cog):
         and if there is no pride leader given, return a random pride leader.
         """
         if not pride_leader_name:
-            leader = random.choice(list(self.pride))
+            leader = random.choice(list(PRIDE_RESOURCE))
         else:
-            leader = self.pride.get(pride_leader_name.title())
+            leader = PRIDE_RESOURCE.get(pride_leader_name.title())
             if not leader:
                 log.trace(f"Got a Invalid pride leader: {pride_leader_name}")
 
