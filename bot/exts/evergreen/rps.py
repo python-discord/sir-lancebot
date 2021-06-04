@@ -54,5 +54,5 @@ class RPS(commands.Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Load RPS Cog."""
+    """Load the RPS Cog."""
     bot.add_cog(RPS(bot))
