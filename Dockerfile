@@ -4,9 +4,8 @@ FROM python:3.9-slim
 ENV PIP_NO_CACHE_DIR=false \
     POETRY_VIRTUALENVS_CREATE=false
 
-# Install Poetry and add it to the path
-RUN pip install --user poetry
-ENV PATH="${PATH}:/root/.local/bin"
+# Install Poetry
+RUN pip install --upgrade poetry
 
 WORKDIR /bot
 
