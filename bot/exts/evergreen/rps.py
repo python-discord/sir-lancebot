@@ -50,12 +50,12 @@ class RPS(commands.Cog):
         player_result = WINNER_DICT[move[0]][bot_move[0]]
 
         if player_result == 0:
-            message_string = f"{player_mention} You and Sir Lancebot played {bot_move.upper()}, It's a tie."
+            message_string = f"{player_mention} You and Sir Lancebot played {bot_move}, it's a tie."
             await channel.send(message_string)
         elif player_result == 1:
-            await channel.send(f"Sir Lancebot played {bot_move.upper()}! {player_mention} Won!")
+            await channel.send(f"Sir Lancebot played {bot_move}! {player_mention} won!")
         else:
-            await channel.send(f"Sir Lancebot played {bot_move.upper()}! {player_mention} Lost!")
+            await channel.send(f"Sir Lancebot played {bot_move}! {player_mention} lost!")
 
 
 def setup(bot: Bot) -> None:
