@@ -33,16 +33,11 @@ class RPS(commands.Cog):
     @commands.command(case_insensitive=True)
     async def rps(self, ctx: commands.Context, move: str) -> None:
         """Play the classic game of Rock Paper Scissor with your own sir-lancebot!"""
-        channel = ctx.channel
-        if not move:
-            await channel.send("Please make a move.")
-            return
-
         move = move.lower()
         player_mention = ctx.author.mention
 
         if move not in CHOICES and move not in SHORT_CHOICES:
-            await channel.send(f"Invalid move. Please make move from options: {', '.join(CHOICES).upper()}.")
+            await ctx.send(f"Invalid move. Please make move from options: {', '.join(CHOICES).upper()}.")
             return
 
         bot_move = choice(CHOICES)
@@ -51,11 +46,11 @@ class RPS(commands.Cog):
 
         if player_result == 0:
             message_string = f"{player_mention} You and Sir Lancebot played {bot_move}, it's a tie."
-            await channel.send(message_string)
+            await ctx.send(message_string)
         elif player_result == 1:
-            await channel.send(f"Sir Lancebot played {bot_move}! {player_mention} won!")
+            await ctx.send(f"Sir Lancebot played {bot_move}! {player_mention} won!")
         else:
-            await channel.send(f"Sir Lancebot played {bot_move}! {player_mention} lost!")
+            await ctx.send(f"Sir Lancebot played {bot_move}! {player_mention} lost!")
 
 
 def setup(bot: Bot) -> None:
