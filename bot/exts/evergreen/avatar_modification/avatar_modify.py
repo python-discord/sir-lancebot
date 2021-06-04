@@ -145,36 +145,6 @@ class AvatarModify(commands.Cog):
             if not user:
                 await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
                 return
-            if ctx.message.attachments:
-                url = str(ctx.message.attachments[0])
-                async with self.bot.http_session.get(url) as r:
-                    image_bytes = await r.read()
-                    filename = file_safe_name("reverse_image", ctx.author.display_name)
-
-                    try:
-                        file = await in_executor(
-                            PfpEffects.apply_effect,
-                            image_bytes,
-                            PfpEffects.flip_effect,
-                            filename
-                        )
-                    except UnidentifiedImageError:
-                        raise commands.BadArgument(
-                            "The attachment given is not an image. Please ensure you send an image."
-                        )
-                        return
-
-                    embed = discord.Embed(
-                        title="Your reversed image.",
-                        description="Here is your reversed image. I think it looks somewhat flipped."
-                    )
-
-                    embed.set_image(url=f"attachment://{filename}")
-                    embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=user.avatar_url)
-
-                    await ctx.send(embed=embed, file=file)
-
-                    return
 
             image_bytes = await user.avatar_url_as(size=1024).read()
             filename = file_safe_name("reverse_avatar", ctx.author.display_name)
