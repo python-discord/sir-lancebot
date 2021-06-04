@@ -2,7 +2,6 @@ from random import choice
 
 from discord import Member, TextChannel
 from discord.ext import commands
-from discord.ext.commands import guild_only
 
 from bot.bot import Bot
 
@@ -72,7 +71,6 @@ class RPS(commands.Cog):
         else:
             await channel.send(f"Sir Lancebot played {bot_move.upper()}! {player.mention} Lost!")
 
-    @guild_only()
     @commands.command(case_insensitive=True)
     async def rps(self, ctx: commands.Context, move: str) -> None:
         """Play the classic game of Rock Paper Scissor with your own sir-lancebot!"""
