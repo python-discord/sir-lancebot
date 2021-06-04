@@ -18,7 +18,7 @@ We know it can be difficult to get into the whole open source thing at first. To
 This later evolved into a bot designed as a fun and beginner-friendly learning environment for writing bot features and learning open-source.
 
 ## Getting started
-Before you start, please take some time to read through our [contributing guidelines](CONTRIBUTING.md).
+Before you start, please take some time to read through our [contributing guidelines](https://pythondiscord.com/pages/guides/pydis-guides/contributing/contributing-guidelines/).
 
 See [Sir Lancebot's Wiki](https://pythondiscord.com/pages/contributing/sir-lancebot/) for in-depth guides on getting started with the project!
 
