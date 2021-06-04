@@ -1,6 +1,5 @@
 from random import choice
 
-from discord import Member, TextChannel
 from discord.ext import commands
 
 from bot.bot import Bot
@@ -30,35 +29,6 @@ WINNER_DICT = {
 
 class RPS(commands.Cog):
     """Rock Paper Scissor. The Classic Game!"""
-
-    async def game_start(self, player: Member, channel: TextChannel, action: str) -> None:
-        """
-        Check action of player, draw a move and return result.
-
-        After checking if action of player is valid, make a random move.
-        And based on the move, compare moves of both player and bot and send approprite result.
-        """
-        if not action:
-            await channel.send("Please make a move.")
-            return
-
-        action = action.lower()
-
-        if action not in CHOICES and action not in SHORT_CHOICES:
-            await channel.send(f"Invalid move. Please make move from options: {' '.join(CHOICES)}")
-            return
-
-        bot_move = choice(CHOICES)
-        # value of player_result will be from (-1, 0, 1) as (lost, tied, won).
-        player_result = WINNER_DICT[action[0]][bot_move[0]]
-
-        if player_result == 0:
-            message_string = f"{player.mention} You and Sir Lancebot played {bot_move.upper()}, It's a tie."
-            await channel.send(message_string)
-        elif player_result == 1:
-            await channel.send(f"Sir Lancebot played {bot_move.upper()}! {player.mention} Won!")
-        else:
-            await channel.send(f"Sir Lancebot played {bot_move.upper()}! {player.mention} Lost!")
 
     @commands.command(case_insensitive=True)
     async def rps(self, ctx: commands.Context, move: str) -> None:
