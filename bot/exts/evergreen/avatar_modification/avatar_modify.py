@@ -129,7 +129,7 @@ class AvatarModify(commands.Cog):
             await invoke_help_command(ctx)
 
     @reverse.command(name="text")
-    async def text(self, ctx: commands.Context, *, text: str) -> None:
+    async def reverse_text(self, ctx: commands.Context, *, text: str) -> None:
         """Sends the given text backwards."""
         await ctx.send(f"> {text[::-1]}", allowed_mentions=discord.AllowedMentions.none())
 
