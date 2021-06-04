@@ -4,25 +4,25 @@ from discord.ext import commands
 
 from bot.bot import Bot
 
-CHOICES = ['rock', 'paper', 'scissor']
-SHORT_CHOICES = ['r', 'p', 's']
+CHOICES = ["rock", "paper", "scissors"]
+SHORT_CHOICES = ["r", "p", "s"]
 
 # Using a dictionary instead of conditions to check for the winner.
 WINNER_DICT = {
-    'r': {
-        'r': 0,
-        'p': -1,
-        's': 1,
+    "r": {
+        "r": 0,
+        "p": -1,
+        "s": 1,
     },
-    'p': {
-        'r': 1,
-        'p': 0,
-        's': -1,
+    "p": {
+        "r": 1,
+        "p": 0,
+        "s": -1,
     },
-    's': {
-        'r': -1,
-        'p': 1,
-        's': 0,
+    "s": {
+        "r": -1,
+        "p": 1,
+        "s": 0,
     }
 }
 
