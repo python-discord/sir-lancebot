@@ -9,8 +9,7 @@ from bot.bot import Bot
 CHOICES = ['rock', 'paper', 'scissor']
 SHORT_CHOICES = ['r', 'p', 's']
 
-# Instead of putting bunch of conditions to check winner,
-# we can just manage this dictionary
+# Using a dictionary instead of conditions to check for the winner.
 WINNER_DICT = {
     'r': {
         'r': 0,
