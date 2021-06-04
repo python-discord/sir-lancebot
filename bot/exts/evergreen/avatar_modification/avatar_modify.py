@@ -134,7 +134,7 @@ class AvatarModify(commands.Cog):
         await ctx.send(f"> {text[::-1]}", allowed_mentions=discord.AllowedMentions.none())
 
     @reverse.command(name="image")
-    async def photo(self, ctx: commands.Context) -> None:
+    async def reverse_photo(self, ctx: commands.Context) -> None:
         """
         Sends a reversed version of the users profile picture.
 
