@@ -37,8 +37,7 @@ class RPS(commands.Cog):
         player_mention = ctx.author.mention
 
         if move not in CHOICES and move not in SHORT_CHOICES:
-            await ctx.send(f"Invalid move. Please make move from options: {', '.join(CHOICES).upper()}.")
-            return
+            raise commands.BadArgument(f"Invalid move. Please make move from options: {', '.join(CHOICES).upper()}.")
 
         bot_move = choice(CHOICES)
         # value of player_result will be from (-1, 0, 1) as (lost, tied, won).
