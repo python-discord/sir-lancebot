@@ -5,7 +5,6 @@ from discord.ext import commands
 
 from bot.bot import Bot
 
-
 CHOICES = ['rock', 'paper', 'scissor']
 SHORT_CHOICES = ['r', 'p', 's']
 
@@ -32,16 +31,6 @@ WINNER_DICT = {
 class RPS(commands.Cog):
     """Rock Paper Scissor. The Classic Game!"""
 
-    @staticmethod
-    def get_winner(action_one: str, action_two: str) -> int:
-        """Returns result of match from (-1, 0, 1) as (lost, tied, won)."""
-        return WINNER_DICT[action_one][action_two]
-
-    @staticmethod
-    def make_move() -> str:
-        """Returns random move for bot from CHOICES."""
-        return choice(CHOICES)
-
     async def game_start(self, player: Member, channel: TextChannel, action: str) -> None:
         """
         Check action of player, draw a move and return result.
@@ -59,8 +48,9 @@ class RPS(commands.Cog):
             await channel.send(f"Invalid move. Please make move from options: {' '.join(CHOICES)}")
             return
 
-        bot_move = self.make_move()
-        player_result = self.get_winner(action[0], bot_move[0])
+        bot_move = choice(CHOICES)
+        # value of player_result will be from (-1, 0, 1) as (lost, tied, won).
+        player_result = WINNER_DICT[action[0]][bot_move[0]]
 
         if player_result == 0:
             message_string = f"{player.mention} You and Sir Lancebot played {bot_move.upper()}, It's a tie."
@@ -73,7 +63,29 @@ class RPS(commands.Cog):
     @commands.command(case_insensitive=True)
     async def rps(self, ctx: commands.Context, move: str) -> None:
         """Play the classic game of Rock Paper Scissor with your own sir-lancebot!"""
-        await self.game_start(ctx.author, ctx.channel, move)
+        channel = ctx.channel
+        if not move:
+            await channel.send("Please make a move.")
+            return
+
+        move = move.lower()
+        player_mention = ctx.author.mention
+
+        if move not in CHOICES and move not in SHORT_CHOICES:
+            await channel.send(f"Invalid move. Please make move from options: {', '.join(CHOICES).upper()}.")
+            return
+
+        bot_move = choice(CHOICES)
+        # value of player_result will be from (-1, 0, 1) as (lost, tied, won).
+        player_result = WINNER_DICT[move[0]][bot_move[0]]
+
+        if player_result == 0:
+            message_string = f"{player_mention} You and Sir Lancebot played {bot_move.upper()}, It's a tie."
+            await channel.send(message_string)
+        elif player_result == 1:
+            await channel.send(f"Sir Lancebot played {bot_move.upper()}! {player_mention} Won!")
+        else:
+            await channel.send(f"Sir Lancebot played {bot_move.upper()}! {player_mention} Lost!")
 
 
 def setup(bot: Bot) -> None:
