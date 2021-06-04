@@ -56,35 +56,37 @@ class PrideLeader(commands.Cog):
 
         return embed
 
-    def embed_builder(self, leader_name: str) -> discord.Embed:
+    def embed_builder(self, pride_leader: dict) -> discord.Embed:
         """Generate an Embed with information about a pride leader."""
+        name =  [name for name, info in PRIDE_RESOURCE.items() if info == pride_leader][0]
+
         embed = discord.Embed(
-            title=leader_name,
-            description=PRIDE_RESOURCE[leader_name]["About"],
+            title=name,
+            description=pride_leader["About"],
             color=constants.Colours.blue
         )
         embed.add_field(
             name="Known for",
-            value=PRIDE_RESOURCE[leader_name]["Known for"],
+            value=pride_leader["Known for"],
             inline=False
         )
         embed.add_field(
             name="D.O.B and Birth place",
-            value=PRIDE_RESOURCE[leader_name]["Born"],
+            value=pride_leader["Born"],
             inline=False
         )
         embed.add_field(
             name="Awards and honors",
-            value=PRIDE_RESOURCE[leader_name]["Awards"],
+            value=pride_leader["Awards"],
             inline=False
         )
         embed.add_field(
             name="For More Information",
-            value=f"Do `{constants.Client.prefix}wiki {leader_name}`"
+            value=f"Do `{constants.Client.prefix}wiki {name}`"
                   f" in <#{constants.Channels.community_bot_commands}>",
             inline=False
         )
-        embed.set_thumbnail(url=PRIDE_RESOURCE[leader_name]["url"])
+        embed.set_thumbnail(url=pride_leader["url"])
         return embed
 
     @commands.command(aliases=("pl", "prideleader"))
@@ -96,7 +98,7 @@ class PrideLeader(commands.Cog):
         and if there is no pride leader given, return a random pride leader.
         """
         if not pride_leader_name:
-            pride_leader_name = random.choice(list(PRIDE_RESOURCE))
+            leader = random.choice(list(PRIDE_RESOURCE.values()))
         else:
             leader = PRIDE_RESOURCE.get(pride_leader_name.title())
             if not leader:
@@ -106,7 +108,7 @@ class PrideLeader(commands.Cog):
                 await ctx.send(embed=embed)
                 return
 
-        embed = self.embed_builder(pride_leader_name)
+        embed = self.embed_builder(leader)
         await ctx.send(embed=embed)
 
 
