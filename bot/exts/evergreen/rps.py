@@ -28,11 +28,11 @@ WINNER_DICT = {
 
 
 class RPS(commands.Cog):
-    """Rock Paper Scissor. The Classic Game!"""
+    """Rock Paper Scissors. The Classic Game!"""
 
     @commands.command(case_insensitive=True)
     async def rps(self, ctx: commands.Context, move: str) -> None:
-        """Play the classic game of Rock Paper Scissor with your own sir-lancebot!"""
+        """Play the classic game of Rock Paper Scissors with your own sir-lancebot!"""
         move = move.lower()
         player_mention = ctx.author.mention
 
