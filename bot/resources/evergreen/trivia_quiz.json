@@ -521,7 +521,7 @@
     },
     {
       "id": 314,
-      "question": "About how many neurons are in the human brain? (A. 1 billion, B. 10 billion, C. 100 billion, D. 300 billion)",
+      "question": "About how many neurons are in the human brain?\n(A. 1 billion, B. 10 billion, C. 100 billion, D. 300 billion)",
       "answer": "C, 100 billion, 100 bil"
     },
     {
@@ -556,7 +556,7 @@
     },
     {
       "id": 321,
-      "question": "What range of frequency are the average human ears capable of hearing (A. 10Hz-10kHz, B. 20Hz-20kHz, C. 20Hz-2000Hz, D. 10kHz-20kHz)?",
+      "question": "What range of frequency are the average human ears capable of hearing?\n(A. 10Hz-10kHz, B. 20Hz-20kHz, C. 20Hz-2000Hz, D. 10kHz-20kHz)",
       "answer": "B, 20Hz-20kHz"
     },
     {
@@ -669,7 +669,7 @@
     {
       "id": 413,
       "question": "What is the most popular protocol (as of 2021) that handles communication between email servers?",
-      "answer": "SMTP"
+      "answer": "SMTP, Simple Mail Transfer Protocol"
     },
     {
       "id": 414,
@@ -703,7 +703,7 @@
     },
     {
       "id": 420,
-      "question": "Why is a DDoS attack different from a DoS attack (answer in letters - A. because the victim's server was indefinitely disrupted from the amount of traffic, B. because it also attacks the victim's confidentiality, C. because the attack had political purposes behind it, D. because the traffic flooding the victim originated from many different sources)?",
+      "question": "Why is a DDoS attack different from a DoS attack?\n(A. because the victim's server was indefinitely disrupted from the amount of traffic, B. because it also attacks the victim's confidentiality, C. because the attack had political purposes behind it, D. because the traffic flooding the victim originated from many different sources)",
       "answer": "D"
     },
     {
@@ -713,7 +713,7 @@
     },
     {
       "id": 422,
-      "question": "Which of these languages is the oldest? Tcl, Smalltalk 80, Haskell, Standard ML, Java",
+      "question": "Which of these languages is the oldest?\n(Tcl, Smalltalk 80, Haskell, Standard ML, Java)",
       "answer": "Smalltalk 80"
     },
     {
@@ -729,7 +729,7 @@
     {
       "id": 425,
       "question": "What does the \"a\" represent in a HSLA color value?",
-      "answer": "transparency, translucency, alpha value, alpha channel"
+      "answer": "transparency, translucency, alpha value, alpha channel, alpha"
     },
     {
       "id": 426,
@@ -748,19 +748,19 @@
     },
     {
       "id": 429,
-      "question": "Which of these sorting algorithms is not stable? Counting sort, quick sort, insertion sort, tim sort, bubble sort",
+      "question": "Which of these sorting algorithms is not stable?\n(Counting sort, quick sort, insertion sort, tim sort, bubble sort)",
       "answer": "quick, quick sort"
     },
     {
       "id": 430,
-      "question": "Which of these languages is the youngest? Lisp, Python, Java, Haskell, Prolog, Ruby, Perl",
+      "question": "Which of these languages is the youngest?\n(Lisp, Python, Java, Haskell, Prolog, Ruby, Perl)",
       "answer": "Java"
     }
   ],
   "python": [
     {
       "id": 501,
-      "question": "Is it all objects (y/n)?",
+      "question": "Is everything an instance of the `object` class (y/n)?",
       "answer": "y, yes"
     },
     {
@@ -775,7 +775,7 @@
     },
     {
       "id": 504,
-      "question": "What type does the `&` operator return given 2 `dict_keys` objects?",
+      "question": "What type does the `&` operator return when given 2 `dict_keys` objects?",
       "answer": "set"
     },
     {
@@ -830,7 +830,7 @@
     },
     {
       "id": 515,
-      "question": "Which of these characters is valid python outside of string literals in some context? `@`, `$`, `?`",
+      "question": "Which of these characters is valid python outside of string literals in some context?\n(`@`, `$`, `?`)",
       "answer": "@"
     },
     {
@@ -840,7 +840,7 @@
     },
     {
       "id": 517,
-      "question": "Which one of these protocols/abstract base classes does the builtin `range` object NOT implement? `Sequence`, `Iterable`, `Generator`",
+      "question": "Which one of these protocols/abstract base classes does the builtin `range` object NOT implement?\n(`Sequence`, `Iterable`, `Generator`)",
       "answer": "Generator"
     },
     {
@@ -885,7 +885,7 @@
     },
     {
       "id": 526,
-      "question": "Which of these is not a generator method? `next`, `send`, `throw`, `close`",
+      "question": "Which of these is not a generator method?\n(`next`, `send`, `throw`, `close`)",
       "answer": "next"
     },
     {
@@ -900,7 +900,7 @@
     },
     {
       "id": 529,
-      "question": "Which of these is a subclass of `Exception`? `NotImplemented`, `asyncio.CancelledError`, `StopIteration`",
+      "question": "Which of these is a subclass of `Exception`?\n(`NotImplemented`, `asyncio.CancelledError`, `StopIteration`)",
       "answer": "StopIteration"
     },
     {
