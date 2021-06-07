@@ -34,14 +34,11 @@ class Stackoverflow(commands.Cog):
         """Sends the top 5 results of a search query from stackoverflow."""
         encoded_search_query = quote_plus(search_query)
 
-        for _ in range(3):
-            async with self.bot.http_session.get(BASE_URL.format(query=encoded_search_query)) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    break
-                else:
-                    logger.error(f'Status code is not 200, it is {response.status}')
-                    continue
+        async with self.bot.http_session.get(BASE_URL.format(query=encoded_search_query)) as response:
+            if response.status == 200:
+                data = await response.json()
+            else:
+                logger.error(f'Status code is not 200, it is {response.status}')
         if response.status != 200:  # If the status is still not 200 after the 3 tries
             await ctx.send(embed=ERR_EMBED)
             return
