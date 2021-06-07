@@ -64,9 +64,9 @@ class Stackoverflow(commands.Cog):
             embed.add_field(
                 name=unescape(item['title']),
                 value=(
-                    f"[{Emojis.stackoverflow_upvote} {item['score']}    "
+                    f"[{Emojis.reddit_upvote} {item['score']}    "
                     f"{Emojis.stackoverflow_views} {item['view_count']}     "
-                    f"{Emojis.stackoverflow_ans} {item['answer_count']}   "
+                    f"{Emojis.reddit_comments} {item['answer_count']}   "
                     f"{Emojis.stackoverflow_tag} {', '.join(item['tags'][:3])}]"
                     f"({item['link']})"
                 ),

@@ -222,10 +222,10 @@ class Emojis:
     status_offline = "<:status_offline:470326266537705472>"
 
 
-    stackoverflow_upvote = environ.get('stack_upvote', "<:stack_upvote:*>")  # TODO: Fill in numbers (ids)
+    # stackoverflow_upvote = environ.get('stack_upvote', "<:stack_upvote:*>")  # TODO: Fill in numbers (ids)
     stackoverflow_tag = environ.get('stack_tag', "<:stack_tag:*> ")
     stackoverflow_views = environ.get('stack_views', "<:stack_eye:*>")
-    stackoverflow_ans = environ.get('stack_ans', "<:sta
+    # stackoverflow_ans = environ.get('stack_ans', "<:sta")
 
     # Reddit emojis
     reddit = "<:reddit:676030265734332427>"
