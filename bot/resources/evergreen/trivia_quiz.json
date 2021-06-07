@@ -401,7 +401,7 @@
     },
     {
       "id": 222,
-      "question": "In probability, the ________ ______ of an experiment or random trial is the set of all possible outcomes of it.",
+      "question": "In probability, the \\_\\_\\_\\_\\_\\_ \\_\\_\\_\\_\\_ of an experiment or random trial is the set of all possible outcomes of it.",
       "answer": "sample space"
     },
     {
@@ -472,12 +472,12 @@
     },
     {
       "id": 305,
-      "question": "The Heisenberg's Uncertainty Principle states that the position and ________ of a quantum object can't be both exactly measured at the same time.",
+      "question": "The Heisenberg's Uncertainty Principle states that the position and \\_\\_\\_\\_\\_\\_\\_\\_ of a quantum object can't be both exactly measured at the same time.",
       "answer": "velocity, momentum"
     },
     {
       "id": 306,
-      "question": "A ____________ reaction is the one wherein an atom or a set of atoms is/are replaced by another atom or a set of atoms",
+      "question": "A \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_ reaction is the one wherein an atom or a set of atoms is/are replaced by another atom or a set of atoms",
       "answer": "displacement, exchange"
     },
     {
@@ -623,7 +623,7 @@
     },
     {
       "id": 404,
-      "question": "In neural networks, _______________ is an algorithm for supervised learning using gradient descent.",
+      "question": "In neural networks, \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_ is an algorithm for supervised learning using gradient descent.",
       "answer": "backpropagation"
     },
     {
@@ -648,7 +648,7 @@
     },
     {
       "id": 409,
-      "question": "How many possible IPv6 addresses are there (answer in 2^n)?",
+      "question": "How many possible public IPv6 addresses are there (answer in 2^n)?",
       "answer": "2^128"
     },
     {
@@ -895,8 +895,8 @@
     },
     {
       "id": 528,
-      "question": "What module is the function to set a function that runs for every line of python code present in?",
-      "answer": "sys"
+      "question": "How does one call a class who defines the behavior of their instance classes?",
+      "answer": "a metaclass, metaclass"
     },
     {
       "id": 529,
