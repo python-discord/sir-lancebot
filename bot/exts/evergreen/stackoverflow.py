@@ -82,6 +82,3 @@ class Stackoverflow(commands.Cog):
 def setup(bot: bot.Bot) -> None:
     """Loads Stackoverflow Cog."""
     bot.add_cog(Stackoverflow(bot))
-
-# Upvote and Comment icon taken from Reddit bot
-# Tag icon made by Freepik (https://www.flaticon.com/authors/freepik) from www.flaticon.com, and edited by me
