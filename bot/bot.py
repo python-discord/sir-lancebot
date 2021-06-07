@@ -41,18 +41,11 @@ class Bot(commands.Bot):
         )
         self._guild_available = asyncio.Event()
         self.redis_session = redis_session
+        self.successfully_unloaded = []
+
         self.loop.create_task(self.check_channels())
         self.loop.create_task(self.send_log(self.name, "Connected!"))
         self.loop.create_task(self.process_ext_not_found())
-
-    async def get_unloaded_extensions(self) -> None:
-        """Get all the unloaded extensions from cache."""
-        # For testing sir-lancebot#705
-        await self.unloads_cache.set("bot.exts.evergreen.catify", "https://dummy-msg-link.com")
-        await self.unloads_cache.set("bot.exts.evergreen.xkd", "https://dummy-msg-link.com")
-
-        cache_dict = await self.unloads_cache.to_dict()
-        self.unloaded_extensions = list(cache_dict.keys()) or []
 
     @property
     def member(self) -> Optional[discord.Member]:
@@ -87,10 +80,10 @@ class Bot(commands.Bot):
         if self.redis_session:
             await self.redis_session.close()
 
-    def load_extension(self, name: str, *, package: Optional[str] = None) -> None:
+    async def load_extension(self, name: str, *, package: Optional[str] = None) -> None:
         """Load the extension only if it is not present in unloaded cache."""
-        if name in self.unloaded_extensions:
-            self.unloaded_extensions.remove(name)
+        if await self.unloads_cache.get(name):
+            self.successfully_unloaded.append(name)
             log.info(f"Skipping cog {name}, found in unloaded cache.")
         else:
             super().load_extension(name, package=package)
@@ -227,12 +220,16 @@ class Bot(commands.Bot):
         Send a message to #dev-alerts with the extensions, and remove them from the cache,
         """
         await self.wait_until_guild_available()
+        cache_dict = await self.unloads_cache.to_dict()
 
-        if not self.unloaded_extensions:
+        unsuccesfully_unloaded = {
+            ext: link for ext, link in cache_dict.items() if ext not in self.successfully_unloaded
+        }
+
+        if not unsuccesfully_unloaded:
             return
 
-        cache_dict = await self.unloads_cache.to_dict()
-        extensions_msg = "\n- ".join(f"`{ext}`: {cache_dict.get(ext)}" for ext in self.unloaded_extensions)
+        extensions_msg = "\n- ".join(f"`{ext}`: {msg}" for ext, msg in unsuccesfully_unloaded.items())
 
         dev_alerts_channel = self.get_channel(constants.Channels.dev_alerts)
         core_dev_role = self.get_guild(constants.Client.guild).get_role(constants.Roles.core_developers)
@@ -243,7 +240,7 @@ class Bot(commands.Bot):
             "\n\nClearing them from the cache."
         )
 
-        for ext in self.unloaded_extensions:
+        for ext in unsuccesfully_unloaded:
             await self.unloads_cache.delete(ext)
 
         await dev_alerts_channel.send(msg)

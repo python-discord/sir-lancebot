@@ -93,7 +93,7 @@ class Extensions(commands.Cog):
         if "*" in extensions or "**" in extensions:
             extensions = set(EXTENSIONS) - set(self.bot.extensions.keys())
 
-        msg, successful = self.batch_manage(Action.LOAD, *extensions)
+        msg, successful = await self.batch_manage(Action.LOAD, *extensions)
 
         # Remove extensions from unload extensions cache
         for ext in successful:
@@ -120,7 +120,7 @@ class Extensions(commands.Cog):
             if "*" in extensions or "**" in extensions:
                 extensions = set(self.bot.extensions.keys()) - UNLOAD_BLACKLIST
 
-            msg, successful = self.batch_manage(Action.UNLOAD, *extensions)
+            msg, successful = await self.batch_manage(Action.UNLOAD, *extensions)
 
             # Add the unload extensions to the unloaded cache
             for ext in successful:
@@ -148,7 +148,7 @@ class Extensions(commands.Cog):
             extensions = set(self.bot.extensions.keys()) | set(extensions)
             extensions.remove("*")
 
-        msg = self.batch_manage(Action.RELOAD, *extensions)
+        msg = await self.batch_manage(Action.RELOAD, *extensions)
 
         await ctx.send(msg)
 
@@ -199,21 +199,21 @@ class Extensions(commands.Cog):
 
         return categories
 
-    def batch_manage(self, action: Action, *extensions: str) -> tuple[str, list]:
+    async def batch_manage(self, action: Action, *extensions: str) -> tuple[str, list]:
         """
         Apply an action to multiple extensions and return a message with the results.
 
         If only one extension is given, it is deferred to `manage()`.
         """
         if len(extensions) == 1:
-            msg, error = self.manage(action, extensions[0])
+            msg, error = await self.manage(action, extensions[0])
             return msg, [] if error else [*extensions]
 
         verb = action.name.lower()
         failures = {}
 
         for extension in extensions:
-            _, error = self.manage(action, extension)
+            _, error = await self.manage(action, extension)
             if error:
                 failures[extension] = error
 
@@ -229,17 +229,20 @@ class Extensions(commands.Cog):
 
         return msg, successful
 
-    def manage(self, action: Action, ext: str) -> tuple[str, Optional[str]]:
+    async def manage(self, action: Action, ext: str) -> tuple[str, Optional[str]]:
         """Apply an action to an extension and return the status message and any error message."""
         verb = action.name.lower()
         error_msg = None
 
         try:
-            action.value(self.bot, ext)
+            if action is action.LOAD:
+                await action.value(self.bot, ext)
+            else:
+                action.value(self.bot, ext)
         except (commands.ExtensionAlreadyLoaded, commands.ExtensionNotLoaded):
             if action is Action.RELOAD:
                 # When reloading, just load the extension if it was not loaded.
-                return self.manage(Action.LOAD, ext)
+                return await self.manage(Action.LOAD, ext)
 
             msg = f":x: Extension `{ext}` is already {verb}ed."
             log.debug(msg[4:])
