@@ -586,7 +586,7 @@ class TriviaQuiz(commands.Cog):
                 winners_mention = winner.mention
 
             await channel.send(
-                f"{winners_mention} Congratulations"
+                f"{winners_mention} Congratulations "
                 f"on winning this quiz game with a grand total of {highest_points} points :tada:"
             )
 
