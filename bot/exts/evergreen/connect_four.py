@@ -8,6 +8,7 @@ import emojis
 from discord.ext import commands
 from discord.ext.commands import guild_only
 
+from bot.bot import Bot
 from bot.constants import Emojis
 
 NUMBERS = list(Emojis.number_emojis.values())
@@ -21,13 +22,13 @@ class Game:
     """A Connect 4 Game."""
 
     def __init__(
-            self,
-            bot: commands.Bot,
-            channel: discord.TextChannel,
-            player1: discord.Member,
-            player2: typing.Optional[discord.Member],
-            tokens: typing.List[str],
-            size: int = 7
+        self,
+        bot: Bot,
+        channel: discord.TextChannel,
+        player1: discord.Member,
+        player2: typing.Optional[discord.Member],
+        tokens: typing.List[str],
+        size: int = 7
     ) -> None:
 
         self.bot = bot
@@ -54,8 +55,8 @@ class Game:
     async def print_grid(self) -> None:
         """Formats and outputs the Connect Four grid to the channel."""
         title = (
-            f'Connect 4: {self.player1.display_name}'
-            f' VS {self.bot.user.display_name if isinstance(self.player2, AI) else self.player2.display_name}'
+            f"Connect 4: {self.player1.display_name}"
+            f" VS {self.bot.user.display_name if isinstance(self.player2, AI) else self.player2.display_name}"
         )
 
         rows = [" ".join(self.tokens[s] for s in row) for row in self.grid]
@@ -66,7 +67,7 @@ class Game:
         if self.message:
             await self.message.edit(embed=embed)
         else:
-            self.message = await self.channel.send(content='Loading...')
+            self.message = await self.channel.send(content="Loading...")
             for emoji in self.unicode_numbers:
                 await self.message.add_reaction(emoji)
             await self.message.add_reaction(CROSS_EMOJI)
@@ -180,7 +181,7 @@ class Game:
 class AI:
     """The Computer Player for Single-Player games."""
 
-    def __init__(self, bot: commands.Bot, game: Game) -> None:
+    def __init__(self, bot: Bot, game: Game) -> None:
         self.game = game
         self.mention = bot.user.mention
 
@@ -255,7 +256,7 @@ class AI:
 class ConnectFour(commands.Cog):
     """Connect Four. The Classic Vertical Four-in-a-row Game!"""
 
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: Bot) -> None:
         self.bot = bot
         self.games: typing.List[Game] = []
         self.waiting: typing.List[discord.Member] = []
@@ -276,27 +277,29 @@ class ConnectFour(commands.Cog):
             return False
 
         if not self.min_board_size <= board_size <= self.max_board_size:
-            await ctx.send(f"{board_size} is not a valid board size. A valid board size is "
-                           f"between `{self.min_board_size}` and `{self.max_board_size}`.")
+            await ctx.send(
+                f"{board_size} is not a valid board size. A valid board size is "
+                f"between `{self.min_board_size}` and `{self.max_board_size}`."
+            )
             return False
 
         return True
 
     def get_player(
-            self,
-            ctx: commands.Context,
-            announcement: discord.Message,
-            reaction: discord.Reaction,
-            user: discord.Member
+        self,
+        ctx: commands.Context,
+        announcement: discord.Message,
+        reaction: discord.Reaction,
+        user: discord.Member
     ) -> bool:
         """Predicate checking the criteria for the announcement message."""
         if self.already_playing(ctx.author):  # If they've joined a game since requesting a player 2
             return True  # Is dealt with later on
 
         if (
-                user.id not in (ctx.me.id, ctx.author.id)
-                and str(reaction.emoji) == Emojis.hand_raised
-                and reaction.message.id == announcement.id
+            user.id not in (ctx.me.id, ctx.author.id)
+            and str(reaction.emoji) == Emojis.hand_raised
+            and reaction.message.id == announcement.id
         ):
             if self.already_playing(user):
                 self.bot.loop.create_task(ctx.send(f"{user.mention} You're already playing a game!"))
@@ -313,9 +316,9 @@ class ConnectFour(commands.Cog):
             return True
 
         if (
-                user.id == ctx.author.id
-                and str(reaction.emoji) == CROSS_EMOJI
-                and reaction.message.id == announcement.id
+            user.id == ctx.author.id
+            and str(reaction.emoji) == CROSS_EMOJI
+            and reaction.message.id == announcement.id
         ):
             return True
         return False
@@ -326,7 +329,7 @@ class ConnectFour(commands.Cog):
 
     @staticmethod
     def check_emojis(
-            e1: EMOJI_CHECK, e2: EMOJI_CHECK
+        e1: EMOJI_CHECK, e2: EMOJI_CHECK
     ) -> typing.Tuple[bool, typing.Optional[str]]:
         """Validate the emojis, the user put."""
         if isinstance(e1, str) and emojis.count(e1) != 1:
@@ -336,12 +339,12 @@ class ConnectFour(commands.Cog):
         return True, None
 
     async def _play_game(
-            self,
-            ctx: commands.Context,
-            user: typing.Optional[discord.Member],
-            board_size: int,
-            emoji1: str,
-            emoji2: str
+        self,
+        ctx: commands.Context,
+        user: typing.Optional[discord.Member],
+        board_size: int,
+        emoji1: str,
+        emoji2: str
     ) -> None:
         """Helper for playing a game of connect four."""
         self.tokens = [":white_circle:", str(emoji1), str(emoji2)]
@@ -354,7 +357,7 @@ class ConnectFour(commands.Cog):
             self.games.remove(game)
         except Exception:
             # End the game in the event of an unforeseen error so the players aren't stuck in a game
-            await ctx.send(f"{ctx.author.mention} {user.mention if user else ''} An error occurred. Game failed")
+            await ctx.send(f"{ctx.author.mention} {user.mention if user else ''} An error occurred. Game failed.")
             if game in self.games:
                 self.games.remove(game)
             raise
@@ -362,15 +365,15 @@ class ConnectFour(commands.Cog):
     @guild_only()
     @commands.group(
         invoke_without_command=True,
-        aliases=["4inarow", "connect4", "connectfour", "c4"],
+        aliases=("4inarow", "connect4", "connectfour", "c4"),
         case_insensitive=True
     )
     async def connect_four(
-            self,
-            ctx: commands.Context,
-            board_size: int = 7,
-            emoji1: EMOJI_CHECK = "\U0001f535",
-            emoji2: EMOJI_CHECK = "\U0001f534"
+        self,
+        ctx: commands.Context,
+        board_size: int = 7,
+        emoji1: EMOJI_CHECK = "\U0001f535",
+        emoji2: EMOJI_CHECK = "\U0001f534"
     ) -> None:
         """
         Play the classic game of Connect Four with someone!
@@ -425,13 +428,13 @@ class ConnectFour(commands.Cog):
         await self._play_game(ctx, user, board_size, str(emoji1), str(emoji2))
 
     @guild_only()
-    @connect_four.command(aliases=["bot", "computer", "cpu"])
+    @connect_four.command(aliases=("bot", "computer", "cpu"))
     async def ai(
-            self,
-            ctx: commands.Context,
-            board_size: int = 7,
-            emoji1: EMOJI_CHECK = "\U0001f535",
-            emoji2: EMOJI_CHECK = "\U0001f534"
+        self,
+        ctx: commands.Context,
+        board_size: int = 7,
+        emoji1: EMOJI_CHECK = "\U0001f535",
+        emoji2: EMOJI_CHECK = "\U0001f534"
     ) -> None:
         """Play Connect Four against a computer player."""
         check, emoji = self.check_emojis(emoji1, emoji2)
@@ -445,6 +448,6 @@ class ConnectFour(commands.Cog):
         await self._play_game(ctx, None, board_size, str(emoji1), str(emoji2))
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load ConnectFour Cog."""
     bot.add_cog(ConnectFour(bot))

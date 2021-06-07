@@ -9,19 +9,19 @@ from typing import Tuple, Union
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
-LETTER_EMOJI = ':love_letter:'
+LETTER_EMOJI = ":love_letter:"
 HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_heart:", ":two_hearts:"]
 
 
 class ValentineZodiac(commands.Cog):
     """A Cog that returns a counter compatible zodiac sign to the given user's zodiac sign."""
 
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
+    def __init__(self):
         self.zodiacs, self.zodiac_fact = self.load_comp_json()
 
     @staticmethod
@@ -29,14 +29,14 @@ class ValentineZodiac(commands.Cog):
         """Load zodiac compatibility from static JSON resource."""
         explanation_file = Path("bot/resources/valentines/zodiac_explanation.json")
         compatibility_file = Path("bot/resources/valentines/zodiac_compatibility.json")
-        with explanation_file.open(encoding="utf8") as json_data:
-            zodiac_fact = json.load(json_data)
-            for zodiac_data in zodiac_fact.values():
-                zodiac_data['start_at'] = datetime.fromisoformat(zodiac_data['start_at'])
-                zodiac_data['end_at'] = datetime.fromisoformat(zodiac_data['end_at'])
 
-        with compatibility_file.open(encoding="utf8") as json_data:
-            zodiacs = json.load(json_data)
+        zodiac_fact = json.loads(explanation_file.read_text("utf8"))
+
+        for zodiac_data in zodiac_fact.values():
+            zodiac_data["start_at"] = datetime.fromisoformat(zodiac_data["start_at"])
+            zodiac_data["end_at"] = datetime.fromisoformat(zodiac_data["end_at"])
+
+        zodiacs = json.loads(compatibility_file.read_text("utf8"))
 
         return zodiacs, zodiac_fact
 
@@ -62,10 +62,10 @@ class ValentineZodiac(commands.Cog):
             log.trace("Making zodiac embed.")
             embed.title = f"__{zodiac}__"
             embed.description = self.zodiac_fact[zodiac]["About"]
-            embed.add_field(name='__Motto__', value=self.zodiac_fact[zodiac]["Motto"], inline=False)
-            embed.add_field(name='__Strengths__', value=self.zodiac_fact[zodiac]["Strengths"], inline=False)
-            embed.add_field(name='__Weaknesses__', value=self.zodiac_fact[zodiac]["Weaknesses"], inline=False)
-            embed.add_field(name='__Full form__', value=self.zodiac_fact[zodiac]["full_form"], inline=False)
+            embed.add_field(name="__Motto__", value=self.zodiac_fact[zodiac]["Motto"], inline=False)
+            embed.add_field(name="__Strengths__", value=self.zodiac_fact[zodiac]["Strengths"], inline=False)
+            embed.add_field(name="__Weaknesses__", value=self.zodiac_fact[zodiac]["Weaknesses"], inline=False)
+            embed.add_field(name="__Full form__", value=self.zodiac_fact[zodiac]["full_form"], inline=False)
             embed.set_thumbnail(url=self.zodiac_fact[zodiac]["url"])
         else:
             embed = self.generate_invalidname_embed(zodiac)
@@ -79,7 +79,7 @@ class ValentineZodiac(commands.Cog):
                 log.trace("Zodiac name sent.")
                 return zodiac_name
 
-    @commands.group(name='zodiac', invoke_without_command=True)
+    @commands.group(name="zodiac", invoke_without_command=True)
     async def zodiac(self, ctx: commands.Context, zodiac_sign: str) -> None:
         """Provides information about zodiac sign by taking zodiac sign name as input."""
         final_embed = self.zodiac_build_embed(zodiac_sign)
@@ -93,9 +93,9 @@ class ValentineZodiac(commands.Cog):
             month = month.capitalize()
             try:
                 month = list(calendar.month_abbr).index(month[:3])
-                log.trace('Valid month name entered by user')
+                log.trace("Valid month name entered by user")
             except ValueError:
-                log.info('Invalid month name entered by user')
+                log.info("Invalid month name entered by user")
                 await ctx.send(f"Sorry, but `{month}` is not a valid month name.")
                 return
         if (month == 1 and 1 <= date <= 19) or (month == 12 and 22 <= date <= 31):
@@ -109,14 +109,14 @@ class ValentineZodiac(commands.Cog):
                 final_embed = discord.Embed()
                 final_embed.color = Colours.soft_red
                 final_embed.description = f"Zodiac sign could not be found because.\n```{e}```"
-                log.info(f'Error in "zodiac date" command:\n{e}.')
+                log.info(f"Error in 'zodiac date' command:\n{e}.")
             else:
                 final_embed = self.zodiac_build_embed(zodiac_sign_based_on_date)
 
         await ctx.send(embed=final_embed)
         log.trace("Embed from date successfully sent.")
 
-    @zodiac.command(name="partnerzodiac", aliases=['partner'])
+    @zodiac.command(name="partnerzodiac", aliases=("partner",))
     async def partner_zodiac(self, ctx: commands.Context, zodiac_sign: str) -> None:
         """Provides a random counter compatible zodiac sign to the given user's zodiac sign."""
         embed = discord.Embed()
@@ -128,12 +128,12 @@ class ValentineZodiac(commands.Cog):
             emoji2 = random.choice(HEART_EMOJIS)
             embed.title = "Zodiac Compatibility"
             embed.description = (
-                f'{zodiac_sign.capitalize()}{emoji1}{compatible_zodiac["Zodiac"]}\n'
-                f'{emoji2}Compatibility meter : {compatible_zodiac["compatibility_score"]}{emoji2}'
+                f"{zodiac_sign.capitalize()}{emoji1}{compatible_zodiac['Zodiac']}\n"
+                f"{emoji2}Compatibility meter : {compatible_zodiac['compatibility_score']}{emoji2}"
             )
             embed.add_field(
-                name=f'A letter from Dr.Zodiac {LETTER_EMOJI}',
-                value=compatible_zodiac['description']
+                name=f"A letter from Dr.Zodiac {LETTER_EMOJI}",
+                value=compatible_zodiac["description"]
             )
         else:
             embed = self.generate_invalidname_embed(zodiac_sign)
@@ -141,6 +141,6 @@ class ValentineZodiac(commands.Cog):
         log.trace("Embed from date successfully sent.")
 
 
-def setup(bot: commands.Bot) -> None:
-    """Valentine zodiac Cog load."""
-    bot.add_cog(ValentineZodiac(bot))
+def setup(bot: Bot) -> None:
+    """Load the Valentine zodiac Cog."""
+    bot.add_cog(ValentineZodiac())

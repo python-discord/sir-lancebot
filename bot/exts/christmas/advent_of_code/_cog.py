@@ -3,6 +3,7 @@ import logging
 from datetime import datetime, timedelta
 from pathlib import Path
 
+import arrow
 import discord
 from discord.ext import commands
 
@@ -72,11 +73,15 @@ class AdventOfCode(commands.Cog):
 
         if role not in ctx.author.roles:
             await ctx.author.add_roles(role)
-            await ctx.send("Okay! You have been __subscribed__ to notifications about new Advent of Code tasks. "
-                           f"You can run `{unsubscribe_command}` to disable them again for you.")
+            await ctx.send(
+                "Okay! You have been __subscribed__ to notifications about new Advent of Code tasks. "
+                f"You can run `{unsubscribe_command}` to disable them again for you."
+            )
         else:
-            await ctx.send("Hey, you already are receiving notifications about new Advent of Code tasks. "
-                           f"If you don't want them any more, run `{unsubscribe_command}` instead.")
+            await ctx.send(
+                "Hey, you already are receiving notifications about new Advent of Code tasks. "
+                f"If you don't want them any more, run `{unsubscribe_command}` instead."
+            )
 
     @in_month(Month.DECEMBER)
     @adventofcode_group.command(name="unsubscribe", aliases=("unsub",), brief="Notifications for new days")
@@ -96,11 +101,11 @@ class AdventOfCode(commands.Cog):
     async def aoc_countdown(self, ctx: commands.Context) -> None:
         """Return time left until next day."""
         if not _helpers.is_in_advent():
-            datetime_now = datetime.now(_helpers.EST)
+            datetime_now = arrow.now(_helpers.EST)
 
             # Calculate the delta to this & next year's December 1st to see which one is closest and not in the past
-            this_year = datetime(datetime_now.year, 12, 1, tzinfo=_helpers.EST)
-            next_year = datetime(datetime_now.year + 1, 12, 1, tzinfo=_helpers.EST)
+            this_year = arrow.get(datetime(datetime_now.year, 12, 1), _helpers.EST)
+            next_year = arrow.get(datetime(datetime_now.year + 1, 12, 1), _helpers.EST)
             deltas = (dec_first - datetime_now for dec_first in (this_year, next_year))
             delta = min(delta for delta in deltas if delta >= timedelta())  # timedelta() gives 0 duration delta
 
@@ -110,8 +115,10 @@ class AdventOfCode(commands.Cog):
             else:
                 delta_str = f"{delta.days} days"
 
-            await ctx.send(f"The Advent of Code event is not currently running. "
-                           f"The next event will start in {delta_str}.")
+            await ctx.send(
+                "The Advent of Code event is not currently running. "
+                f"The next event will start in {delta_str}."
+            )
             return
 
         tomorrow, time_left = _helpers.time_left_to_est_midnight()
@@ -124,7 +131,7 @@ class AdventOfCode(commands.Cog):
     @whitelist_override(channels=AOC_WHITELIST)
     async def about_aoc(self, ctx: commands.Context) -> None:
         """Respond with an explanation of all things Advent of Code."""
-        await ctx.send("", embed=self.cached_about_aoc)
+        await ctx.send(embed=self.cached_about_aoc)
 
     @adventofcode_group.command(name="join", aliases=("j",), brief="Learn how to join the leaderboard (via DM)")
     @whitelist_override(channels=AOC_WHITELIST)
@@ -135,7 +142,7 @@ class AdventOfCode(commands.Cog):
             await ctx.send(f"The Python Discord leaderboard for {current_year} is not yet available!")
             return
 
-        author = ctx.message.author
+        author = ctx.author
         log.info(f"{author.name} ({author.id}) has requested a PyDis AoC leaderboard code")
 
         if AocConfig.staff_leaderboard_id and any(r.id == Roles.helpers for r in author.roles):
@@ -273,8 +280,7 @@ class AdventOfCode(commands.Cog):
 
     def _build_about_embed(self) -> discord.Embed:
         """Build and return the informational "About AoC" embed from the resources file."""
-        with self.about_aoc_filepath.open("r", encoding="utf8") as f:
-            embed_fields = json.load(f)
+        embed_fields = json.loads(self.about_aoc_filepath.read_text("utf8"))
 
         about_embed = discord.Embed(
             title=self._base_url,

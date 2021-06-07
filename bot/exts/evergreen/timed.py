@@ -4,6 +4,8 @@ from time import perf_counter
 from discord import Message
 from discord.ext import commands
 
+from bot.bot import Bot
+
 
 class TimedCommands(commands.Cog):
     """Time the command execution of a command."""
@@ -16,7 +18,7 @@ class TimedCommands(commands.Cog):
 
         return await ctx.bot.get_context(msg)
 
-    @commands.command(name="timed", aliases=["time", "t"])
+    @commands.command(name="timed", aliases=("time", "t"))
     async def timed(self, ctx: commands.Context, *, command: str) -> None:
         """Time the command execution of a command."""
         new_ctx = await self.create_execution_context(ctx, command)
@@ -41,6 +43,6 @@ class TimedCommands(commands.Cog):
         await ctx.send(f"Command execution for `{new_ctx.command}` finished in {(t_end - t_start):.4f} seconds.")
 
 
-def setup(bot: commands.Bot) -> None:
-    """Cog load."""
-    bot.add_cog(TimedCommands(bot))
+def setup(bot: Bot) -> None:
+    """Load the Timed cog."""
+    bot.add_cog(TimedCommands())
