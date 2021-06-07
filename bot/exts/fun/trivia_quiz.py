@@ -84,8 +84,8 @@ class DynamicQuestionGen:
         "tesla": ("(unit of magnetic flux density)", "kg*s^-2*A^-1"),
     }
 
-    @staticmethod
-    def linear_system(q_format: str, a_format: str) -> QuizEntry:
+    @classmethod
+    def linear_system(cls, q_format: str, a_format: str) -> QuizEntry:
         """Generate a system of linear equations with two unknowns."""
         x, y = random.randint(2, 5), random.randint(2, 5)
         answer = a_format.format(x, y)
@@ -103,7 +103,8 @@ class DynamicQuestionGen:
 
         return QuizEntry(question, answer)
 
-    def mod_arith(self, q_format: str, a_format: str) -> QuizEntry:
+    @classmethod
+    def mod_arith(cls, q_format: str, a_format: str) -> QuizEntry:
         """Generate a basic modular arithmetic question."""
         quotient, m, b = random.randint(30, 40), random.randint(10, 20), random.randint(200, 350)
         ans = random.randint(0, 9)  # max remainder is 9, since the minimum modulus is 10
@@ -114,16 +115,18 @@ class DynamicQuestionGen:
 
         return QuizEntry(question, answer)
 
-    def ngonal_prism(self, q_format: str, a_format: str) -> QuizEntry:
+    @classmethod
+    def ngonal_prism(cls, q_format: str, a_format: str) -> QuizEntry:
         """Generate a question regarding vertices on n-gonal prisms."""
-        n = random.randint(0, len(self.N_PREFIXES) - 1)
+        n = random.randint(0, len(cls.N_PREFIXES) - 1)
 
-        question = q_format.format(self.N_PREFIXES[n])
-        answer = a_format.format((n + self.N_PREFIX_STARTS_AT) * 2)
+        question = q_format.format(cls.N_PREFIXES[n])
+        answer = a_format.format((n + cls.N_PREFIX_STARTS_AT) * 2)
 
         return QuizEntry(question, answer)
 
-    def imag_sqrt(self, q_format: str, a_format: str) -> QuizEntry:
+    @classmethod
+    def imag_sqrt(cls, q_format: str, a_format: str) -> QuizEntry:
         """Generate a negative square root question."""
         ans_coeff = random.randint(3, 10)
 
@@ -132,7 +135,8 @@ class DynamicQuestionGen:
 
         return QuizEntry(question, answer)
 
-    def binary_calc(self, q_format: str, a_format: str) -> QuizEntry:
+    @classmethod
+    def binary_calc(cls, q_format: str, a_format: str) -> QuizEntry:
         """Generate a binary calculation question."""
         a = random.randint(15, 20)
         b = random.randint(10, a)
@@ -154,33 +158,36 @@ class DynamicQuestionGen:
 
         return QuizEntry(question, answer)
 
-    def solar_system(self, q_format: str, a_format: str) -> QuizEntry:
+    @classmethod
+    def solar_system(cls, q_format: str, a_format: str) -> QuizEntry:
         """Generate a question on the planets of the Solar System."""
-        planet = random.choice(self.PLANETS)
+        planet = random.choice(cls.PLANETS)
 
         question = q_format.format(planet[0])
         answer = a_format.format(planet[1])
 
         return QuizEntry(question, answer)
 
-    def taxonomic_rank(self, q_format: str, a_format: str) -> QuizEntry:
+    @classmethod
+    def taxonomic_rank(cls, q_format: str, a_format: str) -> QuizEntry:
         """Generate a question on taxonomic classification."""
-        level = random.randint(0, len(self.TAXONOMIC_HIERARCHY) - 2)
+        level = random.randint(0, len(cls.TAXONOMIC_HIERARCHY) - 2)
 
-        question = q_format.format(self.TAXONOMIC_HIERARCHY[level])
-        answer = a_format.format(self.TAXONOMIC_HIERARCHY[level + 1])
+        question = q_format.format(cls.TAXONOMIC_HIERARCHY[level])
+        answer = a_format.format(cls.TAXONOMIC_HIERARCHY[level + 1])
 
         return QuizEntry(question, answer)
 
-    def base_units_convert(self, q_format: str, a_format: str) -> QuizEntry:
+    @classmethod
+    def base_units_convert(cls, q_format: str, a_format: str) -> QuizEntry:
         """Generate a SI base units conversion question."""
-        unit = random.choice(list(self.UNITS_TO_BASE_UNITS))
+        unit = random.choice(list(cls.UNITS_TO_BASE_UNITS))
 
         question = q_format.format(
-            unit + " " + self.UNITS_TO_BASE_UNITS[unit][0]
+            unit + " " + cls.UNITS_TO_BASE_UNITS[unit][0]
         )
         answer = a_format.format(
-            self.UNITS_TO_BASE_UNITS[unit][1]
+            cls.UNITS_TO_BASE_UNITS[unit][1]
         )
 
         return QuizEntry(question, answer)
