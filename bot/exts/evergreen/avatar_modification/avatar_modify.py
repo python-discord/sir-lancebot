@@ -9,7 +9,6 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import discord
-from PIL import UnidentifiedImageError
 from aiohttp import client_exceptions
 from discord.ext import commands
 
