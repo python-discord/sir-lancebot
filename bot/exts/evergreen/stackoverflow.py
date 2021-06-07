@@ -52,7 +52,7 @@ class Stackoverflow(commands.Cog):
 
         top5 = data["items"][:5]
         embed = Embed(
-            title=f"Search results for {search_query!r} - Stackoverflow",
+            title="Search results - Stackoverflow",
             url=SEARCH_URL.format(query=encoded_search_query),
             description=f"Here are the top {len(top5)} results:",
             color=Colours.orange
