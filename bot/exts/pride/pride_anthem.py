@@ -24,7 +24,7 @@ class PrideAnthem(commands.Cog):
         If none can be found, it will log this as well as provide that information to the user.
         """
         if not genre:
-            return random.choice(self.anthems)
+            return random.choice(VIDEOS)
         else:
             songs = [song for song in VIDEOS if genre.casefold() in song["genre"]]
             try:
