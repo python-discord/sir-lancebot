@@ -648,7 +648,7 @@
     },
     {
       "id": 409,
-      "question": "How many possible public IPv6 addresses are there (answer in 2^n)?",
+      "question": "How many possible IPv6 addresses are there (answer in 2^n)?",
       "answer": "2^128"
     },
     {
