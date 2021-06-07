@@ -44,7 +44,7 @@ class Stackoverflow(commands.Cog):
             return
         elif not data['items']:
             no_search_result = Embed(
-                title=f"No search results found for {search_query!r}",
+                title=f"No search results found for {search_query}",
                 color=Colours.soft_red
             )
             await ctx.send(embed=no_search_result)
