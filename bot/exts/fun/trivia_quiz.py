@@ -21,6 +21,8 @@ DEFAULT_QUESTION_LIMIT = 6
 STANDARD_VARIATION_TOLERANCE = 88
 DYNAMICALLY_GEN_VARIATION_TOLERANCE = 97
 
+MAX_ERROR_FETCH_TRIES = 3
+
 WRONG_ANS_RESPONSE = [
     "No one answered correctly!",
     "Better luck next time...",
@@ -239,13 +241,15 @@ class TriviaQuiz(commands.Cog):
     @tasks.loop(hours=1.0)
     async def get_wiki_questions(self) -> None:
         """Get 10 random questions from wikipedia and format them like the questions in resources/."""
+        error_fetches = 0
         wiki_questions = []
         # trivia_quiz.json follows a pattern, every new category starts with the next century.
         start_id = 501
 
-        while len(wiki_questions) != 10:
+        while len(wiki_questions) != 10 and error_fetches < MAX_ERROR_FETCH_TRIES:
             async with self.bot.http_session.get(url=RANDOM_WIKI_URL) as r:
                 if r.status != 200:
+                    error_fetches += 1
                     continue
 
                 raw_data = await r.json()
@@ -269,7 +273,11 @@ class TriviaQuiz(commands.Cog):
                 start_id += 1
                 wiki_questions.append(formatted_data)
 
-        self.questions["wikipedia"] = wiki_questions.copy()
+        if error_fetches < MAX_ERROR_FETCH_TRIES:
+            self.questions["wikipedia"] = wiki_questions.copy()
+        else:
+            del self.categories["wikipedia"]
+            logger.warning(f"Not loading wikipedia guess questions, hit max error fetches: {MAX_ERROR_FETCH_TRIES}.")
 
     @staticmethod
     def load_questions() -> dict:
