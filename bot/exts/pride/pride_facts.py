@@ -57,7 +57,7 @@ class PrideFacts(commands.Cog):
             date = _date
         if date.year < now.year or (date.year == now.year and date.day <= now.day):
             try:
-                await target.send(embed=self.make_embed(self.facts[str(date.year)][date.day - 1]))
+                await target.send(embed=self.make_embed(FACTS[str(date.year)][date.day - 1]))
             except KeyError:
                 await target.send(f"The year {date.year} is not yet supported")
                 return
