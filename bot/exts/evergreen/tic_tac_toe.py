@@ -326,7 +326,7 @@ class TicTacToe(Cog):
         embed = discord.Embed(
             title=f"Match #{game_id} Game Board",
             description=description,
-)
+        )
         await ctx.send(embed=embed)
 
 
