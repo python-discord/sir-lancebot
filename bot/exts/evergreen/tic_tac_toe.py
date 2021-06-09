@@ -319,7 +319,7 @@ class TicTacToe(Cog):
         game = self.games[game_id - 1]
 
         if game.draw:
-            description = f"{game.winner} vs {game.loser} (draw)\n\n{game.format_board()}"
+            description = f"{game.players[0]} vs {game.players[1]} (draw)\n\n{game.format_board()}"
         else:
             description = f"{game.winner} :trophy: vs {game.loser}\n\n{game.format_board()}"
 
