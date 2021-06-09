@@ -39,10 +39,9 @@ class Stackoverflow(commands.Cog):
                 data = await response.json()
             else:
                 logger.error(f'Status code is not 200, it is {response.status}')
-        if response.status != 200:  # If the status is still not 200 after the 3 tries
-            await ctx.send(embed=ERR_EMBED)
-            return
-        elif not data['items']:
+                await ctx.send(embed=ERR_EMBED)
+                return
+        if not data['items']:
             no_search_result = Embed(
                 title=f"No search results found for {search_query}",
                 color=Colours.soft_red
