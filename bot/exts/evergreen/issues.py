@@ -135,7 +135,7 @@ class Issues(commands.Cog):
         # need from the initial API call.
         if "issues" in json_data["html_url"]:
             if json_data.get("state") == "open":
-                emoji = Emojis.issue
+                emoji = Emojis.issue_opened
             else:
                 emoji = Emojis.issue_closed
 
@@ -149,10 +149,10 @@ class Issues(commands.Cog):
                 if pull_data["draft"]:
                     emoji = Emojis.pull_request_draft
                 elif pull_data["state"] == "open":
-                    emoji = Emojis.pull_request
+                    emoji = Emojis.pull_request_open
                 # When 'merged_at' is not None, this means that the state of the PR is merged
                 elif pull_data["merged_at"] is not None:
-                    emoji = Emojis.merge
+                    emoji = Emojis.pull_request_merge
                 else:
                     emoji = Emojis.pull_request_closed
 

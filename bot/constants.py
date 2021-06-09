@@ -190,12 +190,14 @@ class Emojis:
     dice_5 = "<:dice_5:755891608091885627>"
     dice_6 = "<:dice_6:755891607680843838>"
 
-    issue = "<:IssueOpen:629695470327037963>"
-    issue_closed = "<:IssueClosed:629695470570307614>"
-    pull_request = "<:PROpen:629695470175780875>"
-    pull_request_closed = "<:PRClosed:629695470519713818>"
-    pull_request_draft = "<:PRDraft:829755345425399848>"
-    merge = "<:PRMerged:629695470570176522>"
+    # These icons are from Github's repo https://github.com/primer/octicons/
+    issue_opened = "<:IssueOpen:852294683731165184>"
+    issue_closed = "<:IssueClosed:852294683723694140>"
+    issue_draft = "<:IssueDraft:852294683592884284>"  # Not currently used by Github, but here for future.
+    pull_request_open = "<:PROpen:629695470175780875>"
+    pull_request_closed = "<:PRClosed:852294683194294304>"
+    pull_request_draft = "<:PRDraft:852294683861712916>"
+    pull_request_merge = "<:PRMerged:629695470570176522>"
 
     number_emojis = {
         1: "\u0031\ufe0f\u20e3",
