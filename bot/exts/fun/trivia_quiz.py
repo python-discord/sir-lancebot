@@ -644,7 +644,7 @@ class TriviaQuiz(commands.Cog):
             description="",
         )
 
-        if info is not None:
+        if info:
             embed.description += f"**Information**\n{info}\n\n"
 
         embed.description += (
