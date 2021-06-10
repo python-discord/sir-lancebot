@@ -496,15 +496,14 @@ class TriviaQuiz(commands.Cog):
 
                 await asyncio.sleep(2)
 
-    @staticmethod
-    def make_start_embed(category: str) -> discord.Embed:
+    def make_start_embed(self, category: str) -> discord.Embed:
         """Generate a starting/introduction embed for the quiz."""
         rules = "\n".join([f"{index}: {rule}" for index, rule in enumerate(RULES, start=1)])
 
         start_embed = discord.Embed(
             title="Quiz game Starting!!",
             description=(
-                "Each game consists of 5 questions.\n"
+                f"Each game consists of {self.question_limit + 1} questions.\n"
                 f"**Rules :**\n{rules}"
                 f"\n **Category** : {category}"
             ),
