@@ -31,13 +31,14 @@ class ScaryMovie(commands.Cog):
 
     async def select_movie(self) -> dict:
         """Selects a random movie and returns a JSON of movie details from TMDb."""
-        url = "https://api.themoviedb.org/4/discover/movie"
+        url = "https://api.themoviedb.org/3/discover/movie"
         params = {
+            "api_key": TMDB_API_KEY,
             "with_genres": "27",
-            "vote_count.gte": "5"
+            "vote_count.gte": "5",
+            "include_adult": "false"
         }
         headers = {
-            "Authorization": "Bearer " + TMDB_TOKEN,
             "Content-Type": "application/json;charset=utf-8"
         }
 
