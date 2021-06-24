@@ -11,7 +11,6 @@ log = logging.getLogger(__name__)
 
 
 TMDB_API_KEY = environ.get("TMDB_API_KEY")
-TMDB_TOKEN = environ.get("TMDB_TOKEN")
 
 
 class ScaryMovie(commands.Cog):
