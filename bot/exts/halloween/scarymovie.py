@@ -1,16 +1,15 @@
 import logging
 import random
-from os import environ
 
 from discord import Embed
 from discord.ext import commands
 
 from bot.bot import Bot
-
+from bot.constants import Tokens
 log = logging.getLogger(__name__)
 
 
-TMDB_API_KEY = environ.get("TMDB_API_KEY")
+TMDB_API_KEY = Tokens.tmdb
 
 
 class ScaryMovie(commands.Cog):
