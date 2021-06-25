@@ -30,7 +30,7 @@ class ScaryMovie(commands.Cog):
         """Selects a random movie and returns a JSON of movie details from TMDb."""
         url = "https://api.themoviedb.org/3/discover/movie"
         params = {
-            "api_key": TMDB_API_KEY,
+            "api_key": Tokens.tmbd,
             "with_genres": "27",
             "vote_count.gte": "5",
             "include_adult": "false"
