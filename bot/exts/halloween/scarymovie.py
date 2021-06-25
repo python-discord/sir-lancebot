@@ -9,7 +9,6 @@ from bot.constants import Tokens
 log = logging.getLogger(__name__)
 
 
-TMDB_API_KEY = Tokens.tmdb
 
 
 class ScaryMovie(commands.Cog):
