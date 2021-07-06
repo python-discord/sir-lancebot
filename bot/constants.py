@@ -127,6 +127,7 @@ class Categories(NamedTuple):
     media = 799054581991997460
     staff = 364918151625965579
 
+codejam_categories_name = "Code Jam"  # Name of the codejam team categories
 
 class Client(NamedTuple):
     name = "Sir Lancebot"

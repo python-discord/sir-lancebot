@@ -75,6 +75,11 @@ def in_whitelist_check(
         log.trace(f"{ctx.author} may use the `{ctx.command.name}` command as they are in a whitelisted category.")
         return True
 
+    category = getattr(ctx.channel, "category", None)
+    if category and category.name == constants.codejam_categories_name:
+        log.trace(f"{ctx.author} may use the `{ctx.command.name}` command as they are in a codejam team channel.")
+        return True
+
     # Only check the roles whitelist if we have one and ensure the author's roles attribute returns
     # an iterable to prevent breakage in DM channels (for if we ever decide to enable commands there).
     if roles and any(r.id in roles for r in getattr(ctx.author, "roles", ())):
