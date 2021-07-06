@@ -230,6 +230,8 @@ class TriviaQuiz(commands.Cog):
             "cs": "A large variety of computer science questions.",
             "python": "Trivia on our amazing language, Python!",
             "wikipedia": "Guess the title of random wikipedia passages.",
+            "cs": "A large variety of computer science questions.",
+            "python": "Trivia on our amazing language, Python!",
         }
 
         self.get_wiki_questions.start()
@@ -299,6 +301,8 @@ class TriviaQuiz(commands.Cog):
         - cs: A large variety of computer science questions.
         - python: Trivia on our amazing language, Python!
         - wikipedia: Guess the title of random wikipedia passages.
+        - cs: A large variety of computer science questions.
+        - python: Trivia on our amazing language, Python!
 
         (More to come!)
         """
