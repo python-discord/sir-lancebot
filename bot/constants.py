@@ -127,6 +127,7 @@ class Categories(NamedTuple):
     media = 799054581991997460
     staff = 364918151625965579
 
+codejam_categories_name = "Code Jam"  # Name of the codejam team categories
 
 class Client(NamedTuple):
     name = "Sir Lancebot"
@@ -190,12 +191,14 @@ class Emojis:
     dice_5 = "<:dice_5:755891608091885627>"
     dice_6 = "<:dice_6:755891607680843838>"
 
-    issue = "<:IssueOpen:629695470327037963>"
-    issue_closed = "<:IssueClosed:629695470570307614>"
-    pull_request = "<:PROpen:629695470175780875>"
-    pull_request_closed = "<:PRClosed:629695470519713818>"
-    pull_request_draft = "<:PRDraft:829755345425399848>"
-    merge = "<:PRMerged:629695470570176522>"
+    # These icons are from Github's repo https://github.com/primer/octicons/
+    issue_open = "<:IssueOpen:852596024777506817>"
+    issue_closed = "<:IssueClosed:852596024739758081>"
+    issue_draft = "<:IssueDraft:852596025147523102>"  # Not currently used by Github, but here for future.
+    pull_request_open = "<:PROpen:852596471505223781>"
+    pull_request_closed = "<:PRClosed:852596024732286976>"
+    pull_request_draft = "<:PRDraft:852596025045680218>"
+    pull_request_merged = "<:PRMerged:852596100301193227>"
 
     number_emojis = {
         1: "\u0031\ufe0f\u20e3",
