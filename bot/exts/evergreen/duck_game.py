@@ -143,7 +143,7 @@ class DuckGamesDirector(commands.Cog):
         self.bot = bot
         self.current_games = {}
 
-    @commands.command(name='duckduckduckgoose', aliases=['dddg', 'duckgoose'])
+    @commands.group(name='duckduckduckgoose', aliases=['dddg', 'duckgoose'], invoke_without_command=True)
     @commands.cooldown(rate=1, per=2, type=commands.BucketType.channel)
     async def start_game(self, ctx: commands.Context) -> None:
         """Generate a board, send the game embed, and end the game after a time limit."""
@@ -269,6 +269,28 @@ class DuckGamesDirector(commands.Cog):
             text=f"{old_footer.rstrip()}\n\n{end_message} Here are the scores:\n{scoreboard}\n\n{missed_text}"
         )
         await self.edit_embed_with_image(game.embed_msg, game_embed)
+
+    @start_game.command(name="help")
+    async def show_rules(self, ctx: commands.Context) -> None:
+        """Explain the rules of the game."""
+        await self.send_help_embed(ctx)
+
+    @staticmethod
+    async def send_help_embed(ctx: commands.Context) -> discord.Message:
+        """Send rules embed."""
+        embed = discord.Embed(
+            title="Compete against other players to find valid flights!",
+            color=discord.Color.dark_purple(),
+        )
+        embed.description = (
+            "**Each card has 4 features**\nColor, Number, Hat, and Accessory\n"
+            "\n**A valid flight**\n3 cards where each feature is either all the same or all different\n"
+            '\n**Call "GOOSE"**\nif you think there are no more flights\n'
+            "\n**1**   for each valid flight\n"
+            '**2**   for a correct "GOOSE" call\n'
+            "**-1** for any wrong answer"
+        )
+        await ctx.send(embed=embed)
 
     @staticmethod
     async def edit_embed_with_image(msg: discord.Message, embed: discord.Embed) -> discord.Message:
