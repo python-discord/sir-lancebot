@@ -244,7 +244,33 @@ class DuckGamesDirector(commands.Cog):
 
     async def end_game(self, game: DuckGame, end_message: str) -> None:
         """Edit the game embed to reflect the end of the game and mark the game as not running."""
-        pass
+        game.running = False
+
+        scores = sorted(
+            game.scores.items(),
+            key=lambda item: item[1]
+        )
+        scoreboard = "\n".join(f"{member.display_name}: {score}" for member, score in scores)
+
+        missed = [ans for ans in game.solutions if ans not in game.claimed_answers]
+        if missed:
+            missed_text = "Flights everyone missed:\n" + "\n".join(f"{ans}" for ans in missed)
+        else:
+            missed_text = "All the flights were found!"
+
+        game_embed, = game.embed_msg.embeds
+        old_footer = game_embed.footer.text
+        if old_footer == discord.Embed.Empty:
+            old_footer = ""
+
+        embed_as_dict = game_embed.to_dict()  # Cannot set embed color after initialization
+        embed_as_dict["color"] = Colours.soft_red
+        game_embed = discord.Embed.from_dict(embed_as_dict)
+
+        game_embed.set_footer(
+            text=f"{old_footer.rstrip()}\n\n{end_message} Here are the scores:\n{scoreboard}\n\n{missed_text}"
+        )
+        await edit_embed_with_image(game.embed_msg, game_embed)
 
 
 def setup(bot: Bot) -> None:
