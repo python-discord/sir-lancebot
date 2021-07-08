@@ -14,6 +14,7 @@ from discord.ext import commands
 from bot.bot import Bot
 from bot.constants import Colours, Emojis
 
+
 DECK = list(product(*[(0, 1, 2)]*4))
 
 GAME_DURATION = 180
@@ -25,6 +26,7 @@ INCORRECT_GOOSE = -1
 """ Distribution of minimum acceptable solutions at board generation.
     This is for gameplay reasons, to shift the number of solutions per board up,
     while still making the end of the game unpredictable.
+    Note: this is *not* the same as the distribution of number of solutions.
 """
 SOLN_DISTR = 0, 0.05, 0.1, 0.1, 0.15, 0.2, 0.2, 0.15, .05
 
@@ -151,12 +153,7 @@ class DuckGamesDirector(commands.Cog):
     @commands.command(name='duckduckduckgoose', aliases=['dddg', 'duckgoose'])
     @commands.cooldown(rate=1, per=2, type=commands.BucketType.channel)
     async def start_game(self, ctx: commands.Context) -> None:
-        """
-        Start a game.
-
-        The bot will post an embed with the board and will listen to the following comments for valid solutions.
-        Claimed answers and the final scores will be added to this embed.
-        """
+        """Generate a board, send the game embed, and end the game after a time limit."""
         # One game at a time per channel
         if ctx.channel.id in self.current_games:
             return
