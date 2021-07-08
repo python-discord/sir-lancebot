@@ -1,5 +1,6 @@
 import asyncio
 import random
+import re
 from collections import defaultdict
 from io import BytesIO
 from itertools import product
@@ -10,16 +11,24 @@ from PIL import Image, ImageDraw
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Colours
+from bot.constants import Colours, Emojis
 
 DECK = list(product(*[(0, 1, 2)]*4))
 
 GAME_DURATION = 180
+CORRECT_SOLN = 1
+INCORRECT_SOLN = -1
+CORRECT_GOOSE = 2
+INCORRECT_GOOSE = -1
 
 p = Path("bot", "resources", "evergreen", "all_cards.png")
 ALL_CARDS = Image.open(p)
 CARD_WIDTH = 155
 CARD_HEIGHT = 97
+
+EMOJI_WRONG = Emojis.x
+
+ANSWER_REGEX = re.compile(r'^\D*(\d+)\D+(\d+)\D+(\d+)\D*$')
 
 
 def assemble_board_image(board: list[tuple[int]], rows: int, columns: int) -> Image:
@@ -71,6 +80,7 @@ class DuckGame:
         size = rows * columns
 
         self._solutions = None
+        self.claimed_answers = {}
         self.scores = defaultdict(int)
 
         self.board = random.sample(DECK, size)
@@ -152,6 +162,52 @@ class DuckGamesDirector(commands.Cog):
             except KeyError:
                 pass
 
+    @commands.Cog.listener()
+    async def on_message(self, msg: discord.Message) -> None:
+        """Listen for messages and process them as answers if appropriate."""
+        if msg.author.bot:
+            return
+
+        channel = msg.channel
+        if channel.id not in self.current_games:
+            return
+
+        game = self.current_games[channel.id]
+        if msg.content.strip().lower() == 'goose':
+            # If all of the solutions have been claimed, i.e. the "goose" call is correct.
+            if len(game.solutions) == len(game.claimed_answers):
+                try:
+                    del self.current_games[channel.id]
+                    game.scores[msg.author] += CORRECT_GOOSE
+                    await self.end_game(game, end_message=f"{msg.author.display_name} GOOSED!")
+                except KeyError:
+                    pass
+            else:
+                await msg.add_reaction(EMOJI_WRONG)
+                game.scores[msg.author] += INCORRECT_GOOSE
+            return
+
+        # Valid answers contain 3 numbers.
+        if not (match := re.match(ANSWER_REGEX, msg.content)):
+            return
+        answer = tuple(sorted(int(m) for m in match.groups()))
+
+        # Be forgiving for answers that use indices not on the board.
+        if not all(0 <= n < len(game.board) for n in answer):
+            return
+
+        # Also be forgiving for answers that have already been claimed (and avoid penalizing for racing conditions).
+        if answer in game.claimed_answers:
+            return
+
+        if answer in game.solutions:
+            game.claimed_answers[answer] = msg.author
+            game.scores[msg.author] += CORRECT_SOLN
+            await self.display_claimed_answer(game, msg.author, answer)
+        else:
+            await msg.add_reaction(EMOJI_WRONG)
+            game.scores[msg.author] += INCORRECT_SOLN
+
     async def send_board_embed(self, ctx: commands.Context, game: DuckGame) -> discord.Message:
         """Create and send the initial game embed. This will be edited as the game goes on."""
         image = assemble_board_image(game.board, game.rows, game.columns)
@@ -166,6 +222,14 @@ class DuckGamesDirector(commands.Cog):
         )
         embed.set_image(url="attachment://board.png")
         return await ctx.send(embed=embed, file=file)
+
+    async def display_claimed_answer(self, game: DuckGame, author: discord.Member, answer: tuple[int]) -> None:
+        """Add a claimed answer to the game embed."""
+        pass
+
+    async def end_game(self, game: DuckGame, end_message: str) -> None:
+        """Edit the game embed to reflect the end of the game and mark the game as not running."""
+        pass
 
 
 def setup(bot: Bot) -> None:
