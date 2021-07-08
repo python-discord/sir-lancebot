@@ -41,7 +41,7 @@ def assemble_board_image(board: list[tuple[int]], rows: int, columns: int) -> Im
         row, col = divmod(idx, columns)
         top, left = row * CARD_HEIGHT, col * CARD_WIDTH
         new_im.paste(card_image, (left, top))
-        draw.text((left+7, top+4), str(idx))    # magic numbers are buffers for the card labels
+        draw.text((left+7, top+4), str(idx), (0, 0, 0))    # magic numbers are buffers for the card labels
     return new_im
 
 
