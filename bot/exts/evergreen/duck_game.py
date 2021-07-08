@@ -1,11 +1,15 @@
+import asyncio
 import random
 from itertools import product
 
+import discord
 from discord.ext import commands
 
 from bot.bot import Bot
 
 DECK = list(product(*[(0, 1, 2)]*4))
+
+GAME_DURATION = 180
 
 
 class DuckGame:
@@ -73,6 +77,40 @@ class DuckGamesDirector(commands.Cog):
 
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
+        self.current_games = {}
+
+    @commands.command(name='duckduckduckgoose', aliases=['dddg', 'duckgoose'])
+    @commands.cooldown(rate=1, per=2, type=commands.BucketType.channel)
+    async def start_game(self, ctx: commands.Context) -> None:
+        """
+        Start a game.
+
+        The bot will post an embed with the board and will listen to the following comments for valid solutions.
+        Claimed answers and the final scores will be added to this embed.
+        """
+        # One game at a time per channel
+        if ctx.channel.id in self.current_games:
+            return
+
+        game = DuckGame()
+        self.current_games[ctx.channel.id] = game
+
+        game.embed_msg = await self.send_board_embed(ctx, game)
+        await asyncio.sleep(GAME_DURATION)
+
+        """Checking for the channel ID in the currently running games is not sufficient.
+           The game could have been ended by a player, and a new game already started in the same channel.
+        """
+        if game.running:
+            try:
+                del self.current_games[ctx.channel.id]
+                await self.end_game(game, end_message="Time's up!")
+            except KeyError:
+                pass
+
+    async def send_board_embed(self, ctx: commands.Context, game: DuckGame) -> discord.Message:
+        """Create and send the initial game embed. This will be edited as the game goes on."""
+        pass
 
 
 def setup(bot: Bot) -> None:
