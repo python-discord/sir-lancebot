@@ -5,6 +5,7 @@ from collections import defaultdict
 from io import BytesIO
 from itertools import product
 from pathlib import Path
+from urllib.parse import urlparse
 
 import discord
 from PIL import Image, ImageDraw
@@ -59,6 +60,13 @@ def as_trinary(card: tuple[int]) -> int:
     return int(''.join(str(x) for x in card), base=3)
 
 
+async def edit_embed_with_image(msg: discord.Message, embed: discord.Embed) -> discord.Message:
+    """Edit an embed without the attached image going wonky."""
+    attach_name = urlparse(embed.image.url).path.split("/")[-1]
+    embed.set_image(url=f"attachment://{attach_name}")
+    return await msg.edit(embed=embed)
+
+
 class DuckGame:
     """A class for a single game."""
 
@@ -82,6 +90,7 @@ class DuckGame:
         self._solutions = None
         self.claimed_answers = {}
         self.scores = defaultdict(int)
+        self.editing_embed = asyncio.Lock()
 
         self.board = random.sample(DECK, size)
         while len(self.solutions) < minimum_solutions:
@@ -225,7 +234,13 @@ class DuckGamesDirector(commands.Cog):
 
     async def display_claimed_answer(self, game: DuckGame, author: discord.Member, answer: tuple[int]) -> None:
         """Add a claimed answer to the game embed."""
-        pass
+        async with game.editing_embed:
+            game_embed, = game.embed_msg.embeds
+            old_footer = game_embed.footer.text
+            if old_footer == discord.Embed.Empty:
+                old_footer = ""
+            game_embed.set_footer(text=f"{old_footer}\n{str(answer):12s}  -  {author.display_name}")
+            await edit_embed_with_image(game.embed_msg, game_embed)
 
     async def end_game(self, game: DuckGame, end_message: str) -> None:
         """Edit the game embed to reflect the end of the game and mark the game as not running."""
