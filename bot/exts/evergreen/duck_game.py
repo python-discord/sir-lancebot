@@ -22,6 +22,12 @@ INCORRECT_SOLN = -1
 CORRECT_GOOSE = 2
 INCORRECT_GOOSE = -1
 
+""" Distribution of minimum acceptable solutions at board generation.
+    This is for gameplay reasons, to shift the number of solutions per board up,
+    while still making the end of the game unpredictable.
+"""
+SOLN_DISTR = 0, 0.05, 0.1, 0.1, 0.15, 0.2, 0.2, 0.15, .05
+
 p = Path("bot", "resources", "evergreen", "all_cards.png")
 ALL_CARDS = Image.open(p)
 CARD_WIDTH = 155
@@ -104,7 +110,7 @@ class DuckGame:
     @board.setter
     def board(self, val: list[tuple[int]]) -> None:
         """Erases calculated solutions if the board changes."""
-        self._solution = None
+        self._solutions = None
         self._board = val
 
     @property
@@ -154,7 +160,8 @@ class DuckGamesDirector(commands.Cog):
         if ctx.channel.id in self.current_games:
             return
 
-        game = DuckGame()
+        minimum_solutions, = random.choices(range(len(SOLN_DISTR)), weights=SOLN_DISTR)
+        game = DuckGame(minimum_solutions=minimum_solutions)
         game.running = True
         self.current_games[ctx.channel.id] = game
 
