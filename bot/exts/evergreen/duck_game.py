@@ -1,15 +1,53 @@
 import asyncio
 import random
+from collections import defaultdict
+from io import BytesIO
 from itertools import product
+from pathlib import Path
 
 import discord
+from PIL import Image, ImageDraw
 from discord.ext import commands
 
 from bot.bot import Bot
+from bot.constants import Colours
 
 DECK = list(product(*[(0, 1, 2)]*4))
 
 GAME_DURATION = 180
+
+p = Path("bot", "resources", "evergreen", "all_cards.png")
+ALL_CARDS = Image.open(p)
+CARD_WIDTH = 155
+CARD_HEIGHT = 97
+
+
+def assemble_board_image(board: list[tuple[int]], rows: int, columns: int) -> Image:
+    """Cut and paste images representing the given cards into an image representing the board."""
+    new_im = Image.new("RGBA", (CARD_WIDTH*columns, CARD_HEIGHT*rows))
+    draw = ImageDraw.Draw(new_im)
+    for idx, card in enumerate(board):
+        card_image = get_card_image(card)
+        row, col = divmod(idx, columns)
+        top, left = row * CARD_HEIGHT, col * CARD_WIDTH
+        new_im.paste(card_image, (left, top))
+        draw.text((left+7, top+4), str(idx))    # magic numbers are buffers for the card labels
+    return new_im
+
+
+def get_card_image(card: tuple[int]) -> Image:
+    """Slice the image containing all the cards to get just this card."""
+    row, col = divmod(as_trinary(card), 9)  # all_cards.png should have 9x9 cards
+    x1 = col * CARD_WIDTH
+    x2 = x1 + CARD_WIDTH
+    y1 = row * CARD_HEIGHT
+    y2 = y1 + CARD_HEIGHT
+    return ALL_CARDS.crop((x1, y1, x2, y2))
+
+
+def as_trinary(card: tuple[int]) -> int:
+    """Find the card's unique index by interpreting its features as trinary."""
+    return int(''.join(str(x) for x in card), base=3)
 
 
 class DuckGame:
@@ -28,8 +66,13 @@ class DuckGame:
             columns (int, optional): Columns in the game board. Defaults to 3.
             minimum_solutions (int, optional): Minimum acceptable number of solutions in the board. Defaults to 1.
         """
-        self._solutions = None
+        self.rows = rows
+        self.columns = columns
         size = rows * columns
+
+        self._solutions = None
+        self.scores = defaultdict(int)
+
         self.board = random.sample(DECK, size)
         while len(self.solutions) < minimum_solutions:
             self.board = random.sample(DECK, size)
@@ -93,6 +136,7 @@ class DuckGamesDirector(commands.Cog):
             return
 
         game = DuckGame()
+        game.running = True
         self.current_games[ctx.channel.id] = game
 
         game.embed_msg = await self.send_board_embed(ctx, game)
@@ -110,7 +154,18 @@ class DuckGamesDirector(commands.Cog):
 
     async def send_board_embed(self, ctx: commands.Context, game: DuckGame) -> discord.Message:
         """Create and send the initial game embed. This will be edited as the game goes on."""
-        pass
+        image = assemble_board_image(game.board, game.rows, game.columns)
+        with BytesIO() as image_stream:
+            image.save(image_stream, format="png")
+            image_stream.seek(0)
+            file = discord.File(fp=image_stream, filename="board.png")
+        embed = discord.Embed(
+            title="Duck Duck Duck Goose!",
+            color=Colours.bright_green,
+            footer=""
+        )
+        embed.set_image(url="attachment://board.png")
+        return await ctx.send(embed=embed, file=file)
 
 
 def setup(bot: Bot) -> None:
