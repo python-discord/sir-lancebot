@@ -12,7 +12,7 @@ from PIL import Image, ImageDraw
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Colours
+from bot.constants import Colours, MODERATION_ROLES
 
 
 DECK = list(product(*[(0, 1, 2)]*4))
@@ -274,6 +274,17 @@ class DuckGamesDirector(commands.Cog):
     async def show_rules(self, ctx: commands.Context) -> None:
         """Explain the rules of the game."""
         await self.send_help_embed(ctx)
+
+    @start_game.command(name="stop")
+    async def stop_game(self, ctx: commands.Context) -> None:
+        """Stop a currently running game. Only available to mods."""
+        if not any(role in ctx.author.roles for role in MODERATION_ROLES):
+            return
+        try:
+            game = self.current_games.pop(ctx.channel.id)
+        except KeyError:
+            return
+        await self.end_game(game, end_message="Game canceled.")
 
     @staticmethod
     async def send_help_embed(ctx: commands.Context) -> discord.Message:
