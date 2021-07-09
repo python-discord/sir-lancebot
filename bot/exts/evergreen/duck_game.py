@@ -8,7 +8,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 import discord
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 from discord.ext import commands
 
 from bot.bot import Bot
@@ -32,8 +32,11 @@ INCORRECT_GOOSE = -1
 """
 SOLN_DISTR = 0, 0.05, 0.05, 0.1, 0.15, 0.25, 0.2, 0.15, .05
 
-p = Path("bot", "resources", "evergreen", "all_cards.png")
-ALL_CARDS = Image.open(p)
+image_path = Path("bot", "resources", "evergreen", "all_cards.png")
+font_path = Path("bot", "resources", "evergreen", "LuckiestGuy-Regular.ttf")
+
+ALL_CARDS = Image.open(image_path)
+LABEL_FONT = ImageFont.truetype(str(font_path), size=16)
 CARD_WIDTH = 155
 CARD_HEIGHT = 97
 
@@ -51,7 +54,12 @@ def assemble_board_image(board: list[tuple[int]], rows: int, columns: int) -> Im
         row, col = divmod(idx, columns)
         top, left = row * CARD_HEIGHT, col * CARD_WIDTH
         new_im.paste(card_image, (left, top))
-        draw.text((left+7, top+4), str(idx), (0, 0, 0))  # magic numbers are buffers for the card labels
+        draw.text(
+            xy=(left+5, top+5),  # magic numbers are buffers for the card labels
+            text=str(idx),
+            fill=(0, 0, 0),
+            font=LABEL_FONT,
+        )
     return new_im
 
 
