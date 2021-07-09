@@ -247,7 +247,8 @@ class DuckGamesDirector(commands.Cog):
 
         scores = sorted(
             game.scores.items(),
-            key=lambda item: item[1]
+            key=lambda item: item[1],
+            reverse=True,
         )
         scoreboard = "\n".join(f"{member.display_name}: {score}" for member, score in scores)
 
