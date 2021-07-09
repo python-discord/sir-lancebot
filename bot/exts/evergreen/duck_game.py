@@ -311,6 +311,9 @@ class DuckGamesDirector(commands.Cog):
             '**2**   for a correct "GOOSE" call\n'
             "**-1** for any wrong answer"
         )
+        embed.set_footer(
+            text="Tip: using Discord's compact message display mode can help keep the board on the screen"
+        )
         await ctx.send(embed=embed)
 
     @staticmethod
