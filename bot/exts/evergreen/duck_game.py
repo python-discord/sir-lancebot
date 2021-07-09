@@ -12,7 +12,7 @@ from PIL import Image, ImageDraw
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Colours, Emojis
+from bot.constants import Colours
 
 
 DECK = list(product(*[(0, 1, 2)]*4))
@@ -35,7 +35,7 @@ ALL_CARDS = Image.open(p)
 CARD_WIDTH = 155
 CARD_HEIGHT = 97
 
-EMOJI_WRONG = Emojis.x
+EMOJI_WRONG = "\u274C"
 
 ANSWER_REGEX = re.compile(r'^\D*(\d+)\D+(\d+)\D+(\d+)\D*$')
 
