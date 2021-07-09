@@ -18,6 +18,8 @@ from bot.constants import Colours, MODERATION_ROLES
 DECK = list(product(*[(0, 1, 2)]*4))
 
 GAME_DURATION = 180
+
+# Scoring
 CORRECT_SOLN = 1
 INCORRECT_SOLN = -1
 CORRECT_GOOSE = 2
@@ -49,7 +51,7 @@ def assemble_board_image(board: list[tuple[int]], rows: int, columns: int) -> Im
         row, col = divmod(idx, columns)
         top, left = row * CARD_HEIGHT, col * CARD_WIDTH
         new_im.paste(card_image, (left, top))
-        draw.text((left+7, top+4), str(idx), (0, 0, 0))    # magic numbers are buffers for the card labels
+        draw.text((left+7, top+4), str(idx), (0, 0, 0))  # magic numbers are buffers for the card labels
     return new_im
 
 
@@ -147,7 +149,6 @@ class DuckGamesDirector(commands.Cog):
     @commands.cooldown(rate=1, per=2, type=commands.BucketType.channel)
     async def start_game(self, ctx: commands.Context) -> None:
         """Generate a board, send the game embed, and end the game after a time limit."""
-        # One game at a time per channel
         if ctx.channel.id in self.current_games:
             return
 
