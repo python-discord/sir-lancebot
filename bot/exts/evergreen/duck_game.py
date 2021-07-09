@@ -30,7 +30,7 @@ INCORRECT_GOOSE = -1
     while still making the end of the game unpredictable.
     Note: this is *not* the same as the distribution of number of solutions.
 """
-SOLN_DISTR = 0, 0.05, 0.1, 0.1, 0.15, 0.2, 0.2, 0.15, .05
+SOLN_DISTR = 0, 0.05, 0.05, 0.1, 0.15, 0.25, 0.2, 0.15, .05
 
 p = Path("bot", "resources", "evergreen", "all_cards.png")
 ALL_CARDS = Image.open(p)
