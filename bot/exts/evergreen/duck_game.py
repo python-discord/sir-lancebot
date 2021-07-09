@@ -262,7 +262,7 @@ class DuckGamesDirector(commands.Cog):
             old_footer = ""
 
         embed_as_dict = game_embed.to_dict()  # Cannot set embed color after initialization
-        embed_as_dict["color"] = Colours.soft_red
+        embed_as_dict["color"] = discord.Color.red().value
         game_embed = discord.Embed.from_dict(embed_as_dict)
 
         game_embed.set_footer(
