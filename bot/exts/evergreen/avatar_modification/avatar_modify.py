@@ -251,12 +251,9 @@ class AvatarModify(commands.Cog):
         root_aliases=("spookyavatar", "spookify", "savatar"),
         brief="Spookify an user's avatar."
     )
-    async def spookyavatar(self, ctx: commands.Context, member: discord.Member = None) -> None:
-        """This "spookifies" the given user's avatar, with a random *spooky* effect."""
-        if member is None:
-            member = ctx.author
-
-        user = await self._fetch_user(member.id)
+    async def spookyavatar(self, ctx: commands.Context) -> None:
+        """This "spookifies" the user's avatar, with a random *spooky* effect."""
+        user = await self._fetch_user(ctx.author.id)
         if not user:
             await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
             return
@@ -264,7 +261,7 @@ class AvatarModify(commands.Cog):
         async with ctx.typing():
             image_bytes = await user.avatar_url_as(size=1024).read()
 
-            file_name = file_safe_name("spooky_avatar", member.display_name)
+            file_name = file_safe_name("spooky_avatar", ctx.author.display_name)
 
             file = await in_executor(
                 PfpEffects.apply_effect,
@@ -277,7 +274,6 @@ class AvatarModify(commands.Cog):
                 title="Is this you or am I just really paranoid?",
                 colour=Colours.soft_red
             )
-            embed.set_author(name=member.name, icon_url=member.avatar_url)
             embed.set_image(url=f"attachment://{file_name}")
             embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=ctx.author.avatar_url)
 
