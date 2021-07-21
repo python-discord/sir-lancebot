@@ -9,7 +9,6 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import discord
-from aiohttp import client_exceptions
 from discord.ext import commands
 
 from bot.bot import Bot
@@ -233,37 +232,6 @@ class AvatarModify(commands.Cog):
                 await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
                 return
             image_bytes = await user.avatar_url_as(size=1024).read()
-            await self.send_pride_image(ctx, image_bytes, pixels, flag, option)
-
-    @prideavatar.command()
-    async def image(self, ctx: commands.Context, url: str, option: str = "lgbt", pixels: int = 64) -> None:
-        """
-        This surrounds the image specified by the URL with a border of a specified LGBT flag.
-
-        This defaults to the LGBT rainbow flag if none is given.
-        The amount of pixels can be given which determines the thickness of the flag border.
-        This has a maximum of 512px and defaults to a 64px border.
-        The full image is 1024x1024.
-        """
-        option = option.lower()
-        pixels = max(0, min(512, pixels))
-        flag = GENDER_OPTIONS.get(option)
-        if flag is None:
-            await ctx.send("I don't have that flag!")
-            return
-
-        async with ctx.typing():
-            try:
-                async with self.bot.http_session.get(url) as response:
-                    if response.status != 200:
-                        await ctx.send("Bad response from provided URL!")
-                        return
-                    image_bytes = await response.read()
-            except client_exceptions.ClientConnectorError:
-                raise commands.BadArgument("Cannot connect to provided URL!")
-            except client_exceptions.InvalidURL:
-                raise commands.BadArgument("Invalid URL!")
-
             await self.send_pride_image(ctx, image_bytes, pixels, flag, option)
 
     @prideavatar.command()
