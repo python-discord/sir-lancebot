@@ -10,15 +10,14 @@ from async_rediscache import RedisCache
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Channels, Colours, Month, NEGATIVE_REPLIES, Tokens, WHITELISTED_CHANNELS
-from bot.utils.decorators import in_month, whitelist_override
+from bot.constants import Colours, Month, NEGATIVE_REPLIES, Tokens
+from bot.utils.decorators import in_month
 
 log = logging.getLogger(__name__)
 
 CURRENT_YEAR = datetime.now().year  # Used to construct GH API query
 PRS_FOR_SHIRT = 4  # Minimum number of PRs before a shirt is awarded
 REVIEW_DAYS = 14  # number of days needed after PR can be mature
-HACKTOBER_WHITELIST = WHITELISTED_CHANNELS + (Channels.hacktoberfest_2020,)
 
 REQUEST_HEADERS = {"User-Agent": "Python Discord Hacktoberbot"}
 # using repo topics API during preview period requires an accept header
@@ -44,7 +43,6 @@ class HacktoberStats(commands.Cog):
 
     @in_month(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)
     @commands.group(name="hacktoberstats", aliases=("hackstats",), invoke_without_command=True)
-    @whitelist_override(channels=HACKTOBER_WHITELIST)
     async def hacktoberstats_group(self, ctx: commands.Context, github_username: str = None) -> None:
         """
         Display an embed for a user's Hacktoberfest contributions.
@@ -72,7 +70,6 @@ class HacktoberStats(commands.Cog):
 
     @in_month(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)
     @hacktoberstats_group.command(name="link")
-    @whitelist_override(channels=HACKTOBER_WHITELIST)
     async def link_user(self, ctx: commands.Context, github_username: str = None) -> None:
         """
         Link the invoking user's Github github_username to their Discord ID.
@@ -96,7 +93,6 @@ class HacktoberStats(commands.Cog):
 
     @in_month(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)
     @hacktoberstats_group.command(name="unlink")
-    @whitelist_override(channels=HACKTOBER_WHITELIST)
     async def unlink_user(self, ctx: commands.Context) -> None:
         """Remove the invoking user's account link from the log."""
         author_id, author_mention = self._author_mention_from_context(ctx)
