@@ -18,11 +18,8 @@ from bot.constants import (
     Emojis,
     NEGATIVE_REPLIES,
     Tokens,
-    WHITELISTED_CHANNELS
 )
 from bot.exts.core.extensions import invoke_help_command
-from bot.utils.decorators import whitelist_override
-
 log = logging.getLogger(__name__)
 
 GITHUB_API_URL = "https://api.github.com"
@@ -194,40 +191,6 @@ class GithubInfo(commands.Cog):
         """Commands for finding information related to GitHub."""
         if ctx.invoked_subcommand is None:
             await invoke_help_command(ctx)
-
-    @whitelist_override(channels=WHITELISTED_CHANNELS, categories=WHITELISTED_CATEGORIES)
-    @github_group.command(aliases=("pr", "issues", "prs"), root_aliases=("issue", "pr"))
-    async def issue(
-        self,
-        ctx: commands.Context,
-        numbers: commands.Greedy[int],
-        repository: str = "sir-lancebot",
-        user: str = "python-discord"
-    ) -> None:
-        """Command to retrieve issue(s) from a GitHub repository."""
-        # Remove duplicates
-        numbers = set(numbers)
-
-        err_message = None
-        if not numbers:
-            err_message = "You must have at least one issue/PR!"
-
-        elif len(numbers) > MAXIMUM_ISSUES:
-            err_message = f"Too many issues/PRs! (maximum of {MAXIMUM_ISSUES})"
-
-        # If there's an error with command invocation then send an error embed
-        if err_message is not None:
-            err_embed = discord.Embed(
-                title=random.choice(ERROR_REPLIES),
-                color=Colours.soft_red,
-                description=err_message
-            )
-            await ctx.send(embed=err_embed)
-            await invoke_help_command(ctx)
-            return
-
-        results = [await self.fetch_issues(number, repository, user) for number in numbers]
-        await ctx.send(embed=self.format_embed(results, user, repository))
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message) -> None:
