@@ -8,6 +8,10 @@ on:
     types:
       - completed
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   status_embed:
     # We send the embed in the following situations:

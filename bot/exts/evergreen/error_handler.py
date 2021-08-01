@@ -1,3 +1,4 @@
+import difflib
 import logging
 import math
 import random
@@ -7,17 +8,21 @@ from discord import Embed, Message
 from discord.ext import commands
 from sentry_sdk import push_scope
 
-from bot.constants import Channels, Colours, ERROR_REPLIES, NEGATIVE_REPLIES
+from bot.bot import Bot
+from bot.constants import Channels, Colours, ERROR_REPLIES, NEGATIVE_REPLIES, RedirectOutput
 from bot.utils.decorators import InChannelCheckFailure, InMonthCheckFailure
 from bot.utils.exceptions import UserNotPlayingError
 
 log = logging.getLogger(__name__)
 
 
+QUESTION_MARK_ICON = "https://cdn.discordapp.com/emojis/512367613339369475.png"
+
+
 class CommandErrorHandler(commands.Cog):
     """A error handler for the PythonDiscord server."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
     @staticmethod
@@ -41,8 +46,8 @@ class CommandErrorHandler(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
-        """Activates when a command opens an error."""
-        if getattr(error, 'handled', False):
+        """Activates when a command raises an error."""
+        if getattr(error, "handled", False):
             logging.debug(f"Command {ctx.command} had its error already handled locally; ignoring.")
             return
 
@@ -51,7 +56,7 @@ class CommandErrorHandler(commands.Cog):
             parent_command = f"{ctx.command} "
             ctx = subctx
 
-        error = getattr(error, 'original', error)
+        error = getattr(error, "original", error)
         logging.debug(
             f"Error Encountered: {type(error).__name__} - {str(error)}, "
             f"Command: {ctx.command}, "
@@ -60,6 +65,7 @@ class CommandErrorHandler(commands.Cog):
         )
 
         if isinstance(error, commands.CommandNotFound):
+            await self.send_command_suggestion(ctx, ctx.invoked_with)
             return
 
         if isinstance(error, (InChannelCheckFailure, InMonthCheckFailure)):
@@ -127,14 +133,40 @@ class CommandErrorHandler(commands.Cog):
             scope.set_extra("full_message", ctx.message.content)
 
             if ctx.guild is not None:
-                scope.set_extra(
-                    "jump_to",
-                    f"https://discordapp.com/channels/{ctx.guild.id}/{ctx.channel.id}/{ctx.message.id}"
-                )
+                scope.set_extra("jump_to", ctx.message.jump_url)
 
             log.exception(f"Unhandled command error: {str(error)}", exc_info=error)
 
+    async def send_command_suggestion(self, ctx: commands.Context, command_name: str) -> None:
+        """Sends user similar commands if any can be found."""
+        raw_commands = []
+        for cmd in self.bot.walk_commands():
+            if not cmd.hidden:
+                raw_commands += (cmd.name, *cmd.aliases)
+        if similar_command_data := difflib.get_close_matches(command_name, raw_commands, 1):
+            similar_command_name = similar_command_data[0]
+            similar_command = self.bot.get_command(similar_command_name)
 
-def setup(bot: commands.Bot) -> None:
-    """Error handler Cog load."""
+            if not similar_command:
+                return
+
+            log_msg = "Cancelling attempt to suggest a command due to failed checks."
+            try:
+                if not await similar_command.can_run(ctx):
+                    log.debug(log_msg)
+                    return
+            except commands.errors.CommandError as cmd_error:
+                log.debug(log_msg)
+                await self.on_command_error(ctx, cmd_error)
+                return
+
+            misspelled_content = ctx.message.content
+            e = Embed()
+            e.set_author(name="Did you mean:", icon_url=QUESTION_MARK_ICON)
+            e.description = misspelled_content.replace(command_name, similar_command_name, 1)
+            await ctx.send(embed=e, delete_after=RedirectOutput.delete_delay)
+
+
+def setup(bot: Bot) -> None:
+    """Load the ErrorHandler cog."""
     bot.add_cog(CommandErrorHandler(bot))

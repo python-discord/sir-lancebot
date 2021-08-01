@@ -8,6 +8,7 @@ from typing import Dict, NamedTuple
 __all__ = (
     "AdventOfCode",
     "Branding",
+    "Cats",
     "Channels",
     "Categories",
     "Client",
@@ -19,7 +20,9 @@ __all__ = (
     "Roles",
     "Tokens",
     "Wolfram",
+    "Reddit",
     "RedisConfig",
+    "RedirectOutput",
     "MODERATION_ROLES",
     "STAFF_ROLES",
     "WHITELISTED_CHANNELS",
@@ -93,6 +96,10 @@ class Branding:
     cycle_frequency = int(environ.get("CYCLE_FREQUENCY", 3))  # 0: never, 1: every day, 2: every other day, ...
 
 
+class Cats:
+    cats = ["ᓚᘏᗢ", "ᘡᘏᗢ", "🐈", "ᓕᘏᗢ", "ᓇᘏᗢ", "ᓂᘏᗢ", "ᘣᘏᗢ", "ᕦᘏᗢ", "ᕂᘏᗢ"]
+
+
 class Channels(NamedTuple):
     advent_of_code = int(environ.get("AOC_CHANNEL_ID", 782715290437943306))
     advent_of_code_commands = int(environ.get("AOC_COMMANDS_CHANNEL_ID", 607247579608121354))
@@ -106,10 +113,10 @@ class Channels(NamedTuple):
     off_topic_1 = 463035241142026251
     off_topic_2 = 463035268514185226
     community_bot_commands = int(environ.get("CHANNEL_COMMUNITY_BOT_COMMANDS", 607247579608121354))
-    hacktoberfest_2020 = 760857070781071431
     voice_chat_0 = 412357430186344448
     voice_chat_1 = 799647045886541885
     staff_voice = 541638762007101470
+    reddit = int(environ.get("CHANNEL_REDDIT", 458224812528238616))
 
 
 class Categories(NamedTuple):
@@ -119,6 +126,7 @@ class Categories(NamedTuple):
     media = 799054581991997460
     staff = 364918151625965579
 
+codejam_categories_name = "Code Jam"  # Name of the codejam team categories
 
 class Client(NamedTuple):
     name = "Sir Lancebot"
@@ -133,29 +141,47 @@ class Client(NamedTuple):
 
 
 class Colours:
-    blue = 0x0279fd
-    bright_green = 0x01d277
-    dark_green = 0x1f8b4c
-    orange = 0xe67e22
-    pink = 0xcf84e0
-    purple = 0xb734eb
-    soft_green = 0x68c290
-    soft_orange = 0xf9cb54
-    soft_red = 0xcd6d6d
-    yellow = 0xf9f586
+    blue = 0x0279FD
+    bright_green = 0x01D277
+    dark_green = 0x1F8B4C
+    orange = 0xE67E22
+    pink = 0xCF84E0
+    purple = 0xB734EB
+    soft_green = 0x68C290
+    soft_orange = 0xF9CB54
+    soft_red = 0xCD6D6D
+    yellow = 0xF9F586
     python_blue = 0x4B8BBE
     python_yellow = 0xFFD43B
-    grass_green = 0x66ff00
+    grass_green = 0x66FF00
+    gold = 0xE6C200
+
+    easter_like_colours = [
+        (255, 247, 0),
+        (255, 255, 224),
+        (0, 255, 127),
+        (189, 252, 201),
+        (255, 192, 203),
+        (255, 160, 122),
+        (181, 115, 220),
+        (221, 160, 221),
+        (200, 162, 200),
+        (238, 130, 238),
+        (135, 206, 235),
+        (0, 204, 204),
+        (64, 224, 208),
+    ]
 
 
 class Emojis:
+    cross_mark = "\u274C"
     star = "\u2B50"
     christmas_tree = "\U0001F384"
     check = "\u2611"
     envelope = "\U0001F4E8"
     trashcan = environ.get("TRASHCAN_EMOJI", "<:trashcan:637136429717389331>")
     ok_hand = ":ok_hand:"
-    hand_raised = "\U0001f64b"
+    hand_raised = "\U0001F64B"
 
     dice_1 = "<:dice_1:755891608859443290>"
     dice_2 = "<:dice_2:755891608741740635>"
@@ -164,12 +190,14 @@ class Emojis:
     dice_5 = "<:dice_5:755891608091885627>"
     dice_6 = "<:dice_6:755891607680843838>"
 
-    issue = "<:IssueOpen:629695470327037963>"
-    issue_closed = "<:IssueClosed:629695470570307614>"
-    pull_request = "<:PROpen:629695470175780875>"
-    pull_request_closed = "<:PRClosed:629695470519713818>"
-    pull_request_draft = "<:PRDraft:829755345425399848>"
-    merge = "<:PRMerged:629695470570176522>"
+    # These icons are from Github's repo https://github.com/primer/octicons/
+    issue_open = "<:IssueOpen:852596024777506817>"
+    issue_closed = "<:IssueClosed:852596024739758081>"
+    issue_draft = "<:IssueDraft:852596025147523102>"  # Not currently used by Github, but here for future.
+    pull_request_open = "<:PROpen:852596471505223781>"
+    pull_request_closed = "<:PRClosed:852596024732286976>"
+    pull_request_draft = "<:PRDraft:852596025045680218>"
+    pull_request_merged = "<:PRMerged:852596100301193227>"
 
     number_emojis = {
         1: "\u0031\ufe0f\u20e3",
@@ -190,10 +218,22 @@ class Emojis:
     x = "\U0001f1fd"
     o = "\U0001f1f4"
 
+    x_square = "<:x_square:632278427260682281>"
+    o_square = "<:o_square:632278452413661214>"
+
     status_online = "<:status_online:470326272351010816>"
     status_idle = "<:status_idle:470326266625785866>"
     status_dnd = "<:status_dnd:470326272082313216>"
     status_offline = "<:status_offline:470326266537705472>"
+
+    # Reddit emojis
+    reddit = "<:reddit:676030265734332427>"
+    reddit_post_text = "<:reddit_post_text:676030265910493204>"
+    reddit_post_video = "<:reddit_post_video:676030265839190047>"
+    reddit_post_photo = "<:reddit_post_photo:676030265734201344>"
+    reddit_upvote = "<:reddit_upvote:755845219890757644>"
+    reddit_comments = "<:reddit_comments:755845255001014384>"
+    reddit_users = "<:reddit_users:755845303822974997>"
 
 
 class Icons:
@@ -269,6 +309,18 @@ class RedisConfig(NamedTuple):
 class Source:
     github = "https://github.com/python-discord/sir-lancebot"
     github_avatar_url = "https://avatars1.githubusercontent.com/u/9919"
+
+
+class RedirectOutput:
+    delete_delay: int = 10
+
+
+class Reddit:
+    subreddits = ["r/Python"]
+
+    client_id = environ.get("REDDIT_CLIENT_ID")
+    secret = environ.get("REDDIT_SECRET")
+    webhook = int(environ.get("REDDIT_WEBHOOK", 635408384794951680))
 
 
 # Default role combinations

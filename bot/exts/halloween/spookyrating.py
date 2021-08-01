@@ -3,24 +3,24 @@ import json
 import logging
 import random
 from pathlib import Path
+from typing import Dict
 
 import discord
 from discord.ext import commands
 
+from bot.bot import Bot
 from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
-with Path("bot/resources/halloween/spooky_rating.json").open(encoding="utf8") as file:
-    SPOOKY_DATA = json.load(file)
-    SPOOKY_DATA = sorted((int(key), value) for key, value in SPOOKY_DATA.items())
+data: Dict[str, Dict[str, str]] = json.loads(Path("bot/resources/halloween/spooky_rating.json").read_text("utf8"))
+SPOOKY_DATA = sorted((int(key), value) for key, value in data.items())
 
 
 class SpookyRating(commands.Cog):
     """A cog for calculating one's spooky rating."""
 
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
+    def __init__(self):
         self.local_random = random.Random()
 
     @commands.command()
@@ -46,21 +46,21 @@ class SpookyRating(commands.Cog):
         _, data = SPOOKY_DATA[index]
 
         embed = discord.Embed(
-            title=data['title'],
-            description=f'{who} scored {spooky_percent}%!',
+            title=data["title"],
+            description=f"{who} scored {spooky_percent}%!",
             color=Colours.orange
         )
         embed.add_field(
-            name='A whisper from Satan',
-            value=data['text']
+            name="A whisper from Satan",
+            value=data["text"]
         )
         embed.set_thumbnail(
-            url=data['image']
+            url=data["image"]
         )
 
         await ctx.send(embed=embed)
 
 
-def setup(bot: commands.Bot) -> None:
-    """Spooky Rating Cog load."""
-    bot.add_cog(SpookyRating(bot))
+def setup(bot: Bot) -> None:
+    """Load the Spooky Rating Cog."""
+    bot.add_cog(SpookyRating())

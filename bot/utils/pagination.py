@@ -6,6 +6,7 @@ from functools import partial
 
 import discord
 from discord.abc import User
+from discord.embeds import EmptyEmbed
 from discord.ext.commands import Context, Paginator
 
 from bot.constants import Emojis
@@ -85,7 +86,7 @@ class LinePaginator(Paginator):
         self._count = len(prefix) + 1  # prefix + newline
         self._pages = []
 
-    def add_line(self, line: str = '', *, empty: bool = False) -> None:
+    def add_line(self, line: str = "", *, empty: bool = False) -> None:
         """
         Adds a line to the current page.
 
@@ -118,12 +119,11 @@ class LinePaginator(Paginator):
             self._new_page()
 
         self._linecount += 1
-
         self._count += len(line) + 1
         self._current_page.append(line)
 
         if empty:
-            self._current_page.append('')
+            self._current_page.append("")
             self._count += 1
 
         # Start a new page if there were any overflow words
@@ -252,7 +252,8 @@ class LinePaginator(Paginator):
                 log.trace(f"Setting embed url to '{url}'")
 
             log.debug("There's less than two pages, so we won't paginate - sending single page on its own")
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
+            return
         else:
             if footer_text:
                 embed.set_footer(text=f"{footer_text} (Page {current_page + 1}/{len(paginator.pages)})")
@@ -377,7 +378,7 @@ class ImagePaginator(Paginator):
         self.images = []
         self._pages = []
 
-    def add_line(self, line: str = '', *, empty: bool = False) -> None:
+    def add_line(self, line: str = "", *, empty: bool = False) -> None:
         """
         Adds a line to each page, usually just 1 line in this context.
 
@@ -397,7 +398,7 @@ class ImagePaginator(Paginator):
     @classmethod
     async def paginate(cls, pages: t.List[t.Tuple[str, str]], ctx: Context, embed: discord.Embed,
                        prefix: str = "", suffix: str = "", timeout: int = 300,
-                       exception_on_empty_embed: bool = False):
+                       exception_on_empty_embed: bool = False) -> None:
         """
         Use a paginator and set of reactions to provide pagination over a set of title/image pairs.
 
@@ -447,7 +448,8 @@ class ImagePaginator(Paginator):
             embed.set_image(url=image)
 
         if len(paginator.pages) <= 1:
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
+            return
 
         embed.set_footer(text=f"Page {current_page + 1}/{len(paginator.pages)}")
         message = await ctx.send(embed=embed)
@@ -512,9 +514,8 @@ class ImagePaginator(Paginator):
             await message.edit(embed=embed)
             embed.description = paginator.pages[current_page]
 
-            image = paginator.images[current_page]
-            if image:
-                embed.set_image(url=image)
+            image = paginator.images[current_page] or EmptyEmbed
+            embed.set_image(url=image)
 
             embed.set_footer(text=f"Page {current_page + 1}/{len(paginator.pages)}")
             log.debug(f"Got {reaction_type} page reaction - changing to page {current_page + 1}/{len(paginator.pages)}")
