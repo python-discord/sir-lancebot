@@ -11,8 +11,9 @@ from discord import Colour, Embed
 from discord.ext import commands
 from discord.ext.commands import CheckFailure, Command, Context
 
-from bot.constants import ERROR_REPLIES, Month
+from bot.constants import Channels, ERROR_REPLIES, Month, WHITELISTED_CHANNELS
 from bot.utils import human_months, resolve_current_month
+from bot.utils.checks import in_whitelist_check
 
 ONE_DAY = 24 * 60 * 60
 
@@ -186,82 +187,110 @@ def without_role(*role_ids: int) -> t.Callable:
     return commands.check(predicate)
 
 
-def in_channel_check(*channels: int, bypass_roles: t.Container[int] = None) -> t.Callable[[Context], bool]:
+def whitelist_check(**default_kwargs: t.Container[int]) -> t.Callable[[Context], bool]:
     """
-    Checks that the message is in a whitelisted channel or optionally has a bypass role.
+    Checks if a message is sent in a whitelisted context.
 
-    If `in_channel_override` is present, check if it contains channels
-    and use them in place of the global whitelist.
+    All arguments from `in_whitelist_check` are supported, with the exception of "fail_silently".
+    If `whitelist_override` is present, it is added to the global whitelist.
     """
     def predicate(ctx: Context) -> bool:
+        # Skip DM invocations
         if not ctx.guild:
             log.debug(f"{ctx.author} tried to use the '{ctx.command.name}' command from a DM.")
             return True
-        if ctx.channel.id in channels:
+
+        kwargs = default_kwargs.copy()
+
+        # Update kwargs based on override
+        if hasattr(ctx.command.callback, "override"):
+            # Remove default kwargs if reset is True
+            if ctx.command.callback.override_reset:
+                kwargs = {}
+                log.debug(
+                    f"{ctx.author} called the '{ctx.command.name}' command and "
+                    f"overrode default checks."
+                )
+
+            # Merge overwrites and defaults
+            for arg in ctx.command.callback.override:
+                default_value = kwargs.get(arg)
+                new_value = ctx.command.callback.override[arg]
+
+                # Skip values that don't need merging, or can't be merged
+                if default_value is None or isinstance(arg, int):
+                    kwargs[arg] = new_value
+
+                # Merge containers
+                elif isinstance(default_value, t.Container):
+                    if isinstance(new_value, t.Container):
+                        kwargs[arg] = (*default_value, *new_value)
+                    else:
+                        kwargs[arg] = new_value
+
+            log.debug(
+                f"Updated default check arguments for '{ctx.command.name}' "
+                f"invoked by {ctx.author}."
+            )
+
+        log.trace(f"Calling whitelist check for {ctx.author} for command {ctx.command.name}.")
+        result = in_whitelist_check(ctx, fail_silently=True, **kwargs)
+
+        # Return if check passed
+        if result:
             log.debug(
                 f"{ctx.author} tried to call the '{ctx.command.name}' command "
-                f"and the command was used in a whitelisted channel."
+                f"and the command was used in an overridden context."
             )
-            return True
-
-        if bypass_roles and any(r.id in bypass_roles for r in ctx.author.roles):
-            log.debug(
-                f"{ctx.author} called the '{ctx.command.name}' command and "
-                f"had a role to bypass the in_channel check."
-            )
-            return True
-
-        if hasattr(ctx.command.callback, "in_channel_override"):
-            override = ctx.command.callback.in_channel_override
-            if override is None:
-                log.debug(
-                    f"{ctx.author} called the '{ctx.command.name}' command "
-                    f"and the command was whitelisted to bypass the in_channel check."
-                )
-                return True
-            else:
-                if ctx.channel.id in override:
-                    log.debug(
-                        f"{ctx.author} tried to call the '{ctx.command.name}' command "
-                        f"and the command was used in an overridden whitelisted channel."
-                    )
-                    return True
-
-                log.debug(
-                    f"{ctx.author} tried to call the '{ctx.command.name}' command. "
-                    f"The overridden in_channel check failed."
-                )
-                channels_str = ', '.join(f"<#{c_id}>" for c_id in override)
-                raise InChannelCheckFailure(
-                    f"Sorry, but you may only use this command within {channels_str}."
-                )
+            return result
 
         log.debug(
             f"{ctx.author} tried to call the '{ctx.command.name}' command. "
-            f"The in_channel check failed."
+            f"The whitelist check failed."
         )
 
-        channels_str = ', '.join(f"<#{c_id}>" for c_id in channels)
-        raise InChannelCheckFailure(
-            f"Sorry, but you may only use this command within {channels_str}."
-        )
+        # Raise error if the check did not pass
+        channels = set(kwargs.get("channels") or {})
+        categories = kwargs.get("categories")
+
+        # Only output override channels + community_bot_commands
+        if channels:
+            default_whitelist_channels = set(WHITELISTED_CHANNELS)
+            default_whitelist_channels.discard(Channels.community_bot_commands)
+            channels.difference_update(default_whitelist_channels)
+
+        # Add all whitelisted category channels
+        if categories:
+            for category_id in categories:
+                category = ctx.guild.get_channel(category_id)
+                if category is None:
+                    continue
+
+                channels.update(channel.id for channel in category.text_channels)
+
+        if channels:
+            channels_str = ', '.join(f"<#{c_id}>" for c_id in channels)
+            message = f"Sorry, but you may only use this command within {channels_str}."
+        else:
+            message = "Sorry, but you may not use this command."
+
+        raise InChannelCheckFailure(message)
 
     return predicate
 
 
-in_channel = commands.check(in_channel_check)
-
-
-def override_in_channel(channels: t.Tuple[int] = None) -> t.Callable:
+def whitelist_override(bypass_defaults: bool = False, **kwargs: t.Container[int]) -> t.Callable:
     """
-    Set command callback attribute for detection in `in_channel_check`.
+    Override global whitelist context, with the kwargs specified.
 
-    Override global whitelist if channels are specified.
+    All arguments from `in_whitelist_check` are supported, with the exception of `fail_silently`.
+    Set `bypass_defaults` to True if you want to completely bypass global checks.
 
     This decorator has to go before (below) below the `command` decorator.
     """
     def inner(func: t.Callable) -> t.Callable:
-        func.in_channel_override = channels
+        func.override = kwargs
+        func.override_reset = bypass_defaults
         return func
 
     return inner

@@ -2,7 +2,8 @@ import difflib
 import logging
 import random
 import re
-from datetime import datetime as dt
+from asyncio import sleep
+from datetime import datetime as dt, timedelta
 from enum import IntEnum
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -14,13 +15,29 @@ from discord.ext.commands import Cog, Context, group
 from bot.bot import Bot
 from bot.constants import STAFF_ROLES, Tokens
 from bot.utils.decorators import with_role
+from bot.utils.extensions import invoke_help_command
 from bot.utils.pagination import ImagePaginator, LinePaginator
 
 # Base URL of IGDB API
-BASE_URL = "https://api-v3.igdb.com"
+BASE_URL = "https://api.igdb.com/v4"
 
-HEADERS = {
-    "user-key": Tokens.igdb,
+CLIENT_ID = Tokens.igdb_client_id
+CLIENT_SECRET = Tokens.igdb_client_secret
+
+# The number of seconds before expiry that we attempt to re-fetch a new access token
+ACCESS_TOKEN_RENEWAL_WINDOW = 60*60*24*2
+
+# URL to request API access token
+OAUTH_URL = "https://id.twitch.tv/oauth2/token"
+
+OAUTH_PARAMS = {
+    "client_id": CLIENT_ID,
+    "client_secret": CLIENT_SECRET,
+    "grant_type": "client_credentials"
+}
+
+BASE_HEADERS = {
+    "Client-ID": CLIENT_ID,
     "Accept": "application/json"
 }
 
@@ -135,8 +152,47 @@ class Games(Cog):
         self.http_session: ClientSession = bot.http_session
 
         self.genres: Dict[str, int] = {}
+        self.headers = BASE_HEADERS
 
-        self.refresh_genres_task.start()
+        self.bot.loop.create_task(self.renew_access_token())
+
+    async def renew_access_token(self) -> None:
+        """Refeshes V4 access token a number of seconds before expiry. See `ACCESS_TOKEN_RENEWAL_WINDOW`."""
+        while True:
+            async with self.http_session.post(OAUTH_URL, params=OAUTH_PARAMS) as resp:
+                result = await resp.json()
+                if resp.status != 200:
+                    # If there is a valid access token continue to use that,
+                    # otherwise unload cog.
+                    if "Authorization" in self.headers:
+                        time_delta = timedelta(seconds=ACCESS_TOKEN_RENEWAL_WINDOW)
+                        logger.error(
+                            "Failed to renew IGDB access token. "
+                            f"Current token will last for {time_delta} "
+                            f"OAuth response message: {result['message']}"
+                        )
+                    else:
+                        logger.warning(
+                            "Invalid OAuth credentials. Unloading Games cog. "
+                            f"OAuth response message: {result['message']}"
+                        )
+                        self.bot.remove_cog('Games')
+
+                    return
+
+            self.headers["Authorization"] = f"Bearer {result['access_token']}"
+
+            # Attempt to renew before the token expires
+            next_renewal = result["expires_in"] - ACCESS_TOKEN_RENEWAL_WINDOW
+
+            time_delta = timedelta(seconds=next_renewal)
+            logger.info(f"Successfully renewed access token. Refreshing again in {time_delta}")
+
+            # This will be true the first time this loop runs.
+            # Since we now have an access token, its safe to start this task.
+            if self.genres == {}:
+                self.refresh_genres_task.start()
+            await sleep(next_renewal)
 
     @tasks.loop(hours=24.0)
     async def refresh_genres_task(self) -> None:
@@ -156,9 +212,8 @@ class Games(Cog):
     async def _get_genres(self) -> None:
         """Create genres variable for games command."""
         body = "fields name; limit 100;"
-        async with self.http_session.get(f"{BASE_URL}/genres", data=body, headers=HEADERS) as resp:
+        async with self.http_session.post(f"{BASE_URL}/genres", data=body, headers=self.headers) as resp:
             result = await resp.json()
-
         genres = {genre["name"].capitalize(): genre["id"] for genre in result}
 
         # Replace complex names with names from ALIASES
@@ -180,7 +235,7 @@ class Games(Cog):
         """
         # When user didn't specified genre, send help message
         if genre is None:
-            await ctx.send_help("games")
+            await invoke_help_command(ctx)
             return
 
         # Capitalize genre for check
@@ -306,7 +361,7 @@ class Games(Cog):
         body = GAMES_LIST_BODY.format(**params)
 
         # Do request to IGDB API, create headers, URL, define body, return result
-        async with self.http_session.get(url=f"{BASE_URL}/games", data=body, headers=HEADERS) as resp:
+        async with self.http_session.post(url=f"{BASE_URL}/games", data=body, headers=self.headers) as resp:
             return await resp.json()
 
     async def create_page(self, data: Dict[str, Any]) -> Tuple[str, str]:
@@ -348,7 +403,7 @@ class Games(Cog):
         # Define request body of IGDB API request and do request
         body = SEARCH_BODY.format(**{"term": search_term})
 
-        async with self.http_session.get(url=f"{BASE_URL}/games", data=body, headers=HEADERS) as resp:
+        async with self.http_session.post(url=f"{BASE_URL}/games", data=body, headers=self.headers) as resp:
             data = await resp.json()
 
         # Loop over games, format them to good format, make line and append this to total lines
@@ -377,7 +432,7 @@ class Games(Cog):
             "offset": offset
         })
 
-        async with self.http_session.get(url=f"{BASE_URL}/companies", data=body, headers=HEADERS) as resp:
+        async with self.http_session.post(url=f"{BASE_URL}/companies", data=body, headers=self.headers) as resp:
             return await resp.json()
 
     async def create_company_page(self, data: Dict[str, Any]) -> Tuple[str, str]:
@@ -418,7 +473,10 @@ class Games(Cog):
 def setup(bot: Bot) -> None:
     """Add/Load Games cog."""
     # Check does IGDB API key exist, if not, log warning and don't load cog
-    if not Tokens.igdb:
-        logger.warning("No IGDB API key. Not loading Games cog.")
+    if not Tokens.igdb_client_id:
+        logger.warning("No IGDB client ID. Not loading Games cog.")
+        return
+    if not Tokens.igdb_client_secret:
+        logger.warning("No IGDB client secret. Not loading Games cog.")
         return
     bot.add_cog(Games(bot))

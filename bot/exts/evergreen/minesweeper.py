@@ -8,6 +8,7 @@ from discord.ext import commands
 
 from bot.constants import Client
 from bot.utils.exceptions import UserNotPlayingError
+from bot.utils.extensions import invoke_help_command
 
 MESSAGE_MAPPING = {
     0: ":stop_button:",
@@ -83,7 +84,7 @@ class Minesweeper(commands.Cog):
     @commands.group(name='minesweeper', aliases=('ms',), invoke_without_command=True)
     async def minesweeper_group(self, ctx: commands.Context) -> None:
         """Commands for Playing Minesweeper."""
-        await ctx.send_help(ctx.command)
+        await invoke_help_command(ctx)
 
     @staticmethod
     def get_neighbours(x: int, y: int) -> typing.Generator[typing.Tuple[int, int], None, None]:

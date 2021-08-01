@@ -62,7 +62,8 @@ def custom_cooldown(*ignore: List[int]) -> Callable:
             # if the invoked command is help we don't want to increase the ratelimits since it's not actually
             # invoking the command/making a request, so instead just check if the user/guild are on cooldown.
             guild_cooldown = not guildcd.get_bucket(ctx.message).get_tokens() == 0  # if guild is on cooldown
-            if not any(r.id in ignore for r in ctx.author.roles):  # check user bucket if user is not ignored
+            # check the message is in a guild, and check user bucket if user is not ignored
+            if ctx.guild and not any(r.id in ignore for r in ctx.author.roles):
                 return guild_cooldown and not usercd.get_bucket(ctx.message).get_tokens() == 0
             return guild_cooldown
 
@@ -108,7 +109,10 @@ async def get_pod_pages(ctx: Context, bot: commands.Bot, query: str) -> Optional
             "input": query,
             "appid": APPID,
             "output": DEFAULT_OUTPUT_FORMAT,
-            "format": "image,plaintext"
+            "format": "image,plaintext",
+            "location": "the moon",
+            "latlong": "0.0,0.0",
+            "ip": "1.1.1.1"
         })
         request_url = QUERY.format(request="query", data=url_str)
 
@@ -168,6 +172,9 @@ class Wolfram(Cog):
         url_str = parse.urlencode({
             "i": query,
             "appid": APPID,
+            "location": "the moon",
+            "latlong": "0.0,0.0",
+            "ip": "1.1.1.1"
         })
         query = QUERY.format(request="simple", data=url_str)
 
@@ -248,6 +255,9 @@ class Wolfram(Cog):
         url_str = parse.urlencode({
             "i": query,
             "appid": APPID,
+            "location": "the moon",
+            "latlong": "0.0,0.0",
+            "ip": "1.1.1.1"
         })
         query = QUERY.format(request="result", data=url_str)
 

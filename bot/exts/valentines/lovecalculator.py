@@ -4,14 +4,12 @@ import json
 import logging
 import random
 from pathlib import Path
-from typing import Union
+from typing import Coroutine, Union
 
 import discord
 from discord import Member
 from discord.ext import commands
 from discord.ext.commands import BadArgument, Cog, clean_content
-
-from bot.constants import Roles
 
 log = logging.getLogger(__name__)
 
@@ -46,14 +44,11 @@ class LoveCalculator(Cog):
 
         If you want to use multiple words for one argument, you must include quotes.
           .love "Zes Vappa" "morning coffee"
-
-        If only one argument is provided, the subject will become one of the helpers at random.
         """
         if whom is None:
-            staff = ctx.guild.get_role(Roles.helpers).members
-            whom = random.choice(staff)
+            whom = ctx.author
 
-        def normalize(arg: Union[Member, str]) -> str:
+        def normalize(arg: Union[Member, str]) -> Coroutine:
             if isinstance(arg, Member):
                 # If we are given a member, return name#discrim without any extra changes
                 arg = str(arg)

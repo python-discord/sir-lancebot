@@ -140,7 +140,7 @@ class Game:
     @staticmethod
     def get_square(grid: Grid, square: str) -> Square:
         """Grabs a square from a grid with an inputted key."""
-        index = ord(square[0]) - ord("A")
+        index = ord(square[0].upper()) - ord("A")
         number = int(square[1:])
 
         return grid[number-1][index]  # -1 since lists are indexed from 0
@@ -227,7 +227,7 @@ class Game:
             if message.content.lower() == "surrender":
                 self.surrender = True
                 return True
-            self.match = re.match("([A-J]|[a-j]) ?((10)|[1-9])", message.content.strip())
+            self.match = re.fullmatch("([A-J]|[a-j]) ?((10)|[1-9])", message.content.strip())
             if not self.match:
                 self.bot.loop.create_task(message.add_reaction(CROSS_EMOJI))
             return bool(self.match)

@@ -1,11 +1,24 @@
 import logging
 import random
+import re
+import typing as t
+from dataclasses import dataclass
 
 import discord
 from discord.ext import commands
 
-from bot.constants import Channels, Colours, ERROR_REPLIES, Emojis, Tokens, WHITELISTED_CHANNELS
-from bot.utils.decorators import override_in_channel
+from bot.constants import (
+    Categories,
+    Channels,
+    Colours,
+    ERROR_REPLIES,
+    Emojis,
+    NEGATIVE_REPLIES,
+    Tokens,
+    WHITELISTED_CHANNELS
+)
+from bot.utils.decorators import whitelist_override
+from bot.utils.extensions import invoke_help_command
 
 log = logging.getLogger(__name__)
 
@@ -13,12 +26,66 @@ BAD_RESPONSE = {
     404: "Issue/pull request not located! Please enter a valid number!",
     403: "Rate limit has been hit! Please try again later!"
 }
+REQUEST_HEADERS = {
+    "Accept": "application/vnd.github.v3+json"
+}
 
-MAX_REQUESTS = 10
+REPOSITORY_ENDPOINT = "https://api.github.com/orgs/{org}/repos?per_page=100&type=public"
+ISSUE_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/issues/{number}"
+PR_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/pulls/{number}"
 
-REQUEST_HEADERS = dict()
 if GITHUB_TOKEN := Tokens.github:
     REQUEST_HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
+
+WHITELISTED_CATEGORIES = (
+    Categories.development, Categories.devprojects, Categories.media, Categories.staff
+)
+
+CODE_BLOCK_RE = re.compile(
+    r"^`([^`\n]+)`"  # Inline codeblock
+    r"|```(.+?)```",  # Multiline codeblock
+    re.DOTALL | re.MULTILINE
+)
+
+# Maximum number of issues in one message
+MAXIMUM_ISSUES = 5
+
+# Regex used when looking for automatic linking in messages
+# regex101 of current regex https://regex101.com/r/V2ji8M/6
+AUTOMATIC_REGEX = re.compile(
+    r"((?P<org>[a-zA-Z0-9][a-zA-Z0-9\-]{1,39})\/)?(?P<repo>[\w\-\.]{1,100})#(?P<number>[0-9]+)"
+)
+
+
+@dataclass
+class FoundIssue:
+    """Dataclass representing an issue found by the regex."""
+
+    organisation: t.Optional[str]
+    repository: str
+    number: str
+
+    def __hash__(self) -> int:
+        return hash((self.organisation, self.repository, self.number))
+
+
+@dataclass
+class FetchError:
+    """Dataclass representing an error while fetching an issue."""
+
+    return_code: int
+    message: str
+
+
+@dataclass
+class IssueState:
+    """Dataclass representing the state of an issue."""
+
+    repository: str
+    number: int
+    url: str
+    title: str
+    emoji: str
 
 
 class Issues(commands.Cog):
@@ -26,81 +93,180 @@ class Issues(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+        self.repos = []
 
-    @commands.command(aliases=("pr",))
-    @override_in_channel(WHITELISTED_CHANNELS + (Channels.dev_contrib, Channels.dev_branding))
-    async def issue(
-        self,
-        ctx: commands.Context,
-        numbers: commands.Greedy[int],
-        repository: str = "sir-lancebot",
-        user: str = "python-discord"
-    ) -> None:
-        """Command to retrieve issue(s) from a GitHub repository."""
-        links = []
-        numbers = set(numbers)  # Convert from list to set to remove duplicates, if any
+    @staticmethod
+    def remove_codeblocks(message: str) -> str:
+        """Remove any codeblock in a message."""
+        return re.sub(CODE_BLOCK_RE, "", message)
 
-        if not numbers:
-            await ctx.invoke(self.bot.get_command('help'), 'issue')
-            return
+    async def fetch_issues(
+            self,
+            number: int,
+            repository: str,
+            user: str
+    ) -> t.Union[IssueState, FetchError]:
+        """
+        Retrieve an issue from a GitHub repository.
 
-        if len(numbers) > MAX_REQUESTS:
-            embed = discord.Embed(
-                title=random.choice(ERROR_REPLIES),
-                color=Colours.soft_red,
-                description=f"Too many issues/PRs! (maximum of {MAX_REQUESTS})"
-            )
-            await ctx.send(embed=embed)
-            return
+        Returns IssueState on success, FetchError on failure.
+        """
+        url = ISSUE_ENDPOINT.format(user=user, repository=repository, number=number)
+        pulls_url = PR_ENDPOINT.format(user=user, repository=repository, number=number)
+        log.trace(f"Querying GH issues API: {url}")
 
-        for number in numbers:
-            url = f"https://api.github.com/repos/{user}/{repository}/issues/{number}"
-            merge_url = f"https://api.github.com/repos/{user}/{repository}/pulls/{number}/merge"
+        async with self.bot.http_session.get(url, headers=REQUEST_HEADERS) as r:
+            json_data = await r.json()
 
-            log.trace(f"Querying GH issues API: {url}")
-            async with self.bot.http_session.get(url, headers=REQUEST_HEADERS) as r:
-                json_data = await r.json()
+        if r.status == 403:
+            if r.headers.get("X-RateLimit-Remaining") == "0":
+                log.info(f"Ratelimit reached while fetching {url}")
+                return FetchError(403, "Ratelimit reached, please retry in a few minutes.")
+            return FetchError(403, "Cannot access issue.")
+        elif r.status in (404, 410):
+            return FetchError(r.status, "Issue not found.")
+        elif r.status != 200:
+            return FetchError(r.status, "Error while fetching issue.")
 
-            if r.status in BAD_RESPONSE:
-                log.warning(f"Received response {r.status} from: {url}")
-                return await ctx.send(f"[{str(r.status)}] #{number} {BAD_RESPONSE.get(r.status)}")
-
-            # The initial API request is made to the issues API endpoint, which will return information
-            # if the issue or PR is present. However, the scope of information returned for PRs differs
-            # from issues: if the 'issues' key is present in the response then we can pull the data we
-            # need from the initial API call.
-            if "issues" in json_data.get("html_url"):
-                if json_data.get("state") == "open":
-                    icon_url = Emojis.issue
-                else:
-                    icon_url = Emojis.issue_closed
-
-            # If the 'issues' key is not contained in the API response and there is no error code, then
-            # we know that a PR has been requested and a call to the pulls API endpoint is necessary
-            # to get the desired information for the PR.
+        # The initial API request is made to the issues API endpoint, which will return information
+        # if the issue or PR is present. However, the scope of information returned for PRs differs
+        # from issues: if the 'issues' key is present in the response then we can pull the data we
+        # need from the initial API call.
+        if "issues" in json_data["html_url"]:
+            if json_data.get("state") == "open":
+                emoji = Emojis.issue
             else:
-                log.trace(f"PR provided, querying GH pulls API for additional information: {merge_url}")
-                async with self.bot.http_session.get(merge_url) as m:
-                    if json_data.get("state") == "open":
-                        icon_url = Emojis.pull_request
-                    # When the status is 204 this means that the state of the PR is merged
-                    elif m.status == 204:
-                        icon_url = Emojis.merge
-                    else:
-                        icon_url = Emojis.pull_request_closed
+                emoji = Emojis.issue_closed
 
-            issue_url = json_data.get("html_url")
-            links.append([icon_url, f"[{repository}] #{number} {json_data.get('title')}", issue_url])
+        # If the 'issues' key is not contained in the API response and there is no error code, then
+        # we know that a PR has been requested and a call to the pulls API endpoint is necessary
+        # to get the desired information for the PR.
+        else:
+            log.trace(f"PR provided, querying GH pulls API for additional information: {pulls_url}")
+            async with self.bot.http_session.get(pulls_url) as p:
+                pull_data = await p.json()
+                if pull_data["draft"]:
+                    emoji = Emojis.pull_request_draft
+                elif pull_data["state"] == "open":
+                    emoji = Emojis.pull_request
+                # When 'merged_at' is not None, this means that the state of the PR is merged
+                elif pull_data["merged_at"] is not None:
+                    emoji = Emojis.merge
+                else:
+                    emoji = Emojis.pull_request_closed
 
-        # Issue/PR format: emoji to show if open/closed/merged, number and the title as a singular link.
-        description_list = ["{0} [{1}]({2})".format(*link) for link in links]
+        issue_url = json_data.get("html_url")
+
+        return IssueState(repository, number, issue_url, json_data.get('title', ''), emoji)
+
+    @staticmethod
+    def format_embed(
+            results: t.List[t.Union[IssueState, FetchError]],
+            user: str,
+            repository: t.Optional[str] = None
+    ) -> discord.Embed:
+        """Take a list of IssueState or FetchError and format a Discord embed for them."""
+        description_list = []
+
+        for result in results:
+            if isinstance(result, IssueState):
+                description_list.append(f"{result.emoji} [{result.title}]({result.url})")
+            elif isinstance(result, FetchError):
+                description_list.append(f":x: [{result.return_code}] {result.message}")
+
         resp = discord.Embed(
             colour=Colours.bright_green,
             description='\n'.join(description_list)
         )
 
-        resp.set_author(name="GitHub", url=f"https://github.com/{user}/{repository}")
-        await ctx.send(embed=resp)
+        embed_url = f"https://github.com/{user}/{repository}" if repository else f"https://github.com/{user}"
+        resp.set_author(name="GitHub", url=embed_url)
+        return resp
+
+    @whitelist_override(channels=WHITELISTED_CHANNELS, categories=WHITELISTED_CATEGORIES)
+    @commands.command(aliases=("pr",))
+    async def issue(
+            self,
+            ctx: commands.Context,
+            numbers: commands.Greedy[int],
+            repository: str = "sir-lancebot",
+            user: str = "python-discord"
+    ) -> None:
+        """Command to retrieve issue(s) from a GitHub repository."""
+        # Remove duplicates
+        numbers = set(numbers)
+
+        if len(numbers) > MAXIMUM_ISSUES:
+            embed = discord.Embed(
+                title=random.choice(ERROR_REPLIES),
+                color=Colours.soft_red,
+                description=f"Too many issues/PRs! (maximum of {MAXIMUM_ISSUES})"
+            )
+            await ctx.send(embed=embed)
+            await invoke_help_command(ctx)
+
+        results = [await self.fetch_issues(number, repository, user) for number in numbers]
+        await ctx.send(embed=self.format_embed(results, user, repository))
+
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message) -> None:
+        """
+        Automatic issue linking.
+
+        Listener to retrieve issue(s) from a GitHub repository using automatic linking if matching <org>/<repo>#<issue>.
+        """
+        # Ignore bots
+        if message.author.bot:
+            return
+
+        issues = [
+            FoundIssue(*match.group("org", "repo", "number"))
+            for match in AUTOMATIC_REGEX.finditer(self.remove_codeblocks(message.content))
+        ]
+        links = []
+
+        if issues:
+            # Block this from working in DMs
+            if not message.guild:
+                await message.channel.send(
+                    embed=discord.Embed(
+                        title=random.choice(NEGATIVE_REPLIES),
+                        description=(
+                            "You can't retrieve issues from DMs. "
+                            f"Try again in <#{Channels.community_bot_commands}>"
+                        ),
+                        colour=Colours.soft_red
+                    )
+                )
+                return
+
+            log.trace(f"Found {issues = }")
+            # Remove duplicates
+            issues = set(issues)
+
+            if len(issues) > MAXIMUM_ISSUES:
+                embed = discord.Embed(
+                    title=random.choice(ERROR_REPLIES),
+                    color=Colours.soft_red,
+                    description=f"Too many issues/PRs! (maximum of {MAXIMUM_ISSUES})"
+                )
+                await message.channel.send(embed=embed, delete_after=5)
+                return
+
+            for repo_issue in issues:
+                result = await self.fetch_issues(
+                    int(repo_issue.number),
+                    repo_issue.repository,
+                    repo_issue.organisation or "python-discord"
+                )
+                if isinstance(result, IssueState):
+                    links.append(result)
+
+        if not links:
+            return
+
+        resp = self.format_embed(links, "python-discord")
+        await message.channel.send(embed=resp)
 
 
 def setup(bot: commands.Bot) -> None:
