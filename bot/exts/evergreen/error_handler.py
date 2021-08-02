@@ -11,7 +11,7 @@ from sentry_sdk import push_scope
 from bot.bot import Bot
 from bot.constants import Channels, Colours, ERROR_REPLIES, NEGATIVE_REPLIES, RedirectOutput
 from bot.utils.decorators import InChannelCheckFailure, InMonthCheckFailure
-from bot.utils.exceptions import UserNotPlayingError
+from bot.utils.exceptions import ExternalAPIError, UserNotPlayingError
 
 log = logging.getLogger(__name__)
 
@@ -118,6 +118,11 @@ class CommandErrorHandler(commands.Cog):
 
         if isinstance(error, UserNotPlayingError):
             await ctx.send("Game not found.")
+            return
+
+        if isinstance(error, ExternalAPIError):
+            await ctx.send(embed=self.error_embed(f"There was an error when communicating with the {error.api}",
+                                                  NEGATIVE_REPLIES))
             return
 
         with push_scope() as scope:

@@ -9,6 +9,7 @@ from discord.ext import commands
 
 from bot.bot import Bot
 from bot.utils import LinePaginator
+from bot.utils.exceptions import ExternalAPIError
 
 log = logging.getLogger(__name__)
 
@@ -37,48 +38,42 @@ class WikipediaSearch(commands.Cog):
         """Search wikipedia search string and return formatted first 10 pages found."""
         url = SEARCH_API.format(number_of_results=10, string=search)
         async with self.bot.http_session.get(url=url) as resp:
-            if resp.status == 200:
-                raw_data = await resp.json()
-                if raw_data.get("query", None) is None:
-                    if raw_data.get("errors", None) is not None:
-                        log.info("There was an error regarding the Wikipedia API query.")
-                    else:
-                        log.info("There was an issue when trying to communicate with the Wikipedia API")
-
-                    await channel.send(
-                        "There was an issue processing your Wikipedia request, please try again later.")
-                    return
-                else:
-
-                    number_of_results = raw_data["query"]["searchinfo"]["totalhits"]
-
-                    if number_of_results:
-                        results = raw_data["query"]["search"]
-                        lines = []
-
-                        for article in results:
-                            line = WIKI_SEARCH_RESULT.format(
-                                name=article["title"],
-                                description=unescape(
-                                    re.sub(
-                                        WIKI_SNIPPET_REGEX, "", article["snippet"]
-                                    )
-                                ),
-                                url=f"https://en.wikipedia.org/?curid={article['pageid']}"
-                            )
-                            lines.append(line)
-
-                        return lines
-
-                    else:
-                        await channel.send(
-                            "Sorry, we could not find a wikipedia article using that search term."
-                        )
-                        return
-            else:
+            if resp.status != 200:
                 log.info(f"Unexpected response `{resp.status}` while searching wikipedia for `{search}`")
+                raise ExternalAPIError("Wikipedia API")
+
+            raw_data = await resp.json()
+            if raw_data.get("query", None) is None:
+                if raw_data.get("errors", None) is not None:
+                    log.info("There was an error regarding the Wikipedia API query.")
+                else:
+                    log.info("There was an issue when trying to communicate with the Wikipedia API, "
+                             "please try again later.")
+                raise ExternalAPIError("Wikipedia API")
+
+            number_of_results = raw_data["query"]["searchinfo"]["totalhits"]
+
+            if number_of_results:
+                results = raw_data["query"]["search"]
+                lines = []
+
+                for article in results:
+                    line = WIKI_SEARCH_RESULT.format(
+                        name=article["title"],
+                        description=unescape(
+                            re.sub(
+                                WIKI_SNIPPET_REGEX, "", article["snippet"]
+                            )
+                        ),
+                        url=f"https://en.wikipedia.org/?curid={article['pageid']}"
+                    )
+                    lines.append(line)
+
+                return lines
+
+            else:
                 await channel.send(
-                    "Whoops, the Wikipedia API is having some issues right now. Try again later."
+                    "Sorry, we could not find a wikipedia article using that search term."
                 )
                 return
 
