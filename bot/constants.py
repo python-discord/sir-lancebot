@@ -226,6 +226,10 @@ class Emojis:
     status_dnd = "<:status_dnd:470326272082313216>"
     status_offline = "<:status_offline:470326266537705472>"
 
+
+    stackoverflow_tag = environ.get('stack_tag', "<:stack_tag:*> ")
+    stackoverflow_views = environ.get('stack_views', "<:stack_eye:*>")
+
     # Reddit emojis
     reddit = "<:reddit:676030265734332427>"
     reddit_post_text = "<:reddit_post_text:676030265910493204>"
