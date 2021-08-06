@@ -5,7 +5,7 @@ from typing import Iterable, List
 
 import discord
 from discord.ext.commands import Context, Converter
-from fuzzywuzzy import fuzz
+from rapidfuzz import fuzz
 
 from bot.exts.evergreen.snakes._utils import SNAKE_RESOURCES
 from bot.utils import disambiguate

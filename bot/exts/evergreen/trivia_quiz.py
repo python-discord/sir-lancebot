@@ -9,7 +9,7 @@ from typing import Callable, List, Optional
 
 import discord
 from discord.ext import commands
-from fuzzywuzzy import fuzz
+from rapidfuzz import fuzz
 
 from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES, Roles
