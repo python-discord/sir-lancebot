@@ -13,9 +13,18 @@ from bot.utils import LinePaginator
 log = logging.getLogger(__name__)
 
 SEARCH_API = (
-    "https://en.wikipedia.org/w/api.php?action=query&list=search&prop=info&inprop=url&utf8=&"
-    "format=json&origin=*&srlimit={number_of_results}&srsearch={string}"
+    "https://en.wikipedia.org/w/api.php"
 )
+WIKI_PARAMS = {
+    "action": "query",
+    "list": "search",
+    "prop": "info",
+    "inprop": "url",
+    "utf8": "",
+    "format": "json",
+    "origin": "*",
+
+}
 WIKI_THUMBNAIL = (
     "https://upload.wikimedia.org/wikipedia/en/thumb/8/80/Wikipedia-logo-v2.svg"
     "/330px-Wikipedia-logo-v2.svg.png"
@@ -35,8 +44,8 @@ class WikipediaSearch(commands.Cog):
 
     async def wiki_request(self, channel: TextChannel, search: str) -> Optional[List[str]]:
         """Search wikipedia search string and return formatted first 10 pages found."""
-        url = SEARCH_API.format(number_of_results=10, string=search)
-        async with self.bot.http_session.get(url=url) as resp:
+        params = dict(WIKI_PARAMS, srlimit=10, srsearch=search)
+        async with self.bot.http_session.get(url=SEARCH_API, params=params) as resp:
             if resp.status == 200:
                 raw_data = await resp.json()
                 number_of_results = raw_data["query"]["searchinfo"]["totalhits"]
