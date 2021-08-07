@@ -2,7 +2,7 @@ import logging
 import re
 from datetime import datetime
 from html import unescape
-from typing import List
+from typing import Optional
 
 from discord import Color, Embed, TextChannel
 from discord.ext import commands
@@ -43,7 +43,7 @@ class WikipediaSearch(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    async def wiki_request(self, channel: TextChannel, search: str) -> List[str]:
+    async def wiki_request(self, channel: TextChannel, search: str) -> Optional[list[str]]:
         """Search wikipedia search string and return formatted first 10 pages found."""
         params = WIKI_PARAMS | {"srlimit": 10, "srsearch": search}
         async with self.bot.http_session.get(url=SEARCH_API, params=params) as resp:

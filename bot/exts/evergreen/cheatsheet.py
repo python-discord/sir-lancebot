@@ -1,6 +1,6 @@
 import random
 import re
-import typing as t
+from typing import Union
 from urllib.parse import quote_plus
 
 from discord import Embed
@@ -52,7 +52,7 @@ class CheatSheet(commands.Cog):
         )
         return embed
 
-    def result_fmt(self, url: str, body_text: str) -> t.Tuple[bool, t.Union[str, Embed]]:
+    def result_fmt(self, url: str, body_text: str) -> tuple[bool, Union[str, Embed]]:
         """Format Result."""
         if body_text.startswith("#  404 NOT FOUND"):
             embed = self.fmt_error_embed()

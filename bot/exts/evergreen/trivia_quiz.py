@@ -5,7 +5,7 @@ import operator
 import random
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, List, Optional
+from typing import Callable, Optional
 
 import discord
 from discord.ext import commands
@@ -559,7 +559,7 @@ class TriviaQuiz(commands.Cog):
     @staticmethod
     async def send_answer(
         channel: discord.TextChannel,
-        answers: List[str],
+        answers: list[str],
         answer_is_correct: bool,
         question_dict: dict,
         q_left: int,

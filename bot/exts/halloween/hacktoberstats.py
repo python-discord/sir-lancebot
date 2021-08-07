@@ -3,7 +3,7 @@ import random
 import re
 from collections import Counter
 from datetime import datetime, timedelta
-from typing import List, Optional, Tuple, Union
+from typing import Optional, Union
 from urllib.parse import quote_plus
 
 import discord
@@ -139,7 +139,7 @@ class HacktoberStats(commands.Cog):
             else:
                 await ctx.send(f"No valid Hacktoberfest PRs found for '{github_username}'")
 
-    async def build_embed(self, github_username: str, prs: List[dict]) -> discord.Embed:
+    async def build_embed(self, github_username: str, prs: list[dict]) -> discord.Embed:
         """Return a stats embed built from github_username's PRs."""
         logging.info(f"Building Hacktoberfest embed for GitHub user: '{github_username}'")
         in_review, accepted = await self._categorize_prs(prs)
@@ -185,7 +185,7 @@ class HacktoberStats(commands.Cog):
         logging.info(f"Hacktoberfest PR built for GitHub user '{github_username}'")
         return stats_embed
 
-    async def get_october_prs(self, github_username: str) -> Optional[List[dict]]:
+    async def get_october_prs(self, github_username: str) -> Optional[list[dict]]:
         """
         Query GitHub's API for PRs created during the month of October by github_username.
 
@@ -302,7 +302,7 @@ class HacktoberStats(commands.Cog):
             return await resp.json()
 
     @staticmethod
-    def _has_label(pr: dict, labels: Union[List[str], str]) -> bool:
+    def _has_label(pr: dict, labels: Union[list[str], str]) -> bool:
         """
         Check if a PR has label 'labels'.
 
@@ -368,7 +368,7 @@ class HacktoberStats(commands.Cog):
         exp = r"https?:\/\/api.github.com\/repos\/([/\-\_\.\w]+)"
         return re.findall(exp, in_url)[0]
 
-    async def _categorize_prs(self, prs: List[dict]) -> tuple:
+    async def _categorize_prs(self, prs: list[dict]) -> tuple:
         """
         Categorize PRs into 'in_review' and 'accepted' and returns as a tuple.
 
@@ -391,7 +391,7 @@ class HacktoberStats(commands.Cog):
         return in_review, accepted
 
     @staticmethod
-    def _build_prs_string(prs: List[tuple], user: str) -> str:
+    def _build_prs_string(prs: list[tuple], user: str) -> str:
         """
         Builds a discord embed compatible string for a list of PRs.
 
@@ -424,7 +424,7 @@ class HacktoberStats(commands.Cog):
             return "contributions"
 
     @staticmethod
-    def _author_mention_from_context(ctx: commands.Context) -> Tuple[str, str]:
+    def _author_mention_from_context(ctx: commands.Context) -> tuple[str, str]:
         """Return stringified Message author ID and mentionable string from commands.Context."""
         author_id = str(ctx.author.id)
         author_mention = ctx.author.mention

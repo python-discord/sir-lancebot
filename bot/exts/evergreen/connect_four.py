@@ -1,7 +1,7 @@
 import asyncio
 import random
-import typing
 from functools import partial
+from typing import Optional, Union
 
 import discord
 import emojis
@@ -14,8 +14,8 @@ from bot.constants import Emojis
 NUMBERS = list(Emojis.number_emojis.values())
 CROSS_EMOJI = Emojis.incident_unactioned
 
-Coordinate = typing.Optional[typing.Tuple[int, int]]
-EMOJI_CHECK = typing.Union[discord.Emoji, str]
+Coordinate = Optional[tuple[int, int]]
+EMOJI_CHECK = Union[discord.Emoji, str]
 
 
 class Game:
@@ -26,8 +26,8 @@ class Game:
         bot: Bot,
         channel: discord.TextChannel,
         player1: discord.Member,
-        player2: typing.Optional[discord.Member],
-        tokens: typing.List[str],
+        player2: Optional[discord.Member],
+        tokens: list[str],
         size: int = 7
     ) -> None:
 
@@ -48,7 +48,7 @@ class Game:
         self.player_inactive = None
 
     @staticmethod
-    def generate_board(size: int) -> typing.List[typing.List[int]]:
+    def generate_board(size: int) -> list[list[int]]:
         """Generate the connect 4 board."""
         return [[0 for _ in range(size)] for _ in range(size)]
 
@@ -185,7 +185,7 @@ class AI:
         self.game = game
         self.mention = bot.user.mention
 
-    def get_possible_places(self) -> typing.List[Coordinate]:
+    def get_possible_places(self) -> list[Coordinate]:
         """Gets all the coordinates where the AI could possibly place a counter."""
         possible_coords = []
         for column_num in range(self.game.grid_size):
@@ -196,7 +196,7 @@ class AI:
                     break
         return possible_coords
 
-    def check_ai_win(self, coord_list: typing.List[Coordinate]) -> typing.Optional[Coordinate]:
+    def check_ai_win(self, coord_list: list[Coordinate]) -> Optional[Coordinate]:
         """
         Check AI win.
 
@@ -209,7 +209,7 @@ class AI:
             if self.game.check_win(coords, 2):
                 return coords
 
-    def check_player_win(self, coord_list: typing.List[Coordinate]) -> typing.Optional[Coordinate]:
+    def check_player_win(self, coord_list: list[Coordinate]) -> Optional[Coordinate]:
         """
         Check Player win.
 
@@ -223,11 +223,11 @@ class AI:
                 return coords
 
     @staticmethod
-    def random_coords(coord_list: typing.List[Coordinate]) -> Coordinate:
+    def random_coords(coord_list: list[Coordinate]) -> Coordinate:
         """Picks a random coordinate from the possible ones."""
         return random.choice(coord_list)
 
-    def play(self) -> typing.Union[Coordinate, bool]:
+    def play(self) -> Union[Coordinate, bool]:
         """
         Plays for the AI.
 
@@ -258,8 +258,8 @@ class ConnectFour(commands.Cog):
 
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
-        self.games: typing.List[Game] = []
-        self.waiting: typing.List[discord.Member] = []
+        self.games: list[Game] = []
+        self.waiting: list[discord.Member] = []
 
         self.tokens = [":white_circle:", ":blue_circle:", ":red_circle:"]
 
@@ -330,7 +330,7 @@ class ConnectFour(commands.Cog):
     @staticmethod
     def check_emojis(
         e1: EMOJI_CHECK, e2: EMOJI_CHECK
-    ) -> typing.Tuple[bool, typing.Optional[str]]:
+    ) -> tuple[bool, Optional[str]]:
         """Validate the emojis, the user put."""
         if isinstance(e1, str) and emojis.count(e1) != 1:
             return False, e1
@@ -341,7 +341,7 @@ class ConnectFour(commands.Cog):
     async def _play_game(
         self,
         ctx: commands.Context,
-        user: typing.Optional[discord.Member],
+        user: Optional[discord.Member],
         board_size: int,
         emoji1: str,
         emoji2: str

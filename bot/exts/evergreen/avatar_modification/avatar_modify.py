@@ -3,10 +3,10 @@ import json
 import logging
 import math
 import string
-import typing as t
 import unicodedata
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from typing import Callable, Optional, TypeVar, Union
 
 import discord
 from discord.ext import commands
@@ -25,12 +25,12 @@ FILENAME_STRING = "{effect}_{author}.png"
 
 MAX_SQUARES = 10_000
 
-T = t.TypeVar("T")
+T = TypeVar("T")
 
 GENDER_OPTIONS = json.loads(Path("bot/resources/pride/gender_options.json").read_text("utf8"))
 
 
-async def in_executor(func: t.Callable[..., T], *args) -> T:
+async def in_executor(func: Callable[..., T], *args) -> T:
     """
     Runs the given synchronous function `func` in an executor.
 
@@ -65,7 +65,7 @@ class AvatarModify(commands.Cog):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
-    async def _fetch_user(self, user_id: int) -> t.Optional[discord.User]:
+    async def _fetch_user(self, user_id: int) -> Optional[discord.User]:
         """
         Fetches a user and handles errors.
 
@@ -121,7 +121,7 @@ class AvatarModify(commands.Cog):
         await ctx.send(embed=embed, file=file)
 
     @avatar_modify.command(name="reverse", root_aliases=("reverse",))
-    async def reverse(self, ctx: commands.Context, *, text: t.Optional[str]) -> None:
+    async def reverse(self, ctx: commands.Context, *, text: Optional[str]) -> None:
         """
         Reverses the sent text.
 
@@ -158,7 +158,7 @@ class AvatarModify(commands.Cog):
             await ctx.send(embed=embed, file=file)
 
     @avatar_modify.command(aliases=("easterify",), root_aliases=("easterify", "avatareasterify"))
-    async def avatareasterify(self, ctx: commands.Context, *colours: t.Union[discord.Colour, str]) -> None:
+    async def avatareasterify(self, ctx: commands.Context, *colours: Union[discord.Colour, str]) -> None:
         """
         This "Easterifies" the user's avatar.
 

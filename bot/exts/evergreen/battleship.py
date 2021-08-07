@@ -2,9 +2,9 @@ import asyncio
 import logging
 import random
 import re
-import typing
 from dataclasses import dataclass
 from functools import partial
+from typing import Match, Optional
 
 import discord
 from discord.ext import commands
@@ -19,20 +19,20 @@ log = logging.getLogger(__name__)
 class Square:
     """Each square on the battleship grid - if they contain a boat and if they've been aimed at."""
 
-    boat: typing.Optional[str]
+    boat: Optional[str]
     aimed: bool
 
 
-Grid = typing.List[typing.List[Square]]
-EmojiSet = typing.Dict[typing.Tuple[bool, bool], str]
+Grid = list[list[Square]]
+EmojiSet = dict[tuple[bool, bool], str]
 
 
 @dataclass
 class Player:
     """Each player in the game - their messages for the boards and their current grid."""
 
-    user: typing.Optional[discord.Member]
-    board: typing.Optional[discord.Message]
+    user: Optional[discord.Member]
+    board: Optional[discord.Message]
     opponent_board: discord.Message
     grid: Grid
 
@@ -110,10 +110,10 @@ class Game:
 
         self.gameover: bool = False
 
-        self.turn: typing.Optional[discord.Member] = None
-        self.next: typing.Optional[discord.Member] = None
+        self.turn: Optional[discord.Member] = None
+        self.next: Optional[discord.Member] = None
 
-        self.match: typing.Optional[typing.Match] = None
+        self.match: Optional[Match] = None
         self.surrender: bool = False
 
         self.setup_grids()
@@ -233,7 +233,7 @@ class Game:
                 self.bot.loop.create_task(message.add_reaction(CROSS_EMOJI))
             return bool(self.match)
 
-    async def take_turn(self) -> typing.Optional[Square]:
+    async def take_turn(self) -> Optional[Square]:
         """Lets the player who's turn it is choose a square."""
         square = None
         turn_message = await self.turn.user.send(
@@ -268,7 +268,7 @@ class Game:
         await turn_message.delete()
         return square
 
-    async def hit(self, square: Square, alert_messages: typing.List[discord.Message]) -> None:
+    async def hit(self, square: Square, alert_messages: list[discord.Message]) -> None:
         """Occurs when a player successfully aims for a ship."""
         await self.turn.user.send("Hit!", delete_after=3.0)
         alert_messages.append(await self.next.user.send("Hit!"))
@@ -324,8 +324,8 @@ class Battleship(commands.Cog):
 
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
-        self.games: typing.List[Game] = []
-        self.waiting: typing.List[discord.Member] = []
+        self.games: list[Game] = []
+        self.waiting: list[discord.Member] = []
 
     def predicate(
         self,

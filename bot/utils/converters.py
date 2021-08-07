@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Tuple, Union
+from typing import Union
 
 import discord
 from discord.ext import commands
@@ -23,7 +23,7 @@ class CoordinateConverter(commands.Converter):
     """Converter for Coordinates."""
 
     @staticmethod
-    async def convert(ctx: commands.Context, coordinate: str) -> Tuple[int, int]:
+    async def convert(ctx: commands.Context, coordinate: str) -> tuple[int, int]:
         """Take in a coordinate string and turn it into an (x, y) tuple."""
         if len(coordinate) not in (2, 3):
             raise commands.BadArgument("Invalid co-ordinate provided.")

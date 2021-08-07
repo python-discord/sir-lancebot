@@ -1,6 +1,6 @@
 import logging
 from io import BytesIO
-from typing import Callable, List, Optional, Tuple
+from typing import Callable, Optional
 from urllib.parse import urlencode
 
 import arrow
@@ -54,7 +54,7 @@ async def send_embed(
     await ctx.send(embed=embed, file=f)
 
 
-def custom_cooldown(*ignore: List[int]) -> Callable:
+def custom_cooldown(*ignore: int) -> Callable:
     """
     Implement per-user and per-guild cooldowns for requests to the Wolfram API.
 
@@ -105,7 +105,7 @@ def custom_cooldown(*ignore: List[int]) -> Callable:
     return check(predicate)
 
 
-async def get_pod_pages(ctx: Context, bot: Bot, query: str) -> Optional[List[Tuple]]:
+async def get_pod_pages(ctx: Context, bot: Bot, query: str) -> Optional[list[tuple]]:
     """Get the Wolfram API pod pages for the provided query."""
     async with ctx.typing():
         params = {
@@ -133,22 +133,22 @@ async def get_pod_pages(ctx: Context, bot: Bot, query: str) -> Optional[List[Tup
                     f"processing a wolfram request: {log_full_url}, Response: {json}"
                 )
                 await send_embed(ctx, message)
-                return
+                return None
 
             message = "Something went wrong internally with your request, please notify staff!"
             log.warning(f"Something went wrong getting a response from wolfram: {log_full_url}, Response: {json}")
             await send_embed(ctx, message)
-            return
+            return None
 
         if not result["success"]:
             message = f"I couldn't find anything for {query}."
             await send_embed(ctx, message)
-            return
+            return None
 
         if not result["numpods"]:
             message = "Could not find any results."
             await send_embed(ctx, message)
-            return
+            return None
 
         pods = result["pods"]
         pages = []
