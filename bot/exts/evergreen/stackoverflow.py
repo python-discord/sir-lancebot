@@ -10,7 +10,12 @@ from bot.constants import Colours, Emojis
 
 logger = logging.getLogger(__name__)
 
-BASE_URL = "https://api.stackexchange.com/2.2/search/advanced?order=desc&sort=activity&site=stackoverflow&q={query}"
+BASE_URL = "https://api.stackexchange.com/2.2/search/advanced"
+STACKOW_PARAMS = {
+    "order": "desc",
+    "sort": "activity",
+    "site": "stackoverflow"
+}
 SEARCH_URL = "https://stackoverflow.com/search?q={query}"
 ERR_EMBED = Embed(
     title="Error in fetching results from Stackoverflow",
@@ -32,9 +37,8 @@ class Stackoverflow(commands.Cog):
     @commands.cooldown(1, 15, commands.cooldowns.BucketType.user)
     async def stackoverflow(self, ctx: commands.Context, *, search_query: str) -> None:
         """Sends the top 5 results of a search query from stackoverflow."""
-        encoded_search_query = quote_plus(search_query)
-
-        async with self.bot.http_session.get(BASE_URL.format(query=encoded_search_query)) as response:
+        params = STACKOW_PARAMS | {"q": search_query}
+        async with self.bot.http_session.get(url=BASE_URL, params=params) as response:
             if response.status == 200:
                 data = await response.json()
             else:
@@ -50,6 +54,7 @@ class Stackoverflow(commands.Cog):
             return
 
         top5 = data["items"][:5]
+        encoded_search_query = quote_plus(search_query)
         embed = Embed(
             title="Search results - Stackoverflow",
             url=SEARCH_URL.format(query=encoded_search_query),
