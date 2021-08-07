@@ -44,7 +44,7 @@ class WikipediaSearch(commands.Cog):
 
     async def wiki_request(self, channel: TextChannel, search: str) -> Optional[List[str]]:
         """Search wikipedia search string and return formatted first 10 pages found."""
-        params = dict(WIKI_PARAMS, srlimit=10, srsearch=search)
+        params = WIKI_PARAMS | {"srlimit": 10, "srsearch": search}
         async with self.bot.http_session.get(url=SEARCH_API, params=params) as resp:
             if resp.status == 200:
                 raw_data = await resp.json()

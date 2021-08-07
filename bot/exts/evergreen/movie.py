@@ -141,6 +141,8 @@ class Movie(Cog):
 
     async def get_movie(self, client: ClientSession, movie: int) -> Dict:
         """Get Movie by movie ID from TMDB. Return result dictionary."""
+        if not isinstance(movie, int):
+            raise ValueError("Error while fetching movie from TMDB, movie argument must be integer. ")
         url = BASE_URL + f"movie/{movie}"
 
         async with client.get(url, params=MOVIE_PARAMS) as resp:

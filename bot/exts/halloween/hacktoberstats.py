@@ -226,7 +226,7 @@ class HacktoberStats(commands.Cog):
 
         log.debug(f"GitHub query parameters generated: {query_params}")
 
-        jsonresp = await self._fetch_url(base_url, REQUEST_HEADERS, dict(q=query_params))
+        jsonresp = await self._fetch_url(base_url, REQUEST_HEADERS, {"q": query_params})
         if "message" in jsonresp:
             # One of the parameters is invalid, short circuit for now
             api_message = jsonresp["errors"][0]["message"]
