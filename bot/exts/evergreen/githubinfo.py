@@ -91,8 +91,10 @@ class GithubInfo(commands.Cog):
             )
 
             if user_data["type"] == "User":
-                embed.add_field(name="Gists", value=f"[{gists}](https://gist.github.com/"
-                                                    f"{quote_plus(username, safe='')}"f")")
+                embed.add_field(
+                    name="Gists",
+                    value=f"[{gists}](https://gist.github.com/"f"{quote_plus(username, safe='')}"f")"
+                )
 
                 embed.add_field(
                     name=f"Organization{'s' if len(orgs)!=1 else ''}",
