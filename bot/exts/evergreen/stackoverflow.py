@@ -11,7 +11,7 @@ from bot.constants import Colours, Emojis
 logger = logging.getLogger(__name__)
 
 BASE_URL = "https://api.stackexchange.com/2.2/search/advanced"
-STACKOW_PARAMS = {
+SO_PARAMS = {
     "order": "desc",
     "sort": "activity",
     "site": "stackoverflow"
@@ -37,7 +37,7 @@ class Stackoverflow(commands.Cog):
     @commands.cooldown(1, 15, commands.cooldowns.BucketType.user)
     async def stackoverflow(self, ctx: commands.Context, *, search_query: str) -> None:
         """Sends the top 5 results of a search query from stackoverflow."""
-        params = STACKOW_PARAMS | {"q": search_query}
+        params = SO_PARAMS | {"q": search_query}
         async with self.bot.http_session.get(url=BASE_URL, params=params) as response:
             if response.status == 200:
                 data = await response.json()
