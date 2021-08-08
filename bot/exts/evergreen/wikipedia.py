@@ -14,9 +14,18 @@ from bot.utils.exceptions import ExternalAPIError
 log = logging.getLogger(__name__)
 
 SEARCH_API = (
-    "https://en.wikipedia.org/w/api.php?action=query&list=search&prop=info&inprop=url&utf8=&"
-    "format=json&origin=*&srlimit={number_of_results}&srsearch={string}"
+    "https://en.wikipedia.org/w/api.php"
 )
+WIKI_PARAMS = {
+    "action": "query",
+    "list": "search",
+    "prop": "info",
+    "inprop": "url",
+    "utf8": "",
+    "format": "json",
+    "origin": "*",
+
+}
 WIKI_THUMBNAIL = (
     "https://upload.wikimedia.org/wikipedia/en/thumb/8/80/Wikipedia-logo-v2.svg"
     "/330px-Wikipedia-logo-v2.svg.png"
@@ -36,11 +45,31 @@ class WikipediaSearch(commands.Cog):
 
     async def wiki_request(self, channel: TextChannel, search: str) -> Optional[List[str]]:
         """Search wikipedia search string and return formatted first 10 pages found."""
-        url = SEARCH_API.format(number_of_results=10, string=search)
-        async with self.bot.http_session.get(url=url) as resp:
+        params = WIKI_PARAMS | {"srlimit": 10, "srsearch": search}
+        async with self.bot.http_session.get(url=SEARCH_API, params=params) as resp:
             if resp.status != 200:
                 log.info(f"Unexpected response `{resp.status}` while searching wikipedia for `{search}`")
                 raise ExternalAPIError("Wikipedia API")
+            raw_data = await resp.json()
+            number_of_results = raw_data["query"]["searchinfo"]["totalhits"]
+
+            if number_of_results:
+                results = raw_data["query"]["search"]
+                lines = []
+
+                for article in results:
+                    line = WIKI_SEARCH_RESULT.format(
+                        name=article["title"],
+                        description=unescape(
+                            re.sub(
+                                WIKI_SNIPPET_REGEX, "", article["snippet"]
+                            )
+                        ),
+                        url=f"https://en.wikipedia.org/?curid={article['pageid']}"
+                    )
+                    lines.append(line)
+
+                return lines
 
             raw_data = await resp.json()
             if raw_data.get("query", None) is None:
