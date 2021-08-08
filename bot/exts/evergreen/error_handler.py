@@ -113,7 +113,10 @@ class CommandErrorHandler(commands.Cog):
             return
 
         if isinstance(error, commands.CheckFailure):
-            await ctx.send(embed=self.error_embed("You are not authorized to use this command.", NEGATIVE_REPLIES))
+            await ctx.send(
+                embed=self.error_embed(
+                    "You are not authorized to use this command.",
+                    NEGATIVE_REPLIES))
             return
 
         if isinstance(error, UserNotPlayingError):
@@ -121,8 +124,10 @@ class CommandErrorHandler(commands.Cog):
             return
 
         if isinstance(error, ExternalAPIError):
-            await ctx.send(embed=self.error_embed(f"There was an error when communicating with the {error.api}",
-                                                  NEGATIVE_REPLIES))
+            await ctx.send(
+                embed=self.error_embed(
+                    f"There was an error when communicating with the {error.api}",
+                    NEGATIVE_REPLIES))
             return
 
         with push_scope() as scope:
