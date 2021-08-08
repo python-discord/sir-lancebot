@@ -2,7 +2,6 @@ import logging
 import random
 from enum import Enum
 from typing import Any, Dict, List, Tuple
-from urllib.parse import urlencode
 
 from aiohttp import ClientSession
 from discord import Embed
@@ -121,10 +120,10 @@ class Movie(Cog):
             "with_genres": genre_id
         }
 
-        url = BASE_URL + "discover/movie?" + urlencode(params)
+        url = BASE_URL + "discover/movie"
 
         # Make discover request to TMDB, return result
-        async with client.get(url) as resp:
+        async with client.get(url, params=params) as resp:
             return await resp.json()
 
     async def get_pages(self, client: ClientSession, movies: Dict[str, Any], amount: int) -> List[Tuple[str, str]]:
@@ -142,9 +141,11 @@ class Movie(Cog):
 
     async def get_movie(self, client: ClientSession, movie: int) -> Dict:
         """Get Movie by movie ID from TMDB. Return result dictionary."""
-        url = BASE_URL + f"movie/{movie}?" + urlencode(MOVIE_PARAMS)
+        if not isinstance(movie, int):
+            raise ValueError("Error while fetching movie from TMDB, movie argument must be integer. ")
+        url = BASE_URL + f"movie/{movie}"
 
-        async with client.get(url) as resp:
+        async with client.get(url, params=MOVIE_PARAMS) as resp:
             return await resp.json()
 
     async def create_page(self, movie: Dict[str, Any]) -> Tuple[str, str]:
