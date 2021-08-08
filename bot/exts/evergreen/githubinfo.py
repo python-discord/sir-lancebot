@@ -1,7 +1,7 @@
 import logging
 import random
 from datetime import datetime
-from urllib.parse import quote_plus
+from urllib.parse import quote, quote_plus
 
 import discord
 from discord.ext import commands
@@ -123,7 +123,7 @@ class GithubInfo(commands.Cog):
             return
 
         async with ctx.typing():
-            repo_data = await self.fetch_data(f"{GITHUB_API_URL}/repos/{quote_plus(repo)}")
+            repo_data = await self.fetch_data(f"{GITHUB_API_URL}/repos/{quote(repo)}")
 
             # There won't be a message key if this repo exists
             if "message" in repo_data:
