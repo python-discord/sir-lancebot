@@ -6,7 +6,7 @@ from typing import Optional
 
 import discord
 from discord.ext import commands
-from fuzzywuzzy import fuzz
+from rapidfuzz import fuzz
 
 from bot import bot
 from bot import constants
