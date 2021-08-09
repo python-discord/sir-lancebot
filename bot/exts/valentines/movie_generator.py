@@ -1,7 +1,6 @@
 import logging
 import random
 from os import environ
-from urllib import parse
 
 import discord
 from discord.ext import commands
@@ -35,8 +34,8 @@ class RomanceMovieFinder(commands.Cog):
             "with_genres": "10749"
         }
         # The api request url
-        request_url = "https://api.themoviedb.org/3/discover/movie?" + parse.urlencode(params)
-        async with self.bot.http_session.get(request_url) as resp:
+        request_url = "https://api.themoviedb.org/3/discover/movie"
+        async with self.bot.http_session.get(request_url, params=params) as resp:
             # Trying to load the json file returned from the api
             try:
                 data = await resp.json()

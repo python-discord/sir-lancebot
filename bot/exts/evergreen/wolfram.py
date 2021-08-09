@@ -1,7 +1,7 @@
 import logging
 from io import BytesIO
 from typing import Callable, List, Optional, Tuple
-from urllib import parse
+from urllib.parse import urlencode
 
 import arrow
 import discord
@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 
 APPID = Wolfram.key
 DEFAULT_OUTPUT_FORMAT = "JSON"
-QUERY = "http://api.wolframalpha.com/v2/{request}?{data}"
+QUERY = "http://api.wolframalpha.com/v2/{request}"
 WOLF_IMAGE = "https://www.symbols.com/gi.php?type=1&id=2886&i=1"
 
 MAX_PODS = 20
@@ -108,7 +108,7 @@ def custom_cooldown(*ignore: List[int]) -> Callable:
 async def get_pod_pages(ctx: Context, bot: Bot, query: str) -> Optional[List[Tuple]]:
     """Get the Wolfram API pod pages for the provided query."""
     async with ctx.typing():
-        url_str = parse.urlencode({
+        params = {
             "input": query,
             "appid": APPID,
             "output": DEFAULT_OUTPUT_FORMAT,
@@ -116,27 +116,27 @@ async def get_pod_pages(ctx: Context, bot: Bot, query: str) -> Optional[List[Tup
             "location": "the moon",
             "latlong": "0.0,0.0",
             "ip": "1.1.1.1"
-        })
-        request_url = QUERY.format(request="query", data=url_str)
+        }
+        request_url = QUERY.format(request="query")
 
-        async with bot.http_session.get(request_url) as response:
+        async with bot.http_session.get(url=request_url, params=params) as response:
             json = await response.json(content_type="text/plain")
 
         result = json["queryresult"]
-
+        log_full_url = f"{request_url}?{urlencode(params)}"
         if result["error"]:
             # API key not set up correctly
             if result["error"]["msg"] == "Invalid appid":
                 message = "Wolfram API key is invalid or missing."
                 log.warning(
                     "API key seems to be missing, or invalid when "
-                    f"processing a wolfram request: {url_str}, Response: {json}"
+                    f"processing a wolfram request: {log_full_url}, Response: {json}"
                 )
                 await send_embed(ctx, message)
                 return
 
             message = "Something went wrong internally with your request, please notify staff!"
-            log.warning(f"Something went wrong getting a response from wolfram: {url_str}, Response: {json}")
+            log.warning(f"Something went wrong getting a response from wolfram: {log_full_url}, Response: {json}")
             await send_embed(ctx, message)
             return
 
@@ -172,18 +172,18 @@ class Wolfram(Cog):
     @custom_cooldown(*STAFF_ROLES)
     async def wolfram_command(self, ctx: Context, *, query: str) -> None:
         """Requests all answers on a single image, sends an image of all related pods."""
-        url_str = parse.urlencode({
+        params = {
             "i": query,
             "appid": APPID,
             "location": "the moon",
             "latlong": "0.0,0.0",
             "ip": "1.1.1.1"
-        })
-        query = QUERY.format(request="simple", data=url_str)
+        }
+        request_url = QUERY.format(request="simple")
 
         # Give feedback that the bot is working.
         async with ctx.typing():
-            async with self.bot.http_session.get(query) as response:
+            async with self.bot.http_session.get(url=request_url, params=params) as response:
                 status = response.status
                 image_bytes = await response.read()
 
@@ -257,18 +257,18 @@ class Wolfram(Cog):
     @custom_cooldown(*STAFF_ROLES)
     async def wolfram_short_command(self, ctx: Context, *, query: str) -> None:
         """Requests an answer to a simple question."""
-        url_str = parse.urlencode({
+        params = {
             "i": query,
             "appid": APPID,
             "location": "the moon",
             "latlong": "0.0,0.0",
             "ip": "1.1.1.1"
-        })
-        query = QUERY.format(request="result", data=url_str)
+        }
+        request_url = QUERY.format(request="result")
 
         # Give feedback that the bot is working.
         async with ctx.typing():
-            async with self.bot.http_session.get(query) as response:
+            async with self.bot.http_session.get(url=request_url, params=params) as response:
                 status = response.status
                 response_text = await response.text()
 
