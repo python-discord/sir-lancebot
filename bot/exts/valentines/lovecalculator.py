@@ -31,20 +31,18 @@ class LoveCalculator(Cog):
         """
         Tells you how much the two love each other.
 
-        This command accepts users or arbitrary strings as arguments.
-        Users are converted from:
+        This command requires at least one member as input, if two are given love will be calculated between
+        those two users, if only one is given, the second member is asusmed to be the invoker.
+        Members are converted from:
           - User ID
           - Mention
           - name#discrim
           - name
           - nickname
 
-        Any two arguments will always yield the same result, though the order of arguments matters:
-          Running .love joseph erlang will always yield the same result.
-          Running .love erlang joseph won't yield the same result as .love joseph erlang
-
-        If you want to use multiple words for one argument, you must include quotes.
-          .love "Zes Vappa" "morning coffee"
+        Any two arguments will always yield the same result, regardless of the order of arguments:
+          Running .love @joe#6000 @chrisjl#2655 will always yield the same result.
+          Running .love @chrisjl#2655 @joe#6000 will yield the same result as before.
         """
         if whom is None:
             whom = ctx.author
