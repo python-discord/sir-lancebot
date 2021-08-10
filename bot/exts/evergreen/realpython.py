@@ -11,10 +11,10 @@ from bot.constants import Colours
 
 logger = logging.getLogger(__name__)
 
-BASE_URL = "https://realpython.com/search/api/v1/?"
-URL = "https://realpython.com"
+API_ROOT = "https://realpython.com/search/api/v1/?"
+ARTICLE_URL = "https://realpython.com{article_url}"
 
-ERR_EMBED = Embed(
+ERROR_EMBED = Embed(
     title="Error while searching Real Python",
     description="There was an error while trying to reach Real Python. Please try again shortly."
 )
@@ -30,13 +30,13 @@ class RealPython(commands.Cog):
     @commands.cooldown(1, 10, commands.cooldowns.BucketType.user)
     async def realpython(self, ctx: commands.Context, *, user_search: str) -> None:
         """Sends 5 articles that match the user's search terms."""
-        params = {"q": user_search}
-        async with self.bot.http_session.get(url=BASE_URL, params=params) as response:
+        params = {"q": user_search, "limit": 5}
+        async with self.bot.http_session.get(url=API_ROOT, params=params) as response:
             if response.status == 200:
                 data = await response.json()
             else:
                 logger.error(f"Status code is not 200, it is {response.status}")
-                await ctx.send(embed=ERR_EMBED)
+                await ctx.send(embed=ERROR_EMBED)
                 return
 
         if len(data["results"]) == 0:
@@ -51,7 +51,7 @@ class RealPython(commands.Cog):
         encoded_user_search = quote_plus(user_search)
         embed = Embed(
             title="Search results - Real Python",
-            url=URL.format(query=encoded_user_search),
+            url=ARTICLE_URL.format(query=encoded_user_search),
             description=f"Here are the top {len(articles)} results:",
             color=Colours.orange
         )
@@ -59,7 +59,7 @@ class RealPython(commands.Cog):
         for article in articles:
             embed.add_field(
                 name=unescape(article["title"]),
-                value=(f"({URL}{article['url']})"),  # is this OK for showing the URL link?
+                value=(ARTICLE_URL.format(article["url"])),
                 inline=False
             )
         embed.set_footer(text="Click the links to go to the articles.")
