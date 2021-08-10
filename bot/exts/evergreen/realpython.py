@@ -4,7 +4,8 @@ from html import unescape
 from urllib.parse import quote_plus
 
 from discord import Embed, HTTPException
-from discord.ext import commands, cooldowns
+from discord.ext import commands
+from discord.ext.commands import cooldowns
 
 from bot import bot
 from bot.constants import Colours
