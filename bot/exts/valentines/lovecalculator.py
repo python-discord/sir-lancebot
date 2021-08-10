@@ -4,7 +4,7 @@ import json
 import logging
 import random
 from pathlib import Path
-from typing import Coroutine, Union
+from typing import Coroutine, Optional, Union
 
 import discord
 from discord import Member
@@ -12,7 +12,7 @@ from discord.ext import commands
 from discord.ext.commands import BadArgument, Cog, clean_content
 
 from bot.bot import Bot
-from bot.constants import Month
+from bot.constants import Lovefest, Month
 from bot.utils.decorators import in_month
 
 log = logging.getLogger(__name__)
@@ -27,7 +27,7 @@ class LoveCalculator(Cog):
     @in_month(Month.FEBRUARY)
     @commands.command(aliases=("love_calculator", "love_calc"))
     @commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
-    async def love(self, ctx: commands.Context, who: Union[Member, str], whom: Union[Member, str] = None) -> None:
+    async def love(self, ctx: commands.Context, who: Member, whom: Optional[Member] = None) -> None:
         """
         Tells you how much the two love each other.
 
@@ -48,6 +48,12 @@ class LoveCalculator(Cog):
         """
         if whom is None:
             whom = ctx.author
+
+        if not all((
+            Lovefest.role_id in [role.id for role in who.roles],
+            Lovefest.role_id in [role.id for role in whom.roles]
+        )):
+            raise BadArgument("Both members must have the love fest role!")
 
         def normalize(arg: Union[Member, str]) -> Coroutine:
             if isinstance(arg, Member):
