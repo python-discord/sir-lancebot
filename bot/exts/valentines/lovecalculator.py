@@ -4,7 +4,7 @@ import json
 import logging
 import random
 from pathlib import Path
-from typing import Coroutine, Optional, Union
+from typing import Coroutine, Optional
 
 import discord
 from discord import Member
@@ -53,22 +53,12 @@ class LoveCalculator(Cog):
         )):
             raise BadArgument("Both members must have the love fest role!")
 
-        def normalize(arg: Union[Member, str]) -> Coroutine:
-            if isinstance(arg, Member):
-                # If we are given a member, return name#discrim without any extra changes
-                arg = str(arg)
-            else:
-                # Otherwise normalise case and remove any leading/trailing whitespace
-                arg = arg.strip().title()
+        def normalize(arg: Member) -> Coroutine:
             # This has to be done manually to be applied to usernames
-            return clean_content(escape_markdown=True).convert(ctx, arg)
+            return clean_content(escape_markdown=True).convert(ctx, str(arg))
 
         # Sort to ensure same result for same input, regardless of order
         who, whom = sorted([await normalize(arg) for arg in (who, whom)])
-
-        # Make sure user didn't provide something silly such as 10 spaces
-        if not (who and whom):
-            raise BadArgument("Arguments must be non-empty strings.")
 
         # Hash inputs to guarantee consistent results (hashing algorithm choice arbitrary)
         #
