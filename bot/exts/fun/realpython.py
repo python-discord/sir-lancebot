@@ -3,7 +3,7 @@ import logging
 from html import unescape
 from urllib.parse import quote_plus
 
-from discord import ERR_EMBED, Embed, HTTPException
+from discord import Embed, HTTPException
 from discord.ext import commands, cooldowns
 
 from bot import bot
@@ -13,6 +13,11 @@ logger = logging.getLogger(__name__)
 
 BASE_URL = "https://realpython.com/search/api/v1/?"
 URL = "https://realpython.com/search/"
+
+ERR_EMBED = Embed(
+    title="Error while searching Real Python",
+    description="There was an error while trying to reach Real Python. Please try again shortly."
+)
 
 
 class RealPython(commands.Cog):
