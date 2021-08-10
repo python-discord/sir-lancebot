@@ -12,7 +12,7 @@ from bot.constants import Colours
 logger = logging.getLogger(__name__)
 
 BASE_URL = "https://realpython.com/search/api/v1/?"
-URL = "https://realpython.com/search/"
+URL = "https://realpython.com"
 
 ERR_EMBED = Embed(
     title="Error while searching Real Python",
@@ -59,7 +59,7 @@ class RealPython(commands.Cog):
         for article in articles:
             embed.add_field(
                 name=unescape(article["title"]),
-                value=(f"({article['url']})"),
+                value=(f"({URL}{article['url']})"),  # is this OK for showing the URL link?
                 inline=False
             )
         embed.set_footer(text="Click the links to go to the articles.")
