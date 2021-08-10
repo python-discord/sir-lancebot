@@ -39,7 +39,7 @@ class RealPython(commands.Cog):
                 await ctx.send(embed=ERR_EMBED)
                 return
 
-        if len(data["items"]) == 0:
+        if len(data["results"]) == 0:
             no_articles = Embed(
                 title=f"No articles found for {user_search}",
                 color=Colours.soft_red
@@ -47,7 +47,7 @@ class RealPython(commands.Cog):
             await ctx.send(embed=no_articles)
             return
 
-        articles = data["items"][:5]
+        articles = data["results"][:5]
         encoded_user_search = quote_plus(user_search)
         embed = Embed(
             title="Search results - Real Python",
@@ -59,7 +59,7 @@ class RealPython(commands.Cog):
         for article in articles:
             embed.add_field(
                 name=unescape(article["title"]),
-                value=(f"({article['link']})"),
+                value=(f"({article['url']})"),
                 inline=False
             )
         embed.set_footer(text="Click the links to go to the articles.")
