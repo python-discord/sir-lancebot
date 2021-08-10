@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 API_ROOT = "https://realpython.com/search/api/v1/?"
 ARTICLE_URL = "https://realpython.com{article_url}"
+SEARCH_URL = "https://realpython.com/search?q={user_search}"
 
 ERROR_EMBED = Embed(
     title="Error while searching Real Python",
@@ -51,7 +52,7 @@ class RealPython(commands.Cog):
         encoded_user_search = quote_plus(user_search)
         embed = Embed(
             title="Search results - Real Python",
-            url=ARTICLE_URL.format(article_url=encoded_user_search),
+            url=SEARCH_URL.format(user_search=encoded_user_search),
             description=f"Here are the top {len(articles)} results:",
             color=Colours.orange
         )
