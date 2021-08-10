@@ -48,7 +48,7 @@ class RealPython(commands.Cog):
             await ctx.send(embed=no_articles)
             return
 
-        articles = data["results"][:5]
+        articles = data["results"]
         encoded_user_search = quote_plus(user_search)
         embed = Embed(
             title="Search results - Real Python",
