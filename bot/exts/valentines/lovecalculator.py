@@ -51,7 +51,7 @@ class LoveCalculator(Cog):
             Lovefest.role_id in [role.id for role in who.roles],
             Lovefest.role_id in [role.id for role in whom.roles]
         )):
-            raise BadArgument("Both members must have the love fest role!")
+            raise BadArgument("Both members must have the lovefest role!")
 
         def normalize(arg: Member) -> Coroutine:
             # This has to be done manually to be applied to usernames
