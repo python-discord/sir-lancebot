@@ -12,6 +12,8 @@ from discord.ext import commands
 from discord.ext.commands import BadArgument, Cog, clean_content
 
 from bot.bot import Bot
+from bot.constants import Month
+from bot.utils.decorators import in_month
 
 log = logging.getLogger(__name__)
 
@@ -22,6 +24,7 @@ LOVE_DATA = sorted((int(key), value) for key, value in LOVE_DATA.items())
 class LoveCalculator(Cog):
     """A cog for calculating the love between two people."""
 
+    @in_month(Month.FEBRUARY)
     @commands.command(aliases=("love_calculator", "love_calc"))
     @commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
     async def love(self, ctx: commands.Context, who: Union[Member, str], whom: Union[Member, str] = None) -> None:
