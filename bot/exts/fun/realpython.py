@@ -51,7 +51,7 @@ class RealPython(commands.Cog):
         encoded_user_search = quote_plus(user_search)
         embed = Embed(
             title="Search results - Real Python",
-            url=ARTICLE_URL.format(query=encoded_user_search),
+            url=ARTICLE_URL.format(encoded_user_search),
             description=f"Here are the top {len(articles)} results:",
             color=Colours.orange
         )
