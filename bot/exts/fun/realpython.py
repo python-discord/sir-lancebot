@@ -51,7 +51,7 @@ class RealPython(commands.Cog):
         encoded_user_search = quote_plus(user_search)
         embed = Embed(
             title="Search results - Real Python",
-            url=ARTICLE_URL.format(encoded_user_search),
+            url=ARTICLE_URL.format(article_url=encoded_user_search),
             description=f"Here are the top {len(articles)} results:",
             color=Colours.orange
         )
@@ -59,7 +59,7 @@ class RealPython(commands.Cog):
         for article in articles:
             embed.add_field(
                 name=unescape(article["title"]),
-                value=(ARTICLE_URL.format(article["url"])),
+                value=(ARTICLE_URL.format(article_url=article["url"])),
                 inline=False
             )
         embed.set_footer(text="Click the links to go to the articles.")
