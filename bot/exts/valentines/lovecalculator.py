@@ -65,7 +65,8 @@ class LoveCalculator(Cog):
             # This has to be done manually to be applied to usernames
             return clean_content(escape_markdown=True).convert(ctx, arg)
 
-        who, whom = [await normalize(arg) for arg in (who, whom)]
+        # Sort to ensure same result for same input, regardless of order
+        who, whom = sorted([await normalize(arg) for arg in (who, whom)])
 
         # Make sure user didn't provide something silly such as 10 spaces
         if not (who and whom):
