@@ -5,7 +5,6 @@ from urllib.parse import quote_plus
 
 from discord import Embed, HTTPException
 from discord.ext import commands
-from discord.ext.commands import cooldowns
 
 from bot import bot
 from bot.constants import Colours
@@ -28,7 +27,7 @@ class RealPython(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=["rp"])
-    @commands.cooldown(1, 10, commands, cooldowns.BucketType.user)
+    @commands.cooldown(1, 10, commands.cooldowns.BucketType.user)
     async def realpython(self, ctx: commands.Context, *, user_search: str) -> None:
         """Sends 5 articles that match the user's search terms."""
         params = {"q": user_search}
