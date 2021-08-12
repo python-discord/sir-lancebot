@@ -16,7 +16,7 @@ class Cowsay(commands.Cog):
     """Cog for the cowsay command."""
 
     @commands.command(
-        aliases=["cow"],
+        aliases=("cow",),
         help=f"""
         Generates a cowsay string and sends it. The available characters for cowsay are:
 
