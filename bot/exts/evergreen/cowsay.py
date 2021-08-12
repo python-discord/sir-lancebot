@@ -38,8 +38,7 @@ class Cowsay(commands.Cog):
 
         if character not in SUPPORTED_CHAR_NAMES:
             raise commands.BadArgument("The given character cannot be used! Please enter a valid character.")
-        else:
-            msgbody = get_output_string(character, text)
+        msgbody = get_output_string(character, text)
 
         try:
             await ctx.send(f"```\n{msgbody}\n```")
