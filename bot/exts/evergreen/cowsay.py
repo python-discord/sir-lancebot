@@ -37,7 +37,7 @@ class Cowsay(commands.Cog):
             raise commands.BadArgument("The given text is too long! Please submit something under 100 characters.")
 
         if character not in SUPPORTED_CHAR_NAMES:
-            raise commands.BadArgument("The given character cannot be used! Please enter a valid character.")
+            raise commands.BadArgument(f"The given character: {character} cannot be used! Please enter a valid character.")
         msgbody = get_output_string(character, text)
 
         try:
