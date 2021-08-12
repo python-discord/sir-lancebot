@@ -12,7 +12,7 @@ from discord.ext import commands
 from discord.ext.commands import BadArgument, Cog, clean_content
 
 from bot.bot import Bot
-from bot.constants import Client, Lovefest, Month
+from bot.constants import Channels, Client, Lovefest, Month
 from bot.utils.decorators import in_month
 
 log = logging.getLogger(__name__)
@@ -44,14 +44,18 @@ class LoveCalculator(Cog):
           Running .love @joe#6000 @chrisjl#2655 will always yield the same result.
           Running .love @chrisjl#2655 @joe#6000 will yield the same result as before.
         """
+        if (
+            Lovefest.role_id not in [role.id for role in who.roles]
+            or (whom is not None and Lovefest.role_id not in [role.id for role in whom.roles])
+        ):
+            raise BadArgument(
+                "This command can only be ran against members with the lovefest role! "
+                "This role be can assigned by running "
+                f"`{Client.prefix}lovefest sub` in <#{Channels.community_bot_commands}>."
+            )
+
         if whom is None:
             whom = ctx.author
-
-        if not all((
-            Lovefest.role_id in [role.id for role in who.roles],
-            Lovefest.role_id in [role.id for role in whom.roles]
-        )):
-            raise BadArgument("Both members must have the lovefest role!")
 
         def normalize(arg: Member) -> Coroutine:
             # This has to be done manually to be applied to usernames
