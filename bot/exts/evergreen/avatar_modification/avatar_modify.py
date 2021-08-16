@@ -121,49 +121,39 @@ class AvatarModify(commands.Cog):
 
         await ctx.send(embed=embed, file=file)
 
-    @avatar_modify.group(name="reverse", root_aliases=['reverse'])
-    async def reverse(self, ctx: commands.Context) -> None:
-        """Group for the reverse commands."""
-        if not ctx.invoked_subcommand:
-            await invoke_help_command(ctx)
+    @avatar_modify.command(name="reverse", root_aliases=("reverse",))
+    async def reverse(self, ctx: commands.Context, *, text: t.Optional[str]):
+        """Reverses the sent text.
+        
+        If no text is provided, the user's profile picture will be reversed."""
+        if not text:
+            async with ctx.typing():
+                user = await self._fetch_user(ctx.author.id)
+                if not user:
+                    await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
+                    return
 
-    @reverse.command(name="text")
-    async def reverse_text(self, ctx: commands.Context, *, text: str) -> None:
-        """Sends the given text backwards."""
-        await ctx.send(f"> {text[::-1]}", allowed_mentions=discord.AllowedMentions.none())
+                image_bytes = await user.avatar_url_as(size=1024).read()
+                filename = file_safe_name("reverse_avatar", ctx.author.display_name)
 
-    @reverse.command(name="image")
-    async def reverse_photo(self, ctx: commands.Context) -> None:
-        """
-        Sends a reversed version of the users profile picture.
+                file = await in_executor(
+                    PfpEffects.apply_effect,
+                    image_bytes,
+                    PfpEffects.flip_effect,
+                    filename
+                )
 
-        If an image is attached, the given image will be flipped.
-        """
-        async with ctx.typing():
-            user = await self._fetch_user(ctx.author.id)
-            if not user:
-                await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
-                return
+                embed = discord.Embed(
+                    title="Your reversed avatar.",
+                    description="Here is your reversed avatar. I think it is a spitting image of you."
+                )
 
-            image_bytes = await user.avatar_url_as(size=1024).read()
-            filename = file_safe_name("reverse_avatar", ctx.author.display_name)
+                embed.set_image(url=f"attachment://{filename}")
+                embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=user.avatar_url)
 
-            file = await in_executor(
-                PfpEffects.apply_effect,
-                image_bytes,
-                PfpEffects.flip_effect,
-                filename
-            )
-
-            embed = discord.Embed(
-                title="Your reversed avatar.",
-                description="Here is your reversed avatar. I think it is a spitting image of you."
-            )
-
-            embed.set_image(url=f"attachment://{filename}")
-            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=user.avatar_url)
-
-            await ctx.send(embed=embed, file=file)
+                await ctx.send(embed=embed, file=file)
+        else:
+            await ctx.send(f"> {text[::-1]}", allowed_mentions=discord.AllowedMentions.none())
 
     @avatar_modify.command(aliases=("easterify",), root_aliases=("easterify", "avatareasterify"))
     async def avatareasterify(self, ctx: commands.Context, *colours: t.Union[discord.Colour, str]) -> None:
