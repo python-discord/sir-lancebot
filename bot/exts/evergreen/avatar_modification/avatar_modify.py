@@ -122,10 +122,12 @@ class AvatarModify(commands.Cog):
         await ctx.send(embed=embed, file=file)
 
     @avatar_modify.command(name="reverse", root_aliases=("reverse",))
-    async def reverse(self, ctx: commands.Context, *, text: t.Optional[str]):
-        """Reverses the sent text.
-        
-        If no text is provided, the user's profile picture will be reversed."""
+    async def reverse(self, ctx: commands.Context, *, text: t.Optional[str]) -> None:
+        """
+        Reverses the sent text.
+
+        If no text is provided, the user's profile picture will be reversed.
+        """
         if not text:
             async with ctx.typing():
                 user = await self._fetch_user(ctx.author.id)
