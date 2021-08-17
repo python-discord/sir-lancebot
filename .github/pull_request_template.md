@@ -17,4 +17,4 @@ Issues can be skipped with explicit core dev approval, but you have to link the 
 - [ ] Join the [**Python Discord Community**](https://discord.gg/python)?
 - [ ] Read all the comments in this template?
 - [ ] Ensure there is an issue open, or link relevant discord discussions?
-- [ ] Read the [contributing guidelines](https://pythondiscord.com/pages/contributing/contributing-guidelines/)?
+- [ ] Read and agree to the [contributing guidelines](https://pythondiscord.com/pages/contributing/contributing-guidelines/)?

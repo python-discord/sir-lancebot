@@ -9,7 +9,7 @@ from typing import Callable, List, Optional
 
 import discord
 from discord.ext import commands
-from fuzzywuzzy import fuzz
+from rapidfuzz import fuzz
 
 from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES, Roles
@@ -17,8 +17,8 @@ from bot.constants import Colours, NEGATIVE_REPLIES, Roles
 logger = logging.getLogger(__name__)
 
 DEFAULT_QUESTION_LIMIT = 6
-STANDARD_VARIATION_TOLERANCE = 83
-DYNAMICALLY_GEN_VARIATION_TOLERANCE = 95
+STANDARD_VARIATION_TOLERANCE = 88
+DYNAMICALLY_GEN_VARIATION_TOLERANCE = 97
 
 WRONG_ANS_RESPONSE = [
     "No one answered correctly!",
@@ -210,6 +210,8 @@ class TriviaQuiz(commands.Cog):
             "retro": "Questions related to retro gaming.",
             "math": "General questions about mathematics ranging from grade 8 to grade 12.",
             "science": "Put your understanding of science to the test!",
+            "cs": "A large variety of computer science questions.",
+            "python": "Trivia on our amazing language, Python!",
         }
 
     @staticmethod
@@ -225,10 +227,12 @@ class TriviaQuiz(commands.Cog):
         Start a quiz!
 
         Questions for the quiz can be selected from the following categories:
-        - general: Test your general knowledge. (default)
+        - general: Test your general knowledge.
         - retro: Questions related to retro gaming.
         - math: General questions about mathematics ranging from grade 8 to grade 12.
         - science: Put your understanding of science to the test!
+        - cs: A large variety of computer science questions.
+        - python: Trivia on our amazing language, Python!
 
         (More to come!)
         """
@@ -290,7 +294,7 @@ class TriviaQuiz(commands.Cog):
             start_embed = self.make_start_embed(category)
 
             await ctx.send(embed=start_embed)  # send an embed with the rules
-            await asyncio.sleep(1)
+            await asyncio.sleep(5)
 
         done_question = []
         hint_no = 0
@@ -430,19 +434,16 @@ class TriviaQuiz(commands.Cog):
         """Generate a starting/introduction embed for the quiz."""
         start_embed = discord.Embed(
             colour=Colours.blue,
-            title="Quiz game starting!",
+            title="A quiz game is starting!",
             description=(
-                f"This game consists of {self.question_limit + 1} questions.\n"
-                "**Rules: **No cheating and have fun!\n"
+                f"This game consists of {self.question_limit + 1} questions.\n\n"
+                "**Rules: **\n"
+                "1. Only enclose your answer in backticks when the question tells you to.\n"
+                "2. If the question specifies an answer format, follow it or else it won't be accepted.\n"
+                "3. You have 30s per question. Points for each question reduces by 25 after 10s or after a hint.\n"
+                "4. No cheating and have fun!\n\n"
                 f"**Category**: {category}"
             ),
-        )
-
-        start_embed.set_footer(
-            text=(
-                "Points for each question reduces by 25 after 10s or after a hint. "
-                "Total time is 30s per question"
-            )
         )
 
         return start_embed

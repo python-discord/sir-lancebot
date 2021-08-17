@@ -52,6 +52,11 @@ class HTTPStatusCodes(commands.Cog):
     @http_status_group.command(name="dog")
     async def http_dog(self, ctx: commands.Context, code: int) -> None:
         """Sends an embed with an image of a dog, portraying the status code."""
+        # These codes aren't server-friendly.
+        if code in (304, 422):
+            await self.http_cat(ctx, code)
+            return
+
         embed = discord.Embed(title=f"**Status: {code}**")
         url = HTTP_DOG_URL.format(code=code)
 

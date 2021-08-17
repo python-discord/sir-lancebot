@@ -79,7 +79,7 @@ class AI:
         """Get move from AI. AI use Minimax strategy."""
         possible_moves = [i for i, emoji in board.items() if emoji in list(Emojis.number_emojis.values())]
 
-        for symbol in (Emojis.o, Emojis.x):
+        for symbol in (Emojis.o_square, Emojis.x_square):
             for move in possible_moves:
                 board_copy = board.copy()
                 board_copy[move] = symbol
@@ -265,12 +265,12 @@ class TicTacToe(Cog):
             return
         if opponent is None:
             game = Game(
-                [Player(ctx.author, ctx, Emojis.x), AI(Emojis.o)],
+                [Player(ctx.author, ctx, Emojis.x_square), AI(Emojis.o_square)],
                 ctx
             )
         else:
             game = Game(
-                [Player(ctx.author, ctx, Emojis.x), Player(opponent, ctx, Emojis.o)],
+                [Player(ctx.author, ctx, Emojis.x_square), Player(opponent, ctx, Emojis.o_square)],
                 ctx
             )
         self.games.append(game)
@@ -317,8 +317,17 @@ class TicTacToe(Cog):
             await ctx.send("Game don't exist.")
             return
         game = self.games[game_id - 1]
-        await ctx.send(f"{game.winner} :trophy: vs {game.loser}")
-        await ctx.send(game.format_board())
+
+        if game.draw:
+            description = f"{game.players[0]} vs {game.players[1]} (draw)\n\n{game.format_board()}"
+        else:
+            description = f"{game.winner} :trophy: vs {game.loser}\n\n{game.format_board()}"
+
+        embed = discord.Embed(
+            title=f"Match #{game_id} Game Board",
+            description=description,
+        )
+        await ctx.send(embed=embed)
 
 
 def setup(bot: Bot) -> None:
