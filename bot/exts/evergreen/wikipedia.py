@@ -97,7 +97,6 @@ class WikipediaSearch(commands.Cog):
             await ctx.send(
                 "Sorry, we could not find a wikipedia article using that search term."
             )
-            return
 
 
 def setup(bot: Bot) -> None:
