@@ -2,14 +2,14 @@ import logging
 import re
 from datetime import datetime
 from html import unescape
-from typing import List, Optional
+from typing import List
 
 from discord import Color, Embed, TextChannel
 from discord.ext import commands
 
 from bot.bot import Bot
 from bot.utils import LinePaginator
-from bot.utils.exceptions import ExternalAPIError
+from bot.utils.exceptions import APIError
 
 log = logging.getLogger(__name__)
 
@@ -43,25 +43,25 @@ class WikipediaSearch(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    async def wiki_request(self, channel: TextChannel, search: str) -> Optional[List[str]]:
+    async def wiki_request(self, channel: TextChannel, search: str) -> List[str]:
         """Search wikipedia search string and return formatted first 10 pages found."""
         params = WIKI_PARAMS | {"srlimit": 10, "srsearch": search}
         async with self.bot.http_session.get(url=SEARCH_API, params=params) as resp:
             if (status := resp.status) != 200:
                 log.info(f"Unexpected response `{status}` while searching wikipedia for `{search}`")
-                raise ExternalAPIError("Wikipedia API", status)
+                raise APIError("Wikipedia API", status)
 
             raw_data = await resp.json()
+
             if not raw_data.get("query"):
                 if error := raw_data.get("errors"):
                     log.error(f"There was an error while communicating with the Wikipedia API: {error}")
-                raise ExternalAPIError("Wikipedia API", status, error)
+                raise APIError("Wikipedia API", status, error)
 
             number_of_results = raw_data["query"]["searchinfo"]["totalhits"]
-
+            lines = []
             if number_of_results:
                 results = raw_data["query"]["search"]
-                lines = []
 
                 for article in results:
                     line = WIKI_SEARCH_RESULT.format(
@@ -75,13 +75,7 @@ class WikipediaSearch(commands.Cog):
                     )
                     lines.append(line)
 
-                return lines
-
-            else:
-                await channel.send(
-                    "Sorry, we could not find a wikipedia article using that search term."
-                )
-                return
+            return lines
 
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(name="wikipedia", aliases=("wiki",))
@@ -99,6 +93,11 @@ class WikipediaSearch(commands.Cog):
             await LinePaginator.paginate(
                 contents, ctx, embed
             )
+        else:
+            await ctx.send(
+                "Sorry, we could not find a wikipedia article using that search term."
+            )
+            return
 
 
 def setup(bot: Bot) -> None:
