@@ -318,9 +318,14 @@ class TicTacToe(Cog):
             return
         game = self.games[game_id - 1]
 
+        if game.draw:
+            description = f"{game.players[0]} vs {game.players[1]} (draw)\n\n{game.format_board()}"
+        else:
+            description = f"{game.winner} :trophy: vs {game.loser}\n\n{game.format_board()}"
+
         embed = discord.Embed(
             title=f"Match #{game_id} Game Board",
-            description=f"{game.winner} :trophy: vs {game.loser}\n\n{game.format_board()}"
+            description=description,
         )
         await ctx.send(embed=embed)
 

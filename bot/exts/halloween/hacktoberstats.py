@@ -4,21 +4,21 @@ import re
 from collections import Counter
 from datetime import datetime, timedelta
 from typing import List, Optional, Tuple, Union
+from urllib.parse import quote_plus
 
 import discord
 from async_rediscache import RedisCache
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Channels, Colours, Month, NEGATIVE_REPLIES, Tokens, WHITELISTED_CHANNELS
-from bot.utils.decorators import in_month, whitelist_override
+from bot.constants import Colours, Month, NEGATIVE_REPLIES, Tokens
+from bot.utils.decorators import in_month
 
 log = logging.getLogger(__name__)
 
 CURRENT_YEAR = datetime.now().year  # Used to construct GH API query
 PRS_FOR_SHIRT = 4  # Minimum number of PRs before a shirt is awarded
 REVIEW_DAYS = 14  # number of days needed after PR can be mature
-HACKTOBER_WHITELIST = WHITELISTED_CHANNELS + (Channels.hacktoberfest_2020,)
 
 REQUEST_HEADERS = {"User-Agent": "Python Discord Hacktoberbot"}
 # using repo topics API during preview period requires an accept header
@@ -44,7 +44,6 @@ class HacktoberStats(commands.Cog):
 
     @in_month(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)
     @commands.group(name="hacktoberstats", aliases=("hackstats",), invoke_without_command=True)
-    @whitelist_override(channels=HACKTOBER_WHITELIST)
     async def hacktoberstats_group(self, ctx: commands.Context, github_username: str = None) -> None:
         """
         Display an embed for a user's Hacktoberfest contributions.
@@ -72,7 +71,6 @@ class HacktoberStats(commands.Cog):
 
     @in_month(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)
     @hacktoberstats_group.command(name="link")
-    @whitelist_override(channels=HACKTOBER_WHITELIST)
     async def link_user(self, ctx: commands.Context, github_username: str = None) -> None:
         """
         Link the invoking user's Github github_username to their Discord ID.
@@ -96,7 +94,6 @@ class HacktoberStats(commands.Cog):
 
     @in_month(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)
     @hacktoberstats_group.command(name="unlink")
-    @whitelist_override(channels=HACKTOBER_WHITELIST)
     async def unlink_user(self, ctx: commands.Context) -> None:
         """Remove the invoking user's account link from the log."""
         author_id, author_mention = self._author_mention_from_context(ctx)
@@ -212,24 +209,24 @@ class HacktoberStats(commands.Cog):
         None will be returned when the GitHub user was not found.
         """
         log.info(f"Fetching Hacktoberfest Stats for GitHub user: '{github_username}'")
-        base_url = "https://api.github.com/search/issues?q="
+        base_url = "https://api.github.com/search/issues"
         action_type = "pr"
         is_query = "public"
         not_query = "draft"
         date_range = f"{CURRENT_YEAR}-09-30T10:00Z..{CURRENT_YEAR}-11-01T12:00Z"
         per_page = "300"
-        query_url = (
-            f"{base_url}"
+        query_params = (
             f"+type:{action_type}"
             f"+is:{is_query}"
-            f"+author:{github_username}"
+            f"+author:{quote_plus(github_username)}"
             f"+-is:{not_query}"
             f"+created:{date_range}"
             f"&per_page={per_page}"
         )
-        log.debug(f"GitHub query URL generated: {query_url}")
 
-        jsonresp = await self._fetch_url(query_url, REQUEST_HEADERS)
+        log.debug(f"GitHub query parameters generated: {query_params}")
+
+        jsonresp = await self._fetch_url(base_url, REQUEST_HEADERS, {"q": query_params})
         if "message" in jsonresp:
             # One of the parameters is invalid, short circuit for now
             api_message = jsonresp["errors"][0]["message"]
@@ -299,9 +296,9 @@ class HacktoberStats(commands.Cog):
                 outlist.append(itemdict)
         return outlist
 
-    async def _fetch_url(self, url: str, headers: dict) -> dict:
+    async def _fetch_url(self, url: str, headers: dict, params: dict) -> dict:
         """Retrieve API response from URL."""
-        async with self.bot.http_session.get(url, headers=headers) as resp:
+        async with self.bot.http_session.get(url, headers=headers, params=params) as resp:
             return await resp.json()
 
     @staticmethod
