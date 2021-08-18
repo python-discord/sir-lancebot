@@ -97,6 +97,17 @@ class PfpEffects:
         return image.quantize()
 
     @staticmethod
+    def flip_effect(image: Image.Image) -> Image.Image:
+        """
+        Flips the image horizontally.
+
+        This is done by just using ImageOps.mirror().
+        """
+        image = ImageOps.mirror(image)
+
+        return image
+
+    @staticmethod
     def easterify_effect(image: Image.Image, overlay_image: t.Optional[Image.Image] = None) -> Image.Image:
         """
         Applies the easter effect to the given image.
