@@ -175,7 +175,11 @@ class DuckGamesDirector(commands.Cog):
         self.bot = bot
         self.current_games = {}
 
-    @commands.group(name='duckduckduckgoose', aliases=['dddg', 'duckgoose'], invoke_without_command=True)
+    @commands.group(
+        name='duckduckduckgoose',
+        aliases=['dddg', 'ddg', 'duckduckgoose', 'duckgoose'],
+        invoke_without_command=True
+    )
     @commands.cooldown(rate=1, per=2, type=commands.BucketType.channel)
     async def start_game(self, ctx: commands.Context) -> None:
         """Generate a board, send the game embed, and end the game after a time limit."""
