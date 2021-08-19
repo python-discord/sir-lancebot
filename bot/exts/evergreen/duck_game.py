@@ -81,11 +81,12 @@ def as_trinary(card: tuple[int]) -> int:
 class DuckGame:
     """A class for a single game."""
 
-    def __init__(self,
-                 rows: int = 4,
-                 columns: int = 3,
-                 minimum_solutions: int = 1,
-                 ) -> None:
+    def __init__(
+        self,
+        rows: int = 4,
+        columns: int = 3,
+        minimum_solutions: int = 1,
+    ) -> None:
         """
         Take samples from the deck to generate a board.
 
