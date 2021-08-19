@@ -65,7 +65,9 @@ def assemble_board_image(board: list[tuple[int]], rows: int, columns: int) -> Im
 
 def get_card_image(card: tuple[int]) -> Image:
     """Slice the image containing all the cards to get just this card."""
-    row, col = divmod(as_trinary(card), 9)  # all_cards.png should have 9x9 cards
+    # The master card image file should have 9x9 cards,
+    # arranged such that their features can be interpreted as ordered trinary.
+    row, col = divmod(as_trinary(card), 9)
     x1 = col * CARD_WIDTH
     x2 = x1 + CARD_WIDTH
     y1 = row * CARD_HEIGHT
