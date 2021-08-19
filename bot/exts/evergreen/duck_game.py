@@ -25,11 +25,11 @@ INCORRECT_SOLN = -1
 CORRECT_GOOSE = 2
 INCORRECT_GOOSE = -1
 
-""" Distribution of minimum acceptable solutions at board generation.
-    This is for gameplay reasons, to shift the number of solutions per board up,
-    while still making the end of the game unpredictable.
-    Note: this is *not* the same as the distribution of number of solutions.
-"""
+# Distribution of minimum acceptable solutions at board generation.
+# This is for gameplay reasons, to shift the number of solutions per board up,
+# while still making the end of the game unpredictable.
+# Note: this is *not* the same as the distribution of number of solutions.
+
 SOLN_DISTR = 0, 0.05, 0.05, 0.1, 0.15, 0.25, 0.2, 0.15, .05
 
 IMAGE_PATH = Path("bot", "resources", "evergreen", "all_cards.png")
@@ -126,11 +126,9 @@ class DuckGame:
             self._solutions = set()
             for idx_a, card_a in enumerate(self.board):
                 for idx_b, card_b in enumerate(self.board[idx_a+1:], start=idx_a+1):
-                    """
-                        Two points determine a line, and there are exactly 3 points per line in {0,1,2}^4.
-                        The completion of a line will only be a duplicate point if the other two points are the same,
-                        which is prevented by the triangle iteration.
-                    """
+                    # Two points determine a line, and there are exactly 3 points per line in {0,1,2}^4.
+                    # The completion of a line will only be a duplicate point if the other two points are the same,
+                    # which is prevented by the triangle iteration.
                     completion = tuple(
                         feat_a if feat_a == feat_b else 3-feat_a-feat_b
                         for feat_a, feat_b in zip(card_a, card_b)
