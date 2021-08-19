@@ -32,11 +32,11 @@ INCORRECT_GOOSE = -1
 """
 SOLN_DISTR = 0, 0.05, 0.05, 0.1, 0.15, 0.25, 0.2, 0.15, .05
 
-image_path = Path("bot", "resources", "evergreen", "all_cards.png")
-font_path = Path("bot", "resources", "evergreen", "LuckiestGuy-Regular.ttf")
+IMAGE_PATH = Path("bot", "resources", "evergreen", "all_cards.png")
+FONT_PATH = Path("bot", "resources", "evergreen", "LuckiestGuy-Regular.ttf")
 
-ALL_CARDS = Image.open(image_path)
-LABEL_FONT = ImageFont.truetype(str(font_path), size=16)
+ALL_CARDS = Image.open(IMAGE_PATH)
+LABEL_FONT = ImageFont.truetype(str(FONT_PATH), size=16)
 CARD_WIDTH = 155
 CARD_HEIGHT = 97
 
