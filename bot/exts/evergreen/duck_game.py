@@ -34,6 +34,7 @@ SOLN_DISTR = 0, 0.05, 0.05, 0.1, 0.15, 0.25, 0.2, 0.15, .05
 
 IMAGE_PATH = Path("bot", "resources", "evergreen", "all_cards.png")
 FONT_PATH = Path("bot", "resources", "evergreen", "LuckiestGuy-Regular.ttf")
+HELP_IMAGE_PATH = Path("bot", "resources", "evergreen", "ducks_help_ex.png")
 
 ALL_CARDS = Image.open(IMAGE_PATH)
 LABEL_FONT = ImageFont.truetype(str(FONT_PATH), size=16)
@@ -43,6 +44,26 @@ CARD_HEIGHT = 97
 EMOJI_WRONG = "\u274C"
 
 ANSWER_REGEX = re.compile(r'^\D*(\d+)\D+(\d+)\D+(\d+)\D*$')
+
+HELP_TEXT = """
+**Each card has 4 features**
+Color, Number, Hat, and Accessory
+
+**A valid flight**
+3 cards where each feature is either all the same or all different
+
+**Call "GOOSE"**
+if you think there are no more flights
+
+**+1** for each valid flight
+**+2** for a correct "GOOSE" call
+**-1** for any wrong answer
+
+The first flight below is invalid: the first card has swords while the other two have no accessory.\
+ It would be valid if the first card was empty-handed, or one of the other two had paintbrushes.
+
+The second flight is valid because there are no 2:1 splits; each feature is either all the same or all different.
+"""
 
 
 def assemble_board_image(board: list[tuple[int]], rows: int, columns: int) -> Image:
@@ -304,18 +325,13 @@ class DuckGamesDirector(commands.Cog):
             title="Compete against other players to find valid flights!",
             color=discord.Color.dark_purple(),
         )
-        embed.description = (
-            "**Each card has 4 features**\nColor, Number, Hat, and Accessory\n"
-            "\n**A valid flight**\n3 cards where each feature is either all the same or all different\n"
-            '\n**Call "GOOSE"**\nif you think there are no more flights\n'
-            "\n**1**   for each valid flight\n"
-            '**2**   for a correct "GOOSE" call\n'
-            "**-1** for any wrong answer"
-        )
+        embed.description = HELP_TEXT
+        file = discord.File(HELP_IMAGE_PATH, filename="help.png")
+        embed.set_image(url="attachment://help.png")
         embed.set_footer(
             text="Tip: using Discord's compact message display mode can help keep the board on the screen"
         )
-        await ctx.send(embed=embed)
+        await ctx.send(file=file, embed=embed)
 
     @staticmethod
     async def edit_embed_with_image(msg: discord.Message, embed: discord.Embed) -> discord.Message:
