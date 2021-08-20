@@ -60,9 +60,7 @@ class WikipediaSearch(commands.Cog):
 
             lines = []
             if raw_data["query"]["searchinfo"]["totalhits"]:
-                results = raw_data["query"]["search"]
-
-                for article in results:
+                for article in raw_data["query"]["search"]:
                     line = WIKI_SEARCH_RESULT.format(
                         name=article["title"],
                         description=unescape(
