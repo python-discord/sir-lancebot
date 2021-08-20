@@ -47,16 +47,16 @@ class WikipediaSearch(commands.Cog):
         """Search wikipedia search string and return formatted first 10 pages found."""
         params = WIKI_PARAMS | {"srlimit": 10, "srsearch": search}
         async with self.bot.http_session.get(url=SEARCH_API, params=params) as resp:
-            if (status := resp.status) != 200:
-                log.info(f"Unexpected response `{status}` while searching wikipedia for `{search}`")
-                raise APIError("Wikipedia API", status)
+            if resp.status != 200:
+                log.info(f"Unexpected response `{resp.status}` while searching wikipedia for `{search}`")
+                raise APIError("Wikipedia API", resp.status)
 
             raw_data = await resp.json()
 
             if not raw_data.get("query"):
                 if error := raw_data.get("errors"):
                     log.error(f"There was an error while communicating with the Wikipedia API: {error}")
-                raise APIError("Wikipedia API", status, error)
+                raise APIError("Wikipedia API", resp.status, error)
 
             lines = []
             if raw_data["query"]["searchinfo"]["totalhits"]:
