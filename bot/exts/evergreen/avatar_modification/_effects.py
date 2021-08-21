@@ -283,16 +283,14 @@ class PfpEffects:
         return new_image
 
     @staticmethod
-    def mosaic_effect(img_bytes: bytes, squares: int, file_name: str) -> discord.File:
-        """Separate function run from an executor which turns an image into a mosaic."""
-        avatar = Image.open(BytesIO(img_bytes))
-        avatar = avatar.convert("RGBA").resize((1024, 1024))
+    def mosaic_effect(image: Image.Image, squares: int) -> Image.Image:
+        """
+        Applies a mosaic effect to the given image.
 
-        img_squares = PfpEffects.split_image(avatar, squares)
+        The "squares" argument specifies the number of squares to split
+        the image into. This should be a square number.
+        """
+        img_squares = PfpEffects.split_image(image, squares)
         new_img = PfpEffects.join_images(img_squares)
 
-        bufferedio = BytesIO()
-        new_img.save(bufferedio, format="PNG")
-        bufferedio.seek(0)
-
-        return discord.File(bufferedio, filename=file_name)
+        return new_img
