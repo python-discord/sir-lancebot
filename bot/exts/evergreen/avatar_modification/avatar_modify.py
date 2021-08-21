@@ -338,10 +338,11 @@ class AvatarModify(commands.Cog):
             img_bytes = await user.avatar_url_as(size=1024).read()
 
             file = await in_executor(
-                PfpEffects.mosaic_effect,
+                PfpEffects.apply_effect,
                 img_bytes,
+                PfpEffects.mosaic_effect,
+                file_name,
                 squares,
-                file_name
             )
 
             if squares == 1:
