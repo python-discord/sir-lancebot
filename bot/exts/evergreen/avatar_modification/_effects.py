@@ -22,6 +22,7 @@ class PfpEffects:
         """Applies the given effect to the image passed to it."""
         im = Image.open(BytesIO(image_bytes))
         im = im.convert("RGBA")
+        im = im.resize((1024, 1024))
         im = effect(im, *args)
 
         bufferedio = BytesIO()
@@ -74,7 +75,6 @@ class PfpEffects:
     @staticmethod
     def pridify_effect(image: Image.Image, pixels: int, flag: str) -> Image.Image:
         """Applies the given pride effect to the given image."""
-        image = image.resize((1024, 1024))
         image = PfpEffects.crop_avatar_circle(image)
 
         ring = Image.open(Path(f"bot/resources/pride/flags/{flag}.png")).resize((1024, 1024))
