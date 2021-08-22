@@ -3,7 +3,7 @@ import logging
 from html import unescape
 from urllib.parse import quote_plus
 
-from discord import Embed, HTTPException
+from discord import Embed
 from discord.ext import commands
 
 from bot import bot
@@ -11,7 +11,7 @@ from bot.constants import Colours
 
 logger = logging.getLogger(__name__)
 
-API_ROOT = "https://realpython.com/search/api/v1/?"
+API_ROOT = "https://realpython.com/search/api/v1/"
 ARTICLE_URL = "https://realpython.com{article_url}"
 SEARCH_URL = "https://realpython.com/search?q={user_search}"
 
@@ -52,7 +52,7 @@ class RealPython(commands.Cog):
             return
 
         encoded_user_search = quote_plus(user_search)
-        embed = Embed(
+        article_embed = Embed(
             title="Search results - Real Python",
             url=SEARCH_URL.format(user_search=encoded_user_search),
             description="Here are the top 5 results:",
@@ -60,21 +60,14 @@ class RealPython(commands.Cog):
         )
 
         for article in articles:
-            embed.add_field(
+            article_embed.add_field(
                 name=unescape(article["title"]),
                 value=(ARTICLE_URL.format(article_url=article["url"])),
                 inline=False
             )
-        embed.set_footer(text="Click the links to go to the articles.")
+        article_embed.set_footer(text="Click the links to go to the articles.")
 
-        try:
-            await ctx.send(embed=embed)
-        except HTTPException:
-            bad_search = Embed(
-                title="Your search was not Ok, please try something else.",
-                color=Colours.soft_red
-            )
-            await ctx.send(embed=bad_search)
+        await ctx.send(embed=article_embed)
 
 
 def setup(bot: bot.Bot) -> None:
