@@ -39,9 +39,7 @@ class RealPython(commands.Cog):
                 await ctx.send(embed=ERROR_EMBED)
                 return
 
-
             data = await response.json()
-
 
         articles = data["results"]
 
@@ -57,7 +55,7 @@ class RealPython(commands.Cog):
         embed = Embed(
             title="Search results - Real Python",
             url=SEARCH_URL.format(user_search=encoded_user_search),
-            description=f"Here are the top 5 results:",
+            description="Here are the top 5 results:",
             color=Colours.orange
         )
 
