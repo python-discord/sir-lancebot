@@ -11,6 +11,7 @@ from bot.constants import Colours
 
 logger = logging.getLogger(__name__)
 
+
 API_ROOT = "https://realpython.com/search/api/v1/"
 ARTICLE_URL = "https://realpython.com{article_url}"
 SEARCH_URL = "https://realpython.com/search?q={user_search}"
@@ -35,7 +36,8 @@ class RealPython(commands.Cog):
         params = {"q": user_search, "limit": 5}
         async with self.bot.http_session.get(url=API_ROOT, params=params) as response:
             if response.status != 200:
-                logger.error(f"Status code is not 200, it is {response.status}")
+                logger.error(f"Unexpected status code {response.status} from
+                             Real Python")
                 await ctx.send(embed=ERROR_EMBED)
                 return
 
@@ -43,7 +45,7 @@ class RealPython(commands.Cog):
 
         articles = data["results"]
 
-        if len(data["results"]) == 0:
+        if len(articles) == 0:
             no_articles = Embed(
                 title=f"No articles found for '{user_search}'",
                 color=Colours.soft_red
