@@ -36,8 +36,7 @@ class RealPython(commands.Cog):
         params = {"q": user_search, "limit": 5}
         async with self.bot.http_session.get(url=API_ROOT, params=params) as response:
             if response.status != 200:
-                logger.error(f"Unexpected status code {response.status} from
-                             Real Python")
+                logger.error(f"Unexpected status code {response.status} from Real Python")
                 await ctx.send(embed=ERROR_EMBED)
                 return
 
