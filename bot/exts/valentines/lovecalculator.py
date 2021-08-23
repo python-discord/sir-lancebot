@@ -4,7 +4,7 @@ import json
 import logging
 import random
 from pathlib import Path
-from typing import Coroutine, Union
+from typing import Coroutine, Optional
 
 import discord
 from discord import Member
@@ -12,6 +12,8 @@ from discord.ext import commands
 from discord.ext.commands import BadArgument, Cog, clean_content
 
 from bot.bot import Bot
+from bot.constants import Channels, Client, Lovefest, Month
+from bot.utils.decorators import in_month
 
 log = logging.getLogger(__name__)
 
@@ -22,45 +24,45 @@ LOVE_DATA = sorted((int(key), value) for key, value in LOVE_DATA.items())
 class LoveCalculator(Cog):
     """A cog for calculating the love between two people."""
 
+    @in_month(Month.FEBRUARY)
     @commands.command(aliases=("love_calculator", "love_calc"))
     @commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
-    async def love(self, ctx: commands.Context, who: Union[Member, str], whom: Union[Member, str] = None) -> None:
+    async def love(self, ctx: commands.Context, who: Member, whom: Optional[Member] = None) -> None:
         """
         Tells you how much the two love each other.
 
-        This command accepts users or arbitrary strings as arguments.
-        Users are converted from:
+        This command requires at least one member as input, if two are given love will be calculated between
+        those two users, if only one is given, the second member is asusmed to be the invoker.
+        Members are converted from:
           - User ID
           - Mention
           - name#discrim
           - name
           - nickname
 
-        Any two arguments will always yield the same result, though the order of arguments matters:
-          Running .love joseph erlang will always yield the same result.
-          Running .love erlang joseph won't yield the same result as .love joseph erlang
-
-        If you want to use multiple words for one argument, you must include quotes.
-          .love "Zes Vappa" "morning coffee"
+        Any two arguments will always yield the same result, regardless of the order of arguments:
+          Running .love @joe#6000 @chrisjl#2655 will always yield the same result.
+          Running .love @chrisjl#2655 @joe#6000 will yield the same result as before.
         """
+        if (
+            Lovefest.role_id not in [role.id for role in who.roles]
+            or (whom is not None and Lovefest.role_id not in [role.id for role in whom.roles])
+        ):
+            raise BadArgument(
+                "This command can only be ran against members with the lovefest role! "
+                "This role be can assigned by running "
+                f"`{Client.prefix}lovefest sub` in <#{Channels.community_bot_commands}>."
+            )
+
         if whom is None:
             whom = ctx.author
 
-        def normalize(arg: Union[Member, str]) -> Coroutine:
-            if isinstance(arg, Member):
-                # If we are given a member, return name#discrim without any extra changes
-                arg = str(arg)
-            else:
-                # Otherwise normalise case and remove any leading/trailing whitespace
-                arg = arg.strip().title()
+        def normalize(arg: Member) -> Coroutine:
             # This has to be done manually to be applied to usernames
-            return clean_content(escape_markdown=True).convert(ctx, arg)
+            return clean_content(escape_markdown=True).convert(ctx, str(arg))
 
-        who, whom = [await normalize(arg) for arg in (who, whom)]
-
-        # Make sure user didn't provide something silly such as 10 spaces
-        if not (who and whom):
-            raise BadArgument("Arguments must be non-empty strings.")
+        # Sort to ensure same result for same input, regardless of order
+        who, whom = sorted([await normalize(arg) for arg in (who, whom)])
 
         # Hash inputs to guarantee consistent results (hashing algorithm choice arbitrary)
         #
@@ -87,6 +89,7 @@ class LoveCalculator(Cog):
             name="A letter from Dr. Love:",
             value=data["text"]
         )
+        embed.set_footer(text=f"You can unsubscribe from lovefest by using {Client.prefix}lovefest unsub")
 
         await ctx.send(embed=embed)
 

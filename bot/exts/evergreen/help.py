@@ -8,7 +8,7 @@ from typing import List, NamedTuple, Union
 from discord import Colour, Embed, HTTPException, Message, Reaction, User
 from discord.ext import commands
 from discord.ext.commands import CheckFailure, Cog as DiscordCog, Command, Context
-from fuzzywuzzy import fuzz, process
+from rapidfuzz import process
 
 from bot import constants
 from bot.bot import Bot
@@ -159,7 +159,7 @@ class HelpSession:
         # Combine command and cog names
         choices = list(self._bot.all_commands) + list(self._bot.cogs)
 
-        result = process.extractBests(query, choices, scorer=fuzz.ratio, score_cutoff=90)
+        result = process.extract(query, choices, score_cutoff=90)
 
         raise HelpQueryNotFound(f'Query "{query}" not found.', dict(result))
 
