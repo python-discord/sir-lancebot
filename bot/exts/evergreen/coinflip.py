@@ -4,10 +4,7 @@ from typing import Optional, Tuple
 from discord.ext import commands
 
 from bot.bot import Bot
-
-
-LEMON_HYPERPLEASED = "<:lemon_hyperpleased:754441879822663811>"
-LEMON_PENSIVE = "<:lemon_pensive:754441880246419486>"
+from bot.constants import Emojis
 
 
 class CoinSide(commands.Converter):
@@ -46,9 +43,9 @@ class CoinFlip(commands.Cog):
 
         message = f"{ctx.author.mention} flipped **{flipped_side}**. "
         if side == flipped_side:
-            message += f"You guessed correctly! {LEMON_HYPERPLEASED}"
+            message += f"You guessed correctly! {Emojis.lemon_hyperpleased}"
         else:
-            message += f"You guessed incorrectly. {LEMON_PENSIVE}"
+            message += f"You guessed incorrectly. {Emojis.lemon_pensive}"
         await ctx.send(message)
 
 
