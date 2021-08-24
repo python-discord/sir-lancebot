@@ -41,10 +41,10 @@ class CoinFlip(commands.Cog):
         flipped_side = random.choice(["heads", "tails"])
 
         if not side:
-            await ctx.send(f"{ctx.author.mention} Flipped **{flipped_side}**!")
+            await ctx.send(f"{ctx.author.mention} flipped **{flipped_side}**!")
             return
 
-        message = f"{ctx.author.mention} Flipped **{flipped_side}**. "
+        message = f"{ctx.author.mention} flipped **{flipped_side}**. "
         if side == flipped_side:
             message += f"You guessed correctly! {LEMON_HYPERPLEASED}"
         else:
