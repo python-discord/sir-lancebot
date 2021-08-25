@@ -319,6 +319,7 @@ class DuckGamesDirector(commands.Cog):
         try:
             game = self.current_games.pop(ctx.channel.id)
         except KeyError:
+            await ctx.send("No game currently running in this channel")
             return
         await self.end_game(game, end_message="Game canceled.")
 
