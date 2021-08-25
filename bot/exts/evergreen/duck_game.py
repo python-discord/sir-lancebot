@@ -202,7 +202,7 @@ class DuckGamesDirector(commands.Cog):
         if game.running:
             try:
                 del self.current_games[ctx.channel.id]
-                await self.end_game(game, end_message="Time's up!")
+                await self.end_game(ctx.channel, game, end_message="Time's up!")
             except KeyError:
                 pass
 
@@ -223,7 +223,7 @@ class DuckGamesDirector(commands.Cog):
                 try:
                     del self.current_games[channel.id]
                     game.scores[msg.author] += CORRECT_GOOSE
-                    await self.end_game(game, end_message=f"{msg.author.display_name} GOOSED!")
+                    await self.end_game(channel, game, end_message=f"{msg.author.display_name} GOOSED!")
                 except KeyError:
                     pass
             else:
@@ -277,16 +277,23 @@ class DuckGamesDirector(commands.Cog):
             game_embed.set_footer(text=f"{old_footer}\n{str(answer):12s}  -  {author.display_name}")
             await self.edit_embed_with_image(game.embed_msg, game_embed)
 
-    async def end_game(self, game: DuckGame, end_message: str) -> None:
+    async def end_game(self, channel: discord.TextChannel, game: DuckGame, end_message: str) -> None:
         """Edit the game embed to reflect the end of the game and mark the game as not running."""
         game.running = False
 
+        scoreboard_embed = discord.Embed(
+            title=end_message,
+            color=discord.Color.dark_purple(),
+        )
         scores = sorted(
             game.scores.items(),
             key=lambda item: item[1],
             reverse=True,
         )
-        scoreboard = "\n".join(f"{member.display_name}: {score}" for member, score in scores)
+        scoreboard = "Final scores:\n\n"
+        scoreboard += "\n".join(f"{member.display_name}: {score}" for member, score in scores)
+        scoreboard_embed.description = scoreboard
+        await channel.send(embed=scoreboard_embed)
 
         missed = [ans for ans in game.solutions if ans not in game.claimed_answers]
         if missed:
@@ -298,13 +305,11 @@ class DuckGamesDirector(commands.Cog):
         old_footer = game_embed.footer.text
         if old_footer == discord.Embed.Empty:
             old_footer = ""
-
         embed_as_dict = game_embed.to_dict()  # Cannot set embed color after initialization
         embed_as_dict["color"] = discord.Color.red().value
         game_embed = discord.Embed.from_dict(embed_as_dict)
-
         game_embed.set_footer(
-            text=f"{old_footer.rstrip()}\n\n{end_message} Here are the scores:\n{scoreboard}\n\n{missed_text}"
+            text=f"{old_footer.rstrip()}\n\n{missed_text}"
         )
         await self.edit_embed_with_image(game.embed_msg, game_embed)
 
@@ -322,7 +327,7 @@ class DuckGamesDirector(commands.Cog):
         except KeyError:
             await ctx.send("No game currently running in this channel")
             return
-        await self.end_game(game, end_message="Game canceled.")
+        await self.end_game(ctx.channel, game, end_message="Game canceled.")
 
     @staticmethod
     async def send_help_embed(ctx: commands.Context) -> discord.Message:
