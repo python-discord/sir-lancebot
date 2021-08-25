@@ -185,6 +185,7 @@ class DuckGamesDirector(commands.Cog):
     async def start_game(self, ctx: commands.Context) -> None:
         """Generate a board, send the game embed, and end the game after a time limit."""
         if ctx.channel.id in self.current_games:
+            await ctx.send("There's already a game running!")
             return
 
         minimum_solutions, = random.choices(range(len(SOLN_DISTR)), weights=SOLN_DISTR)
