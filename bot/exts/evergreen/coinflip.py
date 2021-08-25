@@ -1,5 +1,5 @@
 import random
-from typing import Optional, Tuple
+from typing import Tuple
 
 from discord.ext import commands
 
@@ -29,7 +29,7 @@ class CoinFlip(commands.Cog):
     """Cog for the CoinFlip command."""
 
     @commands.command(name="coinflip", aliases=("flip", "coin", "cf"))
-    async def coinflip_command(self, ctx: commands.Context, side: Optional[CoinSide]) -> None:
+    async def coinflip_command(self, ctx: commands.Context, side: CoinSide = None) -> None:
         """
         Flips a coin.
 
