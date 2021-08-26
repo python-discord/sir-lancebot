@@ -196,9 +196,8 @@ class DuckGamesDirector(commands.Cog):
         game.embed_msg = await self.send_board_embed(ctx, game)
         await asyncio.sleep(GAME_DURATION)
 
-        """Checking for the channel ID in the currently running games is not sufficient.
-           The game could have been ended by a player, and a new game already started in the same channel.
-        """
+        # Checking for the channel ID in the currently running games is not sufficient.
+        # The game could have been ended by a player, and a new game already started in the same channel.
         if game.running:
             try:
                 del self.current_games[ctx.channel.id]
