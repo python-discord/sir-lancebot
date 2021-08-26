@@ -12,7 +12,7 @@ from PIL import Image, ImageDraw, ImageFont
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Colours, Roles
+from bot.constants import Colours, MODERATION_ROLES
 from bot.utils.decorators import with_role
 
 
@@ -318,7 +318,7 @@ class DuckGamesDirector(commands.Cog):
         await self.send_help_embed(ctx)
 
     @start_game.command(name="stop")
-    @with_role(Roles.moderator)
+    @with_role(*MODERATION_ROLES)
     async def stop_game(self, ctx: commands.Context) -> None:
         """Stop a currently running game. Only available to mods."""
         try:
