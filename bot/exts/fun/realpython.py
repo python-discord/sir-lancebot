@@ -19,7 +19,7 @@ SEARCH_URL = "https://realpython.com/search?q={user_search}"
 ERROR_EMBED = Embed(
     title="Error while searching Real Python",
     description="There was an error while trying to reach Real Python. Please try again shortly.",
-    color=Colours.soft_red
+    color=Colours.soft_red,
 )
 
 
@@ -36,7 +36,9 @@ class RealPython(commands.Cog):
         params = {"q": user_search, "limit": 5}
         async with self.bot.http_session.get(url=API_ROOT, params=params) as response:
             if response.status != 200:
-                logger.error(f"Unexpected status code {response.status} from Real Python")
+                logger.error(
+                    f"Unexpected status code {response.status} from Real Python"
+                )
                 await ctx.send(embed=ERROR_EMBED)
                 return
 
@@ -46,25 +48,23 @@ class RealPython(commands.Cog):
 
         if len(articles) == 0:
             no_articles = Embed(
-                title=f"No articles found for '{user_search}'",
-                color=Colours.soft_red
+                title=f"No articles found for '{user_search}'", color=Colours.soft_red
             )
             await ctx.send(embed=no_articles)
             return
 
-        encoded_user_search = quote_plus(user_search)
         article_embed = Embed(
             title="Search results - Real Python",
-            url=SEARCH_URL.format(user_search=encoded_user_search),
+            url=SEARCH_URL.format(user_search=quote_plus(user_search)),
             description="Here are the top 5 results:",
-            color=Colours.orange
+            color=Colours.orange,
         )
 
         for article in articles:
             article_embed.add_field(
                 name=unescape(article["title"]),
-                value=(ARTICLE_URL.format(article_url=article["url"])),
-                inline=False
+                value=ARTICLE_URL.format(article_url=article["url"]),
+                inline=False,
             )
         article_embed.set_footer(text="Click the links to go to the articles.")
 
