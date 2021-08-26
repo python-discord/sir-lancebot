@@ -116,7 +116,3 @@ venv.bak/
 
 # vscode
 .vscode/
-
-# local
-Scripts/
-pyvenv.cfg
