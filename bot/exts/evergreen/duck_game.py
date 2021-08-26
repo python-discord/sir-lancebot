@@ -341,14 +341,14 @@ class DuckGamesDirector(commands.Cog):
         embed.set_footer(
             text="Tip: using Discord's compact message display mode can help keep the board on the screen"
         )
-        await ctx.send(file=file, embed=embed)
+        return await ctx.send(file=file, embed=embed)
 
     @staticmethod
-    async def edit_embed_with_image(msg: discord.Message, embed: discord.Embed) -> discord.Message:
+    async def edit_embed_with_image(msg: discord.Message, embed: discord.Embed) -> None:
         """Edit an embed without the attached image going wonky."""
         attach_name = urlparse(embed.image.url).path.split("/")[-1]
         embed.set_image(url=f"attachment://{attach_name}")
-        return await msg.edit(embed=embed)
+        await msg.edit(embed=embed)
 
 
 def setup(bot: Bot) -> None:
