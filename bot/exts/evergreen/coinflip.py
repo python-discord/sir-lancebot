@@ -39,7 +39,9 @@ class CoinFlip(commands.Cog):
         message = f"{ctx.author.mention} flipped **{flipped_side}**. "
         if not side:
             await ctx.send(message)
-        elif side == flipped_side:
+            return
+
+        if side == flipped_side:
             message += f"You guessed correctly! {Emojis.lemon_hyperpleased}"
         else:
             message += f"You guessed incorrectly. {Emojis.lemon_pensive}"
