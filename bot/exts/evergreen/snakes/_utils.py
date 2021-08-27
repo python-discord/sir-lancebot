@@ -55,7 +55,8 @@ snakes = {
     "Baby Rattle Snake": "https://i.imgur.com/i5jYA8f.png",
     "Baby Dragon Snake": "https://i.imgur.com/SuMKM4m.png",
     "Baby Garden Snake": "https://i.imgur.com/5vYx3ah.png",
-    "Baby Cobra": "https://i.imgur.com/jk14ryt.png"
+    "Baby Cobra": "https://i.imgur.com/jk14ryt.png", 
+    "Baby Anaconda": "https://i.imgur.com/4zT4aij.png"
 }
 
 BOARD_TILE_SIZE = 56         # the size of each board tile
