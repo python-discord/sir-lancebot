@@ -1,4 +1,3 @@
-# Credit to Vthechamp22, who heavily inspired this bit of code
 import logging
 from html import unescape
 from urllib.parse import quote_plus
