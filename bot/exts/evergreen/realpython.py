@@ -1,4 +1,3 @@
-# Credit to Vthechamp22, who heavily inspired this bit of code
 import logging
 from html import unescape
 from urllib.parse import quote_plus
@@ -19,7 +18,7 @@ SEARCH_URL = "https://realpython.com/search?q={user_search}"
 ERROR_EMBED = Embed(
     title="Error while searching Real Python",
     description="There was an error while trying to reach Real Python. Please try again shortly.",
-    color=Colours.soft_red
+    color=Colours.soft_red,
 )
 
 
@@ -57,14 +56,14 @@ class RealPython(commands.Cog):
             title="Search results - Real Python",
             url=SEARCH_URL.format(user_search=quote_plus(user_search)),
             description="Here are the top 5 results:",
-            color=Colours.orange
+            color=Colours.orange,
         )
 
         for article in articles:
             article_embed.add_field(
                 name=unescape(article["title"]),
                 value=ARTICLE_URL.format(article_url=article["url"]),
-                inline=False
+                inline=False,
             )
         article_embed.set_footer(text="Click the links to go to the articles.")
 
