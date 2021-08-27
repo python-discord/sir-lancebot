@@ -134,7 +134,7 @@ class Client(NamedTuple):
     prefix = environ.get("PREFIX", ".")
     token = environ.get("BOT_TOKEN")
     sentry_dsn = environ.get("BOT_SENTRY_DSN")
-    debug = environ.get("BOT_DEBUG", "").lower() == "true"
+    debug = environ.get("BOT_DEBUG", "true").lower() == "true"
     github_bot_repo = "https://github.com/python-discord/sir-lancebot"
     # Override seasonal locks: 1 (January) to 12 (December)
     month_override = int(environ["MONTH_OVERRIDE"]) if "MONTH_OVERRIDE" in environ else None
