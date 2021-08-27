@@ -15,10 +15,11 @@ class CoinSide(commands.Converter):
 
     async def convert(self, ctx: commands.Context, side: str) -> str:
         """Converts the provided `side` into the corresponding string."""
-        if side in CoinSide.HEADS:
+        side = side.lower()
+        if side in self.HEADS:
             return "heads"
 
-        if side in CoinSide.TAILS:
+        if side in self.TAILS:
             return "tails"
 
         raise commands.BadArgument(f"{side!r} is not a valid coin side.")
