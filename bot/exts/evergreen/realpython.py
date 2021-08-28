@@ -15,6 +15,7 @@ API_ROOT = "https://realpython.com/search/api/v1/"
 ARTICLE_URL = "https://realpython.com{article_url}"
 SEARCH_URL = "https://realpython.com/search?q={user_search}"
 
+
 ERROR_EMBED = Embed(
     title="Error while searching Real Python",
     description="There was an error while trying to reach Real Python. Please try again shortly.",
