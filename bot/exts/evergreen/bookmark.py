@@ -7,14 +7,16 @@ import discord
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Colours, ERROR_REPLIES, Icons
+from bot.constants import Categories, Colours, ERROR_REPLIES, Icons, WHITELISTED_CHANNELS
 from bot.utils.converters import WrappedMessageConverter
+from bot.utils.decorators import whitelist_override
 
 log = logging.getLogger(__name__)
 
 # Number of seconds to wait for other users to bookmark the same message
 TIMEOUT = 120
 BOOKMARK_EMOJI = "📌"
+WHITELISTED_CATEGORIES = (Categories.help_in_use,)
 
 
 class Bookmark(commands.Cog):
@@ -85,6 +87,7 @@ class Bookmark(commands.Cog):
         await message.add_reaction(BOOKMARK_EMOJI)
         return message
 
+    @whitelist_override(channels=WHITELISTED_CHANNELS, categories=WHITELISTED_CATEGORIES)
     @commands.command(name="bookmark", aliases=("bm", "pin"))
     async def bookmark(
         self,
