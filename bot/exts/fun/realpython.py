@@ -15,10 +15,6 @@ API_ROOT = "https://realpython.com/search/api/v1/"
 ARTICLE_URL = "https://realpython.com{article_url}"
 SEARCH_URL = "https://realpython.com/search?q={user_search}"
 
-<<<<<<< HEAD
-=======
-
->>>>>>> d7205b21a86ec2b4731a9a6b6022bbfb22f092fc
 ERROR_EMBED = Embed(
     title="Error while searching Real Python",
     description="There was an error while trying to reach Real Python. Please try again shortly.",
@@ -36,11 +32,7 @@ class RealPython(commands.Cog):
     @commands.cooldown(1, 10, commands.cooldowns.BucketType.user)
     async def realpython(self, ctx: commands.Context, *, user_search: str) -> None:
         """Send 5 articles that match the user's search terms."""
-<<<<<<< HEAD
         params = {"q": user_search, "limit": 5, "kind": "article"}
-=======
-        params = {"q": user_search, "limit": 5}
->>>>>>> d7205b21a86ec2b4731a9a6b6022bbfb22f092fc
         async with self.bot.http_session.get(url=API_ROOT, params=params) as response:
             if response.status != 200:
                 logger.error(
