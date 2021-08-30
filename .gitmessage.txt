@@ -1,9 +1,11 @@
-########50 characters############################
-Subject
-########72 characters##################################################
+50 characters                                   #
+Subject 
+(If implemented this commit will ___)
+
+72 characters                                                         #
 Problem
 # Problem, Task, Reason for CommitSolution
 # Solution or List of ChangesNote
 # Special instructions, testing steps, rake, etc
 
-Issue # 
+Issue #
