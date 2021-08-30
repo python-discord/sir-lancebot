@@ -53,10 +53,15 @@ class RealPython(commands.Cog):
             await ctx.send(embed=no_articles)
             return
 
+        if len(articles) == 1:
+            article_description = "Here is the result:"
+        else:
+            article_description = f"Here are the top {len(articles)} results:"
+
         article_embed = Embed(
             title="Search results - Real Python",
             url=SEARCH_URL.format(user_search=quote_plus(user_search)),
-            description=f"Here are the top {len(articles)} results:",
+            description=article_description,
             color=Colours.orange,
         )
 
