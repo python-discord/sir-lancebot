@@ -44,7 +44,7 @@ TRIVIA_QUIZ_ICON = (
 
 @dataclass(frozen=True)
 class QuizEntry:
-    """Dataclass for a quiz entry (a question and a string containing answers separated by commas)."""
+    """Stores quiz entry (a question and a string containing answers separated by commas)."""
 
     question: str
     answer: str
@@ -277,10 +277,10 @@ class TriviaQuiz(commands.Cog):
                         # Eg. "Jurassic World: Dominion (2022)" would be skipped.
                         continue
 
-                    for word in re.split("[\s-]", title):
+                    for word in re.split("[\s-]", title):  # noqa: W605
                         word = word.strip(string.punctuation)
-                        secret_word = "\*"*len(word)
-                        extract = re.sub(rf'\b{word}\b', f"**{secret_word}**", extract, flags=re.IGNORECASE) 
+                        secret_word = "\*"*len(word)  # noqa: W605
+                        question = re.sub(rf'\b{word}\b', f"**{secret_word}**", question, flags=re.IGNORECASE)
 
                     formatted_article_question = {
                         "id": start_id,
