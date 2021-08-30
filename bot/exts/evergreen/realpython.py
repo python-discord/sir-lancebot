@@ -32,7 +32,7 @@ class RealPython(commands.Cog):
     @commands.cooldown(1, 10, commands.cooldowns.BucketType.user)
     async def realpython(self, ctx: commands.Context, *, user_search: str) -> None:
         """Send 5 articles that match the user's search terms."""
-        params = {"q": user_search, "limit": 5}
+        params = {"q": user_search, "limit": 5, "kind": "article"}
         async with self.bot.http_session.get(url=API_ROOT, params=params) as response:
             if response.status != 200:
                 logger.error(
@@ -55,7 +55,7 @@ class RealPython(commands.Cog):
         article_embed = Embed(
             title="Search results - Real Python",
             url=SEARCH_URL.format(user_search=quote_plus(user_search)),
-            description="Here are the top 5 results:",
+            description=f"Here are the top {max(5, len(articles))} results:",
             color=Colours.orange,
         )
 
