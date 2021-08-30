@@ -3,6 +3,7 @@ import json
 import logging
 import operator
 import random
+import re
 import string
 from collections import defaultdict
 from dataclasses import dataclass
@@ -276,10 +277,10 @@ class TriviaQuiz(commands.Cog):
                         # Eg. "Jurassic World: Dominion (2022)" would be skipped.
                         continue
 
-                    for word in question.split(" "):
-                        word = word.translate(str.maketrans('', '', string.punctuation))
-                        if word.lower() in [_word.lower() for _word in title.split(" ")]:
-                            question = question.replace(word, len(word) * "\*")
+                    for word in re.split("[\s-]", title):
+                        word = word.strip(string.punctuation)
+                        secret_word = "\*"*len(word)
+                        extract = re.sub(rf'\b{word}\b', f"**{secret_word}**", extract, flags=re.IGNORECASE) 
 
                     formatted_article_question = {
                         "id": start_id,
