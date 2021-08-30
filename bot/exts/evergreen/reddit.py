@@ -79,7 +79,8 @@ class Reddit(Cog):
 
             text = data["selftext"]
             if text:
-                first_page += textwrap.shorten(text, width=100, placeholder="...").replace("*", "") + "\n"
+                text = escape_markdown(text).replace("[", "⦋").replace("]", "⦌")
+                first_page += textwrap.shorten(text, width=100, placeholder="...") + "\n"
 
             ups = data["ups"]
             comments = data["num_comments"]

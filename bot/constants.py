@@ -239,6 +239,9 @@ class Emojis:
     reddit_comments = "<:reddit_comments:755845255001014384>"
     reddit_users = "<:reddit_users:755845303822974997>"
 
+    lemon_hyperpleased = "<:lemon_hyperpleased:754441879822663811>"
+    lemon_pensive = "<:lemon_pensive:754441880246419486>"
+
 
 class Icons:
     questionmark = "https://cdn.discordapp.com/emojis/512367613339369475.png"
