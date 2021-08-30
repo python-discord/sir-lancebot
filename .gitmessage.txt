@@ -4,8 +4,10 @@
 
 # 72 characters                                                       #
 # Problem
-# Problem, Task, Reason for CommitSolution
-# Solution or List of ChangesNote
+# Problem, Task, Reason for Commit
+# Solution
+# Solution or List of Changes
+# Note
 # Special instructions, testing steps, rake, etc
 
 Issue #
