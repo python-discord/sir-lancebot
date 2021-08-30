@@ -116,15 +116,3 @@ venv.bak/
 
 # vscode
 .vscode/
-<<<<<<< Updated upstream
-
-# local
-Scripts/
-.gitignore
-.gitmessage.txt
-bin/
-lib/
-Scripts/
-pyvenv.cfg
-lib64
-share/
