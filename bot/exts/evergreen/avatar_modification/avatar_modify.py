@@ -9,7 +9,6 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import discord
-from aiohttp import client_exceptions
 from discord.ext import commands
 
 from bot.bot import Bot
@@ -120,6 +119,43 @@ class AvatarModify(commands.Cog):
             embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=user.avatar_url)
 
         await ctx.send(embed=embed, file=file)
+
+    @avatar_modify.command(name="reverse", root_aliases=("reverse",))
+    async def reverse(self, ctx: commands.Context, *, text: t.Optional[str]) -> None:
+        """
+        Reverses the sent text.
+
+        If no text is provided, the user's profile picture will be reversed.
+        """
+        if text:
+            await ctx.send(f"> {text[::-1]}", allowed_mentions=discord.AllowedMentions.none())
+            return
+
+        async with ctx.typing():
+            user = await self._fetch_user(ctx.author.id)
+            if not user:
+                await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
+                return
+
+            image_bytes = await user.avatar_url_as(size=1024).read()
+            filename = file_safe_name("reverse_avatar", ctx.author.display_name)
+
+            file = await in_executor(
+                PfpEffects.apply_effect,
+                image_bytes,
+                PfpEffects.flip_effect,
+                filename
+            )
+
+            embed = discord.Embed(
+                title="Your reversed avatar.",
+                description="Here is your reversed avatar. I think it is a spitting image of you."
+            )
+
+            embed.set_image(url=f"attachment://{filename}")
+            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=user.avatar_url)
+
+            await ctx.send(embed=embed, file=file)
 
     @avatar_modify.command(aliases=("easterify",), root_aliases=("easterify", "avatareasterify"))
     async def avatareasterify(self, ctx: commands.Context, *colours: t.Union[discord.Colour, str]) -> None:
@@ -236,37 +272,6 @@ class AvatarModify(commands.Cog):
             await self.send_pride_image(ctx, image_bytes, pixels, flag, option)
 
     @prideavatar.command()
-    async def image(self, ctx: commands.Context, url: str, option: str = "lgbt", pixels: int = 64) -> None:
-        """
-        This surrounds the image specified by the URL with a border of a specified LGBT flag.
-
-        This defaults to the LGBT rainbow flag if none is given.
-        The amount of pixels can be given which determines the thickness of the flag border.
-        This has a maximum of 512px and defaults to a 64px border.
-        The full image is 1024x1024.
-        """
-        option = option.lower()
-        pixels = max(0, min(512, pixels))
-        flag = GENDER_OPTIONS.get(option)
-        if flag is None:
-            await ctx.send("I don't have that flag!")
-            return
-
-        async with ctx.typing():
-            try:
-                async with self.bot.http_session.get(url) as response:
-                    if response.status != 200:
-                        await ctx.send("Bad response from provided URL!")
-                        return
-                    image_bytes = await response.read()
-            except client_exceptions.ClientConnectorError:
-                raise commands.BadArgument("Cannot connect to provided URL!")
-            except client_exceptions.InvalidURL:
-                raise commands.BadArgument("Invalid URL!")
-
-            await self.send_pride_image(ctx, image_bytes, pixels, flag, option)
-
-    @prideavatar.command()
     async def flags(self, ctx: commands.Context) -> None:
         """This lists the flags that can be used with the prideavatar command."""
         choices = sorted(set(GENDER_OPTIONS.values()))
@@ -283,12 +288,9 @@ class AvatarModify(commands.Cog):
         root_aliases=("spookyavatar", "spookify", "savatar"),
         brief="Spookify an user's avatar."
     )
-    async def spookyavatar(self, ctx: commands.Context, member: discord.Member = None) -> None:
-        """This "spookifies" the given user's avatar, with a random *spooky* effect."""
-        if member is None:
-            member = ctx.author
-
-        user = await self._fetch_user(member.id)
+    async def spookyavatar(self, ctx: commands.Context) -> None:
+        """This "spookifies" the user's avatar, with a random *spooky* effect."""
+        user = await self._fetch_user(ctx.author.id)
         if not user:
             await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
             return
@@ -296,7 +298,7 @@ class AvatarModify(commands.Cog):
         async with ctx.typing():
             image_bytes = await user.avatar_url_as(size=1024).read()
 
-            file_name = file_safe_name("spooky_avatar", member.display_name)
+            file_name = file_safe_name("spooky_avatar", ctx.author.display_name)
 
             file = await in_executor(
                 PfpEffects.apply_effect,
@@ -309,7 +311,6 @@ class AvatarModify(commands.Cog):
                 title="Is this you or am I just really paranoid?",
                 colour=Colours.soft_red
             )
-            embed.set_author(name=member.name, icon_url=member.avatar_url)
             embed.set_image(url=f"attachment://{file_name}")
             embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=ctx.author.avatar_url)
 
@@ -337,10 +338,11 @@ class AvatarModify(commands.Cog):
             img_bytes = await user.avatar_url_as(size=1024).read()
 
             file = await in_executor(
-                PfpEffects.mosaic_effect,
+                PfpEffects.apply_effect,
                 img_bytes,
+                PfpEffects.mosaic_effect,
+                file_name,
                 squares,
-                file_name
             )
 
             if squares == 1:

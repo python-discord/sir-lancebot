@@ -134,7 +134,7 @@ class Client(NamedTuple):
     prefix = environ.get("PREFIX", ".")
     token = environ.get("BOT_TOKEN")
     sentry_dsn = environ.get("BOT_SENTRY_DSN")
-    debug = environ.get("BOT_DEBUG", "").lower() == "true"
+    debug = environ.get("BOT_DEBUG", "true").lower() == "true"
     github_bot_repo = "https://github.com/python-discord/sir-lancebot"
     # Override seasonal locks: 1 (January) to 12 (December)
     month_override = int(environ["MONTH_OVERRIDE"]) if "MONTH_OVERRIDE" in environ else None
@@ -225,6 +225,10 @@ class Emojis:
     status_idle = "<:status_idle:470326266625785866>"
     status_dnd = "<:status_dnd:470326272082313216>"
     status_offline = "<:status_offline:470326266537705472>"
+
+
+    stackoverflow_tag = "<:stack_tag:870926975307501570>"
+    stackoverflow_views = "<:stack_eye:870926992692879371>"
 
     # Reddit emojis
     reddit = "<:reddit:676030265734332427>"

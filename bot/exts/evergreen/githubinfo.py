@@ -1,7 +1,7 @@
 import logging
 import random
 from datetime import datetime
-from urllib.parse import quote
+from urllib.parse import quote, quote_plus
 
 import discord
 from discord.ext import commands
@@ -37,7 +37,7 @@ class GithubInfo(commands.Cog):
     async def github_user_info(self, ctx: commands.Context, username: str) -> None:
         """Fetches a user's GitHub information."""
         async with ctx.typing():
-            user_data = await self.fetch_data(f"{GITHUB_API_URL}/users/{username}")
+            user_data = await self.fetch_data(f"{GITHUB_API_URL}/users/{quote_plus(username)}")
 
             # User_data will not have a message key if the user exists
             if "message" in user_data:
@@ -91,7 +91,10 @@ class GithubInfo(commands.Cog):
             )
 
             if user_data["type"] == "User":
-                embed.add_field(name="Gists", value=f"[{gists}](https://gist.github.com/{quote(username, safe='')})")
+                embed.add_field(
+                    name="Gists",
+                    value=f"[{gists}](https://gist.github.com/{quote_plus(username, safe='')})"
+                )
 
                 embed.add_field(
                     name=f"Organization{'s' if len(orgs)!=1 else ''}",

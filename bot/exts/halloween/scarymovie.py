@@ -1,17 +1,12 @@
 import logging
 import random
-from os import environ
 
 from discord import Embed
 from discord.ext import commands
 
 from bot.bot import Bot
-
+from bot.constants import Tokens
 log = logging.getLogger(__name__)
-
-
-TMDB_API_KEY = environ.get("TMDB_API_KEY")
-TMDB_TOKEN = environ.get("TMDB_TOKEN")
 
 
 class ScaryMovie(commands.Cog):
@@ -31,13 +26,14 @@ class ScaryMovie(commands.Cog):
 
     async def select_movie(self) -> dict:
         """Selects a random movie and returns a JSON of movie details from TMDb."""
-        url = "https://api.themoviedb.org/4/discover/movie"
+        url = "https://api.themoviedb.org/3/discover/movie"
         params = {
+            "api_key": Tokens.tmdb,
             "with_genres": "27",
-            "vote_count.gte": "5"
+            "vote_count.gte": "5",
+            "include_adult": "false"
         }
         headers = {
-            "Authorization": "Bearer " + TMDB_TOKEN,
             "Content-Type": "application/json;charset=utf-8"
         }
 
@@ -55,7 +51,7 @@ class ScaryMovie(commands.Cog):
         # Get full details and credits
         async with self.bot.http_session.get(
             url=f"https://api.themoviedb.org/3/movie/{selection_id}",
-            params={"api_key": TMDB_API_KEY, "append_to_response": "credits"}
+            params={"api_key": Tokens.tmdb, "append_to_response": "credits"}
         ) as selection:
 
             return await selection.json()
