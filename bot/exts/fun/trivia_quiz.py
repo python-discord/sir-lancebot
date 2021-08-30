@@ -3,8 +3,10 @@ import json
 import logging
 import operator
 import random
+import string
 from collections import defaultdict
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Callable, Optional
 
@@ -33,7 +35,7 @@ RULES = (
     "Points for each question reduces by 25 after 10s or after a hint. Total time is 30s per question"
 )
 
-RANDOM_WIKI_URL = "https://en.wikipedia.org/api/rest_v1/page/random/summary"
+WIKI_FEED_API_URL = "https://en.wikipedia.org/api/rest_v1/feed/featured/{date}"
 TRIVIA_QUIZ_ICON = (
     "https://raw.githubusercontent.com/python-discord/branding/main/icons/trivia_quiz/trivia-quiz-dist.png"
 )
@@ -240,40 +242,56 @@ class TriviaQuiz(commands.Cog):
         """Cancel `get_wiki_questions` task when Cog will unload."""
         self.get_wiki_questions.cancel()
 
-    @tasks.loop(hours=1.0)
+    @tasks.loop(hours=24.0)
     async def get_wiki_questions(self) -> None:
-        """Get 10 random questions from wikipedia and format them like the questions in resources/."""
+        """Get yesterday's most read articles from wikipedia and format them like trivia questions."""
         error_fetches = 0
         wiki_questions = []
         # trivia_quiz.json follows a pattern, every new category starts with the next century.
         start_id = 501
+        yesterday = datetime.strftime(datetime.now() - timedelta(1), '%Y/%m/%d')
 
-        while len(wiki_questions) != 10 and error_fetches < MAX_ERROR_FETCH_TRIES:
-            async with self.bot.http_session.get(url=RANDOM_WIKI_URL) as r:
+        while error_fetches < MAX_ERROR_FETCH_TRIES:
+            async with self.bot.http_session.get(url=WIKI_FEED_API_URL.format(date=yesterday)) as r:
                 if r.status != 200:
                     error_fetches += 1
                     continue
+                raw_json = await r.json()
+                articles_raw = raw_json["mostread"]["articles"]
 
-                raw_data = await r.json()
+                for article in articles_raw:
+                    # Form the question, strategy:
+                    # - Check if `extract` is present in the article, if it doesn't then skip the article
+                    # Sometimes, the wikipedia title is given in the extract, therefore giving away the answer
+                    # therefore, we need to remove all cases of it
+                    question = article.get("extract")
+                    # multi letter words are formatted this way: Jason_Terror
+                    title = article["normalizedtitle"].replace("_", " ")
 
-                if not all(c.isalnum() for c in raw_data["title"]):
-                    # If the title contains non alphabet/numerical(s) then
-                    # don't append it to the question and move on to the next.
-                    # Eg. "Knight's night tour" would be skipped.
-                    continue
+                    if not question:
+                        continue
+                    elif not all(c.isalnum() for c in title):
+                        # If the title contains non alphabet/numerical(s) then
+                        # don't append it to the question and move on to the next.
+                        # Eg. "Jurassic World: Dominion (2022)" would be skipped.
+                        continue
 
-                formatted_data = {
-                    "id": start_id,
-                    "question": f"Guess the title of the Wikipedia article.\n\n"
-                                # Sometimes the wikipedia title is given in the extract,
-                                # giving away the answers, to remove then, they are replaced
-                                # with '[redacted]'.
-                                f"{raw_data['extract'].replace(raw_data['title'], '[redacted]')}",
-                    "answer": raw_data["title"],
-                    "info": raw_data["extract"]
-                }
-                start_id += 1
-                wiki_questions.append(formatted_data)
+                    for word in question.split(" "):
+                        word = word.translate(str.maketrans('', '', string.punctuation))
+                        if word.lower() in [_word.lower() for _word in title.split(" ")]:
+                            question = question.replace(word, len(word) * "\*")
+
+                    formatted_article_question = {
+                        "id": start_id,
+                        "question": f"Guess the title of the Wikipedia article.\n\n{question}",
+                        "answer": title,
+                        "info": article["extract"]
+                    }
+                    start_id += 1
+                    wiki_questions.append(formatted_article_question)
+
+                # If everything has gone smoothly until now, we can break out of the while loop
+                break
 
         if error_fetches < MAX_ERROR_FETCH_TRIES:
             self.questions["wikipedia"] = wiki_questions.copy()
