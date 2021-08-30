@@ -56,7 +56,7 @@ class RealPython(commands.Cog):
         article_embed = Embed(
             title="Search results - Real Python",
             url=SEARCH_URL.format(user_search=quote_plus(user_search)),
-            description=f"Here are the top {max(5, len(articles))} results:",
+            description=f"Here are the top {len(articles)} results:",
             color=Colours.orange,
         )
 
