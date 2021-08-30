@@ -667,6 +667,7 @@ class TriviaQuiz(commands.Cog):
             description="",
         )
 
+        # Don't check for info is not None, as we want to filter out empty strings.
         if info:
             embed.description += f"**Information**\n{info}\n\n"
 
