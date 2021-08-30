@@ -122,3 +122,4 @@ Scripts/
 pyvenv.cfg
 lib/
 bin/
+.gitignore
