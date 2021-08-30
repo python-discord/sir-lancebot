@@ -1,6 +1,9 @@
-Subject line (try to keep under 50 characters)
+########50 characters############################
+Subject
+########72 characters##################################################
+Problem
+# Problem, Task, Reason for CommitSolution
+# Solution or List of ChangesNote
+# Special instructions, testing steps, rake, etc
 
-Multi-line description of commit,
-feel free to be detailed.
-
-[Ticket: X]
+Issue # 
