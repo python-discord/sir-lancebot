@@ -1,5 +1,5 @@
 # 50 characters                                 #
-# Subject 
+# Subject
 # (If implemented this commit will ___)
 
 # 72 characters                                                       #
