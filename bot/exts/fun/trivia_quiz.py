@@ -353,7 +353,7 @@ class TriviaQuiz(commands.Cog):
         topic_length = len(topic)
 
         if questions is None:
-            self.question_limit = DEFAULT_QUESTION_LIMIT
+            self.question_limit = min(DEFAULT_QUESTION_LIMIT, topic_length)
         else:
             if questions > topic_length:
                 await ctx.send(
