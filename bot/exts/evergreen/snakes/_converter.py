@@ -53,7 +53,7 @@ class Snake(Converter):
 
         embed = discord.Embed(
             title="Found multiple choices. Please choose the correct one.", colour=0x59982F)
-        embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
+        embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar.url)
 
         name = await disambiguate(ctx, get_potential(all_names), timeout=timeout, embed=embed)
         return names.get(name, name)

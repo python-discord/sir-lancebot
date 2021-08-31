@@ -155,7 +155,7 @@ class Extensions(commands.Cog):
         embed.set_author(
             name="Extensions List",
             url=Client.github_bot_repo,
-            icon_url=str(self.bot.user.avatar_url)
+            icon_url=str(self.bot.user.display_avatar.url)
         )
 
         lines = []
