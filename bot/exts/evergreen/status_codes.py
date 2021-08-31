@@ -8,8 +8,8 @@ from bot.bot import Bot
 HTTP_DOG_URL = "https://httpstatusdogs.com/img/{code}.jpg"
 HTTP_CAT_URL = "https://http.cat/{code}.jpg"
 STATUS_TEMPLATE = "**Status: {code}**"
-ERR_404 = "Unable to find status Floof for {code}."
-ERR_UNKNOWN = "Error attempting to retrieve status Floof for {code}."
+ERR_404 = "Unable to find status floof for {code}."
+ERR_UNKNOWN = "Error attempting to retrieve status floof for {code}."
 
 
 class HTTPStatusCodes(commands.Cog):
@@ -34,12 +34,12 @@ class HTTPStatusCodes(commands.Cog):
 
     @http_status_group.command(name="cat")
     async def http_cat(self, ctx: commands.Context, code: int) -> None:
-        """Assemble Cat URL and build Embed."""
+        """Send a cat version of the requested HTTP status code."""
         await self.build_embed(url=HTTP_CAT_URL.format(code=code), ctx=ctx, code=code)
 
     @http_status_group.command(name="dog")
     async def http_dog(self, ctx: commands.Context, code: int) -> None:
-        """Assemble Dog URL and build Embed."""
+        """Send a dog version of the requested HTTP status code."""
         await self.build_embed(url=HTTP_DOG_URL.format(code=code), ctx=ctx, code=code)
 
     async def build_embed(self, url: str, ctx: commands.Context, code: int) -> None:
