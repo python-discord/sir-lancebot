@@ -7,9 +7,9 @@ from bot.bot import Bot
 
 HTTP_DOG_URL = "https://httpstatusdogs.com/img/{code}.jpg"
 HTTP_CAT_URL = "https://http.cat/{code}.jpg"
-STATUS_TEMPLATE = '**Status: {code}**'
-ERR_404 = 'Unable to find status Floof for {code}.'
-ERR_UNKNOWN = 'Error attempting to retrieve status Floof for {code}.'
+STATUS_TEMPLATE = "**Status: {code}**"
+ERR_404 = "Unable to find status Floof for {code}."
+ERR_UNKNOWN = "Error attempting to retrieve status Floof for {code}."
 
 
 class HTTPStatusCodes(commands.Cog):
@@ -22,7 +22,11 @@ class HTTPStatusCodes(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @commands.group(name="http_status", aliases=("status", "httpstatus"), invoke_without_command=True)
+    @commands.group(
+        name="http_status",
+        aliases=("status", "httpstatus"),
+        invoke_without_command=True,
+    )
     async def http_status_group(self, ctx: commands.Context, code: int) -> None:
         """Choose a cat or dog randomly for the given status code."""
         subcmd = choice((self.http_cat, self.http_dog))
@@ -42,15 +46,23 @@ class HTTPStatusCodes(commands.Cog):
         """Attempt to build and dispatch embed. Append error message instead if something goes wrong."""
         async with self.bot.http_session.get(url, allow_redirects=False) as response:
             if 200 <= response.status <= 299:
-                await ctx.send(embed=discord.Embed(
-                    title=STATUS_TEMPLATE.format(code=code)).set_image(url=url))
+                await ctx.send(
+                    embed=discord.Embed(
+                        title=STATUS_TEMPLATE.format(code=code)
+                    ).set_image(url=url)
+                )
             elif 404 == response.status:
-                await ctx.send(embed=discord.Embed(
-                    title=ERR_404.format(code=code)).set_image(url=url)
+                await ctx.send(
+                    embed=discord.Embed(title=ERR_404.format(code=code)).set_image(
+                        url=url
+                    )
                 )
             else:
-                await ctx.send(embed=discord.Embed(
-                    title=STATUS_TEMPLATE.format(code=code), footer=ERR_UNKNOWN.format(code=code))
+                await ctx.send(
+                    embed=discord.Embed(
+                        title=STATUS_TEMPLATE.format(code=code),
+                        footer=ERR_UNKNOWN.format(code=code),
+                    )
                 )
 
 
