@@ -100,7 +100,7 @@ class AvatarModify(commands.Cog):
                 await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
                 return
 
-            image_bytes = await user.avatar_url_as(size=1024).read()
+            image_bytes = await user.display_avatar.replace(size=1024).read()
             file_name = file_safe_name("eightbit_avatar", ctx.author.display_name)
 
             file = await in_executor(
@@ -116,7 +116,7 @@ class AvatarModify(commands.Cog):
             )
 
             embed.set_image(url=f"attachment://{file_name}")
-            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=user.avatar_url)
+            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=user.display_avatar.url)
 
         await ctx.send(embed=embed, file=file)
 
@@ -137,7 +137,7 @@ class AvatarModify(commands.Cog):
                 await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
                 return
 
-            image_bytes = await user.avatar_url_as(size=1024).read()
+            image_bytes = await user.display_avatar.replace(size=1024).read()
             filename = file_safe_name("reverse_avatar", ctx.author.display_name)
 
             file = await in_executor(
@@ -153,7 +153,7 @@ class AvatarModify(commands.Cog):
             )
 
             embed.set_image(url=f"attachment://{filename}")
-            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=user.avatar_url)
+            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=user.display_avatar.url)
 
             await ctx.send(embed=embed, file=file)
 
@@ -193,7 +193,7 @@ class AvatarModify(commands.Cog):
                     return
                 ctx.send = send_message  # Reassigns ctx.send
 
-            image_bytes = await user.avatar_url_as(size=256).read()
+            image_bytes = await user.display_avatar.replace(size=256).read()
             file_name = file_safe_name("easterified_avatar", ctx.author.display_name)
 
             file = await in_executor(
@@ -205,11 +205,11 @@ class AvatarModify(commands.Cog):
             )
 
             embed = discord.Embed(
-                name="Your Lovely Easterified Avatar!",
+                title="Your Lovely Easterified Avatar!",
                 description="Here is your lovely avatar, all bright and colourful\nwith Easter pastel colours. Enjoy :D"
             )
             embed.set_image(url=f"attachment://{file_name}")
-            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=user.avatar_url)
+            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=user.display_avatar.url)
 
         await ctx.send(file=file, embed=embed)
 
@@ -235,7 +235,7 @@ class AvatarModify(commands.Cog):
             )
 
             embed = discord.Embed(
-                name="Your Lovely Pride Avatar!",
+                title="Your Lovely Pride Avatar!",
                 description=f"Here is your lovely avatar, surrounded by\n a beautiful {option} flag. Enjoy :D"
             )
             embed.set_image(url=f"attachment://{file_name}")
@@ -268,7 +268,7 @@ class AvatarModify(commands.Cog):
             if not user:
                 await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
                 return
-            image_bytes = await user.avatar_url_as(size=1024).read()
+            image_bytes = await user.display_avatar.replace(size=1024).read()
             await self.send_pride_image(ctx, image_bytes, pixels, flag, option)
 
     @prideavatar.command()
@@ -296,7 +296,7 @@ class AvatarModify(commands.Cog):
             return
 
         async with ctx.typing():
-            image_bytes = await user.avatar_url_as(size=1024).read()
+            image_bytes = await user.display_avatar.replace(size=1024).read()
 
             file_name = file_safe_name("spooky_avatar", ctx.author.display_name)
 
@@ -312,7 +312,7 @@ class AvatarModify(commands.Cog):
                 colour=Colours.soft_red
             )
             embed.set_image(url=f"attachment://{file_name}")
-            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=ctx.author.avatar_url)
+            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=ctx.author.display_avatar.url)
 
             await ctx.send(file=file, embed=embed)
 
@@ -335,7 +335,7 @@ class AvatarModify(commands.Cog):
 
             file_name = file_safe_name("mosaic_avatar", ctx.author.display_name)
 
-            img_bytes = await user.avatar_url_as(size=1024).read()
+            img_bytes = await user.display_avatar.replace(size=1024).read()
 
             file = await in_executor(
                 PfpEffects.apply_effect,
@@ -362,7 +362,7 @@ class AvatarModify(commands.Cog):
             )
 
             embed.set_image(url=f"attachment://{file_name}")
-            embed.set_footer(text=f"Made by {ctx.author.display_name}", icon_url=user.avatar_url)
+            embed.set_footer(text=f"Made by {ctx.author.display_name}", icon_url=user.display_avatar.url)
 
             await ctx.send(file=file, embed=embed)
 

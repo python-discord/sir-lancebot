@@ -461,7 +461,7 @@ class SnakeAndLaddersGame:
         self.players.append(user)
         self.player_tiles[user.id] = 1
 
-        avatar_bytes = await user.avatar_url_as(format="jpeg", size=PLAYER_ICON_IMAGE_SIZE).read()
+        avatar_bytes = await user.display_avatar.read()
         im = Image.open(io.BytesIO(avatar_bytes)).resize((BOARD_PLAYER_SIZE, BOARD_PLAYER_SIZE))
         self.avatar_images[user.id] = im
 

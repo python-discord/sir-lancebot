@@ -120,7 +120,7 @@ class Bot(commands.Bot):
                 return
 
         if not icon:
-            icon = self.user.avatar_url_as(format="png")
+            icon = self.user.display_avatar.url
 
         embed = Embed(description=details)
         embed.set_author(name=title, icon_url=icon)
