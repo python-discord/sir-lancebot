@@ -37,6 +37,7 @@ class HTTPStatusCodes(commands.Cog):
         """Send a cat version of the requested HTTP status code."""
         if code in range(100, 599):
             await self.build_embed(url=HTTP_CAT_URL.format(code=code), ctx=ctx, code=code)
+            return
         await ctx.send(
             embed=discord.Embed(
                 title="Input status code does not exist",
@@ -49,6 +50,7 @@ class HTTPStatusCodes(commands.Cog):
         """Send a dog version of the requested HTTP status code."""
         if code in range(100, 599):
             await self.build_embed(url=HTTP_CAT_URL.format(code=code), ctx=ctx, code=code)
+            return
         await ctx.send(
             embed=discord.Embed(
                 title="Input status code does not exist",
