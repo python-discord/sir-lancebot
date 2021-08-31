@@ -10,8 +10,8 @@ from bot.constants import Emojis
 from bot.utils.pagination import LinePaginator
 
 CONFIRMATION_MESSAGE = (
-    "{opponent}, {requester} wants to play Tic-Tac-Toe against you. React to this message with "
-    f"{Emojis.confirmation} to accept or with {Emojis.decline} to decline."
+    "{opponent}, {requester} wants to play Tic-Tac-Toe against you."
+    f"\nReact to this message with {Emojis.confirmation} to accept or with {Emojis.decline} to decline."
 )
 
 
@@ -58,7 +58,7 @@ class Player:
             )
 
         try:
-            react, _ = await self.ctx.bot.wait_for('reaction_add', timeout=30.0, check=check_for_move)
+            react, _ = await self.ctx.bot.wait_for("reaction_add", timeout=30.0, check=check_for_move)
         except asyncio.TimeoutError:
             return True, None
         else:
@@ -79,7 +79,7 @@ class AI:
         """Get move from AI. AI use Minimax strategy."""
         possible_moves = [i for i, emoji in board.items() if emoji in list(Emojis.number_emojis.values())]
 
-        for symbol in (Emojis.o, Emojis.x):
+        for symbol in (Emojis.o_square, Emojis.x_square):
             for move in possible_moves:
                 board_copy = board.copy()
                 board_copy[move] = symbol
@@ -246,14 +246,13 @@ def is_requester_free() -> t.Callable:
 class TicTacToe(Cog):
     """TicTacToe cog contains tic-tac-toe game commands."""
 
-    def __init__(self, bot: Bot):
-        self.bot = bot
+    def __init__(self):
         self.games: t.List[Game] = []
 
     @guild_only()
     @is_channel_free()
     @is_requester_free()
-    @group(name="tictactoe", aliases=("ttt",), invoke_without_command=True)
+    @group(name="tictactoe", aliases=("ttt", "tic"), invoke_without_command=True)
     async def tic_tac_toe(self, ctx: Context, opponent: t.Optional[discord.User]) -> None:
         """Tic Tac Toe game. Play against friends or AI. Use reactions to add your mark to field."""
         if opponent == ctx.author:
@@ -266,16 +265,20 @@ class TicTacToe(Cog):
             return
         if opponent is None:
             game = Game(
-                [Player(ctx.author, ctx, Emojis.x), AI(Emojis.o)],
+                [Player(ctx.author, ctx, Emojis.x_square), AI(Emojis.o_square)],
                 ctx
             )
         else:
             game = Game(
-                [Player(ctx.author, ctx, Emojis.x), Player(opponent, ctx, Emojis.o)],
+                [Player(ctx.author, ctx, Emojis.x_square), Player(opponent, ctx, Emojis.o_square)],
                 ctx
             )
         self.games.append(game)
         if opponent is not None:
+            if opponent.bot:  # check whether the opponent is a bot or not
+                await ctx.send("You can't play Tic-Tac-Toe with bots!")
+                return
+
             confirmed, msg = await game.get_confirmation()
 
             if not confirmed:
@@ -314,10 +317,19 @@ class TicTacToe(Cog):
             await ctx.send("Game don't exist.")
             return
         game = self.games[game_id - 1]
-        await ctx.send(f"{game.winner} :trophy: vs {game.loser}")
-        await ctx.send(game.format_board())
+
+        if game.draw:
+            description = f"{game.players[0]} vs {game.players[1]} (draw)\n\n{game.format_board()}"
+        else:
+            description = f"{game.winner} :trophy: vs {game.loser}\n\n{game.format_board()}"
+
+        embed = discord.Embed(
+            title=f"Match #{game_id} Game Board",
+            description=description,
+        )
+        await ctx.send(embed=embed)
 
 
 def setup(bot: Bot) -> None:
-    """Load TicTacToe Cog."""
-    bot.add_cog(TicTacToe(bot))
+    """Load the TicTacToe cog."""
+    bot.add_cog(TicTacToe())

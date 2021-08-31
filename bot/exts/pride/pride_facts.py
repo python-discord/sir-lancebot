@@ -15,7 +15,7 @@ from bot.utils.decorators import seasonal_task
 
 log = logging.getLogger(__name__)
 
-Sendable = Union[commands.Context, discord.TextChannel]
+FACTS = json.loads(Path("bot/resources/pride/facts.json").read_text("utf8"))
 
 
 class PrideFacts(commands.Cog):
@@ -23,15 +23,7 @@ class PrideFacts(commands.Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.facts = self.load_facts()
-
         self.daily_fact_task = self.bot.loop.create_task(self.send_pride_fact_daily())
-
-    @staticmethod
-    def load_facts() -> dict:
-        """Loads a dictionary of years mapping to lists of facts."""
-        with open(Path("bot/resources/pride/facts.json"), "r", encoding="utf8") as f:
-            return json.load(f)
 
     @seasonal_task(Month.JUNE)
     async def send_pride_fact_daily(self) -> None:
@@ -44,15 +36,15 @@ class PrideFacts(commands.Cog):
     async def send_random_fact(self, ctx: commands.Context) -> None:
         """Provides a fact from any previous day, or today."""
         now = datetime.utcnow()
-        previous_years_facts = (self.facts[x] for x in self.facts.keys() if int(x) < now.year)
-        current_year_facts = self.facts.get(str(now.year), [])[:now.day]
+        previous_years_facts = (y for x, y in FACTS.items() if int(x) < now.year)
+        current_year_facts = FACTS.get(str(now.year), [])[:now.day]
         previous_facts = current_year_facts + [x for y in previous_years_facts for x in y]
         try:
             await ctx.send(embed=self.make_embed(random.choice(previous_facts)))
         except IndexError:
             await ctx.send("No facts available")
 
-    async def send_select_fact(self, target: Sendable, _date: Union[str, datetime]) -> None:
+    async def send_select_fact(self, target: discord.abc.Messageable, _date: Union[str, datetime]) -> None:
         """Provides the fact for the specified day, if the day is today, or is in the past."""
         now = datetime.utcnow()
         if isinstance(_date, str):
@@ -65,7 +57,7 @@ class PrideFacts(commands.Cog):
             date = _date
         if date.year < now.year or (date.year == now.year and date.day <= now.day):
             try:
-                await target.send(embed=self.make_embed(self.facts[str(date.year)][date.day - 1]))
+                await target.send(embed=self.make_embed(FACTS[str(date.year)][date.day - 1]))
             except KeyError:
                 await target.send(f"The year {date.year} is not yet supported")
                 return
@@ -75,8 +67,8 @@ class PrideFacts(commands.Cog):
         else:
             await target.send("The fact for the selected day is not yet available.")
 
-    @commands.command(name="pridefact", aliases=["pridefacts"])
-    async def pridefact(self, ctx: commands.Context) -> None:
+    @commands.command(name="pridefact", aliases=("pridefacts",))
+    async def pridefact(self, ctx: commands.Context, option: str = None) -> None:
         """
         Sends a message with a pride fact of the day.
 
@@ -85,15 +77,15 @@ class PrideFacts(commands.Cog):
         If a date is given as an argument, and the date is in the past, the fact from that day
         will be provided.
         """
-        message_body = ctx.message.content[len(ctx.invoked_with) + 2:]
-        if message_body == "":
+        if not option:
             await self.send_select_fact(ctx, datetime.utcnow())
-        elif message_body.lower().startswith("rand"):
+        elif option.lower().startswith("rand"):
             await self.send_random_fact(ctx)
         else:
-            await self.send_select_fact(ctx, message_body)
+            await self.send_select_fact(ctx, option)
 
-    def make_embed(self, fact: str) -> discord.Embed:
+    @staticmethod
+    def make_embed(fact: str) -> discord.Embed:
         """Makes a nice embed for the fact to be sent."""
         return discord.Embed(
             colour=Colours.pink,
@@ -103,5 +95,5 @@ class PrideFacts(commands.Cog):
 
 
 def setup(bot: Bot) -> None:
-    """Cog loader for pride facts."""
+    """Load the Pride Facts Cog."""
     bot.add_cog(PrideFacts(bot))

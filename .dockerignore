@@ -3,6 +3,6 @@
 
 # Make exceptions for what's needed
 !bot
-!Pipfile
-!Pipfile.lock
+!pyproject.toml
+!poetry.lock
 !LICENSE

@@ -9,8 +9,8 @@ import typing
 from typing import Tuple
 
 import aiohttp
+import arrow
 import discord
-import pytz
 
 from bot.bot import Bot
 from bot.constants import AdventOfCode, Channels, Colours
@@ -44,11 +44,11 @@ REQUIRED_CACHE_KEYS = (
 
 AOC_EMBED_THUMBNAIL = (
     "https://raw.githubusercontent.com/python-discord"
-    "/branding/master/seasonal/christmas/server_icons/festive_256.gif"
+    "/branding/main/seasonal/christmas/server_icons/festive_256.gif"
 )
 
 # Create an easy constant for the EST timezone
-EST = pytz.timezone("EST")
+EST = "America/New_York"
 
 # Step size for the challenge countdown status
 COUNTDOWN_STEP = 60 * 5
@@ -67,7 +67,7 @@ class UnexpectedResponseStatus(aiohttp.ClientError):
     """Raised when an unexpected redirect was detected."""
 
 
-class FetchingLeaderboardFailed(Exception):
+class FetchingLeaderboardFailedError(Exception):
     """Raised when one or more leaderboards could not be fetched at all."""
 
 
@@ -108,7 +108,7 @@ def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
     # star view. We need that per star view to compute rank scores per star.
     for member in raw_leaderboard_data.values():
         name = member["name"] if member["name"] else f"Anonymous #{member['id']}"
-        member_id = member['id']
+        member_id = member["id"]
         leaderboard[member_id] = {"name": name, "score": 0, "star_1": 0, "star_2": 0}
 
         # Iterate over all days for this participant
@@ -119,7 +119,7 @@ def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
                 leaderboard[member_id][f"star_{star}"] += 1
 
                 # Record completion datetime for this participant for this day/star
-                completion_time = datetime.datetime.fromtimestamp(int(data['get_star_ts']))
+                completion_time = datetime.datetime.fromtimestamp(int(data["get_star_ts"]))
                 star_results[(day, star)].append(
                     StarResult(member_id=member_id, completion_time=completion_time)
                 )
@@ -133,7 +133,7 @@ def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
         if day in AdventOfCode.ignored_days:
             continue
 
-        sorted_result = sorted(results, key=operator.attrgetter('completion_time'))
+        sorted_result = sorted(results, key=operator.attrgetter("completion_time"))
         for rank, star_result in enumerate(sorted_result):
             leaderboard[star_result.member_id]["score"] += max_score - rank
 
@@ -210,7 +210,7 @@ async def _fetch_leaderboard_data() -> typing.Dict[str, typing.Any]:
             except UnexpectedRedirect:
                 if cookies["session"] == AdventOfCode.fallback_session:
                     log.error("It seems like the fallback cookie has expired!")
-                    raise FetchingLeaderboardFailed from None
+                    raise FetchingLeaderboardFailedError from None
 
                 # If we're here, it means that the original session did not
                 # work. Let's fall back to the fallback session.
@@ -218,7 +218,7 @@ async def _fetch_leaderboard_data() -> typing.Dict[str, typing.Any]:
                 continue
             except aiohttp.ClientError:
                 # Don't retry, something unexpected is wrong and it may not be the session.
-                raise FetchingLeaderboardFailed from None
+                raise FetchingLeaderboardFailedError from None
             else:
                 # Get the participants and store their current count.
                 board_participants = raw_data["members"]
@@ -227,7 +227,7 @@ async def _fetch_leaderboard_data() -> typing.Dict[str, typing.Any]:
                 break
         else:
             log.error(f"reached 'unreachable' state while fetching board `{leaderboard.id}`.")
-            raise FetchingLeaderboardFailed
+            raise FetchingLeaderboardFailedError
 
     log.info(f"Fetched leaderboard information for {len(participants)} participants")
     return participants
@@ -307,7 +307,7 @@ async def fetch_leaderboard(invalidate_cache: bool = False) -> dict:
 
 def get_summary_embed(leaderboard: dict) -> discord.Embed:
     """Get an embed with the current summary stats of the leaderboard."""
-    leaderboard_url = leaderboard['full_leaderboard_url']
+    leaderboard_url = leaderboard["full_leaderboard_url"]
     refresh_minutes = AdventOfCode.leaderboard_cache_expiry_seconds // 60
 
     aoc_embed = discord.Embed(
@@ -395,13 +395,13 @@ def is_in_advent() -> bool:
     something for the next Advent of Code challenge should run. As the puzzle
     published on the 25th is the last puzzle, this check excludes that date.
     """
-    return datetime.datetime.now(EST).day in range(1, 25) and datetime.datetime.now(EST).month == 12
+    return arrow.now(EST).day in range(1, 25) and arrow.now(EST).month == 12
 
 
 def time_left_to_est_midnight() -> Tuple[datetime.datetime, datetime.timedelta]:
     """Calculate the amount of time left until midnight EST/UTC-5."""
     # Change all time properties back to 00:00
-    todays_midnight = datetime.datetime.now(EST).replace(
+    todays_midnight = arrow.now(EST).replace(
         microsecond=0,
         second=0,
         minute=0,
@@ -412,7 +412,7 @@ def time_left_to_est_midnight() -> Tuple[datetime.datetime, datetime.timedelta]:
     tomorrow = todays_midnight + datetime.timedelta(days=1)
 
     # Calculate the timedelta between the current time and midnight
-    return tomorrow, tomorrow - datetime.datetime.now(EST)
+    return tomorrow, tomorrow - arrow.now(EST)
 
 
 async def wait_for_advent_of_code(*, hours_before: int = 1) -> None:
@@ -430,9 +430,9 @@ async def wait_for_advent_of_code(*, hours_before: int = 1) -> None:
     if we're already past the Advent of Code edition the bot is currently
     configured for.
     """
-    start = datetime.datetime(AdventOfCode.year, 12, 1, 0, 0, 0, tzinfo=EST)
+    start = arrow.get(datetime.datetime(AdventOfCode.year, 12, 1), EST)
     target = start - datetime.timedelta(hours=hours_before)
-    now = datetime.datetime.now(EST)
+    now = arrow.now(EST)
 
     # If we've already reached or passed to target, we
     # simply return immediately.
@@ -474,10 +474,10 @@ async def countdown_status(bot: Bot) -> None:
     # sleeping for the entire year, it will only wait in the currently
     # configured year. This means that the task will only start hibernating once
     # we start preparing the next event by changing environment variables.
-    last_challenge = datetime.datetime(AdventOfCode.year, 12, 25, 0, 0, 0, tzinfo=EST)
+    last_challenge = arrow.get(datetime.datetime(AdventOfCode.year, 12, 25), EST)
     end = last_challenge + datetime.timedelta(hours=1)
 
-    while datetime.datetime.now(EST) < end:
+    while arrow.now(EST) < end:
         _, time_left = time_left_to_est_midnight()
 
         aligned_seconds = int(math.ceil(time_left.seconds / COUNTDOWN_STEP)) * COUNTDOWN_STEP
@@ -534,8 +534,8 @@ async def new_puzzle_notification(bot: Bot) -> None:
 
     # The last event day is 25 December, so we only have to schedule
     # a reminder if the current day is before 25 December.
-    end = datetime.datetime(AdventOfCode.year, 12, 25, tzinfo=EST)
-    while datetime.datetime.now(EST) < end:
+    end = arrow.get(datetime.datetime(AdventOfCode.year, 12, 25), EST)
+    while arrow.now(EST) < end:
         log.trace("Started puzzle notification loop.")
         tomorrow, time_left = time_left_to_est_midnight()
 
