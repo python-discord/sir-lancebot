@@ -108,7 +108,7 @@ class EggDecorating(commands.Cog):
                 description="Here is your pretty little egg. Hope you like it!"
             )
             embed.set_image(url="attachment://egg.png")
-            embed.set_footer(text=f"Made by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
+            embed.set_footer(text=f"Made by {ctx.author.display_name}", icon_url=ctx.author.display_avatar.url)
 
         await ctx.send(file=file, embed=embed)
         return new_im

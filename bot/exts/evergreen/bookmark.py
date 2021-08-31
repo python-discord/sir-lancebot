@@ -37,7 +37,7 @@ class Bookmark(commands.Cog):
             name="Wanna give it a visit?",
             value=f"[Visit original message]({target_message.jump_url})"
         )
-        embed.set_author(name=target_message.author, icon_url=target_message.author.avatar_url)
+        embed.set_author(name=target_message.author, icon_url=target_message.author.display_avatar.url)
         embed.set_thumbnail(url=Icons.bookmark)
 
         return embed
