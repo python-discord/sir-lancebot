@@ -74,7 +74,7 @@ class HTTPStatusCodes(commands.Cog):
             else:
                 await ctx.send(
                     embed=discord.Embed(
-                        title=STATUS_TEMPLATE.format(code=code),
+                        title=STATUS_TEMPLATE.format(code=code)
                     ).Embed.set_footer(ERR_UNKNOWN.format(code=code))
                 )
 
