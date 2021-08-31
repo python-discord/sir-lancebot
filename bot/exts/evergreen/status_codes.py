@@ -10,6 +10,10 @@ HTTP_CAT_URL = "https://http.cat/{code}.jpg"
 STATUS_TEMPLATE = "**Status: {code}**"
 ERR_404 = "Unable to find status floof for {code}."
 ERR_UNKNOWN = "Error attempting to retrieve status floof for {code}."
+ERROR_LENGTH_EMBED = discord.Embed(
+    title="Input status code does not exist",
+    description="The range of valid status codes is 100 to 599",
+)
 
 
 class HTTPStatusCodes(commands.Cog):
@@ -38,30 +42,20 @@ class HTTPStatusCodes(commands.Cog):
         if code in range(100, 599):
             await self.build_embed(url=HTTP_CAT_URL.format(code=code), ctx=ctx, code=code)
             return
-        await ctx.send(
-            embed=discord.Embed(
-                title="Input status code does not exist",
-                description="The range of accepted status codes that are ok is from 100 to 599",
-            )
-        )
+        await ctx.send(embed=ERROR_LENGTH_EMBED)
 
     @http_status_group.command(name="dog")
     async def http_dog(self, ctx: commands.Context, code: int) -> None:
         """Send a dog version of the requested HTTP status code."""
         if code in range(100, 599):
-            await self.build_embed(url=HTTP_CAT_URL.format(code=code), ctx=ctx, code=code)
+            await self.build_embed(url=HTTP_DOG_URL.format(code=code), ctx=ctx, code=code)
             return
-        await ctx.send(
-            embed=discord.Embed(
-                title="Input status code does not exist",
-                description="The range of accepted status codes that are ok is from 100 to 599",
-            )
-        )
+        await ctx.send(embed=ERROR_LENGTH_EMBED)
 
     async def build_embed(self, url: str, ctx: commands.Context, code: int) -> None:
         """Attempt to build and dispatch embed. Append error message instead if something goes wrong."""
         async with self.bot.http_session.get(url, allow_redirects=False) as response:
-            if response.status in range(200, 299):
+            if response.status in range(200, 300):
                 await ctx.send(
                     embed=discord.Embed(
                         title=STATUS_TEMPLATE.format(code=code)
