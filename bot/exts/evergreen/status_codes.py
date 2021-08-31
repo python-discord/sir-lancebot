@@ -39,7 +39,7 @@ class HTTPStatusCodes(commands.Cog):
     @http_status_group.command(name="cat")
     async def http_cat(self, ctx: commands.Context, code: int) -> None:
         """Send a cat version of the requested HTTP status code."""
-        if code in range(100, 599):
+        if code in range(100, 600):
             await self.build_embed(url=HTTP_CAT_URL.format(code=code), ctx=ctx, code=code)
             return
         await ctx.send(embed=ERROR_LENGTH_EMBED)
@@ -47,7 +47,7 @@ class HTTPStatusCodes(commands.Cog):
     @http_status_group.command(name="dog")
     async def http_dog(self, ctx: commands.Context, code: int) -> None:
         """Send a dog version of the requested HTTP status code."""
-        if code in range(100, 599):
+        if code in range(100, 600):
             await self.build_embed(url=HTTP_DOG_URL.format(code=code), ctx=ctx, code=code)
             return
         await ctx.send(embed=ERROR_LENGTH_EMBED)
