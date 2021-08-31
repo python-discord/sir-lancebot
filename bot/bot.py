@@ -8,6 +8,7 @@ from aiohttp import AsyncResolver, ClientSession, TCPConnector
 from async_rediscache import RedisSession
 from discord import DiscordException, Embed
 from discord.ext import commands
+from discord.ext.commands import when_mentioned_or
 
 from bot import constants
 
@@ -203,7 +204,7 @@ loop.run_until_complete(redis_session.connect())
 
 bot = Bot(
     redis_session=redis_session,
-    command_prefix=constants.Client.prefix,
+    command_prefix=when_mentioned_or(constants.Client.prefix),
     activity=discord.Game(name=f"Commands: {constants.Client.prefix}help"),
     allowed_mentions=discord.AllowedMentions(everyone=False, roles=_allowed_roles),
     intents=_intents,
