@@ -35,34 +35,47 @@ class HTTPStatusCodes(commands.Cog):
     @http_status_group.command(name="cat")
     async def http_cat(self, ctx: commands.Context, code: int) -> None:
         """Send a cat version of the requested HTTP status code."""
-        await self.build_embed(url=HTTP_CAT_URL.format(code=code), ctx=ctx, code=code)
+        if code in range(100, 599):
+            await self.build_embed(url=HTTP_CAT_URL.format(code=code), ctx=ctx, code=code)
+        await ctx.send(
+            embed=discord.Embed(
+                title="Input status code does not exist",
+                description="The range of accepted status codes that are ok is from 100 to 599",
+            )
+        )
 
     @http_status_group.command(name="dog")
     async def http_dog(self, ctx: commands.Context, code: int) -> None:
         """Send a dog version of the requested HTTP status code."""
-        await self.build_embed(url=HTTP_DOG_URL.format(code=code), ctx=ctx, code=code)
+        if code in range(100, 599):
+            await self.build_embed(url=HTTP_CAT_URL.format(code=code), ctx=ctx, code=code)
+        await ctx.send(
+            embed=discord.Embed(
+                title="Input status code does not exist",
+                description="The range of accepted status codes that are ok is from 100 to 599",
+            )
+        )
 
     async def build_embed(self, url: str, ctx: commands.Context, code: int) -> None:
         """Attempt to build and dispatch embed. Append error message instead if something goes wrong."""
         async with self.bot.http_session.get(url, allow_redirects=False) as response:
-            if 200 <= response.status <= 299:
+            if response.status in range(200, 299):
                 await ctx.send(
                     embed=discord.Embed(
                         title=STATUS_TEMPLATE.format(code=code)
                     ).set_image(url=url)
                 )
-            elif 404 == response.status:
+            elif response.status == 404:
                 await ctx.send(
-                    embed=discord.Embed(title=ERR_404.format(code=code)).set_image(
-                        url=url
-                    )
+                    embed=discord.Embed(
+                        title=ERR_404.format(code=code)
+                    ).set_image(url=url)
                 )
             else:
                 await ctx.send(
                     embed=discord.Embed(
                         title=STATUS_TEMPLATE.format(code=code),
-                        footer=ERR_UNKNOWN.format(code=code),
-                    )
+                    ).Embed.set_footer(ERR_UNKNOWN.format(code=code))
                 )
 
 
