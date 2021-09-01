@@ -51,7 +51,7 @@ class PrideLeader(commands.Cog):
             valid_names = "\n".join(valid_names)
             error_msg = "Did you mean?"
 
-        embed.description = f"{error_msg}\n```{valid_names}```"
+        embed.description = f"{error_msg}\n```\n{valid_names}\n```"
         embed.set_footer(text="To add more pride leaders, feel free to open a pull request!")
 
         return embed

@@ -74,7 +74,7 @@ class CommandErrorHandler(commands.Cog):
 
         if isinstance(error, commands.UserInputError):
             self.revert_cooldown_counter(ctx.command, ctx.message)
-            usage = f"```{ctx.prefix}{parent_command}{ctx.command} {ctx.command.signature}```"
+            usage = f"```\n{ctx.prefix}{parent_command}{ctx.command} {ctx.command.signature}\n```"
             embed = self.error_embed(
                 f"Your input was invalid: {error}\n\nUsage:{usage}"
             )
@@ -107,7 +107,7 @@ class CommandErrorHandler(commands.Cog):
             self.revert_cooldown_counter(ctx.command, ctx.message)
             embed = self.error_embed(
                 "The argument you provided was invalid: "
-                f"{error}\n\nUsage:\n```{ctx.prefix}{parent_command}{ctx.command} {ctx.command.signature}```"
+                f"{error}\n\nUsage:\n```\n{ctx.prefix}{parent_command}{ctx.command} {ctx.command.signature}\n```"
             )
             await ctx.send(embed=embed)
             return

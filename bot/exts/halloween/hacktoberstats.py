@@ -61,8 +61,8 @@ class HacktoberStats(commands.Cog):
             else:
                 msg = (
                     f"{author_mention}, you have not linked a GitHub account\n\n"
-                    f"You can link your GitHub account using:\n```{ctx.prefix}hackstats link github_username```\n"
-                    f"Or query GitHub stats directly using:\n```{ctx.prefix}hackstats github_username```"
+                    f"You can link your GitHub account using:\n```\n{ctx.prefix}hackstats link github_username\n```\n"
+                    f"Or query GitHub stats directly using:\n```\n{ctx.prefix}hackstats github_username\n```"
                 )
                 await ctx.send(msg)
                 return

@@ -60,7 +60,7 @@ class Extension(commands.Converter):
             names = "\n".join(matches)
             raise commands.BadArgument(
                 f":x: `{argument}` is an ambiguous extension name. "
-                f"Please use one of the following fully-qualified names.```\n{names}```"
+                f"Please use one of the following fully-qualified names.```\n{names}\n```"
             )
         elif matches:
             return matches[0]
@@ -110,7 +110,7 @@ class Extensions(commands.Cog):
         blacklisted = "\n".join(UNLOAD_BLACKLIST & set(extensions))
 
         if blacklisted:
-            msg = f":x: The following extension(s) may not be unloaded:```{blacklisted}```"
+            msg = f":x: The following extension(s) may not be unloaded:```\n{blacklisted}\n```"
         else:
             if "*" in extensions or "**" in extensions:
                 extensions = set(self.bot.extensions.keys()) - UNLOAD_BLACKLIST
@@ -213,7 +213,7 @@ class Extensions(commands.Cog):
 
         if failures:
             failures = "\n".join(f"{ext}\n    {err}" for ext, err in failures.items())
-            msg += f"\nFailures:```{failures}```"
+            msg += f"\nFailures:```\n{failures}\n```"
 
         log.debug(f"Batch {verb}ed extensions.")
 
@@ -240,7 +240,7 @@ class Extensions(commands.Cog):
             log.exception(f"Extension '{ext}' failed to {verb}.")
 
             error_msg = f"{e.__class__.__name__}: {e}"
-            msg = f":x: Failed to {verb} extension `{ext}`:\n```{error_msg}```"
+            msg = f":x: Failed to {verb} extension `{ext}`:\n```\n{error_msg}\n```"
         else:
             msg = f":ok_hand: Extension successfully {verb}ed: `{ext}`."
             log.debug(msg[10:])
