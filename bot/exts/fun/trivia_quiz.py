@@ -277,9 +277,9 @@ class TriviaQuiz(commands.Cog):
                         # Eg. "Jurassic World: Dominion (2022)" would be skipped.
                         continue
 
-                    for word in re.split("[\s-]", title):  # noqa: W605
+                    for word in re.split(r"[\s-]", title):
                         word = word.strip(string.punctuation)
-                        secret_word = "\*"*len(word)  # noqa: W605
+                        secret_word = r"\*"*len(word)
                         question = re.sub(rf'\b{word}\b', f"**{secret_word}**", question, flags=re.IGNORECASE)
 
                     formatted_article_question = {
