@@ -20,7 +20,7 @@ from bot.constants import Colours, NEGATIVE_REPLIES, Roles
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_QUESTION_LIMIT = 6
+DEFAULT_QUESTION_LIMIT = 7
 STANDARD_VARIATION_TOLERANCE = 88
 DYNAMICALLY_GEN_VARIATION_TOLERANCE = 97
 
@@ -368,13 +368,13 @@ class TriviaQuiz(commands.Cog):
                 await ctx.send(
                     embed=self.make_error_embed(
                         "You must choose to complete at least one question. "
-                        f"(or enter nothing for the default value of {DEFAULT_QUESTION_LIMIT + 1} questions)"
+                        f"(or enter nothing for the default value of {DEFAULT_QUESTION_LIMIT} questions)"
                     )
                 )
                 return
 
             else:
-                self.question_limit = questions - 1
+                self.question_limit = questions
 
         # Start game if not running.
         if not self.game_status[ctx.channel.id]:
@@ -391,7 +391,7 @@ class TriviaQuiz(commands.Cog):
 
         while self.game_status[ctx.channel.id]:
             # Exit quiz if number of questions for a round are already sent.
-            if len(done_questions) > self.question_limit and hint_no == 0:
+            if len(done_questions) == self.question_limit and hint_no == 0:
                 await ctx.send("The round has ended.")
                 await self.declare_winner(ctx.channel, self.game_player_scores[ctx.channel.id])
 
@@ -480,7 +480,7 @@ class TriviaQuiz(commands.Cog):
                         answers,
                         False,
                         question_dict,
-                        self.question_limit - len(done_questions) + 1,
+                        self.question_limit - len(done_questions),
                     )
                     await asyncio.sleep(1)
 
@@ -513,7 +513,7 @@ class TriviaQuiz(commands.Cog):
                     answers,
                     True,
                     question_dict,
-                    self.question_limit - len(done_questions) + 1,
+                    self.question_limit - len(done_questions),
                 )
                 await self.send_score(ctx.channel, self.game_player_scores[ctx.channel.id])
 
@@ -526,7 +526,7 @@ class TriviaQuiz(commands.Cog):
         start_embed = discord.Embed(
             title="Quiz game Starting!!",
             description=(
-                f"Each game consists of {self.question_limit + 1} questions.\n"
+                f"Each game consists of {self.question_limit} questions.\n"
                 f"**Rules :**\n{rules}"
                 f"\n **Category** : {category}"
             ),
