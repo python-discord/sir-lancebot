@@ -44,10 +44,11 @@ TRIVIA_QUIZ_ICON = (
 
 @dataclass(frozen=True)
 class QuizEntry:
-    """Stores quiz entry (a question and a string containing answers separated by commas)."""
+    """Stores quiz entry (a question and a list of answers)."""
 
     question: str
-    answer: str
+    answers: list[str]
+    var_tol: int
 
 
 class DynamicQuestionGen:
@@ -106,7 +107,7 @@ class DynamicQuestionGen:
             coeffs[2] * x + coeffs[3] * y,
         )
 
-        return QuizEntry(question, answer)
+        return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
 
     @classmethod
     def mod_arith(cls, q_format: str, a_format: str) -> QuizEntry:
@@ -118,7 +119,7 @@ class DynamicQuestionGen:
         question = q_format.format(a, b, m)
         answer = a_format.format(ans)
 
-        return QuizEntry(question, answer)
+        return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
 
     @classmethod
     def ngonal_prism(cls, q_format: str, a_format: str) -> QuizEntry:
@@ -128,7 +129,7 @@ class DynamicQuestionGen:
         question = q_format.format(cls.N_PREFIXES[n])
         answer = a_format.format((n + cls.N_PREFIX_STARTS_AT) * 2)
 
-        return QuizEntry(question, answer)
+        return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
 
     @classmethod
     def imag_sqrt(cls, q_format: str, a_format: str) -> QuizEntry:
@@ -138,7 +139,7 @@ class DynamicQuestionGen:
         question = q_format.format(ans_coeff ** 2)
         answer = a_format.format(ans_coeff)
 
-        return QuizEntry(question, answer)
+        return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
 
     @classmethod
     def binary_calc(cls, q_format: str, a_format: str) -> QuizEntry:
@@ -161,7 +162,7 @@ class DynamicQuestionGen:
         question = q_format.format(a, oper[0], b)
         answer = a_format.format(oper[1](a, b))
 
-        return QuizEntry(question, answer)
+        return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
 
     @classmethod
     def solar_system(cls, q_format: str, a_format: str) -> QuizEntry:
@@ -171,7 +172,7 @@ class DynamicQuestionGen:
         question = q_format.format(planet[0])
         answer = a_format.format(planet[1])
 
-        return QuizEntry(question, answer)
+        return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
 
     @classmethod
     def taxonomic_rank(cls, q_format: str, a_format: str) -> QuizEntry:
@@ -181,7 +182,7 @@ class DynamicQuestionGen:
         question = q_format.format(cls.TAXONOMIC_HIERARCHY[level])
         answer = a_format.format(cls.TAXONOMIC_HIERARCHY[level + 1])
 
-        return QuizEntry(question, answer)
+        return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
 
     @classmethod
     def base_units_convert(cls, q_format: str, a_format: str) -> QuizEntry:
@@ -195,7 +196,7 @@ class DynamicQuestionGen:
             cls.UNITS_TO_BASE_UNITS[unit][1]
         )
 
-        return QuizEntry(question, answer)
+        return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
 
 
 DYNAMIC_QUESTIONS_FORMAT_FUNCS = {
@@ -233,8 +234,6 @@ class TriviaQuiz(commands.Cog):
             "cs": "A large variety of computer science questions.",
             "python": "Trivia on our amazing language, Python!",
             "wikipedia": "Guess the title of random wikipedia passages.",
-            "cs": "A large variety of computer science questions.",
-            "python": "Trivia on our amazing language, Python!",
         }
 
         self.get_wiki_questions.start()
@@ -320,8 +319,6 @@ class TriviaQuiz(commands.Cog):
         - cs: A large variety of computer science questions.
         - python: Trivia on our amazing language, Python!
         - wikipedia: Guess the title of random wikipedia passages.
-        - cs: A large variety of computer science questions.
-        - python: Trivia on our amazing language, Python!
 
         (More to come!)
         """
@@ -387,7 +384,7 @@ class TriviaQuiz(commands.Cog):
 
         done_questions = []
         hint_no = 0
-        answers = None
+        quiz_entry = None
 
         while self.game_status[ctx.channel.id]:
             # Exit quiz if number of questions for a round are already sent.
@@ -411,27 +408,22 @@ class TriviaQuiz(commands.Cog):
                         break
 
                 if "dynamic_id" not in question_dict:
-                    question = question_dict["question"]
-                    answers = question_dict["answer"].split(", ")
-
-                    var_tol = STANDARD_VARIATION_TOLERANCE
+                    quiz_entry = QuizEntry(
+                        question_dict["question"],
+                        quiz_answers if isinstance(quiz_answers := question_dict["answer"], list) else [quiz_answers],
+                        STANDARD_VARIATION_TOLERANCE
+                    )
                 else:
                     format_func = DYNAMIC_QUESTIONS_FORMAT_FUNCS[question_dict["dynamic_id"]]
-
                     quiz_entry = format_func(
                         question_dict["question"],
                         question_dict["answer"],
                     )
 
-                    question, answers = quiz_entry.question, quiz_entry.answer
-                    answers = [answers]
-
-                    var_tol = DYNAMICALLY_GEN_VARIATION_TOLERANCE
-
                 embed = discord.Embed(
                     colour=Colours.gold,
                     title=f"Question #{len(done_questions)}",
-                    description=question,
+                    description=quiz_entry.question,
                 )
 
                 if img_url := question_dict.get("img_url"):
@@ -443,13 +435,13 @@ class TriviaQuiz(commands.Cog):
                 def contains_correct_answer(m: discord.Message) -> bool:
                     return m.channel == ctx.channel and any(
                         fuzz.ratio(answer.lower(), m.content.lower()) > variation_tolerance
-                        for answer in answers
+                        for answer in quiz_entry.answers
                     )
 
                 return contains_correct_answer
 
             try:
-                msg = await self.bot.wait_for("message", check=check_func(var_tol), timeout=10)
+                msg = await self.bot.wait_for("message", check=check_func(quiz_entry.var_tol), timeout=10)
             except asyncio.TimeoutError:
                 # In case of TimeoutError and the game has been stopped, then do nothing.
                 if not self.game_status[ctx.channel.id]:
@@ -477,7 +469,7 @@ class TriviaQuiz(commands.Cog):
 
                     await self.send_answer(
                         ctx.channel,
-                        answers,
+                        quiz_entry.answers,
                         False,
                         question_dict,
                         self.question_limit - len(done_questions),
@@ -510,7 +502,7 @@ class TriviaQuiz(commands.Cog):
 
                 await self.send_answer(
                     ctx.channel,
-                    answers,
+                    quiz_entry.answers,
                     True,
                     question_dict,
                     self.question_limit - len(done_questions),
