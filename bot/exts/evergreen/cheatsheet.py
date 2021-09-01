@@ -64,13 +64,13 @@ class CheatSheet(commands.Cog):
             description = (
                 f"**Result Of cht.sh**\n"
                 f"```python\n{body_text[:body_space]}\n"
-                f"... (truncated - too many lines)```\n"
+                f"... (truncated - too many lines)\n```\n"
                 f"Full results: {url} "
             )
         else:
             description = (
                 f"**Result Of cht.sh**\n"
-                f"```python\n{body_text}```\n"
+                f"```python\n{body_text}\n```\n"
                 f"{url}"
             )
         return False, description
