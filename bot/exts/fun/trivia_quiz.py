@@ -261,31 +261,31 @@ class TriviaQuiz(commands.Cog):
                 articles_raw = raw_json["mostread"]["articles"]
 
                 for article in articles_raw:
-                    # Form the question, strategy:
-                    # - Check if `extract` is present in the article, if it doesn't then skip the article
-                    # Sometimes, the wikipedia title is given in the extract, therefore giving away the answer
-                    # therefore, we need to remove all cases of it
                     question = article.get("extract")
-                    # multi letter words are formatted this way: Jason_Terror
-                    title = article["normalizedtitle"].replace("_", " ")
-
                     if not question:
                         continue
-                    elif not all(c.isalnum() for c in title):
-                        # If the title contains non alphabet/numerical(s) then
-                        # don't append it to the question and move on to the next.
-                        # Eg. "Jurassic World: Dominion (2022)" would be skipped.
-                        continue
 
-                    for word in re.split(r"[\s-]", title):
+                    # Normalize the wikipedia article title to remove all punctuations from it
+                    for word in re.split(r"[\s-]", title := article["normalizedtitle"]):
+                        cleaned_title = re.sub(
+                            rf'\b{word.strip(string.punctuation)}\b', word, title, flags=re.IGNORECASE
+                        )
+
+                    # Since the extract contains the article name sometimes this would replace all the matching words
+                    # in that article with *** of that length.
+                    # NOTE: This removes the "answer" for 99% of the cases, but sometimes the wikipedia article is
+                    # very different from the words in the extract, for example the title would be the nickname of a
+                    # person (Bob Ross) whereas in the extract it would the full name (Robert Norman Ross) so it comes
+                    # out as (Robert Norman ****) and (Robert Norman Ross) won't be a right answer :(
+                    for word in re.split(r"[\s-]", cleaned_title):
                         word = word.strip(string.punctuation)
-                        secret_word = r"\*"*len(word)
+                        secret_word = r"\*" * len(word)
                         question = re.sub(rf'\b{word}\b', f"**{secret_word}**", question, flags=re.IGNORECASE)
 
                     formatted_article_question = {
                         "id": start_id,
                         "question": f"Guess the title of the Wikipedia article.\n\n{question}",
-                        "answer": title,
+                        "answer": cleaned_title,
                         "info": article["extract"]
                     }
                     start_id += 1
