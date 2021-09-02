@@ -4,7 +4,7 @@ import random
 import re
 from dataclasses import dataclass
 from functools import partial
-from typing import Match, Optional
+from typing import Optional
 
 import discord
 from discord.ext import commands
@@ -113,7 +113,7 @@ class Game:
         self.turn: Optional[discord.Member] = None
         self.next: Optional[discord.Member] = None
 
-        self.match: Optional[Match] = None
+        self.match: Optional[re.Match] = None
         self.surrender: bool = False
 
         self.setup_grids()
