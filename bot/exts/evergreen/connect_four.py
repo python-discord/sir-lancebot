@@ -29,8 +29,7 @@ class Game:
         player2: Optional[discord.Member],
         tokens: list[str],
         size: int = 7
-    ) -> None:
-
+    ):
         self.bot = bot
         self.channel = channel
         self.player1 = player1
