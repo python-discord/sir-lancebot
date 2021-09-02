@@ -9,8 +9,8 @@ from bot.constants import Emojis
 class CoinSide(commands.Converter):
     """Class used to convert the `side` parameter of coinflip command."""
 
-    HEADS: tuple[str, ...] = ("h", "head", "heads")
-    TAILS: tuple[str, ...] = ("t", "tail", "tails")
+    HEADS = ("h", "head", "heads")
+    TAILS = ("t", "tail", "tails")
 
     async def convert(self, ctx: commands.Context, side: str) -> str:
         """Converts the provided `side` into the corresponding string."""
