@@ -110,7 +110,7 @@ class DuckGame:
         rows: int = 4,
         columns: int = 3,
         minimum_solutions: int = 1,
-    ) -> None:
+    ):
         """
         Take samples from the deck to generate a board.
 

@@ -405,7 +405,7 @@ class Snakes(Cog):
         """Gets a random snake name."""
         return random.choice(self.snake_names)
 
-    async def _validate_answer(self, ctx: Context, message: Message, answer: str, options: list) -> None:
+    async def _validate_answer(self, ctx: Context, message: Message, answer: str, options: dict[str, str]) -> None:
         """Validate the answer using a reaction event loop."""
         def predicate(reaction: Reaction, user: Member) -> bool:
             """Test if the the answer is valid and can be evaluated."""

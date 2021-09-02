@@ -100,7 +100,7 @@ class Game:
         channel: discord.TextChannel,
         player1: discord.Member,
         player2: discord.Member
-    ) -> None:
+    ):
 
         self.bot = bot
         self.public_channel = channel
