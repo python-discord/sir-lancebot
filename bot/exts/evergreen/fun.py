@@ -192,7 +192,7 @@ class Fun(Cog):
 
         Returns a tuple of:
             str: If `text` is a valid discord Message, the contents of the message, else `text`.
-            Union[Embed, None]: The embed if found in the valid Message, else None
+            Optional[Embed]: The embed if found in the valid Message, else None
         """
         embed = None
 

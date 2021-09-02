@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from logging import getLogger
 from os import getenv
 from pathlib import Path
-from typing import Union
+from typing import Optional
 
 from async_rediscache import RedisCache
 from discord import Embed, Reaction, TextChannel, User
@@ -355,7 +355,7 @@ class SpookyNameRate(Cog):
 
         return embed
 
-    async def get_channel(self) -> Union[TextChannel, None]:
+    async def get_channel(self) -> Optional[TextChannel]:
         """Gets the sir-lancebot-channel after waiting until ready."""
         await self.bot.wait_until_ready()
         channel = self.bot.get_channel(
