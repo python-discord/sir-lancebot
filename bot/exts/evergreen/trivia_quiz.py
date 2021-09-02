@@ -193,7 +193,7 @@ DYNAMIC_QUESTIONS_FORMAT_FUNCS = {
 class TriviaQuiz(commands.Cog):
     """A cog for all quiz commands."""
 
-    def __init__(self, bot: Bot) -> None:
+    def __init__(self, bot: Bot):
         self.bot = bot
 
         self.game_status = {}  # A variable to store the game status: either running or not running.

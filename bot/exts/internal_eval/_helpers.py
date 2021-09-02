@@ -80,7 +80,7 @@ class EvalContext:
     clear the context, use the `.internal clear` command.
     """
 
-    def __init__(self, context_vars: Namespace, local_vars: Namespace) -> None:
+    def __init__(self, context_vars: Namespace, local_vars: Namespace):
         self._locals = dict(local_vars)
         self.context_vars = dict(context_vars)
 
@@ -182,7 +182,7 @@ class EvalContext:
 class WrapEvalCodeTree(ast.NodeTransformer):
     """Wraps the AST of eval code with the wrapper function."""
 
-    def __init__(self, eval_code_tree: ast.AST, *args, **kwargs) -> None:
+    def __init__(self, eval_code_tree: ast.AST, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.eval_code_tree = eval_code_tree
 
@@ -207,7 +207,7 @@ class WrapEvalCodeTree(ast.NodeTransformer):
 class CaptureLastExpression(ast.NodeTransformer):
     """Captures the return value from a loose expression."""
 
-    def __init__(self, tree: ast.AST, *args, **kwargs) -> None:
+    def __init__(self, tree: ast.AST, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.tree = tree
         self.last_node = list(ast.iter_child_nodes(tree))[-1]

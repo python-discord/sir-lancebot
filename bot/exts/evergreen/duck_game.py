@@ -172,7 +172,7 @@ class DuckGame:
 class DuckGamesDirector(commands.Cog):
     """A cog for running Duck Duck Duck Goose games."""
 
-    def __init__(self, bot: Bot) -> None:
+    def __init__(self, bot: Bot):
         self.bot = bot
         self.current_games = {}
 

@@ -19,7 +19,7 @@ BASE_URL = "https://xkcd.com"
 class XKCD(Cog):
     """Retrieving XKCD comics."""
 
-    def __init__(self, bot: Bot) -> None:
+    def __init__(self, bot: Bot):
         self.bot = bot
         self.latest_comic_info: dict[str, Union[str, int]] = {}
         self.get_latest_comic_info.start()

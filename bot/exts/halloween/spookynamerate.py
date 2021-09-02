@@ -91,7 +91,7 @@ class SpookyNameRate(Cog):
     # will automatically start the scoring and announcing the result (without waiting for 12, so do not expect it to.).
     # Also, it won't wait for the two hours (when the poll closes).
 
-    def __init__(self, bot: Bot) -> None:
+    def __init__(self, bot: Bot):
         self.bot = bot
         self.name = None
 

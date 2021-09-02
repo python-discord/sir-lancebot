@@ -22,7 +22,7 @@ log = logging.getLogger(__name__)
 class InWhitelistCheckFailure(CheckFailure):
     """Raised when the `in_whitelist` check fails."""
 
-    def __init__(self, redirect_channel: Optional[int]) -> None:
+    def __init__(self, redirect_channel: Optional[int]):
         self.redirect_channel = redirect_channel
 
         if redirect_channel:

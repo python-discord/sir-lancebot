@@ -181,7 +181,7 @@ class Game:
 class AI:
     """The Computer Player for Single-Player games."""
 
-    def __init__(self, bot: Bot, game: Game) -> None:
+    def __init__(self, bot: Bot, game: Game):
         self.game = game
         self.mention = bot.user.mention
 
@@ -256,7 +256,7 @@ class AI:
 class ConnectFour(commands.Cog):
     """Connect Four. The Classic Vertical Four-in-a-row Game!"""
 
-    def __init__(self, bot: Bot) -> None:
+    def __init__(self, bot: Bot):
         self.bot = bot
         self.games: list[Game] = []
         self.waiting: list[discord.Member] = []

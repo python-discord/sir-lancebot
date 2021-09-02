@@ -23,7 +23,7 @@ QUESTION_MARK_ICON = "https://cdn.discordapp.com/emojis/512367613339369475.png"
 class CommandErrorHandler(commands.Cog):
     """A error handler for the PythonDiscord server."""
 
-    def __init__(self, bot: Bot) -> None:
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @staticmethod

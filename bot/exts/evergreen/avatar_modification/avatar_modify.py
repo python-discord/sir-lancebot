@@ -62,7 +62,7 @@ def file_safe_name(effect: str, display_name: str) -> str:
 class AvatarModify(commands.Cog):
     """Various commands for users to apply affects to their own avatars."""
 
-    def __init__(self, bot: Bot) -> None:
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     async def _fetch_user(self, user_id: int) -> Optional[discord.User]:

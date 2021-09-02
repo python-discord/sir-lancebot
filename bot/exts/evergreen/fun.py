@@ -54,7 +54,7 @@ def caesar_cipher(text: str, offset: int) -> Iterable[str]:
 class Fun(Cog):
     """A collection of general commands for fun."""
 
-    def __init__(self, bot: Bot) -> None:
+    def __init__(self, bot: Bot):
         self.bot = bot
 
         self._caesar_cipher_embed = json.loads(Path("bot/resources/evergreen/caesar_info.json").read_text("UTF-8"))

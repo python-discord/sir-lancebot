@@ -51,7 +51,7 @@ class Game:
 class Minesweeper(commands.Cog):
     """Play a game of Minesweeper."""
 
-    def __init__(self) -> None:
+    def __init__(self):
         self.games: dict[int, Game] = {}
 
     @commands.group(name="minesweeper", aliases=("ms",), invoke_without_command=True)

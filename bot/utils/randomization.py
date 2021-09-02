@@ -11,7 +11,7 @@ class RandomCycle:
     The iterable is reshuffled after each full cycle.
     """
 
-    def __init__(self, iterable: Iterable) -> None:
+    def __init__(self, iterable: Iterable):
         self.iterable = list(iterable)
         self.index = itertools.cycle(range(len(iterable)))
 

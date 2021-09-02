@@ -322,7 +322,7 @@ class Game:
 class Battleship(commands.Cog):
     """Play the classic game Battleship!"""
 
-    def __init__(self, bot: Bot) -> None:
+    def __init__(self, bot: Bot):
         self.bot = bot
         self.games: list[Game] = []
         self.waiting: list[discord.Member] = []
