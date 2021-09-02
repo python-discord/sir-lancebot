@@ -9,7 +9,7 @@ import textwrap
 import urllib
 from functools import partial
 from io import BytesIO
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import async_timeout
 from PIL import Image, ImageDraw, ImageFont
@@ -284,7 +284,7 @@ class Snakes(Cog):
             async with self.bot.http_session.get(url, params=params) as response:
                 return await response.json()
 
-    def _get_random_long_message(self, messages: List[str], retries: int = 10) -> str:
+    def _get_random_long_message(self, messages: list[str], retries: int = 10) -> str:
         """
         Fetch a message that's at least 3 words long, if possible to do so in retries attempts.
 
@@ -299,7 +299,7 @@ class Snakes(Cog):
 
         return long_message
 
-    async def _get_snek(self, name: str) -> Dict[str, Any]:
+    async def _get_snek(self, name: str) -> dict[str, Any]:
         """
         Fetches all the data from a wikipedia article about a snake.
 
@@ -401,11 +401,11 @@ class Snakes(Cog):
 
         return snake_info
 
-    async def _get_snake_name(self) -> Dict[str, str]:
+    async def _get_snake_name(self) -> dict[str, str]:
         """Gets a random snake name."""
         return random.choice(self.snake_names)
 
-    async def _validate_answer(self, ctx: Context, message: Message, answer: str, options: list) -> None:
+    async def _validate_answer(self, ctx: Context, message: Message, answer: str, options: dict[str, str]) -> None:
         """Validate the answer using a reaction event loop."""
         def predicate(reaction: Reaction, user: Member) -> bool:
             """Test if the the answer is valid and can be evaluated."""

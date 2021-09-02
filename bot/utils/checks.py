@@ -1,6 +1,7 @@
 import datetime
 import logging
-from typing import Callable, Container, Iterable, Optional
+from collections.abc import Container, Iterable
+from typing import Callable, Optional
 
 from discord.ext.commands import (
     BucketType,
@@ -21,7 +22,7 @@ log = logging.getLogger(__name__)
 class InWhitelistCheckFailure(CheckFailure):
     """Raised when the `in_whitelist` check fails."""
 
-    def __init__(self, redirect_channel: Optional[int]) -> None:
+    def __init__(self, redirect_channel: Optional[int]):
         self.redirect_channel = redirect_channel
 
         if redirect_channel:

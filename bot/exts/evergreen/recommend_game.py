@@ -21,7 +21,7 @@ shuffle(game_recs)
 class RecommendGame(commands.Cog):
     """Commands related to recommending games."""
 
-    def __init__(self, bot: Bot) -> None:
+    def __init__(self, bot: Bot):
         self.bot = bot
         self.index = 0
 

@@ -4,7 +4,7 @@ import logging
 import random
 from datetime import datetime
 from pathlib import Path
-from typing import Tuple, Union
+from typing import Union
 
 import discord
 from discord.ext import commands
@@ -25,7 +25,7 @@ class ValentineZodiac(commands.Cog):
         self.zodiacs, self.zodiac_fact = self.load_comp_json()
 
     @staticmethod
-    def load_comp_json() -> Tuple[dict, dict]:
+    def load_comp_json() -> tuple[dict, dict]:
         """Load zodiac compatibility from static JSON resource."""
         explanation_file = Path("bot/resources/valentines/zodiac_explanation.json")
         compatibility_file = Path("bot/resources/valentines/zodiac_compatibility.json")
