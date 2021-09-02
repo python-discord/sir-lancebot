@@ -52,7 +52,7 @@ class Emojis(commands.Cog):
         return embed, msg
 
     @staticmethod
-    def generate_invalid_embed(emojis: list) -> tuple[Embed, list[str]]:
+    def generate_invalid_embed(emojis: list[Emoji]) -> tuple[Embed, list[str]]:
         """Generates error embed for invalid emoji categories."""
         embed = Embed(
             color=Colours.soft_red,
