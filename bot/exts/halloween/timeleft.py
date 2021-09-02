@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime
-from typing import Tuple
 
 from discord.ext import commands
 
@@ -21,7 +20,7 @@ class TimeLeft(commands.Cog):
         return start <= now <= end
 
     @staticmethod
-    def load_date() -> Tuple[datetime, datetime, datetime]:
+    def load_date() -> tuple[datetime, datetime, datetime]:
         """Return of a tuple of the current time and the end and start times of the next October."""
         now = datetime.utcnow()
         year = now.year

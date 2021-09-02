@@ -4,7 +4,7 @@ import random
 from contextlib import suppress
 from io import BytesIO
 from pathlib import Path
-from typing import Union
+from typing import Optional, Union
 
 import discord
 from PIL import Image
@@ -33,7 +33,7 @@ class EggDecorating(commands.Cog):
     """Decorate some easter eggs!"""
 
     @staticmethod
-    def replace_invalid(colour: str) -> Union[int, None]:
+    def replace_invalid(colour: str) -> Optional[int]:
         """Attempts to match with HTML or XKCD colour names, returning the int value."""
         with suppress(KeyError):
             return int(HTML_COLOURS[colour], 16)
@@ -44,7 +44,7 @@ class EggDecorating(commands.Cog):
     @commands.command(aliases=("decorateegg",))
     async def eggdecorate(
         self, ctx: commands.Context, *colours: Union[discord.Colour, str]
-    ) -> Union[Image.Image, None]:
+    ) -> Optional[Image.Image]:
         """
         Picks a random egg design and decorates it using the given colours.
 

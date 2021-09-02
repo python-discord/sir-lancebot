@@ -3,7 +3,7 @@ import random
 import textwrap
 from collections import defaultdict
 from datetime import datetime
-from typing import List, Optional, Tuple
+from typing import Optional
 
 from discord import Color, Embed, Emoji
 from discord.ext import commands
@@ -21,7 +21,7 @@ class Emojis(commands.Cog):
     """A collection of commands related to emojis in the server."""
 
     @staticmethod
-    def embed_builder(emoji: dict) -> Tuple[Embed, List[str]]:
+    def embed_builder(emoji: dict) -> tuple[Embed, list[str]]:
         """Generates an embed with the emoji names and count."""
         embed = Embed(
             color=Colours.orange,
@@ -52,7 +52,7 @@ class Emojis(commands.Cog):
         return embed, msg
 
     @staticmethod
-    def generate_invalid_embed(emojis: list) -> Tuple[Embed, List[str]]:
+    def generate_invalid_embed(emojis: list[Emoji]) -> tuple[Embed, list[str]]:
         """Generates error embed for invalid emoji categories."""
         embed = Embed(
             color=Colours.soft_red,

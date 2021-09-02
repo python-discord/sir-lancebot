@@ -4,7 +4,7 @@ import random
 import textwrap
 from collections import namedtuple
 from datetime import datetime, timedelta
-from typing import List, Union
+from typing import Union
 
 from aiohttp import BasicAuth, ClientError
 from discord import Colour, Embed, TextChannel
@@ -59,7 +59,7 @@ class Reddit(Cog):
         """Get the #reddit channel object from the bot's cache."""
         return self.bot.get_channel(Channels.reddit)
 
-    def build_pagination_pages(self, posts: List[dict], paginate: bool) -> Union[List[tuple], str]:
+    def build_pagination_pages(self, posts: list[dict], paginate: bool) -> Union[list[tuple], str]:
         """Build embed pages required for Paginator."""
         pages = []
         first_page = ""
@@ -180,7 +180,7 @@ class Reddit(Cog):
         else:
             log.warning(f"Unable to revoke access token: status {response.status}.")
 
-    async def fetch_posts(self, route: str, *, amount: int = 25, params: dict = None) -> List[dict]:
+    async def fetch_posts(self, route: str, *, amount: int = 25, params: dict = None) -> list[dict]:
         """A helper method to fetch a certain amount of Reddit posts at a given route."""
         # Reddit's JSON responses only provide 25 posts at most.
         if not 25 >= amount > 0:
@@ -213,7 +213,7 @@ class Reddit(Cog):
 
     async def get_top_posts(
             self, subreddit: Subreddit, time: str = "all", amount: int = 5, paginate: bool = False
-    ) -> Union[Embed, List[tuple]]:
+    ) -> Union[Embed, list[tuple]]:
         """
         Get the top amount of posts for a given subreddit within a specified timeframe.
 

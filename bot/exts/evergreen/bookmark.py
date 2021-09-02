@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import random
-import typing as t
+from typing import Optional
 
 import discord
 from discord.ext import commands
@@ -92,7 +92,7 @@ class Bookmark(commands.Cog):
     async def bookmark(
         self,
         ctx: commands.Context,
-        target_message: t.Optional[WrappedMessageConverter],
+        target_message: Optional[WrappedMessageConverter],
         *,
         title: str = "Bookmark"
     ) -> None:
