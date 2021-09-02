@@ -105,7 +105,7 @@ def custom_cooldown(*ignore: int) -> Callable:
     return check(predicate)
 
 
-async def get_pod_pages(ctx: Context, bot: Bot, query: str) -> Optional[list[tuple]]:
+async def get_pod_pages(ctx: Context, bot: Bot, query: str) -> Optional[list[tuple[str, str]]]:
     """Get the Wolfram API pod pages for the provided query."""
     async with ctx.typing():
         params = {
