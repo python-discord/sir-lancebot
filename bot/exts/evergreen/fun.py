@@ -198,11 +198,13 @@ class Fun(Cog):
 
         msg = await Fun._get_discord_message(ctx, text)
         # Ensure the user has read permissions for the channel the message is in
-        if isinstance(msg, Message) and ctx.author.permissions_in(msg.channel).read_messages:
-            text = msg.clean_content
-            # Take first embed because we can't send multiple embeds
-            if msg.embeds:
-                embed = msg.embeds[0]
+        if isinstance(msg, Message):
+            permissions = msg.channel.permissions_for(ctx.author)
+            if permissions.read_messages:
+                text = msg.clean_content
+                # Take first embed because we can't send multiple embeds
+                if msg.embeds:
+                    embed = msg.embeds[0]
 
         return (text, embed)
 
