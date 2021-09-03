@@ -32,6 +32,11 @@ class Hangman(commands.Cog):
         filtered_words = list(filter(lambda x: int(min_length) < len(x) < int(max_length)
                                      and int(min_unique_letters) < len(set(x)) < int(max_unique_letters),
                                      self.all_words))
+        if not filtered_words:
+            filter_not_found_embed = Embed(title="With the filters you provided, there were not words that could"
+                                                 "fit all the filters specified.", color=Color.red())
+            await ctx.send(embed=filter_not_found_embed)
+            return
 
         # defining a list of images that will be used for the game to represent the 'hung man'
         images = ['https://cdn.discordapp.com/attachments/859123972884922418/883472355056295946/hangman0.png',
@@ -61,14 +66,17 @@ class Hangman(commands.Cog):
 
                 if len(message.content) > 1:
                     continue
+
                 elif message.content in word:
                     positions = [idx for idx, letter in enumerate(word) if letter == message.content]
                     user_guess = ''.join([message.content if index in positions else dash
                                           for index, dash in enumerate(user_guess)])
+
                 elif tries - 1 <= 0:
                     losing_embed = Embed(title="You lost.", description=f"The word was `{word}`.", color=Color.red())
                     await original_message.edit(embed=losing_embed)
                     return
+
                 else:
                     tries -= 1
 
