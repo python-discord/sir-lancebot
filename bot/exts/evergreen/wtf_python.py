@@ -7,7 +7,7 @@ from typing import Dict, Optional
 
 from discord import Embed
 from discord.ext import commands, tasks
-from fuzzywuzzy import process
+from rapidfuzz import process
 
 from bot import constants
 from bot.bot import Bot
