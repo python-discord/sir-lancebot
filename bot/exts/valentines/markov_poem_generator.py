@@ -1,10 +1,10 @@
+import datetime
 import functools
 import logging
 import random
 import string
 from asyncio import Future, TimeoutError, get_event_loop
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime
 from pathlib import Path
 from types import TracebackType
 from typing import Callable, Dict, List, Optional, Set, Tuple, Type
@@ -17,7 +17,6 @@ from discord.ext import commands
 import bot
 from bot.constants import Colours
 from bot.utils.pagination import LinePaginator
-
 
 # Constants
 POEM_TIMEOUT = 30  # In seconds
@@ -125,7 +124,7 @@ def memoize(func: Callable) -> Callable:
     async def wrapper(
         *args,
         instance: Optional[Callable] = None,
-        word: Optional[str] = None
+        word: str = ""
     ) -> Set[str]:
         with Cache(word) as (cache, word):
             if word not in cache:
@@ -513,5 +512,5 @@ class MarkovPoemGenerator(commands.Cog):
 
 
 def setup(bot: bot.bot.Bot) -> None:
-    """Poem generator cog load."""
+    """Load the Poem Generator cog."""
     bot.add_cog(MarkovPoemGenerator(bot))
