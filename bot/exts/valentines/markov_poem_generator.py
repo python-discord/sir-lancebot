@@ -17,6 +17,34 @@ from discord.ext import commands
 from bot.constants import Colours
 from bot.utils.pagination import LinePaginator
 
+
+# Constants
+POEM_TIMEOUT = 30  # In seconds
+near_rhyme_min_score = 2000
+rhyming_line_finder_limiter = 20000
+max_char_range = (50, 120)  # For the sentence generator
+
+SOURCES: List[str] = [
+    "shakespeare_corpus.txt"
+]
+
+templates: Dict[str, str] = {
+    "shakespearean-sonnet": "abab/cdcd/efef/gg",
+    "spenserian-sonnet": "abab/bcbc/cdcd/ee",
+    "petrarch-sonnet": "abbaabba/cdecde",
+    "ballade": "ababbcbc",
+    "terza-rima": "aba/bcb/cdc/ded/ee",
+    "villanelle": "aba/aba/aba/aba/aba/abaa",
+    "limerick": "aabba"
+}
+
+rhyme_websites: List[Tuple[bool, str]] = [
+    # (is exact rhyme, website link)
+    (True, "https://api.datamuse.com/words?rel_rhy="),
+    (False, "https://api.datamuse.com/words?rel_nry=")
+]
+
+
 log = logging.getLogger(__name__)
 
 _EXECUTOR = ThreadPoolExecutor(10)
@@ -132,38 +160,13 @@ class MarkovPoemGenerator(commands.Cog):
     can be iterated through, whilst corresponding to the given rhyme scheme.
     """
 
-    POEM_TIMEOUT = 30  # In seconds
-    near_rhyme_min_score = 2000
-    rhyming_line_finder_limiter = 20000
-    max_char_range = (50, 120)  # For the sentence generator
-
-    SOURCES: List[str] = [
-        "shakespeare_corpus.txt"
-    ]
-
-    templates: Dict[str, str] = {
-        "shakespearean-sonnet": "abab/cdcd/efef/gg",
-        "spenserian-sonnet": "abab/bcbc/cdcd/ee",
-        "petrarch-sonnet": "abbaabba/cdecde",
-        "ballade": "ababbcbc",
-        "terza-rima": "aba/bcb/cdc/ded/ee",
-        "villanelle": "aba/aba/aba/aba/aba/abaa",
-        "limerick": "aabba"
-    }
-
-    rhyme_websites: List[Tuple[bool, str]] = [
-        # (is exact rhyme, website link)
-        (True, "https://api.datamuse.com/words?rel_rhy="),
-        (False, "https://api.datamuse.com/words?rel_nry=")
-    ]
-
     def __init__(self, bot: commands.Bot):
         """Initializes the full corpus text and the markov model."""
         self.bot = bot
 
         # Load the full text corpus
         full_corpus = []
-        for source_file in self.SOURCES:
+        for source_file in SOURCES:
             with Path(f"bot/resources/valentines/{source_file}").open() as f:
                 curr_corpus = f.read().splitlines()
                 full_corpus.extend(curr_corpus)
@@ -191,7 +194,7 @@ class MarkovPoemGenerator(commands.Cog):
         """
         def func() -> str:
             line = self.model.make_short_sentence(
-                random.randint(*self.max_char_range)
+                random.randint(*max_char_range)
             )
 
             if not isinstance(line, str):
@@ -217,11 +220,11 @@ class MarkovPoemGenerator(commands.Cog):
 
         Should additional web APIs for rhymes be added, the `min_score` needs
         to be tuned. Perhaps it should be added as an element to the tuple of
-        the element of the `self.rhyme_websites` list.
+        the element of the `rhyme_websites` list.
         """
         rhyme_set = set()
 
-        for is_exact, website in self.rhyme_websites:
+        for is_exact, website in rhyme_websites:
             min_score = 0 if is_exact else near_rhyme_min_score
 
             async with self.bot.http_session.get(
@@ -397,7 +400,7 @@ class MarkovPoemGenerator(commands.Cog):
         """Gives the user a paginated embed of their markov poem."""
         lines = await self._get_generated_markov_poem(
             instance=self,
-            timeout=self.POEM_TIMEOUT,
+            timeout=POEM_TIMEOUT,
             ctx=ctx,
             scheme=scheme,
             unit_count=unit_count,
@@ -459,7 +462,7 @@ class MarkovPoemGenerator(commands.Cog):
         footer of the embed.
         """
         scheme = rhyme_scheme.lower()
-        scheme = self.templates.get(scheme, scheme)
+        scheme = templates.get(scheme, scheme)
         unit_count = self._get_unit_count(scheme)
         time_start = datetime.now()
 
