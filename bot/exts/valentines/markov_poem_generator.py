@@ -1,10 +1,10 @@
-import datetime
 import functools
 import logging
 import random
 import string
 from asyncio import Future, TimeoutError, get_event_loop
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, time
 from pathlib import Path
 from types import TracebackType
 from typing import Callable, Dict, List, Optional, Set, Tuple, Type
@@ -76,7 +76,7 @@ class RhymingSentenceNotFound(commands.CommandError):
         self,
         scheme: str,
         unit_count: Dict[str, int],
-        time_start: datetime.time
+        time_start: time
     ):
         self.scheme = scheme
         self.unit_count = unit_count
@@ -436,11 +436,14 @@ class MarkovPoemGenerator(commands.Cog):
             The rhyme scheme is made from characters separated by slashes. E.g
             "abab/cdcd/efef/gg". The slashes denote a new stanza, i.e, they
             create an empty line. Same characters mean that the lines rhyme.
-            Note that the characters are case sensitive! For example, a and A
-            represent two different rhyme schemes.
+            Note that the characters are NOT case sensitive! For example, a and A are the same.
+
+            For instance, `.markov_poem abab/cdcd`
 
             You may also use our existing rhyme scheme templates:
-            {chr(10).join((k + " --- " + v) for k, v in templates.items())}""",
+            {chr(10).join((k + " --- " + v) for k, v in templates.items())}
+
+            For example, `.markov_poem ababbcbc` is the same as `.markov_poem ballade`""",
         brief="Gives the user a love poem made with a markov chain."
     )
     async def markov_poem(
