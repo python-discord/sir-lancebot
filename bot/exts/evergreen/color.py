@@ -1,6 +1,7 @@
 # imports
 import logging
 
+import colorsys
 import pillow
 from discord import Embed
 # ! need to install discord-flags and add to poetry.lock file
@@ -13,8 +14,8 @@ from bot.constants import Colours
 logger = logging.getLogger(__name__)
 
 # constants if needed
-# TODO Will the color conversions be done only from pillow or will an API / URL be needed?
-# Color URLs
+# Color URLs - will be replaced by JSON file?
+COLOR_JSON_PATH = ".bot//exts//resources//evergreen//"
 COLOR_URL_XKCD = "https://xkcd.com/color/rgb/"
 COLOR_URL_NAME_THAT_COLOR = "https://github.com/ryanzec/name-that-color/blob/master/lib/ntc.js#L116-L1681"
 
@@ -78,7 +79,7 @@ class Color(commands.cog):
         #     HSL=color_dict["HSL"],
         #     Hex=color_dict["Hex"],
         #     color_name=color_dict["color_name"]
-        #     )
+        #     ).set_image() # url for image?
         # )
 
         # TODO pass for now
