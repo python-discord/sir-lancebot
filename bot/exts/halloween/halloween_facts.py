@@ -3,7 +3,6 @@ import logging
 import random
 from datetime import timedelta
 from pathlib import Path
-from typing import Tuple
 
 import discord
 from discord.ext import commands
@@ -32,7 +31,7 @@ FACTS = list(enumerate(FACTS))
 class HalloweenFacts(commands.Cog):
     """A Cog for displaying interesting facts about Halloween."""
 
-    def random_fact(self) -> Tuple[int, str]:
+    def random_fact(self) -> tuple[int, str]:
         """Return a random fact from the loaded facts."""
         return random.choice(FACTS)
 

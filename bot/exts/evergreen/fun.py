@@ -2,8 +2,9 @@ import functools
 import json
 import logging
 import random
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Callable, Iterable, Tuple, Union
+from typing import Callable, Optional, Union
 
 from discord import Embed, Message
 from discord.ext import commands
@@ -53,7 +54,7 @@ def caesar_cipher(text: str, offset: int) -> Iterable[str]:
 class Fun(Cog):
     """A collection of general commands for fun."""
 
-    def __init__(self, bot: Bot) -> None:
+    def __init__(self, bot: Bot):
         self.bot = bot
 
         self._caesar_cipher_embed = json.loads(Path("bot/resources/evergreen/caesar_info.json").read_text("UTF-8"))
@@ -182,7 +183,7 @@ class Fun(Cog):
         await self._caesar_cipher(ctx, offset, msg, left_shift=True)
 
     @staticmethod
-    async def _get_text_and_embed(ctx: Context, text: str) -> Tuple[str, Union[Embed, None]]:
+    async def _get_text_and_embed(ctx: Context, text: str) -> tuple[str, Optional[Embed]]:
         """
         Attempts to extract the text and embed from a possible link to a discord Message.
 
@@ -191,17 +192,19 @@ class Fun(Cog):
 
         Returns a tuple of:
             str: If `text` is a valid discord Message, the contents of the message, else `text`.
-            Union[Embed, None]: The embed if found in the valid Message, else None
+            Optional[Embed]: The embed if found in the valid Message, else None
         """
         embed = None
 
         msg = await Fun._get_discord_message(ctx, text)
         # Ensure the user has read permissions for the channel the message is in
-        if isinstance(msg, Message) and ctx.author.permissions_in(msg.channel).read_messages:
-            text = msg.clean_content
-            # Take first embed because we can't send multiple embeds
-            if msg.embeds:
-                embed = msg.embeds[0]
+        if isinstance(msg, Message):
+            permissions = msg.channel.permissions_for(ctx.author)
+            if permissions.read_messages:
+                text = msg.clean_content
+                # Take first embed because we can't send multiple embeds
+                if msg.embeds:
+                    embed = msg.embeds[0]
 
         return (text, embed)
 

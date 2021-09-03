@@ -3,7 +3,7 @@ import asyncio
 import itertools
 import logging
 from contextlib import suppress
-from typing import List, NamedTuple, Union
+from typing import NamedTuple, Union
 
 from discord import Colour, Embed, HTTPException, Message, Reaction, User
 from discord.ext import commands
@@ -34,7 +34,7 @@ class Cog(NamedTuple):
 
     name: str
     description: str
-    commands: List[Command]
+    commands: list[Command]
 
 
 log = logging.getLogger(__name__)
@@ -343,7 +343,7 @@ class HelpSession:
         for category, cmds in grouped:
             await self._format_command_category(paginator, category, list(cmds))
 
-    async def _format_command_category(self, paginator: LinePaginator, category: str, cmds: List[Command]) -> None:
+    async def _format_command_category(self, paginator: LinePaginator, category: str, cmds: list[Command]) -> None:
         cmds = sorted(cmds, key=lambda c: c.name)
         cat_cmds = []
         for command in cmds:
@@ -373,7 +373,7 @@ class HelpSession:
 
             paginator.add_line(details)
 
-    async def _format_command(self, command: Command) -> List[str]:
+    async def _format_command(self, command: Command) -> list[str]:
         # skip if hidden and hide if session is set to
         if command.hidden and not self._show_hidden:
             return []

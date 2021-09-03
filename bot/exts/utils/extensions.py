@@ -1,7 +1,8 @@
 import functools
 import logging
-import typing as t
+from collections.abc import Mapping
 from enum import Enum
+from typing import Optional
 
 from discord import Colour, Embed
 from discord.ext import commands
@@ -170,7 +171,7 @@ class Extensions(commands.Cog):
         log.debug(f"{ctx.author} requested a list of all cogs. Returning a paginated list.")
         await LinePaginator.paginate(lines, ctx, embed, max_size=1200, empty=False)
 
-    def group_extension_statuses(self) -> t.Mapping[str, str]:
+    def group_extension_statuses(self) -> Mapping[str, str]:
         """Return a mapping of extension names and statuses to their categories."""
         categories = {}
 
@@ -219,7 +220,7 @@ class Extensions(commands.Cog):
 
         return msg
 
-    def manage(self, action: Action, ext: str) -> t.Tuple[str, t.Optional[str]]:
+    def manage(self, action: Action, ext: str) -> tuple[str, Optional[str]]:
         """Apply an action to an extension and return the status message and any error message."""
         verb = action.name.lower()
         error_msg = None

@@ -8,14 +8,13 @@ import logging
 import sys
 import traceback
 import types
-import typing
-
+from typing import Any, Optional, Union
 
 log = logging.getLogger(__name__)
 
 # A type alias to annotate the tuples returned from `sys.exc_info()`
-ExcInfo = typing.Tuple[typing.Type[Exception], Exception, types.TracebackType]
-Namespace = typing.Dict[str, typing.Any]
+ExcInfo = tuple[type[Exception], Exception, types.TracebackType]
+Namespace = dict[str, Any]
 
 # This will be used as an coroutine function wrapper for the code
 # to be evaluated. The wrapper contains one `pass` statement which
@@ -81,7 +80,7 @@ class EvalContext:
     clear the context, use the `.internal clear` command.
     """
 
-    def __init__(self, context_vars: Namespace, local_vars: Namespace) -> None:
+    def __init__(self, context_vars: Namespace, local_vars: Namespace):
         self._locals = dict(local_vars)
         self.context_vars = dict(context_vars)
 
@@ -93,7 +92,7 @@ class EvalContext:
         self.eval_tree = None
 
     @property
-    def dependencies(self) -> typing.Dict[str, typing.Any]:
+    def dependencies(self) -> dict[str, Any]:
         """
         Return a mapping of the dependencies for the wrapper function.
 
@@ -111,17 +110,17 @@ class EvalContext:
         }
 
     @property
-    def locals(self) -> typing.Dict[str, typing.Any]:
+    def locals(self) -> dict[str, Any]:
         """Return a mapping of names->values needed for evaluation."""
         return {**collections.ChainMap(self.dependencies, self.context_vars, self._locals)}
 
     @locals.setter
-    def locals(self, locals_: typing.Dict[str, typing.Any]) -> None:
+    def locals(self, locals_: dict[str, Any]) -> None:
         """Update the contextual mapping of names to values."""
         log.trace(f"Updating {self._locals} with {locals_}")
         self._locals.update(locals_)
 
-    def prepare_eval(self, code: str) -> typing.Optional[str]:
+    def prepare_eval(self, code: str) -> Optional[str]:
         """Prepare an evaluation by processing the code and setting up the context."""
         self.code = code
 
@@ -183,7 +182,7 @@ class EvalContext:
 class WrapEvalCodeTree(ast.NodeTransformer):
     """Wraps the AST of eval code with the wrapper function."""
 
-    def __init__(self, eval_code_tree: ast.AST, *args, **kwargs) -> None:
+    def __init__(self, eval_code_tree: ast.AST, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.eval_code_tree = eval_code_tree
 
@@ -195,7 +194,7 @@ class WrapEvalCodeTree(ast.NodeTransformer):
         new_tree = self.visit(self.wrapper)
         return ast.fix_missing_locations(new_tree)
 
-    def visit_Pass(self, node: ast.Pass) -> typing.List[ast.AST]:  # noqa: N802
+    def visit_Pass(self, node: ast.Pass) -> list[ast.AST]:  # noqa: N802
         """
         Replace the `_ast.Pass` node in the wrapper function by the eval AST.
 
@@ -208,12 +207,12 @@ class WrapEvalCodeTree(ast.NodeTransformer):
 class CaptureLastExpression(ast.NodeTransformer):
     """Captures the return value from a loose expression."""
 
-    def __init__(self, tree: ast.AST, *args, **kwargs) -> None:
+    def __init__(self, tree: ast.AST, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.tree = tree
         self.last_node = list(ast.iter_child_nodes(tree))[-1]
 
-    def visit_Expr(self, node: ast.Expr) -> typing.Union[ast.Expr, ast.Assign]:  # noqa: N802
+    def visit_Expr(self, node: ast.Expr) -> Union[ast.Expr, ast.Assign]:  # noqa: N802
         """
         Replace the Expr node that is last child node of Module with an assignment.
 

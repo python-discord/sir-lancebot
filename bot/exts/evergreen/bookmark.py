@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import random
-import typing as t
+from typing import Optional
 
 import discord
 from discord.ext import commands
@@ -92,7 +92,7 @@ class Bookmark(commands.Cog):
     async def bookmark(
         self,
         ctx: commands.Context,
-        target_message: t.Optional[WrappedMessageConverter],
+        target_message: Optional[WrappedMessageConverter],
         *,
         title: str = "Bookmark"
     ) -> None:
@@ -103,7 +103,7 @@ class Bookmark(commands.Cog):
             target_message = ctx.message.reference.resolved
 
         # Prevent users from bookmarking a message in a channel they don't have access to
-        permissions = ctx.author.permissions_in(target_message.channel)
+        permissions = target_message.channel.permissions_for(ctx.author)
         if not permissions.read_messages:
             log.info(f"{ctx.author} tried to bookmark a message in #{target_message.channel} but has no permissions.")
             embed = discord.Embed(

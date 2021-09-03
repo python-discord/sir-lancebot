@@ -2,7 +2,8 @@ import difflib
 import logging
 import math
 import random
-from typing import Iterable, Union
+from collections.abc import Iterable
+from typing import Union
 
 from discord import Embed, Message
 from discord.ext import commands
@@ -22,7 +23,7 @@ QUESTION_MARK_ICON = "https://cdn.discordapp.com/emojis/512367613339369475.png"
 class CommandErrorHandler(commands.Cog):
     """A error handler for the PythonDiscord server."""
 
-    def __init__(self, bot: Bot) -> None:
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @staticmethod

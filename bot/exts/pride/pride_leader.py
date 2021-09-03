@@ -8,8 +8,8 @@ import discord
 from discord.ext import commands
 from rapidfuzz import fuzz
 
-from bot import bot
 from bot import constants
+from bot.bot import Bot
 
 log = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ MINIMUM_FUZZ_RATIO = 40
 class PrideLeader(commands.Cog):
     """Gives information about Pride Leaders."""
 
-    def __init__(self, bot: bot.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     def invalid_embed_generate(self, pride_leader: str) -> discord.Embed:
@@ -112,6 +112,6 @@ class PrideLeader(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: bot.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load the Pride Leader Cog."""
     bot.add_cog(PrideLeader(bot))
