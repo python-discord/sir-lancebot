@@ -1,3 +1,4 @@
+from asyncio import TimeoutError
 from pathlib import Path
 from random import choice
 
@@ -5,7 +6,6 @@ from discord import Color, Embed
 from discord.ext import commands
 
 from bot.bot import Bot
-from asyncio import TimeoutError
 
 
 class Hangman(commands.Cog):
@@ -29,10 +29,11 @@ class Hangman(commands.Cog):
         The arguments denote:
             - min_length, a string denoting what is the minimum amount of letters the word chosen can have.
             - max_length, a string denoting what is the maximum amount of letters the word chosen can have.
-            - min_unique_letters, a string denoting what is the minimum amount of unique letters the word chosen can have.
-            - max_unique_letters, a string denoting what is the maximum amount of unique letters the word chosen can have.
+            - min_unique_letters, a string denoting what is the minimum amount of unique letters the word chosen
+            can have.
+            - max_unique_letters, a string denoting what is the maximum amount of unique letters the word chosen
+            can have.
         """
-
         # filtering the list of all words depending on the configuration
         filtered_words = list(filter(lambda x: int(min_length) < len(x) < int(max_length)
                                      and int(min_unique_letters) < len(set(x)) < int(max_unique_letters),
@@ -43,7 +44,7 @@ class Hangman(commands.Cog):
             await ctx.send(embed=filter_not_found_embed)
             return
 
-        # defining a list of images that will be used for the game to represent the 'hung man'
+        # defining a list of images that will be used for the game to represent the hangman person
         images = ['https://cdn.discordapp.com/attachments/859123972884922418/883472355056295946/hangman0.png',
                   'https://cdn.discordapp.com/attachments/859123972884922418/883472756744814613/hangman1.png',
                   'https://cdn.discordapp.com/attachments/859123972884922418/883472808699629578/hangman2.png',
