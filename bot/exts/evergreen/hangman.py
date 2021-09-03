@@ -1,7 +1,7 @@
 from pathlib import Path
 from random import choice
 
-from discord import Color, Embed
+from discord import Color, Embed, File
 from discord.ext import commands
 
 from bot.bot import Bot
@@ -39,20 +39,25 @@ class Hangman(commands.Cog):
         # a dictionary mapping the images of the 'hung man' to the number of tries it corresponds to
         mapping_of_images = {}
 
-        for image_name, tries_equal_to in zip(images, range(6, -1, -1)):
-            with Path(f"resources/evergreen/hangman/{image_name}").resolve().open() as image:
-                mapping_of_images[tries_equal_to] = image
+        for image_name, tries_equal_to in zip(images, range(6, 0, -1)):
+            mapping_of_images[tries_equal_to] = File(f"bot/resources/evergreen/hangman/{image_name}",
+                                                     filename=image_name)
 
         word = choice(filtered_words)
         user_guess = '_' * len(word)
         tries = 6
         hangman_embed = Embed(title="Hangman", color=Color.blurple())
-        hangman_embed.set_image(url=mapping_of_images[tries])
+        hangman_embed.set_image(url=f"attachment://{mapping_of_images[tries].filename}")
         hangman_embed.add_field(name=f"The word is `{user_guess}`", value="Guess the word by sending a "
                                                                           "message with the letter!", inline=False)
-        original_message = await ctx.send(embed=hangman_embed)
+        original_message = await ctx.send(file=mapping_of_images[tries], embed=hangman_embed)
 
         while user_guess != word:
+            # unfortunately, the bot needs to generate the dictionary every time to avoid an operation on a closed file
+            for image_name, tries_equal_to in zip(images, range(6, 0, -1)):
+                mapping_of_images[tries_equal_to] = File(f"bot/resources/evergreen/hangman/{image_name}",
+                                                         filename=image_name)
+
             try:
                 message = await self.bot.wait_for(event="message", timeout=30.0,
                                                   check=lambda msg: msg.author != self.bot)
@@ -64,22 +69,25 @@ class Hangman(commands.Cog):
                     user_guess = ''.join([message.content if index in positions else dash
                                           for index, dash in enumerate(user_guess)])
                 elif tries - 1 <= 0:
+                    await original_message.delete()
                     losing_embed = Embed(title="You lost.", description=f"The word was `{word}`.", color=Color.red())
-                    await original_message.edit(embed=losing_embed)
+                    await ctx.send(embed=losing_embed)
                     return
                 else:
                     tries -= 1
 
                 hangman_embed.clear_fields()
-                hangman_embed.set_image(url=mapping_of_images[tries])
+                hangman_embed.set_image(url=f"attachment://{mapping_of_images[tries].filename}")
                 hangman_embed.add_field(name=f"The word is `{user_guess}`", value="Guess the word by sending a "
                                                                                   "message with the letter!",
                                         inline=False)
-                await original_message.edit(embed=hangman_embed)
+                await original_message.delete()
+                original_message = await ctx.send(file=mapping_of_images[tries], embed=hangman_embed)
             except TimeoutError:
                 return
         else:
             win_embed = Embed(title="You won!", color=Color.green())
+            await original_message.delete()
             await ctx.send(embed=win_embed)
 
 
