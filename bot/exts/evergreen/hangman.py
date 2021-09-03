@@ -34,7 +34,7 @@ class Hangman(commands.Cog):
                                      self.all_words))
         if not filtered_words:
             filter_not_found_embed = Embed(title="With the filters you provided, there were not words that could"
-                                                 "fit all the filters specified.", color=Color.red())
+                                                 " fit all the filters specified.", color=Color.red())
             await ctx.send(embed=filter_not_found_embed)
             return
 
