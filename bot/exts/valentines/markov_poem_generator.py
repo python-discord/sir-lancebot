@@ -14,6 +14,7 @@ import markovify
 from discord import Embed
 from discord.ext import commands
 
+import bot
 from bot.constants import Colours
 from bot.utils.pagination import LinePaginator
 
@@ -53,7 +54,7 @@ _EXECUTOR = ThreadPoolExecutor(10)
 full_corpus = []
 for source_file in SOURCES:
     with Path(f"bot/resources/valentines/{source_file}").open() as f:
-        curr_corpus = f.read().splitlines()
+        curr_corpus = f.readlines()
         full_corpus.extend(curr_corpus)
 
 
@@ -167,7 +168,7 @@ class MarkovPoemGenerator(commands.Cog):
     can be iterated through, whilst corresponding to the given rhyme scheme.
     """
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: bot.bot.Bot):
         """Initializes the full corpus text and the markov model."""
         self.bot = bot
 
@@ -497,12 +498,12 @@ class MarkovPoemGenerator(commands.Cog):
             embed = Embed(
                 title="Uh oh... Markov Poem can't give you a poem...",
                 color=Colours.soft_red,
-                description=f"""
-                    Apologies {ctx.author.mention},
-                    but it appears that we have encountered a rare bug.
-                    It might be the case that your poem is too long,
-                    please try again.
-                    """
+                description=(
+                    f"Apologies {ctx.author.mention}, "
+                    "but it appears that we have encountered a rare bug. "
+                    "It might be the case that your poem is too long, "
+                    "please try again."
+                )
             )
             await ctx.send(embed=embed)
         elif isinstance(error, commands.errors.MaxConcurrencyReached):
@@ -511,6 +512,6 @@ class MarkovPoemGenerator(commands.Cog):
                            " we are currently working on your poem!")
 
 
-def setup(bot: commands.Bot) -> None:
+def setup(bot: bot.bot.Bot) -> None:
     """Poem generator cog load."""
     bot.add_cog(MarkovPoemGenerator(bot))
