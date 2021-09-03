@@ -123,11 +123,11 @@ def memoize(func: Callable) -> Callable:
     @functools.wraps(func)
     async def wrapper(
         *args,
-        instance: Callable = None,
-        word: str = None
+        instance: Optional[Callable] = None,
+        word: Optional[str] = None
     ) -> Set[str]:
         with Cache(word) as (cache, word):
-            if word not in cache.keys():
+            if word not in cache:
                 cache[word] = await func(instance, word)
 
         return cache[word]
@@ -140,13 +140,13 @@ def command_wrapper(func: Callable) -> Callable:
     @functools.wraps(func)
     async def wrapper(
         *args,
-        instance: Callable = None,
-        timeout: int = None,
-        ctx: commands.Context = None,
-        scheme: str = None,
-        unit_count: Dict[str, int] = None,
-        time_start: datetime.time = None,
-        is_first_error: bool = None
+        instance: Optional[Callable] = None,
+        timeout: Optional[int] = None,
+        ctx: Optional[commands.Context] = None,
+        scheme: Optional[str] = None,
+        unit_count: Optional[Dict[str, int]] = None,
+        time_start: Optional[datetime.time] = None,
+        is_first_error: Optional[bool] = None
     ) -> Callable:
         try:
             async with async_timeout.timeout(timeout), ctx.typing():
