@@ -65,7 +65,7 @@ class Emojis(commands.Cog):
             emoji_dict[emoji.name.split("_")[0]].append(emoji)
 
         error_comp = ", ".join(emoji_dict)
-        msg.append(f"These are the valid emoji categories:\n```{error_comp}```")
+        msg.append(f"These are the valid emoji categories:\n```\n{error_comp}\n```")
         return embed, msg
 
     @commands.group(name="emoji", invoke_without_command=True)
