@@ -49,6 +49,13 @@ log = logging.getLogger(__name__)
 
 _EXECUTOR = ThreadPoolExecutor(10)
 
+# Load the full text corpus
+full_corpus = []
+for source_file in SOURCES:
+    with Path(f"bot/resources/valentines/{source_file}").open() as f:
+        curr_corpus = f.read().splitlines()
+        full_corpus.extend(curr_corpus)
+
 
 async def in_thread(func: Callable) -> Future:
     """Allows non-async functions to work in async functions."""
@@ -163,13 +170,6 @@ class MarkovPoemGenerator(commands.Cog):
     def __init__(self, bot: commands.Bot):
         """Initializes the full corpus text and the markov model."""
         self.bot = bot
-
-        # Load the full text corpus
-        full_corpus = []
-        for source_file in SOURCES:
-            with Path(f"bot/resources/valentines/{source_file}").open() as f:
-                curr_corpus = f.read().splitlines()
-                full_corpus.extend(curr_corpus)
 
         # Create the markov model
         self.model = markovify.Text(full_corpus, state_size=1)
