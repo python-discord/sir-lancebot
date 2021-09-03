@@ -5,9 +5,6 @@ from discord import Color, Embed
 from discord.ext import commands
 
 from bot.bot import Bot
-from sys import stdout
-from bot.constants import WHITELISTED_CHANNELS
-from bot.utils.decorators import whitelist_override
 from asyncio import TimeoutError
 
 
@@ -33,22 +30,36 @@ class Hangman(commands.Cog):
 
         # filtering the list of all words depending on the configuration
         filtered_words = list(filter(lambda x: int(min_length) < len(x) < int(max_length)
-                                               and int(min_unique_letters) < len(set(x)) < int(max_unique_letters),
+                                     and int(min_unique_letters) < len(set(x)) < int(max_unique_letters),
                                      self.all_words))
+
+        # defining a list of images that will be used for the game to represent the 'hung man'
+        images = [f'hangman{num}.png' for num in range(0, 7)]
+
+        # a dictionary mapping the images of the 'hung man' to the number of tries it corresponds to
+        mapping_of_images = {}
+
+        for image_name, tries_equal_to in zip(images, range(6, -1, -1)):
+            with Path(f"resources/evergreen/hangman/{image_name}").resolve().open() as image:
+                mapping_of_images[tries_equal_to] = image
+
         word = choice(filtered_words)
         user_guess = '_' * len(word)
+        tries = 6
         hangman_embed = Embed(title="Hangman", color=Color.blurple())
+        hangman_embed.set_image(url=mapping_of_images[tries])
         hangman_embed.add_field(name=f"The word is `{user_guess}`", value="Guess the word by sending a "
                                                                           "message with the letter!", inline=False)
-        tries = 5
-        hangman_embed.set_footer(text=f"Tries left: `{tries}`")
         original_message = await ctx.send(embed=hangman_embed)
 
         while user_guess != word:
             try:
-                message = await self.bot.wait_for(event="message", timeout=15.0,
-                                                  check=lambda msg: msg.author == ctx.author)
-                if message.content in word:
+                message = await self.bot.wait_for(event="message", timeout=30.0,
+                                                  check=lambda msg: msg.author != self.bot)
+
+                if len(message.content) > 1:
+                    continue
+                elif message.content in word:
                     positions = [idx for idx, letter in enumerate(word) if letter == message.content]
                     user_guess = ''.join([message.content if index in positions else dash
                                           for index, dash in enumerate(user_guess)])
@@ -60,10 +71,10 @@ class Hangman(commands.Cog):
                     tries -= 1
 
                 hangman_embed.clear_fields()
+                hangman_embed.set_image(url=mapping_of_images[tries])
                 hangman_embed.add_field(name=f"The word is `{user_guess}`", value="Guess the word by sending a "
                                                                                   "message with the letter!",
                                         inline=False)
-                hangman_embed.set_footer(text=f"Tries left: {tries}")
                 await original_message.edit(embed=hangman_embed)
             except TimeoutError:
                 return
