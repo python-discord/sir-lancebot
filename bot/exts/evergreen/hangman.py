@@ -21,11 +21,16 @@ class Hangman(commands.Cog):
             self.all_words = list(map(lambda line: line.strip('\n'), file.readlines()))
 
     @commands.command()
-    async def hangman(self, ctx: commands.Context, mode: str = 'g',
-                      min_length: str = '0', max_length: str = '25',
+    async def hangman(self, ctx: commands.Context, min_length: str = '0', max_length: str = '25',
                       min_unique_letters: str = '0', max_unique_letters: str = '25') -> None:
         """
-        Starts the hangman game.
+        Starts the classic Hangman game.
+
+        The arguments denote:
+            - min_length, a string denoting what is the minimum amount of letters the word chosen can have.
+            - max_length, a string denoting what is the maximum amount of letters the word chosen can have.
+            - min_unique_letters, a string denoting what is the minimum amount of unique letters the word chosen can have.
+            - max_unique_letters, a string denoting what is the maximum amount of unique letters the word chosen can have.
         """
 
         # filtering the list of all words depending on the configuration
