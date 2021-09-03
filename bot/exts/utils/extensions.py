@@ -1,7 +1,8 @@
 import functools
 import logging
-import typing as t
+from collections.abc import Mapping
 from enum import Enum
+from typing import Optional
 
 from discord import Colour, Embed
 from discord.ext import commands
@@ -60,7 +61,7 @@ class Extension(commands.Converter):
             names = "\n".join(matches)
             raise commands.BadArgument(
                 f":x: `{argument}` is an ambiguous extension name. "
-                f"Please use one of the following fully-qualified names.```\n{names}```"
+                f"Please use one of the following fully-qualified names.```\n{names}\n```"
             )
         elif matches:
             return matches[0]
@@ -110,7 +111,7 @@ class Extensions(commands.Cog):
         blacklisted = "\n".join(UNLOAD_BLACKLIST & set(extensions))
 
         if blacklisted:
-            msg = f":x: The following extension(s) may not be unloaded:```{blacklisted}```"
+            msg = f":x: The following extension(s) may not be unloaded:```\n{blacklisted}\n```"
         else:
             if "*" in extensions or "**" in extensions:
                 extensions = set(self.bot.extensions.keys()) - UNLOAD_BLACKLIST
@@ -155,7 +156,7 @@ class Extensions(commands.Cog):
         embed.set_author(
             name="Extensions List",
             url=Client.github_bot_repo,
-            icon_url=str(self.bot.user.avatar_url)
+            icon_url=str(self.bot.user.display_avatar.url)
         )
 
         lines = []
@@ -170,7 +171,7 @@ class Extensions(commands.Cog):
         log.debug(f"{ctx.author} requested a list of all cogs. Returning a paginated list.")
         await LinePaginator.paginate(lines, ctx, embed, max_size=1200, empty=False)
 
-    def group_extension_statuses(self) -> t.Mapping[str, str]:
+    def group_extension_statuses(self) -> Mapping[str, str]:
         """Return a mapping of extension names and statuses to their categories."""
         categories = {}
 
@@ -213,13 +214,13 @@ class Extensions(commands.Cog):
 
         if failures:
             failures = "\n".join(f"{ext}\n    {err}" for ext, err in failures.items())
-            msg += f"\nFailures:```{failures}```"
+            msg += f"\nFailures:```\n{failures}\n```"
 
         log.debug(f"Batch {verb}ed extensions.")
 
         return msg
 
-    def manage(self, action: Action, ext: str) -> t.Tuple[str, t.Optional[str]]:
+    def manage(self, action: Action, ext: str) -> tuple[str, Optional[str]]:
         """Apply an action to an extension and return the status message and any error message."""
         verb = action.name.lower()
         error_msg = None
@@ -240,7 +241,7 @@ class Extensions(commands.Cog):
             log.exception(f"Extension '{ext}' failed to {verb}.")
 
             error_msg = f"{e.__class__.__name__}: {e}"
-            msg = f":x: Failed to {verb} extension `{ext}`:\n```{error_msg}```"
+            msg = f":x: Failed to {verb} extension `{ext}`:\n```\n{error_msg}\n```"
         else:
             msg = f":ok_hand: Extension successfully {verb}ed: `{ext}`."
             log.debug(msg[10:])

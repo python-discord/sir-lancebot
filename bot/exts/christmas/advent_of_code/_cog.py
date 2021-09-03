@@ -29,7 +29,7 @@ AOC_WHITELIST = AOC_WHITELIST_RESTRICTED + (Channels.advent_of_code,)
 class AdventOfCode(commands.Cog):
     """Advent of Code festivities! Ho Ho Ho!"""
 
-    def __init__(self, bot: Bot) -> None:
+    def __init__(self, bot: Bot):
         self.bot = bot
 
         self._base_url = f"https://adventofcode.com/{AocConfig.year}"

@@ -1,7 +1,7 @@
 import json
 import logging
 import random
-from typing import Iterable, List
+from collections.abc import Iterable
 
 import discord
 from discord.ext.commands import Context, Converter
@@ -27,7 +27,7 @@ class Snake(Converter):
         if name == "python":
             return "Python (programming language)"
 
-        def get_potential(iterable: Iterable, *, threshold: int = 80) -> List[str]:
+        def get_potential(iterable: Iterable, *, threshold: int = 80) -> list[str]:
             nonlocal name
             potential = []
 
@@ -53,7 +53,7 @@ class Snake(Converter):
 
         embed = discord.Embed(
             title="Found multiple choices. Please choose the correct one.", colour=0x59982F)
-        embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
+        embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar.url)
 
         name = await disambiguate(ctx, get_potential(all_names), timeout=timeout, embed=embed)
         return names.get(name, name)

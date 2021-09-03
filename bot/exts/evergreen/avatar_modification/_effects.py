@@ -1,8 +1,8 @@
 import math
 import random
-import typing as t
 from io import BytesIO
 from pathlib import Path
+from typing import Callable, Optional
 
 import discord
 from PIL import Image, ImageDraw, ImageOps
@@ -18,7 +18,7 @@ class PfpEffects:
     """
 
     @staticmethod
-    def apply_effect(image_bytes: bytes, effect: t.Callable, filename: str, *args) -> discord.File:
+    def apply_effect(image_bytes: bytes, effect: Callable, filename: str, *args) -> discord.File:
         """Applies the given effect to the image passed to it."""
         im = Image.open(BytesIO(image_bytes))
         im = im.convert("RGBA")
@@ -32,7 +32,7 @@ class PfpEffects:
         return discord.File(bufferedio, filename=filename)
 
     @staticmethod
-    def closest(x: t.Tuple[int, int, int]) -> t.Tuple[int, int, int]:
+    def closest(x: tuple[int, int, int]) -> tuple[int, int, int]:
         """
         Finds the closest "easter" colour to a given pixel.
 
@@ -40,7 +40,7 @@ class PfpEffects:
         """
         r1, g1, b1 = x
 
-        def distance(point: t.Tuple[int, int, int]) -> t.Tuple[int, int, int]:
+        def distance(point: tuple[int, int, int]) -> int:
             """Finds the difference between a pastel colour and the original pixel colour."""
             r2, g2, b2 = point
             return (r1 - r2) ** 2 + (g1 - g2) ** 2 + (b1 - b2) ** 2
@@ -108,7 +108,7 @@ class PfpEffects:
         return image
 
     @staticmethod
-    def easterify_effect(image: Image.Image, overlay_image: t.Optional[Image.Image] = None) -> Image.Image:
+    def easterify_effect(image: Image.Image, overlay_image: Optional[Image.Image] = None) -> Image.Image:
         """
         Applies the easter effect to the given image.
 
@@ -212,7 +212,7 @@ class PfpEffects:
         return new_imgs
 
     @staticmethod
-    def join_images(images: t.List[Image.Image]) -> Image.Image:
+    def join_images(images: list[Image.Image]) -> Image.Image:
         """
         Stitches all the image squares into a new image.
 

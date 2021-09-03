@@ -2,8 +2,9 @@ import asyncio
 import contextlib
 import re
 import string
+from collections.abc import Iterable
 from datetime import datetime
-from typing import Iterable, List, Optional
+from typing import Optional
 
 import discord
 from discord.ext.commands import BadArgument, Context
@@ -32,7 +33,7 @@ def resolve_current_month() -> Month:
 
 async def disambiguate(
     ctx: Context,
-    entries: List[str],
+    entries: list[str],
     *,
     timeout: float = 30,
     entries_per_page: int = 20,

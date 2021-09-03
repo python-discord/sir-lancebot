@@ -5,7 +5,7 @@ from urllib.parse import quote_plus
 from discord import Embed
 from discord.ext import commands
 
-from bot import bot
+from bot.bot import Bot
 from bot.constants import Colours
 
 logger = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ ERROR_EMBED = Embed(
 class RealPython(commands.Cog):
     """User initiated command to search for a Real Python article."""
 
-    def __init__(self, bot: bot.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @commands.command(aliases=["rp"])
@@ -76,6 +76,6 @@ class RealPython(commands.Cog):
         await ctx.send(embed=article_embed)
 
 
-def setup(bot: bot.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load the Real Python Cog."""
     bot.add_cog(RealPython(bot))

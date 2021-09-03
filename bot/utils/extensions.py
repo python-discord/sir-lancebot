@@ -1,7 +1,8 @@
 import importlib
 import inspect
 import pkgutil
-from typing import Iterator, NoReturn
+from collections.abc import Iterator
+from typing import NoReturn
 
 from discord.ext.commands import Context
 

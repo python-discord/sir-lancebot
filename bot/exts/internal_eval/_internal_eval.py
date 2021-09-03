@@ -1,7 +1,7 @@
 import logging
 import re
 import textwrap
-import typing
+from typing import Optional
 
 import discord
 from discord.ext import commands
@@ -82,7 +82,7 @@ class InternalEval(commands.Cog):
 
         return shortened_output
 
-    async def _upload_output(self, output: str) -> typing.Optional[str]:
+    async def _upload_output(self, output: str) -> Optional[str]:
         """Upload `internal eval` output to our pastebin and return the url."""
         try:
             async with self.bot.http_session.post(

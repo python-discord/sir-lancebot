@@ -1,6 +1,6 @@
 import logging
 import pkgutil
-from typing import Iterator
+from collections.abc import Iterator
 
 __all__ = ("get_package_names",)
 

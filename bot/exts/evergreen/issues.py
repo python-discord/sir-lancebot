@@ -1,8 +1,8 @@
 import logging
 import random
 import re
-import typing as t
 from dataclasses import dataclass
+from typing import Optional, Union
 
 import discord
 from discord.ext import commands
@@ -62,7 +62,7 @@ AUTOMATIC_REGEX = re.compile(
 class FoundIssue:
     """Dataclass representing an issue found by the regex."""
 
-    organisation: t.Optional[str]
+    organisation: Optional[str]
     repository: str
     number: str
 
@@ -106,7 +106,7 @@ class Issues(commands.Cog):
             number: int,
             repository: str,
             user: str
-    ) -> t.Union[IssueState, FetchError]:
+    ) -> Union[IssueState, FetchError]:
         """
         Retrieve an issue from a GitHub repository.
 
@@ -162,9 +162,9 @@ class Issues(commands.Cog):
 
     @staticmethod
     def format_embed(
-        results: t.List[t.Union[IssueState, FetchError]],
+        results: list[Union[IssueState, FetchError]],
         user: str,
-        repository: t.Optional[str] = None
+        repository: Optional[str] = None
     ) -> discord.Embed:
         """Take a list of IssueState or FetchError and format a Discord embed for them."""
         description_list = []
