@@ -47,7 +47,8 @@ class Challenges(commands.Cog):
             soup = BeautifulSoup(await response.text(), features='lxml')
             section_katas = soup.body.div.div.main.section
             div_of_katas = section_katas.find("div", class_='w-full md:w-9/12 md:pl-4 pr-0 space-y-2')
-            first_kata_div = div_of_katas.find("div", class_='list-item-kata bg-ui-section p-4 rounded-lg shadow-md')
+            first_kata_div = choice(div_of_katas.find_all("div",
+                                    class_='list-item-kata bg-ui-section p-4 rounded-lg shadow-md'))
             if not first_kata_div:
                 no_results_embed = Embed(title="I could not find any results for the filters you provided.",
                                          color=Color.red())
