@@ -2,9 +2,10 @@ import asyncio
 import functools
 import logging
 import random
-import typing as t
 from asyncio import Lock
+from collections.abc import Container
 from functools import wraps
+from typing import Callable, Optional, Union
 from weakref import WeakValueDictionary
 
 from discord import Colour, Embed
@@ -32,7 +33,7 @@ class InMonthCheckFailure(CheckFailure):
     pass
 
 
-def seasonal_task(*allowed_months: Month, sleep_time: t.Union[float, int] = ONE_DAY) -> t.Callable:
+def seasonal_task(*allowed_months: Month, sleep_time: Union[float, int] = ONE_DAY) -> Callable:
     """
     Perform the decorated method periodically in `allowed_months`.
 
@@ -44,7 +45,7 @@ def seasonal_task(*allowed_months: Month, sleep_time: t.Union[float, int] = ONE_
 
     The wrapped task is responsible for waiting for the bot to be ready, if necessary.
     """
-    def decorator(task_body: t.Callable) -> t.Callable:
+    def decorator(task_body: Callable) -> Callable:
         @functools.wraps(task_body)
         async def decorated_task(*args, **kwargs) -> None:
             """Call `task_body` once every `sleep_time` seconds in `allowed_months`."""
@@ -63,13 +64,13 @@ def seasonal_task(*allowed_months: Month, sleep_time: t.Union[float, int] = ONE_
     return decorator
 
 
-def in_month_listener(*allowed_months: Month) -> t.Callable:
+def in_month_listener(*allowed_months: Month) -> Callable:
     """
     Shield a listener from being invoked outside of `allowed_months`.
 
     The check is performed against current UTC month.
     """
-    def decorator(listener: t.Callable) -> t.Callable:
+    def decorator(listener: Callable) -> Callable:
         @functools.wraps(listener)
         async def guarded_listener(*args, **kwargs) -> None:
             """Wrapped listener will abort if not in allowed month."""
@@ -84,7 +85,7 @@ def in_month_listener(*allowed_months: Month) -> t.Callable:
     return decorator
 
 
-def in_month_command(*allowed_months: Month) -> t.Callable:
+def in_month_command(*allowed_months: Month) -> Callable:
     """
     Check whether the command was invoked in one of `enabled_months`.
 
@@ -106,7 +107,7 @@ def in_month_command(*allowed_months: Month) -> t.Callable:
     return commands.check(predicate)
 
 
-def in_month(*allowed_months: Month) -> t.Callable:
+def in_month(*allowed_months: Month) -> Callable:
     """
     Universal decorator for season-locking commands and listeners alike.
 
@@ -124,7 +125,7 @@ def in_month(*allowed_months: Month) -> t.Callable:
     manually set to True - this causes a circumvention of the group's callback
     and the seasonal check applied to it.
     """
-    def decorator(callable_: t.Callable) -> t.Callable:
+    def decorator(callable_: Callable) -> Callable:
         # Functions decorated as commands are turned into instances of `Command`
         if isinstance(callable_, Command):
             logging.debug(f"Command {callable_.qualified_name} will be locked to {human_months(allowed_months)}")
@@ -144,7 +145,7 @@ def in_month(*allowed_months: Month) -> t.Callable:
     return decorator
 
 
-def with_role(*role_ids: int) -> t.Callable:
+def with_role(*role_ids: int) -> Callable:
     """Check to see whether the invoking user has any of the roles specified in role_ids."""
     async def predicate(ctx: Context) -> bool:
         if not ctx.guild:  # Return False in a DM
@@ -167,7 +168,7 @@ def with_role(*role_ids: int) -> t.Callable:
     return commands.check(predicate)
 
 
-def without_role(*role_ids: int) -> t.Callable:
+def without_role(*role_ids: int) -> Callable:
     """Check whether the invoking user does not have all of the roles specified in role_ids."""
     async def predicate(ctx: Context) -> bool:
         if not ctx.guild:  # Return False in a DM
@@ -187,7 +188,7 @@ def without_role(*role_ids: int) -> t.Callable:
     return commands.check(predicate)
 
 
-def whitelist_check(**default_kwargs: t.Container[int]) -> t.Callable[[Context], bool]:
+def whitelist_check(**default_kwargs: Container[int]) -> Callable[[Context], bool]:
     """
     Checks if a message is sent in a whitelisted context.
 
@@ -222,8 +223,8 @@ def whitelist_check(**default_kwargs: t.Container[int]) -> t.Callable[[Context],
                     kwargs[arg] = new_value
 
                 # Merge containers
-                elif isinstance(default_value, t.Container):
-                    if isinstance(new_value, t.Container):
+                elif isinstance(default_value, Container):
+                    if isinstance(new_value, Container):
                         kwargs[arg] = (*default_value, *new_value)
                     else:
                         kwargs[arg] = new_value
@@ -279,7 +280,7 @@ def whitelist_check(**default_kwargs: t.Container[int]) -> t.Callable[[Context],
     return predicate
 
 
-def whitelist_override(bypass_defaults: bool = False, **kwargs: t.Container[int]) -> t.Callable:
+def whitelist_override(bypass_defaults: bool = False, **kwargs: Container[int]) -> Callable:
     """
     Override global whitelist context, with the kwargs specified.
 
@@ -288,7 +289,7 @@ def whitelist_override(bypass_defaults: bool = False, **kwargs: t.Container[int]
 
     This decorator has to go before (below) below the `command` decorator.
     """
-    def inner(func: t.Callable) -> t.Callable:
+    def inner(func: Callable) -> Callable:
         func.override = kwargs
         func.override_reset = bypass_defaults
         return func
@@ -296,7 +297,7 @@ def whitelist_override(bypass_defaults: bool = False, **kwargs: t.Container[int]
     return inner
 
 
-def locked() -> t.Union[t.Callable, None]:
+def locked() -> Optional[Callable]:
     """
     Allows the user to only run one instance of the decorated command at a time.
 
@@ -304,11 +305,11 @@ def locked() -> t.Union[t.Callable, None]:
 
     This decorator has to go before (below) the `command` decorator.
     """
-    def wrap(func: t.Callable) -> t.Union[t.Callable, None]:
+    def wrap(func: Callable) -> Optional[Callable]:
         func.__locks = WeakValueDictionary()
 
         @wraps(func)
-        async def inner(self: t.Callable, ctx: Context, *args, **kwargs) -> t.Union[t.Callable, None]:
+        async def inner(self: Callable, ctx: Context, *args, **kwargs) -> Optional[Callable]:
             lock = func.__locks.setdefault(ctx.author.id, Lock())
             if lock.locked():
                 embed = Embed()

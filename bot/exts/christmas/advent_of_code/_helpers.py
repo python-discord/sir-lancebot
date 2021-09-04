@@ -5,8 +5,7 @@ import json
 import logging
 import math
 import operator
-import typing
-from typing import Tuple
+from typing import Any, Optional
 
 import aiohttp
 import arrow
@@ -67,11 +66,11 @@ class UnexpectedResponseStatus(aiohttp.ClientError):
     """Raised when an unexpected redirect was detected."""
 
 
-class FetchingLeaderboardFailed(Exception):
+class FetchingLeaderboardFailedError(Exception):
     """Raised when one or more leaderboards could not be fetched at all."""
 
 
-def leaderboard_sorting_function(entry: typing.Tuple[str, dict]) -> typing.Tuple[int, int]:
+def leaderboard_sorting_function(entry: tuple[str, dict]) -> tuple[int, int]:
     """
     Provide a sorting value for our leaderboard.
 
@@ -155,7 +154,7 @@ def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
     return {"daily_stats": daily_stats, "leaderboard": sorted_leaderboard}
 
 
-def _format_leaderboard(leaderboard: typing.Dict[str, dict]) -> str:
+def _format_leaderboard(leaderboard: dict[str, dict]) -> str:
     """Format the leaderboard using the AOC_TABLE_TEMPLATE."""
     leaderboard_lines = [HEADER]
     for rank, data in enumerate(leaderboard.values(), start=1):
@@ -171,7 +170,7 @@ def _format_leaderboard(leaderboard: typing.Dict[str, dict]) -> str:
     return "\n".join(leaderboard_lines)
 
 
-async def _leaderboard_request(url: str, board: int, cookies: dict) -> typing.Optional[dict]:
+async def _leaderboard_request(url: str, board: str, cookies: dict) -> dict[str, Any]:
     """Make a leaderboard request using the specified session cookie."""
     async with aiohttp.request("GET", url, headers=AOC_REQUEST_HEADER, cookies=cookies) as resp:
         # The Advent of Code website redirects silently with a 200 response if a
@@ -188,7 +187,7 @@ async def _leaderboard_request(url: str, board: int, cookies: dict) -> typing.Op
         return await resp.json()
 
 
-async def _fetch_leaderboard_data() -> typing.Dict[str, typing.Any]:
+async def _fetch_leaderboard_data() -> dict[str, Any]:
     """Fetch data for all leaderboards and return a pooled result."""
     year = AdventOfCode.year
 
@@ -210,7 +209,7 @@ async def _fetch_leaderboard_data() -> typing.Dict[str, typing.Any]:
             except UnexpectedRedirect:
                 if cookies["session"] == AdventOfCode.fallback_session:
                     log.error("It seems like the fallback cookie has expired!")
-                    raise FetchingLeaderboardFailed from None
+                    raise FetchingLeaderboardFailedError from None
 
                 # If we're here, it means that the original session did not
                 # work. Let's fall back to the fallback session.
@@ -218,7 +217,7 @@ async def _fetch_leaderboard_data() -> typing.Dict[str, typing.Any]:
                 continue
             except aiohttp.ClientError:
                 # Don't retry, something unexpected is wrong and it may not be the session.
-                raise FetchingLeaderboardFailed from None
+                raise FetchingLeaderboardFailedError from None
             else:
                 # Get the participants and store their current count.
                 board_participants = raw_data["members"]
@@ -227,7 +226,7 @@ async def _fetch_leaderboard_data() -> typing.Dict[str, typing.Any]:
                 break
         else:
             log.error(f"reached 'unreachable' state while fetching board `{leaderboard.id}`.")
-            raise FetchingLeaderboardFailed
+            raise FetchingLeaderboardFailedError
 
     log.info(f"Fetched leaderboard information for {len(participants)} participants")
     return participants
@@ -333,7 +332,7 @@ def get_summary_embed(leaderboard: dict) -> discord.Embed:
     return aoc_embed
 
 
-async def get_public_join_code(author: discord.Member) -> typing.Optional[str]:
+async def get_public_join_code(author: discord.Member) -> Optional[str]:
     """
     Get the join code for one of the non-staff leaderboards.
 
@@ -398,7 +397,7 @@ def is_in_advent() -> bool:
     return arrow.now(EST).day in range(1, 25) and arrow.now(EST).month == 12
 
 
-def time_left_to_est_midnight() -> Tuple[datetime.datetime, datetime.timedelta]:
+def time_left_to_est_midnight() -> tuple[datetime.datetime, datetime.timedelta]:
     """Calculate the amount of time left until midnight EST/UTC-5."""
     # Change all time properties back to 00:00
     todays_midnight = arrow.now(EST).replace(

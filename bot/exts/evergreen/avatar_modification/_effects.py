@@ -1,8 +1,8 @@
 import math
 import random
-import typing as t
 from io import BytesIO
 from pathlib import Path
+from typing import Callable, Optional
 
 import discord
 from PIL import Image, ImageDraw, ImageOps
@@ -18,10 +18,11 @@ class PfpEffects:
     """
 
     @staticmethod
-    def apply_effect(image_bytes: bytes, effect: t.Callable, filename: str, *args) -> discord.File:
+    def apply_effect(image_bytes: bytes, effect: Callable, filename: str, *args) -> discord.File:
         """Applies the given effect to the image passed to it."""
         im = Image.open(BytesIO(image_bytes))
         im = im.convert("RGBA")
+        im = im.resize((1024, 1024))
         im = effect(im, *args)
 
         bufferedio = BytesIO()
@@ -31,7 +32,7 @@ class PfpEffects:
         return discord.File(bufferedio, filename=filename)
 
     @staticmethod
-    def closest(x: t.Tuple[int, int, int]) -> t.Tuple[int, int, int]:
+    def closest(x: tuple[int, int, int]) -> tuple[int, int, int]:
         """
         Finds the closest "easter" colour to a given pixel.
 
@@ -39,7 +40,7 @@ class PfpEffects:
         """
         r1, g1, b1 = x
 
-        def distance(point: t.Tuple[int, int, int]) -> t.Tuple[int, int, int]:
+        def distance(point: tuple[int, int, int]) -> int:
             """Finds the difference between a pastel colour and the original pixel colour."""
             r2, g2, b2 = point
             return (r1 - r2) ** 2 + (g1 - g2) ** 2 + (b1 - b2) ** 2
@@ -74,7 +75,6 @@ class PfpEffects:
     @staticmethod
     def pridify_effect(image: Image.Image, pixels: int, flag: str) -> Image.Image:
         """Applies the given pride effect to the given image."""
-        image = image.resize((1024, 1024))
         image = PfpEffects.crop_avatar_circle(image)
 
         ring = Image.open(Path(f"bot/resources/pride/flags/{flag}.png")).resize((1024, 1024))
@@ -97,7 +97,18 @@ class PfpEffects:
         return image.quantize()
 
     @staticmethod
-    def easterify_effect(image: Image.Image, overlay_image: t.Optional[Image.Image] = None) -> Image.Image:
+    def flip_effect(image: Image.Image) -> Image.Image:
+        """
+        Flips the image horizontally.
+
+        This is done by just using ImageOps.mirror().
+        """
+        image = ImageOps.mirror(image)
+
+        return image
+
+    @staticmethod
+    def easterify_effect(image: Image.Image, overlay_image: Optional[Image.Image] = None) -> Image.Image:
         """
         Applies the easter effect to the given image.
 
@@ -201,7 +212,7 @@ class PfpEffects:
         return new_imgs
 
     @staticmethod
-    def join_images(images: t.List[Image.Image]) -> Image.Image:
+    def join_images(images: list[Image.Image]) -> Image.Image:
         """
         Stitches all the image squares into a new image.
 
@@ -272,16 +283,14 @@ class PfpEffects:
         return new_image
 
     @staticmethod
-    def mosaic_effect(img_bytes: bytes, squares: int, file_name: str) -> discord.File:
-        """Separate function run from an executor which turns an image into a mosaic."""
-        avatar = Image.open(BytesIO(img_bytes))
-        avatar = avatar.convert("RGBA").resize((1024, 1024))
+    def mosaic_effect(image: Image.Image, squares: int) -> Image.Image:
+        """
+        Applies a mosaic effect to the given image.
 
-        img_squares = PfpEffects.split_image(avatar, squares)
+        The "squares" argument specifies the number of squares to split
+        the image into. This should be a square number.
+        """
+        img_squares = PfpEffects.split_image(image, squares)
         new_img = PfpEffects.join_images(img_squares)
 
-        bufferedio = BytesIO()
-        new_img.save(bufferedio, format="PNG")
-        bufferedio.seek(0)
-
-        return discord.File(bufferedio, filename=file_name)
+        return new_img

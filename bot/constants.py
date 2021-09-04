@@ -3,7 +3,7 @@ import enum
 import logging
 from datetime import datetime
 from os import environ
-from typing import Dict, NamedTuple
+from typing import NamedTuple
 
 __all__ = (
     "AdventOfCode",
@@ -56,7 +56,7 @@ class AdventOfCodeLeaderboard:
         return self._session
 
 
-def _parse_aoc_leaderboard_env() -> Dict[str, AdventOfCodeLeaderboard]:
+def _parse_aoc_leaderboard_env() -> dict[str, AdventOfCodeLeaderboard]:
     """
     Parse the environment variable containing leaderboard information.
 
@@ -134,7 +134,7 @@ class Client(NamedTuple):
     prefix = environ.get("PREFIX", ".")
     token = environ.get("BOT_TOKEN")
     sentry_dsn = environ.get("BOT_SENTRY_DSN")
-    debug = environ.get("BOT_DEBUG", "").lower() == "true"
+    debug = environ.get("BOT_DEBUG", "true").lower() == "true"
     github_bot_repo = "https://github.com/python-discord/sir-lancebot"
     # Override seasonal locks: 1 (January) to 12 (December)
     month_override = int(environ["MONTH_OVERRIDE"]) if "MONTH_OVERRIDE" in environ else None
@@ -238,6 +238,9 @@ class Emojis:
     reddit_upvote = "<:reddit_upvote:755845219890757644>"
     reddit_comments = "<:reddit_comments:755845255001014384>"
     reddit_users = "<:reddit_users:755845303822974997>"
+
+    lemon_hyperpleased = "<:lemon_hyperpleased:754441879822663811>"
+    lemon_pensive = "<:lemon_pensive:754441880246419486>"
 
 
 class Icons:

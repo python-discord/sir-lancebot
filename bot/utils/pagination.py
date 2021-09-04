@@ -1,6 +1,7 @@
 import asyncio
 import logging
-from typing import Iterable, List, Optional, Tuple
+from collections.abc import Iterable
+from typing import Optional
 
 from discord import Embed, Member, Reaction
 from discord.abc import User
@@ -20,7 +21,7 @@ PAGINATION_EMOJI = (FIRST_EMOJI, LEFT_EMOJI, RIGHT_EMOJI, LAST_EMOJI, DELETE_EMO
 log = logging.getLogger(__name__)
 
 
-class EmptyPaginatorEmbed(Exception):
+class EmptyPaginatorEmbedError(Exception):
     """Base Exception class for an empty paginator embed."""
 
 
@@ -141,7 +142,7 @@ class LinePaginator(Paginator):
         if not lines:
             if exception_on_empty_embed:
                 log.exception("Pagination asked for empty lines iterable")
-                raise EmptyPaginatorEmbed("No lines to paginate")
+                raise EmptyPaginatorEmbedError("No lines to paginate")
 
             log.debug("No lines to add to paginator, adding '(nothing to display)' message")
             lines.append("(nothing to display)")
@@ -313,7 +314,7 @@ class ImagePaginator(Paginator):
         self.images.append(image)
 
     @classmethod
-    async def paginate(cls, pages: List[Tuple[str, str]], ctx: Context, embed: Embed,
+    async def paginate(cls, pages: list[tuple[str, str]], ctx: Context, embed: Embed,
                        prefix: str = "", suffix: str = "", timeout: int = 300,
                        exception_on_empty_embed: bool = False) -> None:
         """
@@ -349,7 +350,7 @@ class ImagePaginator(Paginator):
         if not pages:
             if exception_on_empty_embed:
                 log.exception("Pagination asked for empty image list")
-                raise EmptyPaginatorEmbed("No images to paginate")
+                raise EmptyPaginatorEmbedError("No images to paginate")
 
             log.debug("No images to add to paginator, adding '(no images to display)' message")
             pages.append(("(no images to display)", ""))

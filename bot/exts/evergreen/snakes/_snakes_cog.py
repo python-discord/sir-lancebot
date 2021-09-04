@@ -9,7 +9,7 @@ import textwrap
 import urllib
 from functools import partial
 from io import BytesIO
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import async_timeout
 from PIL import Image, ImageDraw, ImageFont
@@ -284,7 +284,7 @@ class Snakes(Cog):
             async with self.bot.http_session.get(url, params=params) as response:
                 return await response.json()
 
-    def _get_random_long_message(self, messages: List[str], retries: int = 10) -> str:
+    def _get_random_long_message(self, messages: list[str], retries: int = 10) -> str:
         """
         Fetch a message that's at least 3 words long, if possible to do so in retries attempts.
 
@@ -299,7 +299,7 @@ class Snakes(Cog):
 
         return long_message
 
-    async def _get_snek(self, name: str) -> Dict[str, Any]:
+    async def _get_snek(self, name: str) -> dict[str, Any]:
         """
         Fetches all the data from a wikipedia article about a snake.
 
@@ -401,11 +401,11 @@ class Snakes(Cog):
 
         return snake_info
 
-    async def _get_snake_name(self) -> Dict[str, str]:
+    async def _get_snake_name(self) -> dict[str, str]:
         """Gets a random snake name."""
         return random.choice(self.snake_names)
 
-    async def _validate_answer(self, ctx: Context, message: Message, answer: str, options: list) -> None:
+    async def _validate_answer(self, ctx: Context, message: Message, answer: str, options: dict[str, str]) -> None:
         """Validate the answer using a reaction event loop."""
         def predicate(reaction: Reaction, user: Member) -> bool:
             """Test if the the answer is valid and can be evaluated."""
@@ -486,7 +486,7 @@ class Snakes(Cog):
         win = False
 
         antidote_embed = Embed(color=SNAKE_COLOR, title="Antidote")
-        antidote_embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
+        antidote_embed.set_author(name=ctx.author.name, icon_url=ctx.author.display_avatar.url)
 
         # Generate answer
         antidote_answer = list(ANTIDOTE_EMOJI)  # Duplicate list, not reference it
@@ -569,7 +569,7 @@ class Snakes(Cog):
         # Winning / Ending Screen
         if win is True:
             antidote_embed = Embed(color=SNAKE_COLOR, title="Antidote")
-            antidote_embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
+            antidote_embed.set_author(name=ctx.author.name, icon_url=ctx.author.display_avatar.url)
             antidote_embed.set_image(url="https://i.makeagif.com/media/7-12-2015/Cj1pts.gif")
             antidote_embed.add_field(name="You have created the snake antidote!",
                                      value=f"The solution was: {' '.join(antidote_answer)}\n"
@@ -577,7 +577,7 @@ class Snakes(Cog):
             await board_id.edit(embed=antidote_embed)
         else:
             antidote_embed = Embed(color=SNAKE_COLOR, title="Antidote")
-            antidote_embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
+            antidote_embed.set_author(name=ctx.author.name, icon_url=ctx.author.display_avatar.url)
             antidote_embed.set_image(url="https://media.giphy.com/media/ceeN6U57leAhi/giphy.gif")
             antidote_embed.add_field(
                 name=EMPTY_UNICODE,
@@ -1063,16 +1063,10 @@ class Snakes(Cog):
 
                 message = self._get_random_long_message(messages)
 
-            # Set the avatar
-            if user.avatar is not None:
-                avatar = f"https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}"
-            else:
-                avatar = ctx.author.default_avatar_url
-
             # Build and send the embed
             embed.set_author(
                 name=f"{user.name}#{user.discriminator}",
-                icon_url=avatar,
+                icon_url=user.display_avatar.url,
             )
             embed.description = f"*{self._snakify(message)}*"
 

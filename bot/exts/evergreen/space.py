@@ -1,7 +1,7 @@
 import logging
 import random
 from datetime import date, datetime
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 from urllib.parse import urlencode
 
 from discord import Embed
@@ -203,10 +203,10 @@ class Space(Cog):
     async def fetch_from_nasa(
         self,
         endpoint: str,
-        additional_params: Optional[Dict[str, Any]] = None,
+        additional_params: Optional[dict[str, Any]] = None,
         base: Optional[str] = NASA_BASE_URL,
         use_api_key: bool = True
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Fetch information from NASA API, return result."""
         params = {}
         if use_api_key:

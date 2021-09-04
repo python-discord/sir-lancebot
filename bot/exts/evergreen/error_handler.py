@@ -2,7 +2,8 @@ import difflib
 import logging
 import math
 import random
-from typing import Iterable, Union
+from collections.abc import Iterable
+from typing import Union
 
 from discord import Embed, Message
 from discord.ext import commands
@@ -11,7 +12,7 @@ from sentry_sdk import push_scope
 from bot.bot import Bot
 from bot.constants import Channels, Colours, ERROR_REPLIES, NEGATIVE_REPLIES, RedirectOutput
 from bot.utils.decorators import InChannelCheckFailure, InMonthCheckFailure
-from bot.utils.exceptions import UserNotPlayingError
+from bot.utils.exceptions import APIError, UserNotPlayingError
 
 log = logging.getLogger(__name__)
 
@@ -22,7 +23,7 @@ QUESTION_MARK_ICON = "https://cdn.discordapp.com/emojis/512367613339369475.png"
 class CommandErrorHandler(commands.Cog):
     """A error handler for the PythonDiscord server."""
 
-    def __init__(self, bot: Bot) -> None:
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @staticmethod
@@ -74,7 +75,7 @@ class CommandErrorHandler(commands.Cog):
 
         if isinstance(error, commands.UserInputError):
             self.revert_cooldown_counter(ctx.command, ctx.message)
-            usage = f"```{ctx.prefix}{parent_command}{ctx.command} {ctx.command.signature}```"
+            usage = f"```\n{ctx.prefix}{parent_command}{ctx.command} {ctx.command.signature}\n```"
             embed = self.error_embed(
                 f"Your input was invalid: {error}\n\nUsage:{usage}"
             )
@@ -107,7 +108,7 @@ class CommandErrorHandler(commands.Cog):
             self.revert_cooldown_counter(ctx.command, ctx.message)
             embed = self.error_embed(
                 "The argument you provided was invalid: "
-                f"{error}\n\nUsage:\n```{ctx.prefix}{parent_command}{ctx.command} {ctx.command.signature}```"
+                f"{error}\n\nUsage:\n```\n{ctx.prefix}{parent_command}{ctx.command} {ctx.command.signature}\n```"
             )
             await ctx.send(embed=embed)
             return
@@ -118,6 +119,15 @@ class CommandErrorHandler(commands.Cog):
 
         if isinstance(error, UserNotPlayingError):
             await ctx.send("Game not found.")
+            return
+
+        if isinstance(error, APIError):
+            await ctx.send(
+                embed=self.error_embed(
+                    f"There was an error when communicating with the {error.api}",
+                    NEGATIVE_REPLIES
+                )
+            )
             return
 
         with push_scope() as scope:
