@@ -28,7 +28,7 @@ class Challenges(commands.Cog):
         get_kata_link = f'https://codewars.com/kata/search/{language}'
 
         if language and not query:
-            level = choice(['1', '2', '3', '4', '5', '6', '7', '8'])
+            level = f"-{choice(['1', '2', '3', '4', '5', '6', '7', '8'])}"
         elif ',' in query or ', ' in query:
             query, level = query.split(',' if ', ' not in query else ', ')
             level = f'-{level}'
