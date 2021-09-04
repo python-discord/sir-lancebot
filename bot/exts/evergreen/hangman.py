@@ -39,8 +39,8 @@ class Hangman(commands.Cog):
                                      and int(min_unique_letters) < len(set(x)) < int(max_unique_letters),
                                      self.all_words))
         if not filtered_words:
-            filter_not_found_embed = Embed(title="With the filters you provided, there were not words that could"
-                                                 " fit all the filters specified.", color=Color.red())
+            filter_not_found_embed = Embed(title="With the filters you provided, I could not find any words "
+                                                 "that fit all the filters specified..", color=Color.red())
             await ctx.send(embed=filter_not_found_embed)
             return
 
