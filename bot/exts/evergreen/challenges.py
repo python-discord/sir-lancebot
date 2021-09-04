@@ -1,10 +1,12 @@
 import logging
+from random import choice
 
 from bs4 import BeautifulSoup
 from discord import Color, Embed
 from discord.ext import commands
 
 from bot.bot import Bot
+from bot.constants import Emojis
 
 logger = logging.getLogger(__name__)
 API_ROOT = 'https://www.codewars.com/api/v1/code-challenges/{kata_id}'
@@ -21,12 +23,21 @@ class Challenges(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=["kata"])
-    async def challenge(self, ctx: commands.Context, language: str = 'python',
-                        level: str = None, *, query: str = None) -> None:
+    async def challenge(self, ctx: commands.Context, language: str = 'python', query: str = None) -> None:
         """Challenge command."""
         get_kata_link = f'https://codewars.com/kata/search/{language}'
 
-        level = f'-{level}' if level else None
+        if language and not query:
+            level = choice(['1', '2', '3', '4', '5', '6', '7', '8'])
+
+        if ',' in query or ', ' in query:
+            query, level = query.split(',' if ', ' not in query else ', ')
+            level = f'-{level}'
+        elif query.isdigit():
+            level, query = query, None
+        else:
+            level = None
+
         params = {name: value for name, value in zip(['q', 'r[]'], [query, level]) if value}
         params = {**params, 'beta': 'false'}
         async with self.bot.http_session.get(get_kata_link, params=params) as response:
@@ -54,9 +65,26 @@ class Challenges(commands.Cog):
             # maps specific rgb codes to kyu (difficulty) of kata
             mapping_of_kyu = {-8: (221, 219, 218), -7: (221, 219, 218), -6: (236, 182, 19), -5: (236, 182, 19),
                               -4: (60, 126, 187), -3: (60, 126, 187), -2: (134, 108, 199), -1: (134, 108, 199)}
-            kata_embed = Embed(title=f"{kata_information['name']}",
+            description_of_kata = [line for line in kata_information["description"].split('\n') if '##' not in line]
+            description_of_kata = description_of_kata[0] if len(description_of_kata) == 1 else \
+                description_of_kata[0] + f'\n\n[Read more...](https://codewars.com/kata/{first_kata_id})'
+
+            languages_of_kata = ', '.join(map(str.title, kata_information['languages']))
+            creator = kata_information['createdBy']
+            kata_embed = Embed(title=kata_information['name'],
+                               description=description_of_kata,
                                color=Color.from_rgb(*mapping_of_kyu[kata_information['rank']['id']]),
                                url=f'https://codewars.com/kata/{first_kata_id}')
+            kata_embed.add_field(name=f"Information about {kata_information['name']}",
+                                 value=(
+                                     f"{Emojis.reddit_users} [{creator['username']}]({creator['url']})\n"
+                                     f"{Emojis.reddit_post_text} `{languages_of_kata}`\n"
+                                     f"{Emojis.stackoverflow_tag} `{', '.join(kata_information['tags'])}`\n"
+                                     f"{Emojis.reddit_upvote} `{kata_information['voteScore']}`\n"
+                                     f"⭐ `{kata_information['totalStars']}`\n"
+                                     f"🏁 `{kata_information['totalCompleted']}`\n"
+                                     f"{Emojis.stackoverflow_views} `{kata_information['totalAttempts']}`"),
+                                 inline=True)
             await ctx.send(embed=kata_embed)
 
 
