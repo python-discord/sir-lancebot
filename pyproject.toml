@@ -10,6 +10,7 @@ python = "^3.9"
 aiodns = "~=2.0"
 arrow = "~=1.1.0"
 fuzzywuzzy = "~=0.17"
+beautifulsoup4 = "~=4.9"
 pillow = "~=8.1"
 sentry-sdk = "~=0.19"
 PyYAML = "~=5.4"
@@ -17,6 +18,7 @@ PyYAML = "~=5.4"
 async-rediscache = {extras = ["fakeredis"], version = "~=0.1.4"}
 emojis = "~=0.6.0"
 matplotlib = "~=3.4.1"
+lxml = "~=4.4"
 
 [tool.poetry.dev-dependencies]
 flake8 = "~=3.8"
