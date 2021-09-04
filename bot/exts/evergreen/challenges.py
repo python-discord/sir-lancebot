@@ -54,8 +54,13 @@ class Challenges(commands.Cog):
                                          color=Color.red())
                 await ctx.send(embed=no_results_embed)
                 return
-            else:
+            elif not query:
                 first_kata_div = choice(first_kata_div)
+            elif len(first_kata_div) >= 3:
+                first_kata_div = choice(first_kata_div[:3])
+            else:
+                first_kata_div = first_kata_div[0]
+
             first_kata_id = first_kata_div.div.div.div.a['href'].split('/')[-1]
 
         async with self.bot.http_session.get(API_ROOT.format(kata_id=first_kata_id)) as kata_information:
