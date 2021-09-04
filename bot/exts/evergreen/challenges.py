@@ -29,8 +29,7 @@ class Challenges(commands.Cog):
 
         if language and not query:
             level = choice(['1', '2', '3', '4', '5', '6', '7', '8'])
-
-        if ',' in query or ', ' in query:
+        elif ',' in query or ', ' in query:
             query, level = query.split(',' if ', ' not in query else ', ')
             level = f'-{level}'
         elif query.isnumeric():
