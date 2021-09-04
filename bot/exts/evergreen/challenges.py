@@ -23,7 +23,7 @@ class Challenges(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=["kata"])
-    async def challenge(self, ctx: commands.Context, language: str = 'python', query: str = None) -> None:
+    async def challenge(self, ctx: commands.Context, language: str = 'python', *, query: str = None) -> None:
         """Challenge command."""
         get_kata_link = f'https://codewars.com/kata/search/{language}'
 
@@ -33,8 +33,8 @@ class Challenges(commands.Cog):
         if ',' in query or ', ' in query:
             query, level = query.split(',' if ', ' not in query else ', ')
             level = f'-{level}'
-        elif query.isdigit():
-            level, query = query, None
+        elif query.isnumeric():
+            level, query = f'-{query}', None
         else:
             level = None
 
