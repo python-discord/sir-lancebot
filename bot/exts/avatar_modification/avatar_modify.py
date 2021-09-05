@@ -13,7 +13,7 @@ from discord.ext import commands
 
 from bot.bot import Bot
 from bot.constants import Colours, Emojis
-from bot.exts.evergreen.avatar_modification._effects import PfpEffects
+from bot.exts.avatar_modification._effects import PfpEffects
 from bot.utils.extensions import invoke_help_command
 from bot.utils.halloween import spookifications
 
@@ -27,7 +27,7 @@ MAX_SQUARES = 10_000
 
 T = TypeVar("T")
 
-GENDER_OPTIONS = json.loads(Path("bot/resources/pride/gender_options.json").read_text("utf8"))
+GENDER_OPTIONS = json.loads(Path("bot/resources/holidays/pride/gender_options.json").read_text("utf8"))
 
 
 async def in_executor(func: Callable[..., T], *args) -> T:
@@ -239,7 +239,7 @@ class AvatarModify(commands.Cog):
                 description=f"Here is your lovely avatar, surrounded by\n a beautiful {option} flag. Enjoy :D"
             )
             embed.set_image(url=f"attachment://{file_name}")
-            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=ctx.author.avatar_url)
+            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=ctx.author.avatar.url)
             await ctx.send(file=file, embed=embed)
 
     @avatar_modify.group(

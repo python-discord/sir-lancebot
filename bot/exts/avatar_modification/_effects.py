@@ -77,7 +77,7 @@ class PfpEffects:
         """Applies the given pride effect to the given image."""
         image = PfpEffects.crop_avatar_circle(image)
 
-        ring = Image.open(Path(f"bot/resources/pride/flags/{flag}.png")).resize((1024, 1024))
+        ring = Image.open(Path(f"bot/resources/holidays/pride/flags/{flag}.png")).resize((1024, 1024))
         ring = ring.convert("RGBA")
         ring = PfpEffects.crop_ring(ring, pixels)
 
@@ -125,7 +125,7 @@ class PfpEffects:
             ))
             overlay_image = overlay_image.convert("RGBA")
         else:
-            overlay_image = Image.open(Path("bot/resources/easter/chocolate_bunny.png"))
+            overlay_image = Image.open(Path("bot/resources/holidays/easter/chocolate_bunny.png"))
 
         alpha = image.getchannel("A").getdata()
         image = image.convert("RGB")
