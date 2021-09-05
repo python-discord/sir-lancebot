@@ -24,7 +24,7 @@ SPOOKY_EMOJIS = [
 PUMPKIN_ORANGE = 0xFF7518
 INTERVAL = timedelta(hours=6).total_seconds()
 
-FACTS = json.loads(Path("bot/resources/halloween/halloween_facts.json").read_text("utf8"))
+FACTS = json.loads(Path("bot/resources/holidays/halloween/halloween_facts.json").read_text("utf8"))
 FACTS = list(enumerate(FACTS))
 
 

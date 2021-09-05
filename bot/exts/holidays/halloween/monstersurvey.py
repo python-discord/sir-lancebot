@@ -25,7 +25,7 @@ class MonsterSurvey(Cog):
 
     def __init__(self):
         """Initializes values for the bot to use within the voting commands."""
-        self.registry_path = pathlib.Path("bot", "resources", "halloween", "monstersurvey.json")
+        self.registry_path = pathlib.Path("bot", "resources", "holidays", "halloween", "monstersurvey.json")
         self.voter_registry = json.loads(self.registry_path.read_text("utf8"))
 
     def json_write(self) -> None:

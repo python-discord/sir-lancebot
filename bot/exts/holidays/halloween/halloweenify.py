@@ -12,7 +12,7 @@ from bot.bot import Bot
 
 log = logging.getLogger(__name__)
 
-HALLOWEENIFY_DATA = loads(Path("bot/resources/halloween/halloweenify.json").read_text("utf8"))
+HALLOWEENIFY_DATA = loads(Path("bot/resources/holidays/halloween/halloweenify.json").read_text("utf8"))
 
 
 class Halloweenify(commands.Cog):

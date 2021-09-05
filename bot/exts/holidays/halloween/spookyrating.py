@@ -12,7 +12,9 @@ from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
-data: dict[str, dict[str, str]] = json.loads(Path("bot/resources/halloween/spooky_rating.json").read_text("utf8"))
+data: dict[str, dict[str, str]] = json.loads(
+    Path("bot/resources/holidays/halloween/spooky_rating.json").read_text("utf8")
+)
 SPOOKY_DATA = sorted((int(key), value) for key, value in data.items())
 
 

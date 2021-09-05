@@ -66,7 +66,7 @@ HELP_MESSAGE_DICT = {
 }
 
 # The names are from https://www.mockaroo.com/
-NAMES = json.loads(Path("bot/resources/halloween/spookynamerate_names.json").read_text("utf8"))
+NAMES = json.loads(Path("bot/resources/holidays/halloween/spookynamerate_names.json").read_text("utf8"))
 FIRST_NAMES = NAMES["first_names"]
 LAST_NAMES = NAMES["last_names"]
 

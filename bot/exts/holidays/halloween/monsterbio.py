@@ -12,7 +12,7 @@ from bot.constants import Colours
 log = logging.getLogger(__name__)
 
 TEXT_OPTIONS = json.loads(
-    Path("bot/resources/halloween/monster.json").read_text("utf8")
+    Path("bot/resources/holidays/halloween/monster.json").read_text("utf8")
 )  # Data for a mad-lib style generation of text
 
 
