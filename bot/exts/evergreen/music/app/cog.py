@@ -4,13 +4,12 @@ import logging
 
 from aiohttp import ClientSession
 from discord import Embed
-from discord.ext.commands import Cog, Context, group
-from discord.ext.commands.errors import BadArgument
+from discord.ext.commands import BadArgument, Cog, Context, group
 
 from bot.bot import Bot
+from bot.exts.evergreen.music.app import api, utils
 from bot.utils.extensions import invoke_help_command
-from bot.utils.pagination import ImagePaginator
-from . import api, utils
+from bot.utils.pagination import LinePaginator
 
 
 logger = logging.getLogger(__name__)
@@ -58,10 +57,10 @@ class Music(Cog):
             in enumerate(top_tracks_data[method.item_plural][method.item], start=1)
         ]
         paginated_pages = await utils.async_paginate(top_tracks, 10)
-        pages = [("\n".join(page), "") for page in paginated_pages]
+        pages = ["\n".join(page) for page in paginated_pages]
         result_count = len(top_tracks)
         embed = Embed(
             title=f":trophy: :musical_note: Top {result_count} Music Track{'' if result_count == 1 else 's'}",
         )
         embed.set_footer(text=self.footer_text)
-        await ImagePaginator.paginate(pages=pages, ctx=ctx, embed=embed)
+        await LinePaginator.paginate(lines=pages, ctx=ctx, embed=embed)

@@ -1,13 +1,7 @@
-import logging
-
-from discord.ext import commands
-
-from bot.exts.evergreen.music.app.cog import Music
+from bot.bot import Bot
 
 
-logger: logging.Logger = logging.getLogger(__name__)
-
-
-def setup(bot: commands.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load Music cog."""
+    from bot.exts.evergreen.music.app.cog import Music
     bot.add_cog(Music(bot))
