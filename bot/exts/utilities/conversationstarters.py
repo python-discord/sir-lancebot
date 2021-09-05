@@ -11,10 +11,10 @@ from bot.utils.randomization import RandomCycle
 
 SUGGESTION_FORM = "https://forms.gle/zw6kkJqv8U43Nfjg9"
 
-with Path("bot/resources/evergreen/starter.yaml").open("r", encoding="utf8") as f:
+with Path("bot/resources/utilities/starter.yaml").open("r", encoding="utf8") as f:
     STARTERS = yaml.load(f, Loader=yaml.FullLoader)
 
-with Path("bot/resources/evergreen/py_topics.yaml").open("r", encoding="utf8") as f:
+with Path("bot/resources/utilities/py_topics.yaml").open("r", encoding="utf8") as f:
     # First ID is #python-general and the rest are top to bottom categories of Topical Chat/Help.
     PY_TOPICS = yaml.load(f, Loader=yaml.FullLoader)
 
@@ -33,7 +33,7 @@ TOPICS = {
 
 
 class ConvoStarters(commands.Cog):
-    """Evergreen conversation topics."""
+    """General conversation topics."""
 
     @commands.command()
     @whitelist_override(channels=ALL_ALLOWED_CHANNELS)

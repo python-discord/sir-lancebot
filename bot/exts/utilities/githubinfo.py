@@ -8,7 +8,7 @@ from discord.ext import commands
 
 from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES
-from bot.exts.utils.extensions import invoke_help_command
+from bot.exts.core.extensions import invoke_help_command
 
 log = logging.getLogger(__name__)
 
