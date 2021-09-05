@@ -248,7 +248,7 @@ class DuckGamesDirector(commands.Cog):
         if answer in game.solutions:
             game.claimed_answers[answer] = msg.author
             game.scores[msg.author] += CORRECT_SOLN
-            await self.display_claimed_answer(game, msg.author, answer)
+            await self.append_to_found_embed(game, f"{str(answer):12s}  -  {msg.author.display_name}")
         else:
             await msg.add_reaction(EMOJI_WRONG)
             game.scores[msg.author] += INCORRECT_SOLN
@@ -275,6 +275,16 @@ class DuckGamesDirector(commands.Cog):
             color=discord.Color.dark_purple(),
         )
         return await ctx.send(embed=embed)
+
+    async def append_to_found_embed(self, game: DuckGame, text: str) -> None:
+        """Append text to the claimed answers embed."""
+        async with game.editing_embed:
+            found_embed, = game.found_msg.embeds
+            old_desc = found_embed.description
+            if old_desc == discord.Embed.Empty:
+                old_desc = ""
+            found_embed.description = f"{old_desc.rstrip()}\n{text}"
+            await game.found_msg.edit(embed=found_embed)
 
     async def display_claimed_answer(self, game: DuckGame, author: discord.Member, answer: tuple[int]) -> None:
         """Add a claimed answer to the game embed."""
