@@ -11,7 +11,7 @@ from bot.bot import Bot
 from bot.constants import (
     AdventOfCode as AocConfig, Channels, Colours, Emojis, Month, Roles, WHITELISTED_CHANNELS,
 )
-from bot.exts.christmas.advent_of_code import _helpers
+from bot.exts.events.advent_of_code import _helpers
 from bot.utils.decorators import InChannelCheckFailure, in_month, whitelist_override, with_role
 from bot.utils.extensions import invoke_help_command
 
@@ -35,7 +35,7 @@ class AdventOfCode(commands.Cog):
         self._base_url = f"https://adventofcode.com/{AocConfig.year}"
         self.global_leaderboard_url = f"https://adventofcode.com/{AocConfig.year}/leaderboard"
 
-        self.about_aoc_filepath = Path("./bot/resources/advent_of_code/about.json")
+        self.about_aoc_filepath = Path("./bot/resources/events/advent_of_code/about.json")
         self.cached_about_aoc = self._build_about_embed()
 
         notification_coro = _helpers.new_puzzle_notification(self.bot)

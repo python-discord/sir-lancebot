@@ -13,7 +13,7 @@ import discord
 
 from bot.bot import Bot
 from bot.constants import AdventOfCode, Channels, Colours
-from bot.exts.christmas.advent_of_code import _caches
+from bot.exts.advent_of_code import _caches
 
 log = logging.getLogger(__name__)
 
