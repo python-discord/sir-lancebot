@@ -92,6 +92,6 @@ jobs:
         uses: Azure/k8s-deploy@v1
         with:
           manifests: |
-              kubernetes/sir-lancebot/deployment.yaml
+              kubernetes/namespaces/default/sir-lancebot/deployment.yaml
           images: 'ghcr.io/python-discord/sir-lancebot:${{ steps.sha_tag.outputs.tag }}'
           kubectl-version: 'latest'
