@@ -15,9 +15,9 @@ from bot.utils import helpers
 
 log = logging.getLogger(__name__)
 
-HTML_COLOURS = json.loads(Path("bot/resources/evergreen/html_colours.json").read_text("utf8"))
+HTML_COLOURS = json.loads(Path("bot/resources/fun/html_colours.json").read_text("utf8"))
 
-XKCD_COLOURS = json.loads(Path("bot/resources/evergreen/xkcd_colours.json").read_text("utf8"))
+XKCD_COLOURS = json.loads(Path("bot/resources/fun/xkcd_colours.json").read_text("utf8"))
 
 COLOURS = [
     (255, 0, 0, 255), (255, 128, 0, 255), (255, 255, 0, 255), (0, 255, 0, 255),
@@ -80,7 +80,7 @@ class EggDecorating(commands.Cog):
                 q, r = divmod(8, colours_n)
                 colours = colours * q + colours[:r]
             num = random.randint(1, 6)
-            im = Image.open(Path(f"bot/resources/easter/easter_eggs/design{num}.png"))
+            im = Image.open(Path(f"bot/resources/holidays/easter/easter_eggs/design{num}.png"))
             data = list(im.getdata())
 
             replaceable = {x for x in data if x not in IRREPLACEABLE}

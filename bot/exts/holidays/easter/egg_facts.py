@@ -12,7 +12,7 @@ from bot.utils.decorators import seasonal_task
 
 log = logging.getLogger(__name__)
 
-EGG_FACTS = loads(Path("bot/resources/easter/easter_egg_facts.json").read_text("utf8"))
+EGG_FACTS = loads(Path("bot/resources/holidays/easter/easter_egg_facts.json").read_text("utf8"))
 
 
 class EasterFacts(commands.Cog):

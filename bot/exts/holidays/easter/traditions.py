@@ -9,7 +9,7 @@ from bot.bot import Bot
 
 log = logging.getLogger(__name__)
 
-traditions = json.loads(Path("bot/resources/easter/traditions.json").read_text("utf8"))
+traditions = json.loads(Path("bot/resources/holidays/easter/traditions.json").read_text("utf8"))
 
 
 class Traditions(commands.Cog):

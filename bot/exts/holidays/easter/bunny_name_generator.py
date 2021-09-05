@@ -11,7 +11,7 @@ from bot.bot import Bot
 
 log = logging.getLogger(__name__)
 
-BUNNY_NAMES = json.loads(Path("bot/resources/easter/bunny_names.json").read_text("utf8"))
+BUNNY_NAMES = json.loads(Path("bot/resources/holidays/easter/bunny_names.json").read_text("utf8"))
 
 
 class BunnyNameGenerator(commands.Cog):

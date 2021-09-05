@@ -13,7 +13,7 @@ from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
-EGGHEAD_QUESTIONS = loads(Path("bot/resources/easter/egghead_questions.json").read_text("utf8"))
+EGGHEAD_QUESTIONS = loads(Path("bot/resources/holidays/easter/egghead_questions.json").read_text("utf8"))
 
 
 EMOJIS = [

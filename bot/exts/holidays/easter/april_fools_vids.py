@@ -9,7 +9,7 @@ from bot.bot import Bot
 
 log = logging.getLogger(__name__)
 
-ALL_VIDS = loads(Path("bot/resources/easter/april_fools_vids.json").read_text("utf-8"))
+ALL_VIDS = loads(Path("bot/resources/holidays/easter/april_fools_vids.json").read_text("utf-8"))
 
 
 class AprilFoolVideos(commands.Cog):

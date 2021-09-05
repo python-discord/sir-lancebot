@@ -12,7 +12,7 @@ from bot.constants import Colours, NEGATIVE_REPLIES
 
 log = logging.getLogger(__name__)
 
-RIDDLE_QUESTIONS = loads(Path("bot/resources/easter/easter_riddle.json").read_text("utf8"))
+RIDDLE_QUESTIONS = loads(Path("bot/resources/holidays/easter/easter_riddle.json").read_text("utf8"))
 
 TIMELIMIT = 10
 
