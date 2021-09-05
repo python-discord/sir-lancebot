@@ -130,6 +130,9 @@ class DuckGame:
         while len(self.solutions) < minimum_solutions:
             self.board = random.sample(DECK, size)
 
+        self.board_msg = None
+        self.found_msg = None
+
     @property
     def board(self) -> list[tuple[int]]:
         """Accesses board property."""
@@ -191,8 +194,8 @@ class DuckGamesDirector(commands.Cog):
         game.running = True
         self.current_games[ctx.channel.id] = game
 
-        game.msg_content = ""
-        game.embed_msg = await self.send_board_embed(ctx, game)
+        game.board_msg = await self.send_board_embed(ctx, game)
+        game.found_msg = await self.send_found_embed(ctx)
         await asyncio.sleep(GAME_DURATION)
 
         # Checking for the channel ID in the currently running games is not sufficient.
@@ -251,7 +254,7 @@ class DuckGamesDirector(commands.Cog):
             game.scores[msg.author] += INCORRECT_SOLN
 
     async def send_board_embed(self, ctx: commands.Context, game: DuckGame) -> discord.Message:
-        """Create and send the initial game embed. This will be edited as the game goes on."""
+        """Create and send an embed to display the board."""
         image = assemble_board_image(game.board, game.rows, game.columns)
         with BytesIO() as image_stream:
             image.save(image_stream, format="png")
@@ -264,14 +267,21 @@ class DuckGamesDirector(commands.Cog):
         embed.set_image(url="attachment://board.png")
         return await ctx.send(embed=embed, file=file)
 
+    async def send_found_embed(self, ctx: commands.Context) -> discord.Message:
+        """Create and send an embed to display claimed answers. This will be edited as the game goes on."""
+        # Can't be part of the board embed because of discord.py limitations with editing an embed with an image.
+        embed = discord.Embed(
+            title="Flights Found",
+            color=discord.Color.dark_purple(),
+        )
+        return await ctx.send(embed=embed)
+
     async def display_claimed_answer(self, game: DuckGame, author: discord.Member, answer: tuple[int]) -> None:
         """Add a claimed answer to the game embed."""
         async with game.editing_embed:
-            # We specifically edit the message contents instead of the embed
-            # Because we load in the image from the file, editing any portion of the embed
-            # Does weird things to the image and this works around that weirdness
-            game.msg_content = f"{game.msg_content}\n{str(answer):12s}  -  {author.display_name}"
-            await game.embed_msg.edit(content=game.msg_content)
+            found_embed, = game.found_msg.embeds
+            found_embed.description = f"{found_embed.description}\n{str(answer):12s}  -  {author.display_name}"
+            await game.found_msg.edit(embed=found_embed)
 
     async def end_game(self, channel: discord.TextChannel, game: DuckGame, end_message: str) -> None:
         """Edit the game embed to reflect the end of the game and mark the game as not running."""
