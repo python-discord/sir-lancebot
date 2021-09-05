@@ -57,7 +57,7 @@ class Fun(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-        self._caesar_cipher_embed = json.loads(Path("bot/resources/evergreen/caesar_info.json").read_text("UTF-8"))
+        self._caesar_cipher_embed = json.loads(Path("bot/resources/fun/caesar_info.json").read_text("UTF-8"))
 
     @staticmethod
     def _get_random_die() -> str:

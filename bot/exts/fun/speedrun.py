@@ -9,7 +9,7 @@ from bot.bot import Bot
 
 log = logging.getLogger(__name__)
 
-LINKS = json.loads(Path("bot/resources/evergreen/speedrun_links.json").read_text("utf8"))
+LINKS = json.loads(Path("bot/resources/fun/speedrun_links.json").read_text("utf8"))
 
 
 class Speedrun(commands.Cog):

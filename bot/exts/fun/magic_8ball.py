@@ -9,7 +9,7 @@ from bot.bot import Bot
 
 log = logging.getLogger(__name__)
 
-ANSWERS = json.loads(Path("bot/resources/evergreen/magic8ball.json").read_text("utf8"))
+ANSWERS = json.loads(Path("bot/resources/fun/magic8ball.json").read_text("utf8"))
 
 
 class Magic8ball(commands.Cog):

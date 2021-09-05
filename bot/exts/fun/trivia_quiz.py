@@ -217,7 +217,7 @@ class TriviaQuiz(commands.Cog):
     @staticmethod
     def load_questions() -> dict:
         """Load the questions from the JSON file."""
-        p = Path("bot", "resources", "evergreen", "trivia_quiz.json")
+        p = Path("bot", "resources", "fun", "trivia_quiz.json")
 
         return json.loads(p.read_text(encoding="utf-8"))
 

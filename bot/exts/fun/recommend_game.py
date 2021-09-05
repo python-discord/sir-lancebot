@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 game_recs = []
 
 # Populate the list `game_recs` with resource files
-for rec_path in Path("bot/resources/evergreen/game_recs").glob("*.json"):
+for rec_path in Path("bot/resources/fun/game_recs").glob("*.json"):
     data = json.loads(rec_path.read_text("utf8"))
     game_recs.append(data)
 shuffle(game_recs)
