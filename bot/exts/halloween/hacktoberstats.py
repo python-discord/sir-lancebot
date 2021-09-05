@@ -3,7 +3,8 @@ import random
 import re
 from collections import Counter
 from datetime import datetime, timedelta
-from typing import List, Optional, Tuple, Union
+from typing import Optional, Union
+from urllib.parse import quote_plus
 
 import discord
 from async_rediscache import RedisCache
@@ -60,8 +61,8 @@ class HacktoberStats(commands.Cog):
             else:
                 msg = (
                     f"{author_mention}, you have not linked a GitHub account\n\n"
-                    f"You can link your GitHub account using:\n```{ctx.prefix}hackstats link github_username```\n"
-                    f"Or query GitHub stats directly using:\n```{ctx.prefix}hackstats github_username```"
+                    f"You can link your GitHub account using:\n```\n{ctx.prefix}hackstats link github_username\n```\n"
+                    f"Or query GitHub stats directly using:\n```\n{ctx.prefix}hackstats github_username\n```"
                 )
                 await ctx.send(msg)
                 return
@@ -138,7 +139,7 @@ class HacktoberStats(commands.Cog):
             else:
                 await ctx.send(f"No valid Hacktoberfest PRs found for '{github_username}'")
 
-    async def build_embed(self, github_username: str, prs: List[dict]) -> discord.Embed:
+    async def build_embed(self, github_username: str, prs: list[dict]) -> discord.Embed:
         """Return a stats embed built from github_username's PRs."""
         logging.info(f"Building Hacktoberfest embed for GitHub user: '{github_username}'")
         in_review, accepted = await self._categorize_prs(prs)
@@ -184,7 +185,7 @@ class HacktoberStats(commands.Cog):
         logging.info(f"Hacktoberfest PR built for GitHub user '{github_username}'")
         return stats_embed
 
-    async def get_october_prs(self, github_username: str) -> Optional[List[dict]]:
+    async def get_october_prs(self, github_username: str) -> Optional[list[dict]]:
         """
         Query GitHub's API for PRs created during the month of October by github_username.
 
@@ -208,24 +209,24 @@ class HacktoberStats(commands.Cog):
         None will be returned when the GitHub user was not found.
         """
         log.info(f"Fetching Hacktoberfest Stats for GitHub user: '{github_username}'")
-        base_url = "https://api.github.com/search/issues?q="
+        base_url = "https://api.github.com/search/issues"
         action_type = "pr"
         is_query = "public"
         not_query = "draft"
         date_range = f"{CURRENT_YEAR}-09-30T10:00Z..{CURRENT_YEAR}-11-01T12:00Z"
         per_page = "300"
-        query_url = (
-            f"{base_url}"
+        query_params = (
             f"+type:{action_type}"
             f"+is:{is_query}"
-            f"+author:{github_username}"
+            f"+author:{quote_plus(github_username)}"
             f"+-is:{not_query}"
             f"+created:{date_range}"
             f"&per_page={per_page}"
         )
-        log.debug(f"GitHub query URL generated: {query_url}")
 
-        jsonresp = await self._fetch_url(query_url, REQUEST_HEADERS)
+        log.debug(f"GitHub query parameters generated: {query_params}")
+
+        jsonresp = await self._fetch_url(base_url, REQUEST_HEADERS, {"q": query_params})
         if "message" in jsonresp:
             # One of the parameters is invalid, short circuit for now
             api_message = jsonresp["errors"][0]["message"]
@@ -295,13 +296,13 @@ class HacktoberStats(commands.Cog):
                 outlist.append(itemdict)
         return outlist
 
-    async def _fetch_url(self, url: str, headers: dict) -> dict:
+    async def _fetch_url(self, url: str, headers: dict, params: dict) -> dict:
         """Retrieve API response from URL."""
-        async with self.bot.http_session.get(url, headers=headers) as resp:
+        async with self.bot.http_session.get(url, headers=headers, params=params) as resp:
             return await resp.json()
 
     @staticmethod
-    def _has_label(pr: dict, labels: Union[List[str], str]) -> bool:
+    def _has_label(pr: dict, labels: Union[list[str], str]) -> bool:
         """
         Check if a PR has label 'labels'.
 
@@ -367,7 +368,7 @@ class HacktoberStats(commands.Cog):
         exp = r"https?:\/\/api.github.com\/repos\/([/\-\_\.\w]+)"
         return re.findall(exp, in_url)[0]
 
-    async def _categorize_prs(self, prs: List[dict]) -> tuple:
+    async def _categorize_prs(self, prs: list[dict]) -> tuple:
         """
         Categorize PRs into 'in_review' and 'accepted' and returns as a tuple.
 
@@ -390,7 +391,7 @@ class HacktoberStats(commands.Cog):
         return in_review, accepted
 
     @staticmethod
-    def _build_prs_string(prs: List[tuple], user: str) -> str:
+    def _build_prs_string(prs: list[tuple], user: str) -> str:
         """
         Builds a discord embed compatible string for a list of PRs.
 
@@ -423,7 +424,7 @@ class HacktoberStats(commands.Cog):
             return "contributions"
 
     @staticmethod
-    def _author_mention_from_context(ctx: commands.Context) -> Tuple[str, str]:
+    def _author_mention_from_context(ctx: commands.Context) -> tuple[str, str]:
         """Return stringified Message author ID and mentionable string from commands.Context."""
         author_id = str(ctx.author.id)
         author_mention = ctx.author.mention

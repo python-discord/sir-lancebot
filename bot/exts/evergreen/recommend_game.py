@@ -21,7 +21,7 @@ shuffle(game_recs)
 class RecommendGame(commands.Cog):
     """Commands related to recommending games."""
 
-    def __init__(self, bot: Bot) -> None:
+    def __init__(self, bot: Bot):
         self.bot = bot
         self.index = 0
 
@@ -39,7 +39,7 @@ class RecommendGame(commands.Cog):
         # Creating and formatting Embed
         embed = discord.Embed(color=discord.Colour.blue())
         if author is not None:
-            embed.set_author(name=author.name, icon_url=author.avatar_url)
+            embed.set_author(name=author.name, icon_url=author.display_avatar.url)
         embed.set_image(url=game["image"])
         embed.add_field(name=f"Recommendation: {game['title']}\n{game['link']}", value=game["description"])
 

@@ -1,20 +1,22 @@
 import asyncio
 import logging
 import random
-import typing as t
+from typing import Optional
 
 import discord
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Colours, ERROR_REPLIES, Icons
+from bot.constants import Categories, Colours, ERROR_REPLIES, Icons, WHITELISTED_CHANNELS
 from bot.utils.converters import WrappedMessageConverter
+from bot.utils.decorators import whitelist_override
 
 log = logging.getLogger(__name__)
 
 # Number of seconds to wait for other users to bookmark the same message
 TIMEOUT = 120
 BOOKMARK_EMOJI = "📌"
+WHITELISTED_CATEGORIES = (Categories.help_in_use,)
 
 
 class Bookmark(commands.Cog):
@@ -35,7 +37,7 @@ class Bookmark(commands.Cog):
             name="Wanna give it a visit?",
             value=f"[Visit original message]({target_message.jump_url})"
         )
-        embed.set_author(name=target_message.author, icon_url=target_message.author.avatar_url)
+        embed.set_author(name=target_message.author, icon_url=target_message.author.display_avatar.url)
         embed.set_thumbnail(url=Icons.bookmark)
 
         return embed
@@ -85,11 +87,12 @@ class Bookmark(commands.Cog):
         await message.add_reaction(BOOKMARK_EMOJI)
         return message
 
+    @whitelist_override(channels=WHITELISTED_CHANNELS, categories=WHITELISTED_CATEGORIES)
     @commands.command(name="bookmark", aliases=("bm", "pin"))
     async def bookmark(
         self,
         ctx: commands.Context,
-        target_message: t.Optional[WrappedMessageConverter],
+        target_message: Optional[WrappedMessageConverter],
         *,
         title: str = "Bookmark"
     ) -> None:
@@ -100,7 +103,7 @@ class Bookmark(commands.Cog):
             target_message = ctx.message.reference.resolved
 
         # Prevent users from bookmarking a message in a channel they don't have access to
-        permissions = ctx.author.permissions_in(target_message.channel)
+        permissions = target_message.channel.permissions_for(ctx.author)
         if not permissions.read_messages:
             log.info(f"{ctx.author} tried to bookmark a message in #{target_message.channel} but has no permissions.")
             embed = discord.Embed(

@@ -5,7 +5,7 @@ import re
 from asyncio import sleep
 from datetime import datetime as dt, timedelta
 from enum import IntEnum
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Optional
 
 from aiohttp import ClientSession
 from discord import Embed
@@ -151,7 +151,7 @@ class Games(Cog):
         self.bot = bot
         self.http_session: ClientSession = bot.http_session
 
-        self.genres: Dict[str, int] = {}
+        self.genres: dict[str, int] = {}
         self.headers = BASE_HEADERS
 
         self.bot.loop.create_task(self.renew_access_token())
@@ -342,7 +342,7 @@ class Games(Cog):
         sort: Optional[str] = None,
         additional_body: str = "",
         offset: int = 0
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Get list of games from IGDB API by parameters that is provided.
 
@@ -365,7 +365,7 @@ class Games(Cog):
         async with self.http_session.post(url=f"{BASE_URL}/games", data=body, headers=self.headers) as resp:
             return await resp.json()
 
-    async def create_page(self, data: Dict[str, Any]) -> Tuple[str, str]:
+    async def create_page(self, data: dict[str, Any]) -> tuple[str, str]:
         """Create content of Game Page."""
         # Create cover image URL from template
         url = COVER_URL.format(**{"image_id": data["cover"]["image_id"] if "cover" in data else ""})
@@ -399,7 +399,7 @@ class Games(Cog):
 
         return page, url
 
-    async def search_games(self, search_term: str) -> List[str]:
+    async def search_games(self, search_term: str) -> list[str]:
         """Search game from IGDB API by string, return listing of pages."""
         lines = []
 
@@ -422,7 +422,7 @@ class Games(Cog):
 
         return lines
 
-    async def get_companies_list(self, limit: int, offset: int = 0) -> List[Dict[str, Any]]:
+    async def get_companies_list(self, limit: int, offset: int = 0) -> list[dict[str, Any]]:
         """
         Get random Game Companies from IGDB API.
 
@@ -438,7 +438,7 @@ class Games(Cog):
         async with self.http_session.post(url=f"{BASE_URL}/companies", data=body, headers=self.headers) as resp:
             return await resp.json()
 
-    async def create_company_page(self, data: Dict[str, Any]) -> Tuple[str, str]:
+    async def create_company_page(self, data: dict[str, Any]) -> tuple[str, str]:
         """Create good formatted Game Company page."""
         # Generate URL of company logo
         url = LOGO_URL.format(**{"image_id": data["logo"]["image_id"] if "logo" in data else ""})
@@ -462,7 +462,7 @@ class Games(Cog):
 
         return page, url
 
-    async def get_best_results(self, query: str) -> List[Tuple[float, str]]:
+    async def get_best_results(self, query: str) -> list[tuple[float, str]]:
         """Get best match result of genre when original genre is invalid."""
         results = []
         for genre in self.genres:

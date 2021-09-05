@@ -5,12 +5,17 @@ from urllib.parse import quote_plus
 from discord import Embed, HTTPException
 from discord.ext import commands
 
-from bot import bot
+from bot.bot import Bot
 from bot.constants import Colours, Emojis
 
 logger = logging.getLogger(__name__)
 
-BASE_URL = "https://api.stackexchange.com/2.2/search/advanced?order=desc&sort=activity&site=stackoverflow&q={query}"
+BASE_URL = "https://api.stackexchange.com/2.2/search/advanced"
+SO_PARAMS = {
+    "order": "desc",
+    "sort": "activity",
+    "site": "stackoverflow"
+}
 SEARCH_URL = "https://stackoverflow.com/search?q={query}"
 ERR_EMBED = Embed(
     title="Error in fetching results from Stackoverflow",
@@ -25,16 +30,15 @@ ERR_EMBED = Embed(
 class Stackoverflow(commands.Cog):
     """Contains command to interact with stackoverflow from discord."""
 
-    def __init__(self, bot: bot.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @commands.command(aliases=["so"])
     @commands.cooldown(1, 15, commands.cooldowns.BucketType.user)
     async def stackoverflow(self, ctx: commands.Context, *, search_query: str) -> None:
         """Sends the top 5 results of a search query from stackoverflow."""
-        encoded_search_query = quote_plus(search_query)
-
-        async with self.bot.http_session.get(BASE_URL.format(query=encoded_search_query)) as response:
+        params = SO_PARAMS | {"q": search_query}
+        async with self.bot.http_session.get(url=BASE_URL, params=params) as response:
             if response.status == 200:
                 data = await response.json()
             else:
@@ -50,6 +54,7 @@ class Stackoverflow(commands.Cog):
             return
 
         top5 = data["items"][:5]
+        encoded_search_query = quote_plus(search_query)
         embed = Embed(
             title="Search results - Stackoverflow",
             url=SEARCH_URL.format(query=encoded_search_query),
@@ -78,6 +83,6 @@ class Stackoverflow(commands.Cog):
             await ctx.send(embed=search_query_too_long)
 
 
-def setup(bot: bot.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load the Stackoverflow Cog."""
     bot.add_cog(Stackoverflow(bot))

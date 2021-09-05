@@ -1,7 +1,8 @@
 import logging
-import typing
+from collections.abc import Iterator
 from dataclasses import dataclass
 from random import randint, random
+from typing import Union
 
 import discord
 from discord.ext import commands
@@ -33,7 +34,7 @@ MESSAGE_MAPPING = {
 log = logging.getLogger(__name__)
 
 
-GameBoard = typing.List[typing.List[typing.Union[str, int]]]
+GameBoard = list[list[Union[str, int]]]
 
 
 @dataclass
@@ -47,14 +48,11 @@ class Game:
     activated_on_server: bool
 
 
-GamesDict = typing.Dict[int, Game]
-
-
 class Minesweeper(commands.Cog):
     """Play a game of Minesweeper."""
 
-    def __init__(self) -> None:
-        self.games: GamesDict = {}  # Store the currently running games
+    def __init__(self):
+        self.games: dict[int, Game] = {}
 
     @commands.group(name="minesweeper", aliases=("ms",), invoke_without_command=True)
     async def minesweeper_group(self, ctx: commands.Context) -> None:
@@ -62,7 +60,7 @@ class Minesweeper(commands.Cog):
         await invoke_help_command(ctx)
 
     @staticmethod
-    def get_neighbours(x: int, y: int) -> typing.Generator[typing.Tuple[int, int], None, None]:
+    def get_neighbours(x: int, y: int) -> Iterator[tuple[int, int]]:
         """Get all the neighbouring x and y including it self."""
         for x_ in [x - 1, x, x + 1]:
             for y_ in [y - 1, y, y + 1]:

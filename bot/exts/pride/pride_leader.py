@@ -6,10 +6,10 @@ from typing import Optional
 
 import discord
 from discord.ext import commands
-from fuzzywuzzy import fuzz
+from rapidfuzz import fuzz
 
-from bot import bot
 from bot import constants
+from bot.bot import Bot
 
 log = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ MINIMUM_FUZZ_RATIO = 40
 class PrideLeader(commands.Cog):
     """Gives information about Pride Leaders."""
 
-    def __init__(self, bot: bot.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     def invalid_embed_generate(self, pride_leader: str) -> discord.Embed:
@@ -51,7 +51,7 @@ class PrideLeader(commands.Cog):
             valid_names = "\n".join(valid_names)
             error_msg = "Did you mean?"
 
-        embed.description = f"{error_msg}\n```{valid_names}```"
+        embed.description = f"{error_msg}\n```\n{valid_names}\n```"
         embed.set_footer(text="To add more pride leaders, feel free to open a pull request!")
 
         return embed
@@ -112,6 +112,6 @@ class PrideLeader(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: bot.Bot) -> None:
+def setup(bot: Bot) -> None:
     """Load the Pride Leader Cog."""
     bot.add_cog(PrideLeader(bot))

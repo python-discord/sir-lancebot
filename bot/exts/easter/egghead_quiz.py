@@ -31,7 +31,7 @@ TIMELIMIT = 30
 class EggheadQuiz(commands.Cog):
     """This cog contains the command for the Easter quiz!"""
 
-    def __init__(self) -> None:
+    def __init__(self):
         self.quiz_messages = {}
 
     @commands.command(aliases=("eggheadquiz", "easterquiz"))

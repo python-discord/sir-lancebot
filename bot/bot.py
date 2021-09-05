@@ -1,13 +1,15 @@
 import asyncio
 import logging
 import socket
+from contextlib import suppress
 from typing import Optional
 
 import discord
 from aiohttp import AsyncResolver, ClientSession, TCPConnector
 from async_rediscache import RedisSession
-from discord import DiscordException, Embed
+from discord import DiscordException, Embed, Forbidden, Thread
 from discord.ext import commands
+from discord.ext.commands import Cog, when_mentioned_or
 
 from bot import constants
 
@@ -44,6 +46,21 @@ class Bot(commands.Bot):
         if not guild:
             return None
         return guild.me
+
+    @Cog.listener()
+    async def on_thread_join(self, thread: Thread) -> None:
+        """
+        Try to join newly created threads.
+
+        Despite the event name being misleading, this is dispatched when new threads are created.
+        We want our bots to automatically join threads in order to answer commands using their prefixes.
+        """
+        if thread.me:
+            # Already in this thread, return early
+            return
+
+        with suppress(Forbidden):
+            await thread.join()
 
     async def close(self) -> None:
         """Close Redis session when bot is shutting down."""
@@ -120,7 +137,7 @@ class Bot(commands.Bot):
                 return
 
         if not icon:
-            icon = self.user.avatar_url_as(format="png")
+            icon = self.user.display_avatar.url
 
         embed = Embed(description=details)
         embed.set_author(name=title, icon_url=icon)
@@ -203,7 +220,7 @@ loop.run_until_complete(redis_session.connect())
 
 bot = Bot(
     redis_session=redis_session,
-    command_prefix=constants.Client.prefix,
+    command_prefix=when_mentioned_or(constants.Client.prefix),
     activity=discord.Game(name=f"Commands: {constants.Client.prefix}help"),
     allowed_mentions=discord.AllowedMentions(everyone=False, roles=_allowed_roles),
     intents=_intents,

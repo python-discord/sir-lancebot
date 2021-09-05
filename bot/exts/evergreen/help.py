@@ -3,12 +3,12 @@ import asyncio
 import itertools
 import logging
 from contextlib import suppress
-from typing import List, NamedTuple, Union
+from typing import NamedTuple, Union
 
 from discord import Colour, Embed, HTTPException, Message, Reaction, User
 from discord.ext import commands
 from discord.ext.commands import CheckFailure, Cog as DiscordCog, Command, Context
-from fuzzywuzzy import fuzz, process
+from rapidfuzz import process
 
 from bot import constants
 from bot.bot import Bot
@@ -34,7 +34,7 @@ class Cog(NamedTuple):
 
     name: str
     description: str
-    commands: List[Command]
+    commands: list[Command]
 
 
 log = logging.getLogger(__name__)
@@ -159,7 +159,7 @@ class HelpSession:
         # Combine command and cog names
         choices = list(self._bot.all_commands) + list(self._bot.cogs)
 
-        result = process.extractBests(query, choices, scorer=fuzz.ratio, score_cutoff=90)
+        result = process.extract(query, choices, score_cutoff=90)
 
         raise HelpQueryNotFound(f'Query "{query}" not found.', dict(result))
 
@@ -308,7 +308,7 @@ class HelpSession:
 
         signature = self._get_command_params(self.query)
         parent = self.query.full_parent_name + " " if self.query.parent else ""
-        paginator.add_line(f"**```{prefix}{parent}{signature}```**")
+        paginator.add_line(f"**```\n{prefix}{parent}{signature}\n```**")
         aliases = [f"`{alias}`" if not parent else f"`{parent} {alias}`" for alias in self.query.aliases]
         aliases += [f"`{alias}`" for alias in getattr(self.query, "root_aliases", ())]
         aliases = ", ".join(sorted(aliases))
@@ -343,7 +343,7 @@ class HelpSession:
         for category, cmds in grouped:
             await self._format_command_category(paginator, category, list(cmds))
 
-    async def _format_command_category(self, paginator: LinePaginator, category: str, cmds: List[Command]) -> None:
+    async def _format_command_category(self, paginator: LinePaginator, category: str, cmds: list[Command]) -> None:
         cmds = sorted(cmds, key=lambda c: c.name)
         cat_cmds = []
         for command in cmds:
@@ -373,7 +373,7 @@ class HelpSession:
 
             paginator.add_line(details)
 
-    async def _format_command(self, command: Command) -> List[str]:
+    async def _format_command(self, command: Command) -> list[str]:
         # skip if hidden and hide if session is set to
         if command.hidden and not self._show_hidden:
             return []

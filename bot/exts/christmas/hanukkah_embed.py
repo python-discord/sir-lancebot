@@ -1,6 +1,5 @@
 import datetime
 import logging
-from typing import List
 
 from discord import Embed
 from discord.ext import commands
@@ -26,7 +25,7 @@ class HanukkahEmbed(commands.Cog):
         self.hanukkah_months = []
         self.hanukkah_years = []
 
-    async def get_hanukkah_dates(self) -> List[str]:
+    async def get_hanukkah_dates(self) -> list[str]:
         """Gets the dates for hanukkah festival."""
         hanukkah_dates = []
         async with self.bot.http_session.get(HEBCAL_URL) as response:
@@ -101,7 +100,7 @@ class HanukkahEmbed(commands.Cog):
 
             await ctx.send(embed=embed)
 
-    def hanukkah_dates_split(self, hanukkah_dates: List[str]) -> None:
+    def hanukkah_dates_split(self, hanukkah_dates: list[str]) -> None:
         """We are splitting the dates for hanukkah into days, months and years."""
         for date in hanukkah_dates:
             self.hanukkah_days.append(date[8:10])
