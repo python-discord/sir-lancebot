@@ -1,24 +1,24 @@
 """Music cog module to show music information from Last.fm API."""
 import logging
-from typing import Any, Dict, List, Tuple
 
 from aiohttp import ClientSession
 from discord import Embed
-from discord.ext.commands import Bot, Cog, Context, group
+from discord.ext.commands import Cog, Context, group
 from discord.ext.commands.errors import BadArgument
 
+from bot.bot import Bot
 from bot.utils.extensions import invoke_help_command
 from bot.utils.pagination import ImagePaginator
 from . import api, utils
 
 
-logger: logging.Logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class Music(Cog):
     """Music cog with commands to access music data from Last.fm."""
 
-    footer_text: str = "This bot command uses the Last.fm API"
+    footer_text = "This bot command uses the Last.fm API"
 
     def __init__(self, bot: Bot):
         self.bot = bot
@@ -38,27 +38,27 @@ class Music(Cog):
     @music_command.command(name="toplist", aliases=["top", "list"])
     async def toplist(self, ctx: Context, count: int = 10) -> None:
         """Get the top tracks played on Last.fm."""
-        method: api.ApiMethod = self.settings.chart_methods["gettoptracks"]
+        method = self.settings.chart_methods["gettoptracks"]
 
         parameters = {
             "method": str(method),
             "limit": count,
         }
         try:
-            top_tracks_data: Dict[str: Any] = await api.get(
+            top_tracks_data = await api.get(
                 self.settings, self.http_session, **parameters,
             )
         except api.InvalidArgument as e:
             raise BadArgument(str(e))
 
-        top_tracks: List[str] = [
+        top_tracks = [
             f"{position}.  [{track['name']}]({track['url']}) ({track['artist']['name']})"
             for position, track
             in enumerate(top_tracks_data[method.item_plural][method.item], start=1)
         ]
-        paginated_pages: List[List[str]] = await utils.async_paginate(top_tracks, 10)
-        pages: List[Tuple[str, str]] = [("\n".join(page), "") for page in paginated_pages]
-        result_count: int = len(top_tracks)
+        paginated_pages = await utils.async_paginate(top_tracks, 10)
+        pages = [("\n".join(page), "") for page in paginated_pages]
+        result_count = len(top_tracks)
         embed = Embed(
             title=f":trophy: :musical_note: Top {result_count} Music Track{'' if result_count == 1 else 's'}",
         )

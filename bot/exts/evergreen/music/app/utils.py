@@ -2,15 +2,15 @@
 
 import asyncio
 import logging
-from typing import Any, Iterable, List
+from typing import Any, Iterable
 
 
-logger: logging.Logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
-def paginate(items: Iterable, page_count: int = 1) -> List[List[Any]]:
+def paginate(items: Iterable[str], page_count: int = 1) -> list[list[Any]]:
     """Paginate items by target page count."""
-    pages: List[List[str]] = []
+    pages = []
     page_number = 0
     for i, item in enumerate(items):
         if i % page_count == 0:
@@ -20,9 +20,9 @@ def paginate(items: Iterable, page_count: int = 1) -> List[List[Any]]:
     return pages
 
 
-async def async_paginate(items: Iterable, page_count: int = 1) -> List[List[Any]]:
+async def async_paginate(items: Iterable[str], page_count: int = 1) -> list[list[Any]]:
     """Paginate items by target page count, awaitable."""
-    pages: List[List[str]] = []
+    pages = []
     page_number = 0
     for i, item in enumerate(items):
         if i % page_count == 0:
