@@ -12,7 +12,7 @@ from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
-STATES = json.loads(Path("bot/resources/valentines/valenstates.json").read_text("utf8"))
+STATES = json.loads(Path("bot/resources/holidays/valentines/valenstates.json").read_text("utf8"))
 
 
 class MyValenstate(commands.Cog):

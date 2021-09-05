@@ -17,7 +17,7 @@ from bot.utils.decorators import in_month
 
 log = logging.getLogger(__name__)
 
-LOVE_DATA = json.loads(Path("bot/resources/valentines/love_matches.json").read_text("utf8"))
+LOVE_DATA = json.loads(Path("bot/resources/holidays/valentines/love_matches.json").read_text("utf8"))
 LOVE_DATA = sorted((int(key), value) for key, value in LOVE_DATA.items())
 
 

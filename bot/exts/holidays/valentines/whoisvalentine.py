@@ -11,7 +11,7 @@ from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
-FACTS = json.loads(Path("bot/resources/valentines/valentine_facts.json").read_text("utf8"))
+FACTS = json.loads(Path("bot/resources/holidays/valentines/valentine_facts.json").read_text("utf8"))
 
 
 class ValentineFacts(commands.Cog):

@@ -11,7 +11,7 @@ from bot.constants import Colours
 
 log = logging.getLogger(__name__)
 
-PICKUP_LINES = loads(Path("bot/resources/valentines/pickup_lines.json").read_text("utf8"))
+PICKUP_LINES = loads(Path("bot/resources/holidays/valentines/pickup_lines.json").read_text("utf8"))
 
 
 class PickupLine(commands.Cog):

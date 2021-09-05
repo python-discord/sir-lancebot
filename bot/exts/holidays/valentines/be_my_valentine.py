@@ -26,7 +26,7 @@ class BeMyValentine(commands.Cog):
     @staticmethod
     def load_json() -> dict:
         """Load Valentines messages from the static resources."""
-        p = Path("bot/resources/valentines/bemyvalentine_valentines.json")
+        p = Path("bot/resources/holidays/valentines/bemyvalentine_valentines.json")
         return loads(p.read_text("utf8"))
 
     @in_month(Month.FEBRUARY)

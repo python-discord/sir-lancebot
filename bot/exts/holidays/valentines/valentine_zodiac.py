@@ -27,8 +27,8 @@ class ValentineZodiac(commands.Cog):
     @staticmethod
     def load_comp_json() -> tuple[dict, dict]:
         """Load zodiac compatibility from static JSON resource."""
-        explanation_file = Path("bot/resources/valentines/zodiac_explanation.json")
-        compatibility_file = Path("bot/resources/valentines/zodiac_compatibility.json")
+        explanation_file = Path("bot/resources/holidays/valentines/zodiac_explanation.json")
+        compatibility_file = Path("bot/resources/holidays/valentines/zodiac_compatibility.json")
 
         zodiac_fact = json.loads(explanation_file.read_text("utf8"))
 

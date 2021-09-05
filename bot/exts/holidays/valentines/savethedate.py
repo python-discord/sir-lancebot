@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 
 HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_heart:", ":two_hearts:"]
 
-VALENTINES_DATES = loads(Path("bot/resources/valentines/date_ideas.json").read_text("utf8"))
+VALENTINES_DATES = loads(Path("bot/resources/holidays/valentines/date_ideas.json").read_text("utf8"))
 
 
 class SaveTheDate(commands.Cog):
