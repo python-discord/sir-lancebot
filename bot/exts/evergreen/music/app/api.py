@@ -38,7 +38,7 @@ class RequestInfo:
         Time in seconds since last tracked request.
 
         Time may not be exact, depending on when request is tracked.  Should not be
-          an issue, since values are used with caching and precision is not sensitive.
+        an issue, since values are used with caching and precision is not sensitive.
         """
         if self.time is None:
             raise TypeError("No initial value for `time`. Call `update` before accessing other attributes.")
@@ -59,8 +59,8 @@ class ApiMethod:
     API method data.
 
     An API method is immutable (frozen) by design, to avoid editing constant values.  However,
-      the time of when a request was made is used with caching.  A mutable protected
-      attribute can update request info while the other attributes remain immutable.
+    the time of when a request was made is used with caching.  A mutable protected
+    attribute can update request info while the other attributes remain immutable.
     """
 
     name: str

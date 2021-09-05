@@ -1,4 +1,5 @@
 """Music cog module to show music information from Last.fm API."""
+
 import logging
 
 from aiohttp import ClientSession
