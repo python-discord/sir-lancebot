@@ -24,15 +24,9 @@ class Hangman(commands.Cog):
     async def hangman(self, ctx: commands.Context, min_length: str = '0', max_length: str = '25',
                       min_unique_letters: str = '0', max_unique_letters: str = '25') -> None:
         """
-        Starts the classic Hangman game.
+        Play against the bot, where you have to guess the word it has provided!
 
-        The arguments denote:
-            - min_length, a string denoting what is the minimum amount of letters the word chosen can have.
-            - max_length, a string denoting what is the maximum amount of letters the word chosen can have.
-            - min_unique_letters, a string denoting what is the minimum amount of unique letters the word chosen
-            can have.
-            - max_unique_letters, a string denoting what is the maximum amount of unique letters the word chosen
-            can have.
+        You have 7 tries, and you have to guess the letters that are in the word, or you lose those tries!
         """
         # filtering the list of all words depending on the configuration
         filtered_words = list(filter(lambda x: int(min_length) < len(x) < int(max_length)
