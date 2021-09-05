@@ -9,7 +9,7 @@ from bot.bot import Bot
 
 log = logging.getLogger(__name__)
 
-NAMES = json.loads(Path("bot/resources/pride/drag_queen_names.json").read_text("utf8"))
+NAMES = json.loads(Path("bot/resources/holidays/pride/drag_queen_names.json").read_text("utf8"))
 
 
 class DragNames(commands.Cog):

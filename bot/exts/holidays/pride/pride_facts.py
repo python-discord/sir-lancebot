@@ -15,7 +15,7 @@ from bot.utils.decorators import seasonal_task
 
 log = logging.getLogger(__name__)
 
-FACTS = json.loads(Path("bot/resources/pride/facts.json").read_text("utf8"))
+FACTS = json.loads(Path("bot/resources/holidays/pride/facts.json").read_text("utf8"))
 
 
 class PrideFacts(commands.Cog):

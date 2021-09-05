@@ -13,7 +13,7 @@ from bot.bot import Bot
 
 log = logging.getLogger(__name__)
 
-PRIDE_RESOURCE = json.loads(Path("bot/resources/pride/prideleader.json").read_text("utf8"))
+PRIDE_RESOURCE = json.loads(Path("bot/resources/holidays/pride/prideleader.json").read_text("utf8"))
 MINIMUM_FUZZ_RATIO = 40
 
 

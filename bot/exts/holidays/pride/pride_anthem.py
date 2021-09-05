@@ -10,7 +10,7 @@ from bot.bot import Bot
 
 log = logging.getLogger(__name__)
 
-VIDEOS = json.loads(Path("bot/resources/pride/anthems.json").read_text("utf8"))
+VIDEOS = json.loads(Path("bot/resources/holidays/pride/anthems.json").read_text("utf8"))
 
 
 class PrideAnthem(commands.Cog):
