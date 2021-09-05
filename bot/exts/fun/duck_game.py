@@ -11,7 +11,7 @@ from PIL import Image, ImageDraw, ImageFont
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Colours, MODERATION_ROLES
+from bot.constants import MODERATION_ROLES
 from bot.utils.decorators import with_role
 
 DECK = list(product(*[(0, 1, 2)]*4))
@@ -262,7 +262,7 @@ class DuckGamesDirector(commands.Cog):
             file = discord.File(fp=image_stream, filename="board.png")
         embed = discord.Embed(
             title="Duck Duck Duck Goose!",
-            color=Colours.bright_green,
+            color=discord.Color.dark_purple(),
         )
         embed.set_image(url="attachment://board.png")
         return await ctx.send(embed=embed, file=file)
