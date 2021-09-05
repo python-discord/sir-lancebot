@@ -1,15 +1,17 @@
 # imports
+import colorsys
 import logging
 
-import colorsys
-import pillow
+import PIL
 from discord import Embed
-# ! need to install discord-flags and add to poetry.lock file
-from discord.ext import commands, flags
+from discord.ext import commands
 from rapidfuzz import process
 
 from bot.bot import Bot
 from bot.constants import Colours
+
+# Planning to use discord-flags, hence require changes to poetry.lock file
+# from discord.ext import flags
 
 logger = logging.getLogger(__name__)
 
