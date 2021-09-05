@@ -1,7 +1,7 @@
 import logging
 
 from bot.bot import Bot
-from bot.exts.evergreen.snakes._snakes_cog import Snakes
+from bot.exts.fun.snakes._snakes_cog import Snakes
 
 log = logging.getLogger(__name__)
 

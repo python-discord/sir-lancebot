@@ -14,7 +14,7 @@ from discord.ext.commands import Cog, Context
 
 from bot.constants import Roles
 
-SNAKE_RESOURCES = Path("bot/resources/snakes").absolute()
+SNAKE_RESOURCES = Path("bot/resources/fun/snakes").absolute()
 
 h1 = r"""```
    ----

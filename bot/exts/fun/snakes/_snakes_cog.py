@@ -19,8 +19,8 @@ from discord.ext.commands import Cog, CommandError, Context, bot_has_permissions
 
 from bot.bot import Bot
 from bot.constants import ERROR_REPLIES, Tokens
-from bot.exts.evergreen.snakes import _utils as utils
-from bot.exts.evergreen.snakes._converter import Snake
+from bot.exts.fun.snakes import _utils as utils
+from bot.exts.fun.snakes._converter import Snake
 from bot.utils.decorators import locked
 from bot.utils.extensions import invoke_help_command
 
@@ -122,14 +122,14 @@ CORRECT_GUESS = (
 
 # snake card consts
 CARD = {
-    "top": Image.open("bot/resources/snakes/snake_cards/card_top.png"),
-    "frame": Image.open("bot/resources/snakes/snake_cards/card_frame.png"),
-    "bottom": Image.open("bot/resources/snakes/snake_cards/card_bottom.png"),
+    "top": Image.open("bot/resources/fun/snakes/snake_cards/card_top.png"),
+    "frame": Image.open("bot/resources/fun/snakes/snake_cards/card_frame.png"),
+    "bottom": Image.open("bot/resources/fun/snakes/snake_cards/card_bottom.png"),
     "backs": [
-        Image.open(f"bot/resources/snakes/snake_cards/backs/{file}")
-        for file in os.listdir("bot/resources/snakes/snake_cards/backs")
+        Image.open(f"bot/resources/fun/snakes/snake_cards/backs/{file}")
+        for file in os.listdir("bot/resources/fun/snakes/snake_cards/backs")
     ],
-    "font": ImageFont.truetype("bot/resources/snakes/snake_cards/expressway.ttf", 20)
+    "font": ImageFont.truetype("bot/resources/fun/snakes/snake_cards/expressway.ttf", 20)
 }
 # endregion
 

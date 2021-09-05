@@ -7,7 +7,7 @@ import discord
 from discord.ext.commands import Context, Converter
 from rapidfuzz import fuzz
 
-from bot.exts.evergreen.snakes._utils import SNAKE_RESOURCES
+from bot.exts.fun.snakes._utils import SNAKE_RESOURCES
 from bot.utils import disambiguate
 
 log = logging.getLogger(__name__)
