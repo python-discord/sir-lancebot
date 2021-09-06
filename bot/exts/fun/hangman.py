@@ -2,7 +2,7 @@ from asyncio import TimeoutError
 from pathlib import Path
 from random import choice
 
-from discord import Color, Embed
+from discord import Embed
 from discord.ext import commands
 
 from bot.bot import Bot
@@ -74,7 +74,10 @@ class Hangman(commands.Cog):
         user_guess = "_" * len(word)
         tries = 6
 
-        hangman_embed = Embed(title="Hangman", color=Color.blurple())
+        hangman_embed = Embed(
+            title="Hangman",
+            color=Colours.python_blue
+        )
         hangman_embed.set_image(url=mapping_of_images[tries])
         hangman_embed.add_field(
             name=f"The word is `{user_guess}`",
