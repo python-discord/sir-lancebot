@@ -16,6 +16,9 @@ def setup() -> None:
     logging.addLevelName(logging.TRACE, "TRACE")
     logging.Logger.trace = _monkeypatch_trace
 
+    format_string = "%(asctime)s | %(name)s | %(levelname)s | %(message)s"
+    log_format = logging.Formatter(format_string)
+
     # Set up file logging
     log_file = Path("logs/sir-lancebot.log")
     log_file.parent.mkdir(exist_ok=True)
@@ -24,8 +27,11 @@ def setup() -> None:
     file_handler = logging.handlers.RotatingFileHandler(
         log_file, maxBytes=5 * (2 ** 20), backupCount=10, encoding="utf-8",
     )
-    # Console handler prints to terminal
-    console_handler = logging.StreamHandler()
+    file_handler.setFormatter(log_format)
+
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.TRACE if Client.debug else logging.INFO)
+    root_logger.addHandler(file_handler)
 
     if "COLOREDLOGS_LEVEL_STYLES" not in os.environ:
         coloredlogs.DEFAULT_LEVEL_STYLES = {
@@ -36,7 +42,7 @@ def setup() -> None:
         }
 
     if "COLOREDLOGS_LOG_FORMAT" not in os.environ:
-        coloredlogs.DEFAULT_LOG_FORMAT = "%(asctime)s - %(name)s %(levelname)s: %(message)s"
+        coloredlogs.DEFAULT_LOG_FORMAT = format_string
 
     coloredlogs.install(stream=sys.stdout)
 
@@ -47,13 +53,7 @@ def setup() -> None:
     logging.getLogger("matplotlib").setLevel(logging.ERROR)
     logging.getLogger("async_rediscache").setLevel(logging.WARNING)
 
-    # Setup new logging configuration
-    logging.basicConfig(
-        datefmt="%D %H:%M:%S",
-        level=logging.TRACE if Client.debug else logging.INFO,
-        handlers=[console_handler, file_handler],
-    )
-    logging.getLogger().info("Logging initialization complete")
+    root_logger.info("Logging initialization complete")
 
 
 def _monkeypatch_trace(self: logging.Logger, msg: str, *args, **kwargs) -> None:
