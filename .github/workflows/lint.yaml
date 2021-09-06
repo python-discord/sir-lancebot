@@ -17,7 +17,7 @@ jobs:
     env:
       # List of licenses that are compatible with the MIT License and
       # can be used in our project
-      ALLOWED_LICENSE: Apache Software License;
+      ALLOWED_LICENSES: Apache Software License;
         BSD;  BSD License;
         GNU Library or Lesser General Public License (LGPL);
         Historical Permission Notice and Disclaimer (HPND);
@@ -79,7 +79,7 @@ jobs:
       # please make sure it is compatible with the license for this project,
       # and add it to the ALLOWED_LICENSE variable
       - name: Check Dependencies License
-        run: pip-licenses --allow-only="$ALLOWED_LICENSE"
+        run: pip-licenses --allow-only="$ALLOWED_LICENSES"
 
       # This step caches our pre-commit environment. To make sure we
       # do create a new environment when our pre-commit setup changes,
