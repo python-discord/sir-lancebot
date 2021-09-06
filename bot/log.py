@@ -1,6 +1,10 @@
 import logging
 import logging.handlers
+import os
+import sys
 from pathlib import Path
+
+import coloredlogs
 
 from bot.constants import Client
 
@@ -23,6 +27,19 @@ def setup() -> None:
     # Console handler prints to terminal
     console_handler = logging.StreamHandler()
 
+    if "COLOREDLOGS_LEVEL_STYLES" not in os.environ:
+        coloredlogs.DEFAULT_LEVEL_STYLES = {
+            **coloredlogs.DEFAULT_LEVEL_STYLES,
+            "trace": {"color": 246},
+            "critical": {"background": "red"},
+            "debug": coloredlogs.DEFAULT_LEVEL_STYLES["info"],
+        }
+
+    if "COLOREDLOGS_LOG_FORMAT" not in os.environ:
+        coloredlogs.DEFAULT_LOG_FORMAT = "%(asctime)s - %(name)s %(levelname)s: %(message)s"
+
+    coloredlogs.install(stream=sys.stdout)
+
     # Silence irrelevant loggers
     logging.getLogger("discord").setLevel(logging.ERROR)
     logging.getLogger("websockets").setLevel(logging.ERROR)
@@ -32,7 +49,6 @@ def setup() -> None:
 
     # Setup new logging configuration
     logging.basicConfig(
-        format="%(asctime)s - %(name)s %(levelname)s: %(message)s",
         datefmt="%D %H:%M:%S",
         level=logging.TRACE if Client.debug else logging.INFO,
         handlers=[console_handler, file_handler],
