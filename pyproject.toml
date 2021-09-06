@@ -31,8 +31,8 @@ flake8-todo = "~=0.7"
 pep8-naming = "~=0.11"
 pip-licenses = "~=3.5.2"
 pre-commit = "~=2.1"
-python-dotenv = "^0.15.0"
-taskipy = "^1.6.0"
+python-dotenv = "~=0.15"
+taskipy = "~=1.6"
 
 [tool.taskipy.tasks]
 start = "python -m bot"
