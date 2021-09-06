@@ -20,12 +20,8 @@ def setup() -> None:
     file_handler = logging.handlers.RotatingFileHandler(
         log_file, maxBytes=5 * (2 ** 20), backupCount=10, encoding="utf-8",
     )
-    file_handler.setLevel(logging.TRACE if Client.debug else logging.DEBUG)
-
     # Console handler prints to terminal
     console_handler = logging.StreamHandler()
-    level = logging.TRACE if Client.debug else logging.INFO
-    console_handler.setLevel(level)
 
     # Silence irrelevant loggers
     logging.getLogger("discord").setLevel(logging.ERROR)
@@ -38,7 +34,7 @@ def setup() -> None:
     logging.basicConfig(
         format="%(asctime)s - %(name)s %(levelname)s: %(message)s",
         datefmt="%D %H:%M:%S",
-        level=logging.TRACE if Client.debug else logging.DEBUG,
+        level=logging.TRACE if Client.debug else logging.INFO,
         handlers=[console_handler, file_handler],
     )
     logging.getLogger().info("Logging initialization complete")
