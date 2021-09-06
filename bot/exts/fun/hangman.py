@@ -61,7 +61,7 @@ class Hangman(commands.Cog):
             filter_not_found_embed = Embed(
                 title=(
                     "With the filters you provided,"
-                    "I could not find any words that fit all the filters specified.."
+                    "I could not find any words that fit all the filters specified."
                 ),
                 color=Colours.soft_red,
             )
@@ -95,38 +95,38 @@ class Hangman(commands.Cog):
                     timeout=30.0,
                     check=lambda msg: msg.author != self.bot if singleplayer == 'm' else msg.author == ctx.author
                 )
-
-                if len(message.content) > 1:
-                    continue
-
-                elif message.content in word:
-                    positions = [idx for idx, letter in enumerate(word) if letter == message.content]
-                    user_guess = "".join(
-                        [message.content if index in positions else dash for index, dash in enumerate(user_guess)]
-                    )
-
-                elif tries - 1 <= 0:
-                    losing_embed = Embed(
-                        title="You lost.",
-                        description=f"The word was `{word}`.",
-                        color=Colours.soft_red,
-                    )
-                    await original_message.edit(embed=losing_embed)
-                    return
-
-                else:
-                    tries -= 1
-
-                hangman_embed.clear_fields()
-                hangman_embed.set_image(url=mapping_of_images[tries])
-                hangman_embed.add_field(
-                    name=f"The word is `{user_guess}`",
-                    value="Guess the word by sending a message with the letter!",
-                    inline=False,
-                )
-                await original_message.edit(embed=hangman_embed)
             except TimeoutError:
                 return
+
+            if len(message.content) > 1:
+                continue
+
+            elif message.content in word:
+                positions = [idx for idx, letter in enumerate(word) if letter == message.content]
+                user_guess = "".join(
+                    [message.content if index in positions else dash for index, dash in enumerate(user_guess)]
+                )
+
+            elif tries - 1 <= 0:
+                losing_embed = Embed(
+                    title="You lost.",
+                    description=f"The word was `{word}`.",
+                    color=Colours.soft_red,
+                )
+                await original_message.edit(embed=losing_embed)
+                return
+
+            else:
+                tries -= 1
+
+            hangman_embed.clear_fields()
+            hangman_embed.set_image(url=mapping_of_images[tries])
+            hangman_embed.add_field(
+                name=f"The word is `{user_guess}`",
+                value="Guess the word by sending a message with the letter!",
+                inline=False,
+            )
+            await original_message.edit(embed=hangman_embed)
         else:
             win_embed = Embed(
                 title="You won!",
