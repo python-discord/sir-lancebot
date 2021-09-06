@@ -9,13 +9,15 @@ from bot.bot import Bot
 
 TOP_WORDS_FILE_PATH = Path("bot/resources/fun/top_1000_used_words.txt").resolve()
 # defining a list of images that will be used for the game to represent the hangman person
-IMAGES = ["https://cdn.discordapp.com/attachments/859123972884922418/883472355056295946/hangman0.png",
-          "https://cdn.discordapp.com/attachments/859123972884922418/883472756744814613/hangman1.png",
-          "https://cdn.discordapp.com/attachments/859123972884922418/883472808699629578/hangman2.png",
-          "https://cdn.discordapp.com/attachments/859123972884922418/883472862441267230/hangman3.png",
-          "https://cdn.discordapp.com/attachments/859123972884922418/883472950991396864/hangman4.png",
-          "https://cdn.discordapp.com/attachments/859123972884922418/883472999431430204/hangman5.png",
-          "https://cdn.discordapp.com/attachments/859123972884922418/883473051277226015/hangman6.png"]
+IMAGES = [
+    "https://cdn.discordapp.com/attachments/859123972884922418/883472355056295946/hangman0.png",
+    "https://cdn.discordapp.com/attachments/859123972884922418/883472756744814613/hangman1.png",
+    "https://cdn.discordapp.com/attachments/859123972884922418/883472808699629578/hangman2.png",
+    "https://cdn.discordapp.com/attachments/859123972884922418/883472862441267230/hangman3.png",
+    "https://cdn.discordapp.com/attachments/859123972884922418/883472950991396864/hangman4.png",
+    "https://cdn.discordapp.com/attachments/859123972884922418/883472999431430204/hangman5.png",
+    "https://cdn.discordapp.com/attachments/859123972884922418/883473051277226015/hangman6.png"
+]
 
 
 class Hangman(commands.Cog):
