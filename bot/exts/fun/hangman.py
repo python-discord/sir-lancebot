@@ -1,6 +1,7 @@
 from asyncio import TimeoutError
 from pathlib import Path
 from random import choice
+from typing import Literal
 
 from discord import Embed
 from discord.ext import commands
@@ -18,7 +19,7 @@ IMAGES = [
     "https://cdn.discordapp.com/attachments/859123972884922418/883472862441267230/hangman3.png",
     "https://cdn.discordapp.com/attachments/859123972884922418/883472950991396864/hangman4.png",
     "https://cdn.discordapp.com/attachments/859123972884922418/883472999431430204/hangman5.png",
-    "https://cdn.discordapp.com/attachments/859123972884922418/883473051277226015/hangman6.png"
+    "https://cdn.discordapp.com/attachments/859123972884922418/883473051277226015/hangman6.png",
 ]
 
 
@@ -42,6 +43,7 @@ class Hangman(commands.Cog):
             max_length: str = "25",
             min_unique_letters: str = "0",
             max_unique_letters: str = "25",
+            singleplayer: Literal["s", "m"] = "s",
     ) -> None:
         """
         Play against the bot, where you have to guess the word it has provided!
@@ -76,7 +78,7 @@ class Hangman(commands.Cog):
 
         hangman_embed = Embed(
             title="Hangman",
-            color=Colours.python_blue
+            color=Colours.python_blue,
         )
         hangman_embed.set_image(url=mapping_of_images[tries])
         hangman_embed.add_field(
@@ -91,7 +93,7 @@ class Hangman(commands.Cog):
                 message = await self.bot.wait_for(
                     event="message",
                     timeout=30.0,
-                    check=lambda msg: msg.author != self.bot,
+                    check=lambda msg: msg.author != self.bot if singleplayer == 'm' else msg.author == ctx.author
                 )
 
                 if len(message.content) > 1:
