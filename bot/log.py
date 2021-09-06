@@ -1,6 +1,5 @@
 import logging
 import logging.handlers
-import os
 from pathlib import Path
 
 from bot.constants import Client
@@ -14,9 +13,8 @@ def setup() -> None:
     logging.Logger.trace = _monkeypatch_trace
 
     # Set up file logging
-    log_dir = Path("bot/log")
-    log_file = log_dir / "hackbot.log"
-    os.makedirs(log_dir, exist_ok=True)
+    log_file = Path("logs/sir-lancebot.log")
+    log_file.parent.mkdir(exist_ok=True)
 
     # File handler rotates logs every 5 MB
     file_handler = logging.handlers.RotatingFileHandler(
