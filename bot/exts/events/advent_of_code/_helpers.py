@@ -151,7 +151,22 @@ def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
         # this data to JSON in order to cache it in Redis.
         daily_stats[day] = {"star_one": star_one, "star_two": star_two}
 
-    return {"daily_stats": daily_stats, "leaderboard": sorted_leaderboard}
+        perdaystar_stats = collections.defaultdict(list)
+        for member in raw_leaderboard_data.values():
+            username = member["name"] if member["name"] else f"Anonymous #{member['id']}"
+
+            for day_data, stars_data in member["completion_day_level"].items():
+                # Iterate over the complete stars for this day for this participant
+                for star, data in stars_data.items():
+                    # Record completion of this star for this individual
+                    completion_time = int(data["get_star_ts"])
+                    perdaystar_stats[f"{day_data}-{star}"].append(
+                        {'completion_time': completion_time, 'member_name': username}
+                    )
+        for key in perdaystar_stats.keys():
+            perdaystar_stats[key] = sorted(perdaystar_stats[key], key=operator.itemgetter('completion_time'))
+
+        return {"daily_stats": daily_stats, "leaderboard": sorted_leaderboard, 'per_dayandstar': perdaystar_stats}
 
 
 def _format_leaderboard(leaderboard: dict[str, dict]) -> str:
@@ -289,6 +304,7 @@ async def fetch_leaderboard(invalidate_cache: bool = False) -> dict:
             "leaderboard_fetched_at": leaderboard_fetched_at,
             "number_of_participants": number_of_participants,
             "daily_stats": json.dumps(parsed_leaderboard_data["daily_stats"]),
+            "leaderboard_per_dayandstar": json.dumps(parsed_leaderboard_data["per_dayandstar"])
         }
 
         # Store the new values in Redis

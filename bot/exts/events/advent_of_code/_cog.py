@@ -2,6 +2,7 @@ import json
 import logging
 from datetime import datetime, timedelta
 from pathlib import Path
+from typing import Optional
 
 import arrow
 import discord
@@ -150,7 +151,7 @@ class AdventOfCode(commands.Cog):
         else:
             try:
                 join_code = await _helpers.get_public_join_code(author)
-            except _helpers.FetchingLeaderboardFailed:
+            except _helpers.FetchingLeaderboardFailedError:
                 await ctx.send(":x: Failed to get join code! Notified maintainers.")
                 return
 
@@ -185,15 +186,47 @@ class AdventOfCode(commands.Cog):
         brief="Get a snapshot of the PyDis private AoC leaderboard",
     )
     @whitelist_override(channels=AOC_WHITELIST_RESTRICTED)
-    async def aoc_leaderboard(self, ctx: commands.Context) -> None:
-        """Get the current top scorers of the Python Discord Leaderboard."""
+    async def aoc_leaderboard(
+            self,
+            ctx: commands.Context,
+            dayandstar: Optional[str] = None,
+            maximum_scorers: Optional[int] = 10) -> None:
+        """
+        Get the current top scorers of the Python Discord Leaderboard.
+
+        Additionally, you can provide a day-star(eg.: 2-1, as second day first star) to filter your query more.
+        """
+        if maximum_scorers > AocConfig.max_dayandstar_results or maximum_scorers <= 0:
+            raise commands.BadArgument(
+                f"Unfortunately, \n the maximum number of results you can query is {AocConfig.max_dayandstar_results} "
+                "\n and the minimum number is 1"
+            )
         async with ctx.typing():
             try:
                 leaderboard = await _helpers.fetch_leaderboard()
-            except _helpers.FetchingLeaderboardFailed:
+            except _helpers.FetchingLeaderboardFailedError:
                 await ctx.send(":x: Unable to fetch leaderboard!")
                 return
-
+            if dayandstar:
+                # Fetches a dictionary that contains solvers in respect of day, and star.
+                # eg.: 1-1 will fetch the solvers of the first star of the first day and their completion time
+                per_dayandstar = json.loads(leaderboard['leaderboard_per_dayandstar'])
+                try:
+                    scorers = per_dayandstar[dayandstar][:maximum_scorers]
+                except KeyError:
+                    raise commands.BadArgument(
+                        "You provided an invalid \"day-star\" formula! "
+                        "Please use the `day-star` notation. eg.: \"1-2\". \n"
+                        "Also keep in mind that there are only two stars each day, and days are from 1 to 25"
+                    )
+                day, star = dayandstar.split("-")
+                codeblock = f"```csharp\nTop scorers for day {day}, star {star} in UTC timezone \n"
+                for scorer in scorers:
+                    time_data = datetime.fromtimestamp(scorer['completion_time']).strftime("%b.%d %I:%M %p")
+                    codeblock += f"[{scorer['member_name']}] {time_data}  \n"
+                codeblock += "```"
+                await ctx.send(codeblock)
+                return
             number_of_participants = leaderboard["number_of_participants"]
 
             top_count = min(AocConfig.leaderboard_displayed_members, number_of_participants)
@@ -231,7 +264,7 @@ class AdventOfCode(commands.Cog):
         """Send an embed with daily completion statistics for the Python Discord leaderboard."""
         try:
             leaderboard = await _helpers.fetch_leaderboard()
-        except _helpers.FetchingLeaderboardFailed:
+        except _helpers.FetchingLeaderboardFailedError:
             await ctx.send(":x: Can't fetch leaderboard for stats right now!")
             return
 
@@ -267,7 +300,7 @@ class AdventOfCode(commands.Cog):
         async with ctx.typing():
             try:
                 await _helpers.fetch_leaderboard(invalidate_cache=True)
-            except _helpers.FetchingLeaderboardFailed:
+            except _helpers.FetchingLeaderboardFailedError:
                 await ctx.send(":x: Something went wrong while trying to refresh the cache!")
             else:
                 await ctx.send("\N{OK Hand Sign} Refreshed leaderboard cache!")
