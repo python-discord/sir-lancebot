@@ -60,7 +60,7 @@ class Hangman(commands.Cog):
         if not filtered_words:
             filter_not_found_embed = Embed(
                 title=(
-                    "With the filters you provided,"
+                    "With the filters you provided, "
                     "I could not find any words that fit all the filters specified.."
                 ),
                 color=Colours.soft_red,
