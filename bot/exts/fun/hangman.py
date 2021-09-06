@@ -18,11 +18,11 @@ class Hangman(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         with Path("bot/resources/fun/top_1000_used_words.txt").resolve().open(mode="r", encoding="utf-8") as file:
-            self.all_words = list(map(lambda line: line.strip('\n'), file.readlines()))
+            self.all_words = list(map(lambda line: line.strip("\n"), file.readlines()))
 
     @commands.command()
-    async def hangman(self, ctx: commands.Context, min_length: str = '0', max_length: str = '25',
-                      min_unique_letters: str = '0', max_unique_letters: str = '25') -> None:
+    async def hangman(self, ctx: commands.Context, min_length: str = "0", max_length: str = "25",
+                      min_unique_letters: str = "0", max_unique_letters: str = "25") -> None:
         """
         Play against the bot, where you have to guess the word it has provided!
 
@@ -39,19 +39,19 @@ class Hangman(commands.Cog):
             return
 
         # defining a list of images that will be used for the game to represent the hangman person
-        images = ['https://cdn.discordapp.com/attachments/859123972884922418/883472355056295946/hangman0.png',
-                  'https://cdn.discordapp.com/attachments/859123972884922418/883472756744814613/hangman1.png',
-                  'https://cdn.discordapp.com/attachments/859123972884922418/883472808699629578/hangman2.png',
-                  'https://cdn.discordapp.com/attachments/859123972884922418/883472862441267230/hangman3.png',
-                  'https://cdn.discordapp.com/attachments/859123972884922418/883472950991396864/hangman4.png',
-                  'https://cdn.discordapp.com/attachments/859123972884922418/883472999431430204/hangman5.png',
-                  'https://cdn.discordapp.com/attachments/859123972884922418/883473051277226015/hangman6.png']
+        images = ["https://cdn.discordapp.com/attachments/859123972884922418/883472355056295946/hangman0.png",
+                  "https://cdn.discordapp.com/attachments/859123972884922418/883472756744814613/hangman1.png",
+                  "https://cdn.discordapp.com/attachments/859123972884922418/883472808699629578/hangman2.png",
+                  "https://cdn.discordapp.com/attachments/859123972884922418/883472862441267230/hangman3.png",
+                  "https://cdn.discordapp.com/attachments/859123972884922418/883472950991396864/hangman4.png",
+                  "https://cdn.discordapp.com/attachments/859123972884922418/883472999431430204/hangman5.png",
+                  "https://cdn.discordapp.com/attachments/859123972884922418/883473051277226015/hangman6.png"]
 
-        # a dictionary mapping the images of the 'hung man' to the number of tries it corresponds to
+        # a dictionary mapping the images of the "hung man" to the number of tries it corresponds to
         mapping_of_images = {tries_key: image_name for image_name, tries_key in zip(images, range(6, -1, -1))}
 
         word = choice(filtered_words)
-        user_guess = '_' * len(word)
+        user_guess = "_" * len(word)
         tries = 6
         hangman_embed = Embed(title="Hangman", color=Color.blurple())
         hangman_embed.set_image(url=mapping_of_images[tries])
@@ -69,7 +69,7 @@ class Hangman(commands.Cog):
 
                 elif message.content in word:
                     positions = [idx for idx, letter in enumerate(word) if letter == message.content]
-                    user_guess = ''.join([message.content if index in positions else dash
+                    user_guess = "".join([message.content if index in positions else dash
                                           for index, dash in enumerate(user_guess)])
 
                 elif tries - 1 <= 0:
