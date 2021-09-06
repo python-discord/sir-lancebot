@@ -7,7 +7,7 @@ from discord import Embed
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Colours
+from bot.constants import Colours, NEGATIVE_REPLIES
 
 
 TOP_WORDS_FILE_PATH = Path("bot/resources/fun/top_1000_used_words.txt").resolve()
@@ -59,10 +59,8 @@ class Hangman(commands.Cog):
 
         if not filtered_words:
             filter_not_found_embed = Embed(
-                title=(
-                    "With the filters you provided,"
-                    "I could not find any words that fit all the filters specified."
-                ),
+                title=choice(NEGATIVE_REPLIES),
+                description="No words could be found that fit all the filters specified.",
                 color=Colours.soft_red,
             )
             await ctx.send(embed=filter_not_found_embed)
@@ -70,7 +68,6 @@ class Hangman(commands.Cog):
 
         # a dictionary mapping the images of the "hung man" to the number of tries it corresponds to
         mapping_of_images = {tries_key: image_name for tries_key, image_name in zip(range(6, -1, -1), IMAGES)}
-
         word = choice(filtered_words)
 
         user_guess = "_" * len(word)
