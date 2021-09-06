@@ -27,12 +27,6 @@ def setup() -> None:
     level = logging.TRACE if Client.debug else logging.INFO
     console_handler.setLevel(level)
 
-    # Remove old loggers, if any
-    root = logging.getLogger()
-    if root.handlers:
-        for handler in root.handlers:
-            root.removeHandler(handler)
-
     # Silence irrelevant loggers
     logging.getLogger("discord").setLevel(logging.ERROR)
     logging.getLogger("websockets").setLevel(logging.ERROR)
