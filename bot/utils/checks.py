@@ -40,6 +40,7 @@ def in_whitelist_check(
     channels: Container[int] = (),
     categories: Container[int] = (),
     roles: Container[int] = (),
+    every: bool = False,
     redirect: Optional[int] = constants.Channels.community_bot_commands,
     fail_silently: bool = False,
 ) -> bool:
@@ -51,6 +52,8 @@ def in_whitelist_check(
     - `channels`: a container with channel ids for whitelisted channels
     - `categories`: a container with category ids for whitelisted categories
     - `roles`: a container with with role ids for whitelisted roles
+    - `every`: a boolean value that, when set to True, allows the command
+               to be used everywhere by everyone
 
     If the command was invoked in a context that was not whitelisted, the member is either
     redirected to the `redirect` channel that was passed (default: #bot-commands) or simply
@@ -67,24 +70,43 @@ def in_whitelist_check(
         # categories, it's probably not wise to rely on its category in any case.
         channels = tuple(channels) + (redirect,)
 
+    if every:
+        log.trace(
+            f"{ctx.author} may use the `{ctx.command.name}` command "
+            f"as it is completely whitelisted by every."
+        )
+        return True
+
     if channels and ctx.channel.id in channels:
-        log.trace(f"{ctx.author} may use the `{ctx.command.name}` command as they are in a whitelisted channel.")
+        log.trace(
+            f"{ctx.author} may use the `{ctx.command.name}` command "
+            f"as they are in a whitelisted channel."
+        )
         return True
 
     # Only check the category id if we have a category whitelist and the channel has a `category_id`
     if categories and hasattr(ctx.channel, "category_id") and ctx.channel.category_id in categories:
-        log.trace(f"{ctx.author} may use the `{ctx.command.name}` command as they are in a whitelisted category.")
+        log.trace(
+            f"{ctx.author} may use the `{ctx.command.name}` command "
+            f"as they are in a whitelisted category."
+        )
         return True
 
     category = getattr(ctx.channel, "category", None)
     if category and category.name == constants.codejam_categories_name:
-        log.trace(f"{ctx.author} may use the `{ctx.command.name}` command as they are in a codejam team channel.")
+        log.trace(
+            f"{ctx.author} may use the `{ctx.command.name}` command "
+            f"as they are in a codejam team channel."
+        )
         return True
 
     # Only check the roles whitelist if we have one and ensure the author's roles attribute returns
     # an iterable to prevent breakage in DM channels (for if we ever decide to enable commands there).
     if roles and any(r.id in roles for r in getattr(ctx.author, "roles", ())):
-        log.trace(f"{ctx.author} may use the `{ctx.command.name}` command as they have a whitelisted role.")
+        log.trace(
+            f"{ctx.author} may use the `{ctx.command.name}` command "
+            f"as they have a whitelisted role."
+        )
         return True
 
     log.trace(f"{ctx.author} may not use the `{ctx.command.name}` command within this context.")

@@ -280,7 +280,10 @@ def whitelist_check(**default_kwargs: Container[int]) -> Callable[[Context], boo
     return predicate
 
 
-def whitelist_override(bypass_defaults: bool = False, **kwargs: Container[int]) -> Callable:
+def whitelist_override(
+        bypass_defaults: bool = False,
+        **kwargs: Union[Container[int], Optional[int], bool]
+) -> Callable:
     """
     Override global whitelist context, with the kwargs specified.
 
