@@ -1,33 +1,30 @@
-FROM python:3.8-slim
-
-# Set SHA build argument
-ARG git_sha="development"
+FROM --platform=linux/amd64 python:3.9-slim
 
 # Set pip to have cleaner logs and no saved cache
 ENV PIP_NO_CACHE_DIR=false \
-    PIPENV_HIDE_EMOJIS=1 \
-    PIPENV_IGNORE_VIRTUALENVS=1 \
-    PIPENV_NOSPIN=1 \
-    GIT_SHA=$git_sha
+    POETRY_VIRTUALENVS_CREATE=false
 
-# Install git to be able to dowload git dependencies in the Pipfile
-RUN apt-get -y update \
-    && apt-get install -y \
-        ffmpeg \
-    && rm -rf /var/lib/apt/lists/*
+# Install Poetry
+RUN pip install --upgrade poetry
 
-# Install pipenv
-RUN pip install -U pipenv
-
-# Copy the project files into working directory
 WORKDIR /bot
+
+# Copy dependencies and lockfile
+COPY pyproject.toml poetry.lock /bot/
+
+# Install dependencies and lockfile, excluding development
+# dependencies,
+RUN poetry install --no-dev --no-interaction --no-ansi
+
+# Set SHA build argument
+ARG git_sha="development"
+ENV GIT_SHA=$git_sha
+
+# Copy the rest of the project code
 COPY . .
 
-# Install project dependencies
-RUN pipenv install --deploy --system
-
-ENTRYPOINT ["python"]
-CMD ["-m", "bot"]
+# Start the bot
+CMD ["python", "-m", "bot"]
 
 # Define docker persistent volumes
 VOLUME /bot/bot/log /bot/data

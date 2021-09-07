@@ -1,6 +1,7 @@
 import datetime
 import logging
-from typing import Callable, Container, Iterable, Optional
+from collections.abc import Container, Iterable
+from typing import Callable, Optional
 
 from discord.ext.commands import (
     BucketType,
@@ -21,7 +22,7 @@ log = logging.getLogger(__name__)
 class InWhitelistCheckFailure(CheckFailure):
     """Raised when the `in_whitelist` check fails."""
 
-    def __init__(self, redirect_channel: Optional[int]) -> None:
+    def __init__(self, redirect_channel: Optional[int]):
         self.redirect_channel = redirect_channel
 
         if redirect_channel:
@@ -75,6 +76,11 @@ def in_whitelist_check(
         log.trace(f"{ctx.author} may use the `{ctx.command.name}` command as they are in a whitelisted category.")
         return True
 
+    category = getattr(ctx.channel, "category", None)
+    if category and category.name == constants.codejam_categories_name:
+        log.trace(f"{ctx.author} may use the `{ctx.command.name}` command as they are in a codejam team channel.")
+        return True
+
     # Only check the roles whitelist if we have one and ensure the author's roles attribute returns
     # an iterable to prevent breakage in DM channels (for if we ever decide to enable commands there).
     if roles and any(r.id in roles for r in getattr(ctx.author, "roles", ())):
@@ -92,8 +98,10 @@ def in_whitelist_check(
 def with_role_check(ctx: Context, *role_ids: int) -> bool:
     """Returns True if the user has any one of the roles in role_ids."""
     if not ctx.guild:  # Return False in a DM
-        log.trace(f"{ctx.author} tried to use the '{ctx.command.name}'command from a DM. "
-                  "This command is restricted by the with_role decorator. Rejecting request.")
+        log.trace(
+            f"{ctx.author} tried to use the '{ctx.command.name}'command from a DM. "
+            "This command is restricted by the with_role decorator. Rejecting request."
+        )
         return False
 
     for role in ctx.author.roles:
@@ -101,22 +109,28 @@ def with_role_check(ctx: Context, *role_ids: int) -> bool:
             log.trace(f"{ctx.author} has the '{role.name}' role, and passes the check.")
             return True
 
-    log.trace(f"{ctx.author} does not have the required role to use "
-              f"the '{ctx.command.name}' command, so the request is rejected.")
+    log.trace(
+        f"{ctx.author} does not have the required role to use "
+        f"the '{ctx.command.name}' command, so the request is rejected."
+    )
     return False
 
 
 def without_role_check(ctx: Context, *role_ids: int) -> bool:
     """Returns True if the user does not have any of the roles in role_ids."""
     if not ctx.guild:  # Return False in a DM
-        log.trace(f"{ctx.author} tried to use the '{ctx.command.name}' command from a DM. "
-                  "This command is restricted by the without_role decorator. Rejecting request.")
+        log.trace(
+            f"{ctx.author} tried to use the '{ctx.command.name}' command from a DM. "
+            "This command is restricted by the without_role decorator. Rejecting request."
+        )
         return False
 
     author_roles = [role.id for role in ctx.author.roles]
     check = all(role not in author_roles for role in role_ids)
-    log.trace(f"{ctx.author} tried to call the '{ctx.command.name}' command. "
-              f"The result of the without_role check was {check}.")
+    log.trace(
+        f"{ctx.author} tried to call the '{ctx.command.name}' command. "
+        f"The result of the without_role check was {check}."
+    )
     return check
 
 
@@ -154,8 +168,10 @@ def cooldown_with_role_bypass(rate: int, per: float, type: BucketType = BucketTy
         #
         # If the `before_invoke` detail is ever a problem then I can quickly just swap over.
         if not isinstance(command, Command):
-            raise TypeError('Decorator `cooldown_with_role_bypass` must be applied after the command decorator. '
-                            'This means it has to be above the command decorator in the code.')
+            raise TypeError(
+                "Decorator `cooldown_with_role_bypass` must be applied after the command decorator. "
+                "This means it has to be above the command decorator in the code."
+            )
 
         command._before_invoke = predicate
 

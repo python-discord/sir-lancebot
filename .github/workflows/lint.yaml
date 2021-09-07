@@ -3,25 +3,36 @@ name: Lint
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   lint:
     name: Run pre-commit & flake8
     runs-on: ubuntu-latest
     env:
-      # Configure pip to cache dependencies and do a user install
+      # List of licenses that are compatible with the MIT License and
+      # can be used in our project
+      ALLOWED_LICENSES: Apache Software License;
+        BSD;  BSD License;
+        GNU Library or Lesser General Public License (LGPL);
+        Historical Permission Notice and Disclaimer (HPND);
+        ISC License (ISCL);
+        MIT License;
+        Mozilla Public License 2.0 (MPL 2.0);
+        Public Domain;
+        Python Software Foundation License
+
+# Configure pip to cache dependencies and do a user install
       PIP_NO_CACHE_DIR: false
       PIP_USER: 1
 
-      # Hide the graphical elements from pipenv's output
-      PIPENV_HIDE_EMOJIS: 1
-      PIPENV_NOSPIN: 1
-
-      # Make sure pipenv does not try reuse an environment it's running in
-      PIPENV_IGNORE_VIRTUALENVS: 1
+      # Disable Poetry virtualenv creation
+      POETRY_VIRTUALENVS_CREATE: false
 
       # Specify explicit paths for python dependencies and the pre-commit
       # environment so we know which directories to cache
@@ -39,7 +50,7 @@ jobs:
         id: python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.8'
+          python-version: '3.9'
 
       # This step caches our Python dependencies. To make sure we
       # only restore a cache when the dependencies, the python version,
@@ -54,14 +65,21 @@ jobs:
           path: ${{ env.PYTHONUSERBASE }}
           key: "python-0-${{ runner.os }}-${{ env.PYTHONUSERBASE }}-\
           ${{ steps.python.outputs.python-version }}-\
-          ${{ hashFiles('./Pipfile', './Pipfile.lock') }}"
+          ${{ hashFiles('./pyproject.toml', './poetry.lock') }}"
 
       # Install our dependencies if we did not restore a dependency cache
-      - name: Install dependencies using pipenv
+      - name: Install dependencies using poetry
         if: steps.python_cache.outputs.cache-hit != 'true'
         run: |
-          pip install pipenv
-          pipenv install --dev --deploy --system
+          pip install poetry
+          poetry install --no-interaction --no-ansi
+
+      # Check all the dependencies are compatible with the MIT license.
+      # If you added a new dependencies that is being rejected,
+      # please make sure it is compatible with the license for this project,
+      # and add it to the ALLOWED_LICENSE variable
+      - name: Check Dependencies License
+        run: pip-licenses --allow-only="$ALLOWED_LICENSES"
 
       # This step caches our pre-commit environment. To make sure we
       # do create a new environment when our pre-commit setup changes,

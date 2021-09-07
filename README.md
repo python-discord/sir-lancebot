@@ -18,13 +18,13 @@ We know it can be difficult to get into the whole open source thing at first. To
 This later evolved into a bot designed as a fun and beginner-friendly learning environment for writing bot features and learning open-source.
 
 ## Getting started
-Before you start, please take some time to read through our [contributing guidelines](CONTRIBUTING.md).
+Before you start, please take some time to read through our [contributing guidelines](https://pythondiscord.com/pages/guides/pydis-guides/contributing/contributing-guidelines/).
 
 See [Sir Lancebot's Wiki](https://pythondiscord.com/pages/contributing/sir-lancebot/) for in-depth guides on getting started with the project!
 
-[1]:https://github.com/python-discord/sir-lancebot/workflows/Lint/badge.svg?branch=master
-[2]:https://github.com/python-discord/sir-lancebot/actions?query=workflow%3ALint+branch%3Amaster
-[3]:https://github.com/python-discord/sir-lancebot/workflows/Build/badge.svg?branch=master
-[4]:https://github.com/python-discord/sir-lancebot/actions?query=workflow%3ABuild+branch%3Amaster
-[5]: https://raw.githubusercontent.com/python-discord/branding/master/logos/badge/badge_github.svg
+[1]:https://github.com/python-discord/sir-lancebot/workflows/Lint/badge.svg?branch=main
+[2]:https://github.com/python-discord/sir-lancebot/actions?query=workflow%3ALint+branch%3Amain
+[3]:https://github.com/python-discord/sir-lancebot/workflows/Build/badge.svg?branch=main
+[4]:https://github.com/python-discord/sir-lancebot/actions?query=workflow%3ABuild+branch%3Amain
+[5]: https://raw.githubusercontent.com/python-discord/branding/main/logos/badge/badge_github.svg
 [6]: https://discord.gg/python

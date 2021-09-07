@@ -1,9 +1,11 @@
 import asyncio
 import logging
-from typing import Iterable, List, Optional, Tuple
+from collections.abc import Iterable
+from typing import Optional
 
 from discord import Embed, Member, Reaction
 from discord.abc import User
+from discord.embeds import EmptyEmbed
 from discord.ext.commands import Context, Paginator
 
 from bot.constants import Emojis
@@ -19,14 +21,21 @@ PAGINATION_EMOJI = (FIRST_EMOJI, LEFT_EMOJI, RIGHT_EMOJI, LAST_EMOJI, DELETE_EMO
 log = logging.getLogger(__name__)
 
 
-class EmptyPaginatorEmbed(Exception):
+class EmptyPaginatorEmbedError(Exception):
     """Base Exception class for an empty paginator embed."""
 
 
 class LinePaginator(Paginator):
     """A class that aids in paginating code blocks for Discord messages."""
 
-    def __init__(self, prefix: str = '```', suffix: str = '```', max_size: int = 2000, max_lines: int = None):
+    def __init__(
+            self,
+            prefix: str = '```',
+            suffix: str = '```',
+            max_size: int = 2000,
+            max_lines: Optional[int] = None,
+            linesep: str = "\n"
+    ):
         """
         Overrides the Paginator.__init__ from inside discord.ext.commands.
 
@@ -35,16 +44,20 @@ class LinePaginator(Paginator):
         `max_size` and `max_lines` denote the maximum amount of codepoints and lines
         allowed per page.
         """
-        self.prefix = prefix
-        self.suffix = suffix
-        self.max_size = max_size - len(suffix)
+        super().__init__(
+            prefix,
+            suffix,
+            max_size - len(suffix),
+            linesep
+        )
+
         self.max_lines = max_lines
         self._current_page = [prefix]
         self._linecount = 0
         self._count = len(prefix) + 1  # prefix + newline
         self._pages = []
 
-    def add_line(self, line: str = '', *, empty: bool = False) -> None:
+    def add_line(self, line: str = "", *, empty: bool = False) -> None:
         """
         Adds a line to the current page.
 
@@ -56,7 +69,7 @@ class LinePaginator(Paginator):
         If `empty` is True, an empty line will be placed after the a given `line`.
         """
         if len(line) > self.max_size - len(self.prefix) - 2:
-            raise RuntimeError('Line exceeds maximum page size %s' % (self.max_size - len(self.prefix) - 2))
+            raise RuntimeError("Line exceeds maximum page size %s" % (self.max_size - len(self.prefix) - 2))
 
         if self.max_lines is not None:
             if self._linecount >= self.max_lines:
@@ -71,7 +84,7 @@ class LinePaginator(Paginator):
         self._current_page.append(line)
 
         if empty:
-            self._current_page.append('')
+            self._current_page.append("")
             self._count += 1
 
     @classmethod
@@ -79,7 +92,7 @@ class LinePaginator(Paginator):
                        prefix: str = "", suffix: str = "", max_lines: Optional[int] = None,
                        max_size: int = 500, empty: bool = True, restrict_to_user: User = None,
                        timeout: int = 300, footer_text: str = None, url: str = None,
-                       exception_on_empty_embed: bool = False):
+                       exception_on_empty_embed: bool = False) -> None:
         """
         Use a paginator and set of reactions to provide pagination over a set of lines.
 
@@ -129,7 +142,7 @@ class LinePaginator(Paginator):
         if not lines:
             if exception_on_empty_embed:
                 log.exception("Pagination asked for empty lines iterable")
-                raise EmptyPaginatorEmbed("No lines to paginate")
+                raise EmptyPaginatorEmbedError("No lines to paginate")
 
             log.debug("No lines to add to paginator, adding '(nothing to display)' message")
             lines.append("(nothing to display)")
@@ -157,7 +170,8 @@ class LinePaginator(Paginator):
                 log.trace(f"Setting embed url to '{url}'")
 
             log.debug("There's less than two pages, so we won't paginate - sending single page on its own")
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
+            return
         else:
             if footer_text:
                 embed.set_footer(text=f"{footer_text} (Page {current_page + 1}/{len(paginator.pages)})")
@@ -282,7 +296,7 @@ class ImagePaginator(Paginator):
         self.images = []
         self._pages = []
 
-    def add_line(self, line: str = '', *, empty: bool = False) -> None:
+    def add_line(self, line: str = "", *, empty: bool = False) -> None:
         """
         Adds a line to each page, usually just 1 line in this context.
 
@@ -300,9 +314,9 @@ class ImagePaginator(Paginator):
         self.images.append(image)
 
     @classmethod
-    async def paginate(cls, pages: List[Tuple[str, str]], ctx: Context, embed: Embed,
+    async def paginate(cls, pages: list[tuple[str, str]], ctx: Context, embed: Embed,
                        prefix: str = "", suffix: str = "", timeout: int = 300,
-                       exception_on_empty_embed: bool = False):
+                       exception_on_empty_embed: bool = False) -> None:
         """
         Use a paginator and set of reactions to provide pagination over a set of title/image pairs.
 
@@ -336,7 +350,7 @@ class ImagePaginator(Paginator):
         if not pages:
             if exception_on_empty_embed:
                 log.exception("Pagination asked for empty image list")
-                raise EmptyPaginatorEmbed("No images to paginate")
+                raise EmptyPaginatorEmbedError("No images to paginate")
 
             log.debug("No images to add to paginator, adding '(no images to display)' message")
             pages.append(("(no images to display)", ""))
@@ -352,7 +366,8 @@ class ImagePaginator(Paginator):
             embed.set_image(url=image)
 
         if len(paginator.pages) <= 1:
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
+            return
 
         embed.set_footer(text=f"Page {current_page + 1}/{len(paginator.pages)}")
         message = await ctx.send(embed=embed)
@@ -417,9 +432,8 @@ class ImagePaginator(Paginator):
             await message.edit(embed=embed)
             embed.description = paginator.pages[current_page]
 
-            image = paginator.images[current_page]
-            if image:
-                embed.set_image(url=image)
+            image = paginator.images[current_page] or EmptyEmbed
+            embed.set_image(url=image)
 
             embed.set_footer(text=f"Page {current_page + 1}/{len(paginator.pages)}")
             log.debug(f"Got {reaction_type} page reaction - changing to page {current_page + 1}/{len(paginator.pages)}")

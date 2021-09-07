@@ -1,0 +1,74 @@
+[
+  {
+      "question": "What kind of music do bunnies like?",
+      "riddles": [
+            "Two words",
+            "Jump to the beat"
+        ],
+      "correct_answer": "Hip hop"
+  },
+  {
+      "question": "What kind of jewelry do rabbits wear?",
+      "riddles": [
+            "They can eat it too",
+            "14 ___ gold"
+        ],
+      "correct_answer": "14 carrot gold"
+  },
+  {
+      "question": "What does the easter bunny get for making a basket?",
+      "riddles": [
+            "KOBE!",
+            "1+1 = ?"
+        ],
+      "correct_answer": "2 points"
+  },
+  {
+      "question": "Where does the easter bunny eat breakfast?",
+      "riddles": [
+            "No waffles here",
+            "An international home"
+        ],
+      "correct_answer": "IHOP"
+  },
+  {
+      "question": "What do you call a rabbit with fleas?",
+      "riddles": [
+            "A bit of a looney tune",
+            "What's up Doc?"
+        ],
+      "correct_answer": "Bugs Bunny"
+  },
+  {
+      "question": "Why was the little girl sad after the race?",
+      "riddles": [
+            "2nd place?",
+            "Who beat her?"
+        ],
+      "correct_answer": "Because an egg beater"
+  },
+  {
+      "question": "What happened to the Easter Bunny when he misbehaved at school?",
+      "riddles": [
+            "Won't be back anymore",
+            "Worse than suspension"
+        ],
+      "correct_answer": "He was eggspelled"
+  },
+  {
+      "question": "What kind of bunny can't hop?",
+      "riddles": [
+            "Might melt in the sun",
+            "Fragile and yummy"
+        ],
+      "correct_answer": "A chocolate one"
+  },
+  {
+      "question": "Why did the Easter Bunny have to fire the duck?",
+      "riddles": [
+            "Quack",
+            "MY EGGS!!"
+        ],
+      "correct_answer": "He kept quacking the eggs"
+  }
+]
