@@ -55,7 +55,7 @@ class Hangman(commands.Cog):
         - min_unique_letters: the minimum unique letters you want the word to have (i.e. 4)
         - max_unique_letters: the maximum unique letters you want the word to have (i.e. 7)
         - singleplayer: writing 's' means you want to play by yourself, and only you can suggest letters,
-        writing 'm' means you want multiple players to join in and guess the word.
+            - writing 'm' means you want multiple players to join in and guess the word.
         """
         # filtering the list of all words depending on the configuration
         filtered_words = [
