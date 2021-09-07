@@ -1,5 +1,5 @@
 # imports
-import colorsys
+# import colorsys
 import logging
 import re
 from io import BytesIO
@@ -7,10 +7,10 @@ from io import BytesIO
 from PIL import Image, ImageColor
 from discord import Embed, File
 from discord.ext import commands
-from rapidfuzz import process
+# from rapidfuzz import process
 
 from bot.bot import Bot
-from bot.constants import Colours
+# from bot.constants import Colours
 
 
 logger = logging.getLogger(__name__)
@@ -46,12 +46,14 @@ class Color(commands.Cog):
                 hex_color = int(hex(int(user_color.replace("#", ""), 16)), 0)
                 logger.info(f"{hex_color = }")
                 rgb_color = ImageColor.getcolor(user_color, "RGB")
+                logger.info(f"{rgb_color = }")
             else:
-                await ctx.send(embed=Embed(
+                await ctx.send(
+                    embed=Embed(
                         title="An error has occured.",
-                        description=ERROR_MSG.format(user_color=user_color)
-                        )
+                        description=ERROR_MSG.format(user_color=user_color),
                     )
+                )
 
         elif "RGB" or "rgb" in user_color:
             rgb_parse = user_color.split()
@@ -64,7 +66,7 @@ class Color(commands.Cog):
             hex_color = f"0x{int(rgb[0]):02x}{int(rgb[1]):02x}{int(rgb[2]):02x}"
 
         main_embed = Embed(
-            title=user_color,
+            title=user_color,  # need to replace with fuzzymatch color name
             color=hex_color,
         )
         async with ctx.typing():
@@ -75,7 +77,6 @@ class Color(commands.Cog):
 
     async def _create_thumbnail_attachment(self, color: str) -> File:
         """Generate a thumbnail from `color`."""
-
         thumbnail = Image.new("RGB", (100, 100), color=color)
         bufferedio = BytesIO()
         thumbnail.save(bufferedio, format="PNG")
@@ -85,11 +86,8 @@ class Color(commands.Cog):
 
         return file
 
-
     # if user_color in color_lists:
-    #     # TODO fuzzy match for color
-    #     pass
-
+    #     # fuzzy match for color
 
 
 def setup(bot: Bot) -> None:
