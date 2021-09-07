@@ -1,6 +1,7 @@
 # Extensions groups
-bot/exts/christmas/**                   @ks129
-bot/exts/halloween/**                   @ks129
+bot/exts/events/advent_of_code/**                   @ks129
+bot/exts/events/hacktoberfest/**                    @ks129
+bot/exts/holidays/halloween/**                      @ks129
 
 # CI & Docker
 .github/workflows/**                    @Akarys42 @SebastiaanZ @Den4200

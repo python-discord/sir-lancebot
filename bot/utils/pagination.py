@@ -26,7 +26,6 @@ log = logging.getLogger(__name__)
 
 class EmptyPaginatorEmbedError(Exception):
     """Raised when attempting to paginate with empty contents."""
-
     pass
 
 
@@ -396,7 +395,7 @@ class ImagePaginator(Paginator):
         self.images.append(image)
 
     @classmethod
-    async def paginate(cls, pages: t.List[t.Tuple[str, str]], ctx: Context, embed: discord.Embed,
+    async def paginate(cls, pages: list[tuple[str, str]], ctx: Context, embed: Embed,
                        prefix: str = "", suffix: str = "", timeout: int = 300,
                        exception_on_empty_embed: bool = False) -> None:
         """
