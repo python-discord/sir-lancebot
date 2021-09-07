@@ -904,7 +904,6 @@ various
 very
 victim
 view
-violence
 visit
 voice
 vote
@@ -916,7 +915,6 @@ war
 watch
 water
 way
-weapon
 wear
 week
 weight
