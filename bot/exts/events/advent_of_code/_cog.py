@@ -189,17 +189,18 @@ class AdventOfCode(commands.Cog):
     async def aoc_leaderboard(
             self,
             ctx: commands.Context,
-            dayandstar: Optional[str] = None,
-            maximum_scorers: Optional[int] = 10) -> None:
+            day_and_star: Optional[str] = None,
+            maximum_scorers: Optional[int] = 10
+    ) -> None:
         """
         Get the current top scorers of the Python Discord Leaderboard.
 
-        Additionally, you can provide a day-star(eg.: 2-1, as second day first star) to filter your query more.
+        Additionally, you can provide a day-star(e.g. 2-1, as second day first star) to filter your query more.
         """
-        if maximum_scorers > AocConfig.max_dayandstar_results or maximum_scorers <= 0:
+        if maximum_scorers > AocConfig.max_day_and_star_results or maximum_scorers <= 0:
             raise commands.BadArgument(
-                f"Unfortunately, \n the maximum number of results you can query is {AocConfig.max_dayandstar_results} "
-                "\n and the minimum number is 1"
+                "Unfortunately, you reached a limit. "
+                f"(The maximum number of results you can query is {AocConfig.max_day_and_star_results})"
             )
         async with ctx.typing():
             try:
@@ -207,23 +208,22 @@ class AdventOfCode(commands.Cog):
             except _helpers.FetchingLeaderboardFailedError:
                 await ctx.send(":x: Unable to fetch leaderboard!")
                 return
-            if dayandstar:
+            if day_and_star:
                 # Fetches a dictionary that contains solvers in respect of day, and star.
-                # eg.: 1-1 will fetch the solvers of the first star of the first day and their completion time
-                per_dayandstar = json.loads(leaderboard['leaderboard_per_dayandstar'])
+                # e.g. 1-1 will fetch the solvers of the first star of the first day and their completion time
+                per_day_and_star = json.loads(leaderboard['leaderboard_per_day_and_star'])
                 try:
-                    scorers = per_dayandstar[dayandstar][:maximum_scorers]
+                    scorers = per_day_and_star[day_and_star][:maximum_scorers]
                 except KeyError:
                     raise commands.BadArgument(
-                        "You provided an invalid \"day-star\" formula! "
-                        "Please use the `day-star` notation. eg.: \"1-2\". \n"
-                        "Also keep in mind that there are only two stars each day, and days are from 1 to 25"
+                        "Day and star format has a notation of 'day-star' day being 1 to 25, and star is either 1 or "
+                        "2 (e.g. 3-1) "
                     )
-                day, star = dayandstar.split("-")
-                codeblock = f"```csharp\nTop scorers for day {day}, star {star} in UTC timezone \n"
+                day, star = day_and_star.split("-")
+                codeblock = f"```csharp\nTop scorers for day {day}, star {star} in UTC timezone\n"
                 for scorer in scorers:
                     time_data = datetime.fromtimestamp(scorer['completion_time']).strftime("%b.%d %I:%M %p")
-                    codeblock += f"[{scorer['member_name']}] {time_data}  \n"
+                    codeblock += f"[{scorer['member_name']}] {time_data}\n"
                 codeblock += "```"
                 await ctx.send(codeblock)
                 return
