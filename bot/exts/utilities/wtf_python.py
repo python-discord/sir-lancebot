@@ -62,13 +62,17 @@ class WTFPython(commands.Cog):
                 if resp.status == 200:
                     raw = await resp.text()
                     self.parse_readme(raw)
-                    log.debug("Successfully fetched the latest WTF Python README.md, breaking out of retry loop")
+                    log.debug(
+                        "Successfully fetched the latest WTF Python README.md, "
+                        "breaking out of retry loop"
+                    )
                     break
 
                 else:
                     failed_tries += 1
                     log.debug(
-                        f"Failed to get latest WTF Python README.md on try {x}/{FETCH_TRIES}. Status code {resp.status}"
+                        "Failed to get latest WTF Python README.md on try "
+                        f"{x}/{FETCH_TRIES}. Status code {resp.status}"
                     )
 
         if failed_tries == 3:
@@ -128,13 +132,13 @@ class WTFPython(commands.Cog):
             embed = Embed(
                 title=random.choice(constants.ERROR_REPLIES),
                 description=ERROR_MESSAGE,
-                colour=constants.Colours.soft_red
+                colour=constants.Colours.soft_red,
             )
         else:
             embed = Embed(
                 title=f"WTF Python Search Result For {query}",
                 colour=constants.Colours.dark_green,
-                description=f"[Go to Repository Section]({self.headers[match]})"
+                description=f"[Go to Repository Section]({self.headers[match]})",
             )
             embed.set_thumbnail(url=f"{WTF_PYTHON_RAW_URL}images/logo.png")
         await ctx.send(embed=embed)
