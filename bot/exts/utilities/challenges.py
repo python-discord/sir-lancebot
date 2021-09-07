@@ -231,9 +231,10 @@ class KataView(ui.View):
     def __init__(self, link: str, dropdown: InformationDropdown):
         super().__init__()
 
+        # adding the dropdown
+        self.add_item(dropdown)
         # manually creating the button as it is a link button and has no decorator
         self.add_item(ui.Button(label="View the Kata", url=link))
-        self.add_item(dropdown)
 
 
 def setup(bot: Bot) -> None:
