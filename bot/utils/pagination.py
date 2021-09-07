@@ -92,13 +92,15 @@ class LinePaginator(Paginator):
 
         If a line on a page exceeds `max_size` characters, then `max_size` will go up to
         `scale_to_size` for a single line before creating a new page for the overflow words. If it
-        is still exceeded, the excess characters are stored and placed on the next pages unti
+        is still exceeded, the excess characters are stored and placed on the next pages until
         there are none remaining (by word boundary). The line is truncated if `scale_to_size` is
         still exceeded after attempting to continue onto the next page.
+
         In the case that the page already contains one or more lines and the new lines would cause
         `max_size` to be exceeded, a new page is created. This is done in order to make a best
         effort to avoid breaking up single lines across pages, while keeping the total length of the
         page at a reasonable size.
+
         This function overrides the `Paginator.add_line` from inside `discord.ext.commands`.
         It overrides in order to allow us to configure the maximum number of lines per page.
         """
@@ -150,9 +152,11 @@ class LinePaginator(Paginator):
             exceed `max_chars` (rounding down to the nearest word boundary).
         remaining_words: the words in `line` which exceed `max_chars`. This value is None if
             no words could be split from `line`.
+
         If there are any remaining_words, an ellipses is appended to reduced_words and a
         continuation header is inserted before remaining_words to visually communicate the line
         continuation.
+
         Return a tuple in the format (reduced_words, remaining_words).
         """
         reduced_words = []
@@ -206,10 +210,11 @@ class LinePaginator(Paginator):
         The reactions are used to switch page, or to finish with pagination.
         When used, this will send a message using `ctx.send()` and apply a set of reactions to it. These reactions may
         be used to change page, or to remove pagination from the message.
+
         Pagination will also be removed automatically if no reaction is added for five minutes (300 seconds).
         The interaction will be limited to `restrict_to_user` (ctx.author by default) or
         to any user with a moderation role.
-        Example:
+
         >>> embed = discord.Embed()
         >>> embed.set_author(name="Some Operation", url=url, icon_url=icon)
         >>> await LinePaginator.paginate([line for line in lines], ctx, embed)
