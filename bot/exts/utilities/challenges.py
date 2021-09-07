@@ -2,7 +2,7 @@ import logging
 from random import choice
 
 from bs4 import BeautifulSoup
-from discord import Color, Embed
+from discord import Color, Embed, Interaction, Message, SelectOption, ui
 from discord.ext import commands
 
 from bot.bot import Bot
@@ -93,32 +93,121 @@ class Challenges(commands.Cog):
                 -8: (221, 219, 218), -7: (221, 219, 218), -6: (236, 182, 19), -5: (236, 182, 19),
                 -4: (60, 126, 187), -3: (60, 126, 187), -2: (134, 108, 199), -1: (134, 108, 199)
             }
-            description_of_kata = [line for line in kata_information["description"].split('\n') if '##' not in line]
-            description_of_kata = description_of_kata[0] if len(description_of_kata) == 1 else \
-                description_of_kata[0] + f'\n\n[Read more...](https://codewars.com/kata/{first_kata_id})'
 
-            languages_of_kata = ', '.join(map(str.title, kata_information['languages']))
             creator = kata_information['createdBy']
+            languages_of_kata = map(str.title, kata_information['languages'])
+            kata_description = kata_information['description']
+
+            # ensuring it isn't over the length 1024
+            if len(kata_description) > 1024:
+                kata_description = "\n".join(kata_description[:1000].split("\n")[:-1])
+                kata_description += f"\nRead more here: {f'https://codewars.com/kata/{first_kata_id}'}"
+
+            # creating the main kata embed
             kata_embed = Embed(
                 title=kata_information['name'],
-                description=description_of_kata,
                 color=Color.from_rgb(*mapping_of_kyu[kata_information['rank']['id']]),
-                url=f'https://codewars.com/kata/{first_kata_id}',
             )
-            kata_embed.add_field(
-                name=f"Information about {kata_information['name']}",
-                value=(
+            kata_embed.add_field(name="Difficulty", value=kata_information['rank']['name'], inline=False)
+            kata_embed.add_field(name="Description", value=kata_description, inline=False)
+
+            # creating the language embed
+            language_embed = Embed(
+                title=f"Languages Supported for {kata_information['name']}",
+                description=f'\n{Emojis.reddit_post_text}'.join(languages_of_kata),
+                color=Colours.grass_green,
+            )
+
+            # creating the tags embed
+            tags_embed = Embed(
+                title=f"Tags for {kata_information['name']}",
+                description=f'\n{Emojis.stackoverflow_tag}'.join(kata_information['tags']),
+                color=Colours.grass_green,
+            )
+
+            # creating the miscellaneous embed
+            miscellaneous_embed = Embed(
+                title=f"Other Information about {kata_information['name']}",
+                description=(
                     f"{Emojis.reddit_users} [{creator['username']}]({creator['url']})\n"
-                    f"{Emojis.reddit_post_text} `{languages_of_kata}`\n"
-                    f"{Emojis.stackoverflow_tag} `{', '.join(kata_information['tags'])}`\n"
                     f"{Emojis.reddit_upvote} `{kata_information['voteScore']}`\n"
                     f"⭐ `{kata_information['totalStars']}`\n"
                     f"🏁 `{kata_information['totalCompleted']}`\n"
                     f"{Emojis.stackoverflow_views} `{kata_information['totalAttempts']}`"
                 ),
-                inline=True,
+                color=Colours.grass_green,
             )
-            await ctx.send(embed=kata_embed)
+
+            # sending then editing so the dropdown can access the original message
+            original_message = await ctx.send(embed=kata_embed)
+            dropdown = InformationDropdown(
+                original_message=original_message,
+                main_embed=kata_embed,
+                language_embed=language_embed,
+                tags_embed=tags_embed,
+                other_info_embed=miscellaneous_embed,
+            )
+            await original_message.edit(
+                embed=kata_embed,
+                view=KataView(f'https://codewars.com/kata/{first_kata_id}', dropdown)
+            )
+
+
+# creates the information dropdown
+class InformationDropdown(ui.Select):
+    """A dropdown inheriting from ui.Select that allows finding out other information about the kata."""
+
+    def __init__(
+            self,
+            original_message: Message,
+            language_embed: Embed,
+            tags_embed: Embed,
+            other_info_embed: Embed,
+            main_embed: Embed,
+    ):
+        options = [
+            SelectOption(label="Main Information", description="See the kata's difficulty, description, etc."),
+            SelectOption(label='Languages', description='See what languages this kata supports!'),
+            SelectOption(label='Tags', description='See what categories this kata falls under!'),
+            SelectOption(
+                label='Other Information',
+                description='See how other people performed on this kata and more!'
+            ),
+        ]
+
+        self.original_message = original_message
+        # maps embeds to item chosen
+        self.mapping_of_embeds = {
+            "Main Information": main_embed,
+            "Languages": language_embed,
+            "Tags": tags_embed,
+            "Other Information": other_info_embed,
+        }
+
+        super().__init__(
+            placeholder='See more information regarding this kata',
+            min_values=1,
+            max_values=1,
+            options=options,
+        )
+
+    async def callback(self, interaction: Interaction) -> None:
+        """Callback for when someone clicks on a dropdown."""
+        # option chosen will retrieve the embed for that specific option then the message will be edited
+        result_embed = self.mapping_of_embeds[self.values[0]]
+        await self.original_message.edit(embed=result_embed)
+
+
+# creating the discord.ui.View subclass for the UI in the challenges command.
+class KataView(ui.View):
+    """The view for the InformationDropdown and the link to the Kata."""
+
+    def __init__(self, link: str, dropdown: InformationDropdown):
+        super().__init__()
+
+        # manually creating the button as it is a link button and has no decorator
+        self.add_item(ui.Button(label="View the Kata", url=link))
+        self.add_item(dropdown)
 
 
 def setup(bot: Bot) -> None:
