@@ -1,8 +1,8 @@
-import functools
 import logging
 import random
 import re
 from enum import Enum
+from functools import partial
 from typing import Dict, Optional
 
 from discord import Embed
@@ -30,15 +30,15 @@ Unknown WTF Python Query. Please try to reformulate your query.
 If the problem persists send a message in <#{constants.Channels.dev_contrib}>
 """
 
-MINIMUM_CERTAINTY = 75
+MINIMUM_CERTAINTY = 50
 
 
 class Action(Enum):
     """Represents an action to perform on an extension."""
 
     # Need to be partial otherwise they are considered to be function definitions.
-    LOAD = functools.partial(Bot.load_extension)
-    UNLOAD = functools.partial(Bot.unload_extension)
+    LOAD = partial(Bot.load_extension)
+    UNLOAD = partial(Bot.unload_extension)
 
 
 class WTFPython(commands.Cog):
@@ -46,12 +46,12 @@ class WTFPython(commands.Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.get_WTF_python_readme.start()
+        self.fetch_readme.start()
 
         self.headers: Dict[str] = dict()
 
     @tasks.loop(hours=1)
-    async def get_wtf_python_readme(self) -> None:
+    async def fetch_readme(self) -> None:
         """Gets the content of README.md from the WTF Python Repository."""
         failed_tries = 0
 
@@ -82,7 +82,7 @@ class WTFPython(commands.Cog):
             action = Action.LOAD
 
         verb = action.name.lower()
-        ext = "bot.exts.evergreen.wtf_python"
+        ext = "bot.exts.utilities.wtf_python"
 
         try:
             action.value(self.bot, ext)
@@ -107,15 +107,17 @@ class WTFPython(commands.Cog):
         for header in table_of_contents:
             match = re.findall(r"\[▶ (.*)\]\((.*)\)", header)
             if match:
-                self.headers.update(
-                    {
-                        match[0][0]: f"{BASE_URL}{match[0][1]}"
-                    }
-                )
+                self.headers[match[0][0]] = f"{BASE_URL}{match[0][1]}"
 
     def fuzzy_match_header(self, query: str) -> Optional[str]:
-        """Returns the fuzzy match of a query if its ratio is above "MINIMUM_CERTAINTY" else returns None."""
-        match, certainty = process.extractOne(query, self.headers.keys())
+        """
+        Returns the fuzzy match of a query if its ratio is above "MINIMUM_CERTAINTY" else returns None.
+
+        "MINIMUM_CERTAINTY" is the lowest score at which the fuzzy match will return a result.
+        The certainty returned by rapidfuzz.process.extractOne is a score between 0 and 100,
+        with 100 being a perfect match.
+        """
+        match, certainty, _ = process.extractOne(query, self.headers.keys())
         return match if certainty > MINIMUM_CERTAINTY else None
 
     @commands.command(aliases=("wtf", "WTF"))
@@ -128,22 +130,26 @@ class WTFPython(commands.Cog):
             --> .wtf wild imports
         """
         match = self.fuzzy_match_header(query)
-        if not match:
-            embed = Embed(
-                title=random.choice(constants.ERROR_REPLIES),
-                description=ERROR_MESSAGE,
-                colour=constants.Colours.soft_red,
-            )
-        else:
+        if match:
             embed = Embed(
                 title=f"WTF Python Search Result For {query}",
                 colour=constants.Colours.dark_green,
                 description=f"[Go to Repository Section]({self.headers[match]})",
             )
             embed.set_thumbnail(url=f"{WTF_PYTHON_RAW_URL}images/logo.png")
+        else:
+            embed = Embed(
+                title=random.choice(constants.ERROR_REPLIES),
+                description=ERROR_MESSAGE,
+                colour=constants.Colours.soft_red,
+            )
+<<<<<<< HEAD
+
+=======
+>>>>>>> d8fd1baa (Swap if / else for match)
         await ctx.send(embed=embed)
 
 
 def setup(bot: Bot) -> None:
-    """Load WTFPython Cog."""
+    """Load the WTFPython Cog."""
     bot.add_cog(WTFPython(bot))
