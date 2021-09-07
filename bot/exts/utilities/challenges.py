@@ -94,48 +94,61 @@ class Challenges(commands.Cog):
                 -4: (60, 126, 187), -3: (60, 126, 187), -2: (134, 108, 199), -1: (134, 108, 199)
             }
 
-            creator = kata_information['createdBy']
-            languages_of_kata = map(str.title, kata_information['languages'])
             kata_description = kata_information['description']
 
             # ensuring it isn't over the length 1024
             if len(kata_description) > 1024:
                 kata_description = "\n".join(kata_description[:1000].split("\n")[:-1])
-                kata_description += f"\nRead more here: {f'https://codewars.com/kata/{first_kata_id}'}"
+                kata_description += f"\n[Read more]({f'https://codewars.com/kata/{first_kata_id}'})"
 
             # creating the main kata embed
             kata_embed = Embed(
                 title=kata_information['name'],
+                description=kata_description,
                 color=Color.from_rgb(*mapping_of_kyu[kata_information['rank']['id']]),
             )
             kata_embed.add_field(name="Difficulty", value=kata_information['rank']['name'], inline=False)
-            kata_embed.add_field(name="Description", value=kata_description, inline=False)
 
             # creating the language embed
+            languages = '\n'.join(map(str.title, kata_information['languages']))
             language_embed = Embed(
-                title=f"Languages Supported for {kata_information['name']}",
-                description=f'\n{Emojis.reddit_post_text}'.join(languages_of_kata),
+                title="Languages Supported",
+                description=f"```nim\n{languages}```",
                 color=Colours.grass_green,
             )
 
             # creating the tags embed
+            tags = '\n'.join(kata_information['tags'])
             tags_embed = Embed(
-                title=f"Tags for {kata_information['name']}",
-                description=f'\n{Emojis.stackoverflow_tag}'.join(kata_information['tags']),
+                title="Tags",
+                description=f"```nim\n{tags}```",
                 color=Colours.grass_green,
             )
 
             # creating the miscellaneous embed
             miscellaneous_embed = Embed(
-                title=f"Other Information about {kata_information['name']}",
-                description=(
-                    f"{Emojis.reddit_users} [{creator['username']}]({creator['url']})\n"
-                    f"{Emojis.reddit_upvote} `{kata_information['voteScore']}`\n"
-                    f"⭐ `{kata_information['totalStars']}`\n"
-                    f"🏁 `{kata_information['totalCompleted']}`\n"
-                    f"{Emojis.stackoverflow_views} `{kata_information['totalAttempts']}`"
-                ),
+                title="Other Information",
                 color=Colours.grass_green,
+            )
+            miscellaneous_embed.add_field(
+                name="`Total Score`",
+                value=f"**{kata_information['voteScore']}**",
+                inline=False,
+            )
+            miscellaneous_embed.add_field(
+                name="`Total Stars`",
+                value=f"**{kata_information['totalStars']}**",
+                inline=False,
+            )
+            miscellaneous_embed.add_field(
+                name="`Total Completed`",
+                value=f"**{kata_information['totalCompleted']}**",
+                inline=False,
+            )
+            miscellaneous_embed.add_field(
+                name="`Total Attempts`",
+                value=f"**{kata_information['totalAttempts']}**",
+                inline=False,
             )
 
             # sending then editing so the dropdown can access the original message
@@ -166,12 +179,25 @@ class InformationDropdown(ui.Select):
             main_embed: Embed,
     ):
         options = [
-            SelectOption(label="Main Information", description="See the kata's difficulty, description, etc."),
-            SelectOption(label='Languages', description='See what languages this kata supports!'),
-            SelectOption(label='Tags', description='See what categories this kata falls under!'),
+            SelectOption(
+                label="Main Information",
+                description="See the kata's difficulty, description, etc.",
+                emoji='🌎',
+            ),
+            SelectOption(
+                label='Languages',
+                description='See what languages this kata supports!',
+                emoji=Emojis.reddit_post_text,
+            ),
+            SelectOption(
+                label='Tags',
+                description='See what categories this kata falls under!',
+                emoji=Emojis.stackoverflow_tag,
+            ),
             SelectOption(
                 label='Other Information',
-                description='See how other people performed on this kata and more!'
+                description='See how other people performed on this kata and more!',
+                emoji='ℹ',
             ),
         ]
 
