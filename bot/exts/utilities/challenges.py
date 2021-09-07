@@ -47,7 +47,7 @@ class Challenges(commands.Cog):
                     "There can only be one comma within the query, separating the difficulty and the query itself."
                 )
 
-            query, level = query_splitted(',' if ', ' not in query else ', ')
+            query, level = query_splitted
             level = f'-{level}'
         elif query.isnumeric():
             level, query = f'-{query}', None
@@ -62,28 +62,8 @@ class Challenges(commands.Cog):
                     f"Unexpected status code {response.status} from codewars.com"
                 )
             soup = BeautifulSoup(await response.text(), features='lxml')
-            main_screen = soup.body.div.div.main.section
+            first_kata_div = soup.find_all('div', class_='item-title px-0')
 
-            # ensures that the page didn't 404 out
-            try:
-                list_of_katas = main_screen.find("div", class_='w-full md:w-9/12 md:pl-4 pr-0 space-y-2')
-            except AttributeError:
-                # if an attribute error occurred, that means the arguments were formatted incorrectly.
-                raise commands.BadArgument(
-                    "It looks like the arguments are not formatted correctly! Formatting should look like this:\n"
-                    "```diff\n+ a challenge command that only looks for a challenge in the scope of the language\n"
-                    "- .challenge <language>\n\n"
-                    "+ a challenge command that looks for difficulty and language, where the difficulty is"
-                    "from 1-8, 1 being the hardest, 8 being the easiest\n- challenge <language> <difficulty>\n\n"
-                    "+ a challenge command that looks for a query within the scope of the language\n"
-                    "- .challenge <language> <query>\n\n"
-                    "+ a challenge command that looks for a query and difficulty within the scope of the language\n"
-                    "- .challenge <language> <query>, <difficulty>```"
-                )
-
-            first_kata_div = list_of_katas.find_all(
-                "div", class_='list-item-kata bg-ui-section p-4 rounded-lg shadow-md',
-            )
             if not first_kata_div:
                 no_results_embed = Embed(
                     title=choice(NEGATIVE_REPLIES),
@@ -100,7 +80,7 @@ class Challenges(commands.Cog):
                 first_kata_div = first_kata_div[0]
 
             # there are numerous divs before arriving at the id of the kata, which can be used for the link.
-            first_kata_id = first_kata_div.div.div.div.a['href'].split('/')[-1]
+            first_kata_id = first_kata_div.a['href'].split('/')[-1]
 
         async with self.bot.http_session.get(API_ROOT.format(kata_id=first_kata_id)) as kata_information:
             if response.status != 200:
