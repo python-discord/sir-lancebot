@@ -10,7 +10,10 @@ from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES
 
 
-TOP_WORDS_FILE_PATH = Path("bot/resources/fun/top_1000_used_words.txt").resolve()
+# defining all words in the list of words as a global variable
+with Path("bot/resources/fun/top_1000_used_words.txt").resolve().open(mode="r", encoding="utf-8") as f:
+    ALL_WORDS = [line.strip('\n') for line in f.readlines()]
+
 # defining a list of images that will be used for the game to represent the hangman person
 IMAGES = [
     "https://cdn.discordapp.com/attachments/859123972884922418/883472355056295946/hangman0.png",
@@ -32,8 +35,6 @@ class Hangman(commands.Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
-        with TOP_WORDS_FILE_PATH.open(mode="r", encoding="utf-8") as file:
-            self.all_words = [line.strip('\n') for line in file.readlines()]
 
     @commands.command()
     async def hangman(
@@ -52,7 +53,7 @@ class Hangman(commands.Cog):
         """
         # filtering the list of all words depending on the configuration
         filtered_words = [
-            word for word in self.all_words
+            word for word in ALL_WORDS
             if int(min_length) < len(word) < int(max_length)
             and int(min_unique_letters) < len(set(word)) < int(max_unique_letters)
         ]
