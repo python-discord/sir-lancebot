@@ -73,6 +73,16 @@ class Color(commands.Cog):
             file = await self._create_thumbnail_attachment(rgb_color)
             main_embed.set_thumbnail(url="attachment://color.png")
 
+        main_embed.add_field(
+            name="Hex",
+            value=f">>Hex #{hex_color}",
+            inline=False,
+        )
+        main_embed.add_field(
+            name="RGB",
+            value=f">>RGB {rgb_color}",
+            inline=False,
+        )
         await ctx.send(file=file, embed=main_embed)
 
     async def _create_thumbnail_attachment(self, color: str) -> File:
