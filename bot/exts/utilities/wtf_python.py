@@ -42,11 +42,11 @@ class Action(Enum):
 
 
 class WTFPython(commands.Cog):
-    """Cog that allows users to retrieve issues from GitHub."""
+    """Cog that allows getting WTF Python entries from the WTF Python repository."""
 
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.get_wtf_python_readme.start()
+        self.get_WTF_python_readme.start()
 
         self.headers: Dict[str] = dict()
 
@@ -110,14 +110,14 @@ class WTFPython(commands.Cog):
                 )
 
     def fuzzy_match_header(self, query: str) -> Optional[str]:
-        """Returns the fuzzy match of a query if its ratio is above 90 else returns None."""
+        """Returns the fuzzy match of a query if its ratio is above "MINIMUM_CERTAINTY" else returns None."""
         match, certainty = process.extractOne(query, self.headers.keys())
         return match if certainty > MINIMUM_CERTAINTY else None
 
-    @commands.command(aliases=("wtf",))
+    @commands.command(aliases=("wtf", "WTF"))
     async def wtf_python(self, ctx: commands.Context, *, query: str) -> None:
         """
-        Search wtf python.
+        Search WTF python.
 
         Gets the link of the fuzzy matched query from https://github.com/satwikkansal/wtfpython.
         Usage:
