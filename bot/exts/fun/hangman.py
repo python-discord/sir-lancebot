@@ -47,9 +47,15 @@ class Hangman(commands.Cog):
             singleplayer: Literal["s", "m"] = "s",
     ) -> None:
         """
-        Play against the bot, where you have to guess the word it has provided!
+        Play hangman against the bot, where you have to guess the word it has provided!
 
-        You have 7 tries, and you have to guess the letters that are in the word, or you lose!
+        The arguments for this command mean:
+        - min_length: the minimum length you want the word to be (i.e. 2)
+        - max_length: the maximum length you want the word to be (i.e. 5)
+        - min_unique_letters: the minimum unique letters you want the word to have (i.e. 4)
+        - max_unique_letters: the maximum unique letters you want the word to have (i.e. 7)
+        - singleplayer: writing 's' means you want to play by yourself, and only you can suggest letters,
+        writing 'm' means you want multiple players to join in and guess the word.
         """
         # filtering the list of all words depending on the configuration
         filtered_words = [
