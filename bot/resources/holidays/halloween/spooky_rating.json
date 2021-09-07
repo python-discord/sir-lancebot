@@ -1,0 +1,47 @@
+{
+    "-1": {
+        "title": "\uD83D\uDD6F You're not scarin' anyone \uD83D\uDD6F",
+        "text": "No matter what you say or do, nobody even flinches when you try to scare them. Was your costume this year only a white sheet with holes for eyes? Or did you even bother with a costume at all? Either way, don't expect too many treats when going from door-to-door.",
+        "image": "https://raw.githubusercontent.com/python-discord/sir-lancebot/main/bot/resources/holidays/halloween/spookyrating/candle.jpeg"
+    },
+    "5": {
+        "title": "\uD83D\uDC76 Like taking candy from a baby \uD83D\uDC76",
+        "text": "Your scaring will probably make a baby cry... but that's the limit on your frightening powers. Be careful not to get to the point where everyone's running away from you because they don't like you, not because they're scared of you.",
+        "image": "https://raw.githubusercontent.com/python-discord/sir-lancebot/main/bot/resources/holidays/halloween/spookyrating/baby.jpeg"
+    },
+    "20": {
+        "title": "\uD83C\uDFDA You're skills are forming... \uD83C\uDFDA",
+        "text": "As you become the Devil's apprentice, you begin to make people jump every time you sneak up on them. A good start, but you have to learn not to wear the same costume every year until it doesn't fit you. People will notice you and your prowess will decrease.",
+        "image": "https://raw.githubusercontent.com/python-discord/sir-lancebot/main/bot/resources/holidays/halloween/spookyrating/tiger.jpeg"
+    },
+    "30": {
+        "title": "\uD83D\uDC80 Picture Perfect... \uD83D\uDC80",
+        "text": "You've nailed the costume this year! You look suuuper scary! Now make sure to play the part and act out your costume and you'll be sure to give a few people a massive fright!",
+        "image": "https://raw.githubusercontent.com/python-discord/sir-lancebot/main/bot/resources/holidays/halloween/spookyrating/costume.jpeg"
+    },
+    "50": {
+        "title": "\uD83D\uDC7B Uhm... are you human \uD83D\uDC7B",
+        "text": "Uhm... you're too good to be human and now you're beginning to sound like a ghost. You're almost invisible when haunting and nobody truly knows where you are at any given time. But they will always scream at the sound of a ghost...",
+        "image": "https://raw.githubusercontent.com/python-discord/sir-lancebot/main/bot/resources/holidays/halloween/spookyrating/ghost.jpeg"
+    },
+    "65": {
+        "title": "\uD83C\uDF83 That potion can't be real \uD83C\uDF83",
+        "text": "You're carrying... some... unknown liquids and no one knows who they are but yourself. Be careful on who you use these powerful spells on, because no Mage has the power to do any irreversible enchantments because even you won't know what will happen to these mortals.",
+        "image": "https://raw.githubusercontent.com/python-discord/sir-lancebot/main/bot/resources/holidays/halloween/spookyrating/necromancer.jepg"
+    },
+    "80": {
+        "title": "\uD83E\uDD21 The most sinister face \uD83E\uDD21",
+        "text": "Who knew something intended to be playful could be so menacing... Especially other people seeing you in their nightmares, continuing to haunt them day by day, stuck in their head throughout the entire year. Make sure to pull a face they will never forget.",
+        "image": "https://raw.githubusercontent.com/python-discord/sir-lancebot/main/bot/resources/holidays/halloween/spookyrating/clown.jpeg"
+    },
+    "95": {
+        "title": "\uD83D\uDE08 The Devil's Accomplice \uD83D\uDE08",
+        "text": "Imagine being allies with the most evil character with an aim to scare people to death. Force people to suffer as they proceed straight to hell to meet your boss and best friend. Not even you know the power He has...",
+        "image": "https://raw.githubusercontent.com/python-discord/sir-lancebot/main/bot/resources/holidays/halloween/spookyrating/jackolantern.jpg"
+    },
+    "100": {
+        "title":"\uD83D\uDC7F The Devil Himself \uD83D\uDC7F",
+        "text": "You are the evillest creature in existence to scare anyone and everyone humanly possible. The reason your underlings are called mortals is that they die. With your help, they die a lot quicker. With all the evil power in the universe, you know what to do.",
+        "image": "https://raw.githubusercontent.com/python-discord/sir-lancebot/main/bot/resources/holidays/halloween/spookyrating/devil.jpeg"
+    }
+}
