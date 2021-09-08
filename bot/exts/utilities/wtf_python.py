@@ -3,7 +3,7 @@ import random
 import re
 from enum import Enum
 from functools import partial
-from typing import Dict, Optional
+from typing import Optional
 
 from discord import Embed
 from discord.ext import commands, tasks
@@ -48,7 +48,7 @@ class WTFPython(commands.Cog):
         self.bot = bot
         self.fetch_readme.start()
 
-        self.headers: Dict[str] = dict()
+        self.headers: dict[str, str] = dict()
 
     @tasks.loop(hours=1)
     async def fetch_readme(self) -> None:
@@ -99,6 +99,7 @@ class WTFPython(commands.Cog):
         where the key is the heading and the value is the
         link to the heading.
         """
+        # Match the start of examples, until the end of the table of contents (toc)
         table_of_contents = re.findall(
             r"\[👀 Examples\]\(#-examples\)\n([\w\W]*)<!-- tocstop -->", data
         )[0].split("\n")
@@ -143,11 +144,6 @@ class WTFPython(commands.Cog):
                 description=ERROR_MESSAGE,
                 colour=constants.Colours.soft_red,
             )
-<<<<<<< HEAD
-
-=======
->>>>>>> d8fd1baa (Swap if / else for match)
-        await ctx.send(embed=embed)
 
 
 def setup(bot: Bot) -> None:
