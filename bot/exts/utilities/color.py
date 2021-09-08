@@ -1,4 +1,3 @@
-# imports
 # import colorsys
 import logging
 import re
@@ -35,16 +34,14 @@ class Color(commands.Cog):
     @commands.command(aliases=["colour"])
     async def color(self, ctx: commands.Context, mode: str, user_color: str) -> None:
         """Send information on input color code or color name."""
-        # need to check if user_color is RGB, HSV, CMYK, HSL, Hex or color name
-        # should we assume the color is RGB if not defined?
-
+        logger.info(f"{mode = }")
+        logger.info(f"{user_color = }")
         if mode.lower() == "hex":
-            logger.info(f"{user_color = }")
             hex_match = re.search(r"^#(?:[0-9a-fA-F]{3}){1,2}$", user_color)
             if hex_match:
                 hex_color = int(hex(int(user_color.replace("#", ""), 16)), 0)
-                logger.info(f"{hex_color = }")
                 rgb_color = ImageColor.getcolor(user_color, "RGB")
+                logger.info(f"{hex_color = }")
                 logger.info(f"{rgb_color = }")
             else:
                 await ctx.send(
@@ -53,11 +50,8 @@ class Color(commands.Cog):
                         description=ERROR_MSG.format(user_color=user_color),
                     )
                 )
-
         elif mode.lower() == "rgb":
-            logger.info(f"{user_color = }")
-            # rgb_color = user_color
-
+            pass
         elif mode.lower() == "hsv":
             pass
         elif mode.lower() == "hsl":
@@ -66,6 +60,7 @@ class Color(commands.Cog):
             pass
         else:
             # mode is either None or an invalid code
+            # need to handle whether user passes color name
             if mode is None:
                 no_mode_embed = Embed(
                     title="No 'mode' was passed, please define a color code.",
