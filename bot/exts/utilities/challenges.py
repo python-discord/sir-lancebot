@@ -166,7 +166,6 @@ class Challenges(commands.Cog):
             )
 
 
-# creates the information dropdown
 class InformationDropdown(ui.Select):
     """A dropdown inheriting from ui.Select that allows finding out other information about the kata."""
 
