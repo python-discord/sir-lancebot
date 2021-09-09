@@ -142,12 +142,12 @@ class Hangman(commands.Cog):
                 inline=False,
             )
             await original_message.edit(embed=hangman_embed)
-        else:
-            win_embed = Embed(
-                title="You won!",
-                color=Colours.grass_green,
-            )
-            await ctx.send(embed=win_embed)
+
+        win_embed = Embed(
+            title="You won!",
+            color=Colours.grass_green,
+        )
+        await ctx.send(embed=win_embed)
 
 
 def setup(bot: Bot) -> None:
