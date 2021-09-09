@@ -117,7 +117,7 @@ class Hangman(commands.Cog):
                 continue
 
             elif message.content in word:
-                positions = [idx for idx, letter in enumerate(word) if letter == message.content]
+                positions = {idx for idx, letter in enumerate(word) if letter == message.content}
                 user_guess = "".join(
                     [message.content if index in positions else dash for index, dash in enumerate(user_guess)]
                 )
