@@ -9,13 +9,12 @@ from discord.ext import commands
 from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES
 
-
 # defining all words in the list of words as a global variable
 with Path("bot/resources/fun/top_1000_used_words.txt").resolve().open(mode="r", encoding="utf-8") as f:
     ALL_WORDS = [line.strip('\n') for line in f.readlines()]
 
 # defining a list of images that will be used for the game to represent the hangman person
-IMAGES = [
+IMAGES = {tries: image for tries, image in zip(range(6, -1, -1), (
     "https://cdn.discordapp.com/attachments/859123972884922418/883472355056295946/hangman0.png",
     "https://cdn.discordapp.com/attachments/859123972884922418/883472756744814613/hangman1.png",
     "https://cdn.discordapp.com/attachments/859123972884922418/883472808699629578/hangman2.png",
@@ -23,7 +22,9 @@ IMAGES = [
     "https://cdn.discordapp.com/attachments/859123972884922418/883472950991396864/hangman4.png",
     "https://cdn.discordapp.com/attachments/859123972884922418/883472999431430204/hangman5.png",
     "https://cdn.discordapp.com/attachments/859123972884922418/883473051277226015/hangman6.png",
-]
+)
+)
+}
 
 
 class Hangman(commands.Cog):
@@ -40,10 +41,10 @@ class Hangman(commands.Cog):
     async def hangman(
             self,
             ctx: commands.Context,
-            min_length: str = "0",
-            max_length: str = "25",
-            min_unique_letters: str = "0",
-            max_unique_letters: str = "25",
+            min_length: int = 0,
+            max_length: int = 25,
+            min_unique_letters: int = 0,
+            max_unique_letters: int = 25,
             singleplayer: Literal["s", "m"] = "s",
     ) -> None:
         """
@@ -60,8 +61,8 @@ class Hangman(commands.Cog):
         # filtering the list of all words depending on the configuration
         filtered_words = [
             word for word in ALL_WORDS
-            if int(min_length) < len(word) < int(max_length)
-            and int(min_unique_letters) < len(set(word)) < int(max_unique_letters)
+            if min_length < len(word) < max_length
+            and min_unique_letters < len(set(word)) < max_unique_letters
         ]
 
         if not filtered_words:
@@ -73,8 +74,6 @@ class Hangman(commands.Cog):
             await ctx.send(embed=filter_not_found_embed)
             return
 
-        # a dictionary mapping the images of the "hung man" to the number of tries it corresponds to
-        mapping_of_images = {tries_key: image_name for tries_key, image_name in zip(range(6, -1, -1), IMAGES)}
         word = choice(filtered_words)
 
         user_guess = "_" * len(word)
@@ -84,7 +83,7 @@ class Hangman(commands.Cog):
             title="Hangman",
             color=Colours.python_blue,
         )
-        hangman_embed.set_image(url=mapping_of_images[tries])
+        hangman_embed.set_image(url=IMAGES[tries])
         hangman_embed.add_field(
             name=f"The word is `{user_guess}`",
             value="Guess the word by sending a message with the letter!",
@@ -100,9 +99,21 @@ class Hangman(commands.Cog):
                     check=lambda msg: msg.author != self.bot if singleplayer == 'm' else msg.author == ctx.author
                 )
             except TimeoutError:
+                timeout_embed = Embed(
+                    title=choice(NEGATIVE_REPLIES),
+                    description="Looks like the bot timed out! You must send a letter within 60 seconds.",
+                    color=Colours.soft_red,
+                )
+                await ctx.send(embed=timeout_embed)
                 return
 
             if len(message.content) > 1:
+                letter_embed = Embed(
+                    title=choice(NEGATIVE_REPLIES),
+                    description="You can only send a letter for the hangman game!",
+                    color=Colours.soft_red,
+                )
+                await ctx.send(embed=letter_embed)
                 continue
 
             elif message.content in word:
@@ -124,7 +135,7 @@ class Hangman(commands.Cog):
                 tries -= 1
 
             hangman_embed.clear_fields()
-            hangman_embed.set_image(url=mapping_of_images[tries])
+            hangman_embed.set_image(url=IMAGES[tries])
             hangman_embed.add_field(
                 name=f"The word is `{user_guess}`",
                 value="Guess the word by sending a message with the letter!",
