@@ -237,5 +237,5 @@ class KataView(ui.View):
 
 
 def setup(bot: Bot) -> None:
-    """Sets up Challenges cog."""
+    """Load the Challenges cog."""
     bot.add_cog(Challenges(bot))
