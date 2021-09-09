@@ -215,7 +215,6 @@ detail
 determine
 develop
 development
-die
 difference
 different
 difficult
@@ -351,7 +350,6 @@ group
 grow
 growth
 guess
-gun
 guy
 hair
 half
@@ -418,7 +416,6 @@ investment
 involve
 issue
 item
-its
 itself
 job
 join
