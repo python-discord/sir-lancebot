@@ -68,6 +68,7 @@ logging.getLogger("discord").setLevel(logging.ERROR)
 logging.getLogger("websockets").setLevel(logging.ERROR)
 logging.getLogger("PIL").setLevel(logging.ERROR)
 logging.getLogger("matplotlib").setLevel(logging.ERROR)
+logging.getLogger("async_rediscache").setLevel(logging.WARNING)
 
 # Setup new logging configuration
 logging.basicConfig(
