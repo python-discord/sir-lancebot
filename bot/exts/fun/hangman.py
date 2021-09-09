@@ -134,7 +134,6 @@ class Hangman(commands.Cog):
                     await original_message.edit(embed=losing_embed)
                     return
 
-
             hangman_embed.clear_fields()
             hangman_embed.set_image(url=IMAGES[tries])
             hangman_embed.add_field(
