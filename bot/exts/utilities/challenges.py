@@ -218,7 +218,7 @@ class InformationDropdown(ui.Select):
 
     async def callback(self, interaction: Interaction) -> None:
         """Callback for when someone clicks on a dropdown."""
-        # option chosen will retrieve the embed for that specific option then the message will be edited
+        # Edit the message to the embed selected in the option
         result_embed = self.mapping_of_embeds[self.values[0]]
         await self.original_message.edit(embed=result_embed)
 
