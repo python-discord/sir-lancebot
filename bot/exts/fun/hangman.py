@@ -122,17 +122,18 @@ class Hangman(commands.Cog):
                     [message.content if index in positions else dash for index, dash in enumerate(user_guess)]
                 )
 
-            elif tries - 1 <= 0:
-                losing_embed = Embed(
-                    title="You lost.",
-                    description=f"The word was `{word}`.",
-                    color=Colours.soft_red,
-                )
-                await original_message.edit(embed=losing_embed)
-                return
-
             else:
                 tries -= 1
+
+                if tries <= 0:
+                    losing_embed = Embed(
+                        title="You lost.",
+                        description=f"The word was `{word}`.",
+                        color=Colours.soft_red,
+                    )
+                    await original_message.edit(embed=losing_embed)
+                    return
+
 
             hangman_embed.clear_fields()
             hangman_embed.set_image(url=IMAGES[tries])
