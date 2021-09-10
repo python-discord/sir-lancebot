@@ -1,5 +1,4 @@
 import logging
-from asyncio import run
 from random import choice
 
 from bs4 import BeautifulSoup
@@ -74,21 +73,25 @@ class Challenges(commands.Cog):
     """
     Cog for a challenge command.
 
-    Pulls a random kata from codewars.com, and can be filtered through.
+    The challenge command pulls a random kata from codewars.com.
+    A kata is the name for a challenge, specific to `codewars.com`.
+
+    The challenge command also has filters to customize the kata that is given.
+    You can specify the language the kata should be from, the difficulty of the kata.
+    Lastly, you can customize the topic you want the kata to be about!
     """
 
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @classmethod
-    async def kata_id(cls, search_link: str, params: dict) -> str:
+    async def kata_id(self, search_link: str, params: dict) -> str:
         """
         Using bs4, and with a formatted link with the filters provided by the user.
 
         This will webscrape the search page with `search_link` and then get the ID of a kata for the
         codewars.com API to use.
         """
-        async with cls.bot.http_session.get(search_link, params=params) as response:
+        async with self.bot.http_session.get(search_link, params=params) as response:
             if response.status != 200:
                 logger.error(
                     f"Unexpected status code {response.status} from codewars.com"
@@ -109,14 +112,13 @@ class Challenges(commands.Cog):
             first_kata_id = first_kata_div.a["href"].split("/")[-1]
             return first_kata_id
 
-    @classmethod
-    async def kata_information(cls, kata_id: str) -> dict:
+    async def kata_information(self, kata_id: str) -> dict:
         """
         Returns the information about the Kata.
 
         Uses the codewars.com API to get information about the kata using the kata's ID.
         """
-        async with cls.bot.http_session.get(API_ROOT.format(kata_id=kata_id)) as response:
+        async with self.bot.http_session.get(API_ROOT.format(kata_id=kata_id)) as response:
             if response.status != 200:
                 logger.error(
                     f"Unexpected status code {response.status} from codewars.com/api/v1"
@@ -150,7 +152,7 @@ class Challenges(commands.Cog):
             title=kata_information['name'],
             description=kata_description,
             color=Color.from_rgb(
-                *mapping_of_kyu[int(kata_information['rank']['name'].replace(' kyu'))]
+                *mapping_of_kyu[int(kata_information['rank']['name'].replace(' kyu', ''))]
             ),
         )
         kata_embed.add_field(name="Difficulty", value=kata_information['rank']['name'], inline=False)
@@ -274,9 +276,9 @@ class Challenges(commands.Cog):
         params = {name: value for name, value in zip(["q", "r[]"], [query, level]) if value}
         params = {**params, "beta": "false"}
 
-        first_kata_id = run(self.kata_id(get_kata_link, params))
+        first_kata_id = await self.kata_id(get_kata_link, params)
 
-        kata_information = run(self.kata_information(first_kata_id))
+        kata_information = await self.kata_information(first_kata_id)
 
         kata_embed = self.main_embed(kata_information)
 
