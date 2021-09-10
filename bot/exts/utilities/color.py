@@ -1,4 +1,4 @@
-# import colorsys
+import colorsys
 import logging
 import re
 from io import BytesIO
@@ -76,44 +76,28 @@ class Color(commands.Cog):
             await ctx.send(embed=wrong_mode_embed)
             return
 
-        main_embed = Embed(
-            title=user_color,  # need to replace with fuzzymatch color name
-            color=hex_color,
-        )
         async with ctx.typing():
-            file = await self._create_thumbnail_attachment(rgb_color)
+            main_embed = Embed(
+                title=user_color,  # need to replace with fuzzymatch color name
+                description='(Approx..)',
+                color=hex_color,
+            )
+
+            file = await self.create_thumbnail_attachment(rgb_color)
             main_embed.set_thumbnail(url="attachment://color.png")
 
-        main_embed.add_field(
-            name="Hex",
-            value=f">>Hex #{hex_color}",
-            inline=False,
-        )
-        main_embed.add_field(
-            name="RGB",
-            value=f">>RGB {rgb_color}",
-            inline=False,
-        )
-        """
-        main_embed.add_field(
-            name="HSV",
-            value=f">>HSV {hsv_color}",
-            inline=False,
-        )
-        main_embed.add_field(
-            name="HSL",
-            value=f">>HSL {hsl_color}",
-            inline=False,
-        )
-        main_embed.add_field(
-            name="CMYK",
-            value=f">>CMYK {cmyk_color}",
-            inline=False,
-        )
-        """
+            fields = self.get_color_fields(rgb_color)
+            for field in fields:
+                main_embed.add_field(
+                    name=field['name'],
+                    value=field['value'],
+                    inline=False,
+                )
+
         await ctx.send(file=file, embed=main_embed)
 
-    async def _create_thumbnail_attachment(self, color: str) -> File:
+    @staticmethod
+    async def create_thumbnail_attachment(color: str) -> File:
         """Generate a thumbnail from `color`."""
         thumbnail = Image.new("RGB", (100, 100), color=color)
         bufferedio = BytesIO()
@@ -123,6 +107,88 @@ class Color(commands.Cog):
         file = File(bufferedio, filename="color.png")
 
         return file
+
+    @staticmethod
+    def get_color_fields(rgb_color: tuple[int, int, int]) -> list[dict]:
+        """Converts from `RGB` to `CMYK`, `HSV`, `HSL` and returns a list of fields."""
+
+        def _rgb_to_hex(rgb_color: tuple[int, int, int]) -> str:
+            """To convert from `RGB` to `Hex` notation."""
+            return '#' + ''.join(hex(color)[2:].zfill(2) for color in rgb_color).upper()
+
+        def _rgb_to_cmyk(rgb_color: tuple[int, int, int]) -> tuple[int, int, int, int]:
+            """To convert from `RGB` to `CMYK` color space."""
+            r, g, b = rgb_color
+
+            # RGB_SCALE -> 255
+            # CMYK_SCALE -> 100
+
+            if (r == g == b == 0):
+                return 0, 0, 0, 100  # Representing Black
+
+            # rgb [0,RGB_SCALE] -> cmy [0,1]
+            c = 1 - r / 255
+            m = 1 - g / 255
+            y = 1 - b / 255
+
+            # extract out k [0, 1]
+            min_cmy = min(c, m, y)
+            c = (c - min_cmy) / (1 - min_cmy)
+            m = (m - min_cmy) / (1 - min_cmy)
+            y = (y - min_cmy) / (1 - min_cmy)
+            k = min_cmy
+
+            # rescale to the range [0,CMYK_SCALE] and round off
+            c = round(c * 100)
+            m = round(m * 100)
+            y = round(y * 100)
+            k = round(k * 100)
+
+            return c, m, y, k
+
+        def _rgb_to_hsv(rgb_color: tuple[int, int, int]) -> tuple[int, int, int]:
+            """To convert from `RGB` to `HSV` color space."""
+            r, g, b = rgb_color
+            h, v, s = colorsys.rgb_to_hsv(r/float(255), g/float(255), b/float(255))
+            h = round(h*360)
+            s = round(s*100)
+            v = round(v*100)
+            return h, s, v
+
+        def _rgb_to_hsl(rgb_color: tuple[int, int, int]) -> tuple[int, int, int]:
+            """To convert from `RGB` to `HSL` color space."""
+            r, g, b = rgb_color
+            h, l, s = colorsys.rgb_to_hls(r/float(255), g/float(255), b/float(255))
+            h = round(h*360)
+            s = round(s*100)
+            l = round(l*100)  # noqa: E741 It's little `L`, Reason: To maintain consistency.
+            return h, s, l
+
+        hex_color = _rgb_to_hex(rgb_color)
+        cmyk_color = _rgb_to_cmyk(rgb_color)
+        hsv_color = _rgb_to_hsv(rgb_color)
+        hsl_color = _rgb_to_hsl(rgb_color)
+
+        all_fields = [
+            {
+                "name": "RGB",
+                "value": f"» rgb {rgb_color}\n» hex {hex_color}"
+            },
+            {
+                "name": "CMYK",
+                "value": f"» cmyk {cmyk_color}"
+            },
+            {
+                "name": "HSV",
+                "value": f"» hsv {hsv_color}"
+            },
+            {
+                "name": "HSL",
+                "value": f"» hsl {hsl_color}"
+            },
+        ]
+
+        return all_fields
 
     # if user_color in color_lists:
     #     # fuzzy match for color
