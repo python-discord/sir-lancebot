@@ -32,7 +32,7 @@ class Color(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=["colour"])
-    async def color(self, ctx: commands.Context, mode: str, user_color: str) -> None:
+    async def color(self, ctx: commands.Context, mode: str, *, user_color: str) -> None:
         """Send information on input color code or color name."""
         logger.info(f"{mode = }")
         logger.info(f"{user_color = }")
