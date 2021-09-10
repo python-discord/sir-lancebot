@@ -14,16 +14,14 @@ with Path("bot/resources/fun/top_1000_used_words.txt").resolve().open(mode="r", 
     ALL_WORDS = [line.strip('\n') for line in f.readlines()]
 
 # defining a list of images that will be used for the game to represent the hangman person
-IMAGES = {tries: image for tries, image in zip(range(6, -1, -1), (
-    "https://cdn.discordapp.com/attachments/859123972884922418/883472355056295946/hangman0.png",
-    "https://cdn.discordapp.com/attachments/859123972884922418/883472756744814613/hangman1.png",
-    "https://cdn.discordapp.com/attachments/859123972884922418/883472808699629578/hangman2.png",
-    "https://cdn.discordapp.com/attachments/859123972884922418/883472862441267230/hangman3.png",
-    "https://cdn.discordapp.com/attachments/859123972884922418/883472950991396864/hangman4.png",
-    "https://cdn.discordapp.com/attachments/859123972884922418/883472999431430204/hangman5.png",
-    "https://cdn.discordapp.com/attachments/859123972884922418/883473051277226015/hangman6.png",
-)
-)
+IMAGES = {
+    6: "https://cdn.discordapp.com/attachments/859123972884922418/883472355056295946/hangman0.png",
+    5: "https://cdn.discordapp.com/attachments/859123972884922418/883472756744814613/hangman1.png",
+    4: "https://cdn.discordapp.com/attachments/859123972884922418/883472808699629578/hangman2.png",
+    3: "https://cdn.discordapp.com/attachments/859123972884922418/883472862441267230/hangman3.png",
+    2: "https://cdn.discordapp.com/attachments/859123972884922418/883472950991396864/hangman4.png",
+    1: "https://cdn.discordapp.com/attachments/859123972884922418/883472999431430204/hangman5.png",
+    0: "https://cdn.discordapp.com/attachments/859123972884922418/883473051277226015/hangman6.png",
 }
 
 
