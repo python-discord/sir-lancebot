@@ -237,7 +237,7 @@ class Challenges(commands.Cog):
     @staticmethod
     def create_view(dropdown: InformationDropdown, link: str) -> ui.View:
         """
-        Creates the 'view', which is essentially a name for the discord UI.
+        Creates the discord.py View for the Discord message components (dropdowns and buttons).
 
         The discord UI is implemented onto the embed, where the user can choose what information about the kata they
         want, along with a link button to the kata itself.
