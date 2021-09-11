@@ -141,7 +141,7 @@ class Challenges(commands.Cog):
 
         Takes in the kata information dictionary as an argument from the codewars.com API result (JSON)
         """
-        # maps difficulty to color for embed
+        # Map difficulty for the kata to color we want to display in the embed
         mapping_of_kyu = {
             8: (221, 219, 218), 7: (221, 219, 218), 6: (236, 182, 19), 5: (236, 182, 19),
             4: (60, 126, 187), 3: (60, 126, 187), 2: (134, 108, 199), 1: (134, 108, 199)
