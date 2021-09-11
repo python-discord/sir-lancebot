@@ -153,7 +153,7 @@ class Challenges(commands.Cog):
         if len(kata_description) > 1024:
             kata_description = "\n".join(kata_description[:1000].split("\n")[:-1])
             kata_url = f"https://codewars.com/kata/{kata_information['id']}"
-            kata_description += f"\n[Read more]({kata_url})"
+            kata_description += f"\n[Read more...]({kata_url})"
 
         kata_embed = Embed(
             title=f"[{kata_information['name']}]({kata_url})",
