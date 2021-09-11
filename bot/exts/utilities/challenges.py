@@ -274,15 +274,11 @@ class Challenges(commands.Cog):
         params = {**params, "beta": "false"}
 
         first_kata_id = await self.kata_id(get_kata_link, params)
-
         kata_information = await self.kata_information(first_kata_id)
 
         kata_embed = self.main_embed(kata_information)
-
         language_embed = self.language_embed(kata_information)
-
         tags_embed = self.tags_embed(kata_information)
-
         miscellaneous_embed = self.miscellaneous_embed(kata_information)
 
         # sending then editing so the dropdown can access the original message
