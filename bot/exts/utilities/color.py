@@ -194,8 +194,6 @@ class Color(commands.Cog):
 
         return all_fields
 
-    # if user_color in color_lists:
-    #     # fuzzy match for color
     @staticmethod
     def match_color(user_color: str) -> str:
         """Use fuzzy matching to return a hex color code based on the user's input."""
