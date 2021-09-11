@@ -86,7 +86,7 @@ class Challenges(commands.Cog):
 
     async def kata_id(self, search_link: str, params: dict) -> str:
         """
-        Using bs4, and with a formatted link with the filters provided by the user.
+        Uses bs4 to get the HTML code for the page of katas, where the page is the link of the formatted `search_link`.
 
         This will webscrape the search page with `search_link` and then get the ID of a kata for the
         codewars.com API to use.
