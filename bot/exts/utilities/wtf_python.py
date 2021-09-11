@@ -119,6 +119,7 @@ class WTFPython(commands.Cog):
         with 100 being a perfect match.
         """
         match, certainty, _ = process.extractOne(query, self.headers.keys())
+        log.debug(f"{match = }, {certainty = }")
         return match if certainty > MINIMUM_CERTAINTY else None
 
     @commands.command(aliases=("wtf", "WTF"))
@@ -144,6 +145,7 @@ class WTFPython(commands.Cog):
                 description=ERROR_MESSAGE,
                 colour=constants.Colours.soft_red,
             )
+        await ctx.send(embed=embed)
 
 
 def setup(bot: Bot) -> None:
