@@ -47,7 +47,7 @@ class InformationDropdown(ui.Select):
         ]
 
         self.original_message = original_message
-        # maps embeds to item chosen
+        # We map the option label to the embed instance so that it can be easily looked up later in O(1)
         self.mapping_of_embeds = {
             "Main Information": main_embed,
             "Languages": language_embed,
@@ -123,8 +123,7 @@ class Challenges(commands.Cog):
                 logger.error(
                     f"Unexpected status code {response.status} from codewars.com/api/v1"
                 )
-            kata_information = await response.json()
-            return kata_information
+            return await response.json()
 
     @staticmethod
     def main_embed(kata_information: dict) -> Embed:
@@ -235,9 +234,7 @@ class Challenges(commands.Cog):
         want, along with a link button to the kata itself.
         """
         view = ui.View()
-        # adding the dropdown
         view.add_item(dropdown)
-        # manually creating the button as it is a link button and has no decorator
         view.add_item(ui.Button(label="View the Kata", url=link))
         return view
 
@@ -257,8 +254,8 @@ class Challenges(commands.Cog):
         get_kata_link = f"https://codewars.com/kata/search/{language}"
 
         if language and not query:
-            level = f"-{choice(['1', '2', '3', '4', '5', '6', '7', '8'])}"
-        elif "," in query or ", " in query:
+            level = f"-{choice([1, 2, 3, 4, 5, 6, 7, 8])}"
+        elif "," in query:
             query_splitted = query.split("," if ", " not in query else ", ")
 
             if len(query_splitted) > 2:
@@ -277,15 +274,11 @@ class Challenges(commands.Cog):
         params = {**params, "beta": "false"}
 
         first_kata_id = await self.kata_id(get_kata_link, params)
-
         kata_information = await self.kata_information(first_kata_id)
 
         kata_embed = self.main_embed(kata_information)
-
         language_embed = self.language_embed(kata_information)
-
         tags_embed = self.tags_embed(kata_information)
-
         miscellaneous_embed = self.miscellaneous_embed(kata_information)
 
         # sending then editing so the dropdown can access the original message
