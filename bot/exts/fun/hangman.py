@@ -105,6 +105,7 @@ class Hangman(commands.Cog):
                 await ctx.send(embed=timeout_embed)
                 return
 
+            message.content = message.content.lower()
             if len(message.content) > 1:
                 letter_embed = Embed(
                     title=choice(NEGATIVE_REPLIES),
