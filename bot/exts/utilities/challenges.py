@@ -164,11 +164,12 @@ class Challenges(commands.Cog):
             kata_description += f"\n[Read more...]({kata_url})"
 
         kata_embed = Embed(
-            title=f"[{kata_information['name']}]({kata_url})",
+            title=kata_information['name'],
             description=kata_description,
             color=Color.from_rgb(
                 *MAPPING_OF_KYU[int(kata_information['rank']['name'].replace(' kyu', ''))]
             ),
+            url=kata_url,
         )
         kata_embed.add_field(name="Difficulty", value=kata_information['rank']['name'], inline=False)
         return kata_embed
