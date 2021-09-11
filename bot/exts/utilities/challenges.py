@@ -186,7 +186,7 @@ class Challenges(commands.Cog):
         """
         Creates the 'tags embed' which displays all the tags of the Kata.
 
-        Tags are what the Kata is about, and is another word for 'categories'
+        Tags explain what the Kata is about, this is what codewars.com calls categories.
 
         Takes in the kata information dictionary as an argument from the codewars.com API result (JSON)
         """
