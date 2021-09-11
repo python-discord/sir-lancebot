@@ -155,7 +155,6 @@ class Challenges(commands.Cog):
             kata_url = f"https://codewars.com/kata/{kata_information['id']}"
             kata_description += f"\n[Read more](kata_url)"
 
-        # creating the main kata embed
         kata_embed = Embed(
             title=kata_information['name'],
             description=kata_description,
