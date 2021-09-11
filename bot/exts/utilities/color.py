@@ -1,4 +1,5 @@
 import colorsys
+import json
 import logging
 import re
 from io import BytesIO
@@ -6,7 +7,7 @@ from io import BytesIO
 from PIL import Image, ImageColor
 from discord import Embed, File
 from discord.ext import commands
-# from rapidfuzz import process
+from rapidfuzz import process
 
 from bot.bot import Bot
 from bot.constants import Colours
@@ -22,6 +23,8 @@ ERROR_MSG = """The color code {user_color} is not a possible color combination.
 \nHSL: 0-360 degrees
 \nHex: #000000-#FFFFFF
 """
+
+COLOR_LIST = "bot/resources/utilities/ryanzec_colours.json"
 
 
 # define color command
@@ -46,7 +49,7 @@ class Color(commands.Cog):
             else:
                 await ctx.send(
                     embed=Embed(
-                        title="An error has occured.",
+                        title="There was an issue converting the hex color code.",
                         description=ERROR_MSG.format(user_color=user_color),
                     )
                 )
@@ -58,9 +61,10 @@ class Color(commands.Cog):
             pass
         elif mode.lower() == "cmyk":
             pass
+        elif mode.lower() == "name":
+            color_name, hex_color = self.match_color(user_color)
         else:
             # mode is either None or an invalid code
-            # need to handle whether user passes color name
             if mode is None:
                 no_mode_embed = Embed(
                     title="No 'mode' was passed, please define a color code.",
@@ -70,7 +74,7 @@ class Color(commands.Cog):
                 return
             wrong_mode_embed = Embed(
                 title=f"The color code {mode} is not a valid option",
-                description="Possible modes are: Hex, RGB, HSV, HSL and CMYK.",
+                description="Possible modes are: Name, Hex, RGB, HSV, HSL and CMYK.",
                 color=Colours.soft_red,
             )
             await ctx.send(embed=wrong_mode_embed)
@@ -78,15 +82,15 @@ class Color(commands.Cog):
 
         async with ctx.typing():
             main_embed = Embed(
-                title=user_color,  # need to replace with fuzzymatch color name
+                title=color_name,
                 description='(Approx..)',
-                color=hex_color,
+                color=rgb_color,
             )
 
             file = await self.create_thumbnail_attachment(rgb_color)
             main_embed.set_thumbnail(url="attachment://color.png")
-
             fields = self.get_color_fields(rgb_color)
+
             for field in fields:
                 main_embed.add_field(
                     name=field['name'],
@@ -94,7 +98,7 @@ class Color(commands.Cog):
                     inline=False,
                 )
 
-        await ctx.send(file=file, embed=main_embed)
+            await ctx.send(file=file, embed=main_embed)
 
     @staticmethod
     async def create_thumbnail_attachment(color: str) -> File:
@@ -192,6 +196,17 @@ class Color(commands.Cog):
 
     # if user_color in color_lists:
     #     # fuzzy match for color
+    @staticmethod
+    def match_color(user_color: str) -> str:
+        """Use fuzzy matching to return a hex color code based on the user's input."""
+        with open(COLOR_LIST) as f:
+            color_list = json.load(f)
+        logger.debug(f"{type(color_list) = }")
+        match, certainty, _ = process.extractOne(query=user_color, choices=color_list.keys(), score_cutoff=50)
+        logger.debug(f"{match = }, {certainty = }")
+        hex_match = color_list[match]
+        logger.debug(f"{hex_match = }")
+        return match, hex_match
 
 
 def setup(bot: Bot) -> None:
