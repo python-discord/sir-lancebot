@@ -18,6 +18,20 @@ MAPPING_OF_KYU = {
     4: (60, 126, 187), 3: (60, 126, 187), 2: (134, 108, 199), 1: (134, 108, 199),
 }
 
+# Supported languages for a kata on codewars.com
+SUPPORTED_LANGUAGES = {
+    "stable": [
+        "c", "c#", "c++", "clojure", "coffeescript", "coq", "crystal", "dart", "elixir",
+        "f#", "go", "groovy", "haskell", "java", "javascript", "kotlin", "lean", "lua", "nasm",
+        "php", "python", "racket", "ruby", "rust", "scala", "shell", "sql", "swift", "typescript",
+    ],
+    "beta": [
+        "agda", "bf", "cfml", "cobol", "commonlisp", "elm", "erlang", "factor",
+        "forth", "fortran", "haxe", "idris", "julia", "nim", "objective-c", "ocaml",
+        "pascal", "perl", "powershell", "prolog", "purescript", "r", "raku", "reason", "solidity", "vb.net",
+    ]
+}
+
 
 class InformationDropdown(ui.Select):
     """A dropdown inheriting from ui.Select that allows finding out other information about the kata."""
@@ -245,6 +259,9 @@ class Challenges(commands.Cog):
         `.challenge <language> <query>, <difficulty>` - Pulls a random challenge with the query provided,
         under that difficulty within the language's scope.
         """
+        if language.lower() not in SUPPORTED_LANGUAGES["stable"] + SUPPORTED_LANGUAGES["beta"]:
+            raise commands.BadArgument("This is not a recognized language on codewars.com!")
+
         get_kata_link = f"https://codewars.com/kata/search/{language}"
 
         if language and not query:
@@ -270,7 +287,7 @@ class Challenges(commands.Cog):
         if level:
             params["r[]"] = level
 
-        params["beta"] = "false"
+        params["beta"] = "true" if language in SUPPORTED_LANGUAGES["beta"] else "false"
 
         first_kata_id = await self.kata_id(get_kata_link, params)
         if isinstance(first_kata_id, Embed):
