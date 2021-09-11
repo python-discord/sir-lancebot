@@ -142,11 +142,11 @@ class Challenges(commands.Cog):
     def main_embed(kata_information: dict) -> Embed:
         """Creates the main embed which displays the description of the kata and the difficulty, along with the name."""
         kata_description = kata_information["description"]
+        kata_url = f"https://codewars.com/kata/{kata_information['id']}"
 
         # ensuring it isn't over the length 1024
         if len(kata_description) > 1024:
             kata_description = "\n".join(kata_description[:1000].split("\n")[:-1])
-            kata_url = f"https://codewars.com/kata/{kata_information['id']}"
             kata_description += f"\n[Read more...]({kata_url})"
 
         kata_embed = Embed(
