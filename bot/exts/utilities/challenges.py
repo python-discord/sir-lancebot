@@ -235,7 +235,6 @@ class Challenges(commands.Cog):
         want, along with a link button to the kata itself.
         """
         view = ui.View()
-        # adding the dropdown
         view.add_item(dropdown)
         # manually creating the button as it is a link button and has no decorator
         view.add_item(ui.Button(label="View the Kata", url=link))
