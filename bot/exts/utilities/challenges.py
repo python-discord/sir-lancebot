@@ -47,7 +47,7 @@ class InformationDropdown(ui.Select):
         ]
 
         self.original_message = original_message
-        # maps embeds to item chosen
+        # We map the option label to the embed instance so that it can be easily looked up later in O(1)
         self.mapping_of_embeds = {
             "Main Information": main_embed,
             "Languages": language_embed,
