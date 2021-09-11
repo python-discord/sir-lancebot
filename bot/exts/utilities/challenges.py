@@ -156,7 +156,7 @@ class Challenges(commands.Cog):
             kata_description += f"\n[Read more]({kata_url})"
 
         kata_embed = Embed(
-            title=kata_information['name'],
+            title=f"[{kata_information['name']}]({kata_url})",
             description=kata_description,
             color=Color.from_rgb(
                 *MAPPING_OF_KYU[int(kata_information['rank']['name'].replace(' kyu', ''))]
