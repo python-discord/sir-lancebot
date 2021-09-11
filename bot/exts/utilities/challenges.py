@@ -123,8 +123,7 @@ class Challenges(commands.Cog):
                 logger.error(
                     f"Unexpected status code {response.status} from codewars.com/api/v1"
                 )
-            kata_information = await response.json()
-            return kata_information
+            return await response.json()
 
     @staticmethod
     def main_embed(kata_information: dict) -> Embed:
