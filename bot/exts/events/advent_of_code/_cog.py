@@ -199,8 +199,7 @@ class AdventOfCode(commands.Cog):
         """
         if maximum_scorers > AocConfig.max_day_and_star_results or maximum_scorers <= 0:
             raise commands.BadArgument(
-                "Unfortunately, you reached a limit. "
-                f"(The maximum number of results you can query is {AocConfig.max_day_and_star_results})"
+                f"The maximum number of results you can query is {AocConfig.max_day_and_star_results}"
             )
         async with ctx.typing():
             try:
@@ -208,34 +207,40 @@ class AdventOfCode(commands.Cog):
             except _helpers.FetchingLeaderboardFailedError:
                 await ctx.send(":x: Unable to fetch leaderboard!")
                 return
-            if day_and_star:
-                # Fetches a dictionary that contains solvers in respect of day, and star.
-                # e.g. 1-1 will fetch the solvers of the first star of the first day and their completion time
-                per_day_and_star = json.loads(leaderboard['leaderboard_per_day_and_star'])
-                try:
-                    scorers = per_day_and_star[day_and_star][:maximum_scorers]
-                except KeyError:
-                    raise commands.BadArgument(
-                        "Day and star format has a notation of 'day-star' day being 1 to 25, and star is either 1 or "
-                        "2 (e.g. 3-1) "
-                    )
-                day, star = day_and_star.split("-")
-                codeblock = f"```csharp\nTop scorers for day {day}, star {star} in UTC timezone\n"
-                for scorer in scorers:
-                    time_data = datetime.fromtimestamp(scorer['completion_time']).strftime("%b.%d %I:%M %p")
-                    codeblock += f"[{scorer['member_name']}] {time_data}\n"
-                codeblock += "```"
-                await ctx.send(codeblock)
+            if not day_and_star:
+
+                number_of_participants = leaderboard["number_of_participants"]
+
+                top_count = min(AocConfig.leaderboard_displayed_members, number_of_participants)
+                header = f"Here's our current top {top_count}! {Emojis.christmas_tree * 3}"
+
+                table = f"```\n{leaderboard['top_leaderboard']}\n```"
+                info_embed = _helpers.get_summary_embed(leaderboard)
+
+                await ctx.send(content=f"{header}\n\n{table}", embed=info_embed)
                 return
-            number_of_participants = leaderboard["number_of_participants"]
 
-            top_count = min(AocConfig.leaderboard_displayed_members, number_of_participants)
-            header = f"Here's our current top {top_count}! {Emojis.christmas_tree * 3}"
+            # This is a dictionary that contains solvers in respect of day, and star.
+            # e.g. 1-1 will fetch the solvers of the first star of the first day and their completion time
+            per_day_and_star = json.loads(leaderboard['leaderboard_per_day_and_star'])
+            try:
+                scorers = per_day_and_star[day_and_star][:maximum_scorers]
+            except KeyError:
+                raise commands.BadArgument(
+                    "Day and star format has a notation of 'day-star' day being 1 to 25, and star is either 1 or "
+                    "2 (e.g. 3-1) "
+                )
 
-            table = f"```\n{leaderboard['top_leaderboard']}\n```"
-            info_embed = _helpers.get_summary_embed(leaderboard)
+            day, star = day_and_star.split("-")
+            codeblock = f"```csharp\nTop scorers for day {day}, star {star} in UTC timezone\n"
 
-            await ctx.send(content=f"{header}\n\n{table}", embed=info_embed)
+            for scorer in scorers:
+                time_data = datetime.fromtimestamp(scorer['completion_time']).strftime("%b.%d %I:%M %p")
+                codeblock += f"[{scorer['member_name']}] {time_data}\n"
+
+            codeblock += "```"
+            await ctx.send(codeblock)
+            return
 
     @in_month(Month.DECEMBER)
     @adventofcode_group.command(
