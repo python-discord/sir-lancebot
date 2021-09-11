@@ -3,7 +3,7 @@ from random import choice
 from typing import Union
 
 from bs4 import BeautifulSoup
-from discord import Color, Embed, Interaction, Message, SelectOption, ui
+from discord import Color, Embed, Interaction, SelectOption, ui
 from discord.ext import commands
 
 from bot.bot import Bot
@@ -24,7 +24,6 @@ class InformationDropdown(ui.Select):
 
     def __init__(
             self,
-            original_message: Message,
             language_embed: Embed,
             tags_embed: Embed,
             other_info_embed: Embed,
@@ -53,7 +52,6 @@ class InformationDropdown(ui.Select):
             ),
         ]
 
-        self.original_message = original_message
         # We map the option label to the embed instance so that it can be easily looked up later in O(1)
         self.mapping_of_embeds = {
             "Main Information": main_embed,
@@ -142,11 +140,7 @@ class Challenges(commands.Cog):
 
     @staticmethod
     def main_embed(kata_information: dict) -> Embed:
-        """
-        Creates the main embed which displays the description of the kata and the difficulty, along with the name.
-
-        Takes in the kata information dictionary as an argument from the codewars.com API result (JSON)
-        """
+        """Creates the main embed which displays the description of the kata and the difficulty, along with the name."""
         kata_description = kata_information["description"]
 
         # ensuring it isn't over the length 1024
@@ -167,11 +161,7 @@ class Challenges(commands.Cog):
 
     @staticmethod
     def language_embed(kata_information: dict) -> Embed:
-        """
-        Creates the 'language embed' which displays all languages the kata supports.
-
-        Takes in the kata information dictionary as an argument from the codewars.com API result (JSON)
-        """
+        """Creates the 'language embed' which displays all languages the kata supports."""
         languages = '\n'.join(map(str.title, kata_information['languages']))
         language_embed = Embed(
             title="Languages Supported",
@@ -186,8 +176,6 @@ class Challenges(commands.Cog):
         Creates the 'tags embed' which displays all the tags of the Kata.
 
         Tags explain what the Kata is about, this is what codewars.com calls categories.
-
-        Takes in the kata information dictionary as an argument from the codewars.com API result (JSON)
         """
         tags = '\n'.join(kata_information['tags'])
         tags_embed = Embed(
@@ -204,8 +192,6 @@ class Challenges(commands.Cog):
 
         This embed shows statistics like the total number of people who completed the kata,
         the total number of stars of the Kata, etc.
-
-        Takes in the kata information dictionary as an argument from the codewars.com API result (JSON)
         """
         miscellaneous_embed = Embed(
             title="Other Information",
@@ -303,20 +289,15 @@ class Challenges(commands.Cog):
         tags_embed = self.tags_embed(kata_information)
         miscellaneous_embed = self.miscellaneous_embed(kata_information)
 
-        # sending then editing so the dropdown can access the original message
-        original_message = await ctx.send(embed=kata_embed)
         dropdown = InformationDropdown(
-            original_message=original_message,
             main_embed=kata_embed,
             language_embed=language_embed,
             tags_embed=tags_embed,
             other_info_embed=miscellaneous_embed,
         )
         kata_view = self.create_view(dropdown, f'https://codewars.com/kata/{first_kata_id}')
-        await original_message.edit(
-            embed=kata_embed,
-            view=kata_view
-        )
+        original_message = await ctx.send(embed=kata_embed, view=kata_view)
+        dropdown.original_message = original_message
 
 
 def setup(bot: Bot) -> None:
