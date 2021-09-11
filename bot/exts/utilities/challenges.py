@@ -256,7 +256,7 @@ class Challenges(commands.Cog):
 
         if language and not query:
             level = f"-{choice(['1', '2', '3', '4', '5', '6', '7', '8'])}"
-        elif "," in query or ", " in query:
+        elif "," in query:
             query_splitted = query.split("," if ", " not in query else ", ")
 
             if len(query_splitted) > 2:
