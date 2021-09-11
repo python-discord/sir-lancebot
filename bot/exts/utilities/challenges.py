@@ -1,12 +1,13 @@
 import logging
 from random import choice
+from typing import Union
 
 from bs4 import BeautifulSoup
 from discord import Color, Embed, Interaction, Message, SelectOption, ui
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Colours, Emojis
+from bot.constants import Colours, Emojis, NEGATIVE_REPLIES
 
 logger = logging.getLogger(__name__)
 API_ROOT = "https://www.codewars.com/api/v1/code-challenges/{kata_id}"
@@ -84,7 +85,7 @@ class Challenges(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    async def kata_id(self, search_link: str, params: dict) -> str:
+    async def kata_id(self, search_link: str, params: dict) -> Union[str, Embed]:
         """
         Uses bs4 to get the HTML code for the page of katas, where the page is the link of the formatted `search_link`.
 
@@ -93,9 +94,13 @@ class Challenges(commands.Cog):
         """
         async with self.bot.http_session.get(search_link, params=params) as response:
             if response.status != 200:
-                logger.error(
-                    f"Unexpected status code {response.status} from codewars.com"
+                error_embed = Embed(
+                    title=choice(NEGATIVE_REPLIES),
+                    description="We ran into an error with getting the kata from codewars.com, try again later.",
+                    color=Colours.soft_red,
                 )
+                return error_embed
+
             soup = BeautifulSoup(await response.text(), features="lxml")
             first_kata_div = soup.find_all("div", class_="item-title px-0")
 
@@ -112,7 +117,7 @@ class Challenges(commands.Cog):
             first_kata_id = first_kata_div.a["href"].split("/")[-1]
             return first_kata_id
 
-    async def kata_information(self, kata_id: str) -> dict:
+    async def kata_information(self, kata_id: str) -> Union[dict, Embed]:
         """
         Returns the information about the Kata.
 
@@ -120,9 +125,13 @@ class Challenges(commands.Cog):
         """
         async with self.bot.http_session.get(API_ROOT.format(kata_id=kata_id)) as response:
             if response.status != 200:
-                logger.error(
-                    f"Unexpected status code {response.status} from codewars.com/api/v1"
+                error_embed = Embed(
+                    title=choice(NEGATIVE_REPLIES),
+                    description="We ran into an error with getting the kata information, try again later.",
+                    color=Colours.soft_red,
                 )
+                return error_embed
+
             return await response.json()
 
     @staticmethod
@@ -270,11 +279,25 @@ class Challenges(commands.Cog):
         else:
             level = None
 
-        params = {name: value for name, value in zip(["q", "r[]"], [query, level]) if value}
-        params = {**params, "beta": "false"}
+        params = {}
+        if query:
+            params["q"] = query
+        if level:
+            params["r[]"] = level
+
+        params["beta"] = "false"
 
         first_kata_id = await self.kata_id(get_kata_link, params)
+        if isinstance(first_kata_id, Embed):
+            # ran into an error with retrieving the website link
+            await ctx.send(embed=first_kata_id)
+            return
+
         kata_information = await self.kata_information(first_kata_id)
+        if isinstance(kata_information, Embed):
+            # ran into an error with the codewars api, getting the kata information
+            await ctx.send(embed=kata_information)
+            return
 
         kata_embed = self.main_embed(kata_information)
         language_embed = self.language_embed(kata_information)
