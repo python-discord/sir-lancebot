@@ -11,7 +11,8 @@ from bot.constants import Colours, Emojis, NEGATIVE_REPLIES
 
 logger = logging.getLogger(__name__)
 API_ROOT = "https://www.codewars.com/api/v1/code-challenges/{kata_id}"
-# Map difficulty for the kata to color we want to display in the embed
+# Map difficulty for the kata to color we want to display in the embed.
+# These colors are representative of the colors that each 'kyu' level represents on codewars.com
 MAPPING_OF_KYU = {
     8: (221, 219, 218), 7: (221, 219, 218), 6: (236, 182, 19), 5: (236, 182, 19),
     4: (60, 126, 187), 3: (60, 126, 187), 2: (134, 108, 199), 1: (134, 108, 199),
