@@ -11,6 +11,11 @@ from bot.constants import Colours, Emojis, NEGATIVE_REPLIES
 
 logger = logging.getLogger(__name__)
 API_ROOT = "https://www.codewars.com/api/v1/code-challenges/{kata_id}"
+# Map difficulty for the kata to color we want to display in the embed
+MAPPING_OF_KYU = {
+    8: (221, 219, 218), 7: (221, 219, 218), 6: (236, 182, 19), 5: (236, 182, 19),
+    4: (60, 126, 187), 3: (60, 126, 187), 2: (134, 108, 199), 1: (134, 108, 199)
+}
 
 
 class InformationDropdown(ui.Select):
@@ -141,12 +146,6 @@ class Challenges(commands.Cog):
 
         Takes in the kata information dictionary as an argument from the codewars.com API result (JSON)
         """
-        # Map difficulty for the kata to color we want to display in the embed
-        mapping_of_kyu = {
-            8: (221, 219, 218), 7: (221, 219, 218), 6: (236, 182, 19), 5: (236, 182, 19),
-            4: (60, 126, 187), 3: (60, 126, 187), 2: (134, 108, 199), 1: (134, 108, 199)
-        }
-
         kata_description = kata_information["description"]
 
         # ensuring it isn't over the length 1024
@@ -159,7 +158,7 @@ class Challenges(commands.Cog):
             title=kata_information['name'],
             description=kata_description,
             color=Color.from_rgb(
-                *mapping_of_kyu[int(kata_information['rank']['name'].replace(' kyu', ''))]
+                *MAPPING_OF_KYU[int(kata_information['rank']['name'].replace(' kyu', ''))]
             ),
         )
         kata_embed.add_field(name="Difficulty", value=kata_information['rank']['name'], inline=False)
