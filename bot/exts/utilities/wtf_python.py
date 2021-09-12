@@ -104,7 +104,6 @@ class WTFPython(commands.Cog):
         table_of_contents = re.search(
             r"\[👀 Examples\]\(#-examples\)\n([\w\W]*)<!-- tocstop -->", data
         )[0].split("\n")
-        table_of_contents = list(map(str.strip, table_of_contents))
 
         for header in list(map(str.strip, table_of_contents)):
             match = re.findall(r"\[▶ (.*)\]\((.*)\)", header)
