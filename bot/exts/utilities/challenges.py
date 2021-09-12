@@ -298,7 +298,7 @@ class Challenges(commands.Cog):
 
         kata_information = await self.kata_information(first_kata_id)
         if isinstance(kata_information, Embed):
-            # ran into an error with the codewars api, getting the kata information
+            # Something went wrong when trying to fetch the kata information
             await ctx.send(embed=kata_information)
             return
 
