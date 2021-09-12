@@ -106,7 +106,7 @@ class WTFPython(commands.Cog):
         )[0].split("\n")
         table_of_contents = list(map(str.strip, table_of_contents))
 
-        for header in table_of_contents:
+        for header in list(map(str.strip, table_of_contents)):
             match = re.findall(r"\[▶ (.*)\]\((.*)\)", header)
             if match:
                 self.headers[match[0][0]] = f"{BASE_URL}{match[0][1]}"
