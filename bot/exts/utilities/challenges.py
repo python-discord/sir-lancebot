@@ -84,6 +84,8 @@ class InformationDropdown(ui.Select):
     async def callback(self, interaction: Interaction) -> None:
         """Callback for when someone clicks on a dropdown."""
         # Edit the message to the embed selected in the option
+        # The original_message attribute is set just after the message is sent with the view.
+        # The attribute is not set during initialization.
         result_embed = self.mapping_of_embeds[self.values[0]]
         await self.original_message.edit(embed=result_embed)
 
@@ -313,6 +315,7 @@ class Challenges(commands.Cog):
         )
         kata_view = self.create_view(dropdown, f'https://codewars.com/kata/{first_kata_id}')
         original_message = await ctx.send(embed=kata_embed, view=kata_view)
+
         dropdown.original_message = original_message
 
 
