@@ -3,6 +3,7 @@ import random
 import re
 from enum import Enum
 from functools import partial
+from io import StringIO
 from typing import Optional
 
 from discord import Embed, File
@@ -128,11 +129,8 @@ class WTFPython(commands.Cog):
         header_start = self.raw.find(header, toc_end)
         header_stop = self.raw.find("\n---\n", header_start)
         content = self.raw[header_start:header_stop]
-        file_name = "WTF_content.md"
-        with open(file_name, "w") as f:
-            f.write(content)
-        content_file = open(file_name)
-        embed_file = File(content_file, file_name)
+        content_file = StringIO(content)
+        embed_file = File(content_file, "WTF_content.md")
 
         return embed_file
 
