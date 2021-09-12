@@ -10,7 +10,7 @@ from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES
 
 # defining all words in the list of words as a global variable
-with Path("bot/resources/fun/top_1000_used_words.txt").resolve().open(mode="r", encoding="utf-8") as f:
+with Path("bot/resources/fun/hangman_words.txt").resolve().open(mode="r", encoding="utf-8") as f:
     ALL_WORDS = [line.strip('\n') for line in f.readlines()]
 
 # defining a list of images that will be used for the game to represent the hangman person
@@ -83,10 +83,11 @@ class Hangman(commands.Cog):
         )
         hangman_embed.set_image(url=IMAGES[tries])
         hangman_embed.add_field(
-            name=f"The word is `{user_guess}`",
+            name=f"You've guessed `{user_guess}` so far.",
             value="Guess the word by sending a message with the letter!",
             inline=False,
         )
+        hangman_embed.set_footer(text=f"Tries: {tries}")
         original_message = await ctx.send(embed=hangman_embed)
 
         while user_guess != word:
@@ -102,7 +103,7 @@ class Hangman(commands.Cog):
                     description="Looks like the bot timed out! You must send a letter within 60 seconds.",
                     color=Colours.soft_red,
                 )
-                await ctx.send(embed=timeout_embed)
+                await original_message.edit(embed=timeout_embed)
                 return
 
             message.content = message.content.lower()
@@ -112,7 +113,7 @@ class Hangman(commands.Cog):
                     description="You can only send a letter for the hangman game!",
                     color=Colours.soft_red,
                 )
-                await ctx.send(embed=letter_embed)
+                await original_message.edit(embed=letter_embed)
                 continue
 
             elif message.content in word:
@@ -136,10 +137,11 @@ class Hangman(commands.Cog):
             hangman_embed.clear_fields()
             hangman_embed.set_image(url=IMAGES[tries])
             hangman_embed.add_field(
-                name=f"The word is `{user_guess}`",
+                name=f"You've guessed `{user_guess}` so far.",
                 value="Guess the word by sending a message with the letter!",
                 inline=False,
             )
+            hangman_embed.set_footer(text=f"Tries: {tries}")
             await original_message.edit(embed=hangman_embed)
 
         win_embed = Embed(
