@@ -3,7 +3,7 @@ from pathlib import Path
 from random import choice
 from typing import Literal
 
-from discord import Embed
+from discord import Embed, Message
 from discord.ext import commands
 
 from bot.bot import Bot
@@ -77,6 +77,15 @@ class Hangman(commands.Cog):
         user_guess = "_" * len(word)
         tries = 6
 
+        # check if the game is singleplayer or multiplayer
+        def check(msg: Message) -> bool:
+            if singleplayer == 's':
+                return msg.author == ctx.author
+            elif singleplayer == 'm':
+                return msg.author != self.bot
+            else:
+                raise commands.BadArgument("`singleplayer` must be either `s` or `m`")
+
         hangman_embed = Embed(
             title="Hangman",
             color=Colours.python_blue,
@@ -95,7 +104,7 @@ class Hangman(commands.Cog):
                 message = await self.bot.wait_for(
                     event="message",
                     timeout=30.0,
-                    check=lambda msg: msg.author != self.bot if singleplayer == 'm' else msg.author == ctx.author
+                    check=check
                 )
             except TimeoutError:
                 timeout_embed = Embed(
