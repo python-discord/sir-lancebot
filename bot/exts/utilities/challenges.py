@@ -180,7 +180,7 @@ class Challenges(commands.Cog):
         languages = '\n'.join(map(str.title, kata_information['languages']))
         language_embed = Embed(
             title="Languages Supported",
-            description=f"```nim\n{languages}```",
+            description=f"```nim\n{languages}\n```",
             color=Colours.python_blue,
         )
         return language_embed
@@ -195,7 +195,7 @@ class Challenges(commands.Cog):
         tags = '\n'.join(kata_information['tags'])
         tags_embed = Embed(
             title="Tags",
-            description=f"```nim\n{tags}```",
+            description=f"```nim\n{tags}\n```",
             color=Colours.grass_green,
         )
         return tags_embed
@@ -214,22 +214,22 @@ class Challenges(commands.Cog):
         )
         miscellaneous_embed.add_field(
             name="`Total Score`",
-            value=f"**{kata_information['voteScore']}**",
+            value=f"```css\n{kata_information['voteScore']}\n```",
             inline=False,
         )
         miscellaneous_embed.add_field(
             name="`Total Stars`",
-            value=f"**{kata_information['totalStars']}**",
+            value=f"```css\n{kata_information['totalStars']}\n```",
             inline=False,
         )
         miscellaneous_embed.add_field(
             name="`Total Completed`",
-            value=f"**{kata_information['totalCompleted']}**",
+            value=f"```css\n{kata_information['totalCompleted']}\n```",
             inline=False,
         )
         miscellaneous_embed.add_field(
             name="`Total Attempts`",
-            value=f"**{kata_information['totalAttempts']}**",
+            value=f"```css\n{kata_information['totalAttempts']}\n```",
             inline=False,
         )
         return miscellaneous_embed
@@ -264,9 +264,11 @@ class Challenges(commands.Cog):
             raise commands.BadArgument("This is not a recognized language on codewars.com!")
 
         get_kata_link = f"https://codewars.com/kata/search/{language}"
+        params = {}
 
         if language and not query:
             level = f"-{choice([1, 2, 3, 4, 5, 6, 7, 8])}"
+            params['r[]'] = level
         elif "," in query:
             query_splitted = query.split("," if ", " not in query else ", ")
 
@@ -277,18 +279,14 @@ class Challenges(commands.Cog):
 
             query, level = query_splitted
             level = f"-{level}"
+            params['q'] = query
+            params['r[]'] = level
         elif query.isnumeric():
-            level, query = f"-{query}", None
+            params['r[]'] = query
         else:
-            level = None
+            params['q'] = query
 
-        params = {}
-        if query:
-            params["q"] = query
-        if level:
-            params["r[]"] = level
-
-        params["beta"] = "true" if language in SUPPORTED_LANGUAGES["beta"] else "false"
+        params["beta"] = str(language in SUPPORTED_LANGUAGES["beta"]).lower()
 
         first_kata_id = await self.kata_id(get_kata_link, params)
         if isinstance(first_kata_id, Embed):
