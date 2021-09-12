@@ -76,6 +76,7 @@ class Hangman(commands.Cog):
 
         user_guess = "_" * len(word)
         tries = 6
+        guessed_letters = set()
 
         # check if the game is singleplayer or multiplayer
         def check(msg: Message) -> bool:
@@ -125,6 +126,15 @@ class Hangman(commands.Cog):
                 await original_message.edit(embed=letter_embed)
                 continue
 
+            elif message.content in guessed_letters:
+                already_guessed_embed = Embed(
+                    title=choice(NEGATIVE_REPLIES),
+                    description=f"You have already guessed `{message.content}`!",
+                    color=Colours.soft_red,
+                )
+                await original_message.edit(embed=already_guessed_embed)
+                continue
+
             elif message.content in word:
                 positions = {idx for idx, letter in enumerate(word) if letter == message.content}
                 user_guess = "".join(
@@ -142,6 +152,8 @@ class Hangman(commands.Cog):
                     )
                     await original_message.edit(embed=losing_embed)
                     return
+
+            guessed_letters.add(message.content)
 
             hangman_embed.clear_fields()
             hangman_embed.set_image(url=IMAGES[tries])
