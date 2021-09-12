@@ -25,6 +25,8 @@ ERROR_MSG = """The color code {user_color} is not a possible color combination.
 """
 
 COLOR_LIST = "bot/resources/utilities/ryanzec_colours.json"
+with open(COLOR_LIST) as f:
+    COLOR_JSON = json.load(f)
 
 
 # define color command
@@ -197,12 +199,9 @@ class Color(commands.Cog):
     @staticmethod
     def match_color(user_color: str) -> str:
         """Use fuzzy matching to return a hex color code based on the user's input."""
-        with open(COLOR_LIST) as f:
-            color_list = json.load(f)
-        logger.debug(f"{type(color_list) = }")
-        match, certainty, _ = process.extractOne(query=user_color, choices=color_list.keys(), score_cutoff=50)
+        match, certainty, _ = process.extractOne(query=user_color, choices=COLOR_JSON.keys(), score_cutoff=50)
         logger.debug(f"{match = }, {certainty = }")
-        hex_match = color_list[match]
+        hex_match = COLOR_JSON[match]
         logger.debug(f"{hex_match = }")
         return match, hex_match
 
