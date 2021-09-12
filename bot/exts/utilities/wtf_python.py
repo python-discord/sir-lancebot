@@ -5,7 +5,7 @@ from enum import Enum
 from functools import partial
 from typing import Optional
 
-from discord import Embed
+from discord import Embed, File
 from discord.ext import commands, tasks
 from rapidfuzz import process
 
@@ -49,6 +49,7 @@ class WTFPython(commands.Cog):
         self.fetch_readme.start()
 
         self.headers: dict[str, str] = dict()
+        self.raw = None
 
     @tasks.loop(hours=1)
     async def fetch_readme(self) -> None:
@@ -60,8 +61,8 @@ class WTFPython(commands.Cog):
                 log.trace("Fetching the latest WTF Python README.md")
 
                 if resp.status == 200:
-                    raw = await resp.text()
-                    self.parse_readme(raw)
+                    self.raw = await resp.text()
+                    self.parse_readme(self.raw)
                     log.debug(
                         "Successfully fetched the latest WTF Python README.md, "
                         "breaking out of retry loop"
@@ -100,7 +101,7 @@ class WTFPython(commands.Cog):
         link to the heading.
         """
         # Match the start of examples, until the end of the table of contents (toc)
-        table_of_contents = re.findall(
+        table_of_contents = re.search(
             r"\[👀 Examples\]\(#-examples\)\n([\w\W]*)<!-- tocstop -->", data
         )[0].split("\n")
         table_of_contents = list(map(str.strip, table_of_contents))
@@ -122,6 +123,20 @@ class WTFPython(commands.Cog):
         log.debug(f"{match = }, {certainty = }")
         return match if certainty > MINIMUM_CERTAINTY else None
 
+    def readme_file(self, header: str) -> File:
+        """Create a markdown file from the readme using the matched header."""
+        toc_end = self.raw.find("<!-- tocstop -->")
+        header_start = self.raw.find(header, toc_end)
+        header_stop = self.raw.find("\n---\n", header_start)
+        content = self.raw[header_start:header_stop]
+        file_name = "WTF_content.md"
+        with open(file_name, "w") as f:
+            f.write(content)
+        content_file = open(file_name)
+        embed_file = File(content_file, file_name)
+
+        return embed_file
+
     @commands.command(aliases=("wtf", "WTF"))
     async def wtf_python(self, ctx: commands.Context, *, query: str) -> None:
         """
@@ -133,12 +148,15 @@ class WTFPython(commands.Cog):
         """
         match = self.fuzzy_match_header(query)
         if match:
+            embed_file = self.readme_file(match)
             embed = Embed(
                 title=f"WTF Python Search Result For {query}",
                 colour=constants.Colours.dark_green,
                 description=f"[Go to Repository Section]({self.headers[match]})",
             )
             embed.set_thumbnail(url=f"{WTF_PYTHON_RAW_URL}images/logo.png")
+            await ctx.send(embed=embed, file=embed_file)
+            return
         else:
             embed = Embed(
                 title=random.choice(constants.ERROR_REPLIES),
