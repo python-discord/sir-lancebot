@@ -129,8 +129,11 @@ class WTFPython(commands.Cog):
         header_start = self.raw.find(header, toc_end)
         header_stop = self.raw.find("\n---\n", header_start)
         content = self.raw[header_start:header_stop]
-        content_file = StringIO(content)
+        content_file = StringIO()
+        content_file.write(content)
+        content_file.seek(0)
         embed_file = File(content_file, "WTF_content.md")
+        content_file.close()
 
         return embed_file
 
