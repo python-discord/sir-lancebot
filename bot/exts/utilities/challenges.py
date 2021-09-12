@@ -292,7 +292,7 @@ class Challenges(commands.Cog):
 
         first_kata_id = await self.kata_id(get_kata_link, params)
         if isinstance(first_kata_id, Embed):
-            # ran into an error with retrieving the website link
+            # We ran into an error when retrieving the website link
             await ctx.send(embed=first_kata_id)
             return
 
