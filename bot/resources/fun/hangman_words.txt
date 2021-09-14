@@ -31,7 +31,6 @@ already
 also
 although
 always
-American
 among
 amount
 analysis
@@ -148,7 +147,6 @@ computer
 concern
 condition
 conference
-Congress
 consider
 consumer
 contain
@@ -180,8 +178,6 @@ decision
 deep
 defense
 degree
-Democrat
-democratic
 describe
 design
 despite
@@ -252,7 +248,6 @@ explain
 face
 fact
 factor
-fail
 fall
 family
 fast
@@ -609,13 +604,11 @@ reflect
 region
 relate
 relationship
-religious
 remain
 remember
 remove
 report
 represent
-Republican
 require
 research
 resource

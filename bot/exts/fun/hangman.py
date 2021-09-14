@@ -9,11 +9,11 @@ from discord.ext import commands
 from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES
 
-# defining all words in the list of words as a global variable
+# Defining all words in the list of words as a global variable
 with Path("bot/resources/fun/hangman_words.txt").resolve().open(mode="r", encoding="utf-8") as f:
     ALL_WORDS = [line.strip('\n') for line in f.readlines()]
 
-# defining a list of images that will be used for the game to represent the hangman person
+# Defining a list of images that will be used for the game to represent the hangman person
 IMAGES = {
     6: "https://cdn.discordapp.com/attachments/859123972884922418/887067234760032296/hangman0.png",
     5: "https://cdn.discordapp.com/attachments/859123972884922418/887067240204206220/hangman1.png",
@@ -56,7 +56,7 @@ class Hangman(commands.Cog):
         - singleplayer: writing 's' means you want to play by yourself, and only you can suggest letters,
             - writing 'm' means you want multiple players to join in and guess the word.
         """
-        # filtering the list of all words depending on the configuration
+        # Filtering the list of all words depending on the configuration
         filtered_words = [
             word for word in ALL_WORDS
             if min_length < len(word) < max_length
@@ -78,7 +78,7 @@ class Hangman(commands.Cog):
         tries = 6
         guessed_letters = set()
 
-        # check if the game is singleplayer or multiplayer
+        # Checking if the game is singleplayer
         def check(msg: Message) -> bool:
             if singleplayer == 's':
                 return msg.author == ctx.author
