@@ -15,13 +15,13 @@ with Path("bot/resources/fun/hangman_words.txt").resolve().open(mode="r", encodi
 
 # defining a list of images that will be used for the game to represent the hangman person
 IMAGES = {
-    6: "https://cdn.discordapp.com/attachments/859123972884922418/883472355056295946/hangman0.png",
-    5: "https://cdn.discordapp.com/attachments/859123972884922418/883472756744814613/hangman1.png",
-    4: "https://cdn.discordapp.com/attachments/859123972884922418/883472808699629578/hangman2.png",
-    3: "https://cdn.discordapp.com/attachments/859123972884922418/883472862441267230/hangman3.png",
-    2: "https://cdn.discordapp.com/attachments/859123972884922418/883472950991396864/hangman4.png",
-    1: "https://cdn.discordapp.com/attachments/859123972884922418/883472999431430204/hangman5.png",
-    0: "https://cdn.discordapp.com/attachments/859123972884922418/883473051277226015/hangman6.png",
+    6: "https://cdn.discordapp.com/attachments/859123972884922418/887067234760032296/hangman0.png",
+    5: "https://cdn.discordapp.com/attachments/859123972884922418/887067240204206220/hangman1.png",
+    4: "https://cdn.discordapp.com/attachments/859123972884922418/887067244578881626/hangman2.png",
+    3: "https://cdn.discordapp.com/attachments/859123972884922418/887067248546685029/hangman3.png",
+    2: "https://cdn.discordapp.com/attachments/859123972884922418/887067252099268608/hangman4.png",
+    1: "https://cdn.discordapp.com/attachments/859123972884922418/887067255429554197/hangman5.png",
+    0: "https://cdn.discordapp.com/attachments/859123972884922418/887067260726939728/hangman6.png",
 }
 
 
