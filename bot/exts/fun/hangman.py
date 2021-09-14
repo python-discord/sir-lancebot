@@ -104,7 +104,7 @@ class Hangman(commands.Cog):
             try:
                 message = await self.bot.wait_for(
                     event="message",
-                    timeout=30.0,
+                    timeout=60.0,
                     check=check
                 )
             except TimeoutError:
