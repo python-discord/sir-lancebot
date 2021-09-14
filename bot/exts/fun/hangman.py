@@ -43,7 +43,7 @@ class Hangman(commands.Cog):
             max_length: int = 25,
             min_unique_letters: int = 0,
             max_unique_letters: int = 25,
-            singleplayer: Literal["s", "m"] = "s",
+            singleplayer: Literal["s", "m", "S", "M"] = "s",
     ) -> None:
         """
         Play hangman against the bot, where you have to guess the word it has provided!
@@ -56,6 +56,9 @@ class Hangman(commands.Cog):
         - singleplayer: writing 's' means you want to play by yourself, and only you can suggest letters,
             - writing 'm' means you want multiple players to join in and guess the word.
         """
+        # Changing singleplayer to a boolean
+        singleplayer = True if singleplayer.lower() == 's' else False
+
         # Filtering the list of all words depending on the configuration
         filtered_words = [
             word for word in ALL_WORDS
@@ -80,12 +83,11 @@ class Hangman(commands.Cog):
 
         # Checking if the game is singleplayer
         def check(msg: Message) -> bool:
-            if singleplayer == 's':
+            if singleplayer:
                 return msg.author == ctx.author
-            elif singleplayer == 'm':
-                return msg.author != self.bot
             else:
-                raise commands.BadArgument("`singleplayer` must be either `s` or `m`")
+                # Multiplayer mode
+                return msg.author != self.bot
 
         hangman_embed = Embed(
             title="Hangman",
