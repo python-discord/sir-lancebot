@@ -105,6 +105,7 @@ def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
     # The data we get from the AoC website is structured by member, not by day/star,
     # which means we need to iterate over the members to transpose the data to a per
     # star view. We need that per star view to compute rank scores per star.
+    per_day_star_stats = collections.defaultdict(list)
     for member in raw_leaderboard_data.values():
         name = member["name"] if member["name"] else f"Anonymous #{member['id']}"
         member_id = member["id"]
@@ -122,6 +123,12 @@ def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
                 star_results[(day, star)].append(
                     StarResult(member_id=member_id, completion_time=completion_time)
                 )
+                completion_time_raw = int(data["get_star_ts"])
+                per_day_star_stats[f"{day}-{star}"].append(
+                    {'completion_time': completion_time_raw, 'member_name': name}
+                )
+    for key in per_day_star_stats.keys():
+        per_day_star_stats[key] = sorted(per_day_star_stats[key], key=operator.itemgetter('completion_time'))
 
     # Now that we have a transposed dataset that holds the completion time of all
     # participants per star, we can compute the rank-based scores each participant
@@ -150,21 +157,6 @@ def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
         # By using a dictionary instead of namedtuple here, we can serialize
         # this data to JSON in order to cache it in Redis.
         daily_stats[day] = {"star_one": star_one, "star_two": star_two}
-
-        per_day_star_stats = collections.defaultdict(list)
-        for member in raw_leaderboard_data.values():
-            username = member["name"] if member["name"] else f"Anonymous #{member['id']}"
-
-            for day_data, stars_data in member["completion_day_level"].items():
-                # Iterate over the complete stars for this day for this participant
-                for star, data in stars_data.items():
-                    # Record completion of this star for this individual
-                    completion_time = int(data["get_star_ts"])
-                    per_day_star_stats[f"{day_data}-{star}"].append(
-                        {'completion_time': completion_time, 'member_name': username}
-                    )
-        for key in per_day_star_stats.keys():
-            per_day_star_stats[key] = sorted(per_day_star_stats[key], key=operator.itemgetter('completion_time'))
 
         return {"daily_stats": daily_stats, "leaderboard": sorted_leaderboard, 'per_day_and_star': per_day_star_stats}
 
