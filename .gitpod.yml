@@ -5,8 +5,3 @@ tasks:
       PIP_USER: false
     init: pip install poetry
     command: poetry install && poetry run pre-commit install
-
-vscode:
-  extensions:
-    - ms-python.vscode-pylance
-    - ms-python.python
