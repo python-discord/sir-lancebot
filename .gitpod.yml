@@ -1,5 +1,5 @@
 tasks:
-  - name: Initialize Poetry Environment
+  - name: Python Environment
     before: pyenv install 3.9.6 && pyenv global 3.9.6
     env:
       PIP_USER: false
