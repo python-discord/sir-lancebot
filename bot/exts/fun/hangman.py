@@ -69,7 +69,7 @@ class Hangman(commands.Cog):
         if not filtered_words:
             filter_not_found_embed = Embed(
                 title=choice(NEGATIVE_REPLIES),
-                description="No words could be found that fit all the filters specified.",
+                description="No words could be found that fit all filters specified.",
                 color=Colours.soft_red,
             )
             await ctx.send(embed=filter_not_found_embed)
