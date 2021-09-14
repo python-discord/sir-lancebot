@@ -122,19 +122,21 @@ class Hangman(commands.Cog):
             if len(message.content) > 1:
                 letter_embed = Embed(
                     title=choice(NEGATIVE_REPLIES),
-                    description="You can only send a letter for the hangman game!",
-                    color=Colours.soft_red,
+                    description="You can only send a letter for the hangman game, try again!",
+                    color=Colours.dark_green,
                 )
-                await original_message.edit(embed=letter_embed)
+                to_delete = await ctx.send(embed=letter_embed)
+                await to_delete.delete(delay=4)
                 continue
 
             elif message.content in guessed_letters:
                 already_guessed_embed = Embed(
                     title=choice(NEGATIVE_REPLIES),
-                    description=f"You have already guessed `{message.content}`!",
-                    color=Colours.soft_red,
+                    description=f"You have already guessed `{message.content}`, try again!",
+                    color=Colours.dark_green,
                 )
-                await original_message.edit(embed=already_guessed_embed)
+                to_delete = await ctx.send(embed=already_guessed_embed)
+                await to_delete.delete(delay=4)
                 continue
 
             elif message.content in word:
