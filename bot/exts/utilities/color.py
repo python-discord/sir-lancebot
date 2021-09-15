@@ -155,19 +155,19 @@ class Color(commands.Cog):
         def _rgb_to_hsv(rgb_color: tuple[int, int, int]) -> tuple[int, int, int]:
             """To convert from `RGB` to `HSV` color space."""
             r, g, b = rgb_color
-            h, v, s = colorsys.rgb_to_hsv(r/float(255), g/float(255), b/float(255))
-            h = round(h*360)
-            s = round(s*100)
-            v = round(v*100)
+            h, v, s = colorsys.rgb_to_hsv(r / float(255), g / float(255), b / float(255))
+            h = round(h * 360)
+            s = round(s * 100)
+            v = round(v * 100)
             return h, s, v
 
         def _rgb_to_hsl(rgb_color: tuple[int, int, int]) -> tuple[int, int, int]:
             """To convert from `RGB` to `HSL` color space."""
             r, g, b = rgb_color
-            h, l, s = colorsys.rgb_to_hls(r/float(255), g/float(255), b/float(255))
-            h = round(h*360)
-            s = round(s*100)
-            l = round(l*100)  # noqa: E741 It's little `L`, Reason: To maintain consistency.
+            h, l, s = colorsys.rgb_to_hls(r / float(255), g / float(255), b / float(255))
+            h = round(h * 360)
+            s = round(s * 100)
+            l = round(l * 100)  # noqa: E741 It's little `L`, Reason: To maintain consistency.
             return h, s, l
 
         hex_color = _rgb_to_hex(rgb_color)
