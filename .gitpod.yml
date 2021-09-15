@@ -1,7 +1,9 @@
 tasks:
   - name: "Python Environment"
     before: "pyenv install 3.9.6 && pyenv global 3.9.6"
-    env:
-      PIP_USER: "false"
-    init: "pip install poetry"
+    init: "pip install poetry && export PIP_USER=false"
     command: "poetry install && poetry run pre-commit install"
+
+vscode:
+  extensions:
+    - "ms-python.python"
