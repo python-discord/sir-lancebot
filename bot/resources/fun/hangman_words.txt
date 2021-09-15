@@ -94,6 +94,7 @@ budget
 build
 building
 business
+bytecode
 call
 camera
 campaign
@@ -185,6 +186,7 @@ detail
 determine
 develop
 development
+dictionary
 difference
 different
 difficult
@@ -249,6 +251,7 @@ face
 fact
 factor
 fall
+false
 family
 fast
 father
@@ -290,6 +293,7 @@ friend
 from
 front
 full
+function
 fund
 future
 game
@@ -309,6 +313,7 @@ group
 grow
 growth
 guess
+guido
 hair
 half
 hand
@@ -346,6 +351,7 @@ identify
 image
 imagine
 impact
+import
 important
 improve
 include
@@ -378,6 +384,7 @@ kitchen
 know
 knowledge
 land
+lambda
 language
 large
 last
@@ -556,6 +563,7 @@ pressure
 pretty
 prevent
 price
+print
 private
 probably
 problem
@@ -575,6 +583,7 @@ public
 pull
 purpose
 push
+pydis
 python
 quality
 question
@@ -855,6 +864,7 @@ write
 writer
 wrong
 yard
+yield
 yeah
 year
 young
