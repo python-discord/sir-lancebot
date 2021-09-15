@@ -160,14 +160,13 @@ class CommandErrorHandler(commands.Cog):
             if not similar_command:
                 return
 
-            log_msg = "Cancelling attempt to suggest a command due to failed checks."
+            base_log_msg = "Cancelling attempt to suggest a command due to failed checks."
             try:
                 if not await similar_command.can_run(ctx):
-                    log.debug(log_msg)
+                    log.debug(base_log_msg)
                     return
-            except commands.errors.CommandError as cmd_error:
-                log.debug(log_msg)
-                await self.on_command_error(ctx, cmd_error)
+            except commands.errors.CommandError as error:
+                log.debug(f"{base_log_msg} A check raised an error: {type(error).__name__} - {str(error)}")
                 return
 
             misspelled_content = ctx.message.content
