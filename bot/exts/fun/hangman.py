@@ -127,7 +127,7 @@ class Hangman(commands.Cog):
             if len(message.content) > 1:
                 letter_embed = Embed(
                     title=choice(NEGATIVE_REPLIES),
-                    description="You can only send a letter for the hangman game, try again!",
+                    description="You can only send one letter at a time, try again!",
                     color=Colours.dark_green,
                 )
                 to_delete = await ctx.send(embed=letter_embed)
