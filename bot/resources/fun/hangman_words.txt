@@ -414,6 +414,7 @@ live
 local
 long
 look
+loop
 lose
 loss
 love
@@ -813,6 +814,7 @@ until
 upon
 usually
 value
+variable
 various
 very
 victim
