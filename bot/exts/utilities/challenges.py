@@ -1,10 +1,9 @@
 import logging
-from asyncio import to_thread
 from random import choice
 from typing import Union
 
 from bs4 import BeautifulSoup
-from discord import Color, Embed, Interaction, SelectOption, ui
+from discord import Embed, Interaction, SelectOption, ui
 from discord.ext import commands
 
 from bot.bot import Bot
@@ -15,8 +14,9 @@ API_ROOT = "https://www.codewars.com/api/v1/code-challenges/{kata_id}"
 # Map difficulty for the kata to color we want to display in the embed.
 # These colors are representative of the colors that each 'kyu' level represents on codewars.com
 MAPPING_OF_KYU = {
-    8: (221, 219, 218), 7: (221, 219, 218), 6: (236, 182, 19), 5: (236, 182, 19),
-    4: (60, 126, 187), 3: (60, 126, 187), 2: (134, 108, 199), 1: (134, 108, 199)
+    8: f"{221:02x}{219:02x}{218:02x}", 7: f"{221:02x}{219:02x}{218:02x}", 6: f"{236:02x}{182:02x}{19:02x}",
+    5: f"{236:02x}{182:02x}{19:02x}", 4: f"{60:02x}{126:02x}{187:02x}", 3: f"{60:02x}{126:02x}{187:02x}",
+    2: f"{134:02x}{108:02x}{199:02x}", 1: f"{134:02x}{108:02x}{199:02x}"
 }
 
 # Supported languages for a kata on codewars.com
@@ -106,7 +106,7 @@ class Challenges(commands.Cog):
         This will webscrape the search page with `search_link` and then get the ID of a kata for the
         codewars.com API to use.
         """
-        with self.bot.http_session.get(search_link, params=params) as response:
+        async with self.bot.http_session.get(search_link, params=params) as response:
             if response.status != 200:
                 error_embed = Embed(
                     title=choice(NEGATIVE_REPLIES),
@@ -162,9 +162,7 @@ class Challenges(commands.Cog):
         kata_embed = Embed(
             title=kata_information['name'],
             description=kata_description,
-            color=Color.from_rgb(
-                *MAPPING_OF_KYU[int(kata_information['rank']['name'].replace(' kyu', ''))]
-            ),
+            color=int(MAPPING_OF_KYU[int(kata_information['rank']['name'].replace(' kyu', ''))], 16),
             url=kata_url,
         )
         kata_embed.add_field(name="Difficulty", value=kata_information['rank']['name'], inline=False)
@@ -284,7 +282,7 @@ class Challenges(commands.Cog):
 
         params["beta"] = str(language in SUPPORTED_LANGUAGES["beta"]).lower()
 
-        first_kata_id = await to_thread(await self.kata_id(get_kata_link, params))
+        first_kata_id = await self.kata_id(get_kata_link, params)
         if isinstance(first_kata_id, Embed):
             # We ran into an error when retrieving the website link
             await ctx.send(embed=first_kata_id)
