@@ -42,23 +42,23 @@ class InformationDropdown(ui.Select):
             SelectOption(
                 label="Main Information",
                 description="See the kata's difficulty, description, etc.",
-                emoji='🌎',
+                emoji='🌎'
             ),
             SelectOption(
                 label='Languages',
                 description='See what languages this kata supports!',
-                emoji=Emojis.reddit_post_text,
+                emoji=Emojis.reddit_post_text
             ),
             SelectOption(
                 label='Tags',
                 description='See what categories this kata falls under!',
-                emoji=Emojis.stackoverflow_tag,
+                emoji=Emojis.stackoverflow_tag
             ),
             SelectOption(
                 label='Other Information',
                 description='See how other people performed on this kata and more!',
-                emoji='ℹ',
-            ),
+                emoji='ℹ'
+            )
         ]
 
         # We map the option label to the embed instance so that it can be easily looked up later in O(1)
@@ -73,7 +73,7 @@ class InformationDropdown(ui.Select):
             placeholder='See more information regarding this kata',
             min_values=1,
             max_values=1,
-            options=options,
+            options=options
         )
 
     async def callback(self, interaction: Interaction) -> None:
@@ -111,7 +111,7 @@ class Challenges(commands.Cog):
                 error_embed = Embed(
                     title=choice(NEGATIVE_REPLIES),
                     description="We ran into an error when getting the kata from codewars.com, try again later.",
-                    color=Colours.soft_red,
+                    color=Colours.soft_red
                 )
                 return error_embed
 
@@ -142,7 +142,7 @@ class Challenges(commands.Cog):
                 error_embed = Embed(
                     title=choice(NEGATIVE_REPLIES),
                     description="We ran into an error when getting the kata information, try again later.",
-                    color=Colours.soft_red,
+                    color=Colours.soft_red
                 )
                 return error_embed
 
@@ -163,7 +163,7 @@ class Challenges(commands.Cog):
             title=kata_information['name'],
             description=kata_description,
             color=int(MAPPING_OF_KYU[int(kata_information['rank']['name'].replace(' kyu', ''))], 16),
-            url=kata_url,
+            url=kata_url
         )
         kata_embed.add_field(name="Difficulty", value=kata_information['rank']['name'], inline=False)
         return kata_embed
@@ -175,7 +175,7 @@ class Challenges(commands.Cog):
         language_embed = Embed(
             title="Supported Languages",
             description=f"```nim\n{languages}\n```",
-            color=Colours.python_blue,
+            color=Colours.python_blue
         )
         return language_embed
 
@@ -190,7 +190,7 @@ class Challenges(commands.Cog):
         tags_embed = Embed(
             title="Tags",
             description=f"```nim\n{tags}\n```",
-            color=Colours.grass_green,
+            color=Colours.grass_green
         )
         return tags_embed
 
@@ -204,27 +204,27 @@ class Challenges(commands.Cog):
         """
         embed = Embed(
             title="Other Information",
-            color=Colours.grass_green,
+            color=Colours.grass_green
         )
         embed.add_field(
             name="`Total Score`",
             value=f"```css\n{kata_information['voteScore']}\n```",
-            inline=False,
+            inline=False
         )
         embed.add_field(
             name="`Total Stars`",
             value=f"```css\n{kata_information['totalStars']}\n```",
-            inline=False,
+            inline=False
         )
         embed.add_field(
             name="`Total Completed`",
             value=f"```css\n{kata_information['totalCompleted']}\n```",
-            inline=False,
+            inline=False
         )
         embed.add_field(
             name="`Total Attempts`",
             value=f"```css\n{kata_information['totalAttempts']}\n```",
-            inline=False,
+            inline=False
         )
         return embed
 
@@ -303,7 +303,7 @@ class Challenges(commands.Cog):
             main_embed=kata_embed,
             language_embed=language_embed,
             tags_embed=tags_embed,
-            other_info_embed=miscellaneous_embed,
+            other_info_embed=miscellaneous_embed
         )
         original_message = await ctx.send(
             embed=kata_embed,
