@@ -10,7 +10,7 @@ from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES
 
 # Defining all words in the list of words as a global variable
-with Path("bot/resources/fun/hangman_words.txt").resolve().open(mode="r", encoding="utf-8") as f:
+with open("bot/resources/fun/hangman_words.txt", encoding="utf-8") as f:
     ALL_WORDS = [line.strip('\n') for line in f.readlines()]
 
 # Defining a list of images that will be used for the game to represent the hangman person
