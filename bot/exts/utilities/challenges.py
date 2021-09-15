@@ -1,4 +1,5 @@
 import logging
+from asyncio import to_thread
 from random import choice
 from typing import Union
 
@@ -15,7 +16,7 @@ API_ROOT = "https://www.codewars.com/api/v1/code-challenges/{kata_id}"
 # These colors are representative of the colors that each 'kyu' level represents on codewars.com
 MAPPING_OF_KYU = {
     8: (221, 219, 218), 7: (221, 219, 218), 6: (236, 182, 19), 5: (236, 182, 19),
-    4: (60, 126, 187), 3: (60, 126, 187), 2: (134, 108, 199), 1: (134, 108, 199),
+    4: (60, 126, 187), 3: (60, 126, 187), 2: (134, 108, 199), 1: (134, 108, 199)
 }
 
 # Supported languages for a kata on codewars.com
@@ -23,12 +24,12 @@ SUPPORTED_LANGUAGES = {
     "stable": [
         "c", "c#", "c++", "clojure", "coffeescript", "coq", "crystal", "dart", "elixir",
         "f#", "go", "groovy", "haskell", "java", "javascript", "kotlin", "lean", "lua", "nasm",
-        "php", "python", "racket", "ruby", "rust", "scala", "shell", "sql", "swift", "typescript",
+        "php", "python", "racket", "ruby", "rust", "scala", "shell", "sql", "swift", "typescript"
     ],
     "beta": [
         "agda", "bf", "cfml", "cobol", "commonlisp", "elm", "erlang", "factor",
         "forth", "fortran", "haxe", "idris", "julia", "nim", "objective-c", "ocaml",
-        "pascal", "perl", "powershell", "prolog", "purescript", "r", "raku", "reason", "solidity", "vb.net",
+        "pascal", "perl", "powershell", "prolog", "purescript", "r", "raku", "reason", "solidity", "vb.net"
     ]
 }
 
@@ -36,13 +37,7 @@ SUPPORTED_LANGUAGES = {
 class InformationDropdown(ui.Select):
     """A dropdown inheriting from ui.Select that allows finding out other information about the kata."""
 
-    def __init__(
-            self,
-            language_embed: Embed,
-            tags_embed: Embed,
-            other_info_embed: Embed,
-            main_embed: Embed,
-    ):
+    def __init__(self, language_embed: Embed, tags_embed: Embed, other_info_embed: Embed, main_embed: Embed):
         options = [
             SelectOption(
                 label="Main Information",
@@ -84,7 +79,7 @@ class InformationDropdown(ui.Select):
     async def callback(self, interaction: Interaction) -> None:
         """Callback for when someone clicks on a dropdown."""
         # Edit the message to the embed selected in the option
-        # The original_message attribute is set just after the message is sent with the view.
+        # The `original_message` attribute is set just after the message is sent with the view.
         # The attribute is not set during initialization.
         result_embed = self.mapping_of_embeds[self.values[0]]
         await self.original_message.edit(embed=result_embed)
@@ -92,14 +87,13 @@ class InformationDropdown(ui.Select):
 
 class Challenges(commands.Cog):
     """
-    Cog for a challenge command.
+    Cog for the challenge command.
 
     The challenge command pulls a random kata from codewars.com.
-    A kata is the name for a challenge, specific to `codewars.com`.
+    A kata is the name for a challenge, specific to codewars.com.
 
     The challenge command also has filters to customize the kata that is given.
-    You can specify the language the kata should be from, the difficulty of the kata.
-    Lastly, you can customize the topic you want the kata to be about!
+    You can specify the language the kata should be from, difficulty and topic of the kata.
     """
 
     def __init__(self, bot: Bot):
@@ -112,11 +106,11 @@ class Challenges(commands.Cog):
         This will webscrape the search page with `search_link` and then get the ID of a kata for the
         codewars.com API to use.
         """
-        async with self.bot.http_session.get(search_link, params=params) as response:
+        with self.bot.http_session.get(search_link, params=params) as response:
             if response.status != 200:
                 error_embed = Embed(
                     title=choice(NEGATIVE_REPLIES),
-                    description="We ran into an error with getting the kata from codewars.com, try again later.",
+                    description="We ran into an error when getting the kata from codewars.com, try again later.",
                     color=Colours.soft_red,
                 )
                 return error_embed
@@ -133,7 +127,7 @@ class Challenges(commands.Cog):
             else:
                 first_kata_div = first_kata_div[0]
 
-            # there are numerous divs before arriving at the id of the kata, which can be used for the link.
+            # There are numerous divs before arriving at the id of the kata, which can be used for the link.
             first_kata_id = first_kata_div.a["href"].split("/")[-1]
             return first_kata_id
 
@@ -141,13 +135,13 @@ class Challenges(commands.Cog):
         """
         Returns the information about the Kata.
 
-        Uses the codewars.com API to get information about the kata using the kata's ID.
+        Uses the codewars.com API to get information about the kata using `kata_id`.
         """
         async with self.bot.http_session.get(API_ROOT.format(kata_id=kata_id)) as response:
             if response.status != 200:
                 error_embed = Embed(
                     title=choice(NEGATIVE_REPLIES),
-                    description="We ran into an error with getting the kata information, try again later.",
+                    description="We ran into an error when getting the kata information, try again later.",
                     color=Colours.soft_red,
                 )
                 return error_embed
@@ -156,11 +150,11 @@ class Challenges(commands.Cog):
 
     @staticmethod
     def main_embed(kata_information: dict) -> Embed:
-        """Creates the main embed which displays the description of the kata and the difficulty, along with the name."""
+        """Creates the main embed which displays the name, difficulty and description of the kata."""
         kata_description = kata_information["description"]
         kata_url = f"https://codewars.com/kata/{kata_information['id']}"
 
-        # ensuring it isn't over the length 1024
+        # Ensuring it isn't over the length 1024
         if len(kata_description) > 1024:
             kata_description = "\n".join(kata_description[:1000].split("\n")[:-1])
             kata_description += f"\n[Read more...]({kata_url})"
@@ -181,7 +175,7 @@ class Challenges(commands.Cog):
         """Creates the 'language embed' which displays all languages the kata supports."""
         languages = '\n'.join(map(str.title, kata_information['languages']))
         language_embed = Embed(
-            title="Languages Supported",
+            title="Supported Languages",
             description=f"```nim\n{languages}\n```",
             color=Colours.python_blue,
         )
@@ -192,7 +186,7 @@ class Challenges(commands.Cog):
         """
         Creates the 'tags embed' which displays all the tags of the Kata.
 
-        Tags explain what the Kata is about, this is what codewars.com calls categories.
+        Tags explain what the kata is about, this is what codewars.com calls categories.
         """
         tags = '\n'.join(kata_information['tags'])
         tags_embed = Embed(
@@ -207,34 +201,34 @@ class Challenges(commands.Cog):
         """
         Creates the 'other information embed' which displays miscellaneous information about the kata.
 
-        This embed shows statistics like the total number of people who completed the kata,
-        the total number of stars of the Kata, etc.
+        This embed shows statistics such as the total number of people who completed the kata,
+        the total number of stars of the kata, etc.
         """
-        miscellaneous_embed = Embed(
+        embed = Embed(
             title="Other Information",
             color=Colours.grass_green,
         )
-        miscellaneous_embed.add_field(
+        embed.add_field(
             name="`Total Score`",
             value=f"```css\n{kata_information['voteScore']}\n```",
             inline=False,
         )
-        miscellaneous_embed.add_field(
+        embed.add_field(
             name="`Total Stars`",
             value=f"```css\n{kata_information['totalStars']}\n```",
             inline=False,
         )
-        miscellaneous_embed.add_field(
+        embed.add_field(
             name="`Total Completed`",
             value=f"```css\n{kata_information['totalCompleted']}\n```",
             inline=False,
         )
-        miscellaneous_embed.add_field(
+        embed.add_field(
             name="`Total Attempts`",
             value=f"```css\n{kata_information['totalAttempts']}\n```",
             inline=False,
         )
-        return miscellaneous_embed
+        return embed
 
     @staticmethod
     def create_view(dropdown: InformationDropdown, link: str) -> ui.View:
@@ -290,7 +284,7 @@ class Challenges(commands.Cog):
 
         params["beta"] = str(language in SUPPORTED_LANGUAGES["beta"]).lower()
 
-        first_kata_id = await self.kata_id(get_kata_link, params)
+        first_kata_id = await to_thread(await self.kata_id(get_kata_link, params))
         if isinstance(first_kata_id, Embed):
             # We ran into an error when retrieving the website link
             await ctx.send(embed=first_kata_id)
@@ -313,8 +307,10 @@ class Challenges(commands.Cog):
             tags_embed=tags_embed,
             other_info_embed=miscellaneous_embed,
         )
-        kata_view = self.create_view(dropdown, f'https://codewars.com/kata/{first_kata_id}')
-        original_message = await ctx.send(embed=kata_embed, view=kata_view)
+        original_message = await ctx.send(
+            embed=kata_embed,
+            view=self.create_view(dropdown, f'https://codewars.com/kata/{first_kata_id}')
+        )
 
         dropdown.original_message = original_message
 
