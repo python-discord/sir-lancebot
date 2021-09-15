@@ -9,7 +9,7 @@ from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES
 
 # Defining all words in the list of words as a global variable
-with open("bot/resources/fun/hangman_words.txt") as f:
+with open("bot/resources/fun/hangman_words.txt", encoding="utf-8") as f:
     ALL_WORDS = [line.strip('\n') for line in f.readlines()]
 
 # Defining a list of images that will be used for the game to represent the hangman person
@@ -68,7 +68,7 @@ class Hangman(commands.Cog):
         if not filtered_words:
             filter_not_found_embed = Embed(
                 title=choice(NEGATIVE_REPLIES),
-                description="No words could be found that fit all the filters specified.",
+                description="No words could be found that fit all filters specified.",
                 color=Colours.soft_red,
             )
             await ctx.send(embed=filter_not_found_embed)
