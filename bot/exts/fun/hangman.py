@@ -1,5 +1,4 @@
 from asyncio import TimeoutError
-from pathlib import Path
 from random import choice
 from typing import Literal
 
@@ -10,7 +9,7 @@ from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES
 
 # Defining all words in the list of words as a global variable
-with Path("bot/resources/fun/hangman_words.txt").resolve().open(mode="r", encoding="utf-8") as f:
+with open("bot/resources/fun/hangman_words.txt") as f:
     ALL_WORDS = [line.strip('\n') for line in f.readlines()]
 
 # Defining a list of images that will be used for the game to represent the hangman person
@@ -89,20 +88,26 @@ class Hangman(commands.Cog):
                 # Multiplayer mode
                 return msg.author != self.bot
 
-        hangman_embed = Embed(
+        original_message = await ctx.send(embed=Embed(
             title="Hangman",
-            color=Colours.python_blue,
-        )
-        hangman_embed.set_image(url=IMAGES[tries])
-        hangman_embed.add_field(
-            name=f"You've guessed `{user_guess}` so far.",
-            value="Guess the word by sending a message with the letter!",
-            inline=False,
-        )
-        hangman_embed.set_footer(text=f"Tries: {tries}")
-        original_message = await ctx.send(embed=hangman_embed)
+            description="Loading game...",
+            color=Colours.soft_green
+        ))
 
         while user_guess != word:
+            hangman_embed = Embed(
+                title="Hangman",
+                color=Colours.python_blue,
+            )
+            hangman_embed.set_image(url=IMAGES[tries])
+            hangman_embed.add_field(
+                name=f"You've guessed `{user_guess}` so far.",
+                value="Guess the word by sending a message with the letter!",
+                inline=False,
+            )
+            hangman_embed.set_footer(text=f"Tries: {tries}")
+            await original_message.edit(embed=hangman_embed)
+
             try:
                 message = await self.bot.wait_for(
                     event="message",
@@ -158,16 +163,6 @@ class Hangman(commands.Cog):
                     return
 
             guessed_letters.add(message.content)
-
-            hangman_embed.clear_fields()
-            hangman_embed.set_image(url=IMAGES[tries])
-            hangman_embed.add_field(
-                name=f"You've guessed `{user_guess}` so far.",
-                value="Make a guess by sending a message with the letter!",
-                inline=False,
-            )
-            hangman_embed.set_footer(text=f"Tries: {tries}")
-            await original_message.edit(embed=hangman_embed)
 
         win_embed = Embed(
             title="You won!",
