@@ -184,3 +184,4 @@ class Hangman(commands.Cog):
 def setup(bot: Bot) -> None:
     """Load the Hangman cog."""
     bot.add_cog(Hangman(bot))
+    
