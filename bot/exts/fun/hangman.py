@@ -139,9 +139,8 @@ class Hangman(commands.Cog):
 
             # Automatically convert uppercase to lowercase letters
             normalized_content = message.content.lower()
-
             # Sends a message if the user enters more than one letter per guess
-            if normalized_content > 1:
+            if len(normalized_content) > 1:
                 letter_embed = Embed(
                     title=choice(NEGATIVE_REPLIES),
                     description="You can only send one letter at a time, try again!",
