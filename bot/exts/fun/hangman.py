@@ -138,10 +138,10 @@ class Hangman(commands.Cog):
                 return
 
             # Automatically convert uppercase to lowercase letters
-            message.content = message.content.lower()
+            normalized_content = message.content.lower()
 
             # Sends a message if the user enters more than one letter per guess
-            if len(message.content) > 1:
+            if normalized_content > 1:
                 letter_embed = Embed(
                     title=choice(NEGATIVE_REPLIES),
                     description="You can only send one letter at a time, try again!",
@@ -151,20 +151,20 @@ class Hangman(commands.Cog):
                 continue
 
             # Check for repeated guesses
-            elif message.content in guessed_letters:
+            elif normalized_content in guessed_letters:
                 already_guessed_embed = Embed(
                     title=choice(NEGATIVE_REPLIES),
-                    description=f"You have already guessed `{message.content}`, try again!",
+                    description=f"You have already guessed `{normalized_content}`, try again!",
                     color=Colours.dark_green,
                 )
                 await ctx.send(embed=already_guessed_embed, delete_after=4)
                 continue
 
             # Check for the correct guess from the user
-            elif message.content in word:
-                positions = {idx for idx, letter in enumerate(pretty_word) if letter == message.content}
+            elif normalized_content in word:
+                positions = {idx for idx, letter in enumerate(pretty_word) if letter == normalized_content}
                 user_guess = "".join(
-                    [message.content if index in positions else dash for index, dash in enumerate(user_guess)]
+                    [normalized_content if index in positions else dash for index, dash in enumerate(user_guess)]
                 )
 
             else:
@@ -180,7 +180,7 @@ class Hangman(commands.Cog):
                     await ctx.send(embed=losing_embed)
                     return
 
-            guessed_letters.add(message.content)
+            guessed_letters.add(normalized_content)
 
         # Send the message saying that you won and update the game board
         await original_message.edit(embed=self.create_embed(tries, user_guess))
