@@ -95,8 +95,10 @@ class Hangman(commands.Cog):
             return
 
         word = choice(filtered_words)
-
-        user_guess = "_" * len(word)
+        # `pretty_word` is used for comparing the indices where the guess of the user is similar to the word
+        # The `user_guess` variable is prettified by adding spaces between every dash, and so is the `pretty_word`
+        pretty_word = ''.join([f"{letter} " for letter in word])[:-1]
+        user_guess = ("_ " * len(word))[:-1]
         tries = 6
         guessed_letters = set()
 
@@ -115,7 +117,7 @@ class Hangman(commands.Cog):
         ))
 
         # Game loop
-        while user_guess != word:
+        while user_guess.replace(' ', '') != word:
             # Start of the game
             await original_message.edit(embed=self.create_embed(tries, user_guess))
 
@@ -162,7 +164,7 @@ class Hangman(commands.Cog):
 
             # Check for the correct guess from the user
             elif message.content in word:
-                positions = {idx for idx, letter in enumerate(word) if letter == message.content}
+                positions = {idx for idx, letter in enumerate(pretty_word) if letter == message.content}
                 user_guess = "".join(
                     [message.content if index in positions else dash for index, dash in enumerate(user_guess)]
                 )
