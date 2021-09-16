@@ -147,8 +147,7 @@ class Hangman(commands.Cog):
                     description="You can only send one letter at a time, try again!",
                     color=Colours.dark_green,
                 )
-                to_delete = await ctx.send(embed=letter_embed)
-                await to_delete.delete(delay=4)
+                await ctx.send(embed=letter_embed, delete_after=4)
                 continue
 
             # Check for repeated guesses
@@ -158,8 +157,7 @@ class Hangman(commands.Cog):
                     description=f"You have already guessed `{message.content}`, try again!",
                     color=Colours.dark_green,
                 )
-                to_delete = await ctx.send(embed=already_guessed_embed)
-                await to_delete.delete(delay=4)
+                await ctx.send(embed=already_guessed_embed, delete_after=4)
                 continue
 
             # Check for the correct guess from the user
