@@ -14,13 +14,13 @@ with open("bot/resources/fun/hangman_words.txt", encoding="utf-8") as f:
 
 # Defining a list of images that will be used for the game to represent the hangman person
 IMAGES = {
-    6: "https://cdn.discordapp.com/attachments/859123972884922418/887067234760032296/hangman0.png",
-    5: "https://cdn.discordapp.com/attachments/859123972884922418/887067240204206220/hangman1.png",
-    4: "https://cdn.discordapp.com/attachments/859123972884922418/887067244578881626/hangman2.png",
-    3: "https://cdn.discordapp.com/attachments/859123972884922418/887067248546685029/hangman3.png",
-    2: "https://cdn.discordapp.com/attachments/859123972884922418/887067252099268608/hangman4.png",
-    1: "https://cdn.discordapp.com/attachments/859123972884922418/887067255429554197/hangman5.png",
-    0: "https://cdn.discordapp.com/attachments/859123972884922418/887067260726939728/hangman6.png",
+    6: "https://cdn.discordapp.com/attachments/859123972884922418/888133201497837598/hangman0.png",
+    5: "https://cdn.discordapp.com/attachments/859123972884922418/888133595259084800/hangman1.png",
+    4: "https://cdn.discordapp.com/attachments/859123972884922418/888134194474139688/hangman2.png",
+    3: "https://cdn.discordapp.com/attachments/859123972884922418/888133758069395466/hangman3.png",
+    2: "https://cdn.discordapp.com/attachments/859123972884922418/888133786724859924/hangman4.png",
+    1: "https://cdn.discordapp.com/attachments/859123972884922418/888133828831477791/hangman5.png",
+    0: "https://cdn.discordapp.com/attachments/859123972884922418/888133845449338910/hangman6.png",
 }
 
 
@@ -181,14 +181,13 @@ class Hangman(commands.Cog):
 
             guessed_letters.add(message.content)
 
-        # Edit the message to show the final word
-        await original_message.edit(embed=self.create_embed(tries, user_guess))
+        # Edit the message to show that the user won
         win_embed = Embed(
             title="You won!",
             description=f"The word was `{word}`.",
             color=Colours.grass_green
         )
-        await ctx.send(embed=win_embed)
+        await original_message.edit(embed=win_embed)
 
 
 def setup(bot: Bot) -> None:
