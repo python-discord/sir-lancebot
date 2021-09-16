@@ -51,7 +51,7 @@ class Hangman(commands.Cog):
             value="Guess the word by sending a message with the letter!",
             inline=False,
         )
-        hangman_embed.set_footer(text=f"Tries: {tries}")
+        hangman_embed.set_footer(text=f"Tries remaining: {tries}")
         return hangman_embed
 
     @commands.command()
