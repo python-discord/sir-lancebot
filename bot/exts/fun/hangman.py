@@ -34,6 +34,26 @@ class Hangman(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
+    @staticmethod
+    def create_embed(tries: int, user_guess: str) -> Embed:
+        """
+        Helper method that creates the embed where the game information is shown.
+
+        This includes how many letters the user has guessed so far, and the hangman photo itself.
+        """
+        hangman_embed = Embed(
+            title="Hangman",
+            color=Colours.python_blue,
+        )
+        hangman_embed.set_image(url=IMAGES[tries])
+        hangman_embed.add_field(
+            name=f"You've guessed `{user_guess}` so far.",
+            value="Guess the word by sending a message with the letter!",
+            inline=False,
+        )
+        hangman_embed.set_footer(text=f"Tries: {tries}")
+        return hangman_embed
+
     @commands.command()
     async def hangman(
             self,
@@ -97,18 +117,7 @@ class Hangman(commands.Cog):
         # Game loop
         while user_guess != word:
             # Start of the game
-            hangman_embed = Embed(
-                title="Hangman",
-                color=Colours.python_blue,
-            )
-            hangman_embed.set_image(url=IMAGES[tries])
-            hangman_embed.add_field(
-                name=f"You've guessed `{user_guess}` so far.",
-                value="Guess the word by sending a message with the letter!",
-                inline=False,
-            )
-            hangman_embed.set_footer(text=f"Tries: {tries}")
-            await original_message.edit(embed=hangman_embed)
+            await original_message.edit(embed=self.create_embed(tries, user_guess))
 
             # Sends a message if the user does not send a message within 60 seconds
             try:
@@ -172,9 +181,11 @@ class Hangman(commands.Cog):
 
             guessed_letters.add(message.content)
 
+        await original_message.edit(embed=self.create_embed(tries, user_guess))
         win_embed = Embed(
             title="You won!",
-            color=Colours.grass_green,
+            description=f"The word was `{word}`.",
+            color=Colours.grass_green
         )
         await ctx.send(embed=win_embed)
 
