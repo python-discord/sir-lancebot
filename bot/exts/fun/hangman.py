@@ -44,6 +44,7 @@ class Hangman(commands.Cog):
             max_unique_letters: int = 25,
             singleplayer: Literal["s", "m", "S", "M"] = "s",
     ) -> None:
+
         """
         Play hangman against the bot, where you have to guess the word it has provided!
 
@@ -55,6 +56,7 @@ class Hangman(commands.Cog):
         - singleplayer: writing 's' means you want to play by yourself, and only you can suggest letters,
             - writing 'm' means you want multiple players to join in and guess the word.
         """
+
         # Changing singleplayer to a boolean
         singleplayer = True if singleplayer.lower() == 's' else False
 
@@ -94,7 +96,9 @@ class Hangman(commands.Cog):
             color=Colours.soft_green
         ))
 
+        # Game loop
         while user_guess != word:
+            # Start of the game
             hangman_embed = Embed(
                 title="Hangman",
                 color=Colours.python_blue,
@@ -108,6 +112,7 @@ class Hangman(commands.Cog):
             hangman_embed.set_footer(text=f"Tries: {tries}")
             await original_message.edit(embed=hangman_embed)
 
+            # Sends a message if the user does not send a message within 60 seconds
             try:
                 message = await self.bot.wait_for(
                     event="message",
@@ -123,7 +128,10 @@ class Hangman(commands.Cog):
                 await original_message.edit(embed=timeout_embed)
                 return
 
+            # Automatically convert uppercase to lowercase letters
             message.content = message.content.lower()
+
+            # Sends a message if the user enters more than one letter per guess
             if len(message.content) > 1:
                 letter_embed = Embed(
                     title=choice(NEGATIVE_REPLIES),
@@ -134,6 +142,7 @@ class Hangman(commands.Cog):
                 await to_delete.delete(delay=4)
                 continue
 
+            # Check for repeated guesses
             elif message.content in guessed_letters:
                 already_guessed_embed = Embed(
                     title=choice(NEGATIVE_REPLIES),
@@ -144,6 +153,7 @@ class Hangman(commands.Cog):
                 await to_delete.delete(delay=4)
                 continue
 
+            # Check for a correct letter guess from the user
             elif message.content in word:
                 positions = {idx for idx, letter in enumerate(word) if letter == message.content}
                 user_guess = "".join(
