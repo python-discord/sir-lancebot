@@ -178,18 +178,20 @@ class Hangman(commands.Cog):
                         description=f"The word was `{word}`.",
                         color=Colours.soft_red,
                     )
-                    await original_message.edit(embed=losing_embed)
+                    await original_message.edit(embed=self.create_embed(tries, user_guess))
+                    await ctx.send(embed=losing_embed)
                     return
 
             guessed_letters.add(message.content)
 
-        # Edit the message to show that the user won
+        # Send the message saying that you won and update the game board
+        await original_message.edit(embed=self.create_embed(tries, user_guess))
         win_embed = Embed(
             title="You won!",
             description=f"The word was `{word}`.",
             color=Colours.grass_green
         )
-        await original_message.edit(embed=win_embed)
+        await ctx.send(embed=win_embed)
 
 
 def setup(bot: Bot) -> None:
