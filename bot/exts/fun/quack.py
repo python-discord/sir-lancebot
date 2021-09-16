@@ -1,3 +1,4 @@
+import logging
 import random
 from typing import Literal, Optional
 
@@ -8,6 +9,8 @@ from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES
 
 API_URL = 'https://quackstack.pythondiscord.com'
+
+log = logging.getLogger(__name__)
 
 
 class Quackstack(commands.Cog):
@@ -47,6 +50,7 @@ class Quackstack(commands.Cog):
                 color=Colours.soft_red,
             )
             if response.status != 200:
+                log.error(f"Response to Quackstack returned code {response.status}")
                 await ctx.send(embed=error_embed)
                 return
             data = await response.json()
