@@ -181,6 +181,7 @@ class Hangman(commands.Cog):
 
             guessed_letters.add(message.content)
 
+        # Edit the message to show the final word
         await original_message.edit(embed=self.create_embed(tries, user_guess))
         win_embed = Embed(
             title="You won!",
