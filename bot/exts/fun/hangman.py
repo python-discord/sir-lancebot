@@ -44,7 +44,6 @@ class Hangman(commands.Cog):
             max_unique_letters: int = 25,
             singleplayer: Literal["s", "m", "S", "M"] = "s",
     ) -> None:
-
         """
         Play hangman against the bot, where you have to guess the word it has provided!
 
@@ -56,7 +55,6 @@ class Hangman(commands.Cog):
         - singleplayer: writing 's' means you want to play by yourself, and only you can suggest letters,
             - writing 'm' means you want multiple players to join in and guess the word.
         """
-
         # Changing singleplayer to a boolean
         singleplayer = True if singleplayer.lower() == 's' else False
 
@@ -153,7 +151,7 @@ class Hangman(commands.Cog):
                 await to_delete.delete(delay=4)
                 continue
 
-            # Check for a correct letter guess from the user
+            # Check for the correct guess from the user
             elif message.content in word:
                 positions = {idx for idx, letter in enumerate(word) if letter == message.content}
                 user_guess = "".join(
@@ -184,4 +182,3 @@ class Hangman(commands.Cog):
 def setup(bot: Bot) -> None:
     """Load the Hangman cog."""
     bot.add_cog(Hangman(bot))
-    
