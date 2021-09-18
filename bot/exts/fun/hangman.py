@@ -121,7 +121,7 @@ class Hangman(commands.Cog):
             # Start of the game
             await original_message.edit(embed=self.create_embed(tries, user_guess))
 
-            # Sends a message if they do not send a message within 60 seconds
+            # Sends a message if they do not guess within 60 seconds
             try:
                 message = await self.bot.wait_for(
                     event="message",
