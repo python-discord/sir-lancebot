@@ -1,4 +1,5 @@
 import logging
+from asyncio import to_thread
 from random import choice
 from typing import Union
 
@@ -112,10 +113,11 @@ class Challenges(commands.Cog):
                     description="We ran into an error when getting the kata from codewars.com, try again later.",
                     color=Colours.soft_red
                 )
+                logger.error(f"Unexpected response from codewars.com, status code: {response.status}")
                 return error_embed
 
             soup = BeautifulSoup(await response.text(), features="lxml")
-            first_kata_div = await asyncio.to_thread(soup.find_all("div", class_="item-title px-0"))
+            first_kata_div = await to_thread(soup.find_all("div", class_="item-title px-0"))
 
             if not first_kata_div:
                 raise commands.BadArgument("No katas could be found with the filters provided.")
@@ -143,6 +145,7 @@ class Challenges(commands.Cog):
                     description="We ran into an error when getting the kata information, try again later.",
                     color=Colours.soft_red
                 )
+                logger.error(f"Unexpected response from codewars.com/api/v1, status code: {response.status}")
                 return error_embed
 
             return await response.json()
