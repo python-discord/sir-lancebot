@@ -117,10 +117,9 @@ class Hangman(commands.Cog):
 
         # Game loop
         while user_guess.replace(' ', '') != word:
-            # Start of the game
+            # Edit the message to the current state of the game
             await original_message.edit(embed=self.create_embed(tries, user_guess))
 
-            # Sends a message if they do not guess within 60 seconds
             try:
                 message = await self.bot.wait_for(
                     event="message",
@@ -138,7 +137,7 @@ class Hangman(commands.Cog):
 
             # If the user enters a capital letter as their guess, it is automatically converted to a lowercase letter
             normalized_content = message.content.lower()
-            # Alerts the user if they enter more than one letter per guess
+            # The user should only guess one letter per message
             if len(normalized_content) > 1:
                 letter_embed = Embed(
                     title=choice(NEGATIVE_REPLIES),
@@ -180,7 +179,7 @@ class Hangman(commands.Cog):
 
             guessed_letters.add(normalized_content)
 
-        # Send the message saying that you won and update the game board
+        # The loop exited meaning that the user has guessed the word
         await original_message.edit(embed=self.create_embed(tries, user_guess))
         win_embed = Embed(
             title="You won!",
