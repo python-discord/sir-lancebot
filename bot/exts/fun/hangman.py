@@ -1,4 +1,5 @@
 from asyncio import TimeoutError
+from pathlib import Path
 from random import choice
 from typing import Literal
 
@@ -9,10 +10,9 @@ from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES
 
 # Defining all words in the list of words as a global variable
-with open("bot/resources/fun/hangman_words.txt", encoding="utf-8") as f:
-    ALL_WORDS = [line.strip('\n') for line in f.readlines()]
+ALL_WORDS = Path("bot/resources/fun/hangman_words.txt").read_text().splitlines()
 
-# Defining a list of images that will be used for the game to represent the hangman person
+# Defining a dictionary of images that will be used for the game to represent the hangman person
 IMAGES = {
     6: "https://cdn.discordapp.com/attachments/859123972884922418/888133201497837598/hangman0.png",
     5: "https://cdn.discordapp.com/attachments/859123972884922418/888133595259084800/hangman1.png",
@@ -48,8 +48,7 @@ class Hangman(commands.Cog):
         hangman_embed.set_image(url=IMAGES[tries])
         hangman_embed.add_field(
             name=f"You've guessed `{user_guess}` so far.",
-            value="Guess the word by sending a message with a letter!",
-            inline=False,
+            value="Guess the word by sending a message with a letter!"
         )
         hangman_embed.set_footer(text=f"Tries remaining: {tries}")
         return hangman_embed
@@ -76,7 +75,7 @@ class Hangman(commands.Cog):
             - writing 'm' means you want multiple players to join in and guess the word.
         """
         # Changing singleplayer to a boolean
-        singleplayer = True if singleplayer.lower() == 's' else False
+        singleplayer = singleplayer.lower() == 's'
 
         # Filtering the list of all words depending on the configuration
         filtered_words = [
@@ -108,7 +107,7 @@ class Hangman(commands.Cog):
                 return msg.author == ctx.author
             else:
                 # Multiplayer mode
-                return msg.author != self.bot
+                return not msg.author.bot
 
         original_message = await ctx.send(embed=Embed(
             title="Hangman",
