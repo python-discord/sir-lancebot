@@ -4,15 +4,15 @@ import re
 import typing as t
 from dataclasses import dataclass
 from datetime import datetime
-from urllib.parse import quote, quote_plus
+from urllib.parse import quote
 
 import discord
+from aiohttp import ClientResponse
 from discord.ext import commands
 
 from bot.bot import Bot
 from bot.constants import (
     Categories,
-    Channels,
     Colours,
     ERROR_REPLIES,
     Emojis,
@@ -20,14 +20,11 @@ from bot.constants import (
     Tokens,
 )
 from bot.exts.core.extensions import invoke_help_command
+
 log = logging.getLogger(__name__)
 
 GITHUB_API_URL = "https://api.github.com"
 
-BAD_RESPONSE = {
-    404: "Issue/pull request not located! Please enter a valid number!",
-    403: "Rate limit has been hit! Please try again later!"
-}
 REQUEST_HEADERS = {
     "Accept": "application/vnd.github.v3+json"
 }
@@ -102,11 +99,11 @@ class GithubInfo(commands.Cog):
         """Remove any codeblock in a message."""
         return CODE_BLOCK_RE.sub("", message)
 
-    async def fetch_issues(
-            self,
-            number: int,
-            repository: str,
-            user: str
+    async def fetch_issue(
+        self,
+        number: int,
+        repository: str,
+        user: str
     ) -> t.Union[IssueState, FetchError]:
         """
         Retrieve an issue from a GitHub repository.
@@ -117,8 +114,7 @@ class GithubInfo(commands.Cog):
         pulls_url = PR_ENDPOINT.format(user=user, repository=repository, number=number)
         log.trace(f"Querying GH issues API: {url}")
 
-        async with self.bot.http_session.get(url, headers=REQUEST_HEADERS) as r:
-            json_data = await r.json()
+        json_data, r = await self.fetch_data(url)
 
         if r.status == 403:
             if r.headers.get("X-RateLimit-Remaining") == "0":
@@ -145,17 +141,17 @@ class GithubInfo(commands.Cog):
         # to get the desired information for the PR.
         else:
             log.trace(f"PR provided, querying GH pulls API for additional information: {pulls_url}")
-            async with self.bot.http_session.get(pulls_url) as p:
-                pull_data = await p.json()
-                if pull_data["draft"]:
-                    emoji = Emojis.pull_request_draft
-                elif pull_data["state"] == "open":
-                    emoji = Emojis.pull_request_open
-                # When 'merged_at' is not None, this means that the state of the PR is merged
-                elif pull_data["merged_at"] is not None:
-                    emoji = Emojis.pull_request_merged
-                else:
-                    emoji = Emojis.pull_request_closed
+
+            pull_data, _ = await self.fetch_data(pulls_url)
+            if pull_data["draft"]:
+                emoji = Emojis.pull_request_draft
+            elif pull_data["state"] == "open":
+                emoji = Emojis.pull_request_open
+            # When 'merged_at' is not None, this means that the state of the PR is merged
+            elif pull_data["merged_at"] is not None:
+                emoji = Emojis.pull_request_merged
+            else:
+                emoji = Emojis.pull_request_closed
 
         issue_url = json_data.get("html_url")
 
@@ -163,9 +159,7 @@ class GithubInfo(commands.Cog):
 
     @staticmethod
     def format_embed(
-        results: t.List[t.Union[IssueState, FetchError]],
-        user: str,
-        repository: t.Optional[str] = None
+        results: t.List[t.Union[IssueState, FetchError]]
     ) -> discord.Embed:
         """Take a list of IssueState or FetchError and format a Discord embed for them."""
         description_list = []
@@ -181,8 +175,7 @@ class GithubInfo(commands.Cog):
             description="\n".join(description_list)
         )
 
-        embed_url = f"https://github.com/{user}/{repository}" if repository else f"https://github.com/{user}"
-        resp.set_author(name="GitHub", url=embed_url)
+        resp.set_author(name="GitHub")
         return resp
 
     @commands.group(name="github", aliases=("gh", "git"))
@@ -212,16 +205,6 @@ class GithubInfo(commands.Cog):
         if issues:
             # Block this from working in DMs
             if not message.guild:
-                await message.channel.send(
-                    embed=discord.Embed(
-                        title=random.choice(NEGATIVE_REPLIES),
-                        description=(
-                            "You can't retrieve issues from DMs. "
-                            f"Try again in <#{Channels.community_bot_commands}>"
-                        ),
-                        colour=Colours.soft_red
-                    )
-                )
                 return
 
             log.trace(f"Found {issues = }")
@@ -238,7 +221,7 @@ class GithubInfo(commands.Cog):
                 return
 
             for repo_issue in issues:
-                result = await self.fetch_issues(
+                result = await self.fetch_issue(
                     int(repo_issue.number),
                     repo_issue.repository,
                     repo_issue.organisation or "python-discord"
@@ -249,19 +232,19 @@ class GithubInfo(commands.Cog):
         if not links:
             return
 
-        resp = self.format_embed(links, "python-discord")
+        resp = self.format_embed(links)
         await message.channel.send(embed=resp)
 
-    async def fetch_data(self, url: str) -> dict:
-        """Retrieve data as a dictionary."""
-        async with self.bot.http_session.get(url) as r:
-            return await r.json()
+    async def fetch_data(self, url: str) -> tuple[dict[str], ClientResponse]:
+        """Retrieve data as a dictionary and the response in a tuple."""
+        async with self.bot.http_session.get(url, heades=REQUEST_HEADERS) as r:
+            return await r.json(), r
 
     @github_group.command(name="user", aliases=("userinfo",))
     async def github_user_info(self, ctx: commands.Context, username: str) -> None:
         """Fetches a user's GitHub information."""
         async with ctx.typing():
-            user_data = await self.fetch_data(f"{GITHUB_API_URL}/users/{quote_plus(username)}")
+            user_data, _ = await self.fetch_data(f"{GITHUB_API_URL}/users/{username}")
 
             # User_data will not have a message key if the user exists
             if "message" in user_data:
@@ -274,7 +257,7 @@ class GithubInfo(commands.Cog):
                 await ctx.send(embed=embed)
                 return
 
-            org_data = await self.fetch_data(user_data["organizations_url"])
+            org_data, _ = await self.fetch_data(user_data["organizations_url"])
             orgs = [f"[{org['login']}](https://github.com/{org['login']})" for org in org_data]
             orgs_to_add = " | ".join(orgs)
 
@@ -290,8 +273,8 @@ class GithubInfo(commands.Cog):
 
             embed = discord.Embed(
                 title=f"`{user_data['login']}`'s GitHub profile info",
-                description=f"```\n{user_data['bio']}\n```\n" if user_data["bio"] else "",
-                colour=discord.Colour.og_blurple(),
+                description=f"```{user_data['bio']}```\n" if user_data["bio"] else "",
+                colour=discord.Colour.blurple(),
                 url=user_data["html_url"],
                 timestamp=datetime.strptime(user_data["created_at"], "%Y-%m-%dT%H:%M:%SZ")
             )
@@ -315,10 +298,7 @@ class GithubInfo(commands.Cog):
             )
 
             if user_data["type"] == "User":
-                embed.add_field(
-                    name="Gists",
-                    value=f"[{gists}](https://gist.github.com/{quote_plus(username, safe='')})"
-                )
+                embed.add_field(name="Gists", value=f"[{gists}](https://gist.github.com/{quote(username, safe='')})")
 
                 embed.add_field(
                     name=f"Organization{'s' if len(orgs)!=1 else ''}",
@@ -347,7 +327,7 @@ class GithubInfo(commands.Cog):
             return
 
         async with ctx.typing():
-            repo_data = await self.fetch_data(f"{GITHUB_API_URL}/repos/{quote(repo)}")
+            repo_data, _ = await self.fetch_data(f"{GITHUB_API_URL}/repos/{quote(repo)}")
 
             # There won't be a message key if this repo exists
             if "message" in repo_data:
@@ -363,7 +343,7 @@ class GithubInfo(commands.Cog):
         embed = discord.Embed(
             title=repo_data["name"],
             description=repo_data["description"],
-            colour=discord.Colour.og_blurple(),
+            colour=discord.Colour.blurple(),
             url=repo_data["html_url"]
         )
 
