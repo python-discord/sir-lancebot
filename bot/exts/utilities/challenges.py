@@ -14,9 +14,8 @@ API_ROOT = "https://www.codewars.com/api/v1/code-challenges/{kata_id}"
 # Map difficulty for the kata to color we want to display in the embed.
 # These colors are representative of the colors that each 'kyu' level represents on codewars.com
 MAPPING_OF_KYU = {
-    8: f"{221:02x}{219:02x}{218:02x}", 7: f"{221:02x}{219:02x}{218:02x}", 6: f"{236:02x}{182:02x}{19:02x}",
-    5: f"{236:02x}{182:02x}{19:02x}", 4: f"{60:02x}{126:02x}{187:02x}", 3: f"{60:02x}{126:02x}{187:02x}",
-    2: f"{134:02x}{108:02x}{199:02x}", 1: f"{134:02x}{108:02x}{199:02x}"
+    8: 0xdddbda, 7: 0xdddbda, 6: 0xecb613, 5: 0xecb613,
+    4: 0x3c7ebb, 3: 0x3c7ebb, 2: 0x866cc7, 1: 0x866cc7
 }
 
 # Supported languages for a kata on codewars.com
