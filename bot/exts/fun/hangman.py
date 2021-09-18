@@ -48,7 +48,7 @@ class Hangman(commands.Cog):
         hangman_embed.set_image(url=IMAGES[tries])
         hangman_embed.add_field(
             name=f"You've guessed `{user_guess}` so far.",
-            value="Guess the word by sending a message with the letter!",
+            value="Guess the word by sending a message with a letter!",
             inline=False,
         )
         hangman_embed.set_footer(text=f"Tries remaining: {tries}")
@@ -121,7 +121,7 @@ class Hangman(commands.Cog):
             # Start of the game
             await original_message.edit(embed=self.create_embed(tries, user_guess))
 
-            # Sends a message if the user does not send a message within 60 seconds
+            # Sends a message if they do not send a message within 60 seconds
             try:
                 message = await self.bot.wait_for(
                     event="message",
@@ -137,9 +137,9 @@ class Hangman(commands.Cog):
                 await original_message.edit(embed=timeout_embed)
                 return
 
-            # Automatically convert uppercase to lowercase letters
+            # If the user enters a capital letter as their guess, it is automatically converted to a lowercase letter
             normalized_content = message.content.lower()
-            # Sends a message if the user enters more than one letter per guess
+            # Alerts the user if they enter more than one letter per guess
             if len(normalized_content) > 1:
                 letter_embed = Embed(
                     title=choice(NEGATIVE_REPLIES),
@@ -149,7 +149,7 @@ class Hangman(commands.Cog):
                 await ctx.send(embed=letter_embed, delete_after=4)
                 continue
 
-            # Check for repeated guesses
+            # Checks for repeated guesses
             elif normalized_content in guessed_letters:
                 already_guessed_embed = Embed(
                     title=choice(NEGATIVE_REPLIES),
@@ -159,7 +159,7 @@ class Hangman(commands.Cog):
                 await ctx.send(embed=already_guessed_embed, delete_after=4)
                 continue
 
-            # Check for the correct guess from the user
+            # Checks for correct guesses from the user
             elif normalized_content in word:
                 positions = {idx for idx, letter in enumerate(pretty_word) if letter == normalized_content}
                 user_guess = "".join(
