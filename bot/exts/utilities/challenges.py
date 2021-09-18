@@ -272,9 +272,8 @@ class Challenges(commands.Cog):
                 )
 
             query, level = query_splitted
-            level = f"-{level}"
             params['q'] = query
-            params['r[]'] = level
+            params['r[]'] = f"-{level}"
         elif query.isnumeric():
             params['r[]'] = query
         else:
