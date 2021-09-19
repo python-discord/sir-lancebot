@@ -45,6 +45,7 @@ class Color(commands.Cog):
         """
         logger.debug(f"{mode = }")
         logger.debug(f"{user_color = }")
+        color_name = None
         if mode.lower() == "hex":
             hex_match = re.fullmatch(r"(#?[0x]?)((?:[0-9a-fA-F]{3}){1,2})", user_color)
             if hex_match:
@@ -57,19 +58,6 @@ class Color(commands.Cog):
                 else:
                     hex_ = "#" + user_color
                     rgb_color = ImageColor.getcolor(hex_, "RGB")
-                (r, g, b) = rgb_color
-                discord_rgb_int = int(f"{r:02x}{g:02x}{b:02x}", 16)
-                all_colors = self.get_color_fields(rgb_color)
-                hex_color = all_colors[1]["value"].replace("» hex ", "")
-                cmyk_color = all_colors[2]["value"].replace("» cmyk ", "")
-                hsv_color = all_colors[3]["value"].replace("» hsv ", "")
-                hsl_color = all_colors[4]["value"].replace("» hsl ", "")
-                logger.debug(f"{rgb_color = }")
-                logger.debug(f"{hex_color = }")
-                logger.debug(f"{hsv_color = }")
-                logger.debug(f"{hsl_color = }")
-                logger.debug(f"{cmyk_color = }")
-                color_name, _ = self.match_color(hex_color)
             else:
                 await ctx.send(
                     embed=Embed(
@@ -78,30 +66,22 @@ class Color(commands.Cog):
                     )
                 )
         elif mode.lower() == "rgb":
-            if "(" in user_color:
-                remove = "[() ]"
-                rgb_color = re.sub(remove, "", user_color)
-                rgb_color = tuple(map(int, rgb_color.split(",")))
-            elif "," in user_color:
-                rgb_color = tuple(map(int, user_color.split(",")))
-            else:
-                rgb_color = tuple(map(int, user_color.split(" ")))
-            (r, g, b) = rgb_color
-            discord_rgb_int = int(f"{r:02x}{g:02x}{b:02x}", 16)
-            all_colors = self.get_color_fields(rgb_color)
-            hex_color = all_colors[1]["value"].replace("» hex ", "")
-            cmyk_color = all_colors[2]["value"].replace("» cmyk ", "")
-            hsv_color = all_colors[3]["value"].replace("» hsv ", "")
-            hsl_color = all_colors[4]["value"].replace("» hsl ", "")
-            color_name, _ = self.match_color(hex_color)
+            rgb_color = self.tuple_create(user_color)
         elif mode.lower() == "hsv":
-            pass
+            hsv_temp = self.tuple_create(user_color)
+            rgb_color = self.hsv_to_rgb(hsv_temp)
         elif mode.lower() == "hsl":
-            pass
+            hsl_temp = self.tuple_create(user_color)
+            rgb_color = self.hsl_to_rgb(hsl_temp)
         elif mode.lower() == "cmyk":
-            pass
+            cmyk_temp = self.tuple_create(user_color)
+            rgb_color = self.cmyk_to_rgb(cmyk_temp)
         elif mode.lower() == "name":
-            color_name, hex_color = self.match_color(user_color)
+            color_name, hex_color = self.match_color_name(user_color)
+            if "#" in hex_color:
+                rgb_color = ImageColor.getcolor(hex_color, "RGB")
+            else:
+                rgb_color = ImageColor.getcolor("#" + hex_color, "RGB")
         else:
             # mode is either None or an invalid code
             if mode is None:
@@ -119,6 +99,14 @@ class Color(commands.Cog):
             )
             await ctx.send(embed=wrong_mode_embed)
             return
+
+        (r, g, b) = rgb_color
+        discord_rgb_int = int(f"{r:02x}{g:02x}{b:02x}", 16)
+        all_colors = self.get_color_fields(rgb_color)
+        hex_color = all_colors[1]["value"].replace("» hex ", "")
+        if color_name is None:
+            logger.debug(f"Find color name from hex color: {hex_color}")
+            color_name = self.match_color_hex(hex_color)
 
         async with ctx.typing():
             main_embed = Embed(
@@ -239,11 +227,11 @@ class Color(commands.Cog):
         return all_fields
 
     @staticmethod
-    def match_color(input_hex_color: str) -> str:
+    def match_color_name(input_color_name: str) -> str:
         """Use fuzzy matching to return a hex color code based on the user's input."""
         try:
             match, certainty, _ = process.extractOne(
-                query=input_hex_color,
+                query=input_color_name,
                 choices=COLOR_MAPPING.keys(),
                 score_cutoff=50
             )
@@ -253,8 +241,88 @@ class Color(commands.Cog):
             return match, hex_match
         except TypeError:
             match = "No color name match found."
-            hex_match = input_hex_color
+            hex_match = input_color_name
             return match, hex_match
+
+    @staticmethod
+    def match_color_hex(input_hex_color: str) -> str:
+        """Use fuzzy matching to return a hex color code based on the user's input."""
+        try:
+            match, certainty, _ = process.extractOne(
+                query=input_hex_color,
+                choices=COLOR_MAPPING.values(),
+                score_cutoff=80
+            )
+            logger.debug(f"{match = }, {certainty = }")
+            color_name = [name for name, _ in COLOR_MAPPING.items() if _ == match][0]
+            logger.debug(f"{color_name = }")
+            return color_name
+        except TypeError:
+            color_name = "No color name match found."
+            return color_name
+
+    @staticmethod
+    def tuple_create(input_color: str) -> tuple[int, int, int]:
+        """
+        Create a tuple of integers based on user's input.
+
+        Can handle inputs of the types:
+        (100, 100, 100)
+        100, 100, 100
+        100 100 100
+        """
+        if "(" in input_color:
+            remove = "[() ]"
+            color_tuple = re.sub(remove, "", input_color)
+            color_tuple = tuple(map(int, color_tuple.split(",")))
+        elif "," in input_color:
+            color_tuple = tuple(map(int, input_color.split(",")))
+        else:
+            color_tuple = tuple(map(int, input_color.split(" ")))
+        return color_tuple
+
+    @staticmethod
+    def hsv_to_rgb(input_color: tuple[int, int, int]) -> tuple[int, int, int]:
+        """Function to convert hsv color to rgb color."""
+        (h, v, s) = input_color  # the function hsv_to_rgb expects v and s to be swapped
+        h = h / 360
+        s = s / 100
+        v = v / 100
+        rgb_color = colorsys.hsv_to_rgb(h, s, v)
+        (r, g, b) = rgb_color
+        r = int(r * 255)
+        g = int(g * 255)
+        b = int(b * 255)
+        rgb_color = (r, g, b)
+        return rgb_color
+
+    @staticmethod
+    def hsl_to_rgb(input_color: tuple[int, int, int]) -> tuple[int, int, int]:
+        """Function to convert hsl color to rgb color."""
+        (h, s, l) = input_color
+        h = h / 360
+        s = s / 100
+        l = l / 100  # noqa: E741 It's little `L`, Reason: To maintain consistency.
+        rgb_color = colorsys.hls_to_rgb(h, l, s)
+        (r, g, b) = rgb_color
+        r = int(r * 255)
+        g = int(g * 255)
+        b = int(b * 255)
+        rgb_color = (r, g, b)
+        return rgb_color
+
+    @staticmethod
+    def cmyk_to_rgb(input_color: tuple[int, int, int, int]) -> tuple[int, int, int]:
+        """Function to convert cmyk color to rgb color."""
+        c = input_color[0]
+        m = input_color[1]
+        y = input_color[2]
+        k = input_color[3]
+        r = int(255 * (1.0 - c / float(100)) * (1.0 - k / float(100)))
+        g = int(255 * (1.0 - m / float(100)) * (1.0 - k / float(100)))
+        b = int(255 * (1.0 - y / float(100)) * (1.0 - k / float(100)))
+        rgb_color = (r, g, b)
+        return rgb_color
 
 
 def setup(bot: Bot) -> None:
