@@ -94,7 +94,6 @@ class Hangman(commands.Cog):
         tries = 6
         guessed_letters = set()
 
-        # Checking if the game is singleplayer
         def check(msg: Message) -> bool:
             return msg.author == ctx.author and msg.channel == ctx.channel
 
