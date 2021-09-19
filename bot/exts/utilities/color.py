@@ -31,23 +31,45 @@ with open(COLOR_JSON_PATH) as f:
 
 # define color command
 class Color(commands.Cog):
-    """User initiated command to receive color information."""
+    """User initiated commands to receive color information."""
 
     def __init__(self, bot: Bot):
         self.bot = bot
 
     @commands.command(aliases=["colour"])
     async def color(self, ctx: commands.Context, mode: str, *, user_color: str) -> None:
-        """Send information on input color code or color name."""
-        logger.info(f"{mode = }")
-        logger.info(f"{user_color = }")
+        """
+        Send information on input color code or color name.
+
+        Possible modes are: "hex", "rgb", "hsv", "hsl", "cmyk" or "name".
+        """
+        logger.debug(f"{mode = }")
+        logger.debug(f"{user_color = }")
         if mode.lower() == "hex":
-            hex_match = re.search(r"^#(?:[0-9a-fA-F]{3}){1,2}$", user_color)
+            hex_match = re.fullmatch(r"(#?[0x]?)((?:[0-9a-fA-F]{3}){1,2})", user_color)
             if hex_match:
                 hex_color = int(hex(int(user_color.replace("#", ""), 16)), 0)
-                rgb_color = ImageColor.getcolor(user_color, "RGB")
-                logger.info(f"{hex_color = }")
-                logger.info(f"{rgb_color = }")
+                if "#" in user_color:
+                    rgb_color = ImageColor.getcolor(user_color, "RGB")
+                elif "0x" in user_color:
+                    hex_ = user_color.replace("0x", "#")
+                    rgb_color = ImageColor.getcolor(hex_, "RGB")
+                else:
+                    hex_ = "#" + user_color
+                    rgb_color = ImageColor.getcolor(hex_, "RGB")
+                (r, g, b) = rgb_color
+                discord_rgb_int = int(f"{r:02x}{g:02x}{b:02x}", 16)
+                all_colors = self.get_color_fields(rgb_color)
+                hex_color = all_colors[1]["value"].replace("» hex ", "")
+                cmyk_color = all_colors[2]["value"].replace("» cmyk ", "")
+                hsv_color = all_colors[3]["value"].replace("» hsv ", "")
+                hsl_color = all_colors[4]["value"].replace("» hsl ", "")
+                logger.debug(f"{rgb_color = }")
+                logger.debug(f"{hex_color = }")
+                logger.debug(f"{hsv_color = }")
+                logger.debug(f"{hsl_color = }")
+                logger.debug(f"{cmyk_color = }")
+                color_name, _ = self.match_color(hex_color)
             else:
                 await ctx.send(
                     embed=Embed(
@@ -56,7 +78,22 @@ class Color(commands.Cog):
                     )
                 )
         elif mode.lower() == "rgb":
-            pass
+            if "(" in user_color:
+                remove = "[() ]"
+                rgb_color = re.sub(remove, "", user_color)
+                rgb_color = tuple(map(int, rgb_color.split(",")))
+            elif "," in user_color:
+                rgb_color = tuple(map(int, user_color.split(",")))
+            else:
+                rgb_color = tuple(map(int, user_color.split(" ")))
+            (r, g, b) = rgb_color
+            discord_rgb_int = int(f"{r:02x}{g:02x}{b:02x}", 16)
+            all_colors = self.get_color_fields(rgb_color)
+            hex_color = all_colors[1]["value"].replace("» hex ", "")
+            cmyk_color = all_colors[2]["value"].replace("» cmyk ", "")
+            hsv_color = all_colors[3]["value"].replace("» hsv ", "")
+            hsl_color = all_colors[4]["value"].replace("» hsl ", "")
+            color_name, _ = self.match_color(hex_color)
         elif mode.lower() == "hsv":
             pass
         elif mode.lower() == "hsl":
@@ -70,6 +107,7 @@ class Color(commands.Cog):
             if mode is None:
                 no_mode_embed = Embed(
                     title="No 'mode' was passed, please define a color code.",
+                    description="Possible modes are: Name, Hex, RGB, HSV, HSL and CMYK.",
                     color=Colours.soft_red,
                 )
                 await ctx.send(embed=no_mode_embed)
@@ -86,7 +124,7 @@ class Color(commands.Cog):
             main_embed = Embed(
                 title=color_name,
                 description='(Approx..)',
-                color=rgb_color,
+                color=discord_rgb_int,
             )
 
             file = await self.create_thumbnail_attachment(rgb_color)
@@ -120,7 +158,7 @@ class Color(commands.Cog):
 
         def _rgb_to_hex(rgb_color: tuple[int, int, int]) -> str:
             """To convert from `RGB` to `Hex` notation."""
-            return '#' + ''.join(hex(color)[2:].zfill(2) for color in rgb_color).upper()
+            return '#' + ''.join(hex(int(color))[2:].zfill(2) for color in rgb_color).upper()
 
         def _rgb_to_cmyk(rgb_color: tuple[int, int, int]) -> tuple[int, int, int, int]:
             """To convert from `RGB` to `CMYK` color space."""
@@ -178,7 +216,11 @@ class Color(commands.Cog):
         all_fields = [
             {
                 "name": "RGB",
-                "value": f"» rgb {rgb_color}\n» hex {hex_color}"
+                "value": f"» rgb {rgb_color}"
+            },
+            {
+                "name": "HEX",
+                "value": f"» hex {hex_color}"
             },
             {
                 "name": "CMYK",
@@ -197,13 +239,22 @@ class Color(commands.Cog):
         return all_fields
 
     @staticmethod
-    def match_color(user_color: str) -> str:
+    def match_color(input_hex_color: str) -> str:
         """Use fuzzy matching to return a hex color code based on the user's input."""
-        match, certainty, _ = process.extractOne(query=user_color, choices=COLOR_MAPPING.keys(), score_cutoff=50)
-        logger.debug(f"{match = }, {certainty = }")
-        hex_match = COLOR_MAPPING[match]
-        logger.debug(f"{hex_match = }")
-        return match, hex_match
+        try:
+            match, certainty, _ = process.extractOne(
+                query=input_hex_color,
+                choices=COLOR_MAPPING.keys(),
+                score_cutoff=50
+            )
+            logger.debug(f"{match = }, {certainty = }")
+            hex_match = COLOR_MAPPING[match]
+            logger.debug(f"{hex_match = }")
+            return match, hex_match
+        except TypeError:
+            match = "No color name match found."
+            hex_match = input_hex_color
+            return match, hex_match
 
 
 def setup(bot: Bot) -> None:
