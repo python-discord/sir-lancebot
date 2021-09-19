@@ -238,8 +238,7 @@ class AdventOfCode(commands.Cog):
                 time_data = datetime.fromtimestamp(scorer['completion_time']).strftime("%b.%d %I:%M %p")
                 codeblock += f"[{scorer['member_name']}] {time_data}\n"
 
-            codeblock += "```"
-            await ctx.send(codeblock)
+            await ctx.send(codeblock + "```")
             return
 
     @in_month(Month.DECEMBER)

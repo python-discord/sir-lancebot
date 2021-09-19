@@ -127,7 +127,7 @@ def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
                 per_day_star_stats[f"{day}-{star}"].append(
                     {'completion_time': completion_time_raw, 'member_name': name}
                 )
-    for key in per_day_star_stats.keys():
+    for key in per_day_star_stats:
         per_day_star_stats[key] = sorted(per_day_star_stats[key], key=operator.itemgetter('completion_time'))
 
     # Now that we have a transposed dataset that holds the completion time of all
@@ -158,7 +158,7 @@ def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
         # this data to JSON in order to cache it in Redis.
         daily_stats[day] = {"star_one": star_one, "star_two": star_two}
 
-        return {"daily_stats": daily_stats, "leaderboard": sorted_leaderboard, 'per_day_and_star': per_day_star_stats}
+    return {"daily_stats": daily_stats, "leaderboard": sorted_leaderboard, 'per_day_and_star': per_day_star_stats}
 
 
 def _format_leaderboard(leaderboard: dict[str, dict]) -> str:
