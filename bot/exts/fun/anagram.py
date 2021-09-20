@@ -15,7 +15,8 @@ log = logging.getLogger(__name__)
 TIME_LIMIT = 60
 
 # Issue with the json file , gotta try it on local environment first
-ANAGRAMS_ALL = json.loads(Path("bot/resources/fun/anagram.json").read_text("utf8"))
+with open(Path("bot/resources/fun/anagram.json")) as f:
+    ANAGRAMS_ALL = json.loads(f.read_text("utf8"))
 
 
 class Anagram(commands.Cog):
