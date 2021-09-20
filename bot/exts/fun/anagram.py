@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 
 TIME_LIMIT = 60
 
-# Issue with the json file , gotta try it on local environment first
+# anagram.json file contains all the anagrams
 with open(Path("bot/resources/fun/anagram.json")) as f:
     ANAGRAMS_ALL = json.loads(f.read_text("utf8"))
 
@@ -33,7 +33,12 @@ class Anagram(commands.Cog):
         """
         Given shuffled letters which can be rearranged to form Anagrams.
 
-        If this works correctly will update this more in detail
+        It has code for anagram game command. Users can play the game by using ".anagram" command,
+        it will show an embed with scrambled letters which if rearranged can form words.
+        It selects random choices from a json file which has all the anagrams possible from popular English words.
+        After 60 seconds if anyone has provided a correct answer in channel,
+        it will list out the winner's name and if nobody gets its correct
+        then all the correct answers will be displayed after a minute.
         """
         if self.current_channel:
             await ctx.send(f"An anagram is already being solved in {self.current_channel.mention}!")
@@ -44,7 +49,7 @@ class Anagram(commands.Cog):
             await ctx.send(
                 embed=discord.Embed(
                     title=random.choice(NEGATIVE_REPLIES),
-                    description="You can't start riddles in DMs",
+                    description="You can't start anagram command in DMs",
                     colour=discord.Colour.red()
                 )
             )
@@ -52,14 +57,11 @@ class Anagram(commands.Cog):
 
         self.current_channel = ctx.channel
 
-        anagram_letters, anagram_answers = random.choice(list(ANAGRAMS_ALL.items()))
-        scrambled_letters = anagram_letters
-        self.correct = anagram_answers
+        scrambled_letters, self.correct = random.choice(list(ANAGRAMS_ALL.items()))
 
-        embed_title = f"Find anagrams from these letters '{scrambled_letters.upper()}'"
-        embed_description = f"You have {TIME_LIMIT} seconds to find all words."
-
-        anagram_embed = discord.Embed(title=embed_title, description=embed_description, colour=Colours.purple)
+        anagram_embed = discord.Embed(title=f"Find anagrams from these letters '{scrambled_letters.upper()}'",
+                                      description=f"You have {TIME_LIMIT} seconds to find correct words.",
+                                      colour=Colours.purple)
 
         await ctx.send(embed=anagram_embed)
         await asyncio.sleep(TIME_LIMIT)
@@ -71,7 +73,7 @@ class Anagram(commands.Cog):
             content = "Nobody got it right."
 
         answer_embed = discord.Embed(
-            title=f"The words were:  `{'`, `'.join(anagram_answers)}`!",
+            title=f"The words were:  `{'`, `'.join(self.correct)}`!",
             colour=Colours.pink
         )
 
