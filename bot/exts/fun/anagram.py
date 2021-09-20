@@ -65,7 +65,7 @@ class Anagram(commands.Cog):
         await asyncio.sleep(TIME_LIMIT)
 
         if self.winners:
-            win_list = " ".join(self.winners)
+            win_list = ", ".join(self.winners)
             content = f"Well done {win_list} for getting it right!"
         else:
             content = "Nobody got it right."
