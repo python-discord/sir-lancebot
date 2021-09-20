@@ -43,6 +43,7 @@ class Quackstack(commands.Cog):
                 # We just need to turn the string into an integer any way possible
                 seed = int.from_bytes(seed.encode(), "big")
             params["seed"] = seed
+
         async with self.bot.http_session.get(quackstack_url, params=params) as response:
             error_embed = discord.Embed(
                 title=random.choice(NEGATIVE_REPLIES),
