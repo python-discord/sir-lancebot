@@ -54,6 +54,7 @@ class Quackstack(commands.Cog):
                 log.error(f"Response to Quackstack returned code {response.status}")
                 await ctx.send(embed=error_embed)
                 return
+
             data = await response.json()
             file = data["file"]
 
