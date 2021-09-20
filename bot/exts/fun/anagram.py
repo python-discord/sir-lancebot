@@ -71,7 +71,7 @@ class Anagram(commands.Cog):
             content = "Nobody got it right."
 
         answer_embed = discord.Embed(
-            title=f"The words were :  {', '.join(anagram_answers)}!",
+            title=f"The words were:  `{'`, `'.join(anagram_answers)}`!",
             colour=Colours.pink
         )
 
