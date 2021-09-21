@@ -52,10 +52,10 @@ class HacktoberIssues(commands.Cog):
     async def get_issues(self, ctx: commands.Context, option: str) -> Optional[dict]:
         """Get a list of the python issues with the label 'hacktoberfest' from the Github api."""
         if option == "beginner":
-            if (ctx.message.created_at - self.cache_timer_beginner).seconds <= 60:
+            if (ctx.message.created_at.replace(tzinfo=None) - self.cache_timer_beginner).seconds <= 60:
                 log.debug("using cache")
                 return self.cache_beginner
-        elif (ctx.message.created_at - self.cache_timer_normal).seconds <= 60:
+        elif (ctx.message.created_at.replace(tzinfo=None) - self.cache_timer_normal).seconds <= 60:
             log.debug("using cache")
             return self.cache_normal
 
