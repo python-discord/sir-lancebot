@@ -1,15 +1,15 @@
-import re
 import random
+import re
 from functools import partial
-
-from bot.utils import helpers
-
-from bot.bot import Bot
-
-from bot.exts.fun.fun import Fun
+from typing import Callable
 
 from discord.ext import commands
 from discord.ext.commands import Cog, Context, clean_content
+
+from bot.bot import Bot
+from bot.exts.fun.fun import Fun
+from bot.utils import helpers
+
 
 # Wepwacement
 WEPWACE_HASH = {
@@ -63,14 +63,14 @@ EMOJI_LUT = [
 wepwace_regex = re.compile(r"(?<![w])[lr](?![w])")
 
 
-def word_replace(input_string: str) -> str:
+def _word_replace(input_string: str) -> str:
     for word in WEPWACE_HASH:
         input_string = input_string.replace(word, WEPWACE_HASH[word])
 
     return input_string
 
 
-def char_replace(input_string: str) -> str:
+def _char_replace(input_string: str) -> str:
     return wepwace_regex.sub("w", input_string)
 
 
@@ -79,11 +79,11 @@ stutter_regex = re.compile(r"(\s)([a-zA-Z])")
 stutter_subst = "\\g<1>\\g<2>-\\g<2>"
 
 
-def stutter(strength: float, input_string: str):
-    return stutter_regex.sub(partial(stutter_replace, strength=strength), input_string, 0)
+def _stutter(strength: float, input_string: str) -> str:
+    return stutter_regex.sub(partial(_stutter_replace, strength=strength), input_string, 0)
 
 
-def stutter_replace(match, strength=0.0):
+def _stutter_replace(match: Callable, strength: float = 0.0) -> str:
     match_string = match.string[slice(*match.span())]
     if random.random() < strength:
         char = match_string[-1]
@@ -96,7 +96,7 @@ nya_regex = re.compile(r"n([aeou])([^aeiou])")
 nya_subst = "ny\\g<1>\\g<2>"
 
 
-def nyaify(input_string):
+def _nyaify(input_string: str) -> str:
     return nya_regex.sub(nya_subst, input_string, 0)
 
 
@@ -104,11 +104,11 @@ def nyaify(input_string):
 punctuation_regex = re.compile(r"\s+")
 
 
-def emoji(strength: float, input_string: str):
-    return punctuation_regex.sub(partial(emoji_replace, strength=strength), input_string, 0)
+def _emoji(strength: float, input_string: str) -> str:
+    return punctuation_regex.sub(partial(_emoji_replace, strength=strength), input_string, 0)
 
 
-def emoji_replace(match, strength=0.0):
+def _emoji_replace(match: Callable, strength: float = 0.0) -> str:
     match_string = match.string[slice(*match.span())]
     if random.random() < strength:
         return f" {EMOJI_LUT[random.randint(0, len(EMOJI_LUT) - 1)]} "
@@ -118,20 +118,19 @@ def emoji_replace(match, strength=0.0):
 
 # Main
 
-def uwuify(input_string: str, *, stutter_strength: float = 0.2, emoji_strength: float = 0.2) -> str:
+def _uwuify(input_string: str, *, stutter_strength: float = 0.2, emoji_strength: float = 0.2) -> str:
     input_string = input_string.lower()
-    input_string = word_replace(input_string)
-    input_string = nyaify(input_string)
-    input_string = char_replace(input_string)
-    input_string = stutter(stutter_strength, input_string)
-    input_string = emoji(emoji_strength, input_string)
+    input_string = _word_replace(input_string)
+    input_string = _nyaify(input_string)
+    input_string = _char_replace(input_string)
+    input_string = _stutter(stutter_strength, input_string)
+    input_string = _emoji(emoji_strength, input_string)
     return input_string
 
 
 class Uwu(Cog):
-    """
-    Cog for uwuification.
-    """
+    """Cog for uwuification."""
+
     def __init__(self, bot: Bot):
         self.bot = bot
 
@@ -141,8 +140,8 @@ class Uwu(Cog):
         text, embed = await Fun._get_text_and_embed(ctx, text)
         # Convert embed if it exists
         if embed is not None:
-            embed = Fun._convert_embed(uwuify, embed)
-        converted_text = uwuify(text)
+            embed = Fun._convert_embed(_uwuify, embed)
+        converted_text = _uwuify(text)
         converted_text = helpers.suppress_links(converted_text)
         # Don't put >>> if only embed present
         if converted_text:
