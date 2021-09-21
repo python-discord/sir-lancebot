@@ -50,7 +50,7 @@ class Anagram(commands.Cog):
                 embed=discord.Embed(
                     title=random.choice(NEGATIVE_REPLIES),
                     description="You can't start anagram command in DMs",
-                    colour=discord.Colour.red()
+                    colour=discord.Colour.red(),
                 )
             )
             return
@@ -59,9 +59,11 @@ class Anagram(commands.Cog):
 
         scrambled_letters, self.correct = random.choice(list(ANAGRAMS_ALL.items()))
 
-        anagram_embed = discord.Embed(title=f"Find anagrams from these letters '{scrambled_letters.upper()}'",
-                                      description=f"You have {TIME_LIMIT} seconds to find correct words.",
-                                      colour=Colours.purple)
+        anagram_embed = discord.Embed(
+            title=f"Find anagrams from these letters '{scrambled_letters.upper()}'",
+            description=f"You have {TIME_LIMIT} seconds to find correct words.",
+            colour=Colours.purple,
+        )
 
         await ctx.send(embed=anagram_embed)
         await asyncio.sleep(TIME_LIMIT)
@@ -74,7 +76,7 @@ class Anagram(commands.Cog):
 
         answer_embed = discord.Embed(
             title=f"The words were:  `{'`, `'.join(self.correct)}`!",
-            colour=Colours.pink
+            colour=Colours.pink,
         )
 
         await ctx.send(content, embed=answer_embed)
