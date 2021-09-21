@@ -62,7 +62,7 @@ class Quackstack(commands.Cog):
             title=f"Quack! Here's a {ducktype} for you.",
             color=Colours.grass_green,
         )
-        
+
         embed.set_footer(text=f"A {ducktype} from [Quackstack]({API_URL}/docs).")
 
         embed.set_image(url=API_URL + file)
