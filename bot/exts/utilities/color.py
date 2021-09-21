@@ -293,8 +293,7 @@ class Color(commands.Cog):
         r = int(r * 255)
         g = int(g * 255)
         b = int(b * 255)
-        rgb_color = (r, g, b)
-        return rgb_color
+        return r, g, b
 
     @staticmethod
     def hsl_to_rgb(input_color: tuple[int, int, int]) -> tuple[int, int, int]:
@@ -308,8 +307,7 @@ class Color(commands.Cog):
         r = int(r * 255)
         g = int(g * 255)
         b = int(b * 255)
-        rgb_color = (r, g, b)
-        return rgb_color
+        return r, g, b
 
     @staticmethod
     def cmyk_to_rgb(input_color: tuple[int, int, int, int]) -> tuple[int, int, int]:
@@ -321,8 +319,7 @@ class Color(commands.Cog):
         r = int(255 * (1.0 - c / float(100)) * (1.0 - k / float(100)))
         g = int(255 * (1.0 - m / float(100)) * (1.0 - k / float(100)))
         b = int(255 * (1.0 - y / float(100)) * (1.0 - k / float(100)))
-        rgb_color = (r, g, b)
-        return rgb_color
+        return r, g, b
 
 
 def setup(bot: Bot) -> None:
