@@ -1,4 +1,3 @@
-import functools
 import json
 import logging
 import random
@@ -10,12 +9,12 @@ from discord import Embed, Message
 from discord.ext import commands
 from discord.ext.commands import BadArgument, Cog, Context, MessageConverter, clean_content
 
-from bot import utils
 from bot.bot import Bot
 from bot.constants import Client, Colours, Emojis
 from bot.utils import helpers
 
 log = logging.getLogger(__name__)
+
 
 def caesar_cipher(text: str, offset: int) -> Iterable[str]:
     """
