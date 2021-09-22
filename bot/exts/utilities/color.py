@@ -29,7 +29,6 @@ with open(COLOR_JSON_PATH) as f:
     COLOR_MAPPING = json.load(f)
 
 
-# define color command
 class Color(commands.Cog):
     """User initiated commands to receive color information."""
 
@@ -45,7 +44,6 @@ class Color(commands.Cog):
         """
         logger.debug(f"{mode = }")
         logger.debug(f"{user_color = }")
-        color_name = None
         if mode.lower() == "hex":
             self.hex_to_rgb(ctx, user_color)
         elif mode.lower() == "rgb":
@@ -235,11 +233,6 @@ class Color(commands.Cog):
             l = round(l * 100)  # noqa: E741 It's little `L`, Reason: To maintain consistency.
             return h, s, l
 
-        hex_color = _rgb_to_hex(rgb_color)
-        cmyk_color = _rgb_to_cmyk(rgb_color)
-        hsv_color = _rgb_to_hsv(rgb_color)
-        hsl_color = _rgb_to_hsl(rgb_color)
-
         all_fields = [
             {
                 "name": "RGB",
@@ -247,19 +240,19 @@ class Color(commands.Cog):
             },
             {
                 "name": "HEX",
-                "value": f"» hex {hex_color}"
+                "value": f"» hex {_rgb_to_hex(rgb_color)}"
             },
             {
                 "name": "CMYK",
-                "value": f"» cmyk {cmyk_color}"
+                "value": f"» cmyk {_rgb_to_cmyk(rgb_color)}"
             },
             {
                 "name": "HSV",
-                "value": f"» hsv {hsv_color}"
+                "value": f"» hsv {_rgb_to_hsv(rgb_color)}"
             },
             {
                 "name": "HSL",
-                "value": f"» hsl {hsl_color}"
+                "value": f"» hsl {_rgb_to_hsl(rgb_color)}"
             },
         ]
 
@@ -277,11 +270,11 @@ class Color(commands.Cog):
             logger.debug(f"{match = }, {certainty = }")
             hex_match = COLOR_MAPPING[match]
             logger.debug(f"{hex_match = }")
-            return match, hex_match
         except TypeError:
             match = "No color name match found."
             hex_match = input_color_name
-            return match, hex_match
+
+        return match, hex_match
 
     @staticmethod
     def match_color_hex(input_hex_color: str) -> str:
@@ -295,10 +288,10 @@ class Color(commands.Cog):
             logger.debug(f"{match = }, {certainty = }")
             color_name = [name for name, _ in COLOR_MAPPING.items() if _ == match][0]
             logger.debug(f"{color_name = }")
-            return color_name
         except TypeError:
             color_name = "No color name match found."
-            return color_name
+
+        return color_name
 
     async def color_embed(
         self,
