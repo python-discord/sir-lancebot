@@ -324,9 +324,8 @@ class Color(commands.Cog):
 
             file = await self.create_thumbnail_attachment(rgb_color)
             main_embed.set_thumbnail(url="attachment://color.png")
-            fields = self.get_color_fields(rgb_color)
 
-            for field in fields:
+            for field in all_colors:
                 main_embed.add_field(
                     name=field['name'],
                     value=field['value'],
