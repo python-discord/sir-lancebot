@@ -13,9 +13,9 @@ from bot.constants import (
     AdventOfCode as AocConfig, Channels, Colours, Emojis, Month, Roles, WHITELISTED_CHANNELS,
 )
 from bot.exts.events.advent_of_code import _helpers
+from bot.exts.events.advent_of_code.views.dayandstarview import AoCDropdownView
 from bot.utils.decorators import InChannelCheckFailure, in_month, whitelist_override, with_role
 from bot.utils.extensions import invoke_help_command
-
 log = logging.getLogger(__name__)
 
 AOC_REQUEST_HEADER = {"user-agent": "PythonDiscord AoC Event Bot"}
@@ -25,6 +25,7 @@ AOC_WHITELIST_RESTRICTED = WHITELISTED_CHANNELS + (Channels.advent_of_code_comma
 # Some commands can be run in the regular advent of code channel
 # They aren't spammy and foster discussion
 AOC_WHITELIST = AOC_WHITELIST_RESTRICTED + (Channels.advent_of_code,)
+AOC_DAY_ANDSTAR_TEMPLATE = "{rank: >4} | {name:25.25} | {completion_time: >10}"
 
 
 class AdventOfCode(commands.Cog):
@@ -189,7 +190,7 @@ class AdventOfCode(commands.Cog):
     async def aoc_leaderboard(
             self,
             ctx: commands.Context,
-            day_and_star: Optional[str] = None,
+            day_and_star: Optional[bool] = False,
             maximum_scorers: Optional[int] = 10
     ) -> None:
         """
@@ -221,24 +222,16 @@ class AdventOfCode(commands.Cog):
                 return
 
             # This is a dictionary that contains solvers in respect of day, and star.
-            # e.g. 1-1 will fetch the solvers of the first star of the first day and their completion time
+            # e.g. 1-1 means the solvers of the first star of the first day and their completion time
             per_day_and_star = json.loads(leaderboard['leaderboard_per_day_and_star'])
-            try:
-                scorers = per_day_and_star[day_and_star][:maximum_scorers]
-            except KeyError:
-                raise commands.BadArgument(
-                    "Day and star format has a notation of 'day-star' day being 1 to 25, and star is either 1 or "
-                    "2 (e.g. 3-1) "
+            await ctx.send(
+                content="Please select a day and a star to filter by!",
+                view=AoCDropdownView(
+                    day_and_star_data=per_day_and_star,
+                    maximum_scorers=maximum_scorers,
+                    original_author=ctx.author
                 )
-
-            day, star = day_and_star.split("-")
-            codeblock = f"```csharp\nTop scorers for day {day}, star {star} in UTC timezone\n"
-
-            for scorer in scorers:
-                time_data = datetime.fromtimestamp(scorer['completion_time']).strftime("%b.%d %I:%M %p")
-                codeblock += f"[{scorer['member_name']}] {time_data}\n"
-
-            await ctx.send(codeblock + "```")
+            )
             return
 
     @in_month(Month.DECEMBER)
