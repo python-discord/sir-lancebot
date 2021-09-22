@@ -47,35 +47,16 @@ class Color(commands.Cog):
         logger.debug(f"{user_color = }")
         color_name = None
         if mode.lower() == "hex":
-            hex_match = re.fullmatch(r"(#?[0x]?)((?:[0-9a-fA-F]{3}){1,2})", user_color)
-            if hex_match:
-                hex_color = int(hex(int(user_color.replace("#", ""), 16)), 0)
-                if "#" in user_color:
-                    rgb_color = ImageColor.getcolor(user_color, "RGB")
-                elif "0x" in user_color:
-                    hex_ = user_color.replace("0x", "#")
-                    rgb_color = ImageColor.getcolor(hex_, "RGB")
-                else:
-                    hex_ = "#" + user_color
-                    rgb_color = ImageColor.getcolor(hex_, "RGB")
-            else:
-                await ctx.send(
-                    embed=Embed(
-                        title="There was an issue converting the hex color code.",
-                        description=ERROR_MSG.format(user_color=user_color),
-                    )
-                )
+            self.hex_to_rgb(ctx, user_color)
         elif mode.lower() == "rgb":
             rgb_color = self.tuple_create(user_color)
+            self.embed_color(rgb_color)
         elif mode.lower() == "hsv":
-            hsv_temp = self.tuple_create(user_color)
-            rgb_color = self.hsv_to_rgb(hsv_temp)
+            self.hsv_to_rgb(user_color)
         elif mode.lower() == "hsl":
-            hsl_temp = self.tuple_create(user_color)
-            rgb_color = self.hsl_to_rgb(hsl_temp)
+            self.hsl_to_rgb(user_color)
         elif mode.lower() == "cmyk":
-            cmyk_temp = self.tuple_create(user_color)
-            rgb_color = self.cmyk_to_rgb(cmyk_temp)
+            self.cmyk_to_rgb(user_color)
         elif mode.lower() == "name":
             color_name, hex_color = self.match_color_name(user_color)
             if "#" in hex_color:
@@ -100,6 +81,13 @@ class Color(commands.Cog):
             await ctx.send(embed=wrong_mode_embed)
             return
 
+    async def color_embed(
+        self,
+        ctx: commands.Context,
+        rgb_color: tuple[int, int, int],
+        color_name: str = None
+    ) -> None:
+        """Take a RGB color tuple, create embed, and send."""
         (r, g, b) = rgb_color
         discord_rgb_int = int(f"{r:02x}{g:02x}{b:02x}", 16)
         all_colors = self.get_color_fields(rgb_color)
@@ -281,9 +269,9 @@ class Color(commands.Cog):
             color_tuple = tuple(map(int, input_color.split(" ")))
         return color_tuple
 
-    @staticmethod
-    def hsv_to_rgb(input_color: tuple[int, int, int]) -> tuple[int, int, int]:
-        """Function to convert hsv color to rgb color."""
+    def hsv_to_rgb(self, input_color: tuple[int, int, int]) -> tuple[int, int, int]:
+        """Function to convert hsv color to rgb color and send main embed.."""
+        input_color = self.tuple_create(input_color)
         (h, v, s) = input_color  # the function hsv_to_rgb expects v and s to be swapped
         h = h / 360
         s = s / 100
@@ -293,11 +281,11 @@ class Color(commands.Cog):
         r = int(r * 255)
         g = int(g * 255)
         b = int(b * 255)
-        return r, g, b
+        self.color_embed((r, g, b))
 
-    @staticmethod
-    def hsl_to_rgb(input_color: tuple[int, int, int]) -> tuple[int, int, int]:
-        """Function to convert hsl color to rgb color."""
+    def hsl_to_rgb(self, input_color: tuple[int, int, int]) -> tuple[int, int, int]:
+        """Function to convert hsl color to rgb color and send main embed.."""
+        input_color = self.tuple_create(input_color)
         (h, s, l) = input_color
         h = h / 360
         s = s / 100
@@ -307,11 +295,11 @@ class Color(commands.Cog):
         r = int(r * 255)
         g = int(g * 255)
         b = int(b * 255)
-        return r, g, b
+        self.color_embed((r, g, b))
 
-    @staticmethod
-    def cmyk_to_rgb(input_color: tuple[int, int, int, int]) -> tuple[int, int, int]:
-        """Function to convert cmyk color to rgb color."""
+    def cmyk_to_rgb(self, input_color: tuple[int, int, int, int]) -> tuple[int, int, int]:
+        """Function to convert cmyk color to rgb color and send main embed.."""
+        input_color = self.tuple_create(input_color)
         c = input_color[0]
         m = input_color[1]
         y = input_color[2]
@@ -319,7 +307,28 @@ class Color(commands.Cog):
         r = int(255 * (1.0 - c / float(100)) * (1.0 - k / float(100)))
         g = int(255 * (1.0 - m / float(100)) * (1.0 - k / float(100)))
         b = int(255 * (1.0 - y / float(100)) * (1.0 - k / float(100)))
-        return r, g, b
+        self.color_embed((r, g, b))
+
+    async def hex_to_rgb(self, ctx: commands.Context, hex_string: str) -> None:
+        """Create rgb color from hex string and send main embed."""
+        hex_match = re.fullmatch(r"(#?[0x]?)((?:[0-9a-fA-F]{3}){1,2})", hex_string)
+        if hex_match:
+            if "#" in hex_string:
+                rgb_color = ImageColor.getcolor(hex_string, "RGB")
+            elif "0x" in hex_string:
+                hex_ = hex_string.replace("0x", "#")
+                rgb_color = ImageColor.getcolor(hex_, "RGB")
+            else:
+                hex_ = "#" + hex_string
+                rgb_color = ImageColor.getcolor(hex_, "RGB")
+            self.color_embed(rgb_color)
+        else:
+            await ctx.send(
+                embed=Embed(
+                    title="There was an issue converting the hex color code.",
+                    description=ERROR_MSG.format(user_color=hex_string),
+                )
+            )
 
 
 def setup(bot: Bot) -> None:
