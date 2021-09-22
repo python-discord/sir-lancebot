@@ -50,19 +50,20 @@ class Color(commands.Cog):
             self.hex_to_rgb(ctx, user_color)
         elif mode.lower() == "rgb":
             rgb_color = self.tuple_create(user_color)
-            self.embed_color(rgb_color)
+            self.color_embed(ctx, rgb_color)
         elif mode.lower() == "hsv":
-            self.hsv_to_rgb(user_color)
+            self.hsv_to_rgb(ctx, user_color)
         elif mode.lower() == "hsl":
-            self.hsl_to_rgb(user_color)
+            self.hsl_to_rgb(ctx, user_color)
         elif mode.lower() == "cmyk":
-            self.cmyk_to_rgb(user_color)
+            self.cmyk_to_rgb(ctx, user_color)
         elif mode.lower() == "name":
             color_name, hex_color = self.match_color_name(user_color)
             if "#" in hex_color:
                 rgb_color = ImageColor.getcolor(hex_color, "RGB")
             else:
                 rgb_color = ImageColor.getcolor("#" + hex_color, "RGB")
+            self.color_embed(ctx, rgb_color, color_name)
         else:
             # mode is either None or an invalid code
             if mode is None:
@@ -81,44 +82,94 @@ class Color(commands.Cog):
             await ctx.send(embed=wrong_mode_embed)
             return
 
-    async def color_embed(
-        self,
-        ctx: commands.Context,
-        rgb_color: tuple[int, int, int],
-        color_name: str = None
-    ) -> None:
-        """Take a RGB color tuple, create embed, and send."""
-        (r, g, b) = rgb_color
-        discord_rgb_int = int(f"{r:02x}{g:02x}{b:02x}", 16)
-        all_colors = self.get_color_fields(rgb_color)
-        hex_color = all_colors[1]["value"].replace("» hex ", "")
-        if color_name is None:
-            logger.debug(f"Find color name from hex color: {hex_color}")
-            color_name = self.match_color_hex(hex_color)
+    @staticmethod
+    def tuple_create(input_color: str) -> tuple[int, int, int]:
+        """
+        Create a tuple of integers based on user's input.
 
-        async with ctx.typing():
-            main_embed = Embed(
-                title=color_name,
-                description='(Approx..)',
-                color=discord_rgb_int,
+        Can handle inputs of the types:
+        (100, 100, 100)
+        100, 100, 100
+        100 100 100
+        """
+        if "(" in input_color:
+            remove = "[() ]"
+            color_tuple = re.sub(remove, "", input_color)
+            color_tuple = tuple(map(int, color_tuple.split(",")))
+        elif "," in input_color:
+            color_tuple = tuple(map(int, input_color.split(",")))
+        else:
+            color_tuple = tuple(map(int, input_color.split(" ")))
+        return color_tuple
+
+    async def hex_to_rgb(self, ctx: commands.Context, hex_string: str) -> None:
+        """Function to convert hex color to rgb color and send main embed."""
+        hex_match = re.fullmatch(r"(#?[0x]?)((?:[0-9a-fA-F]{3}){1,2})", hex_string)
+        if hex_match:
+            if "#" in hex_string:
+                rgb_color = ImageColor.getcolor(hex_string, "RGB")
+            elif "0x" in hex_string:
+                hex_ = hex_string.replace("0x", "#")
+                rgb_color = ImageColor.getcolor(hex_, "RGB")
+            else:
+                hex_ = "#" + hex_string
+                rgb_color = ImageColor.getcolor(hex_, "RGB")
+            self.color_embed(rgb_color)
+        else:
+            await ctx.send(
+                embed=Embed(
+                    title="There was an issue converting the hex color code.",
+                    description=ERROR_MSG.format(user_color=hex_string),
+                )
             )
 
-            file = await self.create_thumbnail_attachment(rgb_color)
-            main_embed.set_thumbnail(url="attachment://color.png")
-            fields = self.get_color_fields(rgb_color)
+    def hsv_to_rgb(self, input_color: tuple[int, int, int]) -> tuple[int, int, int]:
+        """Function to convert hsv color to rgb color and send main embed."""
+        input_color = self.tuple_create(input_color)
+        (h, v, s) = input_color  # the function hsv_to_rgb expects v and s to be swapped
+        h = h / 360
+        s = s / 100
+        v = v / 100
+        rgb_color = colorsys.hsv_to_rgb(h, s, v)
+        (r, g, b) = rgb_color
+        r = int(r * 255)
+        g = int(g * 255)
+        b = int(b * 255)
+        self.color_embed((r, g, b))
 
-            for field in fields:
-                main_embed.add_field(
-                    name=field['name'],
-                    value=field['value'],
-                    inline=False,
-                )
+    def hsl_to_rgb(self, input_color: tuple[int, int, int]) -> tuple[int, int, int]:
+        """Function to convert hsl color to rgb color and send main embed."""
+        input_color = self.tuple_create(input_color)
+        (h, s, l) = input_color
+        h = h / 360
+        s = s / 100
+        l = l / 100  # noqa: E741 It's little `L`, Reason: To maintain consistency.
+        rgb_color = colorsys.hls_to_rgb(h, l, s)
+        (r, g, b) = rgb_color
+        r = int(r * 255)
+        g = int(g * 255)
+        b = int(b * 255)
+        self.color_embed((r, g, b))
 
-            await ctx.send(file=file, embed=main_embed)
+    def cmyk_to_rgb(self, input_color: tuple[int, int, int, int]) -> tuple[int, int, int]:
+        """Function to convert cmyk color to rgb color and send main embed."""
+        input_color = self.tuple_create(input_color)
+        c = input_color[0]
+        m = input_color[1]
+        y = input_color[2]
+        k = input_color[3]
+        r = int(255 * (1.0 - c / float(100)) * (1.0 - k / float(100)))
+        g = int(255 * (1.0 - m / float(100)) * (1.0 - k / float(100)))
+        b = int(255 * (1.0 - y / float(100)) * (1.0 - k / float(100)))
+        self.color_embed((r, g, b))
 
     @staticmethod
-    async def create_thumbnail_attachment(color: str) -> File:
-        """Generate a thumbnail from `color`."""
+    async def create_thumbnail_attachment(color: tuple[int, int, int]) -> File:
+        """
+        Generate a thumbnail from `color`.
+
+        Assumes that color is an rgb tuple.
+        """
         thumbnail = Image.new("RGB", (100, 100), color=color)
         bufferedio = BytesIO()
         thumbnail.save(bufferedio, format="PNG")
@@ -249,86 +300,40 @@ class Color(commands.Cog):
             color_name = "No color name match found."
             return color_name
 
-    @staticmethod
-    def tuple_create(input_color: str) -> tuple[int, int, int]:
-        """
-        Create a tuple of integers based on user's input.
-
-        Can handle inputs of the types:
-        (100, 100, 100)
-        100, 100, 100
-        100 100 100
-        """
-        if "(" in input_color:
-            remove = "[() ]"
-            color_tuple = re.sub(remove, "", input_color)
-            color_tuple = tuple(map(int, color_tuple.split(",")))
-        elif "," in input_color:
-            color_tuple = tuple(map(int, input_color.split(",")))
-        else:
-            color_tuple = tuple(map(int, input_color.split(" ")))
-        return color_tuple
-
-    def hsv_to_rgb(self, input_color: tuple[int, int, int]) -> tuple[int, int, int]:
-        """Function to convert hsv color to rgb color and send main embed.."""
-        input_color = self.tuple_create(input_color)
-        (h, v, s) = input_color  # the function hsv_to_rgb expects v and s to be swapped
-        h = h / 360
-        s = s / 100
-        v = v / 100
-        rgb_color = colorsys.hsv_to_rgb(h, s, v)
+    async def color_embed(
+        self,
+        ctx: commands.Context,
+        rgb_color: tuple[int, int, int],
+        color_name: str = None
+    ) -> None:
+        """Take a RGB color tuple, create embed, and send."""
         (r, g, b) = rgb_color
-        r = int(r * 255)
-        g = int(g * 255)
-        b = int(b * 255)
-        self.color_embed((r, g, b))
+        discord_rgb_int = int(f"{r:02x}{g:02x}{b:02x}", 16)
+        all_colors = self.get_color_fields(rgb_color)
+        hex_color = all_colors[1]["value"].replace("» hex ", "")
+        if color_name is None:
+            logger.debug(f"Find color name from hex color: {hex_color}")
+            color_name = self.match_color_hex(hex_color)
 
-    def hsl_to_rgb(self, input_color: tuple[int, int, int]) -> tuple[int, int, int]:
-        """Function to convert hsl color to rgb color and send main embed.."""
-        input_color = self.tuple_create(input_color)
-        (h, s, l) = input_color
-        h = h / 360
-        s = s / 100
-        l = l / 100  # noqa: E741 It's little `L`, Reason: To maintain consistency.
-        rgb_color = colorsys.hls_to_rgb(h, l, s)
-        (r, g, b) = rgb_color
-        r = int(r * 255)
-        g = int(g * 255)
-        b = int(b * 255)
-        self.color_embed((r, g, b))
-
-    def cmyk_to_rgb(self, input_color: tuple[int, int, int, int]) -> tuple[int, int, int]:
-        """Function to convert cmyk color to rgb color and send main embed.."""
-        input_color = self.tuple_create(input_color)
-        c = input_color[0]
-        m = input_color[1]
-        y = input_color[2]
-        k = input_color[3]
-        r = int(255 * (1.0 - c / float(100)) * (1.0 - k / float(100)))
-        g = int(255 * (1.0 - m / float(100)) * (1.0 - k / float(100)))
-        b = int(255 * (1.0 - y / float(100)) * (1.0 - k / float(100)))
-        self.color_embed((r, g, b))
-
-    async def hex_to_rgb(self, ctx: commands.Context, hex_string: str) -> None:
-        """Create rgb color from hex string and send main embed."""
-        hex_match = re.fullmatch(r"(#?[0x]?)((?:[0-9a-fA-F]{3}){1,2})", hex_string)
-        if hex_match:
-            if "#" in hex_string:
-                rgb_color = ImageColor.getcolor(hex_string, "RGB")
-            elif "0x" in hex_string:
-                hex_ = hex_string.replace("0x", "#")
-                rgb_color = ImageColor.getcolor(hex_, "RGB")
-            else:
-                hex_ = "#" + hex_string
-                rgb_color = ImageColor.getcolor(hex_, "RGB")
-            self.color_embed(rgb_color)
-        else:
-            await ctx.send(
-                embed=Embed(
-                    title="There was an issue converting the hex color code.",
-                    description=ERROR_MSG.format(user_color=hex_string),
-                )
+        async with ctx.typing():
+            main_embed = Embed(
+                title=color_name,
+                description='(Approx..)',
+                color=discord_rgb_int,
             )
+
+            file = await self.create_thumbnail_attachment(rgb_color)
+            main_embed.set_thumbnail(url="attachment://color.png")
+            fields = self.get_color_fields(rgb_color)
+
+            for field in fields:
+                main_embed.add_field(
+                    name=field['name'],
+                    value=field['value'],
+                    inline=False,
+                )
+
+            await ctx.send(file=file, embed=main_embed)
 
 
 def setup(bot: Bot) -> None:
