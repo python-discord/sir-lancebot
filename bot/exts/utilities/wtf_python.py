@@ -124,7 +124,7 @@ class WTFPython(commands.Cog):
     @commands.command(aliases=("wtf", "WTF"))
     async def wtf_python(self, ctx: commands.Context, *, query: str) -> None:
         """
-        Search WTF python.
+        Search WTF Python repository.
 
         Gets the link of the fuzzy matched query from https://github.com/satwikkansal/wtfpython.
         Usage:
