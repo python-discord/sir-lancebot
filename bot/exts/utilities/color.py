@@ -45,23 +45,23 @@ class Color(commands.Cog):
         logger.debug(f"{mode = }")
         logger.debug(f"{user_color = }")
         if mode.lower() == "hex":
-            self.hex_to_rgb(ctx, user_color)
+            await self.hex_to_rgb(ctx, user_color)
         elif mode.lower() == "rgb":
             rgb_color = self.tuple_create(user_color)
-            self.color_embed(ctx, rgb_color)
+            await self.color_embed(ctx, rgb_color)
         elif mode.lower() == "hsv":
-            self.hsv_to_rgb(ctx, user_color)
+            await self.hsv_to_rgb(ctx, user_color)
         elif mode.lower() == "hsl":
-            self.hsl_to_rgb(ctx, user_color)
+            await self.hsl_to_rgb(ctx, user_color)
         elif mode.lower() == "cmyk":
-            self.cmyk_to_rgb(ctx, user_color)
+            await self.cmyk_to_rgb(ctx, user_color)
         elif mode.lower() == "name":
             color_name, hex_color = self.match_color_name(user_color)
             if "#" in hex_color:
                 rgb_color = ImageColor.getcolor(hex_color, "RGB")
             else:
                 rgb_color = ImageColor.getcolor("#" + hex_color, "RGB")
-            self.color_embed(ctx, rgb_color, color_name)
+            await self.color_embed(ctx, rgb_color, color_name)
         else:
             # mode is either None or an invalid code
             if mode is None:
@@ -112,7 +112,7 @@ class Color(commands.Cog):
             else:
                 hex_ = "#" + hex_string
                 rgb_color = ImageColor.getcolor(hex_, "RGB")
-            self.color_embed(rgb_color)
+            await self.color_embed(ctx, rgb_color)
         else:
             await ctx.send(
                 embed=Embed(
@@ -121,7 +121,7 @@ class Color(commands.Cog):
                 )
             )
 
-    def hsv_to_rgb(self, input_color: tuple[int, int, int]) -> tuple[int, int, int]:
+    async def hsv_to_rgb(self, ctx: commands.Context, input_color: tuple[int, int, int]) -> tuple[int, int, int]:
         """Function to convert hsv color to rgb color and send main embed."""
         input_color = self.tuple_create(input_color)
         (h, v, s) = input_color  # the function hsv_to_rgb expects v and s to be swapped
@@ -133,9 +133,9 @@ class Color(commands.Cog):
         r = int(r * 255)
         g = int(g * 255)
         b = int(b * 255)
-        self.color_embed((r, g, b))
+        await self.color_embed(ctx, (r, g, b))
 
-    def hsl_to_rgb(self, input_color: tuple[int, int, int]) -> tuple[int, int, int]:
+    async def hsl_to_rgb(self, ctx: commands.Context, input_color: tuple[int, int, int]) -> tuple[int, int, int]:
         """Function to convert hsl color to rgb color and send main embed."""
         input_color = self.tuple_create(input_color)
         (h, s, l) = input_color
@@ -147,9 +147,9 @@ class Color(commands.Cog):
         r = int(r * 255)
         g = int(g * 255)
         b = int(b * 255)
-        self.color_embed((r, g, b))
+        await self.color_embed(ctx, (r, g, b))
 
-    def cmyk_to_rgb(self, input_color: tuple[int, int, int, int]) -> tuple[int, int, int]:
+    async def cmyk_to_rgb(self, ctx: commands.Context, input_color: tuple[int, int, int, int]) -> tuple[int, int, int]:
         """Function to convert cmyk color to rgb color and send main embed."""
         input_color = self.tuple_create(input_color)
         c = input_color[0]
@@ -159,7 +159,7 @@ class Color(commands.Cog):
         r = int(255 * (1.0 - c / float(100)) * (1.0 - k / float(100)))
         g = int(255 * (1.0 - m / float(100)) * (1.0 - k / float(100)))
         b = int(255 * (1.0 - y / float(100)) * (1.0 - k / float(100)))
-        self.color_embed((r, g, b))
+        await self.color_embed(ctx, (r, g, b))
 
     @staticmethod
     async def create_thumbnail_attachment(color: tuple[int, int, int]) -> File:
