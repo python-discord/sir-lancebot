@@ -168,7 +168,7 @@ class Color(commands.Cog):
 
         Assumes that color is an rgb tuple.
         """
-        thumbnail = Image.new("RGB", (100, 100), color=color)
+        thumbnail = Image.new("RGB", (80, 80), color=color)
         bufferedio = BytesIO()
         thumbnail.save(bufferedio, format="PNG")
         bufferedio.seek(0)
