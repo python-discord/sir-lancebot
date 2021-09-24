@@ -277,7 +277,7 @@ class Challenges(commands.Cog):
             params['q'] = query
             params['r[]'] = f"-{level}"
         elif query.isnumeric():
-            params['r[]'] = query
+            params['r[]'] = f"-{query}"
         else:
             params['q'] = query
 
