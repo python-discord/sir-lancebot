@@ -1,11 +1,14 @@
+import asyncio
+from contextlib import suppress
+from functools import partial
 from pathlib import Path
 
+import discord
 import yaml
-from discord import Color, Embed
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import WHITELISTED_CHANNELS
+from bot.constants import MODERATION_ROLES, WHITELISTED_CHANNELS
 from bot.utils.decorators import whitelist_override
 from bot.utils.randomization import RandomCycle
 
@@ -35,6 +38,62 @@ TOPICS = {
 class ConvoStarters(commands.Cog):
     """General conversation topics."""
 
+    def __init__(self, bot: Bot):
+        self.bot = bot
+
+    @staticmethod
+    def _build_topic_embed(channel_id: int) -> discord.Embed:
+        """
+        Build an embed containing a conversation topic.
+
+        If in a Python channel, a python-related topic will be given.
+        Otherwise, a random conversation topic will be received by the user.
+        """
+        # No matter what, the form will be shown.
+        embed = discord.Embed(
+            description=f"Suggest more topics [here]({SUGGESTION_FORM})!",
+            color=discord.Color.blurple()
+        )
+
+        try:
+            channel_topics = TOPICS[channel_id]
+        except KeyError:
+            # Channel doesn't have any topics.
+            embed.title = f"**{next(TOPICS['default'])}**"
+        else:
+            embed.title = f"**{next(channel_topics)}**"
+        return embed
+
+    def _predicate(self, message: discord.Message, reaction: discord.Reaction, user: discord.User) -> bool:
+        right_reaction = (
+            user != self.bot.user
+            and reaction.message.id == message.id
+            and str(reaction.emoji) == "🔄"
+        )
+        if not right_reaction:
+            return False
+
+        is_moderator = any(role.id in MODERATION_ROLES for role in getattr(user, "roles", []))
+        if is_moderator or user.id == message.author.id:
+            return True
+
+        return False
+
+    async def _listen_for_refresh(self, message: discord.Message) -> None:
+        await message.add_reaction("🔄")
+        while True:
+            try:
+                reaction, user = await self.bot.wait_for(
+                    "reaction_add",
+                    check=partial(self._predicate, message),
+                    timeout=60.0
+                )
+            except asyncio.TimeoutError:
+                with suppress(discord.NotFound):
+                    await message.clear_reaction("🔄")
+            else:
+                await message.edit(embed=self._build_topic_embed(message.channel.id))
+
     @commands.command()
     @commands.cooldown(1, 60*2, commands.BucketType.channel)
     @whitelist_override(channels=ALL_ALLOWED_CHANNELS)
@@ -50,4 +109,4 @@ class ConvoStarters(commands.Cog):
 
 def setup(bot: Bot) -> None:
     """Load the ConvoStarters cog."""
-    bot.add_cog(ConvoStarters())
+    bot.add_cog(ConvoStarters(bot))
