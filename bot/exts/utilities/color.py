@@ -149,7 +149,11 @@ class Color(commands.Cog):
         b = int(b * 255)
         await self.color_embed(ctx, (r, g, b))
 
-    async def cmyk_to_rgb(self, ctx: commands.Context, input_color: tuple[int, int, int, int]) -> tuple[int, int, int]:
+    async def cmyk_to_rgb(
+        self,
+        ctx: commands.Context,
+        input_color: tuple[int, int, int, int]
+    ) -> tuple[int, int, int]:
         """Function to convert cmyk color to rgb color and send main embed."""
         input_color = self.tuple_create(input_color)
         c = input_color[0]
