@@ -105,9 +105,9 @@ class WTFPython(commands.Cog):
         )[0].split("\n")
 
         for header in list(map(str.strip, table_of_contents)):
-            match = re.findall(r"\[▶ (.*)\]\((.*)\)", header)
+            match = re.search(r"\[▶ (.*)\]\((.*)\)", header)
             if match:
-                self.headers[match[0][0]] = f"{BASE_URL}{match[0][1]}"
+                self.headers[match[0]] = f"{BASE_URL}{match[1]}"
 
     def fuzzy_match_header(self, query: str) -> Optional[str]:
         """
