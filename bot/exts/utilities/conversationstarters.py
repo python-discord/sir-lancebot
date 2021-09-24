@@ -36,32 +36,16 @@ class ConvoStarters(commands.Cog):
     """General conversation topics."""
 
     @commands.command()
+    @commands.cooldown(1, 60*2, commands.BucketType.channel)
     @whitelist_override(channels=ALL_ALLOWED_CHANNELS)
     async def topic(self, ctx: commands.Context) -> None:
         """
         Responds with a random topic to start a conversation.
 
-        If in a Python channel, a python-related topic will be given.
-
-        Otherwise, a random conversation topic will be received by the user.
+        Allows the refresh of a topic by pressing an emoji.
         """
-        # No matter what, the form will be shown.
-        embed = Embed(description=f"Suggest more topics [here]({SUGGESTION_FORM})!", color=Color.blurple())
-
-        try:
-            # Fetching topics.
-            channel_topics = TOPICS[ctx.channel.id]
-
-        # If the channel isn't Python-related.
-        except KeyError:
-            embed.title = f"**{next(TOPICS['default'])}**"
-
-        # If the channel ID doesn't have any topics.
-        else:
-            embed.title = f"**{next(channel_topics)}**"
-
-        finally:
-            await ctx.send(embed=embed)
+        message = await ctx.send(embed=self._build_topic_embed(ctx.channel.id))
+        self.bot.loop.create_task(self._listen_for_refresh(message))
 
 
 def setup(bot: Bot) -> None:
