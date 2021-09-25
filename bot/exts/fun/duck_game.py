@@ -304,13 +304,6 @@ class DuckGamesDirector(commands.Cog):
         scoreboard_embed.description = scoreboard
         await channel.send(embed=scoreboard_embed)
 
-        board_embed, = game.board_msg.embeds
-        embed_as_dict = board_embed.to_dict()  # Cannot set embed color after initialization
-        embed_as_dict["color"] = discord.Color.red().value
-        board_embed = discord.Embed.from_dict(embed_as_dict)
-        await self.edit_embed_with_image(game.board_msg, board_embed)
-
-        found_embed, = game.found_msg.embeds
         missed = [ans for ans in game.solutions if ans not in game.claimed_answers]
         if missed:
             missed_text = "Flights everyone missed:\n" + "\n".join(f"{ans}" for ans in missed)
