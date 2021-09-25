@@ -6,7 +6,7 @@ AOC_DAY_ANDSTAR_TEMPLATE = "{rank: >4} | {name:25.25} | {completion_time: >10}"
 
 
 class AoCDropdownView(discord.ui.View):
-    """Represents a Dropdown to filter AoC stats by Day and Star."""
+    """Interactive view to filter AoC stats by Day and Star."""
 
     def __init__(self, original_author: discord.Member, day_and_star_data: dict[str: dict], maximum_scorers: int):
         super().__init__()
@@ -21,8 +21,7 @@ class AoCDropdownView(discord.ui.View):
         """Generates a formatted codeblock with AoC statistics based on the currently selected day and star."""
         header = AOC_DAY_ANDSTAR_TEMPLATE.format(rank="Rank", name="Name",
                                                  completion_time="Completion time (UTC)")
-        header = f"{header}\n{'-' * (len(header) + 2)}"
-        lines = [header]
+        lines = [f"{header}\n{'-' * (len(header) + 2)}"]
 
         for rank, scorer in enumerate(self.data[f"{self.day}-{self.star}"][:self.maximum_scorers]):
             time_data = datetime.fromtimestamp(scorer['completion_time']).strftime("%I:%M:%S %p")
@@ -32,7 +31,7 @@ class AoCDropdownView(discord.ui.View):
         return f"Statistics for Day: {self.day}, Star: {self.star}.\n ```\n{joined_lines}\n```"
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        """A global check to ensure that the interacting user is the user who invoked the command originally."""
+        """Global check to ensure that the interacting user is the user who invoked the command originally."""
         return interaction.user == self.original_author
 
     @discord.ui.select(
@@ -41,7 +40,7 @@ class AoCDropdownView(discord.ui.View):
         custom_id="day_select"
     )
     async def day_select(self, select: discord.ui.Select, interaction: discord.Interaction) -> None:
-        """Represents a Dropdown to choose a Day of the AoC."""
+        """Dropdown to choose a Day of the AoC."""
         self.day = select.values[0]
         return
 
@@ -51,13 +50,13 @@ class AoCDropdownView(discord.ui.View):
         custom_id="star_select"
     )
     async def star_select(self, select: discord.ui.Select, interaction: discord.Interaction) -> None:
-        """Represents a Dropdown to choose either the first or the second star."""
+        """Dropdown to choose either the first or the second star."""
         self.star = select.values[0]
         return
 
     @discord.ui.button(label="Fetch", style=discord.ButtonStyle.blurple)
     async def fetch(self, button: discord.ui.Button, interaction: discord.Interaction) -> None:
-        """Represents a button that fetches the statistics based on the dropdown values."""
+        """Button that fetches the statistics based on the dropdown values."""
         if not self.element_map['star_select'].values or not self.element_map['day_select'].values:
             await interaction.response.send_message(
                 "You have to select a value from both of the dropdowns!",

@@ -123,9 +123,8 @@ def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
                 star_results[(day, star)].append(
                     StarResult(member_id=member_id, completion_time=completion_time)
                 )
-                completion_time_raw = int(data["get_star_ts"])
                 per_day_star_stats[f"{day}-{star}"].append(
-                    {'completion_time': completion_time_raw, 'member_name': name}
+                    {'completion_time': int(data["get_star_ts"]), 'member_name': name}
                 )
     for key in per_day_star_stats:
         per_day_star_stats[key] = sorted(per_day_star_stats[key], key=operator.itemgetter('completion_time'))
