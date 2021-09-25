@@ -10,10 +10,9 @@ class AoCDropdownView(discord.ui.View):
 
     def __init__(self, original_author: discord.Member, day_and_star_data: dict[str: dict], maximum_scorers: int):
         super().__init__()
-        self.day = 1
-        self.star = 1
+        self.day = 0
+        self.star = 0
         self.data = day_and_star_data
-        self.element_map = {element.custom_id: element for element in self.children}
         self.maximum_scorers = maximum_scorers
         self.original_author = original_author
 
@@ -57,7 +56,7 @@ class AoCDropdownView(discord.ui.View):
     @discord.ui.button(label="Fetch", style=discord.ButtonStyle.blurple)
     async def fetch(self, button: discord.ui.Button, interaction: discord.Interaction) -> None:
         """Button that fetches the statistics based on the dropdown values."""
-        if not self.element_map['star_select'].values or not self.element_map['day_select'].values:
+        if self.day == 0 or self.star == 0:
             await interaction.response.send_message(
                 "You have to select a value from both of the dropdowns!",
                 ephemeral=True
@@ -65,3 +64,5 @@ class AoCDropdownView(discord.ui.View):
             return
         else:
             await interaction.response.edit_message(content=self.generate_output())
+            self.day = 0
+            self.star = 0

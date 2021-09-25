@@ -196,7 +196,8 @@ class AdventOfCode(commands.Cog):
         """
         Get the current top scorers of the Python Discord Leaderboard.
 
-        Additionally, you can provide a day-star(e.g. 2-1, as second day first star) to filter your query more.
+        Additionally, you can provide an argument `day_and_star` (Boolean) to have the bot send a View
+        that will let you filter by day and star.
         """
         if maximum_scorers > AocConfig.max_day_and_star_results or maximum_scorers <= 0:
             raise commands.BadArgument(
