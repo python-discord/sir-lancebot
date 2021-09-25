@@ -184,7 +184,7 @@ class DuckGamesDirector(commands.Cog):
     )
     @commands.cooldown(rate=1, per=2, type=commands.BucketType.channel)
     async def start_game(self, ctx: commands.Context) -> None:
-        """Generate a board, send the game embed, and end the game after a time limit."""
+        """Start a new Duck Duck Duck Goose game."""
         if ctx.channel.id in self.current_games:
             await ctx.send("There's already a game running!")
             return
