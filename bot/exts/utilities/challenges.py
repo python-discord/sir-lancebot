@@ -175,7 +175,7 @@ class Challenges(commands.Cog):
         """Creates the 'language embed' which displays all languages the kata supports."""
         languages = '\n'.join(map(str.title, kata_information['languages']))
         language_embed = Embed(
-            title="Supported Languages",
+            title=f"Supported Languages for {kata_information['name']}",
             description=f"```nim\n{languages}\n```",
             color=Colours.python_blue
         )
@@ -190,7 +190,7 @@ class Challenges(commands.Cog):
         """
         tags = '\n'.join(kata_information['tags'])
         tags_embed = Embed(
-            title="Tags",
+            title=f"Tags for {kata_information['name']}",
             description=f"```nim\n{tags}\n```",
             color=Colours.grass_green
         )
@@ -205,7 +205,7 @@ class Challenges(commands.Cog):
         the total number of stars of the kata, etc.
         """
         embed = Embed(
-            title="Other Information",
+            title=f"Other Information for {kata_information['name']}",
             color=Colours.grass_green
         )
         embed.add_field(
