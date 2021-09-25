@@ -286,13 +286,6 @@ class DuckGamesDirector(commands.Cog):
             found_embed.description = f"{old_desc.rstrip()}\n{text}"
             await game.found_msg.edit(embed=found_embed)
 
-    async def display_claimed_answer(self, game: DuckGame, author: discord.Member, answer: tuple[int]) -> None:
-        """Add a claimed answer to the game embed."""
-        async with game.editing_embed:
-            found_embed, = game.found_msg.embeds
-            found_embed.description = f"{found_embed.description}\n{str(answer):12s}  -  {author.display_name}"
-            await game.found_msg.edit(embed=found_embed)
-
     async def end_game(self, channel: discord.TextChannel, game: DuckGame, end_message: str) -> None:
         """Edit the game embed to reflect the end of the game and mark the game as not running."""
         game.running = False
