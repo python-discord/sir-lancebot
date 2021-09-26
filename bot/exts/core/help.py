@@ -288,7 +288,7 @@ class HelpSession:
         paginator = LinePaginator(prefix="", suffix="", max_lines=self._max_lines)
 
         # show signature if query is a command
-        if isinstance(self.query, commands.Command):
+        if isinstance(self.query, Command):
             await self._add_command_signature(paginator)
 
         if isinstance(self.query, Cog):
@@ -332,7 +332,7 @@ class HelpSession:
         if isinstance(self.query, Cog):
             grouped = (("**Commands:**", self.query.commands),)
 
-        elif isinstance(self.query, commands.Command):
+        elif isinstance(self.query, Command):
             grouped = (("**Subcommands:**", self.query.commands),)
 
         # otherwise sort and organise all commands into categories
@@ -394,7 +394,7 @@ class HelpSession:
                 return []
             strikeout = "~~"
 
-        if isinstance(self.query, commands.Command):
+        if isinstance(self.query, Command):
             prefix = ""
         else:
             prefix = constants.Client.prefix
@@ -410,7 +410,7 @@ class HelpSession:
         """Returns an Embed with the requested page formatted within."""
         embed = Embed()
 
-        if isinstance(self.query, (commands.Command, Cog)) and page_number > 0:
+        if isinstance(self.query, (Command, Cog)) and page_number > 0:
             title = f'Command Help | "{self.query.name}"'
         else:
             title = self.title
