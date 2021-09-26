@@ -280,12 +280,12 @@ if Client.month_override is not None:
 
 
 class Roles(NamedTuple):
+    owner = 267627879762755584
     admin = int(environ.get("BOT_ADMIN_ROLE_ID", 267628507062992896))
     moderator = 267629731250176001
-    owner = 267627879762755584
     helpers = int(environ.get("ROLE_HELPERS", 267630620367257601))
     core_developers = 587606783669829632
-    everyone = 267624335836053506
+    everyone = int(environ.get("BOT_GUILD", 267624335836053506)) 
 
 
 class Tokens(NamedTuple):
