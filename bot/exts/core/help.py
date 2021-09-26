@@ -49,7 +49,7 @@ class HelpQueryNotFound(ValueError):
     query, where keys are the possible matched command names and values are the likeness match scores.
     """
 
-    def __init__(self, arg: str, possible_matches: dict = None):
+    def __init__(self, arg: str, possible_matches: list[str] = None):
         super().__init__(arg)
         self.possible_matches = possible_matches
 
@@ -161,7 +161,7 @@ class HelpSession:
 
         result = process.extract(query, choices, score_cutoff=90)
 
-        raise HelpQueryNotFound(f'Query "{query}" not found.', dict(result))
+        raise HelpQueryNotFound(f'Query "{query}" not found.', [choice[0] for choice in result])
 
     async def timeout(self, seconds: int = 30) -> None:
         """Waits for a set number of seconds, then stops the help session."""
@@ -515,7 +515,7 @@ class Help(DiscordCog):
             embed.title = str(error)
 
             if error.possible_matches:
-                matches = "\n".join(error.possible_matches.keys())
+                matches = "\n".join(error.possible_matches)
                 embed.description = f"**Did you mean:**\n`{matches}`"
 
             await ctx.send(embed=embed)
