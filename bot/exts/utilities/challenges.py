@@ -173,11 +173,14 @@ class Challenges(commands.Cog):
     @staticmethod
     def language_embed(kata_information: dict) -> Embed:
         """Creates the 'language embed' which displays all languages the kata supports."""
+        kata_url = f"https://codewars.com/kata/{kata_information['id']}"
+
         languages = '\n'.join(map(str.title, kata_information['languages']))
         language_embed = Embed(
-            title=f"Supported Languages for {kata_information['name']}",
-            description=f"```nim\n{languages}\n```",
-            color=Colours.python_blue
+            title=kata_information['name'],
+            description=f"```yaml\nSupported Languages:\n{languages}\n```",
+            color=Colours.python_blue,
+            url=kata_url
         )
         return language_embed
 
@@ -188,11 +191,14 @@ class Challenges(commands.Cog):
 
         Tags explain what the kata is about, this is what codewars.com calls categories.
         """
+        kata_url = f"https://codewars.com/kata/{kata_information['id']}"
+
         tags = '\n'.join(kata_information['tags'])
         tags_embed = Embed(
-            title=f"Tags for {kata_information['name']}",
-            description=f"```nim\n{tags}\n```",
-            color=Colours.grass_green
+            title=kata_information['name'],
+            description=f"```yaml\nTags:\n{tags}\n```",
+            color=Colours.grass_green,
+            url=kata_url
         )
         return tags_embed
 
@@ -204,9 +210,13 @@ class Challenges(commands.Cog):
         This embed shows statistics such as the total number of people who completed the kata,
         the total number of stars of the kata, etc.
         """
+        kata_url = f"https://codewars.com/kata/{kata_information['id']}"
+
         embed = Embed(
-            title=f"Other Information for {kata_information['name']}",
-            color=Colours.grass_green
+            title=kata_information['name'],
+            description="```nim\nOther Information\n```",
+            color=Colours.grass_green,
+            url=kata_url
         )
         embed.add_field(
             name="`Total Score`",
