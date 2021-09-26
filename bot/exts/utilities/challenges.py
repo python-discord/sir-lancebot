@@ -316,12 +316,17 @@ class Challenges(commands.Cog):
             tags_embed=tags_embed,
             other_info_embed=miscellaneous_embed
         )
+        kata_view = self.create_view(dropdown, f'https://codewars.com/kata/{first_kata_id}')
         original_message = await ctx.send(
             embed=kata_embed,
-            view=self.create_view(dropdown, f'https://codewars.com/kata/{first_kata_id}')
+            view=kata_view
         )
 
         dropdown.original_message = original_message
+
+        wait_for_kata = await kata_view.wait()
+        if wait_for_kata:
+            await original_message.edit(embed=kata_embed, view=None)
 
 
 def setup(bot: Bot) -> None:
