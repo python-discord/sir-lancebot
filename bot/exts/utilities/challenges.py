@@ -159,7 +159,7 @@ class Challenges(commands.Cog):
         # Ensuring it isn't over the length 1024
         if len(kata_description) > 1024:
             kata_description = "\n".join(kata_description[:1000].split("\n")[:-1]) + "..."
-            kata_description += f"\n[Read more...]({kata_url})"
+            kata_description += f" [continue reading]({kata_url})"
 
         kata_embed = Embed(
             title=kata_information['name'],
