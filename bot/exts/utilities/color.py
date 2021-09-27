@@ -17,11 +17,11 @@ logger = logging.getLogger(__name__)
 
 
 ERROR_MSG = """The color code {user_color} is not a possible color combination.
-\nThe range of possible values are:
-\nRGB & HSV: 0-255
-\nCMYK: 0-100%
-\nHSL: 0-360 degrees
-\nHex: #000000-#FFFFFF
+The range of possible values are:
+RGB & HSV: 0-255
+CMYK: 0-100%
+HSL: 0-360 degrees
+Hex: #000000-#FFFFFF
 """
 
 COLOR_JSON_PATH = "bot/resources/utilities/ryanzec_colours.json"
