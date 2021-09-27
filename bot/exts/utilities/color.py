@@ -65,7 +65,7 @@ class Color(commands.Cog):
             # mode is either None or an invalid code
             if mode is None:
                 no_mode_embed = Embed(
-                    title="No 'mode' was passed, please define a color code.",
+                    title="No mode was passed, please define a color code.",
                     description="Possible modes are: Name, Hex, RGB, HSV, HSL and CMYK.",
                     color=Colours.soft_red,
                 )
