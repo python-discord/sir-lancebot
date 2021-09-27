@@ -24,8 +24,7 @@ HSL: 0-360 degrees
 Hex: #000000-#FFFFFF
 """
 
-COLOR_JSON_PATH = "bot/resources/utilities/ryanzec_colours.json"
-with open(COLOR_JSON_PATH) as f:
+with open("bot/resources/utilities/ryanzec_colours.json") as f:
     COLOR_MAPPING = json.load(f)
 
 
