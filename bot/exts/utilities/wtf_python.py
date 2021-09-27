@@ -1,13 +1,13 @@
+import asyncio
+import datetime
 import logging
 import random
 import re
-from enum import Enum
-from functools import partial
 from typing import Optional
 
+import rapidfuzz
 from discord import Embed
-from discord.ext import commands, tasks
-from rapidfuzz import process
+from discord.ext import commands
 
 from bot import constants
 from bot.bot import Bot
@@ -31,14 +31,7 @@ If the problem persists send a message in <#{constants.Channels.dev_contrib}>
 """
 
 MINIMUM_CERTAINTY = 50
-
-
-class Action(Enum):
-    """Represents an action to perform on an extension."""
-
-    # Need to be partial otherwise they are considered to be function definitions.
-    LOAD = partial(Bot.load_extension)
-    UNLOAD = partial(Bot.unload_extension)
+README_REFRESH = 60  # minutes between fetch calls
 
 
 class WTFPython(commands.Cog):
@@ -46,50 +39,24 @@ class WTFPython(commands.Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.fetch_readme.start()
-
         self.headers: dict[str, str] = dict()
+        self.last_fetched = datetime.datetime.now()
+        log.debug(f"{self.last_fetched = }")
 
-    @tasks.loop(hours=1)
+        asyncio.create_task(self.fetch_readme)
+
     async def fetch_readme(self) -> None:
         """Gets the content of README.md from the WTF Python Repository."""
-        failed_tries = 0
+        refresh = self.last_fetched + datetime.timedelta(minutes=README_REFRESH)
 
-        for x in range(FETCH_TRIES):
-            async with self.bot.http_session.get(f"{WTF_PYTHON_RAW_URL}README.md") as resp:
-                log.trace("Fetching the latest WTF Python README.md")
+        if refresh > datetime.datetime.now() and self.headers:
+            return  # cache should be up-to-date
 
-                if resp.status == 200:
-                    raw = await resp.text()
-                    self.parse_readme(raw)
-                    log.debug(
-                        "Successfully fetched the latest WTF Python README.md, "
-                        "breaking out of retry loop"
-                    )
-                    break
-
-                else:
-                    failed_tries += 1
-                    log.debug(
-                        "Failed to get latest WTF Python README.md on try "
-                        f"{x}/{FETCH_TRIES}. Status code {resp.status}"
-                    )
-
-        if failed_tries == 3:
-            log.error("Couldn't fetch WTF Python README.md after 3 tries, unloading extension.")
-            action = Action.UNLOAD
-        else:
-            action = Action.LOAD
-
-        verb = action.name.lower()
-        ext = "bot.exts.utilities.wtf_python"
-
-        try:
-            action.value(self.bot, ext)
-        except (commands.ExtensionAlreadyLoaded, commands.ExtensionNotLoaded):
-            log.debug(f"Extension `{ext}` is already {verb}ed.")
-        else:
-            log.debug(f"Extension {verb}ed: `{ext}`.")
+        async with self.bot.http_session.get(f"{WTF_PYTHON_RAW_URL}README.md") as resp:
+            log.trace("Fetching the latest WTF Python README.md")
+            if resp.status == 200:
+                raw = await resp.text()
+                self.parse_readme(raw)
 
     def parse_readme(self, data: str) -> None:
         """
@@ -117,7 +84,7 @@ class WTFPython(commands.Cog):
         The certainty returned by rapidfuzz.process.extractOne is a score between 0 and 100,
         with 100 being a perfect match.
         """
-        match, certainty, _ = process.extractOne(query, self.headers.keys())
+        match, certainty, _ = rapidfuzz.process.extractOne(query, self.headers.keys())
         log.debug(f"{match = }, {certainty = }")
         return match if certainty > MINIMUM_CERTAINTY else None
 
