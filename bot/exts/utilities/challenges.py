@@ -321,12 +321,13 @@ class Challenges(commands.Cog):
             embed=kata_embed,
             view=kata_view
         )
-
         dropdown.original_message = original_message
 
         wait_for_kata = await kata_view.wait()
         if wait_for_kata:
-            await original_message.edit(embed=kata_embed, view=None)
+            for child in kata_view.children:
+                child.disabled = True
+            await original_message.edit(embed=kata_embed, view=kata_view)
 
 
 def setup(bot: Bot) -> None:
