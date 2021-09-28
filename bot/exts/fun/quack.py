@@ -61,9 +61,10 @@ class Quackstack(commands.Cog):
         embed = discord.Embed(
             title=f"Quack! Here's a {ducktype} for you.",
             color=Colours.grass_green,
+            url=f"{API_URL}/docs"
         )
 
-        embed.set_footer(text=f"A {ducktype} from [Quackstack]({API_URL}/docs).")
+        embed.set_footer(text=f"A {ducktype} from Quackstack.")
 
         embed.set_image(url=API_URL + file)
 
