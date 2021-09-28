@@ -30,7 +30,6 @@ If the problem persists send a message in <#{constants.Channels.dev_contrib}>
 """
 
 MINIMUM_CERTAINTY = 50
-README_REFRESH = 60  # minutes between fetch calls
 
 
 class WTFPython(commands.Cog):
@@ -42,14 +41,9 @@ class WTFPython(commands.Cog):
         self.last_fetched = datetime.datetime.now()
         self.fetch_readme.start()
 
-    @tasks.loop(minutes=README_REFRESH)
+    @tasks.loop(minutes=60)
     async def fetch_readme(self) -> None:
         """Gets the content of README.md from the WTF Python Repository."""
-        refresh = self.last_fetched + datetime.timedelta(minutes=README_REFRESH)
-
-        if refresh > datetime.datetime.now() and self.headers:
-            return  # Cache should be up-to-date
-
         async with self.bot.http_session.get(f"{WTF_PYTHON_RAW_URL}README.md") as resp:
             log.trace("Fetching the latest WTF Python README.md")
             if resp.status == 200:
@@ -72,7 +66,8 @@ class WTFPython(commands.Cog):
         for header in list(map(str.strip, table_of_contents)):
             match = re.search(r"\[▶ (.*)\]\((.*)\)", header)
             if match:
-                self.headers[match[0]] = f"{BASE_URL}{match[1]}"
+                hyper_link = match[0].split("(")[1].replace(")", "")
+                self.headers[match[0]] = f"{BASE_URL}/{hyper_link}"
 
     def fuzzy_match_header(self, query: str) -> Optional[str]:
         """
@@ -96,10 +91,12 @@ class WTFPython(commands.Cog):
         """
         match = self.fuzzy_match_header(query)
         if match:
+            log.debug(f"{self.headers[match]}")
             embed = Embed(
-                title=f"WTF Python Search Result For {query}",
+                title="WTF Python?!",
                 colour=constants.Colours.dark_green,
-                description=f"[Go to Repository Section]({self.headers[match]})",
+                description=f"""Search Result For '{query}'
+                [Go to Repository Section]({self.headers[match]})""",
             )
             embed.set_thumbnail(url=f"{WTF_PYTHON_RAW_URL}images/logo.png")
             await ctx.send(embed=embed)
