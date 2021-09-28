@@ -95,7 +95,7 @@ class WTFPython(commands.Cog):
             embed = Embed(
                 title="WTF Python?!",
                 colour=constants.Colours.dark_green,
-                description=f"""Search Result For '{query}'
+                description=f"""Search result for '{query}'
                 [Go to Repository Section]({self.headers[match]})""",
             )
             embed.set_thumbnail(url=f"{WTF_PYTHON_RAW_URL}images/logo.png")
