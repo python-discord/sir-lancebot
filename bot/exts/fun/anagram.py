@@ -55,7 +55,7 @@ class Anagram(commands.Cog):
         Given shuffled letters, rearrange them into anagrams.
 
         Show an embed with scrambled letters which if rearranged can form words.
-        After specific amount of time list the correct answers and whether someone provided a
+        After a specific amount of time, list the correct answers and whether someone provided a
         correct answer.
         """
         if self.games.get(ctx.channel.id):
