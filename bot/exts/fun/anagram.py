@@ -74,7 +74,7 @@ class Anagram(commands.Cog):
         )
 
         await ctx.send(embed=anagram_embed)
-        await asyncio.sleep(seconds=TIME_LIMIT)
+        await asyncio.sleep(TIME_LIMIT)
 
         if game.winners:
             win_list = ", ".join(game.winners)
