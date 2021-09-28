@@ -52,7 +52,7 @@ class Anagram(commands.Cog):
     @commands.guild_only()
     async def anagram_command(self, ctx: commands.Context) -> None:
         """
-        Given shuffled letters rearrange them into anagrams.
+        Given shuffled letters, rearrange them into anagrams.
 
         Show an embed with scrambled letters which if rearranged can form words.
         After specific amount of time list the correct answers and whether someone provided a
