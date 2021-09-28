@@ -108,3 +108,4 @@ class Anagram(commands.Cog):
 def setup(bot: Bot) -> None:
     """Load the Anagram cog."""
     bot.add_cog(Anagram(bot))
+
