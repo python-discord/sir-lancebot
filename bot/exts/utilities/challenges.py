@@ -12,8 +12,9 @@ from bot.constants import Colours, Emojis, NEGATIVE_REPLIES
 
 logger = logging.getLogger(__name__)
 API_ROOT = "https://www.codewars.com/api/v1/code-challenges/{kata_id}"
+
 # Map difficulty for the kata to color we want to display in the embed.
-# These colors are representative of the colors that each 'kyu' level represents on codewars.com
+# These colors are representative of the colors that each kyu's level represents on codewars.com
 MAPPING_OF_KYU = {
     8: 0xdddbda, 7: 0xdddbda, 6: 0xecb613, 5: 0xecb613,
     4: 0x3c7ebb, 3: 0x3c7ebb, 2: 0x866cc7, 1: 0x866cc7
@@ -42,22 +43,22 @@ class InformationDropdown(ui.Select):
             SelectOption(
                 label="Main Information",
                 description="See the kata's difficulty, description, etc.",
-                emoji='🌎'
+                emoji="🌎"
             ),
             SelectOption(
-                label='Languages',
-                description='See what languages this kata supports!',
+                label="Languages",
+                description="See what languages this kata supports!",
                 emoji=Emojis.reddit_post_text
             ),
             SelectOption(
-                label='Tags',
-                description='See what categories this kata falls under!',
+                label="Tags",
+                description="See what categories this kata falls under!",
                 emoji=Emojis.stackoverflow_tag
             ),
             SelectOption(
-                label='Other Information',
-                description='See how other people performed on this kata and more!',
-                emoji='ℹ'
+                label="Other Information",
+                description="See how other people performed on this kata and more!",
+                emoji="ℹ"
             )
         ]
 
@@ -70,7 +71,7 @@ class InformationDropdown(ui.Select):
         }
 
         super().__init__(
-            placeholder='See more information regarding this kata',
+            placeholder="See more information regarding this kata",
             min_values=1,
             max_values=1,
             options=options
@@ -123,7 +124,7 @@ class Challenges(commands.Cog):
                 raise commands.BadArgument("No katas could be found with the filters provided.")
             elif len(first_kata_div) >= 3:
                 first_kata_div = choice(first_kata_div[:3])
-            elif 'q=' not in search_link:
+            elif "q=" not in search_link:
                 first_kata_div = choice(first_kata_div)
             else:
                 first_kata_div = first_kata_div[0]
@@ -162,12 +163,12 @@ class Challenges(commands.Cog):
             kata_description += f" [continue reading]({kata_url})"
 
         kata_embed = Embed(
-            title=kata_information['name'],
+            title=kata_information["name"],
             description=kata_description,
-            color=MAPPING_OF_KYU[int(kata_information['rank']['name'].replace(' kyu', ''))],
+            color=MAPPING_OF_KYU[int(kata_information["rank"]["name"].replace(" kyu", ""))],
             url=kata_url
         )
-        kata_embed.add_field(name="Difficulty", value=kata_information['rank']['name'], inline=False)
+        kata_embed.add_field(name="Difficulty", value=kata_information["rank"]["name"], inline=False)
         return kata_embed
 
     @staticmethod
@@ -175,9 +176,9 @@ class Challenges(commands.Cog):
         """Creates the 'language embed' which displays all languages the kata supports."""
         kata_url = f"https://codewars.com/kata/{kata_information['id']}"
 
-        languages = '\n'.join(map(str.title, kata_information['languages']))
+        languages = "\n".join(map(str.title, kata_information["languages"]))
         language_embed = Embed(
-            title=kata_information['name'],
+            title=kata_information["name"],
             description=f"```yaml\nSupported Languages:\n{languages}\n```",
             color=Colours.python_blue,
             url=kata_url
@@ -193,9 +194,9 @@ class Challenges(commands.Cog):
         """
         kata_url = f"https://codewars.com/kata/{kata_information['id']}"
 
-        tags = '\n'.join(kata_information['tags'])
+        tags = "\n".join(kata_information["tags"])
         tags_embed = Embed(
-            title=kata_information['name'],
+            title=kata_information["name"],
             description=f"```yaml\nTags:\n{tags}\n```",
             color=Colours.grass_green,
             url=kata_url
@@ -213,7 +214,7 @@ class Challenges(commands.Cog):
         kata_url = f"https://codewars.com/kata/{kata_information['id']}"
 
         embed = Embed(
-            title=kata_information['name'],
+            title=kata_information["name"],
             description="```nim\nOther Information\n```",
             color=Colours.grass_green,
             url=kata_url
@@ -274,7 +275,7 @@ class Challenges(commands.Cog):
 
         if language and not query:
             level = f"-{choice([1, 2, 3, 4, 5, 6, 7, 8])}"
-            params['r[]'] = level
+            params["r[]"] = level
         elif "," in query:
             query_splitted = query.split("," if ", " not in query else ", ")
 
@@ -284,12 +285,12 @@ class Challenges(commands.Cog):
                 )
 
             query, level = query_splitted
-            params['q'] = query
-            params['r[]'] = f"-{level}"
+            params["q"] = query
+            params["r[]"] = f"-{level}"
         elif query.isnumeric():
-            params['r[]'] = f"-{query}"
+            params["r[]"] = f"-{query}"
         else:
-            params['q'] = query
+            params["q"] = query
 
         params["beta"] = str(language in SUPPORTED_LANGUAGES["beta"]).lower()
 
@@ -302,7 +303,7 @@ class Challenges(commands.Cog):
         kata_information = await self.kata_information(first_kata_id)
         if isinstance(kata_information, Embed):
             # Something went wrong when trying to fetch the kata information
-            await ctx.send(embed=kata_information)
+            await ctx.d(embed=kata_information)
             return
 
         kata_embed = self.main_embed(kata_information)
@@ -316,7 +317,7 @@ class Challenges(commands.Cog):
             tags_embed=tags_embed,
             other_info_embed=miscellaneous_embed
         )
-        kata_view = self.create_view(dropdown, f'https://codewars.com/kata/{first_kata_id}')
+        kata_view = self.create_view(dropdown, f"https://codewars.com/kata/{first_kata_id}")
         original_message = await ctx.send(
             embed=kata_embed,
             view=kata_view
