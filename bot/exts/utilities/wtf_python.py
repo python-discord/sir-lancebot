@@ -31,7 +31,7 @@ If the problem persists send a message in <#{constants.Channels.dev_contrib}>
 """
 
 MINIMUM_CERTAINTY = 50
-README_REFRESH = 60  # minutes between fetch calls
+README_REFRESH = 1  # minutes between fetch calls
 
 
 class WTFPython(commands.Cog):
@@ -43,7 +43,7 @@ class WTFPython(commands.Cog):
         self.last_fetched = datetime.datetime.now()
         log.debug(f"{self.last_fetched = }")
 
-        asyncio.create_task(self.fetch_readme)
+        asyncio.create_task(self.fetch_readme())
 
     async def fetch_readme(self) -> None:
         """Gets the content of README.md from the WTF Python Repository."""
@@ -85,7 +85,6 @@ class WTFPython(commands.Cog):
         with 100 being a perfect match.
         """
         match, certainty, _ = rapidfuzz.process.extractOne(query, self.headers.keys())
-        log.debug(f"{match = }, {certainty = }")
         return match if certainty > MINIMUM_CERTAINTY else None
 
     @commands.command(aliases=("wtf", "WTF"))
