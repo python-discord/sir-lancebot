@@ -1,4 +1,3 @@
-import asyncio
 import datetime
 import logging
 import random
@@ -7,7 +6,7 @@ from typing import Optional
 
 import rapidfuzz
 from discord import Embed
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 from bot import constants
 from bot.bot import Bot
@@ -31,7 +30,7 @@ If the problem persists send a message in <#{constants.Channels.dev_contrib}>
 """
 
 MINIMUM_CERTAINTY = 50
-README_REFRESH = 1  # minutes between fetch calls
+README_REFRESH = 60  # minutes between fetch calls
 
 
 class WTFPython(commands.Cog):
@@ -39,18 +38,17 @@ class WTFPython(commands.Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.headers: dict[str, str] = dict()
+        self.headers: dict[str, str] = {}
         self.last_fetched = datetime.datetime.now()
-        log.debug(f"{self.last_fetched = }")
+        self.fetch_readme.start()
 
-        asyncio.create_task(self.fetch_readme())
-
+    @tasks.loop(minutes=README_REFRESH)
     async def fetch_readme(self) -> None:
         """Gets the content of README.md from the WTF Python Repository."""
         refresh = self.last_fetched + datetime.timedelta(minutes=README_REFRESH)
 
         if refresh > datetime.datetime.now() and self.headers:
-            return  # cache should be up-to-date
+            return  # Cache should be up-to-date
 
         async with self.bot.http_session.get(f"{WTF_PYTHON_RAW_URL}README.md") as resp:
             log.trace("Fetching the latest WTF Python README.md")
@@ -113,6 +111,10 @@ class WTFPython(commands.Cog):
                 colour=constants.Colours.soft_red,
             )
         await ctx.send(embed=embed)
+
+    def cog_unload(self) -> None:
+        """Unload the cog and cancel the task."""
+        self.fetch_readme.cancel()
 
 
 def setup(bot: Bot) -> None:
