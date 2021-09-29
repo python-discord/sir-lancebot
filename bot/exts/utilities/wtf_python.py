@@ -1,4 +1,3 @@
-import datetime
 import logging
 import random
 import re
@@ -38,7 +37,6 @@ class WTFPython(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.headers: dict[str, str] = {}
-        self.last_fetched = datetime.datetime.now()
         self.fetch_readme.start()
 
     @tasks.loop(minutes=60)
