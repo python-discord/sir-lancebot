@@ -14,7 +14,6 @@ log = logging.getLogger(__name__)
 
 WTF_PYTHON_RAW_URL = "http://raw.githubusercontent.com/satwikkansal/wtfpython/master/"
 BASE_URL = "https://github.com/satwikkansal/wtfpython"
-FETCH_TRIES = 3
 
 ERROR_MESSAGE = f"""
 Unknown WTF Python Query. Please try to reformulate your query.
