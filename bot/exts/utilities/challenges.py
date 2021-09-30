@@ -255,6 +255,7 @@ class Challenges(commands.Cog):
         return view
 
     @commands.command(aliases=["kata"])
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def challenge(self, ctx: commands.Context, language: str = "python", *, query: str = None) -> None:
         """
         The challenge command pulls a random kata (challenge) from codewars.com.
@@ -326,9 +327,7 @@ class Challenges(commands.Cog):
 
         wait_for_kata = await kata_view.wait()
         if wait_for_kata:
-            for child in kata_view.children:
-                child.disabled = True
-            await original_message.edit(embed=kata_embed, view=kata_view)
+            await original_message.edit(embed=kata_embed, view=None)
 
 
 def setup(bot: Bot) -> None:
