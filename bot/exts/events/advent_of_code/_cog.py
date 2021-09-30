@@ -225,14 +225,17 @@ class AdventOfCode(commands.Cog):
             # This is a dictionary that contains solvers in respect of day, and star.
             # e.g. 1-1 means the solvers of the first star of the first day and their completion time
             per_day_and_star = json.loads(leaderboard['leaderboard_per_day_and_star'])
-            await ctx.send(
-                content="Please select a day and a star to filter by!",
-                view=AoCDropdownView(
-                    day_and_star_data=per_day_and_star,
-                    maximum_scorers=maximum_scorers,
-                    original_author=ctx.author
-                )
+            view = AoCDropdownView(
+                day_and_star_data=per_day_and_star,
+                maximum_scorers=maximum_scorers,
+                original_author=ctx.author
             )
+            message = await ctx.send(
+                content="Please select a day and a star to filter by!",
+                view=view
+            )
+            await view.wait()
+            await message.edit(view=None)
             return
 
     @in_month(Month.DECEMBER)
