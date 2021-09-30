@@ -180,7 +180,6 @@ class AdventOfCode(commands.Cog):
         else:
             await ctx.message.add_reaction(Emojis.envelope)
 
-    @in_month(Month.DECEMBER)
     @adventofcode_group.command(
         name="leaderboard",
         aliases=("board", "lb"),
@@ -209,34 +208,34 @@ class AdventOfCode(commands.Cog):
             except _helpers.FetchingLeaderboardFailedError:
                 await ctx.send(":x: Unable to fetch leaderboard!")
                 return
-            if not day_and_star:
+        if not day_and_star:
 
-                number_of_participants = leaderboard["number_of_participants"]
+            number_of_participants = leaderboard["number_of_participants"]
 
-                top_count = min(AocConfig.leaderboard_displayed_members, number_of_participants)
-                header = f"Here's our current top {top_count}! {Emojis.christmas_tree * 3}"
+            top_count = min(AocConfig.leaderboard_displayed_members, number_of_participants)
+            header = f"Here's our current top {top_count}! {Emojis.christmas_tree * 3}"
 
-                table = f"```\n{leaderboard['top_leaderboard']}\n```"
-                info_embed = _helpers.get_summary_embed(leaderboard)
+            table = f"```\n{leaderboard['top_leaderboard']}\n```"
+            info_embed = _helpers.get_summary_embed(leaderboard)
 
-                await ctx.send(content=f"{header}\n\n{table}", embed=info_embed)
-                return
-
-            # This is a dictionary that contains solvers in respect of day, and star.
-            # e.g. 1-1 means the solvers of the first star of the first day and their completion time
-            per_day_and_star = json.loads(leaderboard['leaderboard_per_day_and_star'])
-            view = AoCDropdownView(
-                day_and_star_data=per_day_and_star,
-                maximum_scorers=maximum_scorers,
-                original_author=ctx.author
-            )
-            message = await ctx.send(
-                content="Please select a day and a star to filter by!",
-                view=view
-            )
-            await view.wait()
-            await message.edit(view=None)
+            await ctx.send(content=f"{header}\n\n{table}", embed=info_embed)
             return
+
+        # This is a dictionary that contains solvers in respect of day, and star.
+        # e.g. 1-1 means the solvers of the first star of the first day and their completion time
+        per_day_and_star = json.loads(leaderboard['leaderboard_per_day_and_star'])
+        view = AoCDropdownView(
+            day_and_star_data=per_day_and_star,
+            maximum_scorers=maximum_scorers,
+            original_author=ctx.author
+        )
+        message = await ctx.send(
+            content="Please select a day and a star to filter by!",
+            view=view
+        )
+        await view.wait()
+        await message.edit(view=None)
+        return
 
     @in_month(Month.DECEMBER)
     @adventofcode_group.command(
