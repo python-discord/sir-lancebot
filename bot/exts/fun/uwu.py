@@ -119,7 +119,7 @@ class Uwu(Cog):
     @commands.command(name="uwu", aliases=("uwuwize", "uwuify",))
     async def uwu_command(self, ctx: Context, *, text: clean_content(fix_channel_mentions=True)) -> None:
         """
-        Echoes an uwuified version of a message.
+        Echo an uwuified version of the passed text.
 
         Example:
         '.uwu Hello, my name is John' returns something like
