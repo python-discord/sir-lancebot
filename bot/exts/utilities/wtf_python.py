@@ -4,7 +4,7 @@ import re
 from typing import Optional
 
 import rapidfuzz
-from discord import Embed
+from discord import Embed, File
 from discord.ext import commands, tasks
 
 from bot import constants
@@ -14,6 +14,7 @@ log = logging.getLogger(__name__)
 
 WTF_PYTHON_RAW_URL = "http://raw.githubusercontent.com/satwikkansal/wtfpython/master/"
 BASE_URL = "https://github.com/satwikkansal/wtfpython"
+LOGO_PATH = "./bot/resources/utilities/wtf_python_logo.jpg"
 
 ERROR_MESSAGE = f"""
 Unknown WTF Python Query. Please try to reformulate your query.
@@ -95,8 +96,9 @@ class WTFPython(commands.Cog):
                 description=f"""Search result for '{query}'
                 [Go to Repository Section]({self.headers[match]})""",
             )
-            embed.set_thumbnail(url=f"{WTF_PYTHON_RAW_URL}images/logo.png")
-            await ctx.send(embed=embed)
+            logo = File(LOGO_PATH, filename="wtf_logo.jpg")
+            embed.set_thumbnail(url="attachment://wtf_logo.jpg")
+            await ctx.send(embed=embed, file=logo)
             return
         else:
             embed = Embed(
