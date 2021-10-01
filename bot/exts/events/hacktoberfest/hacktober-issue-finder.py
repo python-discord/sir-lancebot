@@ -88,10 +88,10 @@ class HacktoberIssues(commands.Cog):
 
             if option == "beginner":
                 self.cache_beginner = data
-                self.cache_timer_beginner = ctx.message.created_at
+                self.cache_timer_beginner = ctx.message.created_at.replace(tzinfo=None)
             else:
                 self.cache_normal = data
-                self.cache_timer_normal = ctx.message.created_at
+                self.cache_timer_normal = ctx.message.created_at.replace(tzinfo=None)
 
             return data
 
