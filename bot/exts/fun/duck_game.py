@@ -280,9 +280,7 @@ class DuckGamesDirector(commands.Cog):
         """Append text to the claimed answers embed."""
         async with game.editing_embed:
             found_embed, = game.found_msg.embeds
-            old_desc = found_embed.description
-            if old_desc == discord.Embed.Empty:
-                old_desc = ""
+            old_desc = found_embed.description or ""
             found_embed.description = f"{old_desc.rstrip()}\n{text}"
             await game.found_msg.edit(embed=found_embed)
 
