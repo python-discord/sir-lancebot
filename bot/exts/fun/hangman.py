@@ -1,7 +1,6 @@
 from asyncio import TimeoutError
 from pathlib import Path
 from random import choice
-from typing import Literal
 
 from discord import Embed, Message
 from discord.ext import commands
@@ -61,7 +60,6 @@ class Hangman(commands.Cog):
             max_length: int = 25,
             min_unique_letters: int = 0,
             max_unique_letters: int = 25,
-            mode: Literal["s", "m", "S", "M"] = "s",
     ) -> None:
         """
         Play hangman against the bot, where you have to guess the word it has provided!
@@ -71,12 +69,7 @@ class Hangman(commands.Cog):
         - max_length: the maximum length you want the word to be (i.e. 5)
         - min_unique_letters: the minimum unique letters you want the word to have (i.e. 4)
         - max_unique_letters: the maximum unique letters you want the word to have (i.e. 7)
-        - mode: writing 's' means you want to play by yourself, and only you can suggest letters,
-            - writing 'm' means you want multiple players to join in and guess the word.
         """
-        # Changing singleplayer to a boolean
-        singleplayer = mode.lower() == 's'
-
         # Filtering the list of all words depending on the configuration
         filtered_words = [
             word for word in ALL_WORDS
@@ -101,13 +94,8 @@ class Hangman(commands.Cog):
         tries = 6
         guessed_letters = set()
 
-        # Checking if the game is singleplayer
         def check(msg: Message) -> bool:
-            if singleplayer:
-                return msg.author == ctx.author
-            else:
-                # Multiplayer mode
-                return not msg.author.bot
+            return msg.author == ctx.author and msg.channel == ctx.channel
 
         original_message = await ctx.send(embed=Embed(
             title="Hangman",
