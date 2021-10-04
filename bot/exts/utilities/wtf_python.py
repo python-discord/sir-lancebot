@@ -92,7 +92,7 @@ class WTFPython(commands.Cog):
             embed = Embed(
                 title="WTF Python?!",
                 colour=constants.Colours.dark_green,
-                description=f"""Search result for '{query}'
+                description=f"""Search result for '{query}': {match.split("]")[0].replace("[", "")}
                 [Go to Repository Section]({self.headers[match]})""",
             )
             logo = File(LOGO_PATH, filename="wtf_logo.jpg")
