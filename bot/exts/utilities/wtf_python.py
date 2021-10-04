@@ -89,7 +89,6 @@ class WTFPython(commands.Cog):
         """
         match = self.fuzzy_match_header(query)
         if match:
-            log.debug(f"{self.headers[match]}")
             embed = Embed(
                 title="WTF Python?!",
                 colour=constants.Colours.dark_green,
