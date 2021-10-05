@@ -74,7 +74,8 @@ class LoveCalculator(Cog):
         # We need the -1 due to how bisect returns the point
         # see the documentation for further detail
         # https://docs.python.org/3/library/bisect.html#bisect.bisect
-        index = bisect.bisect(LOVE_DATA, (love_percent,)) - 1
+        love_threshold = [threshold for threshold, _ in LOVE_DATA]
+        index = bisect.bisect(love_threshold, love_percent) - 1
         # We already have the nearest "fit" love level
         # We only need the dict, so we can ditch the first element
         _, data = LOVE_DATA[index]
