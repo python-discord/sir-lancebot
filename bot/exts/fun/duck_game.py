@@ -5,6 +5,7 @@ from collections import defaultdict
 from io import BytesIO
 from itertools import product
 from pathlib import Path
+from urllib.parse import urlparse
 
 import discord
 from PIL import Image, ImageDraw, ImageFont
@@ -13,6 +14,7 @@ from discord.ext import commands
 from bot.bot import Bot
 from bot.constants import Colours, MODERATION_ROLES
 from bot.utils.decorators import with_role
+
 
 DECK = list(product(*[(0, 1, 2)]*4))
 
@@ -31,9 +33,9 @@ INCORRECT_GOOSE = -1
 
 SOLN_DISTR = 0, 0.05, 0.05, 0.1, 0.15, 0.25, 0.2, 0.15, .05
 
-IMAGE_PATH = Path("bot", "resources", "fun", "all_cards.png")
-FONT_PATH = Path("bot", "resources", "fun", "LuckiestGuy-Regular.ttf")
-HELP_IMAGE_PATH = Path("bot", "resources", "fun", "ducks_help_ex.png")
+IMAGE_PATH = Path("bot", "resources", "evergreen", "all_cards.png")
+FONT_PATH = Path("bot", "resources", "evergreen", "LuckiestGuy-Regular.ttf")
+HELP_IMAGE_PATH = Path("bot", "resources", "evergreen", "ducks_help_ex.png")
 
 ALL_CARDS = Image.open(IMAGE_PATH)
 LABEL_FONT = ImageFont.truetype(str(FONT_PATH), size=16)
@@ -108,7 +110,7 @@ class DuckGame:
         rows: int = 4,
         columns: int = 3,
         minimum_solutions: int = 1,
-    ):
+    ) -> None:
         """
         Take samples from the deck to generate a board.
 
@@ -170,7 +172,7 @@ class DuckGame:
 class DuckGamesDirector(commands.Cog):
     """A cog for running Duck Duck Duck Goose games."""
 
-    def __init__(self, bot: Bot):
+    def __init__(self, bot: Bot) -> None:
         self.bot = bot
         self.current_games = {}
 
@@ -191,7 +193,6 @@ class DuckGamesDirector(commands.Cog):
         game.running = True
         self.current_games[ctx.channel.id] = game
 
-        game.msg_content = ""
         game.embed_msg = await self.send_board_embed(ctx, game)
         await asyncio.sleep(GAME_DURATION)
 
@@ -260,6 +261,7 @@ class DuckGamesDirector(commands.Cog):
         embed = discord.Embed(
             title="Duck Duck Duck Goose!",
             color=Colours.bright_green,
+            footer=""
         )
         embed.set_image(url="attachment://board.png")
         return await ctx.send(embed=embed, file=file)
@@ -267,11 +269,12 @@ class DuckGamesDirector(commands.Cog):
     async def display_claimed_answer(self, game: DuckGame, author: discord.Member, answer: tuple[int]) -> None:
         """Add a claimed answer to the game embed."""
         async with game.editing_embed:
-            # We specifically edit the message contents instead of the embed
-            # Because we load in the image from the file, editing any portion of the embed
-            # Does weird things to the image and this works around that weirdness
-            game.msg_content = f"{game.msg_content}\n{str(answer):12s}  -  {author.display_name}"
-            await game.embed_msg.edit(content=game.msg_content)
+            game_embed, = game.embed_msg.embeds
+            old_footer = game_embed.footer.text
+            if old_footer == discord.Embed.Empty:
+                old_footer = ""
+            game_embed.set_footer(text=f"{old_footer}\n{str(answer):12s}  -  {author.display_name}")
+            await self.edit_embed_with_image(game.embed_msg, game_embed)
 
     async def end_game(self, channel: discord.TextChannel, game: DuckGame, end_message: str) -> None:
         """Edit the game embed to reflect the end of the game and mark the game as not running."""
@@ -297,7 +300,17 @@ class DuckGamesDirector(commands.Cog):
         else:
             missed_text = "All the flights were found!"
 
-        await game.embed_msg.edit(content=f"{missed_text}")
+        game_embed, = game.embed_msg.embeds
+        old_footer = game_embed.footer.text
+        if old_footer == discord.Embed.Empty:
+            old_footer = ""
+        embed_as_dict = game_embed.to_dict()  # Cannot set embed color after initialization
+        embed_as_dict["color"] = discord.Color.red().value
+        game_embed = discord.Embed.from_dict(embed_as_dict)
+        game_embed.set_footer(
+            text=f"{old_footer.rstrip()}\n\n{missed_text}"
+        )
+        await self.edit_embed_with_image(game.embed_msg, game_embed)
 
     @start_game.command(name="help")
     async def show_rules(self, ctx: commands.Context) -> None:
@@ -329,6 +342,13 @@ class DuckGamesDirector(commands.Cog):
             text="Tip: using Discord's compact message display mode can help keep the board on the screen"
         )
         return await ctx.send(file=file, embed=embed)
+
+    @staticmethod
+    async def edit_embed_with_image(msg: discord.Message, embed: discord.Embed) -> None:
+        """Edit an embed without the attached image going wonky."""
+        attach_name = urlparse(embed.image.url).path.split("/")[-1]
+        embed.set_image(url=f"attachment://{attach_name}")
+        await msg.edit(embed=embed)
 
 
 def setup(bot: Bot) -> None:
