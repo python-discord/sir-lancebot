@@ -28,7 +28,7 @@ Unknown WTF Python Query. Please try to reformulate your query.
 If the problem persists send a message in <#{constants.Channels.dev_contrib}>
 """
 
-MINIMUM_CERTAINTY = 50
+MINIMUM_CERTAINTY = 55
 
 
 class WTFPython(commands.Cog):
@@ -76,6 +76,7 @@ class WTFPython(commands.Cog):
         with 100 being a perfect match.
         """
         match, certainty, _ = rapidfuzz.process.extractOne(query, self.headers.keys())
+        log.debug(f"{certainty = }")
         return match if certainty > MINIMUM_CERTAINTY else None
 
     @commands.command(aliases=("wtf", "WTF"))
@@ -87,7 +88,15 @@ class WTFPython(commands.Cog):
         Usage:
             --> .wtf wild imports
         """
-        match = self.fuzzy_match_header(query)
+        if len(query) > 50:
+            embed = Embed(
+                title=random.choice(constants.ERROR_REPLIES),
+                description=ERROR_MESSAGE,
+                colour=constants.Colours.soft_red,
+            )
+            match = None
+        else:
+            match = self.fuzzy_match_header(query)
         if match:
             embed = Embed(
                 title="WTF Python?!",
