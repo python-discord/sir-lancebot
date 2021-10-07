@@ -18,7 +18,7 @@ from bot.utils.pagination import LinePaginator
 log = logging.getLogger(__name__)
 
 
-UNLOAD_BLACKLIST = {f"{exts.__name__}.utils.extensions"}
+UNLOAD_BLACKLIST = {f"{exts.__name__}.core.extensions"}
 BASE_PATH_LEN = len(exts.__name__.split("."))
 
 

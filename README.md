@@ -4,6 +4,7 @@
 [![Lint Badge][1]][2]
 [![Build Badge][3]][4]
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Open in Gitpod](https://img.shields.io/badge/Gitpod-ready--to--code-908a85?logo=gitpod)](https://gitpod.io/#/github.com/python-discord/sir-lancebot)
 
 ![Header](sir-lancebot-logo.png)
 
