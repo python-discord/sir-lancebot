@@ -96,24 +96,25 @@ class WTFPython(commands.Cog):
             match = None
         else:
             match = self.fuzzy_match_header(query)
-        if match:
-            embed = Embed(
-                title="WTF Python?!",
-                colour=constants.Colours.dark_green,
-                description=f"""Search result for '{query}': {match.split("]")[0].replace("[", "")}
-                [Go to Repository Section]({self.headers[match]})""",
-            )
-            logo = File(LOGO_PATH, filename="wtf_logo.jpg")
-            embed.set_thumbnail(url="attachment://wtf_logo.jpg")
-            await ctx.send(embed=embed, file=logo)
-            return
-        else:
+
+        if not match:
             embed = Embed(
                 title=random.choice(constants.ERROR_REPLIES),
                 description=ERROR_MESSAGE,
                 colour=constants.Colours.soft_red,
             )
-        await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
+            return
+
+        embed = Embed(
+            title="WTF Python?!",
+            colour=constants.Colours.dark_green,
+            description=f"""Search result for '{query}': {match.split("]")[0].replace("[", "")}
+            [Go to Repository Section]({self.headers[match]})""",
+        )
+        logo = File(LOGO_PATH, filename="wtf_logo.jpg")
+        embed.set_thumbnail(url="attachment://wtf_logo.jpg")
+        await ctx.send(embed=embed, file=logo)
 
     def cog_unload(self) -> None:
         """Unload the cog and cancel the task."""
