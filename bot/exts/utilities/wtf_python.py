@@ -76,7 +76,6 @@ class WTFPython(commands.Cog):
         with 100 being a perfect match.
         """
         match, certainty, _ = rapidfuzz.process.extractOne(query, self.headers.keys())
-        log.debug(f"{certainty = }")
         return match if certainty > MINIMUM_CERTAINTY else None
 
     @commands.command(aliases=("wtf", "WTF"))
