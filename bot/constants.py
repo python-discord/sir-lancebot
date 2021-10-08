@@ -280,7 +280,7 @@ if Client.month_override is not None:
 
 
 class Roles(NamedTuple):
-    owner = int(environ.get("ROLE_OWNERS", 267627879762755584))
+    owners = int(environ.get("ROLE_OWNERS", 267627879762755584))
     admins = int(environ.get("BOT_ADMIN_ROLE_ID", 267628507062992896))
     moderation_team = int(environ.get("ROLE_MODERATION_TEAM", 267629731250176001))
     helpers = int(environ.get("ROLE_HELPERS", 267630620367257601))
@@ -332,8 +332,8 @@ class Reddit:
 
 
 # Default role combinations
-MODERATION_ROLES = Roles.moderation_team, Roles.admins, Roles.owner
-STAFF_ROLES = Roles.helpers, Roles.moderation_team, Roles.admins, Roles.owner
+MODERATION_ROLES = Roles.moderation_team, Roles.admins, Roles.owners
+STAFF_ROLES = Roles.helpers, Roles.moderation_team, Roles.admins, Roles.owners
 
 # Whitelisted channels
 WHITELISTED_CHANNELS = (
