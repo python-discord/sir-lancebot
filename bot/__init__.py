@@ -15,28 +15,15 @@ from pathlib import Path
 import arrow
 from discord.ext import commands
 
-from bot.command import Command
+from bot import monkey_patches
 from bot.constants import Client
-from bot.group import Group
 
 
 # Configure the "TRACE" logging level (e.g. "log.trace(message)")
 logging.TRACE = 5
 logging.addLevelName(logging.TRACE, "TRACE")
 
-
-def monkeypatch_trace(self: logging.Logger, msg: str, *args, **kwargs) -> None:
-    """
-    Log 'msg % args' with severity 'TRACE'.
-
-    To pass exception information, use the keyword argument exc_info with a true value, e.g.
-    logger.trace("Houston, we have an %s", "interesting problem", exc_info=1)
-    """
-    if self.isEnabledFor(logging.TRACE):
-        self._log(logging.TRACE, msg, args, **kwargs)
-
-
-logging.Logger.trace = monkeypatch_trace
+logging.Logger.trace = monkey_patches.trace_log
 
 # Set timestamp of when execution started (approximately)
 start_time = arrow.utcnow()
@@ -84,11 +71,12 @@ logging.getLogger().info("Logging initialization complete")
 if os.name == "nt":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
+monkey_patches.patch_typing()
 
 # Monkey-patch discord.py decorators to use the both the Command and Group subclasses which supports root aliases.
 # Must be patched before any cogs are added.
-commands.command = partial(commands.command, cls=Command)
-commands.GroupMixin.command = partialmethod(commands.GroupMixin.command, cls=Command)
+commands.command = partial(commands.command, cls=monkey_patches.Command)
+commands.GroupMixin.command = partialmethod(commands.GroupMixin.command, cls=monkey_patches.Command)
 
-commands.group = partial(commands.group, cls=Group)
-commands.GroupMixin.group = partialmethod(commands.GroupMixin.group, cls=Group)
+commands.group = partial(commands.group, cls=monkey_patches.Group)
+commands.GroupMixin.group = partialmethod(commands.GroupMixin.group, cls=monkey_patches.Group)
