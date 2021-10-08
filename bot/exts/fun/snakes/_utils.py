@@ -718,4 +718,4 @@ class SnakeAndLaddersGame:
     @staticmethod
     def _is_moderator(user: Member) -> bool:
         """Return True if the user is a Moderator."""
-        return any(Roles.moderator == role.id for role in user.roles)
+        return any(Roles.moderation_team == role.id for role in user.roles)
