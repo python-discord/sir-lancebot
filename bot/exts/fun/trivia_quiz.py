@@ -550,7 +550,7 @@ class TriviaQuiz(commands.Cog):
             if self.game_status[ctx.channel.id]:
                 # Check if the author is the game starter or a moderator.
                 if ctx.author == self.game_owners[ctx.channel.id] or any(
-                    Roles.moderator == role.id for role in ctx.author.roles
+                        Roles.moderation_team == role.id for role in ctx.author.roles
                 ):
                     self.game_status[ctx.channel.id] = False
                     del self.game_owners[ctx.channel.id]
