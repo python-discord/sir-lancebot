@@ -251,7 +251,7 @@ class AdventOfCode(commands.Cog):
             info_embed = _helpers.get_summary_embed(leaderboard)
             await ctx.send(f"```\n{table}\n```", embed=info_embed)
 
-    @with_role(Roles.admin)
+    @with_role(Roles.admins)
     @adventofcode_group.command(
         name="refresh",
         aliases=("fetch",),

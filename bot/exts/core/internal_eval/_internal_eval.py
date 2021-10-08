@@ -146,14 +146,14 @@ class InternalEval(commands.Cog):
         await self._send_output(ctx, eval_context.format_output())
 
     @commands.group(name="internal", aliases=("int",))
-    @with_role(Roles.admin)
+    @with_role(Roles.admins)
     async def internal_group(self, ctx: commands.Context) -> None:
         """Internal commands. Top secret!"""
         if not ctx.invoked_subcommand:
             await invoke_help_command(ctx)
 
     @internal_group.command(name="eval", aliases=("e",))
-    @with_role(Roles.admin)
+    @with_role(Roles.admins)
     async def eval(self, ctx: commands.Context, *, code: str) -> None:
         """Run eval in a REPL-like format."""
         if match := list(FORMATTED_CODE_REGEX.finditer(code)):
@@ -172,7 +172,7 @@ class InternalEval(commands.Cog):
         await self._eval(ctx, code)
 
     @internal_group.command(name="reset", aliases=("clear", "exit", "r", "c"))
-    @with_role(Roles.admin)
+    @with_role(Roles.admins)
     async def reset(self, ctx: commands.Context) -> None:
         """Reset the context and locals of the eval session."""
         self.locals = {}
