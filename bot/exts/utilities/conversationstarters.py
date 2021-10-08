@@ -100,8 +100,13 @@ class ConvoStarters(commands.Cog):
                     await message.clear_reaction("🔄")
                 break
             else:
-                await message.edit(embed=self._build_topic_embed(message.channel.id))
-                await message.remove_reaction(reaction, user)
+                try:
+                    await message.edit(embed=self._build_topic_embed(message.channel.id))
+                except discord.NotFound:
+                    break
+
+                with suppress(discord.NotFound):
+                    await message.remove_reaction(reaction, user)
 
     @commands.command()
     @commands.cooldown(1, 60*2, commands.BucketType.channel)
