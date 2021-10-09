@@ -92,7 +92,7 @@ class Uwu(Cog):
 
     def _emoji_replace(self, match: re.Match, strength: float = 0.0) -> str:
         """Replaces a punctuation character with an emoticon."""
-        match_string = match.string[slice(*match.span())]
+        match_string = match.group()
         if random.random() < strength:
             return f" {EMOJI_LUT[random.randint(0, len(EMOJI_LUT) - 1)]} "
         return match_string
