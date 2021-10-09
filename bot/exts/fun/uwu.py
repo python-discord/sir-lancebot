@@ -75,7 +75,7 @@ class Uwu(Cog):
         """Adds stuttering to a string."""
         return REGEX_STUTTER.sub(partial(self._stutter_replace, strength=strength), input_string, 0)
 
-    def _stutter_replace(self, match: Callable, strength: float = 0.0) -> str:
+    def _stutter_replace(self, match: re.Match, strength: float = 0.0) -> str:
         """Replaces a single character with a stuttered character."""
         match_string = match.string[slice(*match.span())]
         if random.random() < strength:
