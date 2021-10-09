@@ -79,8 +79,7 @@ class Uwu(Cog):
         """Replaces a single character with a stuttered character."""
         match_string = match.string[slice(*match.span())]
         if random.random() < strength:
-            char = match_string[-1]
-            return f"{match_string}-{char}"
+            return f"{match_string}-{match_string[-1]}"  # Stutter the last character
         return match_string
 
     def _nyaify(self, input_string: str) -> str:
