@@ -90,7 +90,7 @@ class Uwu(Cog):
         """Replaces some punctuation with emoticons."""
         return REGEX_PUNCTUATION.sub(partial(self._emoji_replace, strength=strength), input_string, 0)
 
-    def _emoji_replace(self, match: Callable, strength: float = 0.0) -> str:
+    def _emoji_replace(self, match: re.Match, strength: float = 0.0) -> str:
         """Replaces a punctuation character with an emoticon."""
         match_string = match.string[slice(*match.span())]
         if random.random() < strength:
