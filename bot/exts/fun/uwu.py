@@ -77,7 +77,7 @@ class Uwu(Cog):
 
     def _stutter_replace(self, match: re.Match, strength: float = 0.0) -> str:
         """Replaces a single character with a stuttered character."""
-        match_string = match.string[slice(*match.span())]
+        match_string = match.group()
         if random.random() < strength:
             return f"{match_string}-{match_string[-1]}"  # Stutter the last character
         return match_string
