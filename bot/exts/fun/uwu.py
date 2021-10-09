@@ -68,7 +68,7 @@ class Uwu(Cog):
         return input_string
 
     def _char_replace(self, input_string: str) -> str:
-        """Replaces characters with 'w'."""
+        """Replace certain characters with 'w'."""
         return REGEX_WORD_REPLACE.sub("w", input_string)
 
     def _stutter(self, strength: float, input_string: str) -> str:
