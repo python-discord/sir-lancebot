@@ -63,8 +63,8 @@ class Uwu(Cog):
 
     def _word_replace(self, input_string: str) -> str:
         """Replaces words that are keys in the word replacement hash to the values specified."""
-        for word in WORD_REPLACE_HASH:
-            input_string = input_string.replace(word, WORD_REPLACE_HASH[word])
+        for word, replacement in WORD_REPLACE_HASH.items():
+            input_string = input_string.replace(word, replacement)
         return input_string
 
     def _char_replace(self, input_string: str) -> str:
