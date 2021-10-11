@@ -108,6 +108,7 @@ class Game:
     def __init__(self, players: list[Union[Player, AI]], ctx: Context):
         self.players = players
         self.ctx = ctx
+        self.channel = ctx.channel
         self.board = {
             1: Emojis.number_emojis[1],
             2: Emojis.number_emojis[2],
