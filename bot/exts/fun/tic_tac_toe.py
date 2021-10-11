@@ -72,7 +72,8 @@ class Player:
 class AI:
     """Tic Tac Toe AI class for against computer gaming."""
 
-    def __init__(self, symbol: str):
+    def __init__(self, ctx: Context, symbol: str):
+        self.user = ctx.me
         self.symbol = symbol
 
     async def get_move(self, board: dict[int, str], _: discord.Message) -> tuple[bool, int]:
@@ -97,8 +98,8 @@ class AI:
         return False, random.choice(open_edges)
 
     def __str__(self) -> str:
-        """Return `AI` as user name."""
-        return "AI"
+        """Return mention of @Sir Lancebot."""
+        return self.user.mention
 
 
 class Game:
@@ -265,7 +266,7 @@ class TicTacToe(Cog):
             return
         if opponent is None:
             game = Game(
-                [Player(ctx.author, ctx, Emojis.x_square), AI(Emojis.o_square)],
+                [Player(ctx.author, ctx, Emojis.x_square), AI(ctx, Emojis.o_square)],
                 ctx
             )
         else:
