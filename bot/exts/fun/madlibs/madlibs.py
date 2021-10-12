@@ -27,7 +27,7 @@ class Madlibs(commands.Cog):
     def create_embed(tries: int, user_guess: str) -> Embed:
         """
         Helper method that creates the embed where the game information is shown.
-        
+
         This includes what part of speech the word that the user enters has to fit
         and how many inputs the users has left
         """
@@ -85,7 +85,7 @@ class Madlibs(commands.Cog):
 				return
 
 			word = message.content()
-			
+
 
 def setup(bot: Bot) -> None:
     """Load the Madlibs cog."""
