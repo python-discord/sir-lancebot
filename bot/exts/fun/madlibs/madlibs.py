@@ -27,7 +27,9 @@ class Madlibs(commands.Cog):
     def create_embed(tries: int, user_guess: str) -> Embed:
         """
         Helper method that creates the embed where the game information is shown.
-        This includes how many letters the user has guessed so far, and the hangman photo itself.
+        
+        This includes what part of speech the word that the user enters has to fit
+        and how many inputs the users has left
         """
         madlibs_embed = Embed(
             title="Madlibs",
@@ -35,9 +37,9 @@ class Madlibs(commands.Cog):
         )
         madlibs_embed.add_field(
             name=f"Enter a word that fits the given part of speech!",
-            value=f"Please enter a {blank_number}!"
+            value=f"Please enter a {part_of_speech}!"
         )
-        madlibs_embed.set_footer(text=f"Blanks remaining: {blanks_left}")
+        madlibs_embed.set_footer(text=f"Inputs remaining: {inputs_left}")
         return madlibs_embed
 
 	@commands.command()
@@ -67,25 +69,23 @@ class Madlibs(commands.Cog):
             await ctx.send(embed=filter_not_found_embed)
             return
 
-
 		with open("madlibs_templates.json") as file:
 			file = loads(file)
 			random_template = choice(file["templates"])
-			blank_number = random_template["blanks"][0]
-			blanks_left = templates["blanks"][blanks_left - 1]
-			# blanks_embed = discord.Embed(title='Welcome to Madlibs!', description='Please enter a ' + blank_number + '!', color=Colours.python_blue)
+			part_of_speech = random_template["blanks"][0]
+			inputs_left = templates["blanks"][len("blanks") - 1]
+
 			self.create_embed()
-			bot.wait_for()
+
+			try:
+				timeout = await self.bot.wait_for(event='on_message', timeout=60.0)
+			except TimeoutError:
+				timeout_embed = discord.Embed(title=choice(NEGATIVE_REPLIES), description='Looks like the bot timed out!')
+				await ctx.send(embed=timeout_embed)
+				return
+
 			word = message.content()
 			
-			# try:
-			# 	self.bot.wait_for(event='message', timeout=60.0)
-			# except TimeoutError:
-			# 	timeout_embed = discord.Embed(title=choice(NEGATIVE_REPLIES), description='Looks like the bot timed out!')
-			# 	await ctx.send(embed=timeout_embed)
-			# 	return
-			
-
 
 def setup(bot: Bot) -> None:
     """Load the Madlibs cog."""
