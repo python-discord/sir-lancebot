@@ -234,7 +234,7 @@ class Bot(commands.Bot):
         dev_alerts_channel = self.get_channel(constants.Channels.dev_alerts)
         core_dev_role = self.get_guild(constants.Client.guild).get_role(constants.Roles.core_developers)
         msg = (
-            f"\u26a0 {core_dev_role.mention}\n"
+            f"\N{WARNING SIGN} {core_dev_role.mention}\n"
             "The following extensions were found in the cache but not on the bot:\n\n"
             f"- {extensions_msg}"
             "\n\nClearing them from the cache."
