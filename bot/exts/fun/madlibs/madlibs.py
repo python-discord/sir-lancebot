@@ -1,17 +1,21 @@
 from asyncio import TimeoutError
 from pathlib import Path
 from random import choice
-from typing import Literal
-from json import loads
+# from json import loads
+# from typing import Literal
+from typing import List
 
-from discord import Embed, Message
+from discord import Embed
 from discord.ext import commands
 
 from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES
 
 # Defining a json file with the story templates as a global variable
-madlibs_stories = Path("bot/resources/fun/madlibs_templates.json")
+madlibs_stories = Path("bot/exts/fun/madlibs/madlibs_templates.json")
+
+with madlibs_stories as file:
+    random_template = choice(file["templates"])
 
 
 class Madlibs(commands.Cog):
@@ -27,22 +31,30 @@ class Madlibs(commands.Cog):
         self.bot = bot
 
     @staticmethod
-    def create_embed(tries: int, user_guess: str) -> Embed:
+    def create_embed(random_template: List) -> Embed:
         """
         Helper method that creates the embed where the game information is shown.
 
         This includes what part of speech the word that the user enters has to fit
         and how many inputs the users has left
         """
+        i = 0
+
+        part_of_speech = random_template["blanks"][i]
+        inputs_left = random_template["blanks"][len("blanks") - 1]
+
         madlibs_embed = Embed(
             title="Madlibs",
             color=Colours.python_blue,
         )
         madlibs_embed.add_field(
-            name=f"Enter a word that fits the given part of speech!",
+            name="Enter a word that fits the given part of speech!",
             value=f"Please enter a {part_of_speech}!"
         )
         madlibs_embed.set_footer(text=f"Inputs remaining: {inputs_left}")
+
+        i += 1
+
         return madlibs_embed
 
     @commands.command()
@@ -59,33 +71,32 @@ class Madlibs(commands.Cog):
         - min_length: the minimum number of inputs you would like in your game
         - max_length: the maximum number of inputs you would like in your game
         """
-        filtered_blanks = [if min_length < len(random_template["blanks"]) < max_length]
+        filtered_blanks = [min_length < len(random_template["blanks"]) < max_length]
 
         if not filtered_blanks:
             filter_not_found_embed = Embed(
                 title=choice(NEGATIVE_REPLIES),
-                description="Sorry, we could not generate a game for you because you entered invalid numbers for the filters.",
+                description="Sorry, we could not generate a game for you because "
+                + "you entered invalid numbers for the filters.",
                 color=Colours.soft_red,
             )
-           	await ctx.send(embed=filter_not_found_embed)
+            await ctx.send(embed=filter_not_found_embed)
             return
 
-        with open("madlibs_templates.json") as file:
-            file = loads(file)
-            random_template = choice(file["templates"])
-            part_of_speech = random_template["blanks"][0]
-            inputs_left = templates["blanks"][len("blanks") - 1]
+        # with madlibs_stories as file:
+        #     file = loads(file)
 
             self.create_embed()
 
             try:
-                timeout = await self.bot.wait_for(event='on_message', timeout=60.0)
+                await self.bot.wait_for(event='on_message', timeout=60.0)
             except TimeoutError:
-                timeout_embed = discord.Embed(title=choice(NEGATIVE_REPLIES), description='Looks like the bot timed out!')
+                timeout_embed = Embed(title=choice(NEGATIVE_REPLIES),
+                                      description='Looks like the bot timed out!')
                 await ctx.send(embed=timeout_embed)
                 return
 
-            word = message.content()
+            # word = message.content()
 
 
 def setup(bot: Bot) -> None:
