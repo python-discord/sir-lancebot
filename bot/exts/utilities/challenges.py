@@ -114,7 +114,7 @@ class Challenges(commands.Cog):
                     description="We ran into an error when getting the kata from codewars.com, try again later.",
                     color=Colours.soft_red
                 )
-                logger.error(f"Unexpected response from codewars.com, status code: {response.status}")
+                log.error(f"Unexpected response from codewars.com, status code: {response.status}")
                 return error_embed
 
             soup = BeautifulSoup(await response.text(), features="lxml")
@@ -146,7 +146,7 @@ class Challenges(commands.Cog):
                     description="We ran into an error when getting the kata information, try again later.",
                     color=Colours.soft_red
                 )
-                logger.error(f"Unexpected response from codewars.com/api/v1, status code: {response.status}")
+                log.error(f"Unexpected response from codewars.com/api/v1, status code: {response.status}")
                 return error_embed
 
             return await response.json()
