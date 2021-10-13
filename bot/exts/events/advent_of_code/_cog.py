@@ -25,7 +25,6 @@ AOC_WHITELIST_RESTRICTED = WHITELISTED_CHANNELS + (Channels.advent_of_code_comma
 # Some commands can be run in the regular advent of code channel
 # They aren't spammy and foster discussion
 AOC_WHITELIST = AOC_WHITELIST_RESTRICTED + (Channels.advent_of_code,)
-AOC_DAY_ANDSTAR_TEMPLATE = "{rank: >4} | {name:25.25} | {completion_time: >10}"
 
 
 class AdventOfCode(commands.Cog):

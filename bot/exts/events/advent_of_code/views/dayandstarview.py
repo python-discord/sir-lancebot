@@ -2,7 +2,7 @@ from datetime import datetime
 
 import discord
 
-AOC_DAY_ANDSTAR_TEMPLATE = "{rank: >4} | {name:25.25} | {completion_time: >10}"
+AOC_DAY_AND_STAR_TEMPLATE = "{rank: >4} | {name:25.25} | {completion_time: >10}"
 
 
 class AoCDropdownView(discord.ui.View):
@@ -18,14 +18,20 @@ class AoCDropdownView(discord.ui.View):
 
     def generate_output(self) -> str:
         """Generates a formatted codeblock with AoC statistics based on the currently selected day and star."""
-        header = AOC_DAY_ANDSTAR_TEMPLATE.format(rank="Rank", name="Name",
-                                                 completion_time="Completion time (UTC)")
+        header = AOC_DAY_AND_STAR_TEMPLATE.format(
+            rank="Rank",
+            name="Name", completion_time="Completion time (UTC)"
+        )
         lines = [f"{header}\n{'-' * (len(header) + 2)}"]
 
         for rank, scorer in enumerate(self.data[f"{self.day}-{self.star}"][:self.maximum_scorers]):
             time_data = datetime.fromtimestamp(scorer['completion_time']).strftime("%I:%M:%S %p")
-            lines.append(AOC_DAY_ANDSTAR_TEMPLATE.format(datastamp="", rank=rank + 1, name=scorer['member_name'],
-                                                         completion_time=time_data))
+            lines.append(AOC_DAY_AND_STAR_TEMPLATE.format(
+                datastamp="",
+                rank=rank + 1,
+                name=scorer['member_name'],
+                completion_time=time_data)
+            )
         joined_lines = "\n".join(lines)
         return f"Statistics for Day: {self.day}, Star: {self.star}.\n ```\n{joined_lines}\n```"
 
