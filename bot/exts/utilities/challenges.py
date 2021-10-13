@@ -162,10 +162,16 @@ class Challenges(commands.Cog):
             kata_description = "\n".join(kata_description[:1000].split("\n")[:-1]) + "..."
             kata_description += f" [continue reading]({kata_url})"
 
+        if kata_information["rank"]["name"] is None:
+            embed_color = 8
+            kata_information["rank"]["name"] = "Unable to retrieve difficulty for beta languages."
+        else:
+            embed_color = int(kata_information["rank"]["name"].replace(" kyu", ""))
+
         kata_embed = Embed(
             title=kata_information["name"],
             description=kata_description,
-            color=MAPPING_OF_KYU[int(kata_information["rank"]["name"].replace(" kyu", ""))],
+            color=MAPPING_OF_KYU[embed_color],
             url=kata_url
         )
         kata_embed.add_field(name="Difficulty", value=kata_information["rank"]["name"], inline=False)
@@ -275,8 +281,7 @@ class Challenges(commands.Cog):
         params = {}
 
         if language and not query:
-            level = f"-{choice([1, 2, 3, 4, 5, 6, 7, 8])}"
-            params["r[]"] = level
+            pass
         elif "," in query:
             query_splitted = query.split("," if ", " not in query else ", ")
 
