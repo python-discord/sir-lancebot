@@ -134,7 +134,7 @@ class CandyCollection(commands.Cog):
     @property
     def hacktober_channel(self) -> discord.TextChannel:
         """Get #hacktoberbot channel from its ID."""
-        return self.bot.get_channel(id=Channels.community_bot_commands)
+        return self.bot.get_channel(Channels.community_bot_commands)
 
     @staticmethod
     async def send_spook_msg(
