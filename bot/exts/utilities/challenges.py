@@ -164,9 +164,10 @@ class Challenges(commands.Cog):
 
         if kata_information["rank"]["name"] is None:
             embed_color = 8
-            kata_information["rank"]["name"] = "Unable to retrieve difficulty for beta languages."
+            kata_difficulty = "Unable to retrieve difficulty for beta languages."
         else:
             embed_color = int(kata_information["rank"]["name"].replace(" kyu", ""))
+            kata_difficulty = kata_information["rank"]["name"]
 
         kata_embed = Embed(
             title=kata_information["name"],
@@ -174,7 +175,7 @@ class Challenges(commands.Cog):
             color=MAPPING_OF_KYU[embed_color],
             url=kata_url
         )
-        kata_embed.add_field(name="Difficulty", value=kata_information["rank"]["name"], inline=False)
+        kata_embed.add_field(name="Difficulty", value=kata_difficulty, inline=False)
         return kata_embed
 
     @staticmethod
@@ -280,9 +281,7 @@ class Challenges(commands.Cog):
         get_kata_link = f"https://codewars.com/kata/search/{language}"
         params = {}
 
-        if language and not query:
-            pass
-        elif "," in query:
+        if query is not None and "," in query:
             query_splitted = query.split("," if ", " not in query else ", ")
 
             if len(query_splitted) > 2:
@@ -293,9 +292,9 @@ class Challenges(commands.Cog):
             query, level = query_splitted
             params["q"] = query
             params["r[]"] = f"-{level}"
-        elif query.isnumeric():
+        elif query is not None and query.isnumeric():
             params["r[]"] = f"-{query}"
-        else:
+        elif query is not None:
             params["q"] = query
 
         params["beta"] = str(language in SUPPORTED_LANGUAGES["beta"]).lower()
