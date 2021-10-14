@@ -47,7 +47,6 @@ class AoCDropdownView(discord.ui.View):
     async def day_select(self, select: discord.ui.Select, interaction: discord.Interaction) -> None:
         """Dropdown to choose a Day of the AoC."""
         self.day = select.values[0]
-        return
 
     @discord.ui.select(
         placeholder="Star",
@@ -57,7 +56,6 @@ class AoCDropdownView(discord.ui.View):
     async def star_select(self, select: discord.ui.Select, interaction: discord.Interaction) -> None:
         """Dropdown to choose either the first or the second star."""
         self.star = select.values[0]
-        return
 
     @discord.ui.button(label="Fetch", style=discord.ButtonStyle.blurple)
     async def fetch(self, button: discord.ui.Button, interaction: discord.Interaction) -> None:
@@ -67,7 +65,6 @@ class AoCDropdownView(discord.ui.View):
                 "You have to select a value from both of the dropdowns!",
                 ephemeral=True
             )
-            return
         else:
             await interaction.response.edit_message(content=self.generate_output())
             self.day = 0

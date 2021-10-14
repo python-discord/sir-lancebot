@@ -16,6 +16,7 @@ from bot.exts.events.advent_of_code import _helpers
 from bot.exts.events.advent_of_code.views.dayandstarview import AoCDropdownView
 from bot.utils.decorators import InChannelCheckFailure, in_month, whitelist_override, with_role
 from bot.utils.extensions import invoke_help_command
+
 log = logging.getLogger(__name__)
 
 AOC_REQUEST_HEADER = {"user-agent": "PythonDiscord AoC Event Bot"}
@@ -235,7 +236,6 @@ class AdventOfCode(commands.Cog):
         )
         await view.wait()
         await message.edit(view=None)
-        return
 
     @in_month(Month.DECEMBER)
     @adventofcode_group.command(
