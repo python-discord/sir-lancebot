@@ -88,6 +88,7 @@ class AdventOfCode:
     ignored_days = environ.get("AOC_IGNORED_DAYS", "").split(",")
     leaderboard_displayed_members = 10
     leaderboard_cache_expiry_seconds = 1800
+    max_day_and_star_results = 15
     year = int(environ.get("AOC_YEAR", datetime.utcnow().year))
     role_id = int(environ.get("AOC_ROLE_ID", 518565788744024082))
 
