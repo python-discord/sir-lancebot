@@ -70,6 +70,15 @@ class Bot(commands.Bot):
         with suppress(Forbidden):
             await thread.join()
 
+    async def start(self, *args, **kwargs) -> None:
+        """Async wrapper to load all the extensions."""
+        from bot.utils.extensions import walk_extensions
+
+        for ext in walk_extensions():
+            await bot.load_extension(ext)
+
+        await super().start(*args, **kwargs)
+
     async def close(self) -> None:
         """Close Redis session when bot is shutting down."""
         await super().close()
