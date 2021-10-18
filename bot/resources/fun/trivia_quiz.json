@@ -52,7 +52,7 @@
         "They generally have handdrawn nature images on them."
       ],
       "question": "What did Nintendo make before video games and toys?",
-      "answer": "Hanafuda, Hanafuda cards"
+      "answer": ["Hanafuda", "Hanafuda cards"]
     },
     {
       "id": 7,
@@ -292,22 +292,22 @@
     {
       "id": 201,
       "question": "What is the highest power of a biquadratic polynomial?",
-      "answer": "4, four"
+      "answer": ["4", "four"]
     },
     {
       "id": 202,
       "question": "What is the formula for surface area of a sphere?",
-      "answer": "4pir^2, 4πr^2"
+      "answer": ["4pir^2", "4πr^2"]
     },
     {
       "id": 203,
       "question": "Which theorem states that hypotenuse^2 = base^2 + height^2?",
-      "answer": "Pythagorean's, Pythagorean's theorem"
+      "answer": ["Pythagorean's", "Pythagorean's theorem"]
     },
     {
       "id": 204,
       "question": "Which trigonometric function is defined as hypotenuse/opposite?",
-      "answer": "cosecant, cosec, csc"
+      "answer": ["cosecant", "cosec", "csc"]
     },
     {
       "id": 205,
@@ -317,7 +317,7 @@
     {
       "id": 206,
       "question": "How many quadrants are there in a cartesian plane?",
-      "answer": "4, four"
+      "answer": ["4", "four"]
     },
     {
       "id": 207,
@@ -328,7 +328,7 @@
       "id": 208,
       "question": "What's the following formula that finds the area of a triangle called?",
       "img_url": "https://wikimedia.org/api/rest_v1/media/math/render/png/d22b8566e8187542966e8d166e72e93746a1a6fc",
-      "answer": "Heron's formula, Heron"
+      "answer": ["Heron's formula", "Heron"]
     },
     {
       "id": 209,
@@ -372,12 +372,12 @@
     {
       "id": 216,
       "question": "In set builder notation, what does {p/q | q ≠ 0, p & q ∈ Z} represent?",
-      "answer": "Rationals, Rational Numbers"
+      "answer": ["Rationals", "Rational Numbers"]
     },
     {
       "id": 217,
       "question": "What is the natural log of -1 (use i for imaginary number)?",
-      "answer": "pi*i, pii, πi"
+      "answer": ["pi*i", "pii", "πi"]
     },
     {
       "id": 218,
@@ -397,7 +397,7 @@
     {
       "id": 221,
       "question": "Prime numbers only have __ factors.",
-      "answer": "2, two"
+      "answer": ["2", "two"]
     },
     {
       "id": 222,
@@ -408,7 +408,7 @@
       "id": 223,
       "question": "In statistics, what does this formula represent?",
       "img_url": "https://www.statisticshowto.com/wp-content/uploads/2013/11/sample-standard-deviation.jpg",
-      "answer": "sample standard deviation, standard deviation of a sample"
+      "answer": ["sample standard deviation", "standard deviation of a sample"]
     },
     {
       "id": 224,
@@ -418,7 +418,7 @@
     {
       "id": 225,
       "question": "A matrix multiplied by its inverse matrix equals...",
-      "answer": "the identity matrix, identity matrix"
+      "answer": ["the identity matrix", "identity matrix"]
     },
     {
       "id": 226,
@@ -429,19 +429,19 @@
     {
       "id": 227,
       "question": "What is the only number in the entire number system which can be spelled with the same number of letters as itself?",
-      "answer": "4, four"
+      "answer": ["4", "four"]
 
     },
     {
       "id": 228,
       "question": "1/100th of a second is also termed as what?",
-      "answer": "a jiffy, jiffy, centisecond"
+      "answer": ["a jiffy", "jiffy", "centisecond"]
     },
     {
       "id": 229,
       "question": "What is this triangle called?",
-      "img_url": "https://cdn.askpython.com/wp-content/uploads/2020/07/Pascals-triangle.png",
-      "answer": "Pascal's triangle, Pascal"
+      "img_url": "https://wikimedia.org/api/rest_v1/media/math/render/png/23050fcb53d6083d9e42043bebf2863fa9746043",
+      "answer": ["Pascal's triangle", "Pascal"]
     },
     {
       "id": 230,
@@ -468,17 +468,17 @@
     {
       "id": 304,
       "question": "What do you call an organism composed of only one cell?",
-      "answer": "unicellular, single-celled"
+      "answer": ["unicellular", "single-celled"]
     },
     {
       "id": 305,
       "question": "The Heisenberg's Uncertainty Principle states that the position and \\_\\_\\_\\_\\_\\_\\_\\_ of a quantum object can't be both exactly measured at the same time.",
-      "answer": "velocity, momentum"
+      "answer": ["velocity", "momentum"]
     },
     {
       "id": 306,
       "question": "A \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_ reaction is the one wherein an atom or a set of atoms is/are replaced by another atom or a set of atoms",
-      "answer": "displacement, exchange"
+      "answer": ["displacement", "exchange"]
     },
     {
       "id": 307,
@@ -512,7 +512,7 @@
     {
       "id": 312,
       "question": "What is the intermolecular force caused by temporary and induced dipoles?",
-      "answer": "LDF, London dispersion, London dispersion force"
+      "answer": ["LDF", "London dispersion", "London dispersion force"]
     },
     {
       "id": 313,
@@ -522,7 +522,7 @@
     {
       "id": 314,
       "question": "About how many neurons are in the human brain?\n(A. 1 billion, B. 10 billion, C. 100 billion, D. 300 billion)",
-      "answer": "C, 100 billion, 100 bil"
+      "answer": ["C", "100 billion", "100 bil"]
     },
     {
       "id": 315,
@@ -537,12 +537,12 @@
     {
       "id": 317,
       "question": "Which vascular tissue transports water and minerals from the roots to the rest of a plant?",
-      "answer": "the xylem, xylem"
+      "answer": ["the xylem", "xylem"]
     },
     {
       "id": 318,
       "question": "Who discovered the theories of relativity?",
-      "answer": "Albert Einstein, Einstein"
+      "answer": ["Albert Einstein", "Einstein"]
     },
     {
       "id": 319,
@@ -557,7 +557,7 @@
     {
       "id": 321,
       "question": "What range of frequency are the average human ears capable of hearing?\n(A. 10Hz-10kHz, B. 20Hz-20kHz, C. 20Hz-2000Hz, D. 10kHz-20kHz)",
-      "answer": "B, 20Hz-20kHz"
+      "answer": ["B", "20Hz-20kHz"]
     },
     {
       "id": 322,
@@ -572,7 +572,7 @@
     {
       "id": 324,
       "question": "The type of rock that is formed by the accumulation or deposition of mineral or organic particles at the Earth's surface, followed by cementation, is called...",
-      "answer": "sedimentary, sedimentary rock"
+      "answer": ["sedimentary", "sedimentary rock"]
     },
     {
       "id": 325,
@@ -582,7 +582,7 @@
     {
       "id": 326,
       "question": "What type of image is formed by a convex mirror?",
-      "answer": "virtual image, virtual"
+      "answer": ["virtual image", "virtual"]
     },
     {
       "id": 327,
@@ -592,17 +592,17 @@
     {
       "id": 328,
       "question": "Which law states that the global entropy in a closed system can only increase?",
-      "answer": "second law, second law of thermodynamics"
+      "answer": ["second law", "second law of thermodynamics"]
     },
     {
       "id": 329,
       "question": "Which particle is emitted during the beta decay of a radioactive element?",
-      "answer": "an electron, the electron, electron"
+      "answer": ["an electron", "the electron", "electron"]
     },
     {
       "id": 330,
       "question": "When DNA is unzipped, two strands are formed. What are they called (separate both answers by the word \"and\")?",
-      "answer": "leading and lagging, leading strand and lagging strand"
+      "answer": ["leading and lagging", "leading strand and lagging strand"]
     }
   ],
   "cs": [
@@ -619,7 +619,7 @@
     {
       "id": 403,
       "question": "What does SASS stand for?",
-      "answer": "Syntactically Awesome Stylesheets, Syntactically Awesome Style Sheets"
+      "answer": ["Syntactically Awesome Stylesheets", "Syntactically Awesome Style Sheets"]
     },
     {
       "id": 404,
@@ -629,7 +629,7 @@
     {
       "id": 405,
       "question": "What is computing capable of performing exaFLOPS called?",
-      "answer": "exascale computing, exascale"
+      "answer": ["exascale computing", "exascale"]
     },
     {
       "id": 406,
@@ -654,7 +654,7 @@
     {
       "id": 410,
       "question": "A hypothetical point in time at which technological growth becomes uncontrollable and irreversible, resulting in unforeseeable changes to human civilization is termed as...?",
-      "answer": "technological singularity, singularity"
+      "answer": ["technological singularity", "singularity"]
     },
     {
       "id": 411,
@@ -664,12 +664,12 @@
     {
       "id": 412,
       "question": "How many bits are in a TCP checksum header?",
-      "answer": "16, sixteen"
+      "answer": ["16", "sixteen"]
     },
     {
       "id": 413,
       "question": "What is the most popular protocol (as of 2021) that handles communication between email servers?",
-      "answer": "SMTP, Simple Mail Transfer Protocol"
+      "answer": ["SMTP", "Simple Mail Transfer Protocol"]
     },
     {
       "id": 414,
@@ -679,12 +679,12 @@
     {
       "id": 415,
       "question": "Which DNS record contains mail servers of a given domain?",
-      "answer": "MX, mail exchange"
+      "answer": ["MX", "mail exchange"]
     },
     {
       "id": 416,
       "question": "Which newline sequence does HTTP use?",
-      "answer": "carriage return line feed, CRLF, \\r\\n"
+      "answer": ["carriage return line feed", "CRLF", "\\r\\n"]
     },
     {
       "id": 417,
@@ -694,7 +694,7 @@
     {
       "id": 418,
       "question": "Name a universal logic gate.",
-      "answer": "NAND, NOR"
+      "answer": ["NAND", "NOR"]
     },
     {
       "id": 419,
@@ -729,7 +729,7 @@
     {
       "id": 425,
       "question": "What does the \"a\" represent in a HSLA color value?",
-      "answer": "transparency, translucency, alpha value, alpha channel, alpha"
+      "answer": ["transparency", "translucency", "alpha value", "alpha channel", "alpha"]
     },
     {
       "id": 426,
@@ -749,7 +749,7 @@
     {
       "id": 429,
       "question": "Which of these sorting algorithms is not stable?\n(Counting sort, quick sort, insertion sort, tim sort, bubble sort)",
-      "answer": "quick, quick sort"
+      "answer": ["quick", "quick sort"]
     },
     {
       "id": 430,
@@ -761,7 +761,7 @@
     {
       "id": 501,
       "question": "Is everything an instance of the `object` class (y/n)?",
-      "answer": "y, yes"
+      "answer": ["y", "yes"]
     },
     {
       "id": 502,
@@ -781,7 +781,7 @@
     {
       "id": 505,
       "question": "Can you pickle a running `list_iterator` (y/n)?",
-      "answer": "y, yes"
+      "answer": ["y", "yes"]
     },
     {
       "id": 506,
@@ -821,12 +821,12 @@
     {
       "id": 513,
       "question": "Where does the name Python come from?",
-      "answer": "Monty Python, Monty Python's Flying Circus"
+      "answer": ["Monty Python", "Monty Python's Flying Circus"]
     },
     {
       "id": 514,
       "question": "How is infinity represented in Python?",
-      "answer": "float(\"infinity\"), float('infinity'), float(\"inf\"), float('inf')"
+      "answer": ["float(\"infinity\")", "float('infinity')", "float(\"inf\")", "float('inf')"]
     },
     {
       "id": 515,
@@ -846,12 +846,12 @@
     {
       "id": 518,
       "question": "What decorator is used to allow a protocol to be checked at runtime?",
-      "answer": "runtime_checkable, typing.runtime_checkable"
+      "answer": ["runtime_checkable", "typing.runtime_checkable"]
     },
     {
       "id": 519,
       "question": "Does `numbers.Rational` include the builtin object float (y/n)",
-      "answer": "n, no"
+      "answer": ["n", "no"]
     },
     {
       "id": 520,
@@ -866,7 +866,7 @@
     {
       "id": 522,
       "question": "What is the garbage collection strategy used by cpython to collect everything but reference cycles?",
-      "answer": "reference counting, refcounting"
+      "answer": ["reference counting", "refcounting"]
     },
     {
       "id": 523,
@@ -891,12 +891,12 @@
     {
       "id": 527,
       "question": "Is the `__aiter__` method async (y/n)?",
-      "answer": "n, no"
+      "answer": ["n", "no"]
     },
     {
       "id": 528,
       "question": "How does one call a class who defines the behavior of their instance classes?",
-      "answer": "a metaclass, metaclass"
+      "answer": ["a metaclass", "metaclass"]
     },
     {
       "id": 529,

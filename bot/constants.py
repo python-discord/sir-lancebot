@@ -88,6 +88,7 @@ class AdventOfCode:
     ignored_days = environ.get("AOC_IGNORED_DAYS", "").split(",")
     leaderboard_displayed_members = 10
     leaderboard_cache_expiry_seconds = 1800
+    max_day_and_star_results = 15
     year = int(environ.get("AOC_YEAR", datetime.utcnow().year))
     role_id = int(environ.get("AOC_ROLE_ID", 518565788744024082))
 
@@ -101,8 +102,8 @@ class Cats:
 
 
 class Channels(NamedTuple):
-    advent_of_code = int(environ.get("AOC_CHANNEL_ID", 782715290437943306))
-    advent_of_code_commands = int(environ.get("AOC_COMMANDS_CHANNEL_ID", 607247579608121354))
+    advent_of_code = int(environ.get("AOC_CHANNEL_ID", 897932085766004786))
+    advent_of_code_commands = int(environ.get("AOC_COMMANDS_CHANNEL_ID", 897932607545823342))
     bot = 267659945086812160
     organisation = 551789653284356126
     devlog = int(environ.get("CHANNEL_DEVLOG", 622895325144940554))
@@ -281,11 +282,12 @@ if Client.month_override is not None:
 
 
 class Roles(NamedTuple):
+    owner = 267627879762755584
     admin = int(environ.get("BOT_ADMIN_ROLE_ID", 267628507062992896))
     moderator = 267629731250176001
-    owner = 267627879762755584
     helpers = int(environ.get("ROLE_HELPERS", 267630620367257601))
     core_developers = int(environ.get("ROLE_CORE_DEVELOPERS", 587606783669829632))
+    everyone = int(environ.get("BOT_GUILD", 267624335836053506))
 
 
 class Tokens(NamedTuple):

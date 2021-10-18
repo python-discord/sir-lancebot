@@ -3,190 +3,211 @@ import json
 import logging
 import operator
 import random
+import re
+import string
+from collections import defaultdict
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Callable, Optional
 
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 from rapidfuzz import fuzz
 
 from bot.bot import Bot
-from bot.constants import Colours, NEGATIVE_REPLIES, Roles
+from bot.constants import Client, Colours, NEGATIVE_REPLIES, Roles
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_QUESTION_LIMIT = 6
+DEFAULT_QUESTION_LIMIT = 7
 STANDARD_VARIATION_TOLERANCE = 88
 DYNAMICALLY_GEN_VARIATION_TOLERANCE = 97
+
+MAX_ERROR_FETCH_TRIES = 3
 
 WRONG_ANS_RESPONSE = [
     "No one answered correctly!",
     "Better luck next time...",
 ]
 
-N_PREFIX_STARTS_AT = 5
-N_PREFIXES = [
-    "penta", "hexa", "hepta", "octa", "nona",
-    "deca", "hendeca", "dodeca", "trideca", "tetradeca",
-]
+RULES = (
+    "No cheating and have fun!",
+    "Points for each question reduces by 25 after 10s or after a hint. Total time is 30s per question"
+)
 
-PLANETS = [
-    ("1st", "Mercury"),
-    ("2nd", "Venus"),
-    ("3rd", "Earth"),
-    ("4th", "Mars"),
-    ("5th", "Jupiter"),
-    ("6th", "Saturn"),
-    ("7th", "Uranus"),
-    ("8th", "Neptune"),
-]
-
-TAXONOMIC_HIERARCHY = [
-    "species", "genus", "family", "order",
-    "class", "phylum", "kingdom", "domain",
-]
-
-UNITS_TO_BASE_UNITS = {
-    "hertz": ("(unit of frequency)", "s^-1"),
-    "newton": ("(unit of force)", "m*kg*s^-2"),
-    "pascal": ("(unit of pressure & stress)", "m^-1*kg*s^-2"),
-    "joule": ("(unit of energy & quantity of heat)", "m^2*kg*s^-2"),
-    "watt": ("(unit of power)", "m^2*kg*s^-3"),
-    "coulomb": ("(unit of electric charge & quantity of electricity)", "s*A"),
-    "volt": ("(unit of voltage & electromotive force)", "m^2*kg*s^-3*A^-1"),
-    "farad": ("(unit of capacitance)", "m^-2*kg^-1*s^4*A^2"),
-    "ohm": ("(unit of electric resistance)", "m^2*kg*s^-3*A^-2"),
-    "weber": ("(unit of magnetic flux)", "m^2*kg*s^-2*A^-1"),
-    "tesla": ("(unit of magnetic flux density)", "kg*s^-2*A^-1"),
-}
+WIKI_FEED_API_URL = "https://en.wikipedia.org/api/rest_v1/feed/featured/{date}"
+TRIVIA_QUIZ_ICON = (
+    "https://raw.githubusercontent.com/python-discord/branding/main/icons/trivia_quiz/trivia-quiz-dist.png"
+)
 
 
 @dataclass(frozen=True)
 class QuizEntry:
-    """Dataclass for a quiz entry (a question and a string containing answers separated by commas)."""
+    """Stores quiz entry (a question and a list of answers)."""
 
     question: str
-    answer: str
+    answers: list[str]
+    var_tol: int
 
 
-def linear_system(q_format: str, a_format: str) -> QuizEntry:
-    """Generate a system of linear equations with two unknowns."""
-    x, y = random.randint(2, 5), random.randint(2, 5)
-    answer = a_format.format(x, y)
+class DynamicQuestionGen:
+    """Class that contains functions to generate math/science questions for TriviaQuiz Cog."""
 
-    coeffs = random.sample(range(1, 6), 4)
+    N_PREFIX_STARTS_AT = 5
+    N_PREFIXES = [
+        "penta", "hexa", "hepta", "octa", "nona",
+        "deca", "hendeca", "dodeca", "trideca", "tetradeca",
+    ]
 
-    question = q_format.format(
-        coeffs[0],
-        coeffs[1],
-        coeffs[0] * x + coeffs[1] * y,
-        coeffs[2],
-        coeffs[3],
-        coeffs[2] * x + coeffs[3] * y,
-    )
+    PLANETS = [
+        ("1st", "Mercury"),
+        ("2nd", "Venus"),
+        ("3rd", "Earth"),
+        ("4th", "Mars"),
+        ("5th", "Jupiter"),
+        ("6th", "Saturn"),
+        ("7th", "Uranus"),
+        ("8th", "Neptune"),
+    ]
 
-    return QuizEntry(question, answer)
+    TAXONOMIC_HIERARCHY = [
+        "species", "genus", "family", "order",
+        "class", "phylum", "kingdom", "domain",
+    ]
 
+    UNITS_TO_BASE_UNITS = {
+        "hertz": ("(unit of frequency)", "s^-1"),
+        "newton": ("(unit of force)", "m*kg*s^-2"),
+        "pascal": ("(unit of pressure & stress)", "m^-1*kg*s^-2"),
+        "joule": ("(unit of energy & quantity of heat)", "m^2*kg*s^-2"),
+        "watt": ("(unit of power)", "m^2*kg*s^-3"),
+        "coulomb": ("(unit of electric charge & quantity of electricity)", "s*A"),
+        "volt": ("(unit of voltage & electromotive force)", "m^2*kg*s^-3*A^-1"),
+        "farad": ("(unit of capacitance)", "m^-2*kg^-1*s^4*A^2"),
+        "ohm": ("(unit of electric resistance)", "m^2*kg*s^-3*A^-2"),
+        "weber": ("(unit of magnetic flux)", "m^2*kg*s^-2*A^-1"),
+        "tesla": ("(unit of magnetic flux density)", "kg*s^-2*A^-1"),
+    }
 
-def mod_arith(q_format: str, a_format: str) -> QuizEntry:
-    """Generate a basic modular arithmetic question."""
-    quotient, m, b = random.randint(30, 40), random.randint(10, 20), random.randint(200, 350)
-    ans = random.randint(0, 9)  # max remainder is 9, since the minimum modulus is 10
-    a = quotient * m + ans - b
+    @classmethod
+    def linear_system(cls, q_format: str, a_format: str) -> QuizEntry:
+        """Generate a system of linear equations with two unknowns."""
+        x, y = random.randint(2, 5), random.randint(2, 5)
+        answer = a_format.format(x, y)
 
-    question = q_format.format(a, b, m)
-    answer = a_format.format(ans)
+        coeffs = random.sample(range(1, 6), 4)
 
-    return QuizEntry(question, answer)
-
-
-def ngonal_prism(q_format: str, a_format: str) -> QuizEntry:
-    """Generate a question regarding vertices on n-gonal prisms."""
-    n = random.randint(0, len(N_PREFIXES) - 1)
-
-    question = q_format.format(N_PREFIXES[n])
-    answer = a_format.format((n + N_PREFIX_STARTS_AT) * 2)
-
-    return QuizEntry(question, answer)
-
-
-def imag_sqrt(q_format: str, a_format: str) -> QuizEntry:
-    """Generate a negative square root question."""
-    ans_coeff = random.randint(3, 10)
-
-    question = q_format.format(ans_coeff ** 2)
-    answer = a_format.format(ans_coeff)
-
-    return QuizEntry(question, answer)
-
-
-def binary_calc(q_format: str, a_format: str) -> QuizEntry:
-    """Generate a binary calculation question."""
-    a = random.randint(15, 20)
-    b = random.randint(10, a)
-    oper = random.choice(
-        (
-            ("+", operator.add),
-            ("-", operator.sub),
-            ("*", operator.mul),
+        question = q_format.format(
+            coeffs[0],
+            coeffs[1],
+            coeffs[0] * x + coeffs[1] * y,
+            coeffs[2],
+            coeffs[3],
+            coeffs[2] * x + coeffs[3] * y,
         )
-    )
 
-    # if the operator is multiplication, lower the values of the two operands to make it easier
-    if oper[0] == "*":
-        a -= 5
-        b -= 5
+        return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
 
-    question = q_format.format(a, oper[0], b)
-    answer = a_format.format(oper[1](a, b))
+    @classmethod
+    def mod_arith(cls, q_format: str, a_format: str) -> QuizEntry:
+        """Generate a basic modular arithmetic question."""
+        quotient, m, b = random.randint(30, 40), random.randint(10, 20), random.randint(200, 350)
+        ans = random.randint(0, 9)  # max remainder is 9, since the minimum modulus is 10
+        a = quotient * m + ans - b
 
-    return QuizEntry(question, answer)
+        question = q_format.format(a, b, m)
+        answer = a_format.format(ans)
 
+        return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
 
-def solar_system(q_format: str, a_format: str) -> QuizEntry:
-    """Generate a question on the planets of the Solar System."""
-    planet = random.choice(PLANETS)
+    @classmethod
+    def ngonal_prism(cls, q_format: str, a_format: str) -> QuizEntry:
+        """Generate a question regarding vertices on n-gonal prisms."""
+        n = random.randint(0, len(cls.N_PREFIXES) - 1)
 
-    question = q_format.format(planet[0])
-    answer = a_format.format(planet[1])
+        question = q_format.format(cls.N_PREFIXES[n])
+        answer = a_format.format((n + cls.N_PREFIX_STARTS_AT) * 2)
 
-    return QuizEntry(question, answer)
+        return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
 
+    @classmethod
+    def imag_sqrt(cls, q_format: str, a_format: str) -> QuizEntry:
+        """Generate a negative square root question."""
+        ans_coeff = random.randint(3, 10)
 
-def taxonomic_rank(q_format: str, a_format: str) -> QuizEntry:
-    """Generate a question on taxonomic classification."""
-    level = random.randint(0, len(TAXONOMIC_HIERARCHY) - 2)
+        question = q_format.format(ans_coeff ** 2)
+        answer = a_format.format(ans_coeff)
 
-    question = q_format.format(TAXONOMIC_HIERARCHY[level])
-    answer = a_format.format(TAXONOMIC_HIERARCHY[level + 1])
+        return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
 
-    return QuizEntry(question, answer)
+    @classmethod
+    def binary_calc(cls, q_format: str, a_format: str) -> QuizEntry:
+        """Generate a binary calculation question."""
+        a = random.randint(15, 20)
+        b = random.randint(10, a)
+        oper = random.choice(
+            (
+                ("+", operator.add),
+                ("-", operator.sub),
+                ("*", operator.mul),
+            )
+        )
 
+        # if the operator is multiplication, lower the values of the two operands to make it easier
+        if oper[0] == "*":
+            a -= 5
+            b -= 5
 
-def base_units_convert(q_format: str, a_format: str) -> QuizEntry:
-    """Generate a SI base units conversion question."""
-    unit = random.choice(list(UNITS_TO_BASE_UNITS))
+        question = q_format.format(a, oper[0], b)
+        answer = a_format.format(oper[1](a, b))
 
-    question = q_format.format(
-        unit + " " + UNITS_TO_BASE_UNITS[unit][0]
-    )
-    answer = a_format.format(
-        UNITS_TO_BASE_UNITS[unit][1]
-    )
+        return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
 
-    return QuizEntry(question, answer)
+    @classmethod
+    def solar_system(cls, q_format: str, a_format: str) -> QuizEntry:
+        """Generate a question on the planets of the Solar System."""
+        planet = random.choice(cls.PLANETS)
+
+        question = q_format.format(planet[0])
+        answer = a_format.format(planet[1])
+
+        return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
+
+    @classmethod
+    def taxonomic_rank(cls, q_format: str, a_format: str) -> QuizEntry:
+        """Generate a question on taxonomic classification."""
+        level = random.randint(0, len(cls.TAXONOMIC_HIERARCHY) - 2)
+
+        question = q_format.format(cls.TAXONOMIC_HIERARCHY[level])
+        answer = a_format.format(cls.TAXONOMIC_HIERARCHY[level + 1])
+
+        return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
+
+    @classmethod
+    def base_units_convert(cls, q_format: str, a_format: str) -> QuizEntry:
+        """Generate a SI base units conversion question."""
+        unit = random.choice(list(cls.UNITS_TO_BASE_UNITS))
+
+        question = q_format.format(
+            unit + " " + cls.UNITS_TO_BASE_UNITS[unit][0]
+        )
+        answer = a_format.format(
+            cls.UNITS_TO_BASE_UNITS[unit][1]
+        )
+
+        return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
 
 
 DYNAMIC_QUESTIONS_FORMAT_FUNCS = {
-    201: linear_system,
-    202: mod_arith,
-    203: ngonal_prism,
-    204: imag_sqrt,
-    205: binary_calc,
-    301: solar_system,
-    302: taxonomic_rank,
-    303: base_units_convert,
+    201: DynamicQuestionGen.linear_system,
+    202: DynamicQuestionGen.mod_arith,
+    203: DynamicQuestionGen.ngonal_prism,
+    204: DynamicQuestionGen.imag_sqrt,
+    205: DynamicQuestionGen.binary_calc,
+    301: DynamicQuestionGen.solar_system,
+    302: DynamicQuestionGen.taxonomic_rank,
+    303: DynamicQuestionGen.base_units_convert,
 }
 
 
@@ -202,7 +223,7 @@ class TriviaQuiz(commands.Cog):
         self.questions = self.load_questions()
         self.question_limit = 0
 
-        self.player_scores = {}  # A variable to store all player's scores for a bot session.
+        self.player_scores = defaultdict(int)  # A variable to store all player's scores for a bot session.
         self.game_player_scores = {}  # A variable to store temporary game player's scores.
 
         self.categories = {
@@ -212,7 +233,71 @@ class TriviaQuiz(commands.Cog):
             "science": "Put your understanding of science to the test!",
             "cs": "A large variety of computer science questions.",
             "python": "Trivia on our amazing language, Python!",
+            "wikipedia": "Guess the title of random wikipedia passages.",
         }
+
+        self.get_wiki_questions.start()
+
+    def cog_unload(self) -> None:
+        """Cancel `get_wiki_questions` task when Cog will unload."""
+        self.get_wiki_questions.cancel()
+
+    @tasks.loop(hours=24.0)
+    async def get_wiki_questions(self) -> None:
+        """Get yesterday's most read articles from wikipedia and format them like trivia questions."""
+        error_fetches = 0
+        wiki_questions = []
+        # trivia_quiz.json follows a pattern, every new category starts with the next century.
+        start_id = 501
+        yesterday = datetime.strftime(datetime.now() - timedelta(1), '%Y/%m/%d')
+
+        while error_fetches < MAX_ERROR_FETCH_TRIES:
+            async with self.bot.http_session.get(url=WIKI_FEED_API_URL.format(date=yesterday)) as r:
+                if r.status != 200:
+                    error_fetches += 1
+                    continue
+                raw_json = await r.json()
+                articles_raw = raw_json["mostread"]["articles"]
+
+                for article in articles_raw:
+                    question = article.get("extract")
+                    if not question:
+                        continue
+
+                    # Normalize the wikipedia article title to remove all punctuations from it
+                    for word in re.split(r"[\s-]", title := article["normalizedtitle"]):
+                        cleaned_title = re.sub(
+                            rf'\b{word.strip(string.punctuation)}\b', word, title, flags=re.IGNORECASE
+                        )
+
+                    # Since the extract contains the article name sometimes this would replace all the matching words
+                    # in that article with *** of that length.
+                    # NOTE: This removes the "answer" for 99% of the cases, but sometimes the wikipedia article is
+                    # very different from the words in the extract, for example the title would be the nickname of a
+                    # person (Bob Ross) whereas in the extract it would the full name (Robert Norman Ross) so it comes
+                    # out as (Robert Norman ****) and (Robert Norman Ross) won't be a right answer :(
+                    for word in re.split(r"[\s-]", cleaned_title):
+                        word = word.strip(string.punctuation)
+                        secret_word = r"\*" * len(word)
+                        question = re.sub(rf'\b{word}\b', f"**{secret_word}**", question, flags=re.IGNORECASE)
+
+                    formatted_article_question = {
+                        "id": start_id,
+                        "question": f"Guess the title of the Wikipedia article.\n\n{question}",
+                        "answer": cleaned_title,
+                        "info": article["extract"]
+                    }
+                    start_id += 1
+                    wiki_questions.append(formatted_article_question)
+
+                # If everything has gone smoothly until now, we can break out of the while loop
+                break
+
+        if error_fetches < MAX_ERROR_FETCH_TRIES:
+            self.questions["wikipedia"] = wiki_questions.copy()
+        else:
+            del self.categories["wikipedia"]
+            logger.warning(f"Not loading wikipedia guess questions, hit max error fetches: {MAX_ERROR_FETCH_TRIES}.")
 
     @staticmethod
     def load_questions() -> dict:
@@ -221,7 +306,7 @@ class TriviaQuiz(commands.Cog):
 
         return json.loads(p.read_text(encoding="utf-8"))
 
-    @commands.group(name="quiz", aliases=["trivia"], invoke_without_command=True)
+    @commands.group(name="quiz", aliases=("trivia", "triviaquiz"), invoke_without_command=True)
     async def quiz_game(self, ctx: commands.Context, category: Optional[str], questions: Optional[int]) -> None:
         """
         Start a quiz!
@@ -233,6 +318,7 @@ class TriviaQuiz(commands.Cog):
         - science: Put your understanding of science to the test!
         - cs: A large variety of computer science questions.
         - python: Trivia on our amazing language, Python!
+        - wikipedia: Guess the title of random wikipedia passages.
 
         (More to come!)
         """
@@ -246,7 +332,7 @@ class TriviaQuiz(commands.Cog):
         if self.game_status[ctx.channel.id]:
             await ctx.send(
                 "Game is already running... "
-                f"do `{self.bot.command_prefix}quiz stop`"
+                f"do `{Client.prefix}quiz stop`"
             )
             return
 
@@ -264,7 +350,7 @@ class TriviaQuiz(commands.Cog):
         topic_length = len(topic)
 
         if questions is None:
-            self.question_limit = DEFAULT_QUESTION_LIMIT
+            self.question_limit = min(DEFAULT_QUESTION_LIMIT, topic_length)
         else:
             if questions > topic_length:
                 await ctx.send(
@@ -279,13 +365,13 @@ class TriviaQuiz(commands.Cog):
                 await ctx.send(
                     embed=self.make_error_embed(
                         "You must choose to complete at least one question. "
-                        f"(or enter nothing for the default value of {DEFAULT_QUESTION_LIMIT + 1} questions)"
+                        f"(or enter nothing for the default value of {DEFAULT_QUESTION_LIMIT} questions)"
                     )
                 )
                 return
 
             else:
-                self.question_limit = questions - 1
+                self.question_limit = questions
 
         # Start game if not running.
         if not self.game_status[ctx.channel.id]:
@@ -296,13 +382,13 @@ class TriviaQuiz(commands.Cog):
             await ctx.send(embed=start_embed)  # send an embed with the rules
             await asyncio.sleep(5)
 
-        done_question = []
+        done_questions = []
         hint_no = 0
-        answers = None
+        quiz_entry = None
 
         while self.game_status[ctx.channel.id]:
             # Exit quiz if number of questions for a round are already sent.
-            if len(done_question) > self.question_limit and hint_no == 0:
+            if len(done_questions) == self.question_limit and hint_no == 0:
                 await ctx.send("The round has ended.")
                 await self.declare_winner(ctx.channel, self.game_player_scores[ctx.channel.id])
 
@@ -317,32 +403,27 @@ class TriviaQuiz(commands.Cog):
                 # Select a random question which has not been used yet.
                 while True:
                     question_dict = random.choice(topic)
-                    if question_dict["id"] not in done_question:
-                        done_question.append(question_dict["id"])
+                    if question_dict["id"] not in done_questions:
+                        done_questions.append(question_dict["id"])
                         break
 
                 if "dynamic_id" not in question_dict:
-                    question = question_dict["question"]
-                    answers = question_dict["answer"].split(", ")
-
-                    var_tol = STANDARD_VARIATION_TOLERANCE
+                    quiz_entry = QuizEntry(
+                        question_dict["question"],
+                        quiz_answers if isinstance(quiz_answers := question_dict["answer"], list) else [quiz_answers],
+                        STANDARD_VARIATION_TOLERANCE
+                    )
                 else:
                     format_func = DYNAMIC_QUESTIONS_FORMAT_FUNCS[question_dict["dynamic_id"]]
-
                     quiz_entry = format_func(
                         question_dict["question"],
                         question_dict["answer"],
                     )
 
-                    question, answers = quiz_entry.question, quiz_entry.answer
-                    answers = [answers]
-
-                    var_tol = DYNAMICALLY_GEN_VARIATION_TOLERANCE
-
                 embed = discord.Embed(
                     colour=Colours.gold,
-                    title=f"Question #{len(done_question)}",
-                    description=question,
+                    title=f"Question #{len(done_questions)}",
+                    description=quiz_entry.question,
                 )
 
                 if img_url := question_dict.get("img_url"):
@@ -354,13 +435,13 @@ class TriviaQuiz(commands.Cog):
                 def contains_correct_answer(m: discord.Message) -> bool:
                     return m.channel == ctx.channel and any(
                         fuzz.ratio(answer.lower(), m.content.lower()) > variation_tolerance
-                        for answer in answers
+                        for answer in quiz_entry.answers
                     )
 
                 return contains_correct_answer
 
             try:
-                msg = await self.bot.wait_for("message", check=check_func(var_tol), timeout=10)
+                msg = await self.bot.wait_for("message", check=check_func(quiz_entry.var_tol), timeout=10)
             except asyncio.TimeoutError:
                 # In case of TimeoutError and the game has been stopped, then do nothing.
                 if not self.game_status[ctx.channel.id]:
@@ -388,10 +469,10 @@ class TriviaQuiz(commands.Cog):
 
                     await self.send_answer(
                         ctx.channel,
-                        answers,
+                        quiz_entry.answers,
                         False,
                         question_dict,
-                        self.question_limit - len(done_question) + 1,
+                        self.question_limit - len(done_questions),
                     )
                     await asyncio.sleep(1)
 
@@ -421,10 +502,10 @@ class TriviaQuiz(commands.Cog):
 
                 await self.send_answer(
                     ctx.channel,
-                    answers,
+                    quiz_entry.answers,
                     True,
                     question_dict,
-                    self.question_limit - len(done_question) + 1,
+                    self.question_limit - len(done_questions),
                 )
                 await self.send_score(ctx.channel, self.game_player_scores[ctx.channel.id])
 
@@ -432,19 +513,18 @@ class TriviaQuiz(commands.Cog):
 
     def make_start_embed(self, category: str) -> discord.Embed:
         """Generate a starting/introduction embed for the quiz."""
+        rules = "\n".join([f"{index}: {rule}" for index, rule in enumerate(RULES, start=1)])
+
         start_embed = discord.Embed(
-            colour=Colours.blue,
-            title="A quiz game is starting!",
+            title="Quiz game Starting!!",
             description=(
-                f"This game consists of {self.question_limit + 1} questions.\n\n"
-                "**Rules: **\n"
-                "1. Only enclose your answer in backticks when the question tells you to.\n"
-                "2. If the question specifies an answer format, follow it or else it won't be accepted.\n"
-                "3. You have 30s per question. Points for each question reduces by 25 after 10s or after a hint.\n"
-                "4. No cheating and have fun!\n\n"
-                f"**Category**: {category}"
+                f"Each game consists of {self.question_limit} questions.\n"
+                f"**Rules :**\n{rules}"
+                f"\n **Category** : {category}"
             ),
+            colour=Colours.blue
         )
+        start_embed.set_thumbnail(url=TRIVIA_QUIZ_ICON)
 
         return start_embed
 
@@ -503,6 +583,7 @@ class TriviaQuiz(commands.Cog):
             title="Score Board",
             description="",
         )
+        embed.set_thumbnail(url=TRIVIA_QUIZ_ICON)
 
         sorted_dict = sorted(player_data.items(), key=operator.itemgetter(1), reverse=True)
         for item in sorted_dict:
@@ -534,8 +615,8 @@ class TriviaQuiz(commands.Cog):
                 winners_mention = winner.mention
 
             await channel.send(
-                f"Congratulations {winners_mention} :tada: "
-                f"You have won this quiz game with a grand total of {highest_points} points!"
+                f"{winners_mention} Congratulations "
+                f"on winning this quiz game with a grand total of {highest_points} points :tada:"
             )
 
     def category_embed(self) -> discord.Embed:
@@ -578,7 +659,8 @@ class TriviaQuiz(commands.Cog):
             description="",
         )
 
-        if info is not None:
+        # Don't check for info is not None, as we want to filter out empty strings.
+        if info:
             embed.description += f"**Information**\n{info}\n\n"
 
         embed.description += (
