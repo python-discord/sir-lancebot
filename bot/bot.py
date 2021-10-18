@@ -243,7 +243,10 @@ class Bot(commands.Bot):
         for ext in unsuccesfully_unloaded:
             await self.unloads_cache.delete(ext)
 
-        await dev_alerts_channel.send(msg)
+        await dev_alerts_channel.send(
+            msg,
+            allowed_mentions=discord.AllowedMentions(roles=[core_dev_role])
+        )
 
 
 _allowed_roles = [discord.Object(id_) for id_ in constants.MODERATION_ROLES]
