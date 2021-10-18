@@ -21,8 +21,9 @@ with open(madlibs_stories) as file:
     json_file = loads(file)
     templates = [template for template in json_file]
     random_template = choice(templates)
+    number_of_inputs = len(random_template["blanks"])
 
-blank_number = 0
+current_input = 0
 
 
 class Madlibs(commands.Cog):
@@ -39,15 +40,15 @@ class Madlibs(commands.Cog):
         self.bot = bot
 
     @staticmethod
-    def create_embed(random_template: list, blank_number: int) -> Embed:
+    def create_embed(random_template: list, current_input: int, number_of_inputs: int) -> Embed:
         """
         Helper method that creates the embed where the game information is shown.
 
         This includes what part of speech the word that the user enters has to fit
         and how many inputs the users has left
         """
-        part_of_speech = random_template["blanks"][blank_number]
-        inputs_left = random_template["blanks"][len("blanks") - 1]
+        part_of_speech = random_template["blanks"][current_input]
+        inputs_left = random_template["blanks"][number_of_inputs]
 
         madlibs_embed = Embed(
             title="Madlibs",
@@ -59,7 +60,8 @@ class Madlibs(commands.Cog):
         )
         madlibs_embed.set_footer(text=f"Inputs remaining: {inputs_left}")
 
-        blank_number += 1
+        current_input += 1
+        number_of_inputs -= 1
 
         return madlibs_embed
 
@@ -89,9 +91,16 @@ class Madlibs(commands.Cog):
             await ctx.send(embed=filter_not_found_embed)
             return
 
-        self.create_embed(random_template, blank_number)
+        while number_of_inputs != 0:
+            self.create_embed(random_template, current_input)
 
-        await self.bot.wait_for(event='message', timeout=TIMEOUT)
+            await self.bot.wait_for(event='message', timeout=TIMEOUT)
+
+        if number_of_inputs == 0:
+            Embed(
+                title="Here's your story!",
+                description=random_template["value"]
+            )
 
 
 def setup(bot: Bot) -> None:
