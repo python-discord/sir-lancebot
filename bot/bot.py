@@ -237,14 +237,14 @@ class Bot(commands.Bot):
         await self.wait_until_guild_available()
         cache_dict = await self.unloads_cache.to_dict()
 
-        unsuccesfully_unloaded = {
+        unsuccessfully_unloaded = {
             ext: link for ext, link in cache_dict.items() if ext not in self.successfully_unloaded
         }
 
-        if not unsuccesfully_unloaded:
+        if not unsuccessfully_unloaded:
             return
 
-        extensions_msg = "\n- ".join(f"`{ext}`: {msg}" for ext, msg in unsuccesfully_unloaded.items())
+        extensions_msg = "\n- ".join(f"`{ext}`: {msg}" for ext, msg in unsuccessfully_unloaded.items())
 
         dev_alerts_channel = self.get_channel(constants.Channels.dev_alerts)
         core_dev_role = self.get_guild(constants.Client.guild).get_role(constants.Roles.core_developers)
@@ -255,7 +255,7 @@ class Bot(commands.Bot):
             "\n\nClearing them from the cache."
         )
 
-        for ext in unsuccesfully_unloaded:
+        for ext in unsuccessfully_unloaded:
             await self.unloads_cache.delete(ext)
 
         await dev_alerts_channel.send(

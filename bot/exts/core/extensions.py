@@ -95,7 +95,7 @@ class Extensions(commands.Cog):
 
         msg, successful = await self.batch_manage(Action.LOAD, *extensions)
 
-        # Remove extensions from unload extensions cache
+        # Remove extensions from the unload extensions cache
         for ext in successful:
             await self.bot.unloads_cache.delete(ext)
 
@@ -207,7 +207,7 @@ class Extensions(commands.Cog):
         """
         if len(extensions) == 1:
             msg, error = await self.manage(action, extensions[0])
-            return msg, [] if error else [*extensions]
+            return msg, [] if error else [extensions[0]]
 
         verb = action.name.lower()
         failures = {}
