@@ -100,7 +100,8 @@ class HacktoberIssues(commands.Cog):
         """Format the issue data into a embed."""
         title = issue["title"]
         issue_url = issue["url"].replace("api.", "").replace("/repos/", "/")
-        body = issue["body"]
+        # issues can have empty bodies, which in that case GitHub doesn't include the key in the API response
+        body = issue.get("body", "")
         labels = [label["name"] for label in issue["labels"]]
 
         embed = discord.Embed(title=title)
