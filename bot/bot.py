@@ -80,9 +80,15 @@ class Bot(commands.Bot):
         if self.redis_session:
             await self.redis_session.close()
 
-    async def load_extension(self, name: str, *, package: Optional[str] = None) -> None:
+    async def load_extension(
+        self,
+        name: str,
+        *,
+        package: Optional[str] = None,
+        ignore_cache: Optional[bool] = False
+    ) -> None:
         """Load the extension only if it is not present in unloaded cache."""
-        if await self.unloads_cache.get(name):
+        if ignore_cache and not await self.unloads_cache.get(name):
             self.successfully_unloaded.append(name)
             log.info(f"Skipping cog {name}, found in unloaded cache.")
         else:

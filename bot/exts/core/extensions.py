@@ -236,7 +236,7 @@ class Extensions(commands.Cog):
 
         try:
             if action is action.LOAD:
-                await action.value(self.bot, ext)
+                await action.value(self.bot, ext, ignore_cache=True)
             else:
                 action.value(self.bot, ext)
         except (commands.ExtensionAlreadyLoaded, commands.ExtensionNotLoaded):
