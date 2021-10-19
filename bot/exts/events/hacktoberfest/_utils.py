@@ -69,15 +69,14 @@ async def get_stats(ctx: commands.Context, github_username: str) -> None:
     """
     Query GitHub's API for PRs created by a GitHub user during the month of October.
 
-    PRs with an 'invalid' or 'spam' label are ignored
+    PRs with an 'invalid' or 'spam' label are ignored unless merged or approved.
 
-    For PRs created after October 3rd, they have to be in a repository that has a
-    'hacktoberfest' topic, unless the PR is labelled 'hacktoberfest-accepted' for it
-    to count.
+    PRs have to be in a repository that has a 'hacktoberfest' topic,
+    unless the PR is labelled 'hacktoberfest-accepted' for it to count.
 
-    If a valid github_username is provided, an embed is generated and posted to the channel
+    If a valid `github_username` is provided, an embed is generated and posted to the channel.
 
-    Otherwise, post a helpful error message
+    Otherwise, a helpful error message is posted.
     """
     async with ctx.typing():
         prs = await get_october_prs(ctx.bot, github_username)
@@ -148,15 +147,14 @@ async def build_stats_embed(bot: Bot, github_username: str, prs: list[dict]) -> 
 
 async def get_october_prs(bot: Bot, github_username: str) -> Optional[list[dict]]:
     """
-    Query GitHub's API for PRs created during the month of October by github_username.
+    Query GitHub's API for PRs created by a GitHub user during the month of October.
 
-    PRs with an 'invalid' or 'spam' label are ignored unless it is merged or approved
+    PRs with an 'invalid' or 'spam' label are ignored unless merged or approved.
 
-    For PRs created after October 3rd, they have to be in a repository that has a
-    'hacktoberfest' topic, unless the PR is labelled 'hacktoberfest-accepted' for it
-    to count.
+    PRs have to be in a repository that has a 'hacktoberfest' topic,
+    unless the PR is labelled 'hacktoberfest-accepted' for it to count.
 
-    If PRs are found, return a list of dicts with basic PR information
+    If PRs are found, return a list of dicts with basic PR information.
 
     For each PR:
     {
@@ -187,7 +185,8 @@ async def get_october_prs(bot: Bot, github_username: str) -> Optional[list[dict]
 
     log.debug(f"GitHub query parameters generated: {query_params}")
 
-    jsonresp = await fetch_url(bot, base_url, STATS_REQUEST_HEADERS, {"q": query_params})
+    # The `params` argument needs to be specified as a string to stop aiohttp percent-encoding
+    jsonresp = await fetch_url(bot, base_url, STATS_REQUEST_HEADERS, f"q={query_params}")
     if "message" in jsonresp:
         # One of the parameters is invalid, short circuit for now
         api_message = jsonresp["errors"][0]["message"]
@@ -207,7 +206,6 @@ async def get_october_prs(bot: Bot, github_username: str) -> Optional[list[dict]
 
     logging.info(f"Found {len(jsonresp['items'])} Hacktoberfest PRs for GitHub user: '{github_username}'")
     outlist = []  # list of pr information dicts that will get returned
-    oct3 = datetime(int(CURRENT_YEAR), 10, 3, 23, 59, 59, tzinfo=None)
     hackto_topics = {}  # cache whether each repo has the appropriate topic (bool values)
     for item in jsonresp["items"]:
         shortname = get_shortname(item["repository_url"])
@@ -226,13 +224,6 @@ async def get_october_prs(bot: Bot, github_username: str) -> Optional[list[dict]
             if not await is_accepted(bot, itemdict):
                 continue
 
-        # PRs before oct 3 no need to check for topics
-        # continue the loop if 'hacktoberfest-accepted' is labelled then
-        # there is no need to check for its topics
-        if itemdict["created_at"] < oct3:
-            outlist.append(itemdict)
-            continue
-
         # Checking PR's labels for "hacktoberfest-accepted"
         if has_label(item, "hacktoberfest-accepted"):
             outlist.append(itemdict)
@@ -245,12 +236,12 @@ async def get_october_prs(bot: Bot, github_username: str) -> Optional[list[dict]
         # Fetch topics for the PR's repo
         topics_query_url = f"https://api.github.com/repos/{shortname}/topics"
         log.debug(f"Fetching repo topics for {shortname} with url: {topics_query_url}")
-        jsonresp2 = await fetch_url(bot, topics_query_url, GITHUB_TOPICS_ACCEPT_HEADER, {"q": query_params})
+        jsonresp2 = await fetch_url(bot, topics_query_url, GITHUB_TOPICS_ACCEPT_HEADER)
         if jsonresp2.get("names") is None:
             log.error(f"Error fetching topics for {shortname}: {jsonresp2['message']}")
-            continue  # Assume the repo doesn't have the `hacktoberfest` topic if API  request errored
+            continue  # Assume the repo doesn't have the `hacktoberfest` topic if API request errored
 
-        # PRs after oct 3 that doesn't have 'hacktoberfest-accepted' label
+        # PRs that doesn't have 'hacktoberfest-accepted' label
         # must be in repo with 'hacktoberfest' topic
         if "hacktoberfest" in jsonresp2["names"]:
             hackto_topics[shortname] = True  # Cache result in the dict for later use if needed
@@ -258,8 +249,8 @@ async def get_october_prs(bot: Bot, github_username: str) -> Optional[list[dict]
     return outlist
 
 
-async def fetch_url(bot: Bot, url: str, headers: dict, params: dict) -> dict:
-    """Retrieve API response from URL."""
+async def fetch_url(bot: Bot, url: str, headers: dict, params: Optional[Union[str, dict]] = "") -> dict:
+    """Retrieve API JSON response from URL."""
     async with bot.http_session.get(url, headers=headers, params=params) as resp:
         return await resp.json()
 
@@ -343,13 +334,12 @@ async def categorize_prs(bot: Bot, prs: list[dict]) -> tuple[list[dict], list[di
     'hacktoberfest-accepted.
     """
     now = datetime.now()
-    oct3 = datetime(CURRENT_YEAR, 10, 3, 23, 59, 59, tzinfo=None)
     in_review = []
     accepted = []
     for pr in prs:
         if (pr["created_at"] + timedelta(REVIEW_DAYS)) > now:
             in_review.append(pr)
-        elif (pr["created_at"] <= oct3) or await is_accepted(bot, pr):
+        elif await is_accepted(bot, pr):
             accepted.append(pr)
 
     return in_review, accepted
