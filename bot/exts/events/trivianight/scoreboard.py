@@ -74,7 +74,7 @@ class Scoreboard:
         if item.startswith("points: "):
             return self.view.points[item.removeprefix("points: ")]
         elif item.startswith("speed: "):
-            return self.view.speed[item.removepreix("speed: ")]
+            return self.view.speed[item.removeprefix("speed: ")]
 
     def display(self) -> Union[Embed, View]:
         """Returns the embed of the main leaderboard along with the ScoreboardView."""
