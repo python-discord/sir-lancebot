@@ -5,7 +5,7 @@ from discord import ButtonStyle, Embed, Interaction
 from discord.ui import Button, View
 
 from bot.constants import Colours, NEGATIVE_REPLIES
-from .scoreboard import Scoreboard
+from ._scoreboard import Scoreboard
 
 
 class QuestionButton(Button):
@@ -87,6 +87,7 @@ class Questions:
 
     def __init__(self, scoreboard: Scoreboard):
         self.scoreboard = scoreboard
+        self.view = QuestionView()
         self.questions = []
         self._ptr = -1
 

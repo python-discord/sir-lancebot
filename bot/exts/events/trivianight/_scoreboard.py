@@ -53,8 +53,8 @@ class ScoreboardView(View):
 class Scoreboard:
     """Class for the scoreboard for the trivianight event."""
 
-    def __init__(self):
-        self.view = ScoreboardView()
+    def __init__(self, bot: Bot):
+        self.view = ScoreboardView(bot)
 
     def __setitem__(self, key: str, value: int):
         if key.startswith("points: "):
