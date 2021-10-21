@@ -1,3 +1,4 @@
+import logging
 from json import loads
 from random import choice
 
@@ -6,8 +7,8 @@ from discord.ext import commands
 
 from bot.bot import Bot
 from bot.constants import Colours, POSITIVE_REPLIES
-from ._questions import Questions
-from ._scoreboard import Scoreboard
+from ._questions import QuestionView, Questions
+from ._scoreboard import Scoreboard, ScoreboardView
 
 
 class TriviaNight(commands.Cog):
@@ -15,7 +16,7 @@ class TriviaNight(commands.Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.scoreboard = Scoreboard(self.bot)
+        self.scoreboard = Scoreboard()
         self.questions = Questions(self.scoreboard)
 
     @commands.group()
@@ -28,6 +29,9 @@ class TriviaNight(commands.Cog):
         """Load the JSON file provided into the questions."""
         json_text = (await ctx.message.attachments[0].read()).decode("utf8")
         serialized_json = loads(json_text)
+        self.questions.view = QuestionView()
+        logging.getLogger(__name__).debug(self.questions.view)
+        self.scoreboard.view = ScoreboardView(self.bot)
         self.questions.set_questions(serialized_json)
         success_embed = Embed(
             title=choice(POSITIVE_REPLIES),
@@ -35,6 +39,28 @@ class TriviaNight(commands.Cog):
             color=Colours.soft_green
         )
         await ctx.send(embed=success_embed)
+
+    @trivianight.command()
+    async def next(self, ctx: commands.Context) -> None:
+        """Gets a random question from the unanswered question list and lets user choose the answer."""
+        next_question = self.questions.next_question()
+        if isinstance(next_question, Embed):
+            await ctx.send(embed=next_question)
+            return
+
+        question_embed, question_view = self.questions.current_question()
+        await ctx.send(embed=question_embed, view=question_view)
+
+    @trivianight.command()
+    async def stop(self, ctx: commands.Context) -> None:
+        """End the ongoing question to show the correct question."""
+        await ctx.send(embed=self.questions.end_question())
+
+    @trivianight.command()
+    async def end(self, ctx: commands.Context) -> None:
+        """Ends the trivia night event and displays the scoreboard."""
+        scoreboard_embed, scoreboard_view = await self.scoreboard.display()
+        await ctx.send(embed=scoreboard_embed, view=scoreboard_view)
 
 
 def setup(bot: Bot) -> None:
