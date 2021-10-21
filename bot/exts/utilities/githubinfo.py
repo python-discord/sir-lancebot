@@ -67,7 +67,7 @@ class GithubInfo(commands.Cog):
             embed = discord.Embed(
                 title=f"`{user_data['login']}`'s GitHub profile info",
                 description=f"```\n{user_data['bio']}\n```\n" if user_data["bio"] else "",
-                colour=discord.Colour.blurple(),
+                colour=discord.Colour.og_blurple(),
                 url=user_data["html_url"],
                 timestamp=datetime.strptime(user_data["created_at"], "%Y-%m-%dT%H:%M:%SZ")
             )
@@ -139,7 +139,7 @@ class GithubInfo(commands.Cog):
         embed = discord.Embed(
             title=repo_data["name"],
             description=repo_data["description"],
-            colour=discord.Colour.blurple(),
+            colour=discord.Colour.og_blurple(),
             url=repo_data["html_url"]
         )
 
