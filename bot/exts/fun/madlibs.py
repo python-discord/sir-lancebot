@@ -83,21 +83,25 @@ class Madlibs(commands.Cog):
 
             madlibs_embed.set_footer(text=f"Inputs remaining: {inputs_left}")
 
+            await ctx.send(embed=madlibs_embed)
+
             current_input += 1
             number_of_inputs -= 1
-
-            await ctx.send(embed=madlibs_embed)
 
             try:
                 await self.bot.wait_for(event='message', timeout=TIMEOUT)
             except TimeoutError:
-                Embed(title=choice(NEGATIVE_REPLIES),
-                      description='Uh oh! Looks like the bot timed out! Please try again later.')
+                timeout_embed = Embed(title=choice(NEGATIVE_REPLIES),
+                                      description='Uh oh! Looks like the bot timed out! Please try again later.')
 
-        Embed(
+                await ctx.send(embed=timeout_embed)
+
+        story_embed = Embed(
             title="Here's your story!",
             description=random_template["value"]
         )
+
+        await ctx.send(embed=story_embed)
 
 
 def setup(bot: Bot) -> None:
