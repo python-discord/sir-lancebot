@@ -91,7 +91,7 @@ class Madlibs(commands.Cog):
             try:
                 await self.bot.wait_for(event='message', timeout=TIMEOUT)
             except TimeoutError:
-                Embed(tile=choice(NEGATIVE_REPLIES),
+                Embed(title=choice(NEGATIVE_REPLIES),
                       description='Uh oh! Looks like the bot timed out! Please try again later.')
 
         Embed(
