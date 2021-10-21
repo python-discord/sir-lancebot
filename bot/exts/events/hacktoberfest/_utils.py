@@ -40,7 +40,15 @@ GITHUB_NONEXISTENT_USER_MESSAGE = (
     "or you do not have permission to view the users."
 )
 
-URL = "https://api.github.com/search/issues?per_page=100&q=is:issue+label:hacktoberfest+language:python+state:open"
+URL = (
+    "https://api.github.com/search/issues?"  # base url
+    "per_page=100"  # limit results per-page returned by API to 100 (the maximum)
+    "&q="  # add query parameters
+    "is:issue+"  # is an issue...
+    "state:open+"  # ...that's open...
+    "label:hacktoberfest+"  # ...with the `hacktoberfest` label...
+    "language:python"  # ...and in Python.
+)
 
 
 # Util functions for `.hacktoberfest timeleft`
@@ -105,21 +113,16 @@ async def build_stats_embed(bot: Bot, github_username: str, prs: list[dict]) -> 
 
     n = len(accepted) + len(in_review)  # Total number of PRs
     if n >= PRS_FOR_SHIRT:
-        shirtstr = f"**{github_username} is eligible for a T-shirt or a tree!**"
-    elif n == PRS_FOR_SHIRT - 1:
-        shirtstr = f"**{github_username} is 1 PR away from a T-shirt or a tree!**"
+        shirtstr = f"**{github_username} is eligible for hacktoberfest swag!**"
+    elif (remaining_prs := PRS_FOR_SHIRT - n) == 1:
+        shirtstr = f"**{github_username} is 1 PR away from being eligible for hacktoberfest swag!**"
     else:
-        shirtstr = f"**{github_username} is {PRS_FOR_SHIRT - n} PRs away from a T-shirt or a tree!**"
+        shirtstr = f"**{github_username} is {remaining_prs} PRs away from being eligible for hacktoberfest swag!**"
 
     stats_embed = discord.Embed(
         title=f"{github_username}'s Hacktoberfest",
         color=Colours.purple,
-        description=(
-            f"{github_username} has made {n} valid "
-            f"{contributionator(n)} in "
-            f"October\n\n"
-            f"{shirtstr}\n\n"
-        )
+        description=f"{github_username} has made **{n}** valid {contributionator(n)} in October.\n\n{shirtstr}\n\n"
     )
 
     stats_embed.set_thumbnail(url=f"https://www.github.com/{github_username}.png")
@@ -169,18 +172,14 @@ async def get_october_prs(bot: Bot, github_username: str) -> Optional[list[dict]
     """
     log.info(f"Fetching Hacktoberfest Stats for GitHub user: '{github_username}'")
     base_url = "https://api.github.com/search/issues"
-    action_type = "pr"
-    is_query = "public"
-    not_query = "draft"
-    date_range = f"{CURRENT_YEAR}-09-30T10:00Z..{CURRENT_YEAR}-11-01T12:00Z"
-    per_page = "300"
+
     query_params = (
-        f"+type:{action_type}"
-        f"+is:{is_query}"
-        f"+author:{quote_plus(github_username)}"
-        f"+-is:{not_query}"
-        f"+created:{date_range}"
-        f"&per_page={per_page}"
+        f"+type:pr"  # Only get PR if it's:
+        f"+is:public"  # - public,...
+        f"+author:{quote_plus(github_username)}"  # - by the user's github username,...
+        f"+-is:draft"   # - not a draft...
+        f"+created:{CURRENT_YEAR}-09-30T10:00Z..{CURRENT_YEAR}-11-01T12:00Z"  # and made in october.
+        f"&per_page=100"  # Limit results per-page returned from API (100 is the maximum)
     )
 
     log.debug(f"GitHub query parameters generated: {query_params}")
@@ -205,8 +204,8 @@ async def get_october_prs(bot: Bot, github_username: str) -> Optional[list[dict]
         return []
 
     logging.info(f"Found {len(jsonresp['items'])} Hacktoberfest PRs for GitHub user: '{github_username}'")
-    outlist = []  # list of pr information dicts that will get returned
-    hackto_topics = {}  # cache whether each repo has the appropriate topic (bool values)
+    outlist = []  # List of pr information dicts that will get returned
+    hackto_topics = {}  # Cache whether each repo has the appropriate topic (bool values)
     for item in jsonresp["items"]:
         shortname = get_shortname(item["repository_url"])
         itemdict = {
@@ -262,7 +261,7 @@ def has_label(pr: dict, labels: Union[list[str], str]) -> bool:
     'labels' can be a string or a list of strings, if it's a list of strings
     it will return true if any of the labels match.
     """
-    if not pr.get("labels"):  # if PR has no labels
+    if not pr.get("labels"):  # If the PR has no labels
         return False
     if isinstance(labels, str) and any(label["name"].casefold() == labels for label in pr["labels"]):
         return True
@@ -274,7 +273,7 @@ def has_label(pr: dict, labels: Union[list[str], str]) -> bool:
 
 async def is_accepted(bot: Bot, pr: dict) -> bool:
     """Check if a PR is merged, approved, or labelled hacktoberfest-accepted."""
-    # checking for merge status
+    # Check for merge status
     query_url = f"https://api.github.com/repos/{pr['repo_shortname']}/pulls/{pr['number']}"
     jsonresp = await fetch_url(bot, query_url, STATS_REQUEST_HEADERS)
 
@@ -285,11 +284,11 @@ async def is_accepted(bot: Bot, pr: dict) -> bool:
     if jsonresp.get("merged"):
         return True
 
-    # checking for the label, using `jsonresp` which has the label information
+    # Check for the label, using `jsonresp` which has the label information
     if has_label(jsonresp, "hacktoberfest-accepted"):
         return True
 
-    # checking approval
+    # Check for PR approval
     query_url += "/reviews"
     jsonresp2 = await fetch_url(bot, query_url, STATS_REQUEST_HEADERS)
     if isinstance(jsonresp2, dict):
@@ -299,11 +298,11 @@ async def is_accepted(bot: Bot, pr: dict) -> bool:
             f"{jsonresp2['message']}"
         )
         return False
-    # if it is successful it will be a list instead of a dict
-    if len(jsonresp2) == 0:  # if PR has no reviews
+    # If it is successful it will be a list instead of a dict
+    if len(jsonresp2) == 0:  # if the PR has no reviews
         return False
 
-    # loop through reviews and check for approval
+    # Loop through reviews and check for approval
     for item in jsonresp2:
         if item.get("status") == "APPROVED":
             return True
@@ -359,7 +358,7 @@ def build_prs_string(prs: list[dict], user: str) -> str:
     more = len(prs) - sum(i[1] for i in prs_list)
 
     for pr in prs_list:
-        # for example: https://www.github.com/python-discord/bot/pulls/octocat
+        # For example: https://www.github.com/python-discord/bot/pulls/octocat
         # will display pull requests authored by octocat.
         # pr[1] is the number of PRs to the repo
         string = f"{pr[1]} to [{pr[0]}]({base_url}{pr[0]}/pulls/{user})"
@@ -438,13 +437,14 @@ def format_issues_embed(issue: dict) -> discord.Embed:
     """Format the issue data into a embed."""
     title = issue["title"]
     issue_url = issue["url"].replace("api.", "").replace("/repos/", "/")
-    # issues can have empty bodies, which in that case GitHub doesn't include the key in the API response
-    body = issue.get("body", "")
+    # Issues can have empty bodies, which in that case GitHub doesn't include the key in the API response
+    body = issue.get("body") or ''
     labels = [label["name"] for label in issue["labels"]]
 
     embed = discord.Embed(title=title)
     embed.description = body[:500] + "..." if len(body) > 500 else body
-    embed.add_field(name="labels", value="\n".join(labels))
+    # Add labels in backticks and joined by a comma
+    embed.add_field(name="Labels", value=",".join(map(lambda label: f"`{label}`", labels)))
     embed.url = issue_url
     embed.set_footer(text=issue_url)
 

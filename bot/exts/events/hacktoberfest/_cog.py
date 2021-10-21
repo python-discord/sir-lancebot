@@ -6,7 +6,6 @@ from async_rediscache import RedisCache
 from discord.ext import commands
 
 import bot.exts.events.hacktoberfest._utils as utils
-from bot.bot import Bot
 from bot.constants import Client, Month
 from bot.utils.decorators import in_month
 from bot.utils.extensions import invoke_help_command
@@ -17,7 +16,7 @@ log = logging.getLogger()
 class Hacktoberfest(commands.Cog):
     """Cog containing all Hacktober-related commands."""
 
-    # Caches for `.hacktoberfest stats`
+    # Cache for `.hacktoberfest stats`which maps the discord user ID (as string) to their GitHub account
     linked_accounts = RedisCache()
 
     # Caches for `.hacktoberfest issue`
@@ -26,12 +25,9 @@ class Hacktoberfest(commands.Cog):
     cache_beginner = None
     cache_timer_beginner = datetime(1, 1, 1)
 
-    def __init__(self, bot: Bot):
-        self.bot = bot
-
     @commands.group(aliases=('hacktober',))
     async def hacktoberfest(self, ctx: commands.Context) -> None:
-        """Handler of all Hacktoberfest commands."""
+        """Commands related to Hacktoberfest."""
         if not ctx.invoked_subcommand:
             await invoke_help_command(ctx)
             return
@@ -61,16 +57,14 @@ class Hacktoberfest(commands.Cog):
 
         If invoked without a subcommand or github_username, get the invoking user's stats if they've
         linked their Discord name to GitHub using `.hacktoberfest stats link`. If invoked with a github_username,
-        get that user's contributions
+        get that user's contributions.
         """
         if not github_username:
-            author_id, author_mention = utils.author_mention_from_context(ctx)  # in _utils.py
+            author_id, author_mention = utils.author_mention_from_context(ctx)
 
-            if await self.linked_accounts.contains(author_id):
-                github_username = await self.linked_accounts.get(author_id)
-                log.info(f"Getting stats for {author_id} linked GitHub account '{github_username}'")
-            else:
-                command_string = Client.prefix + ctx.command.qualified_name
+            if not (github_username := await self.linked_accounts.get(author_id)):
+                # User hasn't linked a GitHub account, so send a message informing them of such.
+                command_string = Client.prefix + " ".join(ctx.invoked_parents)
                 msg = (
                     f"{author_mention}, you have not linked a GitHub account\n\n"
                     f"You can link your GitHub account using:\n```\n{command_string} link github_username\n```\n"
@@ -78,31 +72,32 @@ class Hacktoberfest(commands.Cog):
                 )
                 await ctx.send(msg)
                 return
-
+            log.info(f"Getting stats for {author_id} linked GitHub account '{github_username}'")
+        else:
+            log.info(f"Getting stats for '{github_username} as requested by {ctx.author.id}")
         await utils.get_stats(ctx, github_username)
 
     @in_month(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)
     @stats.command()
-    async def link(self, ctx: commands.Context, github_username: str = None) -> None:
+    async def link(self, ctx: commands.Context, github_username: str) -> None:
         """
         Link the invoking user's Github github_username to their Discord ID.
 
         Linked users are stored in Redis: User ID => GitHub Username.
         """
         author_id, author_mention = utils.author_mention_from_context(ctx)
-        if github_username:
-            if await self.linked_accounts.contains(author_id):
-                old_username = await self.linked_accounts.get(author_id)
-                log.info(f"{author_id} has changed their github link from '{old_username}' to '{github_username}'")
-                await ctx.send(f"{author_mention}, your GitHub username has been updated to: '{github_username}'")
-            else:
-                log.info(f"{author_id} has added a github link to '{github_username}'")
-                await ctx.send(f"{author_mention}, your GitHub username has been added")
 
-            await self.linked_accounts.set(author_id, github_username)
+        # If author has changed their linked GitHub username
+        if old_username := await self.linked_accounts.get(author_id):
+            log.info(f"{author_id} has changed their github link from '{old_username}' to '{github_username}'")
+            await ctx.send(f"{author_mention}, your GitHub username has been updated to: '{github_username}'")
+
+        # Author linked GitHub username for the first time
         else:
-            log.info(f"{author_id} tried to link a GitHub account but didn't provide a username")
-            await ctx.send(f"{author_mention}, a GitHub username is required to link your account")
+            log.info(f"{author_id} has added a github link to '{github_username}'")
+            await ctx.send(f"{author_mention}, your GitHub username has been added")
+
+        await self.linked_accounts.set(author_id, github_username)
 
     @in_month(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)
     @stats.command()
