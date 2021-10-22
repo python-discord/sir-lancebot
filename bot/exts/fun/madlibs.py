@@ -53,7 +53,7 @@ class Madlibs(commands.Cog):
         current_input = 0
         number_of_inputs = 0
 
-        random_template = choice(self._load_templates)
+        random_template = choice(self.templates())
 
         filtered_blanks = min_length < len(random_template["blanks"]) < max_length
 
