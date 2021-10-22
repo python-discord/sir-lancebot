@@ -239,7 +239,7 @@ class AvatarModify(commands.Cog):
                 description=f"Here is your lovely avatar, surrounded by\n a beautiful {option} flag. Enjoy :D"
             )
             embed.set_image(url=f"attachment://{file_name}")
-            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=ctx.author.avatar.url)
+            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=ctx.author.display_avatar.url)
             await ctx.send(file=file, embed=embed)
 
     @avatar_modify.group(
