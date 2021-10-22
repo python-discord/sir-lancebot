@@ -53,9 +53,9 @@ class Madlibs(commands.Cog):
         current_input = 0
         number_of_inputs = 0
 
-        random_template = choice(self.templates)
-
         await ctx.send(self.templates)
+
+        random_template = choice(self.templates)
 
         filtered_blanks = min_length < len(random_template["blanks"]) < max_length
 
