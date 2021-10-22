@@ -143,7 +143,7 @@ class SpookyNameRate(Cog):
             if data["author"] == ctx.author.id:
                 await ctx.send(
                     "But you have already added an entry! Type "
-                    f"`{self.bot.command_prefix}spookynamerate "
+                    f"`{Client.prefix}spookynamerate "
                     "delete` to delete it, and then you can add it again"
                 )
                 return
@@ -185,7 +185,7 @@ class SpookyNameRate(Cog):
                 return
 
         await ctx.send(
-            f"But you don't have an entry... :eyes: Type `{self.bot.command_prefix}spookynamerate add your entry`"
+            f"But you don't have an entry... :eyes: Type `{Client.prefix}spookynamerate add your entry`"
         )
 
     @Cog.listener()
@@ -225,7 +225,7 @@ class SpookyNameRate(Cog):
                 "Okkey... Welcome to the **Spooky Name Rate Game**! It's a relatively simple game.\n"
                 f"Everyday, a random name will be sent in <#{Channels.community_bot_commands}> "
                 "and you need to try and spookify it!\nRegister your name using "
-                f"`{self.bot.command_prefix}spookynamerate add spookified name`"
+                f"`{Client.prefix}spookynamerate add spookified name`"
             )
 
             await self.data.set("first_time", False)
