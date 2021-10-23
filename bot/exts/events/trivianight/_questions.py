@@ -1,6 +1,6 @@
 from random import choice, randrange
 from time import perf_counter
-from typing import Union
+from typing import TypedDict, Union
 
 import discord
 from discord import Embed, Interaction
@@ -8,6 +8,15 @@ from discord.ui import Button, View
 
 from bot.constants import Colours, NEGATIVE_REPLIES
 from ._scoreboard import Scoreboard
+
+
+class CurrentQuestion(TypedDict):
+    """Representing the different 'keys' of the question taken from the JSON."""
+
+    number: str
+    description: str
+    answers: list
+    correct: str
 
 
 class QuestionButton(Button):
@@ -25,10 +34,26 @@ class QuestionButton(Button):
         """When a user interacts with the button, this will be called."""
         if interaction.user.id not in self.users_picked.keys():
             self.users_picked[interaction.user.id] = [self.label, 1, perf_counter() - self._time]
+            await interaction.response.send_message(
+                embed=Embed(
+                    title="Success!",
+                    description=f"You chose answer choice {self.label}.",
+                    color=Colours.soft_green
+                ),
+                ephemeral=True
+            )
         elif self.users_picked[interaction.user.id][1] < 2:
             self.users_picked[interaction.user.id] = [
                 self.label, self.users_picked[interaction.user.id][1] + 1, perf_counter() - self._time
             ]
+            await interaction.response.send_message(
+                embed=Embed(
+                    title="Success!",
+                    description=f"You changed your answer to answer choice {self.label}.",
+                    color=Colours.soft_green
+                ),
+                ephemeral=True
+            )
         else:
             await interaction.response.send_message(
                 embed=Embed(
@@ -45,7 +70,7 @@ class QuestionView(View):
 
     def __init__(self):
         super().__init__()
-        self.current_question = {}
+        self.current_question: CurrentQuestion
         self.users_picked = {}
         self.buttons = [QuestionButton(label, self.users_picked) for label in ("A", "B", "C", "D")]
         for button in self.buttons:
@@ -91,26 +116,51 @@ class Questions:
     def __init__(self, scoreboard: Scoreboard):
         self.scoreboard = scoreboard
         self.questions = []
-        self._ptr = -1
 
     def set_questions(self, questions: list) -> None:
         """Setting `self.questions` dynamically via a function to set it."""
         self.questions = questions
 
-    def next_question(self) -> Union[Embed, None]:
-        """Uses another, new question."""
-        if all("visited" in question.keys() for question in self.questions.values()):
+    def next_question(self, number: int = None) -> Union[Embed, None]:
+        """
+        Chooses a random unvisited question from the question bank.
+
+        If the number parameter is specified, it'll head to that specific question.
+        """
+        if all("visited" in question.keys() for question in self.questions):
             return Embed(
                 title=choice(NEGATIVE_REPLIES),
                 description="All of the questions in the question bank have been used.",
                 color=Colours.soft_red
             )
 
-        while "visited" in self.questions[self._ptr].keys():
-            self._ptr = randrange(0, len(self.questions))
+        if number is None:
+            question_number = randrange(0, len(self.questions))
+            while "visited" in self.questions[question_number].keys():
+                question_number = randrange(0, len(self.questions))
+        else:
+            question_number = number
 
-        self.questions[self._ptr]["visited"] = True
-        self.view.current_question = self.questions[self._ptr]
+        self.questions[question_number]["visited"] = True
+        self.view.current_question = self.questions[question_number]
+
+    def list_questions(self) -> str:
+        """
+        Lists all questions from the question bank.
+
+        It will put the following into a message:
+            - Question number
+            - Question description
+            - If the question was already 'visited' (displayed)
+        """
+        spaces = len(sorted(self.questions, key=lambda question: len(question['description']))[-1]["description"]) + 3
+        formatted_string = ""
+        for question in self.questions:
+            formatted_string += f"`Q{question['number']}: {question['description']!r}" \
+                                f"{' ' * (spaces - len(question['description']) + 2)}" \
+                                f"|` {':x:' if not question.get('visited') else ':checkmark:'}\n"
+
+        return formatted_string.strip()
 
     def current_question(self) -> tuple[Embed, QuestionView]:
         """Returns an embed entailing the current question as an embed with a view."""
@@ -120,7 +170,7 @@ class Questions:
         """Terminates answering of the question and displays the correct answer."""
         scores, answer_embed = self.view.end_question()
         for user, score in scores.items():
-            self.scoreboard[f"points: {user}"] = score[1]
+            self.scoreboard[f"points: {user}"] = 1
             self.scoreboard[f"speed: {user}"] = score[2]
 
         return answer_embed

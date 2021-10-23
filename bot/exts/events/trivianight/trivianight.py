@@ -41,6 +41,20 @@ class TriviaNight(commands.Cog):
         await ctx.send(embed=success_embed)
 
     @trivianight.command()
+    async def reset(self, ctx: commands.Context) -> None:
+        """Resets previous questions and scoreboards."""
+        self.scoreboard.view = ScoreboardView(self.bot)
+        for question in self.questions.questions:
+            del question["visited"]
+
+        success_embed = Embed(
+            title=choice(POSITIVE_REPLIES),
+            description="The scoreboards were reset and questions marked unvisited!",
+            color=Colours.soft_green
+        )
+        await ctx.send(embed=success_embed)
+
+    @trivianight.command()
     async def next(self, ctx: commands.Context) -> None:
         """Gets a random question from the unanswered question list and lets user choose the answer."""
         next_question = self.questions.next_question()
@@ -50,6 +64,23 @@ class TriviaNight(commands.Cog):
 
         question_embed, question_view = self.questions.current_question()
         await ctx.send(embed=question_embed, view=question_view)
+
+    @trivianight.command()
+    async def question(self, ctx: commands.Context, question_number: int) -> None:
+        """Gets a question from the question bank depending on the question number provided."""
+        question = self.questions.next_question(question_number)
+        if isinstance(question, Embed):
+            await ctx.send(embed=question)
+            return
+
+        question_embed, question_view = self.questions.current_question()
+        await ctx.send(embed=question_embed, view=question_view)
+
+    @trivianight.command()
+    async def list(self, ctx: commands.Context) -> None:
+        """Displays all the questions from the question bank."""
+        formatted_string = self.questions.list_questions()
+        await ctx.send(formatted_string)
 
     @trivianight.command()
     async def stop(self, ctx: commands.Context) -> None:

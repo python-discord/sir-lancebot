@@ -25,14 +25,14 @@ class ScoreboardView(View):
             color=Colours.python_blue,
         )
 
-        # Limit self.points.items() to 10 items at maximum (top 10 users) in the future
-        for user, points in list(self.points.items()):
+        current_placement = 1
+        for user, points in self.points.items():
             user = await self.bot.fetch_user(int(user))
             main_embed.add_field(
-                name=f"{user.name}#{user.discriminator}",
-                value=f"`{points}` pts",
-                inline=False
+                name=f"{current_placement}. {user.name}#{user.discriminator}",
+                value=f"`{points}` pts"
             )
+            current_placement += 1
 
         return main_embed
 
@@ -43,13 +43,14 @@ class ScoreboardView(View):
             description="See the leaderboard for how fast each user took to answer a question correctly!",
             color=Colours.python_blue,
         )
-        for user, time_taken in list(self.speed.items()):
+        current_placement = 1
+        for user, time_taken in self.speed.items():
             user = await self.bot.fetch_user(int(user))
             speed_embed.add_field(
-                name=f"{user.name}#{user.discriminator}",
+                name=f"{current_placement}. {user.name}#{user.discriminator}",
                 value=f"`{(time_taken[1] / time_taken[0]):.3f}s` (on average)",
-                inline=False
             )
+            current_placement += 1
 
         return speed_embed
 
