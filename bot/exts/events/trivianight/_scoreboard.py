@@ -1,11 +1,12 @@
+from random import choice
 from typing import Union
 
 import discord.ui
-from discord import ButtonStyle, Embed, Interaction
+from discord import ButtonStyle, Embed, Interaction, Member
 from discord.ui import Button, View
 
 from bot.bot import Bot
-from bot.constants import Colours
+from bot.constants import Colours, NEGATIVE_REPLIES
 
 
 class ScoreboardView(View):
@@ -25,43 +26,85 @@ class ScoreboardView(View):
             color=Colours.python_blue,
         )
 
+        formatted_string = ""
+        participant_points = list(self.points.items())[:30] if len(self.points.items()) > 30 else self.points.items()
         current_placement = 1
-        for user, points in self.points.items():
+        for user, points in participant_points:
             user = await self.bot.fetch_user(int(user))
-            main_embed.add_field(
-                name=f"{current_placement}. {user.name}#{user.discriminator}",
-                value=f"`{points}` pts"
-            )
+            formatted_string += f"`{current_placement}`. {user.mention} "
+            formatted_string += f"({points} pts)\n"
+            if current_placement % 10 == 0:
+                formatted_string += "⎯⎯⎯⎯⎯⎯⎯⎯\n"
             current_placement += 1
 
         return main_embed
 
     async def _create_speed_embed(self) -> Embed:
         """Helper function that iterates through `self.speed` to generate a leaderboard embed."""
-        speed_embed = Embed(
-            title="Average Time Taken to Answer a Question",
-            description="See the leaderboard for how fast each user took to answer a question correctly!",
-            color=Colours.python_blue,
-        )
         current_placement = 1
-        for user, time_taken in self.speed.items():
+        formatted_string = ""
+        participant_speed = list(self.speed.items())[:30] if len(self.speed.items()) > 30 else self.speed.items()
+
+        for user, time_taken in participant_speed:
             user = await self.bot.fetch_user(int(user))
-            speed_embed.add_field(
-                name=f"{current_placement}. {user.name}#{user.discriminator}",
-                value=f"`{(time_taken[1] / time_taken[0]):.3f}s` (on average)",
-            )
+            formatted_string += f"`{current_placement}`. {user.mention} "
+            formatted_string += f"({time_taken:.1f}s)\n"
+            if current_placement % 10 == 0:
+                formatted_string += "⎯⎯⎯⎯⎯⎯⎯⎯\n"
             current_placement += 1
 
+        speed_embed = Embed(
+            title="Average time taken to answer a question",
+            description=formatted_string,
+            color=Colours.python_blue
+        )
         return speed_embed
+
+    def _get_rank(self, member: Member) -> Embed:
+        """Gets the member's rank for the points leaderboard and speed leaderboard."""
+        rank_embed = Embed(title=f"Ranks for {member.display_name}", color=Colours.python_blue)
+        try:
+            points_rank = str(list(self.points.keys()).index(str(member.id)) + 1)
+            speed_rank = str(list(self.speed.keys()).index(str(member.id)) + 1)
+        except ValueError:
+            return Embed(
+                title=choice(NEGATIVE_REPLIES),
+                description="It looks like you didn't participate in the Trivia Night event!",
+                color=Colours.soft_red
+            )
+
+        suffixes = {"1": "st", "2": "nd", "3": "rd"}
+        rank_embed.add_field(
+            name="Total Points",
+            value=(
+                f"You got {points_rank}{'th' if not (suffix := suffixes.get(points_rank[-1])) else suffix} place"
+                f" with {self.points[str(member.id)]} points."
+            ),
+            inline=False
+        )
+        rank_embed.add_field(
+            name="Average Speed",
+            value=(
+                f"You got {speed_rank}{'th' if not (suffix := suffixes.get(speed_rank[-1])) else suffix} place"
+                f" with a time of {(self.speed[str(member.id)][1] / self.speed[str(member.id)][0]):.1f} seconds."
+            ),
+            inline=False
+        )
+        return rank_embed
 
     @discord.ui.button(label="Scoreboard for Speed", style=ButtonStyle.green)
     async def speed_leaderboard(self, button: Button, interaction: Interaction) -> None:
         """Send an ephemeral message with the speed leaderboard embed."""
         await interaction.response.send_message(embed=await self._create_speed_embed(), ephemeral=True)
 
+    @discord.ui.button(label="What's my rank?", style=ButtonStyle.blurple)
+    async def rank_button(self, button: Button, interaction: Interaction) -> None:
+        """Send an ephemeral message with the user's rank for the overall points/average speed."""
+        await interaction.response.send_message(embed=self._get_rank(interaction.user), ephemeral=True)
+
 
 class Scoreboard:
-    """Class for the scoreboard for the trivianight event."""
+    """Class for the scoreboard for the Trivia Night event."""
 
     def __setitem__(self, key: str, value: int):
         if key.startswith("points: "):
