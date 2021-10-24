@@ -28,12 +28,11 @@ class ScoreboardView(View):
 
         formatted_string = ""
         participant_points = list(self.points.items())[:30] if len(self.points.items()) > 30 else self.points.items()
-        current_placement = 1
-        for user, points in participant_points:
+        for current_placement, (user, points) in participant_points:
             user = await self.bot.fetch_user(int(user))
-            formatted_string += f"`{current_placement}`. {user.mention} "
+            formatted_string += f"`{current_placement + 1}`. {user.mention} "
             formatted_string += f"({points} pts)\n"
-            if current_placement % 10 == 0:
+            if (current_placement + 1) % 10 == 0:
                 formatted_string += "⎯⎯⎯⎯⎯⎯⎯⎯\n"
             current_placement += 1
 
@@ -41,15 +40,14 @@ class ScoreboardView(View):
 
     async def _create_speed_embed(self) -> Embed:
         """Helper function that iterates through `self.speed` to generate a leaderboard embed."""
-        current_placement = 1
         formatted_string = ""
         participant_speed = list(self.speed.items())[:30] if len(self.speed.items()) > 30 else self.speed.items()
 
-        for user, time_taken in participant_speed:
+        for current_placement, (user, time_taken) in enumerate(participant_speed):
             user = await self.bot.fetch_user(int(user))
-            formatted_string += f"`{current_placement}`. {user.mention} "
+            formatted_string += f"`{current_placement + 1}`. {user.mention} "
             formatted_string += f"({time_taken:.1f}s)\n"
-            if current_placement % 10 == 0:
+            if (current_placement + 1) % 10 == 0:
                 formatted_string += "⎯⎯⎯⎯⎯⎯⎯⎯\n"
             current_placement += 1
 
