@@ -4,13 +4,15 @@ import logging
 import re
 from io import BytesIO
 
-from PIL import Image, ImageColor
 from discord import Embed, File
 from discord.ext import commands
+from PIL import Image, ImageColor
 from rapidfuzz import process
 
 from bot.bot import Bot
 from bot.constants import Colours
+
+# from bot.exts.core.extension import invoke_help_command
 
 
 logger = logging.getLogger(__name__)
@@ -26,6 +28,139 @@ Hex: #000000-#FFFFFF
 
 with open("bot/resources/utilities/ryanzec_colours.json") as f:
     COLOR_MAPPING = json.load(f)
+
+
+THUMBNAIL_SIZE = 80
+
+"""
+class Colour(commands.Cog):
+
+    def __init__(self, bot: Bot) -> None:
+        self.bot = bot
+
+    @commands.group(aliases=["color"])
+    async def colour(self, ctx: commands.Context) -> None:
+        if ctx.invoked_subcommand is None:
+            await invoke_help_command(ctx)
+
+    @colour.command()
+    async def rgb(self, ctx: commands.Context, red: int, green: int, blue: int) -> None:
+        rgb_tuple = ImageColor.getrgb(f"rgb({red}, {green}, {blue})")
+        await Colour.send_colour_response(ctx, list(rgb_tuple))
+
+    @colour.command()
+    async def hsv(self, ctx: commands.Context, hue: int, saturation: int, value: int) -> None:
+        hsv_tuple = ImageColor.getrgb(f"hsv({hue}, {saturation}%, {value}%)")
+        await Colour.send_colour_response(ctx, list(hsv_tuple))
+
+    @colour.command()
+    async def hsl(self, ctx: commands.Context, hue: int, saturation: int, lightness: int) -> None:
+        hsl_tuple = ImageColor.getrgb(f"hsl({hue}, {saturation}%, {lightness}%)")
+        await Colour.send_colour_response(ctx, list(hsl_tuple))
+
+    @colour.command()
+    async def cmyk(self, ctx: commands.Context, cyan: int, yellow: int, magenta: int, key: int) -> None:
+        ...
+
+    @colour.command()
+    async def hex(self, ctx: commands.Context, hex_code: str) -> None:
+        hex_tuple = ImageColor.getrgb(hex_code)
+        await Colour.send_colour_response(ctx, list(hex_tuple))
+
+    @colour.command()
+    async def yiq(
+      self,
+      ctx: commands.Context,
+      perceived_luminesence: int,
+      in_phase: int,
+      quadrature: int
+    ) -> None:
+        yiq_list = list(colorsys.yiq_to_rgb(perceived_luminesence, in_phase, quadrature))
+        yiq_tuple = [int(val * 255.0) for val in yiq_list]
+        await Colour.send_colour_response(ctx, list(yiq_tuple))
+
+    @staticmethod
+    async def send_colour_response(ctx: commands.Context, rgb: list[int]) -> Message:
+        r, g, b = rgb[0], rgb[1], rgb[2]
+        colour_embed = Embed(
+            title="Colour",
+            description="Here lies thy colour",
+            colour=int(f"{r:02x}{g:02x}{b:02x}", 16)
+        )
+        colour_conversions = Colour.get_colour_conversions(rgb)
+        for colour_space, value in colour_conversions.items():
+            colour_embed.add_field(
+                name=colour_space.upper(),
+                value=f"`{value}`",
+                inline=True
+            )
+
+        thumbnail = Image.new("RGB", (THUMBNAIL_SIZE, THUMBNAIL_SIZE), color=tuple(rgb))
+        buffer = BytesIO()
+        thumbnail.save(buffer, "PNG")
+        buffer.seek(0)
+        thumbnail_file = File(buffer, filename="colour.png")
+
+        colour_embed.set_thumbnail(url="attachment://colour.png")
+
+        await ctx.send(file=thumbnail_file, embed=colour_embed)
+
+    @staticmethod
+    def get_colour_conversions(rgb: list[int]) -> dict[str, str]:
+        return {
+            "rgb": tuple(rgb),
+            "hsv": Colour._rgb_to_hsv(rgb),
+            "hsl": Colour._rgb_to_hsl(rgb),
+            "cmyk": Colour._rgb_to_cmyk(rgb),
+            "hex": Colour._rgb_to_hex(rgb),
+            "yiq": Colour._rgb_to_yiq(rgb)
+        }
+
+    @staticmethod
+    def _rgb_to_hsv(rgb: list[int]) -> tuple[int, int, int]:
+        rgb = [val / 255.0 for val in rgb]
+        h, v, s = colorsys.rgb_to_hsv(*rgb)
+        hsv = (round(h * 360), round(s * 100), round(v * 100))
+        return hsv
+
+    @staticmethod
+    def _rgb_to_hsl(rgb: list[int]) -> tuple[int, int, int]:
+        rgb = [val / 255.0 for val in rgb]
+        h, l, s = colorsys.rgb_to_hls(*rgb)
+        hsl = (round(h * 360), round(s * 100), round(l * 100))
+        return hsl
+
+    @staticmethod
+    def _rgb_to_cmyk(rgb: list[int]) -> tuple[int, int, int, int]:
+        rgb = [val / 255.0 for val in rgb]
+
+        if all(val == 0 for val in rgb):
+            return 0, 0, 0, 100
+
+        cmy = [1 - val / 255 for val in rgb]
+        min_cmy = min(cmy)
+
+        cmyk = [(val - min_cmy) / (1 - min_cmy) for val in cmy] + [min_cmy]
+        cmyk = [round(val * 100) for val in cmyk]
+
+        return tuple(cmyk)
+
+    @staticmethod
+    def _rgb_to_hex(rgb: list[int]) -> str:
+        hex_ = ''.join([hex(val)[2:].zfill(2) for val in rgb])
+        hex_code = f"#{hex_}".upper()
+        return hex_code
+
+    @staticmethod
+    def _rgb_to_yiq(rgb: list[int]) -> tuple[int, int, int, int]:
+        rgb = [val / 255.0 for val in rgb]
+        y, i, q = colorsys.rgb_to_yiq(*rgb)
+        yiq = (round(y), round(i), round(q))
+        return yiq
+
+def setup(bot: commands.Bot) -> None:
+    bot.add_cog(Colour(bot))
+"""
 
 
 class Color(commands.Cog):
