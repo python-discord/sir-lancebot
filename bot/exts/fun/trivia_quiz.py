@@ -16,7 +16,7 @@ from discord.ext import commands, tasks
 from rapidfuzz import fuzz
 
 from bot.bot import Bot
-from bot.constants import Colours, NEGATIVE_REPLIES, Roles
+from bot.constants import Client, Colours, NEGATIVE_REPLIES, Roles
 
 logger = logging.getLogger(__name__)
 
@@ -332,7 +332,7 @@ class TriviaQuiz(commands.Cog):
         if self.game_status[ctx.channel.id]:
             await ctx.send(
                 "Game is already running... "
-                f"do `{self.bot.command_prefix}quiz stop`"
+                f"do `{Client.prefix}quiz stop`"
             )
             return
 

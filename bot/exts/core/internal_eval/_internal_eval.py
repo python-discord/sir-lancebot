@@ -10,6 +10,7 @@ from bot.bot import Bot
 from bot.constants import Client, Roles
 from bot.utils.decorators import with_role
 from bot.utils.extensions import invoke_help_command
+
 from ._helpers import EvalContext
 
 __all__ = ["InternalEval"]
