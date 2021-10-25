@@ -4,9 +4,9 @@ import logging
 import random
 from io import BytesIO
 
+from PIL import Image, ImageColor
 from discord import Embed, File
 from discord.ext import commands
-from PIL import Image, ImageColor
 from rapidfuzz import process
 
 from bot.bot import Bot
