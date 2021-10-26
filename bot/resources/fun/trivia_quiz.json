@@ -440,7 +440,7 @@
     {
       "id": 229,
       "question": "What is this triangle called?",
-      "img_url": "https://cdn.askpython.com/wp-content/uploads/2020/07/Pascals-triangle.png",
+      "img_url": "https://wikimedia.org/api/rest_v1/media/math/render/png/23050fcb53d6083d9e42043bebf2863fa9746043",
       "answer": ["Pascal's triangle", "Pascal"]
     },
     {

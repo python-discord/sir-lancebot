@@ -9,14 +9,7 @@ from discord.ext import commands
 
 from bot.bot import Bot
 from bot.constants import (
-    Categories,
-    Channels,
-    Colours,
-    ERROR_REPLIES,
-    Emojis,
-    NEGATIVE_REPLIES,
-    Tokens,
-    WHITELISTED_CHANNELS
+    Categories, Channels, Colours, ERROR_REPLIES, Emojis, NEGATIVE_REPLIES, Tokens, WHITELISTED_CHANNELS
 )
 from bot.utils.decorators import whitelist_override
 from bot.utils.extensions import invoke_help_command
@@ -185,7 +178,7 @@ class Issues(commands.Cog):
         return resp
 
     @whitelist_override(channels=WHITELISTED_CHANNELS, categories=WHITELISTED_CATEGORIES)
-    @commands.command(aliases=("pr",))
+    @commands.command(aliases=("issues", "pr", "prs"))
     async def issue(
         self,
         ctx: commands.Context,
@@ -197,14 +190,23 @@ class Issues(commands.Cog):
         # Remove duplicates
         numbers = set(numbers)
 
-        if len(numbers) > MAXIMUM_ISSUES:
-            embed = discord.Embed(
+        err_message = None
+        if not numbers:
+            err_message = "You must have at least one issue/PR!"
+
+        elif len(numbers) > MAXIMUM_ISSUES:
+            err_message = f"Too many issues/PRs! (maximum of {MAXIMUM_ISSUES})"
+
+        # If there's an error with command invocation then send an error embed
+        if err_message is not None:
+            err_embed = discord.Embed(
                 title=random.choice(ERROR_REPLIES),
                 color=Colours.soft_red,
-                description=f"Too many issues/PRs! (maximum of {MAXIMUM_ISSUES})"
+                description=err_message
             )
-            await ctx.send(embed=embed)
+            await ctx.send(embed=err_embed)
             await invoke_help_command(ctx)
+            return
 
         results = [await self.fetch_issues(number, repository, user) for number in numbers]
         await ctx.send(embed=self.format_embed(results, user, repository))
