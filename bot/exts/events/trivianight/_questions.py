@@ -15,7 +15,7 @@ class CurrentQuestion(TypedDict):
 
     number: str
     description: str
-    answers: list
+    answers: list[str]
     correct: str
 
 
