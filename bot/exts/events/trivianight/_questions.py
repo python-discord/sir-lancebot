@@ -84,7 +84,7 @@ class QuestionView(View):
             color=Colours.python_yellow
         )
         for label, answer in zip("ABCD", self.current_question["answers"]):
-            question_embed.add_field(name=f"Choice {label}", value=answer, inline=False)
+            question_embed.add_field(name=f"Answer {label}", value=answer, inline=False)
 
         for button in self.buttons:
             button.set_time()
