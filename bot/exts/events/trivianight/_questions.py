@@ -37,7 +37,7 @@ class QuestionButton(Button):
             await interaction.response.send_message(
                 embed=Embed(
                     title="Success!",
-                    description=f"You chose answer choice {self.label}.",
+                    description=f"You chose answer {self.label}.",
                     color=Colours.soft_green
                 ),
                 ephemeral=True
