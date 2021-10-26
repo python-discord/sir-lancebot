@@ -12,91 +12,112 @@ from rapidfuzz import process
 from bot.bot import Bot
 from bot.exts.core.extensions import invoke_help_command
 
-with open(pathlib.Path("bot/resources/utilities/ryanzec_colours.json")) as f:
-    COLOR_MAPPING = json.load(f)
-
-THUMBNAIL_SIZE = 80
+THUMBNAIL_SIZE = (80, 80)
 
 
 class Colour(commands.Cog):
     """Cog for the Colour command."""
 
+    def __init__(self):
+        with open(pathlib.Path("bot/resources/utilities/ryanzec_colours.json")) as f:
+            self.COLOUR_MAPPING = json.load(f)
+
     @commands.group(aliases=("color",))
     async def colour(self, ctx: commands.Context) -> None:
-        """
-        User initiated command to create an embed that displays color information.
-
-        For the commands `hsl`, `hsv` and `rgb`: input is in the form `.color <mode> <int> <int> <int>`
-        For the command `cmyk`: input is in the form `.color cmyk <int> <int> <int> <int>`
-        For the command `hex`: input is in the form `.color hex #<hex code>`
-        For the command `name`: input is in the form `.color name <color name>`
-        For the command `random`: input is in the form `.color random`
-        """
+        """User initiated command to create an embed that displays colour information."""
         if ctx.invoked_subcommand is None:
             await invoke_help_command(ctx)
 
     @colour.command()
     async def rgb(self, ctx: commands.Context, red: int, green: int, blue: int) -> None:
-        """Function to create an embed from an RGB input."""
+        """
+        Command to create an embed from an RGB input.
+
+        Input is in the form `.colour rgb <int> <int> <int>`
+        """
         rgb_tuple = ImageColor.getrgb(f"rgb({red}, {green}, {blue})")
-        await Colour.send_colour_response(ctx, list(rgb_tuple))
+        await self.send_colour_response(ctx, list(rgb_tuple))
 
     @colour.command()
     async def hsv(self, ctx: commands.Context, hue: int, saturation: int, value: int) -> None:
-        """Function to create an embed from an HSV input."""
+        """
+        Command to create an embed from an HSV input.
+
+        Input is in the form `.colour hsv <int> <int> <int>`
+        """
         hsv_tuple = ImageColor.getrgb(f"hsv({hue}, {saturation}%, {value}%)")
-        await Colour.send_colour_response(ctx, list(hsv_tuple))
+        await self.send_colour_response(ctx, list(hsv_tuple))
 
     @colour.command()
     async def hsl(self, ctx: commands.Context, hue: int, saturation: int, lightness: int) -> None:
-        """Function to create an embed from an HSL input."""
+        """
+        Command to create an embed from an HSL input.
+
+        Input is in the form `.colour hsl <int> <int> <int>`
+        """
         hsl_tuple = ImageColor.getrgb(f"hsl({hue}, {saturation}%, {lightness}%)")
-        await Colour.send_colour_response(ctx, list(hsl_tuple))
+        await self.send_colour_response(ctx, list(hsl_tuple))
 
     @colour.command()
     async def cmyk(self, ctx: commands.Context, cyan: int, yellow: int, magenta: int, key: int) -> None:
-        """Function to create an embed from a CMYK input."""
+        """
+        Command to create an embed from a CMYK input.
+
+        Input is in the form `.colour cmyk <int> <int> <int> <int>`
+        """
         r = int(255 * (1.0 - cyan / float(100)) * (1.0 - key / float(100)))
         g = int(255 * (1.0 - magenta / float(100)) * (1.0 - key / float(100)))
         b = int(255 * (1.0 - yellow / float(100)) * (1.0 - key / float(100)))
-        await Colour.send_colour_response(ctx, list((r, g, b)))
+        await self.send_colour_response(ctx, list((r, g, b)))
 
     @colour.command()
     async def hex(self, ctx: commands.Context, hex_code: str) -> None:
-        """Function to create an embed from a HEX input. (Requires # as a prefix)."""
+        """
+        Command to create an embed from a HEX input.
+
+        Input is in the form `.colour hex #<hex code>`
+        """
         hex_tuple = ImageColor.getrgb(hex_code)
-        await Colour.send_colour_response(ctx, list(hex_tuple))
+        await self.send_colour_response(ctx, list(hex_tuple))
 
     @colour.command()
-    async def name(self, ctx: commands.Context, user_color: str) -> None:
-        """Function to create an embed from a name input."""
-        _, hex_color = self.match_color_name(user_color)
-        hex_tuple = ImageColor.getrgb(hex_color)
-        await Colour.send_colour_response(ctx, list(hex_tuple))
+    async def name(self, ctx: commands.Context, user_colour: str) -> None:
+        """
+        Command to create an embed from a name input.
+
+        Input is in the form `.colour name <color name>`
+        """
+        _, hex_colour = self.match_colour_name(user_colour)
+        hex_tuple = ImageColor.getrgb(hex_colour)
+        await self.send_colour_response(ctx, list(hex_tuple))
 
     @colour.command()
     async def random(self, ctx: commands.Context) -> None:
-        """Function to create an embed from a randomly chosen color from the ryanzec.json file."""
-        color_choices = list(COLOR_MAPPING.values())
-        hex_color = random.choice(color_choices)
-        hex_tuple = ImageColor.getrgb(f"#{hex_color}")
-        await Colour.send_colour_response(ctx, list(hex_tuple))
+        """
+        Command to create an embed from a randomly chosen colour from the reference file.
 
-    @staticmethod
-    async def send_colour_response(ctx: commands.Context, rgb: list[int]) -> None:
-        """Function to create and send embed from color information."""
+        Input is in the form `.colour random`
+        """
+        colour_choices = list(self.COLOUR_MAPPING.values())
+        hex_colour = random.choice(colour_choices)
+        hex_tuple = ImageColor.getrgb(f"#{hex_colour}")
+        await self.send_colour_response(ctx, list(hex_tuple))
+
+    async def send_colour_response(self, ctx: commands.Context, rgb: list[int]) -> None:
+        """Function to create and send embed from colour information."""
         r, g, b = rgb[0], rgb[1], rgb[2]
-        name = Colour._rgb_to_name(rgb)
+        name = self._rgb_to_name(rgb)
+        colour_mode = ctx.invoked_command
         if name is None:
-            desc = "Color information for the input color."
+            desc = f"{colour_mode.title()} information for the input colour."
         else:
-            desc = f"Color information for {name}."
+            desc = f"{colour_mode.title()} information for {name}."
         colour_embed = Embed(
             title="Colour",
             description=desc,
             colour=int(f"{r:02x}{g:02x}{b:02x}", 16)
         )
-        colour_conversions = Colour.get_colour_conversions(rgb)
+        colour_conversions = self.get_colour_conversions(rgb)
         for colour_space, value in colour_conversions.items():
             colour_embed.add_field(
                 name=colour_space.upper(),
@@ -104,7 +125,7 @@ class Colour(commands.Cog):
                 inline=True
             )
 
-        thumbnail = Image.new("RGB", (THUMBNAIL_SIZE, THUMBNAIL_SIZE), color=tuple(rgb))
+        thumbnail = Image.new("RGB", THUMBNAIL_SIZE, color=tuple(rgb))
         buffer = BytesIO()
         thumbnail.save(buffer, "PNG")
         buffer.seek(0)
@@ -114,16 +135,15 @@ class Colour(commands.Cog):
 
         await ctx.send(file=thumbnail_file, embed=colour_embed)
 
-    @staticmethod
-    def get_colour_conversions(rgb: list[int]) -> dict[str, str]:
-        """Create a dictionary mapping of color types and their values."""
+    def get_colour_conversions(self, rgb: list[int]) -> dict[str, str]:
+        """Create a dictionary mapping of colour types and their values."""
         return {
             "rgb": tuple(rgb),
-            "hsv": Colour._rgb_to_hsv(rgb),
-            "hsl": Colour._rgb_to_hsl(rgb),
-            "cmyk": Colour._rgb_to_cmyk(rgb),
-            "hex": Colour._rgb_to_hex(rgb),
-            "name": Colour._rgb_to_name(rgb)
+            "hsv": self._rgb_to_hsv(rgb),
+            "hsl": self._rgb_to_hsl(rgb),
+            "cmyk": self._rgb_to_cmyk(rgb),
+            "hex": self._rgb_to_hex(rgb),
+            "name": self._rgb_to_name(rgb)
         }
 
     @staticmethod
@@ -161,34 +181,34 @@ class Colour(commands.Cog):
         hex_code = f"#{hex_}".upper()
         return hex_code
 
-    @staticmethod
-    def _rgb_to_name(rgb: list[int]) -> str:
-        """Function to convert from an RGB list to a fuzzy matched color name."""
-        input_hex_color = Colour._rgb_to_hex(rgb)
+    @classmethod
+    def _rgb_to_name(cls, rgb: list[int]) -> str:
+        """Function to convert from an RGB list to a fuzzy matched colour name."""
+        input_hex_colour = cls._rgb_to_hex(rgb)
         try:
             match, certainty, _ = process.extractOne(
-                query=input_hex_color,
-                choices=COLOR_MAPPING.values(),
+                query=input_hex_colour,
+                choices=cls.COLOUR_MAPPING.values(),
                 score_cutoff=80
             )
-            color_name = [name for name, _ in COLOR_MAPPING.items() if _ == match][0]
+            colour_name = [name for name, _ in cls.COLOUR_MAPPING.items() if _ == match][0]
         except TypeError:
-            color_name = None
-        return color_name
+            colour_name = None
+        return colour_name
 
-    @staticmethod
-    def match_color_name(input_color_name: str) -> str:
-        """Use fuzzy matching to return a hex color code based on the user's input."""
+    @classmethod
+    def match_colour_name(cls, input_colour_name: str) -> str:
+        """Use fuzzy matching to return a hex colour code based on the user's input."""
         try:
             match, certainty, _ = process.extractOne(
-                query=input_color_name,
-                choices=COLOR_MAPPING.keys(),
+                query=input_colour_name,
+                choices=cls.COLOUR_MAPPING.keys(),
                 score_cutoff=50
             )
-            hex_match = f"#{COLOR_MAPPING[match]}"
+            hex_match = f"#{cls.COLOUR_MAPPING[match]}"
         except TypeError:
-            match = "No color name match found."
-            hex_match = input_color_name
+            match = "No colour name match found."
+            hex_match = input_colour_name
         return match, hex_match
 
 
