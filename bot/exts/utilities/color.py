@@ -1,6 +1,6 @@
 import colorsys
 import json
-import logging
+import pathlib
 import random
 from io import BytesIO
 
@@ -12,12 +12,8 @@ from rapidfuzz import process
 from bot.bot import Bot
 from bot.exts.core.extensions import invoke_help_command
 
-logger = logging.getLogger(__name__)
-
-
-with open("bot/resources/utilities/ryanzec_colours.json") as f:
+with open(pathlib.Path("bot/resources/utilities/ryanzec_colours.json")) as f:
     COLOR_MAPPING = json.load(f)
-
 
 THUMBNAIL_SIZE = 80
 
@@ -25,10 +21,7 @@ THUMBNAIL_SIZE = 80
 class Colour(commands.Cog):
     """Cog for the Colour command."""
 
-    def __init__(self, bot: Bot) -> None:
-        self.bot = bot
-
-    @commands.group(aliases=["color"])
+    @commands.group(aliases=("color",))
     async def colour(self, ctx: commands.Context) -> None:
         """
         User initiated command to create an embed that displays color information.
@@ -97,7 +90,7 @@ class Colour(commands.Cog):
         if name is None:
             desc = "Color information for the input color."
         else:
-            desc = f"Color information for {name}"
+            desc = f"Color information for {name}."
         colour_embed = Embed(
             title="Colour",
             description=desc,
@@ -178,9 +171,7 @@ class Colour(commands.Cog):
                 choices=COLOR_MAPPING.values(),
                 score_cutoff=80
             )
-            logger.debug(f"{match = }, {certainty = }")
             color_name = [name for name, _ in COLOR_MAPPING.items() if _ == match][0]
-            logger.debug(f"{color_name = }")
         except TypeError:
             color_name = None
         return color_name
@@ -194,9 +185,7 @@ class Colour(commands.Cog):
                 choices=COLOR_MAPPING.keys(),
                 score_cutoff=50
             )
-            logger.debug(f"{match = }, {certainty = }")
             hex_match = f"#{COLOR_MAPPING[match]}"
-            logger.debug(f"{hex_match = }")
         except TypeError:
             match = "No color name match found."
             hex_match = input_color_name
