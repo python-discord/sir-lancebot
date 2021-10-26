@@ -102,7 +102,7 @@ class QuestionView(View):
             button.users_picked = self.users_picked
 
         answer_embed = Embed(
-            title=f"The correct answer for Question {self.current_question['number']} was",
+            title=f"The correct answer for Question {self.current_question['number']} was..",
             description=self.current_question["correct"],
             color=Colours.soft_green
         )
