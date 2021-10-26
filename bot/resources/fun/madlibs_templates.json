@@ -6,10 +6,10 @@
                         "verb ending in 'ing'", "verb", "verb ending in 'ing'",
                         "adverb", "adjective", "a place", "type of liquid", "part of the body", "verb"],
             "value": ["If you are traveling in ", " and find yourself having to cross a piranha-filled river, here's how to do it ",
-                        ": \n* Piranhas are more ", " during the day, so cross the river at night.\n* Avoid areas with netted ",
-                        " traps--piranhas may be ", " there looking to ", " them!\n* When "," the river, swim ",
-                        ". You don't want to wake them up and make them ", "!\n* Whatever you do, if you have an open wound, try to find another way to get back to the ",
-                        ". Piranhas are attracted to fresh ", " and will most likely take a bite out of your ", " if you ", " in the water!", 0]
+                      ": \n* Piranhas are more ", " during the day, so cross the river at night.\n* Avoid areas with netted ",
+                      " traps--piranhas may be ", " there looking to ", " them!\n* When "," the river, swim ",
+                      ". You don't want to wake them up and make them ", "!\n* Whatever you do, if you have an open wound, try to find another way to get back to the ",
+                      ". Piranhas are attracted to fresh ", " and will most likely take a bite out of your ", " if you ", " in the water!", 0]
         },
         {
             "title": "Three Little Pigs",
@@ -17,22 +17,22 @@
                         "plural noun", "noun", "verb", "past tense verb", "noun", "noun", "noun", "past tense verb", "adjective", "past tense verb",
                         "past tense verb", "noun", "past tense verb"],
             "value": ["Once up a time, there were three ", " pigs. One day, their mother said, \"You are all grown up and must ", " on your own.\" So they left to ",
-                        " their houses. The first little pig wanted only to ", " all day and quickly built his house out of ", ". The second little pig wanted to ",
-                        " and ", " all day so he ", " his house with ", ". The third ", " pig knew the wolf lived nearby and worked hard to ", " his house out of ",
-                        ". One day, the wolf knocked on the first pig's ", ". \"Let me in or I'll ", " your house down!\" The pig didn't, so the wolf ", " down the ",
-                        ". The wolf knocked on the second pig's ", ". \"Let me in or I'll blow your ", " down!\" The pig didn't, so the wolf ",
-                        " down the house. Then the wolf knocked on the third ", " pig's door. \"Let me in or I'll blow your house down!\" The little pig didn't so the wolf ",
-                        " and ", ". He could not blow the house down. All the pigs went to live in the ", " house and they all ", " happily ever after.", 0]
+                      " their houses. The first little pig wanted only to ", " all day and quickly built his house out of ", ". The second little pig wanted to ",
+                      " and ", " all day so he ", " his house with ", ". The third ", " pig knew the wolf lived nearby and worked hard to ", " his house out of ",
+                      ". One day, the wolf knocked on the first pig's ", ". \"Let me in or I'll ", " your house down!\" The pig didn't, so the wolf ", " down the ",
+                      ". The wolf knocked on the second pig's ", ". \"Let me in or I'll blow your ", " down!\" The pig didn't, so the wolf ",
+                      " down the house. Then the wolf knocked on the third ", " pig's door. \"Let me in or I'll blow your house down!\" The little pig didn't so the wolf ",
+                      " and ", ". He could not blow the house down. All the pigs went to live in the ", " house and they all ", " happily ever after.", 0]
         },
         {
             "title": "Talk Like a Pirate",
             "blanks": ["noun", "adjective", "verb", "adverb", "noun", "adjective", "plural noun", "plural noun", "plural noun", "part of the body", "noun",
                         "noun", "noun", "noun", "part of the body"],
             "value": ["Ye can always pretend to be a bloodthirsty ", ", threatening everyone by waving yer ", " sword in the air, but until ye learn to ",
-                        " like a pirate, ye'll never be ", " accepted as an authentic ", ". So here's what ye do: Cleverly work into yer daily conversations ",
-                        " pirate phrases such as \"Ahoy there, ", ", \"\"Avast, ye ", ",\" and \"Shiver me ", ".\" Remember to drop all yer gs when ye say such words as sailin', spittin', and fightin'. This will give ye a/an ",
-                        " start to being recognized as a swashbucklin' ", ". Once ye have the lingo down pat, it helps to wear a three-cornered ", " on yer head, stash a/an ",
-                        " in yer pants, and keep a/an ", " perched atop yer ", ". Aye, now ye be a real pirate!", 0]
+                      " like a pirate, ye'll never be ", " accepted as an authentic ", ". So here's what ye do: Cleverly work into yer daily conversations ",
+                      " pirate phrases such as \"Ahoy there, ", ", \"\"Avast, ye ", ",\" and \"Shiver me ", ".\" Remember to drop all yer gs when ye say such words as sailin', spittin', and fightin'. This will give ye a/an ",
+                      " start to being recognized as a swashbucklin' ", ". Once ye have the lingo down pat, it helps to wear a three-cornered ", " on yer head, stash a/an ",
+                      " in yer pants, and keep a/an ", " perched atop yer ", ". Aye, now ye be a real pirate!", 0]
         },
         {
             "title": "How to Date the Coolest Guy/Girl in School",
