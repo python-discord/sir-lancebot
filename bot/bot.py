@@ -2,11 +2,11 @@ import asyncio
 import logging
 import socket
 from contextlib import suppress
-from typing import Optional
+from typing import Optional, Callable
 
 import discord
 from aiohttp import AsyncResolver, ClientSession, TCPConnector
-from async_rediscache import RedisSession
+from async_rediscache import RedisSession, RedisCache
 from discord import DiscordException, Embed, Forbidden, Thread
 from discord.ext import commands
 from discord.ext.commands import Cog, when_mentioned_or
@@ -16,6 +16,8 @@ from bot import constants
 log = logging.getLogger(__name__)
 
 __all__ = ("Bot", "bot")
+
+DEFAULT_POINTS = 20
 
 
 class Bot(commands.Bot):
@@ -38,6 +40,36 @@ class Bot(commands.Bot):
         self.redis_session = redis_session
         self.loop.create_task(self.check_channels())
         self.loop.create_task(self.send_log(self.name, "Connected!"))
+
+        # Mapping for the main games leaderboard
+        # The key holds the name of the discord Cog and the value is the redis cache object
+        # for that specific game leaderboard
+        self.games_leaderboard: dict[str, RedisCache] = dict()
+
+    def ensure_leaderboard(self, cog: Cog) -> None:
+        if self.games_leaderboard.get(cog.qualified_name):
+            return
+
+        # This cache contains the leaderboard for game `cog`
+        # RedisCache[int: int]
+        # Where the key is the discord user ID, and the values if the total
+        # points registered for that user.
+        _leaderboard_cache = RedisCache(namespace=cog.qualified_name)
+        self.games_leaderboard[cog.qualified_name] = _leaderboard_cache
+
+    async def change_points(
+        self,
+        cog: Cog,
+        user: discord.Member,
+        points: int = DEFAULT_POINTS,
+        operation: Callable = lambda before: before + DEFAULT_POINTS
+    ) -> None:
+        _leaderboard_cache: RedisCache = self.games_leaderboard.get(cog.qualified_name)
+        current_points = await _leaderboard_cache.get(user.id) or 0
+        await _leaderboard_cache.set(user.id, operation(current_points))
+        log.info(
+            f"Add {points} points to {user.name}#{user.discriminator} for game cog {cog.qualified_name}."
+        )
 
     @property
     def member(self) -> Optional[discord.Member]:

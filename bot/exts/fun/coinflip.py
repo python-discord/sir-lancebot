@@ -27,6 +27,10 @@ class CoinSide(commands.Converter):
 class CoinFlip(commands.Cog):
     """Cog for the CoinFlip command."""
 
+    def __init__(self, bot: Bot) -> None:
+        self.bot = bot
+        self.bot.ensure_leaderboard(self)
+
     @commands.command(name="coinflip", aliases=("flip", "coin", "cf"))
     async def coinflip_command(self, ctx: commands.Context, side: CoinSide = None) -> None:
         """
@@ -42,6 +46,7 @@ class CoinFlip(commands.Cog):
             return
 
         if side == flipped_side:
+            await self.bot.change_points(self, ctx.author, 10)
             message += f"You guessed correctly! {Emojis.lemon_hyperpleased}"
         else:
             message += f"You guessed incorrectly. {Emojis.lemon_pensive}"
@@ -50,4 +55,4 @@ class CoinFlip(commands.Cog):
 
 def setup(bot: Bot) -> None:
     """Loads the coinflip cog."""
-    bot.add_cog(CoinFlip())
+    bot.add_cog(CoinFlip(bot))
