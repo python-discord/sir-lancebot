@@ -1,16 +1,17 @@
+import json
 from asyncio import TimeoutError
-from json import load
 from pathlib import Path
 from random import choice
-# import json
-# from typing import Literal
-# from typing import List
 
 from discord import Embed
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Colours, NEGATIVE_REPLIES
+from bot.constants import Colours
+
+# import json
+# from typing import Literal
+# from typing import List
 
 TIMEOUT = 60.0
 
@@ -34,76 +35,83 @@ class Madlibs(commands.Cog):
         madlibs_stories = Path("bot/resources/fun/madlibs_templates.json")
 
         with open(madlibs_stories) as file:
-            return load(file)
+            return json.load(file)
+
+    @staticmethod
+    def madlibs_embed(random_template: list, current_input: int, part_of_speech: str, number_of_inputs: int) -> Embed:
+        """Method to have the bot send an embed with the game information."""
+        part_of_speech = random_template["blanks"][current_input]
+
+        madlibs_embed = Embed(
+            title="Madlibs",
+            color=Colours.python_blue,
+        )
+
+        madlibs_embed.add_field(
+            name="Enter a word that fits the given part of speech!",
+            value=f"Please enter a(n) {part_of_speech}!"
+        )
+
+        return madlibs_embed
 
     @commands.command()
     async def madlibs(
         self,
         ctx: commands.Context,
-        min_length: int = 5,
-        max_length: int = 15
     ) -> None:
-        """
-        Play Madlibs with the bot, where you have to enter a word that fits the part of speech that you are given!
+        """Play Madlibs with the bot, where you have to enter a word that fits the part of speech that you are given!"""
+        random_template = choice(self.templates["templates"])
 
-        The arguments for this command mean:
-        - min_length: the minimum number of inputs you would like in your game
-        - max_length: the maximum number of inputs you would like in your game
-        """
         current_input = 0
-        number_of_inputs = 0
+        number_of_inputs = len(random_template["blanks"])
 
-        await ctx.send(self.templates)
+        part_of_speech = random_template["blanks"][current_input]
 
-        random_template = choice(self.templates)
+        madlibs_embed = Embed(
+            title="Madlibs",
+            color=Colours.python_blue,
+        )
 
-        filtered_blanks = min_length < len(random_template["blanks"]) < max_length
+        madlibs_embed.add_field(
+            name="Enter a word that fits the given part of speech!",
+            value=f"Please enter a(n) {part_of_speech}!"
+        )
 
-        if not filtered_blanks:
-            filter_not_found_embed = Embed(
-                title=choice(NEGATIVE_REPLIES),
-                description="Sorry, we could not generate a game for you because "
-                            "you entered invalid numbers for the filters.",
-                color=Colours.soft_red,
-            )
-            await ctx.send(embed=filter_not_found_embed)
-            return
+        original_message = await ctx.send(embed=madlibs_embed)
 
-        while number_of_inputs != 0:
-            part_of_speech = random_template["blanks"][current_input]
-            inputs_left = random_template["blanks"][number_of_inputs]
+        while current_input != 30:
+            try:
+                message = await self.bot.wait_for(event='message', timeout=TIMEOUT)
+            except TimeoutError:
+                timeout_embed = Embed(title='Timeout!',
+                                      description='Uh oh! Looks like the bot timed out! Please try again later.',
+                                      color=Colours.soft_red)
 
-            madlibs_embed = Embed(
-                title="Madlibs",
-                color=Colours.python_blue,
-            )
+                await ctx.send(embed=timeout_embed)
+                return
 
-            madlibs_embed.add_field(
-                name="Enter a word that fits the given part of speech!",
-                value=f"Please enter a {part_of_speech}!"
-            )
-
-            madlibs_embed.set_footer(text=f"Inputs remaining: {inputs_left}")
-
-            await ctx.send(embed=madlibs_embed)
+            word = message.content
+            for blank in random_template["value"]:
+                blank = ''
+                blank.replace('', word)
 
             current_input += 1
             number_of_inputs -= 1
 
-            try:
-                await self.bot.wait_for(event='message', timeout=TIMEOUT)
-            except TimeoutError:
-                timeout_embed = Embed(title=choice(NEGATIVE_REPLIES),
-                                      description='Uh oh! Looks like the bot timed out! Please try again later.')
+            madlibs_embed.clear_fields()
 
-                await ctx.send(embed=timeout_embed)
+            madlibs_embed = self.new_embed_fields(random_template, current_input, part_of_speech, number_of_inputs)
+
+            await original_message.edit(embed=madlibs_embed)
 
         story_embed = Embed(
-            title="Here's your story!",
-            description=random_template["value"]
+            title=random_template["title"],
+            description=str(random_template["value"]),
+            color=Colours.bright_green,
         )
 
         await ctx.send(embed=story_embed)
+        return
 
 
 def setup(bot: Bot) -> None:
