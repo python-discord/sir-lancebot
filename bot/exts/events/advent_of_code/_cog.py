@@ -9,9 +9,7 @@ import discord
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import (
-    AdventOfCode as AocConfig, Channels, Colours, Emojis, Month, Roles, WHITELISTED_CHANNELS,
-)
+from bot.constants import AdventOfCode as AocConfig, Channels, Colours, Emojis, Month, Roles, WHITELISTED_CHANNELS
 from bot.exts.events.advent_of_code import _helpers
 from bot.exts.events.advent_of_code.views.dayandstarview import AoCDropdownView
 from bot.utils.decorators import InChannelCheckFailure, in_month, whitelist_override, with_role

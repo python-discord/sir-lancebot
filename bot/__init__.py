@@ -18,7 +18,6 @@ from discord.ext import commands
 from bot import monkey_patches
 from bot.constants import Client
 
-
 # Configure the "TRACE" logging level (e.g. "log.trace(message)")
 logging.TRACE = 5
 logging.addLevelName(logging.TRACE, "TRACE")

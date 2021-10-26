@@ -9,14 +9,7 @@ from discord.ext import commands
 
 from bot.bot import Bot
 from bot.constants import (
-    Categories,
-    Channels,
-    Colours,
-    ERROR_REPLIES,
-    Emojis,
-    NEGATIVE_REPLIES,
-    Tokens,
-    WHITELISTED_CHANNELS
+    Categories, Channels, Colours, ERROR_REPLIES, Emojis, NEGATIVE_REPLIES, Tokens, WHITELISTED_CHANNELS
 )
 from bot.utils.decorators import whitelist_override
 from bot.utils.extensions import invoke_help_command
