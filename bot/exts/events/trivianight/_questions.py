@@ -83,7 +83,7 @@ class QuestionView(View):
             description=self.current_question["description"],
             color=Colours.python_yellow
         )
-        for label, answer in zip(("A", "B", "C", "D"), self.current_question["answers"]):
+        for label, answer in zip("ABCD", self.current_question["answers"]):
             question_embed.add_field(name=f"Choice {label}", value=answer, inline=False)
 
         for button in self.buttons:
