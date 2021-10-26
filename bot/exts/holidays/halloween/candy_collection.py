@@ -182,7 +182,7 @@ class CandyCollection(commands.Cog):
                 for index, record in enumerate(top_five)
             ) if top_five else "No Candies"
 
-        e = discord.Embed(colour=discord.Colour.blurple())
+        e = discord.Embed(colour=discord.Colour.og_blurple())
         e.add_field(
             name="Top Candy Records",
             value=generate_leaderboard(),
