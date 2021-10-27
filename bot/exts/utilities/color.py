@@ -23,6 +23,38 @@ class Colour(commands.Cog):
         with open(pathlib.Path("bot/resources/utilities/ryanzec_colours.json")) as f:
             self.COLOUR_MAPPING = json.load(f)
 
+    async def send_colour_response(self, ctx: commands.Context, rgb: list[int]) -> None:
+        """Function to create and send embed from colour information."""
+        r, g, b = rgb[0], rgb[1], rgb[2]
+        name = self._rgb_to_name(rgb)
+        colour_mode = ctx.invoked_with
+        if name is None:
+            desc = f"{colour_mode.upper()} information for the input colour."
+        else:
+            desc = f"{colour_mode.upper()} information for `{name}`."
+        colour_embed = Embed(
+            title="Colour",
+            description=desc,
+            colour=int(f"{r:02x}{g:02x}{b:02x}", 16)
+        )
+        colour_conversions = self.get_colour_conversions(rgb)
+        for colour_space, value in colour_conversions.items():
+            colour_embed.add_field(
+                name=colour_space.upper(),
+                value=f"`{value}`",
+                inline=True
+            )
+
+        thumbnail = Image.new("RGB", THUMBNAIL_SIZE, color=tuple(rgb))
+        buffer = BytesIO()
+        thumbnail.save(buffer, "PNG")
+        buffer.seek(0)
+        thumbnail_file = File(buffer, filename="colour.png")
+
+        colour_embed.set_thumbnail(url="attachment://colour.png")
+
+        await ctx.send(file=thumbnail_file, embed=colour_embed)
+
     @commands.group(aliases=("color",))
     async def colour(self, ctx: commands.Context) -> None:
         """User initiated command to create an embed that displays colour information."""
@@ -103,38 +135,6 @@ class Colour(commands.Cog):
         hex_colour = random.choice(colour_choices)
         hex_tuple = ImageColor.getrgb(f"#{hex_colour}")
         await self.send_colour_response(ctx, list(hex_tuple))
-
-    async def send_colour_response(self, ctx: commands.Context, rgb: list[int]) -> None:
-        """Function to create and send embed from colour information."""
-        r, g, b = rgb[0], rgb[1], rgb[2]
-        name = self._rgb_to_name(rgb)
-        colour_mode = ctx.invoked_with
-        if name is None:
-            desc = f"{colour_mode.upper()} information for the input colour."
-        else:
-            desc = f"{colour_mode.upper()} information for `{name}`."
-        colour_embed = Embed(
-            title="Colour",
-            description=desc,
-            colour=int(f"{r:02x}{g:02x}{b:02x}", 16)
-        )
-        colour_conversions = self.get_colour_conversions(rgb)
-        for colour_space, value in colour_conversions.items():
-            colour_embed.add_field(
-                name=colour_space.upper(),
-                value=f"`{value}`",
-                inline=True
-            )
-
-        thumbnail = Image.new("RGB", THUMBNAIL_SIZE, color=tuple(rgb))
-        buffer = BytesIO()
-        thumbnail.save(buffer, "PNG")
-        buffer.seek(0)
-        thumbnail_file = File(buffer, filename="colour.png")
-
-        colour_embed.set_thumbnail(url="attachment://colour.png")
-
-        await ctx.send(file=thumbnail_file, embed=colour_embed)
 
     def get_colour_conversions(self, rgb: list[int]) -> dict[str, str]:
         """Create a dictionary mapping of colour types and their values."""
