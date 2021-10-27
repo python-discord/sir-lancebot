@@ -46,7 +46,7 @@ class CoinFlip(commands.Cog):
             return
 
         if side == flipped_side:
-            await self.bot.change_points(self, ctx.author, 10)
+            await self.bot.increment_points(self, ctx.author, 10)
             message += f"You guessed correctly! {Emojis.lemon_hyperpleased}"
         else:
             message += f"You guessed incorrectly. {Emojis.lemon_pensive}"

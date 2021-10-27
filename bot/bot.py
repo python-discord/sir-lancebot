@@ -2,14 +2,17 @@ import asyncio
 import logging
 import socket
 from contextlib import suppress
-from typing import Optional, Callable
+from datetime import datetime, timedelta
+from typing import Optional
 
 import discord
 from aiohttp import AsyncResolver, ClientSession, TCPConnector
-from async_rediscache import RedisSession, RedisCache
+from async_rediscache import RedisCache, RedisSession
 from discord import DiscordException, Embed, Forbidden, Thread
 from discord.ext import commands
 from discord.ext.commands import Cog, when_mentioned_or
+from discord.ext.tasks import loop
+from discord.utils import sleep_until
 
 from bot import constants
 
@@ -18,6 +21,7 @@ log = logging.getLogger(__name__)
 __all__ = ("Bot", "bot")
 
 DEFAULT_POINTS = 20
+MAX_PER_GAME_PER_DAY_POINTS = 100
 
 
 class Bot(commands.Bot):
@@ -44,9 +48,25 @@ class Bot(commands.Bot):
         # Mapping for the main games leaderboard
         # The key holds the name of the discord Cog and the value is the redis cache object
         # for that specific game leaderboard
-        self.games_leaderboard: dict[str, RedisCache] = dict()
+        self.games_leaderboard: dict[str, tuple[RedisCache, ...]] = dict()
+        self.auto_per_day_leaderboard_clear.start()
+
+    @loop()
+    async def auto_per_day_leaderboard_clear(self) -> None:
+        """Loop for clearing the per day leaderboard redis cache at UTC midnight."""
+        # once d.py get support for `time` parameter in loop decorator,
+        # this can be removed and the loop can use the `time=datetime.time.min` parameter
+        now = datetime.utcnow()
+        tomorrow = now + timedelta(days=1)
+        midnight_tomorrow = tomorrow.replace(hour=0, minute=0, second=0)
+
+        await sleep_until(midnight_tomorrow)
+
+        for _, per_day_lb in self.games_leaderboard.values():
+            await per_day_lb.clear()
 
     def ensure_leaderboard(self, cog: Cog) -> None:
+        """Ensure that per day leaderboard and total leaderboard redis cache are available for the cog."""
         if self.games_leaderboard.get(cog.qualified_name):
             return
 
@@ -54,22 +74,39 @@ class Bot(commands.Bot):
         # RedisCache[int: int]
         # Where the key is the discord user ID, and the values if the total
         # points registered for that user.
-        _leaderboard_cache = RedisCache(namespace=cog.qualified_name)
-        self.games_leaderboard[cog.qualified_name] = _leaderboard_cache
+        _leaderboard_cache = RedisCache(namespace=f"{cog.qualified_name}-total")
 
-    async def change_points(
-        self,
-        cog: Cog,
-        user: discord.Member,
-        points: int = DEFAULT_POINTS,
-        operation: Callable = lambda before: before + DEFAULT_POINTS
-    ) -> None:
-        _leaderboard_cache: RedisCache = self.games_leaderboard.get(cog.qualified_name)
+        # This cache contains the per day leaderboard, same specifies
+        _per_day_leaderboard = RedisCache(namespace=cog.qualified_name)
+
+        self.games_leaderboard[cog.qualified_name] = (_leaderboard_cache, _per_day_leaderboard)
+
+    async def increment_points(self, cog: Cog, user: discord.Member, points: int = DEFAULT_POINTS) -> None:
+        """
+        Increment points for a user in the leaderboard for game `cog` by `points`.
+
+        If max points for today are hit for that particular game cog, then set today's points to the max
+        points and add the difference of the(before today points and max possible points for a day to the
+        overall points for the user.
+        """
+        _leaderboard_cache, _per_day_leaderboard = self.games_leaderboard.get(cog.qualified_name)
+
         current_points = await _leaderboard_cache.get(user.id) or 0
-        await _leaderboard_cache.set(user.id, operation(current_points))
-        log.info(
-            f"Add {points} points to {user.name}#{user.discriminator} for game cog {cog.qualified_name}."
-        )
+        current_points_today = await _per_day_leaderboard.get(user.id) or 0
+        new_points_today = current_points_today + points
+
+        if new_points_today > MAX_PER_GAME_PER_DAY_POINTS:
+            log.info(f"Member({user.id}) has got maximum possible points for game cog {cog.qualified_name}.")
+            await _per_day_leaderboard.set(user.id, MAX_PER_GAME_PER_DAY_POINTS)
+            await _leaderboard_cache.set(
+                user.id, current_points + (MAX_PER_GAME_PER_DAY_POINTS - current_points_today)
+            )
+        else:
+            await _per_day_leaderboard.set(user.id, new_points_today)
+            await _leaderboard_cache.set(user.id, current_points + points)
+            log.info(
+                f"Added {points} points to Member({user.id}) for game cog {cog.qualified_name}."
+            )
 
     @property
     def member(self) -> Optional[discord.Member]:
@@ -97,6 +134,7 @@ class Bot(commands.Bot):
     async def close(self) -> None:
         """Close Redis session when bot is shutting down."""
         await super().close()
+        self.auto_per_day_leaderboard_clear.cancel()
 
         if self.http_session:
             await self.http_session.close()
@@ -161,7 +199,9 @@ class Bot(commands.Bot):
         devlog = self.get_channel(constants.Channels.devlog)
 
         if not devlog:
-            log.info(f"Fetching devlog channel as it wasn't found in the cache (ID: {constants.Channels.devlog})")
+            log.info(
+                f"Fetching devlog channel as it wasn't found in the cache (ID: {constants.Channels.devlog})"
+            )
             try:
                 devlog = await self.fetch_channel(constants.Channels.devlog)
             except discord.HTTPException as discord_exc:
