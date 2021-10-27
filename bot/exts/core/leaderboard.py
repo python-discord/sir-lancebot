@@ -1,12 +1,67 @@
+import logging
 from collections import Counter
 from datetime import datetime
 
 import discord
 from async_rediscache import RedisCache
+from discord import ButtonStyle, Colour, Interaction, ui
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Colours
+from bot.constants import Roles
+from bot.utils.decorators import with_role
+
+log = logging.getLogger(__name__)
+DUCKY_COINS_THUMBNAIL = (
+    "https://media.discordapp.net/attachments/753252897059373066/902713599884152872/"
+    "new_duck.png?width=230&height=231"
+)
+
+
+class ConfirmClear(ui.View):
+    """A confirmation view for clearing the leaderboard caches."""
+
+    def __init__(self, author_id: int, bot: Bot) -> None:
+        super().__init__(timeout=5)
+        self.confirmed = None
+        self.interaction = None
+        self.authorization = author_id
+        self.bot = bot
+
+    async def interaction_check(self, interaction: Interaction) -> bool:
+        """Check the interactor is authorised."""
+        if interaction.user.id == self.authorization:
+            return True
+
+        await interaction.response.send_message(
+            ":no_entry_sign: You are not authorized to perform this action.",
+            ephemeral=True,
+        )
+
+        return False
+
+    @ui.button(label="Confirm", style=ButtonStyle.green, row=0)
+    async def confirm(self, _button: ui.Button, interaction: Interaction) -> None:
+        """Redeploy the specified service."""
+        for _, per_day_lb in self.bot.games_leaderboard.values():
+            await per_day_lb.clear()
+
+        log.info(f"The leaderboard was cleared by Member({self.authorization})")
+        await interaction.response.send_message(
+            content=":white_check_mark: Cleared all game leaderboards.",
+            ephemeral=False
+        )
+
+        self.stop()
+
+    @ui.button(label="Cancel", style=ButtonStyle.grey, row=0)
+    async def cancel(self, _button: ui.Button, interaction: Interaction) -> None:
+        """Logic for if the deployment is not approved."""
+        await interaction.response.send_message(
+            content=":x: Clearing cache aborted!",
+            ephemeral=False,
+        )
+        self.stop()
 
 
 class Leaderboard(commands.Cog):
@@ -49,12 +104,10 @@ class Leaderboard(commands.Cog):
         embed = discord.Embed(
             title="Top 10",
             description=description,
-            colour=Colours.orange,
+            colour=Colour.from_rgb(255, 230, 102),
             timestamp=datetime.utcnow(),
         )
-        embed.set_thumbnail(
-            url="https://cdn.discordapp.com/emojis/902160691509723208.png?size=96"
-        )
+        embed.set_thumbnail(url=DUCKY_COINS_THUMBNAIL)
 
         return embed
 
@@ -89,6 +142,30 @@ class Leaderboard(commands.Cog):
 
         embed = await self.make_leaderboard(leaderboard)
         await ctx.send(embed=embed)
+
+    @leaderboard.command(name="clear")
+    @with_role(Roles.admin)
+    async def clear_leaderboard(self, ctx: commands.Context) -> None:
+        """Clear the current scoreboard."""
+        confirmation = ConfirmClear(ctx.author.id, self.bot)
+
+        msg = await ctx.send(
+            ":warning: THIS WILL IRREVOCABLY CLEAR THE LEADERBOARD. ARE YOU SURE?",
+            view=confirmation,
+        )
+
+        timed_out = await confirmation.wait()
+
+        if timed_out:
+            await msg.edit(
+                content=":x: Clearing cache aborted! You took too long."
+            )
+
+        # Disable the confirmation button
+        confirmation.children[0].disabled = True
+        confirmation.children[1].disabled = True
+
+        await msg.edit(view=confirmation)
 
 
 def setup(bot: Bot) -> None:
