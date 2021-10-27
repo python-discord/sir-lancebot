@@ -62,8 +62,8 @@ class ConfirmClear(ui.View):
     @ui.button(label="Confirm", style=ButtonStyle.green, row=0)
     async def confirm(self, _button: ui.Button, interaction: Interaction) -> None:
         """Redeploy the specified service."""
-        for _, per_day_lb in self.bot.games_leaderboard.values():
-            await per_day_lb.clear()
+        for global_lb, _ in self.bot.games_leaderboard.values():
+            await global_lb.clear()
 
         log.info(f"The leaderboard was cleared by Member({self.authorization})")
         await interaction.response.send_message(
