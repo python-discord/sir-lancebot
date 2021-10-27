@@ -18,7 +18,8 @@ THUMBNAIL_SIZE = (80, 80)
 class Colour(commands.Cog):
     """Cog for the Colour command."""
 
-    def __init__(self):
+    def __init__(self, bot: Bot):
+        self.bot = bot
         with open(pathlib.Path("bot/resources/utilities/ryanzec_colours.json")) as f:
             self.COLOUR_MAPPING = json.load(f)
 
@@ -107,7 +108,7 @@ class Colour(commands.Cog):
         """Function to create and send embed from colour information."""
         r, g, b = rgb[0], rgb[1], rgb[2]
         name = self._rgb_to_name(rgb)
-        colour_mode = ctx.invoked_command
+        colour_mode = ctx.invoked_with
         if name is None:
             desc = f"{colour_mode.title()} information for the input colour."
         else:
@@ -181,31 +182,29 @@ class Colour(commands.Cog):
         hex_code = f"#{hex_}".upper()
         return hex_code
 
-    @classmethod
-    def _rgb_to_name(cls, rgb: list[int]) -> str:
+    def _rgb_to_name(self, rgb: list[int]) -> str:
         """Function to convert from an RGB list to a fuzzy matched colour name."""
-        input_hex_colour = cls._rgb_to_hex(rgb)
+        input_hex_colour = self._rgb_to_hex(rgb)
         try:
             match, certainty, _ = process.extractOne(
                 query=input_hex_colour,
-                choices=cls.COLOUR_MAPPING.values(),
+                choices=self.COLOUR_MAPPING.values(),
                 score_cutoff=80
             )
-            colour_name = [name for name, _ in cls.COLOUR_MAPPING.items() if _ == match][0]
+            colour_name = [name for name, _ in self.COLOUR_MAPPING.items() if _ == match][0]
         except TypeError:
             colour_name = None
         return colour_name
 
-    @classmethod
-    def match_colour_name(cls, input_colour_name: str) -> str:
+    def match_colour_name(self, input_colour_name: str) -> str:
         """Use fuzzy matching to return a hex colour code based on the user's input."""
         try:
             match, certainty, _ = process.extractOne(
                 query=input_colour_name,
-                choices=cls.COLOUR_MAPPING.keys(),
+                choices=self.COLOUR_MAPPING.keys(),
                 score_cutoff=50
             )
-            hex_match = f"#{cls.COLOUR_MAPPING[match]}"
+            hex_match = f"#{self.COLOUR_MAPPING[match]}"
         except TypeError:
             match = "No colour name match found."
             hex_match = input_colour_name
