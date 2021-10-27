@@ -1,4 +1,3 @@
-import logging
 from json import loads
 from random import choice
 
@@ -7,6 +6,7 @@ from discord.ext import commands
 
 from bot.bot import Bot
 from bot.constants import Colours, POSITIVE_REPLIES
+
 from ._questions import QuestionView, Questions
 from ._scoreboard import Scoreboard, ScoreboardView
 
@@ -30,7 +30,6 @@ class TriviaNight(commands.Cog):
         json_text = (await ctx.message.attachments[0].read()).decode("utf8")
         serialized_json = loads(json_text)
         self.questions.view = QuestionView()
-        logging.getLogger(__name__).debug(self.questions.view)
         self.scoreboard.view = ScoreboardView(self.bot)
         self.questions.set_questions(serialized_json)
         success_embed = Embed(

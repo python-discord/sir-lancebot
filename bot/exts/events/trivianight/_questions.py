@@ -7,7 +7,17 @@ from discord import Embed, Interaction
 from discord.ui import Button, View
 
 from bot.constants import Colours, NEGATIVE_REPLIES
+
 from ._scoreboard import Scoreboard
+
+
+class UserScore:
+    """Marker class for passing into the scoreboard to add points/record speed."""
+
+    __slots__ = ("user_id",)
+
+    def __init__(self, user_id: int):
+        self.user_id = user_id
 
 
 class CurrentQuestion(TypedDict):
@@ -26,30 +36,26 @@ class QuestionButton(Button):
         self.users_picked = users_picked
         super().__init__(label=label, style=discord.ButtonStyle.green)
 
-    def set_time(self) -> None:
-        """Sets an instance attribute to a perf counter simulating the question beginning."""
-        self._time = perf_counter()
-
     async def callback(self, interaction: Interaction) -> None:
         """When a user interacts with the button, this will be called."""
         if interaction.user.id not in self.users_picked.keys():
-            self.users_picked[interaction.user.id] = [self.label, 1, perf_counter() - self._time]
+            self.users_picked[interaction.user.id] = [self.label, True, perf_counter() - self._time]
             await interaction.response.send_message(
                 embed=Embed(
-                    title="Success!",
+                    title="Confirming that..",
                     description=f"You chose answer {self.label}.",
                     color=Colours.soft_green
                 ),
                 ephemeral=True
             )
-        elif self.users_picked[interaction.user.id][1] < 2:
+        elif self.users_picked[interaction.user.id][1] is True:
             self.users_picked[interaction.user.id] = [
-                self.label, self.users_picked[interaction.user.id][1] + 1, perf_counter() - self._time
+                self.label, False, perf_counter() - self._time
             ]
             await interaction.response.send_message(
                 embed=Embed(
-                    title="Success!",
-                    description=f"You changed your answer to answer choice {self.label}.",
+                    title="Confirming that..",
+                    description=f"You changed your answer to answer {self.label}.",
                     color=Colours.soft_green
                 ),
                 ephemeral=True
@@ -86,8 +92,9 @@ class QuestionView(View):
         for label, answer in zip("ABCD", self.current_question["answers"]):
             question_embed.add_field(name=f"Answer {label}", value=answer, inline=False)
 
+        current_time = perf_counter()
         for button in self.buttons:
-            button.set_time()
+            button._time = current_time
 
         return question_embed
 
@@ -170,7 +177,6 @@ class Questions:
         """Terminates answering of the question and displays the correct answer."""
         scores, answer_embed = self.view.end_question()
         for user, score in scores.items():
-            self.scoreboard[f"points: {user}"] = 1
-            self.scoreboard[f"speed: {user}"] = score[2]
+            self.scoreboard[UserScore(user)] = {"points": 1, "speed": score[2]}
 
         return answer_embed

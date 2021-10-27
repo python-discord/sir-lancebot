@@ -20,36 +20,38 @@ class ScoreboardView(View):
 
     async def create_main_leaderboard(self) -> Embed:
         """Helper function that iterates through `self.points` to generate the main leaderboard embed."""
-        main_embed = Embed(
-            title="Winners of the Trivia Night",
-            description="See the leaderboard for who got the most points during the Trivia Night!",
-            color=Colours.python_blue,
-        )
-
         formatted_string = ""
-        participant_points = list(self.points.items())[:30] if len(self.points.items()) > 30 else self.points.items()
-        for current_placement, (user, points) in participant_points:
+        for current_placement, (user, points) in enumerate(self.points.items()):
+            if current_placement + 1 > 30:
+                break
+
             user = await self.bot.fetch_user(int(user))
             formatted_string += f"`{current_placement + 1}`. {user.mention} "
             formatted_string += f"({points} pts)\n"
             if (current_placement + 1) % 10 == 0:
                 formatted_string += "⎯⎯⎯⎯⎯⎯⎯⎯\n"
-            current_placement += 1
+
+        main_embed = Embed(
+            title="Winners of the Trivia Night",
+            description=formatted_string,
+            color=Colours.python_blue,
+        )
 
         return main_embed
 
     async def _create_speed_embed(self) -> Embed:
         """Helper function that iterates through `self.speed` to generate a leaderboard embed."""
         formatted_string = ""
-        participant_speed = list(self.speed.items())[:30] if len(self.speed.items()) > 30 else self.speed.items()
 
-        for current_placement, (user, time_taken) in enumerate(participant_speed):
+        for current_placement, (user, time_taken) in enumerate(self.speed.items()):
+            if current_placement + 1 > 30:
+                break
+
             user = await self.bot.fetch_user(int(user))
             formatted_string += f"`{current_placement + 1}`. {user.mention} "
-            formatted_string += f"({time_taken:.1f}s)\n"
+            formatted_string += f"({(time_taken[-1] / time_taken[0]):.1f}s)\n"
             if (current_placement + 1) % 10 == 0:
                 formatted_string += "⎯⎯⎯⎯⎯⎯⎯⎯\n"
-            current_placement += 1
 
         speed_embed = Embed(
             title="Average time taken to answer a question",
@@ -61,9 +63,10 @@ class ScoreboardView(View):
     def _get_rank(self, member: Member) -> Embed:
         """Gets the member's rank for the points leaderboard and speed leaderboard."""
         rank_embed = Embed(title=f"Ranks for {member.display_name}", color=Colours.python_blue)
+        # These are stored as strings so that the last digit can be determined to choose the suffix
         try:
-            points_rank = str(list(self.points.keys()).index(str(member.id)) + 1)
-            speed_rank = str(list(self.speed.keys()).index(str(member.id)) + 1)
+            points_rank = str(list(self.points.keys()).index(member.id) + 1)
+            speed_rank = str(list(self.speed.keys()).index(member.id) + 1)
         except ValueError:
             return Embed(
                 title=choice(NEGATIVE_REPLIES),
@@ -76,7 +79,7 @@ class ScoreboardView(View):
             name="Total Points",
             value=(
                 f"You got {points_rank}{'th' if not (suffix := suffixes.get(points_rank[-1])) else suffix} place"
-                f" with {self.points[str(member.id)]} points."
+                f" with {self.points[member.id]} points."
             ),
             inline=False
         )
@@ -84,7 +87,7 @@ class ScoreboardView(View):
             name="Average Speed",
             value=(
                 f"You got {speed_rank}{'th' if not (suffix := suffixes.get(speed_rank[-1])) else suffix} place"
-                f" with a time of {(self.speed[str(member.id)][1] / self.speed[str(member.id)][0]):.1f} seconds."
+                f" with a time of {(self.speed[member.id][1] / self.speed[member.id][0]):.1f} seconds."
             ),
             inline=False
         )
@@ -105,24 +108,17 @@ class Scoreboard:
     """Class for the scoreboard for the Trivia Night event."""
 
     def __setitem__(self, key: str, value: int):
-        if key.startswith("points: "):
-            key = key.removeprefix("points: ")
-            if key not in self.view.points.keys():
-                self.view.points[key] = value
-            else:
-                self.view.points[key] += self.view.points[key]
-        elif key.startswith("speed: "):
-            key = key.removeprefix("speed: ")
-            if key not in self.view.speed.keys():
-                self.view.speed[key] = [1, value]
-            else:
-                self.view.speed[key] = [self.view.speed[key][0] + 1, self.view.speed[key][1] + value]
+        if key.user_id not in self.view.points.keys():
+            self.view.points[key.user_id] = value["points"]
+        else:
+            self.view.points[key.user_id] += self.view.points[key.user_id]
 
-    def __getitem__(self, item: str):
-        if item.startswith("points: "):
-            return self.view.points[item.removeprefix("points: ")]
-        elif item.startswith("speed: "):
-            return self.view.speed[item.removeprefix("speed: ")]
+        if key.user_id not in self.view.speed.keys():
+            self.view.speed[key.user_id] = [1, value["speed"]]
+        else:
+            self.view.speed[key.user_id] = [
+                self.view.speed[key.user_id][0] + 1, self.view.speed[key.user_id][1] + value["speed"]
+            ]
 
     async def display(self) -> Union[Embed, View]:
         """Returns the embed of the main leaderboard along with the ScoreboardView."""
