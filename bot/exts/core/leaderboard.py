@@ -18,6 +18,25 @@ DUCKY_COINS_THUMBNAIL = (
 )
 
 
+class ParentCogConvertor(commands.Converter):
+    """Return the parent cog name for the argument."""
+
+    @staticmethod
+    async def convert(ctx: commands.Context, argument: str) -> str:
+        """Return the parent cog name for the argument."""
+        cog: commands.Cog = ctx.bot.get_cog(argument)
+        if cog:
+            return cog.qualified_name
+
+        cmd: commands.Command = ctx.bot.get_command(argument)
+        if cmd:
+            return cmd.cog_name
+
+        raise commands.BadArgument(
+            f"Unable to convert `{argument}` to valid command or Cog."
+        )
+
+
 class ConfirmClear(ui.View):
     """A confirmation view for clearing the leaderboard caches."""
 
@@ -112,14 +131,13 @@ class Leaderboard(commands.Cog):
         return embed
 
     @commands.group(aliases=("lb",), invoke_without_command=True)
-    async def leaderboard(self, ctx: commands.Context, game: str = None) -> None:
+    async def leaderboard(self, ctx: commands.Context, game: ParentCogConvertor = None) -> None:
         """Get overall leaderboard if not game specified, else leaderboard for that game."""
         if ctx.invoked_subcommand:
             return
 
         if game:
             leaderboards = self.bot.games_leaderboard.get(game)
-            await ctx.send(", ".join(self.bot.games_leaderboard.keys()))
             if not leaderboards:
                 raise commands.BadArgument(f"Leaderboard for game {game} not found.")
             leaderboard = [leaderboards[0]]
@@ -130,7 +148,7 @@ class Leaderboard(commands.Cog):
         await ctx.send(embed=embed)
 
     @leaderboard.command(name="today", aliases=("t",))
-    async def per_day_leaderboard(self, ctx: commands.Context, game: str = None) -> None:
+    async def per_day_leaderboard(self, ctx: commands.Context, game: ParentCogConvertor = None) -> None:
         """Get today's overall leaderboard if not game specified, else leaderboard for that game."""
         if game:
             leaderboards = self.bot.games_leaderboard.get(game)
