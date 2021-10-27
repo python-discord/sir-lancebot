@@ -110,9 +110,9 @@ class Colour(commands.Cog):
         name = self._rgb_to_name(rgb)
         colour_mode = ctx.invoked_with
         if name is None:
-            desc = f"{colour_mode.title()} information for the input colour."
+            desc = f"{colour_mode.upper()} information for the input colour."
         else:
-            desc = f"{colour_mode.title()} information for {name}."
+            desc = f"{colour_mode.upper()} information for `{name}`."
         colour_embed = Embed(
             title="Colour",
             description=desc,
