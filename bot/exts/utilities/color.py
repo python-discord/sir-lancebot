@@ -23,9 +23,9 @@ class Colour(commands.Cog):
         with open(pathlib.Path("bot/resources/utilities/ryanzec_colours.json")) as f:
             self.COLOUR_MAPPING = json.load(f)
 
-    async def send_colour_response(self, ctx: commands.Context, rgb: list[int]) -> None:
+    async def send_colour_response(self, ctx: commands.Context, rgb: tuple[int, int, int]) -> None:
         """Create and send embed from user given colour information."""
-        r, g, b = rgb[0], rgb[1], rgb[2]
+        r, g, b = rgb
         name = self._rgb_to_name(rgb)
         colour_mode = ctx.invoked_with
         desc = f"{colour_mode.upper()} information for `{name or 'the input colour'}`."
@@ -42,7 +42,7 @@ class Colour(commands.Cog):
                 inline=True
             )
 
-        thumbnail = Image.new("RGB", THUMBNAIL_SIZE, color=tuple(rgb))
+        thumbnail = Image.new("RGB", THUMBNAIL_SIZE, color=rgb)
         buffer = BytesIO()
         thumbnail.save(buffer, "PNG")
         buffer.seek(0)
@@ -61,53 +61,53 @@ class Colour(commands.Cog):
     @colour.command()
     async def rgb(self, ctx: commands.Context, red: int, green: int, blue: int) -> None:
         """Command to create an embed from an RGB input."""
-        rgb_tuple = ImageColor.getrgb(f"rgb({red}, {green}, {blue})")
-        await self.send_colour_response(ctx, list(rgb_tuple))
+        rgb_tuple = (red, green, blue)
+        await self.send_colour_response(ctx, rgb_tuple)
 
     @colour.command()
     async def hsv(self, ctx: commands.Context, hue: int, saturation: int, value: int) -> None:
         """Command to create an embed from an HSV input."""
         hsv_tuple = ImageColor.getrgb(f"hsv({hue}, {saturation}%, {value}%)")
-        await self.send_colour_response(ctx, list(hsv_tuple))
+        await self.send_colour_response(ctx, hsv_tuple)
 
     @colour.command()
     async def hsl(self, ctx: commands.Context, hue: int, saturation: int, lightness: int) -> None:
         """Command to create an embed from an HSL input."""
         hsl_tuple = ImageColor.getrgb(f"hsl({hue}, {saturation}%, {lightness}%)")
-        await self.send_colour_response(ctx, list(hsl_tuple))
+        await self.send_colour_response(ctx, hsl_tuple)
 
     @colour.command()
     async def cmyk(self, ctx: commands.Context, cyan: int, yellow: int, magenta: int, key: int) -> None:
         """Command to create an embed from a CMYK input."""
-        r = int(255 * (1.0 - cyan / float(100)) * (1.0 - key / float(100)))
-        g = int(255 * (1.0 - magenta / float(100)) * (1.0 - key / float(100)))
-        b = int(255 * (1.0 - yellow / float(100)) * (1.0 - key / float(100)))
-        await self.send_colour_response(ctx, list((r, g, b)))
+        r = int(255 * (1.0 - cyan / 100) * (1.0 - key / 100))
+        g = int(255 * (1.0 - magenta / 100) * (1.0 - key / 100))
+        b = int(255 * (1.0 - yellow / 100) * (1.0 - key / 100))
+        await self.send_colour_response(ctx, (r, g, b))
 
     @colour.command()
     async def hex(self, ctx: commands.Context, hex_code: str) -> None:
         """Command to create an embed from a HEX input."""
         hex_tuple = ImageColor.getrgb(hex_code)
-        await self.send_colour_response(ctx, list(hex_tuple))
+        await self.send_colour_response(ctx, hex_tuple)
 
     @colour.command()
-    async def name(self, ctx: commands.Context, user_colour: str) -> None:
+    async def name(self, ctx: commands.Context, user_colour_name: str) -> None:
         """Command to create an embed from a name input."""
-        hex_colour = self.match_colour_name(user_colour)
+        hex_colour = self.match_colour_name(user_colour_name)
         hex_tuple = ImageColor.getrgb(hex_colour)
-        await self.send_colour_response(ctx, list(hex_tuple))
+        await self.send_colour_response(ctx, hex_tuple)
 
     @colour.command()
     async def random(self, ctx: commands.Context) -> None:
         """Command to create an embed from a randomly chosen colour from the reference file."""
         hex_colour = random.choice(list(self.COLOUR_MAPPING.values()))
         hex_tuple = ImageColor.getrgb(f"#{hex_colour}")
-        await self.send_colour_response(ctx, list(hex_tuple))
+        await self.send_colour_response(ctx, hex_tuple)
 
-    def get_colour_conversions(self, rgb: list[int]) -> dict[str, str]:
+    def get_colour_conversions(self, rgb: tuple[int, int, int]) -> dict[str, str]:
         """Create a dictionary mapping of colour types and their values."""
         return {
-            "RGB": tuple(rgb),
+            "RGB": rgb,
             "HSV": self._rgb_to_hsv(rgb),
             "HSL": self._rgb_to_hsl(rgb),
             "CMYK": self._rgb_to_cmyk(rgb),
@@ -116,41 +116,41 @@ class Colour(commands.Cog):
         }
 
     @staticmethod
-    def _rgb_to_hsv(rgb: list[int]) -> tuple[int, int, int]:
+    def _rgb_to_hsv(rgb: tuple[int, int, int]) -> tuple[int, int, int]:
         """Convert RGB values to HSV values."""
-        rgb = [val / 255.0 for val in rgb]
-        h, v, s = colorsys.rgb_to_hsv(*rgb)
+        rgb_list = [val / 255.0 for val in rgb]
+        h, v, s = colorsys.rgb_to_hsv(*rgb_list)
         hsv = (round(h * 360), round(s * 100), round(v * 100))
         return hsv
 
     @staticmethod
-    def _rgb_to_hsl(rgb: list[int]) -> tuple[int, int, int]:
+    def _rgb_to_hsl(rgb: tuple[int, int, int]) -> tuple[int, int, int]:
         """Convert RGB values to HSL values."""
-        rgb = [val / 255.0 for val in rgb]
-        h, l, s = colorsys.rgb_to_hls(*rgb)
+        rgb_list = [val / 255.0 for val in rgb]
+        h, l, s = colorsys.rgb_to_hls(*rgb_list)
         hsl = (round(h * 360), round(s * 100), round(l * 100))
         return hsl
 
     @staticmethod
-    def _rgb_to_cmyk(rgb: list[int]) -> tuple[int, int, int, int]:
+    def _rgb_to_cmyk(rgb: tuple[int, int, int, int]) -> tuple[int, int, int, int]:
         """Convert RGB values to CMYK values."""
-        rgb = [val / 255.0 for val in rgb]
-        if all(val == 0 for val in rgb):
+        rgb_list = [val / 255.0 for val in rgb]
+        if not any(rgb_list):
             return 0, 0, 0, 100
-        cmy = [1 - val / 255 for val in rgb]
+        cmy = [1 - val / 255 for val in rgb_list]
         min_cmy = min(cmy)
         cmyk = [(val - min_cmy) / (1 - min_cmy) for val in cmy] + [min_cmy]
         cmyk = [round(val * 100) for val in cmyk]
         return tuple(cmyk)
 
     @staticmethod
-    def _rgb_to_hex(rgb: list[int]) -> str:
+    def _rgb_to_hex(rgb: tuple[int, int, int]) -> str:
         """Convert RGB values to HEX code."""
         hex_ = ''.join([hex(val)[2:].zfill(2) for val in rgb])
         hex_code = f"#{hex_}".upper()
         return hex_code
 
-    def _rgb_to_name(self, rgb: list[int]) -> str:
+    def _rgb_to_name(self, rgb: tuple[int, int, int]) -> str:
         """Convert RGB values to a fuzzy matched name."""
         input_hex_colour = self._rgb_to_hex(rgb)
         try:
