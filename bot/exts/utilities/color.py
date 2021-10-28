@@ -28,9 +28,14 @@ class Colour(commands.Cog):
         r, g, b = rgb
         name = self._rgb_to_name(rgb)
         colour_mode = ctx.invoked_with
-        desc = f"{colour_mode.upper()} information for `{name or 'the input colour'}`."
+        colour_or_color = ctx.command.name
+        if colour_mode not in ("name", "hex", "random"):
+            colour_mode = colour_mode.upper()
+        else:
+            colour_mode = colour_mode.title()
+        desc = f"{colour_mode} information for `{name or 'the input colour'}`."
         colour_embed = Embed(
-            title="Colour",
+            title=colour_or_color.title(),
             description=desc,
             colour=int(f"{r:02x}{g:02x}{b:02x}", 16)
         )
