@@ -21,7 +21,7 @@ class Colour(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         with open(pathlib.Path("bot/resources/utilities/ryanzec_colours.json")) as f:
-            self.COLOUR_MAPPING = json.load(f)
+            self.colour_mapping = json.load(f)
 
     async def send_colour_response(self, ctx: commands.Context, rgb: tuple[int, int, int]) -> None:
         """Create and send embed from user given colour information."""
@@ -105,7 +105,7 @@ class Colour(commands.Cog):
     @colour.command()
     async def random(self, ctx: commands.Context) -> None:
         """Command to create an embed from a randomly chosen colour from the reference file."""
-        hex_colour = random.choice(list(self.COLOUR_MAPPING.values()))
+        hex_colour = random.choice(list(self.colour_mapping.values()))
         hex_tuple = ImageColor.getrgb(f"#{hex_colour}")
         await self.send_colour_response(ctx, hex_tuple)
 
@@ -161,10 +161,10 @@ class Colour(commands.Cog):
         try:
             match, certainty, _ = process.extractOne(
                 query=input_hex_colour,
-                choices=self.COLOUR_MAPPING.values(),
+                choices=self.colour_mapping.values(),
                 score_cutoff=80
             )
-            colour_name = [name for name, hex_code in self.COLOUR_MAPPING.items() if hex_code == match][0]
+            colour_name = [name for name, hex_code in self.colour_mapping.items() if hex_code == match][0]
         except TypeError:
             colour_name = None
         return colour_name
@@ -174,10 +174,10 @@ class Colour(commands.Cog):
         try:
             match, certainty, _ = process.extractOne(
                 query=input_colour_name,
-                choices=self.COLOUR_MAPPING.keys(),
+                choices=self.colour_mapping.keys(),
                 score_cutoff=90
             )
-            hex_match = f"#{self.COLOUR_MAPPING[match]}"
+            hex_match = f"#{self.colour_mapping[match]}"
         except (ValueError, TypeError):
             hex_match = None
         return hex_match
