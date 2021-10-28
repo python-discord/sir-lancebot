@@ -7,6 +7,7 @@ from io import BytesIO
 from PIL import Image, ImageColor
 from discord import Embed, File
 from discord.ext import commands
+from discord.ext.commands.errors import BadArgument
 from rapidfuzz import process
 
 from bot.bot import Bot
@@ -28,12 +29,16 @@ class Colour(commands.Cog):
         r, g, b = rgb
         name = self._rgb_to_name(rgb)
         colour_mode = ctx.invoked_with
-        colour_or_color = ctx.command.name
+        try:
+            colour_or_color = ctx.invoked_parents[0]
+        except IndexError:
+            colour_or_color = "colour"
+        input_colour = ctx.args[2:]
         if colour_mode not in ("name", "hex", "random"):
             colour_mode = colour_mode.upper()
         else:
             colour_mode = colour_mode.title()
-        desc = f"{colour_mode} information for `{name or 'the input colour'}`."
+        desc = f"{colour_mode} information for `{name or input_colour}`."
         colour_embed = Embed(
             title=colour_or_color.title(),
             description=desc,
@@ -66,32 +71,50 @@ class Colour(commands.Cog):
     @colour.command()
     async def rgb(self, ctx: commands.Context, red: int, green: int, blue: int) -> None:
         """Command to create an embed from an RGB input."""
+        if (red or green or blue) > 250 or (red or green or blue) < 0:
+            raise BadArgument(
+                message=f"RGB values can only be from 0 to 250. User input was: `{red, green, blue}`"
+            )
         rgb_tuple = (red, green, blue)
         await self.send_colour_response(ctx, rgb_tuple)
 
     @colour.command()
     async def hsv(self, ctx: commands.Context, hue: int, saturation: int, value: int) -> None:
         """Command to create an embed from an HSV input."""
+        if (hue or saturation or value) > 250 or (hue or saturation or value) < 0:
+            raise BadArgument(
+                message=f"HSV values can only be from 0 to 250. User input was: `{hue, saturation, value}`"
+            )
         hsv_tuple = ImageColor.getrgb(f"hsv({hue}, {saturation}%, {value}%)")
         await self.send_colour_response(ctx, hsv_tuple)
 
     @colour.command()
     async def hsl(self, ctx: commands.Context, hue: int, saturation: int, lightness: int) -> None:
         """Command to create an embed from an HSL input."""
+        if (hue or saturation or lightness) > 360 or (hue or saturation or lightness) < 0:
+            raise BadArgument(
+                message=f"HSL values can only be from 0 to 360. User input was: `{hue, saturation, lightness}`"
+            )
         hsl_tuple = ImageColor.getrgb(f"hsl({hue}, {saturation}%, {lightness}%)")
         await self.send_colour_response(ctx, hsl_tuple)
 
     @colour.command()
     async def cmyk(self, ctx: commands.Context, cyan: int, yellow: int, magenta: int, key: int) -> None:
         """Command to create an embed from a CMYK input."""
-        r = int(255 * (1.0 - cyan / 100) * (1.0 - key / 100))
-        g = int(255 * (1.0 - magenta / 100) * (1.0 - key / 100))
-        b = int(255 * (1.0 - yellow / 100) * (1.0 - key / 100))
+        if (cyan or magenta or yellow or key) > 100 or (cyan or magenta or yellow or key) < 0:
+            raise BadArgument(
+                message=f"CMYK values can only be from 0 to 100. User input was: `{cyan, magenta, yellow, key}`"
+            )
+        r = int(255 * (1.0 - cyan / float(100)) * (1.0 - key / float(100)))
+        g = int(255 * (1.0 - magenta / float(100)) * (1.0 - key / float(100)))
+        b = int(255 * (1.0 - yellow / float(100)) * (1.0 - key / float(100)))
         await self.send_colour_response(ctx, (r, g, b))
 
     @colour.command()
     async def hex(self, ctx: commands.Context, hex_code: str) -> None:
         """Command to create an embed from a HEX input."""
+        if "#" not in hex_code:
+            hex_code = f"#{hex_code}"
         hex_tuple = ImageColor.getrgb(hex_code)
         await self.send_colour_response(ctx, hex_tuple)
 
@@ -175,11 +198,12 @@ class Colour(commands.Cog):
             match, certainty, _ = process.extractOne(
                 query=input_colour_name,
                 choices=self.colour_mapping.keys(),
-                score_cutoff=90
+                score_cutoff=80
             )
             hex_match = f"#{self.colour_mapping[match]}"
         except (ValueError, TypeError):
             hex_match = None
+            raise BadArgument(message=f"No color found for: `{input_colour_name}`")
         return hex_match
 
 
