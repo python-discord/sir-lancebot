@@ -85,7 +85,8 @@ class Colour(commands.Cog):
             raise BadArgument(
                 message=f"HSV values can only be from 0 to 250. User input was: `{hue, saturation, value}`."
             )
-        hsv_tuple = ImageColor.getrgb(f"hsv({hue}, {saturation}%, {value}%)")
+        # ImageColor HSV expects S and V to be swapped
+        hsv_tuple = ImageColor.getrgb(f"hsv({hue}, {value}%, {saturation}%)")
         await self.send_colour_response(ctx, hsv_tuple)
 
     @colour.command()
@@ -99,15 +100,15 @@ class Colour(commands.Cog):
         await self.send_colour_response(ctx, hsl_tuple)
 
     @colour.command()
-    async def cmyk(self, ctx: commands.Context, cyan: int, yellow: int, magenta: int, key: int) -> None:
+    async def cmyk(self, ctx: commands.Context, cyan: int, magenta: int, yellow: int, key: int) -> None:
         """Command to create an embed from a CMYK input."""
         if (cyan or magenta or yellow or key) > 100 or (cyan or magenta or yellow or key) < 0:
             raise BadArgument(
                 message=f"CMYK values can only be from 0 to 100. User input was: `{cyan, magenta, yellow, key}`."
             )
-        r = int(255 * (1.0 - cyan / float(100)) * (1.0 - key / float(100)))
-        g = int(255 * (1.0 - magenta / float(100)) * (1.0 - key / float(100)))
-        b = int(255 * (1.0 - yellow / float(100)) * (1.0 - key / float(100)))
+        r = round(255 * (1 - (cyan / 100)) * (1 - (key / 100)))
+        g = round(255 * (1 - (magenta / 100)) * (1 - (key / 100)))
+        b = round(255 * (1 - (yellow / 100)) * (1 - (key / 100)))
         await self.send_colour_response(ctx, (r, g, b))
 
     @colour.command()
@@ -165,11 +166,12 @@ class Colour(commands.Cog):
         rgb_list = [val / 255.0 for val in rgb]
         if not any(rgb_list):
             return 0, 0, 0, 100
-        cmy = [1 - val / 255 for val in rgb_list]
-        min_cmy = min(cmy)
-        cmyk = [(val - min_cmy) / (1 - min_cmy) for val in cmy] + [min_cmy]
-        cmyk = [round(val * 100) for val in cmyk]
-        return tuple(cmyk)
+        k = 1 - max(val for val in rgb_list)
+        c = round((1 - rgb_list[0] - k) * 100 / (1 - k))
+        m = round((1 - rgb_list[1] - k) * 100 / (1 - k))
+        y = round((1 - rgb_list[2] - k) * 100 / (1 - k))
+        cmyk = (c, m, y, round(k * 100))
+        return cmyk
 
     @staticmethod
     def _rgb_to_hex(rgb: tuple[int, int, int]) -> str:
