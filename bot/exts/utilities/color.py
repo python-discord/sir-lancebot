@@ -73,7 +73,7 @@ class Colour(commands.Cog):
         """Command to create an embed from an RGB input."""
         if (red or green or blue) > 250 or (red or green or blue) < 0:
             raise BadArgument(
-                message=f"RGB values can only be from 0 to 250. User input was: `{red, green, blue}`"
+                message=f"RGB values can only be from 0 to 250. User input was: `{red, green, blue}`."
             )
         rgb_tuple = (red, green, blue)
         await self.send_colour_response(ctx, rgb_tuple)
@@ -83,7 +83,7 @@ class Colour(commands.Cog):
         """Command to create an embed from an HSV input."""
         if (hue or saturation or value) > 250 or (hue or saturation or value) < 0:
             raise BadArgument(
-                message=f"HSV values can only be from 0 to 250. User input was: `{hue, saturation, value}`"
+                message=f"HSV values can only be from 0 to 250. User input was: `{hue, saturation, value}`."
             )
         hsv_tuple = ImageColor.getrgb(f"hsv({hue}, {saturation}%, {value}%)")
         await self.send_colour_response(ctx, hsv_tuple)
@@ -93,7 +93,7 @@ class Colour(commands.Cog):
         """Command to create an embed from an HSL input."""
         if (hue or saturation or lightness) > 360 or (hue or saturation or lightness) < 0:
             raise BadArgument(
-                message=f"HSL values can only be from 0 to 360. User input was: `{hue, saturation, lightness}`"
+                message=f"HSL values can only be from 0 to 360. User input was: `{hue, saturation, lightness}`."
             )
         hsl_tuple = ImageColor.getrgb(f"hsl({hue}, {saturation}%, {lightness}%)")
         await self.send_colour_response(ctx, hsl_tuple)
@@ -103,7 +103,7 @@ class Colour(commands.Cog):
         """Command to create an embed from a CMYK input."""
         if (cyan or magenta or yellow or key) > 100 or (cyan or magenta or yellow or key) < 0:
             raise BadArgument(
-                message=f"CMYK values can only be from 0 to 100. User input was: `{cyan, magenta, yellow, key}`"
+                message=f"CMYK values can only be from 0 to 100. User input was: `{cyan, magenta, yellow, key}`."
             )
         r = int(255 * (1.0 - cyan / float(100)) * (1.0 - key / float(100)))
         g = int(255 * (1.0 - magenta / float(100)) * (1.0 - key / float(100)))
