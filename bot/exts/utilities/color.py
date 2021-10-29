@@ -113,7 +113,7 @@ class Colour(commands.Cog):
     @colour.command()
     async def cmyk(self, ctx: commands.Context, cyan: int, magenta: int, yellow: int, key: int) -> None:
         """Command to create an embed from a CMYK input."""
-        if any(c not in range(0, 101) for c in (cyan or magenta or yellow or key)):
+        if any(c not in range(0, 101) for c in (cyan, magenta, yellow, key)):
             raise BadArgument(
                 message=f"CMYK values can only be from 0 to 100. User input was: `{cyan, magenta, yellow, key}`."
             )
