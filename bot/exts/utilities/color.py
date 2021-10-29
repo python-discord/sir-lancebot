@@ -33,7 +33,7 @@ class Colour(commands.Cog):
             colour_or_color = ctx.invoked_parents[0]
         except IndexError:
             colour_or_color = "colour"
-        input_colour = ctx.args[2:]
+        input_colour = ctx.args[2:][0]
         if colour_mode not in ("name", "hex", "random"):
             colour_mode = colour_mode.upper()
         else:
@@ -71,9 +71,9 @@ class Colour(commands.Cog):
     @colour.command()
     async def rgb(self, ctx: commands.Context, red: int, green: int, blue: int) -> None:
         """Command to create an embed from an RGB input."""
-        if (red or green or blue) > 250 or (red or green or blue) < 0:
+        if any(c not in range(0, 256) for c in (red, green, blue)):
             raise BadArgument(
-                message=f"RGB values can only be from 0 to 250. User input was: `{red, green, blue}`."
+                message=f"RGB values can only be from 0 to 255. User input was: `{red, green, blue}`."
             )
         rgb_tuple = (red, green, blue)
         await self.send_colour_response(ctx, rgb_tuple)
@@ -81,9 +81,10 @@ class Colour(commands.Cog):
     @colour.command()
     async def hsv(self, ctx: commands.Context, hue: int, saturation: int, value: int) -> None:
         """Command to create an embed from an HSV input."""
-        if (hue or saturation or value) > 250 or (hue or saturation or value) < 0:
+        if (hue not in range(0, 361)) or any(c not in range(0, 101) for c in (saturation, value)):
             raise BadArgument(
-                message=f"HSV values can only be from 0 to 250. User input was: `{hue, saturation, value}`."
+                message="Hue can only be from 0 to 360. Saturation and Value can only be from 0 to 100. "
+                f"User input was: `{hue, saturation, value}`."
             )
         # ImageColor HSV expects S and V to be swapped
         hsv_tuple = ImageColor.getrgb(f"hsv({hue}, {value}%, {saturation}%)")
@@ -92,9 +93,10 @@ class Colour(commands.Cog):
     @colour.command()
     async def hsl(self, ctx: commands.Context, hue: int, saturation: int, lightness: int) -> None:
         """Command to create an embed from an HSL input."""
-        if (hue or saturation or lightness) > 360 or (hue or saturation or lightness) < 0:
+        if (hue not in range(0, 361)) or any(c not in range(0, 101) for c in (saturation, lightness)):
             raise BadArgument(
-                message=f"HSL values can only be from 0 to 360. User input was: `{hue, saturation, lightness}`."
+                message="Hue can only be from 0 to 360. Saturation and Lightness can only be from 0 to 100. "
+                f"User input was: `{hue, saturation, lightness}`."
             )
         hsl_tuple = ImageColor.getrgb(f"hsl({hue}, {saturation}%, {lightness}%)")
         await self.send_colour_response(ctx, hsl_tuple)
@@ -102,7 +104,7 @@ class Colour(commands.Cog):
     @colour.command()
     async def cmyk(self, ctx: commands.Context, cyan: int, magenta: int, yellow: int, key: int) -> None:
         """Command to create an embed from a CMYK input."""
-        if (cyan or magenta or yellow or key) > 100 or (cyan or magenta or yellow or key) < 0:
+        if any(c not in range(0, 101) for c in (cyan or magenta or yellow or key)):
             raise BadArgument(
                 message=f"CMYK values can only be from 0 to 100. User input was: `{cyan, magenta, yellow, key}`."
             )
@@ -191,7 +193,7 @@ class Colour(commands.Cog):
             )
             colour_name = [name for name, hex_code in self.colour_mapping.items() if hex_code == match][0]
         except TypeError:
-            colour_name = None
+            colour_name = "No match found"
         return colour_name
 
     def match_colour_name(self, input_colour_name: str) -> str:
@@ -204,7 +206,6 @@ class Colour(commands.Cog):
             )
             hex_match = f"#{self.colour_mapping[match]}"
         except (ValueError, TypeError):
-            hex_match = None
             raise BadArgument(message=f"No color found for: `{input_colour_name}`")
         return hex_match
 
