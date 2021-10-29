@@ -28,16 +28,25 @@ class Colour(commands.Cog):
         """Create and send embed from user given colour information."""
         r, g, b = rgb
         name = self._rgb_to_name(rgb)
-        colour_mode = ctx.invoked_with
+        if name == "No match found":
+            name = None
+
         try:
             colour_or_color = ctx.invoked_parents[0]
         except IndexError:
             colour_or_color = "colour"
-        input_colour = ctx.args[2:][0]
+
+        colour_mode = ctx.invoked_with
+        if colour_mode == "random":
+            input_colour = "random"
+        else:
+            input_colour = ctx.args[2:][0]
+
         if colour_mode not in ("name", "hex", "random"):
             colour_mode = colour_mode.upper()
         else:
             colour_mode = colour_mode.title()
+
         desc = f"{colour_mode} information for `{name or input_colour}`."
         colour_embed = Embed(
             title=colour_or_color.title(),
