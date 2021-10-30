@@ -39,10 +39,12 @@ class Colour(commands.Cog):
         colour_mode = ctx.invoked_with
         if colour_mode == "random":
             input_colour = "random"
+        elif colour_mode in ("colour", "color"):
+            input_colour = rgb
         else:
             input_colour = ctx.args[2:][0]
 
-        if colour_mode not in ("name", "hex", "random"):
+        if colour_mode not in ("name", "hex", "random", "color", "colour"):
             colour_mode = colour_mode.upper()
         else:
             colour_mode = colour_mode.title()
@@ -71,11 +73,15 @@ class Colour(commands.Cog):
 
         await ctx.send(file=thumbnail_file, embed=colour_embed)
 
-    @commands.group(aliases=("color",))
-    async def colour(self, ctx: commands.Context) -> None:
+    @commands.group(aliases=("color",), invoke_without_command=True)
+    async def colour(self, ctx: commands.Context, *, extra: str) -> None:
         """User initiated command to create an embed that displays colour information."""
         if ctx.invoked_subcommand is None:
-            await invoke_help_command(ctx)
+            try:
+                extra_colour = ImageColor.getrgb(extra)
+                await self.send_colour_response(ctx, extra_colour)
+            except ValueError:
+                await invoke_help_command(ctx)
 
     @colour.command()
     async def rgb(self, ctx: commands.Context, red: int, green: int, blue: int) -> None:
@@ -95,8 +101,7 @@ class Colour(commands.Cog):
                 message="Hue can only be from 0 to 360. Saturation and Value can only be from 0 to 100. "
                 f"User input was: `{hue, saturation, value}`."
             )
-        # ImageColor HSV expects S and V to be swapped
-        hsv_tuple = ImageColor.getrgb(f"hsv({hue}, {value}%, {saturation}%)")
+        hsv_tuple = ImageColor.getrgb(f"hsv({hue}, {saturation}%, {value}%)")
         await self.send_colour_response(ctx, hsv_tuple)
 
     @colour.command()
@@ -158,8 +163,8 @@ class Colour(commands.Cog):
     @staticmethod
     def _rgb_to_hsv(rgb: tuple[int, int, int]) -> tuple[int, int, int]:
         """Convert RGB values to HSV values."""
-        rgb_list = [val / 255.0 for val in rgb]
-        h, v, s = colorsys.rgb_to_hsv(*rgb_list)
+        rgb_list = [val / 255 for val in rgb]
+        h, s, v = colorsys.rgb_to_hsv(*rgb_list)
         hsv = (round(h * 360), round(s * 100), round(v * 100))
         return hsv
 
