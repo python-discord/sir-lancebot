@@ -83,6 +83,11 @@ class CandyCollection(commands.Cog):
         # if its not a candy or skull, and it is one of 10 most recent messages,
         # proceed to add a skull/candy with higher chance
         if str(reaction.emoji) not in (EMOJIS["SKULL"], EMOJIS["CANDY"]):
+            # Ensure the reaction is not for a bot's message so users can't spam
+            # reaction buttons like in .help to get candies.
+            if message.author.bot:
+                return
+
             recent_message_ids = map(
                 lambda m: m.id,
                 await self.hacktober_channel.history(limit=10).flatten()
