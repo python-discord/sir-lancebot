@@ -72,9 +72,9 @@ class Hacktoberfest(commands.Cog):
                 )
                 await ctx.send(msg)
                 return
-            log.info(f"Getting stats for {author_id} linked GitHub account '{github_username}'")
+            log.info(f"Getting stats for {author_id}'s linked GitHub account: '{github_username}'")
         else:
-            log.info(f"Getting stats for '{github_username} as requested by {ctx.author.id}")
+            log.info(f"Getting stats for '{github_username}' as requested by {ctx.author.id}")
         await utils.get_stats(ctx, github_username)
 
     @in_month(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)

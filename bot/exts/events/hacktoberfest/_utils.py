@@ -42,12 +42,12 @@ GITHUB_NONEXISTENT_USER_MESSAGE = (
 
 URL = (
     "https://api.github.com/search/issues?"  # base url
-    "per_page=100"  # limit results per-page returned by API to 100 (the maximum)
-    "&q="  # add query parameters
-    "is:issue+"  # is an issue...
-    "state:open+"  # ...that's open...
-    "label:hacktoberfest+"  # ...with the `hacktoberfest` label...
-    "language:python"  # ...and in Python.
+    "per_page=100"                           # limit results per-page returned by API to 100 (the maximum)
+    "&q="                                    # add query parameters
+    "is:issue+"                              # is an issue
+    "state:open+"                            # that's open
+    "label:hacktoberfest+"                   # with the `hacktoberfest` label...
+    "language:python"                        # in Python.
 )
 
 
@@ -173,12 +173,13 @@ async def get_october_prs(bot: Bot, github_username: str) -> Optional[list[dict]
     log.info(f"Fetching Hacktoberfest Stats for GitHub user: '{github_username}'")
     base_url = "https://api.github.com/search/issues"
 
+    hacktoberfest_timeframe = f"{CURRENT_YEAR} - 09 - 30T10: 00Z..{CURRENT_YEAR} - 11 - 01T12: 00Z"
     query_params = (
-        f"+type:pr"  # Only get PR if it's:
-        f"+is:public"  # - public,...
-        f"+author:{quote_plus(github_username)}"  # - by the user's github username,...
-        f"+-is:draft"   # - not a draft...
-        f"+created:{CURRENT_YEAR}-09-30T10:00Z..{CURRENT_YEAR}-11-01T12:00Z"  # and made in october.
+        f"+type:pr"                               # Only get PR if it's:
+        f"+is:public"                             # - public
+        f"+author:{quote_plus(github_username)}"  # - by the user's github username
+        f"+-is:draft"                             # - not a draft
+        f"+created:{hacktoberfest_timeframe}"     # - made within hacktoberfest.
         f"&per_page=100"  # Limit results per-page returned from API (100 is the maximum)
     )
 
@@ -330,7 +331,7 @@ async def categorize_prs(bot: Bot, prs: list[dict]) -> tuple[list[dict], list[di
     are 'accepted' (after 14 days review period).
 
     PRs that are accepted must either be merged, approved, or labelled
-    'hacktoberfest-accepted.
+    'hacktoberfest-accepted'.
     """
     now = datetime.now()
     in_review = []
