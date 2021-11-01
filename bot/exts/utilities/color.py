@@ -5,7 +5,7 @@ import random
 from io import BytesIO
 
 from PIL import Image, ImageColor
-from discord import Embed, File
+from discord import Embed, File, Color
 from discord.ext import commands
 from discord.ext.commands.errors import BadArgument
 from rapidfuzz import process
@@ -23,10 +23,10 @@ class Colour(commands.Cog):
         self.bot = bot
         with open(pathlib.Path("bot/resources/utilities/ryanzec_colours.json")) as f:
             self.colour_mapping = json.load(f)
+            del self.colour_mapping['_'] # Delete source credit entry
 
     async def send_colour_response(self, ctx: commands.Context, rgb: tuple[int, int, int]) -> None:
         """Create and send embed from user given colour information."""
-        r, g, b = rgb
         name = self._rgb_to_name(rgb)
         if name == "No match found":
             name = None
@@ -53,7 +53,7 @@ class Colour(commands.Cog):
         colour_embed = Embed(
             title=colour_or_color.title(),
             description=desc,
-            colour=int(f"{r:02x}{g:02x}{b:02x}", 16)
+            colour= Color.from_rgb(*rgb)
         )
         colour_conversions = self.get_colour_conversions(rgb)
         for colour_space, value in colour_conversions.items():
