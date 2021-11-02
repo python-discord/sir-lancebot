@@ -32,13 +32,22 @@ class CurrentQuestion(TypedDict):
 class QuestionButton(Button):
     """Button subclass for the options of the questions."""
 
-    def __init__(self, label: str, users_picked: dict):
+    def __init__(self, label: str, users_picked: dict, view: View):
         self.users_picked = users_picked
+        self._view = view
         super().__init__(label=label, style=discord.ButtonStyle.green)
 
     async def callback(self, interaction: Interaction) -> None:
         """When a user interacts with the button, this will be called."""
+        original_message = interaction.message
+        original_embed = original_message.embeds[0]
+
         if interaction.user.id not in self.users_picked.keys():
+            people_answered = original_embed.footer.text
+            people_answered = f"{int(people_answered[0]) + 1} " \
+                              f"{'person has' if int(people_answered[0]) + 1 == 1 else 'people have'} answered"
+            original_embed.set_footer(text=people_answered)
+            await original_message.edit(embed=original_embed, view=self._view)
             self.users_picked[interaction.user.id] = [self.label, True, perf_counter() - self._time]
             await interaction.response.send_message(
                 embed=Embed(
@@ -78,7 +87,7 @@ class QuestionView(View):
         super().__init__()
         self.current_question: CurrentQuestion
         self.users_picked = {}
-        self.buttons = [QuestionButton(label, self.users_picked) for label in ("A", "B", "C", "D")]
+        self.buttons = [QuestionButton(label, self.users_picked, self) for label in ("A", "B", "C", "D")]
         for button in self.buttons:
             self.add_item(button)
 
@@ -92,6 +101,7 @@ class QuestionView(View):
         for label, answer in zip("ABCD", self.current_question["answers"]):
             question_embed.add_field(name=f"Answer {label}", value=answer, inline=False)
 
+        question_embed.set_footer(text="0 people have answered")
         current_time = perf_counter()
         for button in self.buttons:
             button._time = current_time
@@ -103,16 +113,34 @@ class QuestionView(View):
         labels = ("A", "B", "C", "D")
         label = labels[self.current_question["answers"].index(self.current_question["correct"])]
         return_dict = {name: info for name, info in self.users_picked.items() if info[0] == label}
-        self.users_picked = {}
+        all_players = list(self.users_picked.items())
+        answers_chosen = {
+            answer_choice: len(
+                tuple(filter(lambda x: x[0] == answer_choice, self.users_picked.values()))
+            ) / len(all_players)
+            for answer_choice in "ABCD"
+        }
 
-        for button in self.buttons:
-            button.users_picked = self.users_picked
+        answers_chosen = dict(sorted(answers_chosen.items(), key=lambda item: item[1], reverse=True))
 
         answer_embed = Embed(
             title=f"The correct answer for Question {self.current_question['number']} was..",
             description=self.current_question["correct"],
             color=Colours.soft_green
         )
+
+        for answer, percent in answers_chosen.items():
+            # The `ord` function is used here to change the letter, say 'A' to its corresponding position in the answers
+            answer_embed.add_field(
+                name=f"{percent * 100:.1f}% of players chose",
+                value=self.current_question['answers'][ord(answer) - 65],
+                inline=False
+            )
+
+        self.users_picked = {}
+
+        for button in self.buttons:
+            button.users_picked = self.users_picked
 
         return return_dict, answer_embed
 

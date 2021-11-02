@@ -19,6 +19,14 @@ class TriviaNight(commands.Cog):
         self.scoreboard = Scoreboard()
         self.questions = Questions(self.scoreboard)
 
+    @staticmethod
+    def unicodeify(text: str) -> str:
+        """Takes `text` and adds zero-width spaces to prevent copy and pasting the question."""
+        return "".join(
+            f"{letter}\u200b" if letter not in ('\n', '\t', '`', 'p', 'y') else letter
+            for idx, letter in enumerate(text)
+        )
+
     @commands.group()
     async def trivianight(self, ctx: commands.Context) -> None:
         """No-op subcommand group for organizing different commands."""
@@ -29,6 +37,8 @@ class TriviaNight(commands.Cog):
         """Load the JSON file provided into the questions."""
         json_text = (await ctx.message.attachments[0].read()).decode("utf8")
         serialized_json = loads(json_text)
+        for idx, question in enumerate(serialized_json):
+            serialized_json[idx] = {**question, **{"description": self.unicodeify(question["description"])}}
         self.questions.view = QuestionView()
         self.scoreboard.view = ScoreboardView(self.bot)
         self.questions.set_questions(serialized_json)

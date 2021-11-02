@@ -26,7 +26,7 @@ class ScoreboardView(View):
                 break
 
             user = await self.bot.fetch_user(int(user))
-            formatted_string += f"`{current_placement + 1}`. {user.mention} "
+            formatted_string += f"**{current_placement + 1}.** {user.mention} "
             formatted_string += f"({points} pts)\n"
             if (current_placement + 1) % 10 == 0:
                 formatted_string += "⎯⎯⎯⎯⎯⎯⎯⎯\n"
@@ -48,7 +48,7 @@ class ScoreboardView(View):
                 break
 
             user = await self.bot.fetch_user(int(user))
-            formatted_string += f"`{current_placement + 1}`. {user.mention} "
+            formatted_string += f"**{current_placement + 1}.** {user.mention} "
             formatted_string += f"({(time_taken[-1] / time_taken[0]):.1f}s)\n"
             if (current_placement + 1) % 10 == 0:
                 formatted_string += "⎯⎯⎯⎯⎯⎯⎯⎯\n"
