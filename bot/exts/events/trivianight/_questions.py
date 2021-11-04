@@ -1,3 +1,4 @@
+import logging
 from random import choice, randrange
 from time import perf_counter
 from typing import Optional, TypedDict, Union
@@ -9,6 +10,8 @@ from discord.ui import Button, View
 from bot.constants import Colours, NEGATIVE_REPLIES
 
 from ._scoreboard import Scoreboard
+
+logger = logging.getLogger(__name__)
 
 
 class UserScore:
@@ -93,7 +96,9 @@ class QuestionView(View):
         for button in self.buttons:
             self.add_item(button)
 
-    def create_current_question(self) -> Embed:
+        self.active_question = False
+
+    def create_current_question(self) -> Union[Embed, None]:
         """Helper function to create the embed for the current question."""
         question_embed = Embed(
             title=f"Question {self.current_question['number']}",
@@ -109,6 +114,8 @@ class QuestionView(View):
             button._time = current_time
 
         time_limit = self.current_question.get("time", 10)
+
+        self.active_question = True
 
         return question_embed, time_limit
 
@@ -151,6 +158,8 @@ class QuestionView(View):
         time_limit = self.current_question.get("time", 10)
         question_points = self.current_question.get("points", 10)
 
+        self.active_question = False
+
         return return_dict, answer_embed, time_limit, question_points
 
 
@@ -183,7 +192,7 @@ class Questions:
             while "visited" in self.questions[question_number].keys():
                 question_number = randrange(0, len(self.questions))
         else:
-            question_number = number
+            question_number = number - 1
 
         self.questions[question_number]["visited"] = True
         self.view.current_question = self.questions[question_number]

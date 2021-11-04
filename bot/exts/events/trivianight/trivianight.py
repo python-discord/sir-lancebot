@@ -1,12 +1,13 @@
 import asyncio
-from json import loads
+from json import JSONDecodeError, loads
 from random import choice
+from typing import Optional
 
 from discord import Embed
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Colours, POSITIVE_REPLIES
+from bot.constants import Colours, NEGATIVE_REPLIES, POSITIVE_REPLIES
 
 from ._questions import QuestionView, Questions
 from ._scoreboard import Scoreboard, ScoreboardView
@@ -43,10 +44,27 @@ class TriviaNight(commands.Cog):
             await ctx.send(embed=cog_description)
 
     @trivianight.command()
-    async def load(self, ctx: commands.Context) -> None:
+    async def load(self, ctx: commands.Context, *, to_load: Optional[str]) -> None:
         """Load the JSON file provided into the questions."""
-        json_text = (await ctx.message.attachments[0].read()).decode("utf8")
-        serialized_json = loads(json_text)
+        if ctx.message.attachments:
+            json_text = (await ctx.message.attachments[0].read()).decode("utf8")
+        elif to_load.startswith("https://discord.com/channels") or \
+                to_load.startswith("https://discordapp.com/channels"):
+            channel_id, message_id = to_load.split("/")[-2:]
+            channel = await ctx.guild.fetch_channel(int(channel_id))
+            message = await channel.fetch_message(int(message_id))
+            if message.attachments:
+                json_text = (await message.attachments[0].read()).decode("utf8")
+            else:
+                json_text = message.content.replace("```", "").replace("json", "")
+        else:
+            json_text = message.content.replace("```", "").replace("json", "")
+
+        try:
+            serialized_json = loads(json_text)
+        except JSONDecodeError:
+            raise commands.BadArgument("Invalid JSON")
+
         for idx, question in enumerate(serialized_json):
             serialized_json[idx] = {**question, **{"description": self.unicodeify(question["description"])}}
         self.questions.view = QuestionView()
@@ -64,7 +82,8 @@ class TriviaNight(commands.Cog):
         """Resets previous questions and scoreboards."""
         self.scoreboard.view = ScoreboardView(self.bot)
         for question in self.questions.questions:
-            del question["visited"]
+            if "visited" in question.keys():
+                del question["visited"]
 
         success_embed = Embed(
             title=choice(POSITIVE_REPLIES),
@@ -76,20 +95,35 @@ class TriviaNight(commands.Cog):
     @trivianight.command()
     async def next(self, ctx: commands.Context) -> None:
         """Gets a random question from the unanswered question list and lets user choose the answer."""
+        if self.questions.view.active_question is True:
+            error_embed = Embed(
+                title=choice(NEGATIVE_REPLIES),
+                description="There is already an ongoing question!",
+                color=Colours.soft_red
+            )
+            await ctx.send(embed=error_embed)
+            return
+
         next_question = self.questions.next_question()
         if isinstance(next_question, Embed):
             await ctx.send(embed=next_question)
             return
 
         (question_embed, time_limit), question_view = self.questions.current_question()
-        await ctx.send(embed=question_embed, view=question_view)
+        message = await ctx.send(embed=question_embed, view=question_view)
 
-        for time_remaining in range(time_limit - 1, -1, -1):
+        for time_remaining in range(time_limit, -1, -1):
+            if self.questions.view.active_question is False:
+                await ctx.send(embed=self.questions.end_question())
+                await message.edit(embed=question_embed, view=None)
+                return
+
             await asyncio.sleep(1)
-            if time_remaining % 5 == 0:
+            if time_remaining % 5 == 0 and time_remaining not in (time_limit, 0):
                 await ctx.send(f"{time_remaining}s remaining")
 
         await ctx.send(embed=self.questions.end_question())
+        await message.edit(embed=question_embed, view=None)
 
     @trivianight.command()
     async def question(self, ctx: commands.Context, question_number: int) -> None:
@@ -100,14 +134,20 @@ class TriviaNight(commands.Cog):
             return
 
         (question_embed, time_limit), question_view = self.questions.current_question()
-        await ctx.send(embed=question_embed, view=question_view)
+        message = await ctx.send(embed=question_embed, view=question_view)
 
-        for time_remaining in range(time_limit - 1, -1, -1):
+        for time_remaining in range(time_limit, -1, -1):
+            if self.questions.view.active_question is False:
+                await ctx.send(embed=self.questions.end_question())
+                await message.edit(embed=question_embed, view=None)
+                return
+
             await asyncio.sleep(1)
-            if time_remaining % 5 == 0:
+            if time_remaining % 5 == 0 and time_remaining not in (time_limit, 0):
                 await ctx.send(f"{time_remaining}s remaining")
 
         await ctx.send(embed=self.questions.end_question())
+        await message.edit(embed=question_embed, view=None)
 
     @trivianight.command()
     async def list(self, ctx: commands.Context) -> None:
@@ -121,7 +161,16 @@ class TriviaNight(commands.Cog):
     @trivianight.command()
     async def stop(self, ctx: commands.Context) -> None:
         """End the ongoing question to show the correct question."""
-        await ctx.send(embed=self.questions.end_question())
+        if self.questions.view.active_question is False:
+            error_embed = Embed(
+                title=choice(NEGATIVE_REPLIES),
+                description="There is not an ongoing question to stop!",
+                color=Colours.soft_red
+            )
+            await ctx.send(embed=error_embed)
+            return
+
+        self.questions.view.active_question = False
 
     @trivianight.command()
     async def end(self, ctx: commands.Context) -> None:

@@ -79,7 +79,7 @@ class ScoreboardView(View):
             name="Total Points",
             value=(
                 f"You got {points_rank}{'th' if not (suffix := suffixes.get(points_rank[-1])) else suffix} place"
-                f" with {self.points[member.id]} points."
+                f" with {self.points[member.id]:.1f} points."
             ),
             inline=False
         )
@@ -108,12 +108,12 @@ class Scoreboard:
     """Class for the scoreboard for the Trivia Night event."""
 
     def __setitem__(self, key: str, value: int):
-        if key.user_id not in self.view.points.keys():
+        if value.get("points") and key.user_id not in self.view.points.keys():
             self.view.points[key.user_id] = value["points"]
         else:
             self.view.points[key.user_id] += self.view.points[key.user_id]
 
-        if key.user_id not in self.view.speed.keys():
+        if value.get("speed") and key.user_id not in self.view.speed.keys():
             self.view.speed[key.user_id] = [1, value["speed"]]
         else:
             self.view.speed[key.user_id] = [
