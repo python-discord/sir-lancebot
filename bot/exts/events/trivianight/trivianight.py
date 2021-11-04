@@ -1,3 +1,4 @@
+import asyncio
 from json import loads
 from random import choice
 
@@ -27,18 +28,19 @@ class TriviaNight(commands.Cog):
             for idx, letter in enumerate(text)
         )
 
-    @commands.group()
+    @commands.group(aliases=["tn"], invoke_without_command=True)
     async def trivianight(self, ctx: commands.Context) -> None:
         """No-op subcommand group for organizing different commands."""
-        cog_description = Embed(
-            title="What is .trivianight?",
-            description=(
-                "This 'cog' is for the Python Discord's TriviaNight (date tentative)! Compete against other"
-                "players in a trivia about Python!"
-            ),
-            color=Colours.soft_green
-        )
-        await ctx.send(embed=cog_description)
+        if ctx.invoked_subcommand is None:
+            cog_description = Embed(
+                title="What is .trivianight?",
+                description=(
+                    "This 'cog' is for the Python Discord's TriviaNight (date tentative)! Compete against other"
+                    "players in a trivia about Python!"
+                ),
+                color=Colours.soft_green
+            )
+            await ctx.send(embed=cog_description)
 
     @trivianight.command()
     async def load(self, ctx: commands.Context) -> None:
@@ -79,8 +81,15 @@ class TriviaNight(commands.Cog):
             await ctx.send(embed=next_question)
             return
 
-        question_embed, question_view = self.questions.current_question()
+        (question_embed, time_limit), question_view = self.questions.current_question()
         await ctx.send(embed=question_embed, view=question_view)
+
+        for time_remaining in range(time_limit - 1, -1, -1):
+            await asyncio.sleep(1)
+            if time_remaining % 5 == 0:
+                await ctx.send(f"{time_remaining}s remaining")
+
+        await ctx.send(embed=self.questions.end_question())
 
     @trivianight.command()
     async def question(self, ctx: commands.Context, question_number: int) -> None:
@@ -90,8 +99,15 @@ class TriviaNight(commands.Cog):
             await ctx.send(embed=question)
             return
 
-        question_embed, question_view = self.questions.current_question()
+        (question_embed, time_limit), question_view = self.questions.current_question()
         await ctx.send(embed=question_embed, view=question_view)
+
+        for time_remaining in range(time_limit - 1, -1, -1):
+            await asyncio.sleep(1)
+            if time_remaining % 5 == 0:
+                await ctx.send(f"{time_remaining}s remaining")
+
+        await ctx.send(embed=self.questions.end_question())
 
     @trivianight.command()
     async def list(self, ctx: commands.Context) -> None:

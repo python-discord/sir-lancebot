@@ -27,7 +27,7 @@ class ScoreboardView(View):
 
             user = await self.bot.fetch_user(int(user))
             formatted_string += f"**{current_placement + 1}.** {user.mention} "
-            formatted_string += f"({points} pts)\n"
+            formatted_string += f"({points:.1f} pts)\n"
             if (current_placement + 1) % 10 == 0:
                 formatted_string += "⎯⎯⎯⎯⎯⎯⎯⎯\n"
 

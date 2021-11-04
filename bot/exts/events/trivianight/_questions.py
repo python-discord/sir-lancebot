@@ -1,6 +1,6 @@
 from random import choice, randrange
 from time import perf_counter
-from typing import TypedDict, Union
+from typing import Optional, TypedDict, Union
 
 import discord
 from discord import Embed, Interaction
@@ -27,6 +27,8 @@ class CurrentQuestion(TypedDict):
     description: str
     answers: list[str]
     correct: str
+    points: Optional[int]
+    time: Optional[int]
 
 
 class QuestionButton(Button):
@@ -106,22 +108,16 @@ class QuestionView(View):
         for button in self.buttons:
             button._time = current_time
 
-        return question_embed
+        time_limit = self.current_question.get("time", 10)
+
+        return question_embed, time_limit
 
     def end_question(self) -> tuple[dict, Embed]:
         """Returns the dictionaries from the corresponding buttons for those who got it correct."""
         labels = ("A", "B", "C", "D")
         label = labels[self.current_question["answers"].index(self.current_question["correct"])]
-        return_dict = {name: info for name, info in self.users_picked.items() if info[0] == label}
+        return_dict = {name: (*info, info[0] == label) for name, info in self.users_picked.items()}
         all_players = list(self.users_picked.items())
-        answers_chosen = {
-            answer_choice: len(
-                tuple(filter(lambda x: x[0] == answer_choice, self.users_picked.values()))
-            ) / len(all_players)
-            for answer_choice in "ABCD"
-        }
-
-        answers_chosen = dict(sorted(answers_chosen.items(), key=lambda item: item[1], reverse=True))
 
         answer_embed = Embed(
             title=f"The correct answer for Question {self.current_question['number']} was..",
@@ -129,20 +125,33 @@ class QuestionView(View):
             color=Colours.soft_green
         )
 
-        for answer, percent in answers_chosen.items():
-            # The `ord` function is used here to change the letter, say 'A' to its corresponding position in the answers
-            answer_embed.add_field(
-                name=f"{percent * 100:.1f}% of players chose",
-                value=self.current_question['answers'][ord(answer) - 65],
-                inline=False
-            )
+        if len(all_players) != 0:
+            answers_chosen = {
+                answer_choice: len(
+                    tuple(filter(lambda x: x[0] == answer_choice, self.users_picked.values()))
+                ) / len(all_players)
+                for answer_choice in "ABCD"
+            }
+
+            answers_chosen = dict(sorted(answers_chosen.items(), key=lambda item: item[1], reverse=True))
+
+            for answer, percent in answers_chosen.items():
+                # The `ord` function is used here to change the letter to its corresponding position
+                answer_embed.add_field(
+                    name=f"{percent * 100:.1f}% of players chose",
+                    value=self.current_question['answers'][ord(answer) - 65],
+                    inline=False
+                )
 
         self.users_picked = {}
 
         for button in self.buttons:
             button.users_picked = self.users_picked
 
-        return return_dict, answer_embed
+        time_limit = self.current_question.get("time", 10)
+        question_points = self.current_question.get("points", 10)
+
+        return return_dict, answer_embed, time_limit, question_points
 
 
 class Questions:
@@ -209,8 +218,14 @@ class Questions:
 
     def end_question(self) -> Embed:
         """Terminates answering of the question and displays the correct answer."""
-        scores, answer_embed = self.view.end_question()
+        scores, answer_embed, time_limit, total_points = self.view.end_question()
         for user, score in scores.items():
-            self.scoreboard[UserScore(user)] = {"points": 1, "speed": score[2]}
-
+            # Overhead with calculating scores leads to inflated times, subtracts 0.5 to give an accurate depiction
+            time_taken = score[2] - 0.5
+            point_calculation = (1 - (time_taken / time_limit) / 2) * total_points
+            if score[-1] is True:
+                self.scoreboard[UserScore(user)] = {"points": point_calculation, "speed": time_taken}
+            elif score[-1] is False and score[2] <= 2:
+                # Get the negative of the point_calculation to deduct it
+                self.scoreboard[UserScore(user)] = {"points": -point_calculation}
         return answer_embed
