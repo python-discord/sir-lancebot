@@ -98,7 +98,8 @@ class WTFPython(commands.Cog):
             no_query_embed.set_thumbnail(url="attachment://wtf_logo.jpg")
             await ctx.send(embed=no_query_embed, file=logo)
             return
-        elif len(query) > 50:
+
+        if len(query) > 50:
             embed = Embed(
                 title=random.choice(constants.ERROR_REPLIES),
                 description=ERROR_MESSAGE,
