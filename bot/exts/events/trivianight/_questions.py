@@ -217,7 +217,7 @@ class Questions:
         for question in self.questions:
             formatted_string += f"`Q{question['number']}: {question['description']}" \
                                 f"{' ' * (spaces - len(question['description']) + 2)}" \
-                                f"|` {':x:' if not question.get('visited') else ':checkmark:'}\n"
+                                f"|` {':x:' if not question.get('visited') else ':white_check_mark:'}\n"
 
         return formatted_string.strip()
 
