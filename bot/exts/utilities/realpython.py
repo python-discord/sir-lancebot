@@ -41,6 +41,7 @@ class RealPython(commands.Cog):
         if not 1 <= amount <= 5:
             await ctx.send("`amount` must be between 1 and 5 (inclusive).")
             return
+
         params = {"q": user_search, "limit": amount, "kind": "article"}
         async with self.bot.http_session.get(url=API_ROOT, params=params) as response:
             if response.status != 200:
