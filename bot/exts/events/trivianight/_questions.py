@@ -212,11 +212,16 @@ class Questions:
                 description="No questions are currently loaded in!",
                 color=Colours.soft_red
             )
-        spaces = len(sorted(self.questions, key=lambda question: len(question['description']))[-1]["description"]) + 3
+        spaces = len(
+            sorted(
+                self.questions, key=lambda question: len(question['description'].replace("\u200b", ""))
+            )[-1]["description"].replace("\u200b", "")
+        ) + 3
         formatted_string = ""
         for question in self.questions:
-            formatted_string += f"`Q{question['number']}: {question['description']}" \
-                                f"{' ' * (spaces - len(question['description']) + 2)}" \
+            question_description = question["description"].replace("\u200b", "")
+            formatted_string += f"`Q{question['number']}: {question_description}" \
+                                f"{' ' * (spaces - len(question_description) + 2)}" \
                                 f"|` {':x:' if not question.get('visited') else ':white_check_mark:'}\n"
 
         return formatted_string.strip()
