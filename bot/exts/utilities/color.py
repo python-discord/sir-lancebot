@@ -49,10 +49,9 @@ class Colour(commands.Cog):
         else:
             colour_mode = colour_mode.title()
 
-        desc = f"{colour_mode} information for `{name or input_colour}`."
         colour_embed = Embed(
             title=colour_or_color.title(),
-            description=desc,
+            description=f"{colour_mode} information for `{name or input_colour}`.",
             colour=Color.from_rgb(*rgb)
         )
         colour_conversions = self.get_colour_conversions(rgb)
