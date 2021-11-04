@@ -34,9 +34,10 @@ class RealPython(commands.Cog):
     @commands.cooldown(1, 10, commands.cooldowns.BucketType.user)
     async def realpython(self, ctx: commands.Context, amount: Optional[int] = 5, *, user_search: str) -> None:
         """
-        Send `amount` articles that match the search terms (`user_search`).
+        Send some articles from RealPython that match the search terms.
 
-        `amount` must be between 1 and 5 (inclusive). If it's not, an error message is sent.
+        By default the top 5 matches are sent, this can be overwritten to
+        a number between 1 and 5 by specifying an amount before the search query.
         """
         if not 1 <= amount <= 5:
             await ctx.send("`amount` must be between 1 and 5 (inclusive).")
