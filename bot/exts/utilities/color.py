@@ -28,8 +28,8 @@ class Colour(commands.Cog):
     async def send_colour_response(self, ctx: commands.Context, rgb: tuple[int, int, int]) -> None:
         """Create and send embed from user given colour information."""
         name = self._rgb_to_name(rgb)
-        if name == "No match found":
-            name = None
+        if name is None:
+            name = "No match found"
 
         try:
             colour_or_color = ctx.invoked_parents[0]
@@ -207,7 +207,7 @@ class Colour(commands.Cog):
             )
             colour_name = [name for name, hex_code in self.colour_mapping.items() if hex_code == match][0]
         except TypeError:
-            colour_name = "No match found"
+            colour_name = None
         return colour_name
 
     def match_colour_name(self, input_colour_name: str) -> str:
