@@ -1,6 +1,6 @@
 import logging
+import math
 from collections import Counter
-from datetime import datetime
 
 import discord
 from async_rediscache import RedisCache
@@ -90,14 +90,22 @@ class Leaderboard(commands.Cog):
         self.bot = bot
 
     @staticmethod
-    def ordinal_number(n: int) -> str:
-        """Get the ordinal number for `n`."""
+    def get_rank(n: int) -> str:
+        """Get the rank in form of emoji (first 3 places) or ordinal number for `n`."""
+        first_3 = {1: ":first_place:", 2: ":second_place:", 3: ":third_place:"}
+        if n in first_3:
+            return first_3[n]
+
         suffix = ["th", "st", "nd", "rd", "th"][min(n % 10, 4)]
         if 11 <= (n % 100) <= 13:
             suffix = "th"
         return str(n) + suffix
 
-    async def make_leaderboard(self, cached_leaderboard: list[RedisCache]) -> discord.Embed:
+    async def make_leaderboard(
+        self,
+        author: discord.Member,
+        cached_leaderboard: list[RedisCache]
+    ) -> discord.Embed:
         """Make a discord embed for the current top 10 members in the cached leaderboard."""
         if len(cached_leaderboard) == 1:
             game_leaderboard = await cached_leaderboard[0].to_dict()
@@ -109,22 +117,29 @@ class Leaderboard(commands.Cog):
                 leaderboard += Counter(game_leaderboard)
 
         top_ten = leaderboard.most_common(10)
+        try:
+            author_rank = list(leaderboard.keys()).index(author.id) + 1
+        except ValueError:
+            author_rank = 0
 
         lines = []
         for index, (member_id, score) in enumerate(top_ten, start=1):
-            rank = format(self.ordinal_number(index), " >4")
-            score = format(score, " >4")
             mention = f"<@{member_id}>"
-            lines.append(f"`{rank} |  {score} |` {mention}")
-
-        board_formatted = "\n".join(lines) if lines else "(no entries yet)"
-        description = f"`Rank | Score |` Member\n{board_formatted}"
+            rank = self.ordinal_number(index)
+            buffer = 4 if index >= 4 else len(rank)+1
+            formatted_rank = format(rank, f"\u2800<{buffer}")
+            lines.append(f"{formatted_rank}{score:\u2800<4}— {mention}")
 
         embed = discord.Embed(
             title="Top 10",
-            description=description,
+            description="\n".join(lines) if lines else "(no entries yet)",
             colour=Colour.from_rgb(255, 230, 102),
-            timestamp=datetime.utcnow(),
+        )
+        embed.set_footer(
+            text=(
+                f"Page 1/{math.ceil(len(leaderboard) / 10)}  |"
+                f"  Your rank: {author_rank}/{len(leaderboard)}"
+            )
         )
         embed.set_thumbnail(url=DUCKY_COINS_THUMBNAIL)
 
@@ -144,7 +159,7 @@ class Leaderboard(commands.Cog):
         else:
             leaderboard = [lb for lb, _ in self.bot.games_leaderboard.values()]
 
-        embed = await self.make_leaderboard(leaderboard)
+        embed = await self.make_leaderboard(ctx.author, leaderboard)
         await ctx.send(embed=embed)
 
     @leaderboard.command(name="today", aliases=("t",))
@@ -158,7 +173,7 @@ class Leaderboard(commands.Cog):
         else:
             leaderboard = [lb for _, lb in self.bot.games_leaderboard.values()]
 
-        embed = await self.make_leaderboard(leaderboard)
+        embed = await self.make_leaderboard(ctx.author, leaderboard)
         await ctx.send(embed=embed)
 
     @leaderboard.command(name="clear")
