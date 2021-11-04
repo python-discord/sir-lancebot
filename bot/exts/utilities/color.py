@@ -151,13 +151,16 @@ class Colour(commands.Cog):
 
     def get_colour_conversions(self, rgb: tuple[int, int, int]) -> dict[str, str]:
         """Create a dictionary mapping of colour types and their values."""
+        colour_name = self._rgb_to_name(rgb)
+        if colour_name is None:
+            colour_name = "No match found"
         return {
             "RGB": rgb,
             "HSV": self._rgb_to_hsv(rgb),
             "HSL": self._rgb_to_hsl(rgb),
             "CMYK": self._rgb_to_cmyk(rgb),
             "Hex": self._rgb_to_hex(rgb),
-            "Name": self._rgb_to_name(rgb)
+            "Name": colour_name
         }
 
     @staticmethod
@@ -182,7 +185,7 @@ class Colour(commands.Cog):
         rgb_list = [val / 255.0 for val in rgb]
         if not any(rgb_list):
             return 0, 0, 0, 100
-        k = 1 - max(val for val in rgb_list)
+        k = 1 - max(rgb_list)
         c = round((1 - rgb_list[0] - k) * 100 / (1 - k))
         m = round((1 - rgb_list[1] - k) * 100 / (1 - k))
         y = round((1 - rgb_list[2] - k) * 100 / (1 - k))
