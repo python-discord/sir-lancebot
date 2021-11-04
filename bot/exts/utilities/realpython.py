@@ -7,6 +7,7 @@ from discord.ext import commands
 
 from bot.bot import Bot
 from bot.constants import Colours
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -31,9 +32,16 @@ class RealPython(commands.Cog):
 
     @commands.command(aliases=["rp"])
     @commands.cooldown(1, 10, commands.cooldowns.BucketType.user)
-    async def realpython(self, ctx: commands.Context, *, user_search: str) -> None:
-        """Send 5 articles that match the user's search terms."""
-        params = {"q": user_search, "limit": 5, "kind": "article"}
+    async def realpython(self, ctx: commands.Context, amount: Optional[int] = 5, *, user_search: str) -> None:
+        """
+        Send `amount` articles that match the search terms (`user_search`).
+
+        `amount` must be between 1 and 5 (inclusive). If it's not, an error message is sent.
+        """
+        if not 1 <= amount <= 5:
+            await ctx.send("`amount` must be between 1 and 5 (inclusive).")
+            return
+        params = {"q": user_search, "limit": amount, "kind": "article"}
         async with self.bot.http_session.get(url=API_ROOT, params=params) as response:
             if response.status != 200:
                 logger.error(
