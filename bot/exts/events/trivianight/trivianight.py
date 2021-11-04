@@ -45,7 +45,22 @@ class TriviaNight(commands.Cog):
 
     @trivianight.command()
     async def load(self, ctx: commands.Context, *, to_load: Optional[str]) -> None:
-        """Load the JSON file provided into the questions."""
+        """
+        Loads a JSON file from the provided attachment or argument.
+
+        The JSON provided is formatted where it is a list of dictionaries, each dictionary containing the keys below:
+        - number: int (represents the current question #)
+        - description: str (represents the question itself)
+        - answers: list (represents the different answers possible, must be a length of 4)
+        - correct: str (represents the correct answer in terms of what the correct answer is in `answers`
+        - time: Optional[int] (represents the timer for the question and how long it should run, default is 10)
+        - points: Optional[int] (represents how many points are awarded for each question, default is 10)
+
+        The load command accepts three different ways of loading in a JSON:
+        - an attachment of the JSON file
+        - a message link to the attachment/JSON
+        - reading the JSON itself via a codeblock or plain text
+        """
         if ctx.message.attachments:
             json_text = (await ctx.message.attachments[0].read()).decode("utf8")
         elif to_load.startswith("https://discord.com/channels") or \
