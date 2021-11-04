@@ -191,7 +191,8 @@ class Questions:
         spaces = len(sorted(self.questions, key=lambda question: len(question['description']))[-1]["description"]) + 3
         formatted_string = ""
         for question in self.questions:
-            formatted_string += f"`Q{question['number']}: {question['description']!r}" \
+            question_description = question['description'].replace("\u200b", "")
+            formatted_string += f"`Q{question['number']}: {question_description!r}" \
                                 f"{' ' * (spaces - len(question['description']) + 2)}" \
                                 f"|` {':x:' if not question.get('visited') else ':checkmark:'}\n"
 
