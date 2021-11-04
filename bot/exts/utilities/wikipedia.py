@@ -87,7 +87,7 @@ class WikipediaSearch(commands.Cog):
             embed.set_thumbnail(url=WIKI_THUMBNAIL)
             embed.timestamp = datetime.utcnow()
             await LinePaginator.paginate(
-                contents, ctx, embed, restrict_to_user=ctx.author
+                contents, ctx, embed
             )
         else:
             await ctx.send(
