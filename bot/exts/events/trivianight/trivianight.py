@@ -30,7 +30,15 @@ class TriviaNight(commands.Cog):
     @commands.group()
     async def trivianight(self, ctx: commands.Context) -> None:
         """No-op subcommand group for organizing different commands."""
-        return
+        cog_description = Embed(
+            title="What is .trivianight?",
+            description=(
+                "This 'cog' is for the Python Discord's TriviaNight (date tentative)! Compete against other"
+                "players in a trivia about Python!"
+            ),
+            color=Colours.soft_green
+        )
+        await ctx.send(embed=cog_description)
 
     @trivianight.command()
     async def load(self, ctx: commands.Context) -> None:
@@ -88,8 +96,11 @@ class TriviaNight(commands.Cog):
     @trivianight.command()
     async def list(self, ctx: commands.Context) -> None:
         """Displays all the questions from the question bank."""
-        formatted_string = self.questions.list_questions()
-        await ctx.send(formatted_string)
+        question_list = self.questions.list_questions()
+        if isinstance(question_list, Embed):
+            await ctx.send(embed=question_list)
+
+        await ctx.send(question_list)
 
     @trivianight.command()
     async def stop(self, ctx: commands.Context) -> None:
