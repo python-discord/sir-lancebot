@@ -4,11 +4,10 @@ import pathlib
 import random
 from io import BytesIO
 
+import discord
+import rapidfuzz
 from PIL import Image, ImageColor
-from discord import Color, Embed, File
 from discord.ext import commands
-from discord.ext.commands.errors import BadArgument
-from rapidfuzz import process
 
 from bot.bot import Bot
 from bot.exts.core.extensions import invoke_help_command
@@ -49,10 +48,10 @@ class Colour(commands.Cog):
         else:
             colour_mode = colour_mode.title()
 
-        colour_embed = Embed(
+        colour_embed = discord.Embed(
             title=colour_or_color.title(),
             description=f"{colour_mode} information for `{name or input_colour}`.",
-            colour=Color.from_rgb(*rgb)
+            colour=discord.Color.from_rgb(*rgb)
         )
         colour_conversions = self.get_colour_conversions(rgb)
         for colour_space, value in colour_conversions.items():
@@ -66,7 +65,7 @@ class Colour(commands.Cog):
         buffer = BytesIO()
         thumbnail.save(buffer, "PNG")
         buffer.seek(0)
-        thumbnail_file = File(buffer, filename="colour.png")
+        thumbnail_file = discord.File(buffer, filename="colour.png")
 
         colour_embed.set_thumbnail(url="attachment://colour.png")
 
@@ -86,7 +85,7 @@ class Colour(commands.Cog):
     async def rgb(self, ctx: commands.Context, red: int, green: int, blue: int) -> None:
         """Command to create an embed from an RGB input."""
         if any(c not in range(0, 256) for c in (red, green, blue)):
-            raise BadArgument(
+            raise commands.BadArgument(
                 message=f"RGB values can only be from 0 to 255. User input was: `{red, green, blue}`."
             )
         rgb_tuple = (red, green, blue)
@@ -96,7 +95,7 @@ class Colour(commands.Cog):
     async def hsv(self, ctx: commands.Context, hue: int, saturation: int, value: int) -> None:
         """Command to create an embed from an HSV input."""
         if (hue not in range(0, 361)) or any(c not in range(0, 101) for c in (saturation, value)):
-            raise BadArgument(
+            raise commands.BadArgument(
                 message="Hue can only be from 0 to 360. Saturation and Value can only be from 0 to 100. "
                 f"User input was: `{hue, saturation, value}`."
             )
@@ -107,7 +106,7 @@ class Colour(commands.Cog):
     async def hsl(self, ctx: commands.Context, hue: int, saturation: int, lightness: int) -> None:
         """Command to create an embed from an HSL input."""
         if (hue not in range(0, 361)) or any(c not in range(0, 101) for c in (saturation, lightness)):
-            raise BadArgument(
+            raise commands.BadArgument(
                 message="Hue can only be from 0 to 360. Saturation and Lightness can only be from 0 to 100. "
                 f"User input was: `{hue, saturation, lightness}`."
             )
@@ -118,7 +117,7 @@ class Colour(commands.Cog):
     async def cmyk(self, ctx: commands.Context, cyan: int, magenta: int, yellow: int, key: int) -> None:
         """Command to create an embed from a CMYK input."""
         if any(c not in range(0, 101) for c in (cyan, magenta, yellow, key)):
-            raise BadArgument(
+            raise commands.BadArgument(
                 message=f"CMYK values can only be from 0 to 100. User input was: `{cyan, magenta, yellow, key}`."
             )
         r = round(255 * (1 - (cyan / 100)) * (1 - (key / 100)))
@@ -202,7 +201,7 @@ class Colour(commands.Cog):
         """Convert RGB values to a fuzzy matched name."""
         input_hex_colour = self._rgb_to_hex(rgb)
         try:
-            match, certainty, _ = process.extractOne(
+            match, certainty, _ = rapidfuzz.process.extractOne(
                 query=input_hex_colour,
                 choices=self.colour_mapping.values(),
                 score_cutoff=80
@@ -215,14 +214,14 @@ class Colour(commands.Cog):
     def match_colour_name(self, input_colour_name: str) -> str:
         """Convert a colour name to HEX code."""
         try:
-            match, certainty, _ = process.extractOne(
+            match, certainty, _ = rapidfuzz.process.extractOne(
                 query=input_colour_name,
                 choices=self.colour_mapping.keys(),
                 score_cutoff=80
             )
             hex_match = f"#{self.colour_mapping[match]}"
         except (ValueError, TypeError):
-            raise BadArgument(message=f"No color found for: `{input_colour_name}`")
+            raise commands.BadArgument(message=f"No color found for: `{input_colour_name}`")
         return hex_match
 
 
