@@ -79,7 +79,7 @@ class WTFPython(commands.Cog):
         return match if certainty > MINIMUM_CERTAINTY else None
 
     @commands.command(aliases=("wtf", "WTF"))
-    async def wtf_python(self, ctx: commands.Context, *, query: str = None) -> None:
+    async def wtf_python(self, ctx: commands.Context, *, query: Optional[str] = None) -> None:
         """
         Search WTF Python repository.
 
