@@ -19,11 +19,6 @@ TIMEOUT = 60.0
 class Madlibs(commands.Cog):
     """
     Cog for the Madlibs game.
-
-    Madlibs is a game where the player is asked to enter a word that
-    fits a random part of speech (e.g. noun, adjective, verb, plural noun, etc.).
-    The bot chooses a random number of user inputs (within the specified bounds
-    of the command arguments) to use for the game and a random story.
     """
 
     def __init__(self, bot: Bot):
@@ -59,7 +54,13 @@ class Madlibs(commands.Cog):
         self,
         ctx: commands.Context,
     ) -> None:
-        """Play Madlibs with the bot, where you have to enter a word that fits the part of speech that you are given!"""
+        """Play Madlibs with the bot!
+
+        Madlibs is a game where the player is asked to enter a word that
+        fits a random part of speech (e.g. noun, adjective, verb, plural noun, etc.).
+        The bot chooses a random number of user inputs (within the specified bounds
+        of the command arguments) to use for the game and a random story.
+        """
         random_template = choice(self.templates["templates"])
         # random_template = self.templates["templates"][0]
 
