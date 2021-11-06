@@ -4,7 +4,7 @@ from pathlib import Path
 from random import choice
 from typing import TypedDict
 
-from discord import Embed
+import discord
 from discord.ext import commands
 
 from bot.bot import Bot
@@ -40,9 +40,9 @@ class Madlibs(commands.Cog):
             return json.load(file)["templates"]
 
     @staticmethod
-    def madlibs_embed(part_of_speech: str, number_of_inputs: int) -> Embed:
+    def madlibs_embed(part_of_speech: str, number_of_inputs: int) -> discord.Embed:
         """Method to have the bot send an embed with the game information."""
-        madlibs_embed = Embed(
+        madlibs_embed = discord.Embed(
             title="Madlibs",
             color=Colours.python_blue,
         )
@@ -69,7 +69,9 @@ class Madlibs(commands.Cog):
         of the command arguments) to use for the game and a random story.
         """
         random_template = choice(self.templates)
-        # random_template = self.templates["templates"][0]
+
+        def author_check(message: discord.Message):
+            return message.channel.id == ctx.channel.id and message.author.id == ctx.author.id
 
         current_input = 0
 
@@ -85,9 +87,9 @@ class Madlibs(commands.Cog):
             part_of_speech = random_template["blanks"][current_input]
 
             try:
-                message = await self.bot.wait_for(event="message", timeout=TIMEOUT)
+                message = await self.bot.wait_for(event="message", check=author_check, timeout=TIMEOUT)
             except TimeoutError:
-                timeout_embed = Embed(
+                timeout_embed = discord.Embed(
                     title="Timeout!",
                     description="Uh oh! Looks like the bot timed out! Please try again later.",
                     color=Colours.soft_red
@@ -121,7 +123,7 @@ class Madlibs(commands.Cog):
         str_template = " ".join(random_template["value"])
         str_template_with_words = str_template.join(submitted_words)
 
-        story_embed = Embed(
+        story_embed = discord.Embed(
             title=random_template["title"],
             description=str_template_with_words,
             color=Colours.bright_green,
