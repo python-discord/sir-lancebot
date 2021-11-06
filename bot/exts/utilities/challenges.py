@@ -278,7 +278,7 @@ class Challenges(commands.Cog):
         if language.lower() not in SUPPORTED_LANGUAGES["stable"] + SUPPORTED_LANGUAGES["beta"]:
             raise commands.BadArgument("This is not a recognized language on codewars.com!")
 
-        get_kata_link = f"https://codewars.com/kata/search/{language}"
+        get_kata_link = f"https://codewars.com/kata/search/{language.lower()}"
         params = {}
 
         if query is not None:
