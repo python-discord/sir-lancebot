@@ -71,9 +71,7 @@ class TriviaNight(commands.Cog):
             if message.attachments:
                 json_text = (await message.attachments[0].read()).decode("utf8")
             else:
-                json_text = message.content.replace("```", "").replace("json", "")
-        else:
-            json_text = message.content.replace("```", "").replace("json", "")
+                json_text = message.content.replace("```", "").replace("json", "").replace("\n", "")
 
         try:
             serialized_json = loads(json_text)

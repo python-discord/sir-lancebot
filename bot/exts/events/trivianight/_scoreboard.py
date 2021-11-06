@@ -21,6 +21,9 @@ class ScoreboardView(View):
     async def create_main_leaderboard(self) -> Embed:
         """Helper function that iterates through `self.points` to generate the main leaderboard embed."""
         formatted_string = ""
+        self.points = dict(sorted(self.points.items(), key=lambda item: item[-1], reverse=True))
+        self.speed = dict(sorted(self.speed.items(), key=lambda item: item[-1]))
+
         for current_placement, (user, points) in enumerate(self.points.items()):
             if current_placement + 1 > 30:
                 break
