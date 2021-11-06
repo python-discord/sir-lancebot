@@ -87,9 +87,11 @@ class Madlibs(commands.Cog):
             try:
                 message = await self.bot.wait_for(event="message", timeout=TIMEOUT)
             except TimeoutError:
-                timeout_embed = Embed(title="Timeout!",
-                                      description="Uh oh! Looks like the bot timed out! Please try again later.",
-                                      color=Colours.soft_red)
+                timeout_embed = Embed(
+                    title="Timeout!",
+                    description="Uh oh! Looks like the bot timed out! Please try again later.",
+                    color=Colours.soft_red
+                )
 
                 await ctx.send(embed=timeout_embed)
                 return
