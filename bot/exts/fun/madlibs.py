@@ -2,6 +2,7 @@ import json
 from asyncio import TimeoutError
 from pathlib import Path
 from random import choice
+from typing import TypedDict
 
 from discord import Embed
 from discord.ext import commands
@@ -16,6 +17,12 @@ from bot.constants import Colours
 TIMEOUT = 60.0
 
 
+class MadlibsTemplate(TypedDict):
+    title: str
+    blanks: list[str]
+    value: list[str]
+
+
 class Madlibs(commands.Cog):
     """
     Cog for the Madlibs game.
@@ -26,11 +33,11 @@ class Madlibs(commands.Cog):
         self.templates = self._load_templates()
 
     @staticmethod
-    def _load_templates() -> list:
+    def _load_templates() -> list[MadlibsTemplate]:
         madlibs_stories = Path("bot/resources/fun/madlibs_templates (1).json")
 
         with open(madlibs_stories) as file:
-            return json.load(file)
+            return json.load(file)["templates"]
 
     @staticmethod
     def madlibs_embed(part_of_speech: str, number_of_inputs: int) -> Embed:
@@ -61,7 +68,7 @@ class Madlibs(commands.Cog):
         The bot chooses a random number of user inputs (within the specified bounds
         of the command arguments) to use for the game and a random story.
         """
-        random_template = choice(self.templates["templates"])
+        random_template = choice(self.templates)
         # random_template = self.templates["templates"][0]
 
         current_input = 0
