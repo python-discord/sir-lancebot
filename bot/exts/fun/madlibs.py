@@ -103,8 +103,6 @@ class Madlibs(commands.Cog):
 
             # random_template["value"] += submitted_words
 
-            madlibs_embed.clear_fields()
-
             madlibs_embed = self.madlibs_embed(part_of_speech, inputs_left)
             await original_message.edit(embed=madlibs_embed)
 
