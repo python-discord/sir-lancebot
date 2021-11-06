@@ -52,7 +52,7 @@ class Madlibs(commands.Cog):
             value=f"Part of speech: {part_of_speech}"
         )
 
-        madlibs_embed.set_footer(text=f'Inputs remaining: {number_of_inputs}')
+        madlibs_embed.set_footer(text=f"Inputs remaining: {number_of_inputs}")
 
         return madlibs_embed
 
@@ -85,10 +85,10 @@ class Madlibs(commands.Cog):
             part_of_speech = random_template["blanks"][current_input]
 
             try:
-                message = await self.bot.wait_for(event='message', timeout=TIMEOUT)
+                message = await self.bot.wait_for(event="message", timeout=TIMEOUT)
             except TimeoutError:
-                timeout_embed = Embed(title='Timeout!',
-                                      description='Uh oh! Looks like the bot timed out! Please try again later.',
+                timeout_embed = Embed(title="Timeout!",
+                                      description="Uh oh! Looks like the bot timed out! Please try again later.",
                                       color=Colours.soft_red)
 
                 await ctx.send(embed=timeout_embed)
@@ -116,7 +116,7 @@ class Madlibs(commands.Cog):
             if number_of_inputs == 0:
                 break
 
-        str_template = ' '.join(random_template["value"])
+        str_template = " ".join(random_template["value"])
         str_template_with_words = str_template.join(submitted_words)
 
         story_embed = Embed(
