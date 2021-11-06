@@ -91,7 +91,7 @@ class WTFPython(commands.Cog):
             no_query_embed = Embed(
                 title="WTF Python?!",
                 colour=constants.Colours.dark_green,
-                description="A repository filled with suprising snippets that can make you say WTF?!\n"
+                description="A repository filled with suprising snippets that can make you say WTF?!\n\n"
                 f"[Go to the Repository]({BASE_URL})"
             )
             logo = File(LOGO_PATH, filename="wtf_logo.jpg")
