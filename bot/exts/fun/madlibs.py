@@ -73,18 +73,13 @@ class Madlibs(commands.Cog):
         def author_check(message: discord.Message):
             return message.channel.id == ctx.channel.id and message.author.id == ctx.author.id
 
-        current_input = 0
-
-        number_of_inputs = len(random_template["blanks"])
-
-        part_of_speech = random_template["blanks"][current_input]
-
-        madlibs_embed = self.madlibs_embed(part_of_speech, number_of_inputs)
-
+        # Send the first necessary embed, because we do this outside of the
+        # loop we need to skip the first item in the actual loop.
+        madlibs_embed = self.madlibs_embed(random_template["blanks"][0], len(random_template["blanks"]))
         original_message = await ctx.send(embed=madlibs_embed)
 
-        while True:
-            part_of_speech = random_template["blanks"][current_input]
+        for i, part_of_speech in enumerate(random_template["blanks"][1:], start=1):
+            inputs_left = len(random_template["blanks"]) - i
 
             try:
                 message = await self.bot.wait_for(event="message", check=author_check, timeout=TIMEOUT)
@@ -108,17 +103,10 @@ class Madlibs(commands.Cog):
 
             # random_template["value"] += submitted_words
 
-            current_input += 1
-            number_of_inputs -= 1
-
             madlibs_embed.clear_fields()
 
-            madlibs_embed = self.madlibs_embed(part_of_speech, number_of_inputs)
-
+            madlibs_embed = self.madlibs_embed(part_of_speech, inputs_left)
             await original_message.edit(embed=madlibs_embed)
-
-            if number_of_inputs == 0:
-                break
 
         str_template = " ".join(random_template["value"])
         str_template_with_words = str_template.join(submitted_words)
