@@ -275,10 +275,12 @@ class Challenges(commands.Cog):
         `.challenge <language> <query>, <difficulty>` - Pulls a random challenge with the query provided,
         under that difficulty within the language's scope.
         """
-        if language.lower() not in SUPPORTED_LANGUAGES["stable"] + SUPPORTED_LANGUAGES["beta"]:
+        
+        language = language.lower()
+        if language not in SUPPORTED_LANGUAGES["stable"] + SUPPORTED_LANGUAGES["beta"]:
             raise commands.BadArgument("This is not a recognized language on codewars.com!")
 
-        get_kata_link = f"https://codewars.com/kata/search/{language.lower()}"
+        get_kata_link = f"https://codewars.com/kata/search/{language}"
         params = {}
 
         if query is not None:
