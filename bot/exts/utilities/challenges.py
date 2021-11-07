@@ -275,7 +275,6 @@ class Challenges(commands.Cog):
         `.challenge <language> <query>, <difficulty>` - Pulls a random challenge with the query provided,
         under that difficulty within the language's scope.
         """
-        
         language = language.lower()
         if language not in SUPPORTED_LANGUAGES["stable"] + SUPPORTED_LANGUAGES["beta"]:
             raise commands.BadArgument("This is not a recognized language on codewars.com!")
