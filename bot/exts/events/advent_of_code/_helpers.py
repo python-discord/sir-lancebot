@@ -105,6 +105,7 @@ def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
     # The data we get from the AoC website is structured by member, not by day/star,
     # which means we need to iterate over the members to transpose the data to a per
     # star view. We need that per star view to compute rank scores per star.
+    per_day_star_stats = collections.defaultdict(list)
     for member in raw_leaderboard_data.values():
         name = member["name"] if member["name"] else f"Anonymous #{member['id']}"
         member_id = member["id"]
@@ -122,6 +123,11 @@ def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
                 star_results[(day, star)].append(
                     StarResult(member_id=member_id, completion_time=completion_time)
                 )
+                per_day_star_stats[f"{day}-{star}"].append(
+                    {'completion_time': int(data["get_star_ts"]), 'member_name': name}
+                )
+    for key in per_day_star_stats:
+        per_day_star_stats[key] = sorted(per_day_star_stats[key], key=operator.itemgetter('completion_time'))
 
     # Now that we have a transposed dataset that holds the completion time of all
     # participants per star, we can compute the rank-based scores each participant
@@ -151,7 +157,7 @@ def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
         # this data to JSON in order to cache it in Redis.
         daily_stats[day] = {"star_one": star_one, "star_two": star_two}
 
-    return {"daily_stats": daily_stats, "leaderboard": sorted_leaderboard}
+    return {"daily_stats": daily_stats, "leaderboard": sorted_leaderboard, 'per_day_and_star': per_day_star_stats}
 
 
 def _format_leaderboard(leaderboard: dict[str, dict]) -> str:
@@ -289,6 +295,7 @@ async def fetch_leaderboard(invalidate_cache: bool = False) -> dict:
             "leaderboard_fetched_at": leaderboard_fetched_at,
             "number_of_participants": number_of_participants,
             "daily_stats": json.dumps(parsed_leaderboard_data["daily_stats"]),
+            "leaderboard_per_day_and_star": json.dumps(parsed_leaderboard_data["per_day_and_star"])
         }
 
         # Store the new values in Redis

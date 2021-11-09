@@ -52,10 +52,10 @@ class HacktoberIssues(commands.Cog):
     async def get_issues(self, ctx: commands.Context, option: str) -> Optional[dict]:
         """Get a list of the python issues with the label 'hacktoberfest' from the Github api."""
         if option == "beginner":
-            if (ctx.message.created_at - self.cache_timer_beginner).seconds <= 60:
+            if (ctx.message.created_at.replace(tzinfo=None) - self.cache_timer_beginner).seconds <= 60:
                 log.debug("using cache")
                 return self.cache_beginner
-        elif (ctx.message.created_at - self.cache_timer_normal).seconds <= 60:
+        elif (ctx.message.created_at.replace(tzinfo=None) - self.cache_timer_normal).seconds <= 60:
             log.debug("using cache")
             return self.cache_normal
 
@@ -88,10 +88,10 @@ class HacktoberIssues(commands.Cog):
 
             if option == "beginner":
                 self.cache_beginner = data
-                self.cache_timer_beginner = ctx.message.created_at
+                self.cache_timer_beginner = ctx.message.created_at.replace(tzinfo=None)
             else:
                 self.cache_normal = data
-                self.cache_timer_normal = ctx.message.created_at
+                self.cache_timer_normal = ctx.message.created_at.replace(tzinfo=None)
 
             return data
 
@@ -100,7 +100,8 @@ class HacktoberIssues(commands.Cog):
         """Format the issue data into a embed."""
         title = issue["title"]
         issue_url = issue["url"].replace("api.", "").replace("/repos/", "/")
-        body = issue["body"]
+        # issues can have empty bodies, which in that case GitHub doesn't include the key in the API response
+        body = issue.get("body", "")
         labels = [label["name"] for label in issue["labels"]]
 
         embed = discord.Embed(title=title)
