@@ -178,7 +178,7 @@ class Colour(commands.Cog):
         return hsl
 
     @staticmethod
-    def _rgb_to_cmyk(rgb: tuple[int, int, int, int]) -> tuple[int, int, int, int]:
+    def _rgb_to_cmyk(rgb: tuple[int, int, int]) -> tuple[int, int, int, int]:
         """Convert RGB values to CMYK values."""
         rgb_list = [val / 255.0 for val in rgb]
         if not any(rgb_list):
