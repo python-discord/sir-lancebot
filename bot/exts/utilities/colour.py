@@ -36,7 +36,7 @@ class Colour(commands.Cog):
 
         colour_mode = ctx.invoked_with
         if colour_mode == "random":
-            input_colour = "random"
+            colour_mode = colour_or_color
         elif colour_mode in ("colour", "color"):
             input_colour = rgb
         elif colour_mode == "name":
