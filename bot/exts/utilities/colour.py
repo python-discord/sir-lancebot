@@ -4,6 +4,7 @@ import pathlib
 import random
 import string
 from io import BytesIO
+from typing import Optional, Union
 
 import discord
 import rapidfuzz
@@ -75,8 +76,11 @@ class Colour(commands.Cog):
         await ctx.send(file=thumbnail_file, embed=colour_embed)
 
     @commands.group(aliases=("color",), invoke_without_command=True)
-    async def colour(self, ctx: commands.Context, *, color_input: str) -> None:
+    async def colour(self, ctx: commands.Context, *, color_input: Optional[str] = None) -> None:
         """User initiated command to create an embed that displays colour information."""
+        if color_input is None:
+            await self.random()
+
         if ctx.invoked_subcommand:
             return
 
@@ -133,13 +137,17 @@ class Colour(commands.Cog):
     @colour.command()
     async def hex(self, ctx: commands.Context, hex_code: str) -> None:
         """Command to create an embed from a HEX input."""
-        if "#" not in hex_code:
+        if hex_code[0] != "#":
             hex_code = f"#{hex_code}"
-        if len(hex_code) not in (4, 5, 7, 9) or any(_ not in string.hexdigits+"#" for _ in hex_code):
-            raise commands.BadArgument(
-                message="HEX values must be hexadecimal and take the form *#RRGGBB* or *#RGB*. "
-                f"User input was: `{hex_code}`."
+
+        if len(hex_code) not in (4, 5, 7, 9) or any(_ not in string.hexdigits for _ in hex_code[1:]):
+            hex_error_embed = discord.Embed(
+                title="The input hex code is not valid.",
+                message=f"Cannot convert `{hex_code}` to a recognizable Hex format. "
+                "Hex values must be hexadecimal and take the form *#RRGGBB* or *#RGB*.",
+                colour=discord.Colour.dark_red()
             )
+            await ctx.send(hex_error_embed)
 
         hex_tuple = ImageColor.getrgb(hex_code)
         if len(hex_tuple) == 4:
@@ -149,7 +157,7 @@ class Colour(commands.Cog):
     @colour.command()
     async def name(self, ctx: commands.Context, *, user_colour_name: str) -> None:
         """Command to create an embed from a name input."""
-        hex_colour = self.match_colour_name(user_colour_name)
+        hex_colour = await self.match_colour_name(ctx, user_colour_name)
         hex_tuple = ImageColor.getrgb(hex_colour)
         await self.send_colour_response(ctx, hex_tuple)
 
@@ -224,7 +232,7 @@ class Colour(commands.Cog):
             colour_name = None
         return colour_name
 
-    def match_colour_name(self, input_colour_name: str) -> str:
+    async def match_colour_name(self, ctx: commands.Context, input_colour_name: str) -> Union[str, None]:
         """Convert a colour name to HEX code."""
         try:
             match, certainty, _ = rapidfuzz.process.extractOne(
@@ -233,7 +241,12 @@ class Colour(commands.Cog):
                 score_cutoff=80
             )
         except (ValueError, TypeError):
-            raise commands.BadArgument(message=f"No color found for: `{input_colour_name}`")
+            name_error_embed = discord.Embed(
+                title="No colour match found.",
+                description=f"No color found for: `{input_colour_name}`",
+                colour=discord.Color.dark_red()
+            )
+            await ctx.send(name_error_embed)
         return f"#{self.colour_mapping[match]}"
 
 
