@@ -80,6 +80,7 @@ class Colour(commands.Cog):
         """User initiated command to create an embed that displays colour information."""
         if color_input is None:
             await self.random()
+            return
 
         if ctx.invoked_subcommand:
             return
