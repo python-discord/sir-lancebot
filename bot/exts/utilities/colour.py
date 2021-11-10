@@ -75,12 +75,14 @@ class Colour(commands.Cog):
     @commands.group(aliases=("color",), invoke_without_command=True)
     async def colour(self, ctx: commands.Context, *, extra: str) -> None:
         """User initiated command to create an embed that displays colour information."""
-        if ctx.invoked_subcommand is None:
-            try:
-                extra_colour = ImageColor.getrgb(extra)
-                await self.send_colour_response(ctx, extra_colour)
-            except ValueError:
-                await invoke_help_command(ctx)
+        if ctx.invoked_subcommand:
+            return
+
+        try:
+            extra_colour = ImageColor.getrgb(extra)
+            await self.send_colour_response(ctx, extra_colour)
+        except ValueError:
+            await invoke_help_command(ctx)
 
     @colour.command()
     async def rgb(self, ctx: commands.Context, red: int, green: int, blue: int) -> None:
