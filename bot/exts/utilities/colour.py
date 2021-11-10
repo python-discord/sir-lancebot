@@ -75,13 +75,13 @@ class Colour(commands.Cog):
         await ctx.send(file=thumbnail_file, embed=colour_embed)
 
     @commands.group(aliases=("color",), invoke_without_command=True)
-    async def colour(self, ctx: commands.Context, *, extra: str) -> None:
+    async def colour(self, ctx: commands.Context, *, color_input: str) -> None:
         """User initiated command to create an embed that displays colour information."""
         if ctx.invoked_subcommand:
             return
 
         try:
-            extra_colour = ImageColor.getrgb(extra)
+            extra_colour = ImageColor.getrgb(color_input)
             await self.send_colour_response(ctx, extra_colour)
         except ValueError:
             await invoke_help_command(ctx)
