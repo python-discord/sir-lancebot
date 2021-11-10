@@ -1,8 +1,8 @@
 import asyncio
+import datetime
 import logging
 import socket
 from contextlib import suppress
-from datetime import datetime, timedelta
 from typing import Optional
 
 import discord
@@ -12,7 +12,6 @@ from discord import DiscordException, Embed, Forbidden, Thread
 from discord.ext import commands
 from discord.ext.commands import Cog, when_mentioned_or
 from discord.ext.tasks import loop
-from discord.utils import sleep_until
 
 from bot import constants
 
@@ -48,20 +47,12 @@ class Bot(commands.Bot):
         # Mapping for the main games leaderboard
         # The key holds the name of the discord Cog and the value is the redis cache object
         # for that specific game leaderboard
-        self.games_leaderboard: dict[str, tuple[RedisCache, ...]] = dict()
+        self.games_leaderboard: dict[str, tuple[RedisCache, ...]] = {}
         self.auto_per_day_leaderboard_clear.start()
 
-    @loop()
+    @loop(time=datetime.time.min)
     async def auto_per_day_leaderboard_clear(self) -> None:
         """Loop for clearing the per day leaderboard redis cache at UTC midnight."""
-        # once d.py get support for `time` parameter in loop decorator,
-        # this can be removed and the loop can use the `time=datetime.time.min` parameter
-        now = datetime.utcnow()
-        tomorrow = now + timedelta(days=1)
-        midnight_tomorrow = tomorrow.replace(hour=0, minute=0, second=0)
-
-        await sleep_until(midnight_tomorrow)
-
         for _, per_day_lb in self.games_leaderboard.values():
             await per_day_lb.clear()
 

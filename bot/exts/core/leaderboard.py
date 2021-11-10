@@ -61,13 +61,13 @@ class ConfirmClear(ui.View):
 
     @ui.button(label="Confirm", style=ButtonStyle.green, row=0)
     async def confirm(self, _button: ui.Button, interaction: Interaction) -> None:
-        """Redeploy the specified service."""
-        for global_lb, _ in self.bot.games_leaderboard.values():
-            await global_lb.clear()
+        """Functionality ran when the clearing the total leaderboard has been approved.."""
+        for total_lb, _ in self.bot.games_leaderboard.values():
+            await total_lb.clear()
 
         log.info(f"The leaderboard was cleared by Member({self.authorization})")
         await interaction.response.send_message(
-            content=":white_check_mark: Cleared all game leaderboards.",
+            content=":white_check_mark: Cleared all total game leaderboards.",
             ephemeral=False
         )
 
@@ -75,7 +75,7 @@ class ConfirmClear(ui.View):
 
     @ui.button(label="Cancel", style=ButtonStyle.grey, row=0)
     async def cancel(self, _button: ui.Button, interaction: Interaction) -> None:
-        """Logic for if the deployment is not approved."""
+        """Functionality ran when the clearing the total leaderboard has been denied."""
         await interaction.response.send_message(
             content=":x: Clearing cache aborted!",
             ephemeral=False,
@@ -113,8 +113,7 @@ class Leaderboard(commands.Cog):
         else:
             leaderboard = Counter()
             for lb in cached_leaderboard:
-                game_leaderboard = await lb.to_dict()
-                leaderboard += Counter(game_leaderboard)
+                leaderboard += Counter(await lb.to_dict())
 
         top_ten = leaderboard.most_common(10)
         try:
@@ -183,7 +182,7 @@ class Leaderboard(commands.Cog):
         confirmation = ConfirmClear(ctx.author.id, self.bot)
 
         msg = await ctx.send(
-            ":warning: THIS WILL IRREVOCABLY CLEAR THE LEADERBOARD. ARE YOU SURE?",
+            ":warning: THIS WILL IRREVOCABLY CLEAR THE TOTAL LEADERBOARD. ARE YOU SURE?",
             view=confirmation,
         )
 
