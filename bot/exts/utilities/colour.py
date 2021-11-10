@@ -2,6 +2,7 @@ import colorsys
 import json
 import pathlib
 import random
+import string
 from io import BytesIO
 
 import discord
@@ -27,8 +28,6 @@ class Colour(commands.Cog):
     async def send_colour_response(self, ctx: commands.Context, rgb: tuple[int, int, int]) -> None:
         """Create and send embed from user given colour information."""
         name = self._rgb_to_name(rgb)
-        if name is None:
-            name = "No match found"
 
         try:
             colour_or_color = ctx.invoked_parents[0]
@@ -132,7 +131,9 @@ class Colour(commands.Cog):
             hex_code = f"#{hex_code}"
         if len(hex_code) not in (4, 5, 7, 9) or any(_ not in string.hexdigits+"#" for _ in hex_code):
             raise commands.BadArgument(
-                message=f"HEX values must be hexadecimal and take the form *#RRGGBB* or *#RGB*. User input was: `{hex_code}`.")
+                message="HEX values must be hexadecimal and take the form *#RRGGBB* or *#RGB*. "
+                f"User input was: `{hex_code}`."
+            )
 
         hex_tuple = ImageColor.getrgb(hex_code)
         if len(hex_tuple) == 4:
