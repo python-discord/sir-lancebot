@@ -39,8 +39,10 @@ class Colour(commands.Cog):
             input_colour = "random"
         elif colour_mode in ("colour", "color"):
             input_colour = rgb
+        elif colour_mode == "name":
+            input_colour = ctx.kwargs["user_colour_name"]
         else:
-            input_colour = ctx.args[2:][0]
+            input_colour = tuple(ctx.args[2:])
 
         if colour_mode not in ("name", "hex", "random", "color", "colour"):
             colour_mode = colour_mode.upper()
@@ -141,7 +143,7 @@ class Colour(commands.Cog):
         await self.send_colour_response(ctx, hex_tuple)
 
     @colour.command()
-    async def name(self, ctx: commands.Context, user_colour_name: str) -> None:
+    async def name(self, ctx: commands.Context, *, user_colour_name: str) -> None:
         """Command to create an embed from a name input."""
         hex_colour = self.match_colour_name(user_colour_name)
         hex_tuple = ImageColor.getrgb(hex_colour)
