@@ -87,7 +87,7 @@ class Colour(commands.Cog):
     @colour.command()
     async def rgb(self, ctx: commands.Context, red: int, green: int, blue: int) -> None:
         """Command to create an embed from an RGB input."""
-        if any(c not in range(0, 256) for c in (red, green, blue)):
+        if any(c not in range(256) for c in (red, green, blue)):
             raise commands.BadArgument(
                 message=f"RGB values can only be from 0 to 255. User input was: `{red, green, blue}`."
             )
@@ -97,7 +97,7 @@ class Colour(commands.Cog):
     @colour.command()
     async def hsv(self, ctx: commands.Context, hue: int, saturation: int, value: int) -> None:
         """Command to create an embed from an HSV input."""
-        if (hue not in range(0, 361)) or any(c not in range(0, 101) for c in (saturation, value)):
+        if (hue not in range(361)) or any(c not in range(101) for c in (saturation, value)):
             raise commands.BadArgument(
                 message="Hue can only be from 0 to 360. Saturation and Value can only be from 0 to 100. "
                 f"User input was: `{hue, saturation, value}`."
@@ -108,7 +108,7 @@ class Colour(commands.Cog):
     @colour.command()
     async def hsl(self, ctx: commands.Context, hue: int, saturation: int, lightness: int) -> None:
         """Command to create an embed from an HSL input."""
-        if (hue not in range(0, 361)) or any(c not in range(0, 101) for c in (saturation, lightness)):
+        if (hue not in range(361)) or any(c not in range(101) for c in (saturation, lightness)):
             raise commands.BadArgument(
                 message="Hue can only be from 0 to 360. Saturation and Lightness can only be from 0 to 100. "
                 f"User input was: `{hue, saturation, lightness}`."
@@ -119,7 +119,7 @@ class Colour(commands.Cog):
     @colour.command()
     async def cmyk(self, ctx: commands.Context, cyan: int, magenta: int, yellow: int, key: int) -> None:
         """Command to create an embed from a CMYK input."""
-        if any(c not in range(0, 101) for c in (cyan, magenta, yellow, key)):
+        if any(c not in range(101) for c in (cyan, magenta, yellow, key)):
             raise commands.BadArgument(
                 message=f"CMYK values can only be from 0 to 100. User input was: `{cyan, magenta, yellow, key}`."
             )
@@ -204,7 +204,7 @@ class Colour(commands.Cog):
     @staticmethod
     def _rgb_to_hex(rgb: tuple[int, int, int]) -> str:
         """Convert RGB values to HEX code."""
-        hex_ = ''.join([hex(val)[2:].zfill(2) for val in rgb])
+        hex_ = "".join([hex(val)[2:].zfill(2) for val in rgb])
         hex_code = f"#{hex_}".upper()
         return hex_code
 
