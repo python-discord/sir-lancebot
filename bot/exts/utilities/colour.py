@@ -130,7 +130,13 @@ class Colour(commands.Cog):
         """Command to create an embed from a HEX input."""
         if "#" not in hex_code:
             hex_code = f"#{hex_code}"
+        if len(hex_code) not in (4, 5, 7, 9) or any(_ not in string.hexdigits+"#" for _ in hex_code):
+            raise commands.BadArgument(
+                message=f"HEX values must be hexadecimal and take the form *#RRGGBB* or *#RGB*. User input was: `{hex_code}`.")
+
         hex_tuple = ImageColor.getrgb(hex_code)
+        if len(hex_tuple) == 4:
+            hex_tuple = hex_tuple[:-1]  # color must be RGB. If RGBA, we remove the alpha value
         await self.send_colour_response(ctx, hex_tuple)
 
     @colour.command()
