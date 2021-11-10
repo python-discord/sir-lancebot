@@ -144,11 +144,11 @@ class Colour(commands.Cog):
         if len(hex_code) not in (4, 5, 7, 9) or any(_ not in string.hexdigits for _ in hex_code[1:]):
             hex_error_embed = discord.Embed(
                 title="The input hex code is not valid.",
-                message=f"Cannot convert `{hex_code}` to a recognizable Hex format. "
+                description=f"Cannot convert `{hex_code}` to a recognizable Hex format. "
                 "Hex values must be hexadecimal and take the form *#RRGGBB* or *#RGB*.",
                 colour=discord.Colour.dark_red()
             )
-            await ctx.send(hex_error_embed)
+            await ctx.send(embed=hex_error_embed)
 
         hex_tuple = ImageColor.getrgb(hex_code)
         if len(hex_tuple) == 4:
@@ -247,7 +247,7 @@ class Colour(commands.Cog):
                 description=f"No color found for: `{input_colour_name}`",
                 colour=discord.Color.dark_red()
             )
-            await ctx.send(name_error_embed)
+            await ctx.send(embed=name_error_embed)
         return f"#{self.colour_mapping[match]}"
 
 
