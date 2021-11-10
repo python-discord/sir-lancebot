@@ -228,10 +228,9 @@ class Colour(commands.Cog):
                 choices=self.colour_mapping.keys(),
                 score_cutoff=80
             )
-            hex_match = f"#{self.colour_mapping[match]}"
         except (ValueError, TypeError):
             raise commands.BadArgument(message=f"No color found for: `{input_colour_name}`")
-        return hex_match
+        return f"#{self.colour_mapping[match]}"
 
 
 def setup(bot: Bot) -> None:
