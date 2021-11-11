@@ -159,7 +159,15 @@ class Colour(commands.Cog):
     @colour.command()
     async def name(self, ctx: commands.Context, *, user_colour_name: str) -> None:
         """Create an embed from a name input."""
-        hex_colour = await self.match_colour_name(ctx, user_colour_name)
+        hex_colour = self.match_colour_name(ctx, user_colour_name)
+        if hex_colour is None:
+            name_error_embed = discord.Embed(
+                title="No colour match found.",
+                description=f"No color found for: `{user_colour_name}`",
+                colour=discord.Color.dark_red()
+            )
+            await ctx.send(embed=name_error_embed)
+            return
         hex_tuple = ImageColor.getrgb(hex_colour)
         await self.send_colour_response(ctx, hex_tuple)
 
@@ -234,7 +242,7 @@ class Colour(commands.Cog):
             colour_name = None
         return colour_name
 
-    async def match_colour_name(self, ctx: commands.Context, input_colour_name: str) -> Union[str, None]:
+    def match_colour_name(self, ctx: commands.Context, input_colour_name: str) -> Union[str, None]:
         """Convert a colour name to HEX code."""
         try:
             match, certainty, _ = rapidfuzz.process.extractOne(
@@ -243,12 +251,7 @@ class Colour(commands.Cog):
                 score_cutoff=80
             )
         except (ValueError, TypeError):
-            name_error_embed = discord.Embed(
-                title="No colour match found.",
-                description=f"No color found for: `{input_colour_name}`",
-                colour=discord.Color.dark_red()
-            )
-            await ctx.send(embed=name_error_embed)
+            return None
         return f"#{self.colour_mapping[match]}"
 
 
