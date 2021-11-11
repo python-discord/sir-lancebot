@@ -79,7 +79,7 @@ class Colour(commands.Cog):
     async def colour(self, ctx: commands.Context, *, color_input: Optional[str] = None) -> None:
         """User initiated command to create an embed that displays colour information."""
         if color_input is None:
-            await self.random()
+            await self.random(ctx)
             return
 
         if ctx.invoked_subcommand:
@@ -93,7 +93,7 @@ class Colour(commands.Cog):
 
     @colour.command()
     async def rgb(self, ctx: commands.Context, red: int, green: int, blue: int) -> None:
-        """Command to create an embed from an RGB input."""
+        """Create an embed from an RGB input."""
         if any(c not in range(256) for c in (red, green, blue)):
             raise commands.BadArgument(
                 message=f"RGB values can only be from 0 to 255. User input was: `{red, green, blue}`."
@@ -103,7 +103,7 @@ class Colour(commands.Cog):
 
     @colour.command()
     async def hsv(self, ctx: commands.Context, hue: int, saturation: int, value: int) -> None:
-        """Command to create an embed from an HSV input."""
+        """Create an embed from an HSV input."""
         if (hue not in range(361)) or any(c not in range(101) for c in (saturation, value)):
             raise commands.BadArgument(
                 message="Hue can only be from 0 to 360. Saturation and Value can only be from 0 to 100. "
@@ -114,7 +114,7 @@ class Colour(commands.Cog):
 
     @colour.command()
     async def hsl(self, ctx: commands.Context, hue: int, saturation: int, lightness: int) -> None:
-        """Command to create an embed from an HSL input."""
+        """Create an embed from an HSL input."""
         if (hue not in range(361)) or any(c not in range(101) for c in (saturation, lightness)):
             raise commands.BadArgument(
                 message="Hue can only be from 0 to 360. Saturation and Lightness can only be from 0 to 100. "
@@ -125,7 +125,7 @@ class Colour(commands.Cog):
 
     @colour.command()
     async def cmyk(self, ctx: commands.Context, cyan: int, magenta: int, yellow: int, key: int) -> None:
-        """Command to create an embed from a CMYK input."""
+        """Create an embed from a CMYK input."""
         if any(c not in range(101) for c in (cyan, magenta, yellow, key)):
             raise commands.BadArgument(
                 message=f"CMYK values can only be from 0 to 100. User input was: `{cyan, magenta, yellow, key}`."
@@ -137,18 +137,15 @@ class Colour(commands.Cog):
 
     @colour.command()
     async def hex(self, ctx: commands.Context, hex_code: str) -> None:
-        """Command to create an embed from a HEX input."""
+        """Create an embed from a HEX input."""
         if hex_code[0] != "#":
             hex_code = f"#{hex_code}"
 
-        if len(hex_code) not in (4, 5, 7, 9) or any(_ not in string.hexdigits for _ in hex_code[1:]):
-            hex_error_embed = discord.Embed(
-                title="The input hex code is not valid.",
-                description=f"Cannot convert `{hex_code}` to a recognizable Hex format. "
-                "Hex values must be hexadecimal and take the form *#RRGGBB* or *#RGB*.",
-                colour=discord.Colour.dark_red()
+        if len(hex_code) not in (4, 5, 7, 9) or any(digit not in string.hexdigits for digit in hex_code[1:]):
+            raise commands.BadArgument(
+                message=f"Cannot convert `{hex_code}` to a recognizable Hex format. "
+                "Hex values must be hexadecimal and take the form *#RRGGBB* or *#RGB*."
             )
-            await ctx.send(embed=hex_error_embed)
 
         hex_tuple = ImageColor.getrgb(hex_code)
         if len(hex_tuple) == 4:
@@ -157,14 +154,14 @@ class Colour(commands.Cog):
 
     @colour.command()
     async def name(self, ctx: commands.Context, *, user_colour_name: str) -> None:
-        """Command to create an embed from a name input."""
+        """Create an embed from a name input."""
         hex_colour = await self.match_colour_name(ctx, user_colour_name)
         hex_tuple = ImageColor.getrgb(hex_colour)
         await self.send_colour_response(ctx, hex_tuple)
 
     @colour.command()
     async def random(self, ctx: commands.Context) -> None:
-        """Command to create an embed from a randomly chosen colour from the reference file."""
+        """Create an embed from a randomly chosen colour from the reference file."""
         hex_colour = random.choice(list(self.colour_mapping.values()))
         hex_tuple = ImageColor.getrgb(f"#{hex_colour}")
         await self.send_colour_response(ctx, hex_tuple)
