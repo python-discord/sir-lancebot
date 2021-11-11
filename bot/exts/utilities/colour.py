@@ -43,7 +43,7 @@ class Colour(commands.Cog):
         elif colour_mode == "name":
             input_colour = ctx.kwargs["user_colour_name"]
         elif colour_mode == "hex":
-            input_colour = ctx.args[2:][0]
+            input_colour = ctx.args[2:][0][0:-2]
         else:
             input_colour = tuple(ctx.args[2:])
 
@@ -80,7 +80,7 @@ class Colour(commands.Cog):
         """
         Create an embed that displays colour information.
 
-        If no subcommand is called, a randomly selected colour will be shown.
+        If no subcommand is called, a randomly selected colour will be selected and shown.
         """
         if color_input is None:
             await self.random(ctx)
