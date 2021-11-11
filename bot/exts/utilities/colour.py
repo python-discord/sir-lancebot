@@ -80,7 +80,7 @@ class Colour(commands.Cog):
         """
         Create an embed that displays colour information.
 
-        If no subcommand is called, a randomly selected colour will be selected and shown.
+        If no subcommand is called, a randomly selected colour will be shown.
         """
         if color_input is None:
             await self.random(ctx)
