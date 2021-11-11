@@ -77,7 +77,11 @@ class Colour(commands.Cog):
 
     @commands.group(aliases=("color",), invoke_without_command=True)
     async def colour(self, ctx: commands.Context, *, color_input: Optional[str] = None) -> None:
-        """User initiated command to create an embed that displays colour information."""
+        """
+        Create an embed that displays colour information.
+
+        If no subcommand is called, a randomly selected colour will be selected and shown.
+        """
         if color_input is None:
             await self.random(ctx)
             return
