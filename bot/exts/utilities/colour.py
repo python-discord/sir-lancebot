@@ -153,7 +153,7 @@ class Colour(commands.Cog):
 
         hex_tuple = ImageColor.getrgb(hex_code)
         if len(hex_tuple) == 4:
-            hex_tuple = hex_tuple[:-1]  # color must be RGB. If RGBA, we remove the alpha value
+            hex_tuple = hex_tuple[:-1]  # Colour must be RGB. If RGBA, we remove the alpha value
         await self.send_colour_response(ctx, hex_tuple)
 
     @colour.command()
