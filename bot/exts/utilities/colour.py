@@ -245,7 +245,7 @@ class Colour(commands.Cog):
         except (ValueError, TypeError):
             name_error_embed = discord.Embed(
                 title="No colour match found.",
-                description=f"No color found for: `{input_colour_name}`",
+                description=f"No colour found for: `{input_colour_name}`",
                 colour=discord.Color.dark_red()
             )
             await ctx.send(embed=name_error_embed)
