@@ -18,19 +18,22 @@ def setup() -> None:
 
     format_string = "%(asctime)s | %(name)s | %(levelname)s | %(message)s"
     log_format = logging.Formatter(format_string)
-
-    # Set up file logging
-    log_file = Path("logs/sir-lancebot.log")
-    log_file.parent.mkdir(exist_ok=True)
-
-    # File handler rotates logs every 5 MB
-    file_handler = logging.handlers.RotatingFileHandler(
-        log_file, maxBytes=5 * (2 ** 20), backupCount=10, encoding="utf-8",
-    )
-    file_handler.setFormatter(log_format)
-
     root_logger = logging.getLogger()
-    root_logger.addHandler(file_handler)
+
+    # Copied from constants file, which we can't import yet since loggers aren't instantiated
+    debug = os.environ.get("BOT_DEBUG", "true").lower() == "true"
+
+    if debug:
+        # Set up file logging
+        log_file = Path("logs/sir-lancebot.log")
+        log_file.parent.mkdir(exist_ok=True)
+
+        # File handler rotates logs every 5 MB
+        file_handler = logging.handlers.RotatingFileHandler(
+            log_file, maxBytes=5 * (2 ** 20), backupCount=10, encoding="utf-8",
+        )
+        file_handler.setFormatter(log_format)
+        root_logger.addHandler(file_handler)
 
     if "COLOREDLOGS_LEVEL_STYLES" not in os.environ:
         coloredlogs.DEFAULT_LEVEL_STYLES = {
