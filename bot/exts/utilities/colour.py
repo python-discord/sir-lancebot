@@ -244,7 +244,7 @@ class Colour(commands.Cog):
             colour_name = None
         return colour_name
 
-    def match_colour_name(self, ctx: commands.Context, input_colour_name: str) -> Union[str, None]:
+    def match_colour_name(self, ctx: commands.Context, input_colour_name: str) -> Optional[str]:
         """Convert a colour name to HEX code."""
         try:
             match, certainty, _ = rapidfuzz.process.extractOne(
