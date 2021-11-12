@@ -253,7 +253,7 @@ class Colour(commands.Cog):
                 score_cutoff=80
             )
         except (ValueError, TypeError):
-            return None
+            return
         return f"#{self.colour_mapping[match]}"
 
 
