@@ -43,7 +43,9 @@ class Colour(commands.Cog):
         elif colour_mode == "name":
             input_colour = ctx.kwargs["user_colour_name"]
         elif colour_mode == "hex":
-            input_colour = ctx.args[2:][0][0:-2]
+            input_colour = ctx.args[2:][0]
+            if len(input_colour) >= 7:
+                input_colour = input_colour[0:-2]
         else:
             input_colour = tuple(ctx.args[2:])
 
