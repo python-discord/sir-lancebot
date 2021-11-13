@@ -39,7 +39,7 @@ class Colour(commands.Cog):
             colour_mode = colour_or_color
             input_colour = name
         elif colour_mode in ("colour", "color"):
-            input_colour = name
+            input_colour = ctx.kwargs["colour_input"]
         elif colour_mode == "name":
             input_colour = ctx.kwargs["user_colour_name"]
         elif colour_mode == "hex":
