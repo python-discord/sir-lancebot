@@ -29,7 +29,6 @@ class Colour(commands.Cog):
     async def send_colour_response(self, ctx: commands.Context, rgb: tuple[int, int, int]) -> None:
         """Create and send embed from user given colour information."""
         name = self._rgb_to_name(rgb)
-
         try:
             colour_or_color = ctx.invoked_parents[0]
         except IndexError:
@@ -38,8 +37,9 @@ class Colour(commands.Cog):
         colour_mode = ctx.invoked_with
         if colour_mode == "random":
             colour_mode = colour_or_color
+            input_colour = name
         elif colour_mode in ("colour", "color"):
-            input_colour = rgb
+            input_colour = name
         elif colour_mode == "name":
             input_colour = ctx.kwargs["user_colour_name"]
         elif colour_mode == "hex":
@@ -55,8 +55,8 @@ class Colour(commands.Cog):
             colour_mode = colour_mode.title()
 
         colour_embed = discord.Embed(
-            title=colour_or_color.title(),
-            description=f"{colour_mode} information for `{name or input_colour}`.",
+            title=f"{name or input_colour}",
+            description=f"{colour_or_color.title()} information for {colour_mode} `{input_colour or name}`.",
             colour=discord.Color.from_rgb(*rgb)
         )
         colour_conversions = self.get_colour_conversions(rgb)
@@ -78,18 +78,18 @@ class Colour(commands.Cog):
         await ctx.send(file=thumbnail_file, embed=colour_embed)
 
     @commands.group(aliases=("color",), invoke_without_command=True)
-    async def colour(self, ctx: commands.Context, *, color_input: Optional[str] = None) -> None:
+    async def colour(self, ctx: commands.Context, *, colour_input: Optional[str] = None) -> None:
         """
         Create an embed that displays colour information.
 
         If no subcommand is called, a randomly selected colour will be shown.
         """
-        if color_input is None:
+        if colour_input is None:
             await self.random(ctx)
             return
 
         try:
-            extra_colour = ImageColor.getrgb(color_input)
+            extra_colour = ImageColor.getrgb(colour_input)
             await self.send_colour_response(ctx, extra_colour)
         except ValueError:
             await invoke_help_command(ctx)
@@ -162,7 +162,7 @@ class Colour(commands.Cog):
         if hex_colour is None:
             name_error_embed = discord.Embed(
                 title="No colour match found.",
-                description=f"No color found for: `{user_colour_name}`",
+                description=f"No colour found for: `{user_colour_name}`",
                 colour=discord.Color.dark_red()
             )
             await ctx.send(embed=name_error_embed)
@@ -172,7 +172,7 @@ class Colour(commands.Cog):
 
     @colour.command()
     async def random(self, ctx: commands.Context) -> None:
-        """Create an embed from a randomly chosen colour from the reference file."""
+        """Create an embed from a randomly chosen colour."""
         hex_colour = random.choice(list(self.colour_mapping.values()))
         hex_tuple = ImageColor.getrgb(f"#{hex_colour}")
         await self.send_colour_response(ctx, hex_tuple)
@@ -227,7 +227,7 @@ class Colour(commands.Cog):
         hex_code = f"#{hex_}".upper()
         return hex_code
 
-    def _rgb_to_name(self, rgb: tuple[int, int, int]) -> str:
+    def _rgb_to_name(self, rgb: tuple[int, int, int]) -> Optional[str]:
         """Convert RGB values to a fuzzy matched name."""
         input_hex_colour = self._rgb_to_hex(rgb)
         try:
