@@ -88,9 +88,6 @@ class Colour(commands.Cog):
             await self.random(ctx)
             return
 
-        if ctx.invoked_subcommand:
-            return
-
         try:
             extra_colour = ImageColor.getrgb(color_input)
             await self.send_colour_response(ctx, extra_colour)
