@@ -39,10 +39,10 @@
             "blanks": ["plural noun", "adverb", "verb", "article of clothing", "body part", "adjective", "noun", "plural noun", "another body part", "plural noun",
                         "another body part", "noun", "noun", "verb ending in 'ing'", "adjective", "adjective", "verb"],
             "value": ["It's simple. Turn the ", ". Make him/her want ", " to date you. Make sure you're always dressed to ", ". Each and every day, wear a/an ",
-                        " that you know shows off your ", " to ", " advantage and make your ", " look like a million ", ". Even if the two of you make meaningful ",
-                        " contact, don't admit it. No hugs or ", ". Just shake his/her ", " firmly. And remember, when he/she asks you out, even though a chill may run down your ",
-                        " and you can't stop your ", " from ", ", just play it ", ". Take a long pause before answering in a very ", " voice. \"I'll have to ",
-                        " it over.\""]
+                      " that you know shows off your ", " to ", " advantage and make your ", " look like a million ", ". Even if the two of you make meaningful ",
+                      " contact, don't admit it. No hugs or ", ". Just shake his/her ", " firmly. And remember, when he/she asks you out, even though a chill may run down your ",
+                      " and you can't stop your ", " from ", ", just play it ", ". Take a long pause before answering in a very ", " voice. \"I'll have to ",
+                      " it over.\""]
         },
         {
             "title": "The Fun Park",
@@ -59,8 +59,8 @@
             "blanks": ["adjective", "adjective", "number", "adjective", "animal", "noun", "animal", "name", "verb", "adjective", "adjective"],
             "value": ["Every summer, I get totally amped and ", " to go camping in the deep, ", " forests. It's good to get away from it all - but not too far, like getting lost! Last year, my friend and I went hiking and got lost for ",
                       " hour(s). We started off on a(n) ", " adventure, but we kept losing the trail. Night began to fall, and when we heard the howls of a ",
-                     ", we began to panic. It was getting darker and our flashlights were running on ", ". I'm sure glad my pet ", ", ", ", was with us. He is one gifted creature, because he was able to guide us back by ",
-                     " the ", " s'mores by the campfire. This year, before setting off on an ", " journey, I'll be sure to have working flashlights - and of course, my gifted pet!"]
+                      ", we began to panic. It was getting darker and our flashlights were running on ", ". I'm sure glad my pet ", ", ", ", was with us. He is one gifted creature, because he was able to guide us back by ",
+                      " the ", " s'mores by the campfire. This year, before setting off on an ", " journey, I'll be sure to have working flashlights - and of course, my gifted pet!"]
         },
         {
             "title": "Weird News",
@@ -92,7 +92,7 @@
         {
              "title": "A Scary Halloween Story",
              "blanks": ["adjective", "name", "adjective", "noun", "verb", "animal", "adjective", "name", "adjective", "noun", "noun"],
-             "value": ["They say my school is haunted; my ", " friend ", "says they saw a ", " ", " floating at the end of the hall near the cafeteria. Some say if you ",
+             "value": ["They say my school is haunted; my ", " friend ", " says they saw a ", " ", " floating at the end of the hall near the cafeteria. Some say if you ",
                        " down that hallway at night, you'll hear a ", " growling deeply. My ", " friend ", " saw a ", " ", " slithering under the tables once. I hope I never see any ",
                        " crawling; eating lunch there is scary enough!"]
         },
@@ -113,8 +113,8 @@
         },
         {
              "title": "Snowstorm!",
-             "blanks": ["noun", "adjective", "noun", "noun", "adjective", "adjective", "adjective", "noun", "noun", "adjective"],
-             "value": ["Weather plays an important part in our ", "s everyday. What is weather, you ask? Accoring to ", " scientists, who are known as meteorologists, weather is what the ",
+             "blanks": ["plural noun", "adjective", "noun", "noun", "adjective", "adjective", "adjective", "noun", "noun", "adjective"],
+             "value": ["Weather plays an important part in our ", " everyday. What is weather, you ask? According to ", " scientists, who are known as meteorologists, weather is what the ",
                        " is like at any given time of the ", ". It doesn't matter if the air is ", " or ", ", it's all weather. When vapors in ", " clouds condense, we have ",
                        " and snow. A lot of ", " means a ", " snowstorm!"]
         },

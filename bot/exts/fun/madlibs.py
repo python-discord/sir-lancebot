@@ -10,23 +10,19 @@ from discord.ext import commands
 from bot.bot import Bot
 from bot.constants import Colours
 
-# import json
-# from typing import Literal
-# from typing import List
-
 TIMEOUT = 60.0
 
 
 class MadlibsTemplate(TypedDict):
+    """Structure of a template in the madlibs JSON file."""
+
     title: str
     blanks: list[str]
     value: list[str]
 
 
 class Madlibs(commands.Cog):
-    """
-    Cog for the Madlibs game.
-    """
+    """Cog for the Madlibs game."""
 
     def __init__(self, bot: Bot):
         self.bot = bot
@@ -34,7 +30,7 @@ class Madlibs(commands.Cog):
 
     @staticmethod
     def _load_templates() -> list[MadlibsTemplate]:
-        madlibs_stories = Path("bot/resources/fun/madlibs_templates (1).json")
+        madlibs_stories = Path("bot/resources/fun/madlibs_templates.json")
 
         with open(madlibs_stories) as file:
             return json.load(file)["templates"]
@@ -61,25 +57,27 @@ class Madlibs(commands.Cog):
         self,
         ctx: commands.Context,
     ) -> None:
-        """Play Madlibs with the bot!
+        """
+        Play Madlibs with the bot!
 
         Madlibs is a game where the player is asked to enter a word that
-        fits a random part of speech (e.g. noun, adjective, verb, plural noun, etc.).
-        The bot chooses a random number of user inputs (within the specified bounds
-        of the command arguments) to use for the game and a random story.
+        fits a random part of speech (e.g. noun, adjective, verb, plural noun, etc.)
+        a random amount of times, depending on the story chosen by the bot at the beginning.
         """
         random_template = choice(self.templates)
 
-        def author_check(message: discord.Message):
+        def author_check(message: discord.Message) -> bool:
             return message.channel.id == ctx.channel.id and message.author.id == ctx.author.id
 
-        # Send the first necessary embed, because we do this outside of the
-        # loop we need to skip the first item in the actual loop.
-        madlibs_embed = self.madlibs_embed(random_template["blanks"][0], len(random_template["blanks"]))
-        original_message = await ctx.send(embed=madlibs_embed)
+        original_message = await ctx.send("Loading your Madlibs game...")
 
-        for i, part_of_speech in enumerate(random_template["blanks"][1:], start=1):
+        submitted_words = []
+
+        for i, part_of_speech in enumerate(random_template["blanks"]):
             inputs_left = len(random_template["blanks"]) - i
+
+            madlibs_embed = self.madlibs_embed(part_of_speech, inputs_left)
+            await original_message.edit(embed=madlibs_embed)
 
             try:
                 message = await self.bot.wait_for(event="message", check=author_check, timeout=TIMEOUT)
@@ -94,26 +92,21 @@ class Madlibs(commands.Cog):
                 return
 
             word = message.content
-            submitted_words = []
-            submitted_words += word
+            submitted_words.append(" " + f"__{word}__")
 
-            # str_template = ' '.join(random_template["value"])
-            # for word, blank in zip(submitted_words, random_template["value"]):
-            #     word_in_story = blank.replace("", word)
+        story = []
+        for value, blank in zip(random_template["value"], submitted_words):
+            story.append(f'{value}{blank}')
 
-            # random_template["value"] += submitted_words
-
-            madlibs_embed = self.madlibs_embed(part_of_speech, inputs_left)
-            await original_message.edit(embed=madlibs_embed)
-
-        str_template = " ".join(random_template["value"])
-        str_template_with_words = str_template.join(submitted_words)
+        story.append(random_template["value"][-1])
 
         story_embed = discord.Embed(
             title=random_template["title"],
-            description=str_template_with_words,
+            description="".join(story),
             color=Colours.bright_green,
         )
+
+        story_embed.set_footer(text=f"Generated for {ctx.author}", icon_url=ctx.author.display_avatar.url)
 
         await ctx.send(embed=story_embed)
 
