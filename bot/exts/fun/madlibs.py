@@ -90,7 +90,7 @@ class Madlibs(commands.Cog):
 
         story = []
         for value, blank in zip(random_template["value"], submitted_words):
-            story.append(f'{value}{blank}')
+            story.append(f"{value}{blank}")
 
         story.append(random_template["value"][-1])
 
