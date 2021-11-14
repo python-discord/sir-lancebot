@@ -33,7 +33,7 @@ class Madlibs(commands.Cog):
         madlibs_stories = Path("bot/resources/fun/madlibs_templates.json")
 
         with open(madlibs_stories) as file:
-            return json.load(file)["templates"]
+            return json.load(file)
 
     @staticmethod
     def madlibs_embed(part_of_speech: str, number_of_inputs: int) -> discord.Embed:

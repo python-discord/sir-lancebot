@@ -1,5 +1,4 @@
-{
-    "templates": [
+[
         {
             "title": "How To Cross a Piranha-Infested River",
             "blanks": ["foreign country", "adverb", "adjective", "animal",
@@ -129,9 +128,8 @@
              "title": "Star Wars",
              "blanks": ["adjective", "noun", "adjective", "noun; place", "adjective", "adjective", "adjective", "adjective", "plural noun", "adjective", "plural noun", "plural noun", "adjective",
                         "noun", "verb", "adjective", "verb", "plural noun; type of job", "adjective", "verb", "adjective"],
-             "value": ["Star Wars is a ", " ", " of ", " versus evil in a ", " far far away. There are ", " battles between ", "ships in ", " space and ", " duels with ", " called ",
+             "value": ["Star Wars is a ", " ", " of ", " versus evil in a ", " far far away. There are ", " battles between ", " ships in ", " space and ", " duels with ", " called ",
                        " sabers. ", " called \"droids\" are helpers and ", " to the heroes. A ", " power called The ", " ", "s people to do ", " things, like ", " ", " use The Force for the ",
                        " side and the Sith ", " it for the ", " side."]
         }
-    ]
-}
+]
