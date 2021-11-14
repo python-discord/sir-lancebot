@@ -53,10 +53,7 @@ class Madlibs(commands.Cog):
         return madlibs_embed
 
     @commands.command()
-    async def madlibs(
-        self,
-        ctx: commands.Context,
-    ) -> None:
+    async def madlibs(self, ctx: commands.Context) -> None:
         """
         Play Madlibs with the bot!
 
