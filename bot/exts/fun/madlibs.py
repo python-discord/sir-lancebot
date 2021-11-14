@@ -86,7 +86,7 @@ class Madlibs(commands.Cog):
                 return
 
             word = message.content
-            submitted_words.append(" " + f"__{word}__")
+            submitted_words.append(f" __{word}__")
 
         story = []
         for value, blank in zip(random_template["value"], submitted_words):
