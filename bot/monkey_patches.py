@@ -7,17 +7,6 @@ from discord.ext import commands
 log = logging.getLogger(__name__)
 
 
-def trace_log(self: logging.Logger, msg: str, *args, **kwargs) -> None:
-    """
-    Log 'msg % args' with severity 'TRACE'.
-
-    To pass exception information, use the keyword argument exc_info with a true value, e.g.
-    logger.trace("Houston, we have an %s", "interesting problem", exc_info=1)
-    """
-    if self.isEnabledFor(logging.TRACE):
-        self._log(logging.TRACE, msg, args, **kwargs)
-
-
 class Command(commands.Command):
     """
     A `discord.ext.commands.Command` subclass which supports root aliases.
