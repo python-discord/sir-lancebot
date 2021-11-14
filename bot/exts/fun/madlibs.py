@@ -38,10 +38,7 @@ class Madlibs(commands.Cog):
     @staticmethod
     def madlibs_embed(part_of_speech: str, number_of_inputs: int) -> discord.Embed:
         """Method to have the bot send an embed with the game information."""
-        madlibs_embed = discord.Embed(
-            title="Madlibs",
-            color=Colours.python_blue,
-        )
+        madlibs_embed = discord.Embed(title="Madlibs", color=Colours.python_blue)
 
         madlibs_embed.add_field(
             name="Enter a word that fits the given part of speech!",
