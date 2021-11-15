@@ -123,11 +123,11 @@ class Leaderboard(commands.Cog):
 
         lines = []
         for index, (member_id, score) in enumerate(top_ten, start=1):
-            mention = f"<@{member_id}>"
-            rank = self.ordinal_number(index)
+            rank = self.get_rank(index)
             buffer = 4 if index >= 4 else len(rank)+1
-            formatted_rank = format(rank, f"\u2800<{buffer}")
-            lines.append(f"{formatted_rank}{score:\u2800<4}— {mention}")
+            formatted_rank = format(rank, f"\N{BRAILLE PATTERN BLANK}<{buffer}")
+            formatted_score = format(score, "\N{BRAILLE PATTERN BLANK}<4")
+            lines.append(f"{formatted_rank}{formatted_score}— <@{member_id}>")
 
         embed = discord.Embed(
             title="Top 10",
