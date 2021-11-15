@@ -11,6 +11,7 @@ services:
       dockerfile: Dockerfile
     container_name: sir-lancebot
     init: true
+    tty: true
 
     depends_on:
       - redis

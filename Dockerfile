@@ -25,6 +25,3 @@ COPY . .
 
 # Start the bot
 CMD ["python", "-m", "bot"]
-
-# Define docker persistent volumes
-VOLUME /bot/bot/log /bot/data

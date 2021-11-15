@@ -19,6 +19,8 @@ PyYAML = "~=5.4"
 async-rediscache = {extras = ["fakeredis"], version = "~=0.1.4"}
 emojis = "~=0.6.0"
 matplotlib = "~=3.4.1"
+coloredlogs = "~=15.0"
+colorama = { version = "~=0.4.3", markers = "sys_platform == 'win32'" }
 lxml = "~=4.4"
 
 [tool.poetry.dev-dependencies]

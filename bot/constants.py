@@ -134,11 +134,11 @@ class Client(NamedTuple):
     guild = int(environ.get("BOT_GUILD", 267624335836053506))
     prefix = environ.get("PREFIX", ".")
     token = environ.get("BOT_TOKEN")
-    sentry_dsn = environ.get("BOT_SENTRY_DSN")
     debug = environ.get("BOT_DEBUG", "true").lower() == "true"
     github_bot_repo = "https://github.com/python-discord/sir-lancebot"
     # Override seasonal locks: 1 (January) to 12 (December)
     month_override = int(environ["MONTH_OVERRIDE"]) if "MONTH_OVERRIDE" in environ else None
+    trace_loggers = environ.get("BOT_TRACE_LOGGERS")
 
 
 class Colours:
@@ -346,8 +346,6 @@ WHITELISTED_CHANNELS = (
     Channels.voice_chat_0,
     Channels.voice_chat_1,
 )
-
-GIT_SHA = environ.get("GIT_SHA", "foobar")
 
 # Bot replies
 ERROR_REPLIES = [
