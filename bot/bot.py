@@ -77,10 +77,17 @@ class Bot(commands.Bot):
         Increment points for a user in the leaderboard for game `cog` by `points`.
 
         If max points for today are hit for that particular game cog, then set today's points to the max
-        points and add the difference of the(before today points and max possible points for a day to the
-        overall points for the user.
+        points and add the difference of today's points and maximum daily possible points to the overall
+        points for the user.
         """
-        _leaderboard_cache, _per_day_leaderboard = self.games_leaderboard.get(cog.qualified_name)
+        try:
+            _leaderboard_cache, _per_day_leaderboard = self.games_leaderboard[cog.qualified_name]
+        except KeyError:
+            log.error(
+                f"No leaderboards found for cog {cog.qualified_name}. Make sure to run `ensure_leaderboard` "
+                f"before using this utility function."
+            )
+            return
 
         current_points = await _leaderboard_cache.get(user.id) or 0
         current_points_today = await _per_day_leaderboard.get(user.id) or 0
