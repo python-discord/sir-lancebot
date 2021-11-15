@@ -1,6 +1,7 @@
+import itertools
 import logging
 import math
-from collections import Counter
+from collections import OrderedDict
 
 import discord
 from async_rediscache import RedisCache
@@ -108,16 +109,23 @@ class Leaderboard(commands.Cog):
     ) -> discord.Embed:
         """Make a discord embed for the current top 10 members in the cached leaderboard."""
         if len(cached_leaderboard) == 1:
-            game_leaderboard = await cached_leaderboard[0].to_dict()
-            leaderboard = Counter(game_leaderboard)
+            unsorted_lb = await cached_leaderboard[0].to_dict()
         else:
-            leaderboard = Counter()
+            unsorted_lb = {}
             for lb in cached_leaderboard:
-                leaderboard += Counter(await lb.to_dict())
+                async for member, points in lb.to_dict():
+                    exists = unsorted_lb.get(member)
 
-        top_ten = leaderboard.most_common(10)
+                    if exists:
+                        unsorted_lb[member] += points
+                    else:
+                        unsorted_lb[member] = points
+
+        sorted_lb = OrderedDict(sorted(unsorted_lb.items(), key=lambda kv: kv[1], reverse=True))
+        top_ten = itertools.islice(sorted_lb.items(), 0, 10)
+
         try:
-            author_rank = list(leaderboard.keys()).index(author.id) + 1
+            author_rank = list(sorted_lb).index(author.id) + 1
         except ValueError:
             author_rank = 0
 
@@ -136,8 +144,8 @@ class Leaderboard(commands.Cog):
         )
         embed.set_footer(
             text=(
-                f"Page 1/{math.ceil(len(leaderboard) / 10)}  |"
-                f"  Your rank: {author_rank}/{len(leaderboard)}"
+                f"Page 1/{math.ceil(len(sorted_lb) / 10)}  |"
+                f"  Your rank: {author_rank}/{len(sorted_lb)}"
             )
         )
         embed.set_thumbnail(url=DUCKY_COINS_THUMBNAIL)
@@ -147,9 +155,6 @@ class Leaderboard(commands.Cog):
     @commands.group(aliases=("lb",), invoke_without_command=True)
     async def leaderboard(self, ctx: commands.Context, game: ParentCogConvertor = None) -> None:
         """Get overall leaderboard if not game specified, else leaderboard for that game."""
-        if ctx.invoked_subcommand:
-            return
-
         if game:
             leaderboards = self.bot.games_leaderboard.get(game)
             if not leaderboards:
