@@ -94,13 +94,18 @@ class TriviaNight(commands.Cog):
     async def reset(self, ctx: commands.Context) -> None:
         """Resets previous questions and scoreboards."""
         self.scoreboard.view = ScoreboardView(self.bot)
-        for question in self.questions.questions:
+        all_questions = self.questions.questions
+        self.questions.view = QuestionView()
+
+        for question in all_questions:
             if "visited" in question.keys():
                 del question["visited"]
 
+        self.questions.questions = list(all_questions)
+
         success_embed = Embed(
             title=choice(POSITIVE_REPLIES),
-            description="The scoreboards were reset and questions marked unvisited!",
+            description="The scoreboards were reset and questions reset!",
             color=Colours.soft_green
         )
         await ctx.send(embed=success_embed)

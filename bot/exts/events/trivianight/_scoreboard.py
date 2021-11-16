@@ -113,12 +113,12 @@ class Scoreboard:
     def __setitem__(self, key: str, value: int):
         if value.get("points") and key.user_id not in self.view.points.keys():
             self.view.points[key.user_id] = value["points"]
-        else:
+        elif value.get("points"):
             self.view.points[key.user_id] += self.view.points[key.user_id]
 
         if value.get("speed") and key.user_id not in self.view.speed.keys():
             self.view.speed[key.user_id] = [1, value["speed"]]
-        else:
+        elif value.get("speed"):
             self.view.speed[key.user_id] = [
                 self.view.speed[key.user_id][0] + 1, self.view.speed[key.user_id][1] + value["speed"]
             ]
