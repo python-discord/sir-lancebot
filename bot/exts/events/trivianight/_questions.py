@@ -92,20 +92,22 @@ class QuestionView(View):
         super().__init__()
         self.current_question: CurrentQuestion
         self.users_picked = {}
-        self.buttons = [QuestionButton(label, self.users_picked, self) for label in ("A", "B", "C", "D")]
-        for button in self.buttons:
-            self.add_item(button)
 
         self.active_question = False
 
     def create_current_question(self) -> Union[Embed, None]:
         """Helper function to create the embed for the current question."""
+        self.current_labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:len(self.current_question["answers"])]
         question_embed = Embed(
             title=f"Question {self.current_question['number']}",
             description=self.current_question["description"],
             color=Colours.python_yellow
         )
-        for label, answer in zip("ABCD", self.current_question["answers"]):
+        self.buttons = [QuestionButton(label, self.users_picked, self) for label in self.current_labels]
+        for button in self.buttons:
+            self.add_item(button)
+
+        for label, answer in zip(self.current_labels, self.current_question["answers"]):
             question_embed.add_field(name=f"Answer {label}", value=answer, inline=False)
 
         question_embed.set_footer(text="0 people have answered")
@@ -121,7 +123,7 @@ class QuestionView(View):
 
     def end_question(self) -> tuple[dict, Embed]:
         """Returns the dictionaries from the corresponding buttons for those who got it correct."""
-        labels = ("A", "B", "C", "D")
+        labels = self.current_labels
         label = labels[self.current_question["answers"].index(self.current_question["correct"])]
         return_dict = {name: (*info, info[0] == label) for name, info in self.users_picked.items()}
         all_players = list(self.users_picked.items())
@@ -137,7 +139,7 @@ class QuestionView(View):
                 answer_choice: len(
                     tuple(filter(lambda x: x[0] == answer_choice, self.users_picked.values()))
                 ) / len(all_players)
-                for answer_choice in "ABCD"
+                for answer_choice in labels
             }
 
             answers_chosen = dict(sorted(answers_chosen.items(), key=lambda item: item[1], reverse=True))
