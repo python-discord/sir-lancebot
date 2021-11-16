@@ -128,10 +128,14 @@ class QuestionView(View):
         return_dict = {name: (*info, info[0] == label) for name, info in self.users_picked.items()}
         all_players = list(self.users_picked.items())
 
+        # Maps the % of people who got it right to a color, from a range of red to green
+        percentage_to_color = {
+            range(0, 26): 0xFC94A1, range(26, 51): 0xFFCCCB, range(51, 76): 0xCDFFCC, range(76, 101): 0xB0F5AB
+        }
+
         answer_embed = Embed(
             title=f"The correct answer for Question {self.current_question['number']} was..",
-            description=self.current_question["correct"],
-            color=Colours.soft_green
+            description=self.current_question["correct"]
         )
 
         if len(all_players) != 0:
@@ -144,7 +148,12 @@ class QuestionView(View):
 
             answers_chosen = dict(sorted(answers_chosen.items(), key=lambda item: item[1], reverse=True))
 
-            for answer, percent in answers_chosen.items():
+            for idx, (answer, percent) in enumerate(answers_chosen.items()):
+                # Setting the color of answer_embed to the % of people that got it correct via the mapping
+                if idx == 0:
+                    all_ranges = [range(0, 26), range(26, 51), range(51, 76), range(76, 101)]
+                    answer_embed.color = percentage_to_color[all_ranges[round(percent * 100) // 25 - 1]]
+
                 # The `ord` function is used here to change the letter to its corresponding position
                 answer_embed.add_field(
                     name=f"{percent * 100:.1f}% of players chose",
