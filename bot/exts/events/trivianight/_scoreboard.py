@@ -1,5 +1,4 @@
 from random import choice
-from typing import Union
 
 import discord.ui
 from discord import ButtonStyle, Embed, Interaction, Member
@@ -7,6 +6,8 @@ from discord.ui import Button, View
 
 from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES
+
+from . import UserScore
 
 
 class ScoreboardView(View):
@@ -110,7 +111,7 @@ class ScoreboardView(View):
 class Scoreboard:
     """Class for the scoreboard for the Trivia Night event."""
 
-    def __setitem__(self, key: str, value: int):
+    def __setitem__(self, key: UserScore, value: dict):
         if value.get("points") and key.user_id not in self.view.points.keys():
             self.view.points[key.user_id] = value["points"]
         elif value.get("points"):
@@ -123,6 +124,6 @@ class Scoreboard:
                 self.view.speed[key.user_id][0] + 1, self.view.speed[key.user_id][1] + value["speed"]
             ]
 
-    async def display(self) -> Union[Embed, View]:
+    async def display(self) -> tuple[Embed, View]:
         """Returns the embed of the main leaderboard along with the ScoreboardView."""
         return await self.view.create_main_leaderboard(), self.view

@@ -1,4 +1,3 @@
-import logging
 from random import choice, randrange
 from time import perf_counter
 from typing import Optional, TypedDict, Union
@@ -9,18 +8,8 @@ from discord.ui import Button, View
 
 from bot.constants import Colours, NEGATIVE_REPLIES
 
+from . import UserScore
 from ._scoreboard import Scoreboard
-
-logger = logging.getLogger(__name__)
-
-
-class UserScore:
-    """Marker class for passing into the scoreboard to add points/record speed."""
-
-    __slots__ = ("user_id",)
-
-    def __init__(self, user_id: int):
-        self.user_id = user_id
 
 
 class CurrentQuestion(TypedDict):
@@ -100,7 +89,7 @@ class QuestionView(View):
         self.current_labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:len(self.current_question["answers"])]
         question_embed = Embed(
             title=f"Question {self.current_question['number']}",
-            description=self.current_question["description"],
+            description=self.current_question["obfuscated_description"],
             color=Colours.python_yellow
         )
         self.buttons = [QuestionButton(label, self.users_picked, self) for label in self.current_labels]
@@ -128,11 +117,6 @@ class QuestionView(View):
         return_dict = {name: (*info, info[0] == label) for name, info in self.users_picked.items()}
         all_players = list(self.users_picked.items())
 
-        # Maps the % of people who got it right to a color, from a range of red to green
-        percentage_to_color = {
-            range(0, 26): 0xFC94A1, range(26, 51): 0xFFCCCB, range(51, 76): 0xCDFFCC, range(76, 101): 0xB0F5AB
-        }
-
         answer_embed = Embed(
             title=f"The correct answer for Question {self.current_question['number']} was..",
             description=self.current_question["correct"]
@@ -146,13 +130,12 @@ class QuestionView(View):
                 for answer_choice in labels
             }
 
-            answers_chosen = dict(sorted(answers_chosen.items(), key=lambda item: item[1], reverse=True))
-
             for idx, (answer, percent) in enumerate(answers_chosen.items()):
                 # Setting the color of answer_embed to the % of people that got it correct via the mapping
                 if idx == 0:
-                    all_ranges = [range(0, 26), range(26, 51), range(51, 76), range(76, 101)]
-                    answer_embed.color = percentage_to_color[all_ranges[round(percent * 100) // 25 - 1]]
+                    # Maps the % of people who got it right to a color, from a range of red to green
+                    percentage_to_color = [0xFC94A1, 0xFFCCCB, 0xCDFFCC, 0xB0F5AB, 0xB0F5AB]
+                    answer_embed.color = percentage_to_color[round(percent * 100) // 25]
 
                 # The `ord` function is used here to change the letter to its corresponding position
                 answer_embed.add_field(
@@ -206,6 +189,8 @@ class Questions:
             question_number = number - 1
 
         self.questions[question_number]["visited"] = True
+
+        # The `self.view` refers to the QuestionView
         self.view.current_question = self.questions[question_number]
 
     def list_questions(self) -> Union[Embed, str]:
@@ -225,12 +210,12 @@ class Questions:
             )
         spaces = len(
             sorted(
-                self.questions, key=lambda question: len(question['description'].replace("\u200b", ""))
-            )[-1]["description"].replace("\u200b", "")
+                self.questions, key=lambda question: len(question['description'])
+            )[-1]["description"]
         ) + 3
         formatted_string = ""
         for question in self.questions:
-            question_description = question["description"].replace("\u200b", "")
+            question_description = question["description"]
             formatted_string += f"`Q{question['number']}: {question_description}" \
                                 f"{' ' * (spaces - len(question_description) + 2)}" \
                                 f"|` {':x:' if not question.get('visited') else ':white_check_mark:'}\n"
@@ -245,8 +230,7 @@ class Questions:
         """Terminates answering of the question and displays the correct answer."""
         scores, answer_embed, time_limit, total_points = self.view.end_question()
         for user, score in scores.items():
-            # Overhead with calculating scores leads to inflated times, subtracts 0.5 to give an accurate depiction
-            time_taken = score[2] - 0.5
+            time_taken = score[2]
             point_calculation = (1 - (time_taken / time_limit) / 2) * total_points
             if score[-1] is True:
                 self.scoreboard[UserScore(user)] = {"points": point_calculation, "speed": time_taken}

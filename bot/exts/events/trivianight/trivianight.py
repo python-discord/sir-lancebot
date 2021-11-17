@@ -51,7 +51,7 @@ class TriviaNight(commands.Cog):
         The JSON provided is formatted where it is a list of dictionaries, each dictionary containing the keys below:
         - number: int (represents the current question #)
         - description: str (represents the question itself)
-        - answers: list (represents the different answers possible, must be a length of 4)
+        - answers: list[str] (represents the different answers possible, must be a length of 4)
         - correct: str (represents the correct answer in terms of what the correct answer is in `answers`
         - time: Optional[int] (represents the timer for the question and how long it should run, default is 10)
         - points: Optional[int] (represents how many points are awarded for each question, default is 10)
@@ -79,7 +79,8 @@ class TriviaNight(commands.Cog):
             raise commands.BadArgument("Invalid JSON")
 
         for idx, question in enumerate(serialized_json):
-            serialized_json[idx] = {**question, **{"description": self.unicodeify(question["description"])}}
+            serialized_json[idx]["obfuscated_description"] = self.unicodeify(question["description"])
+
         self.questions.view = QuestionView()
         self.scoreboard.view = ScoreboardView(self.bot)
         self.questions.set_questions(serialized_json)
@@ -101,7 +102,7 @@ class TriviaNight(commands.Cog):
             if "visited" in question.keys():
                 del question["visited"]
 
-        self.questions.questions = list(all_questions)
+        self.questions.set_questions(list(all_questions))
 
         success_embed = Embed(
             title=choice(POSITIVE_REPLIES),
