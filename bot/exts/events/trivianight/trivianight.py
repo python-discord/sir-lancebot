@@ -7,13 +7,13 @@ from discord import Embed
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Colours, MODERATION_ROLES, NEGATIVE_REPLIES, POSITIVE_REPLIES
+from bot.constants import Colours, NEGATIVE_REPLIES, POSITIVE_REPLIES, Roles
 
 from ._questions import QuestionView, Questions
 from ._scoreboard import Scoreboard, ScoreboardView
 
 # The ID you see below is the Events Lead role ID
-TRIVIA_NIGHT_ROLES = MODERATION_ROLES + (778361735739998228,)
+TRIVIA_NIGHT_ROLES = (Roles.admin, 78361735739998228)
 
 
 class TriviaNight(commands.Cog):
