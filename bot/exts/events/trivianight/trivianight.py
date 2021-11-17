@@ -7,10 +7,13 @@ from discord import Embed
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Colours, NEGATIVE_REPLIES, POSITIVE_REPLIES
+from bot.constants import Colours, MODERATION_ROLES, NEGATIVE_REPLIES, POSITIVE_REPLIES
 
 from ._questions import QuestionView, Questions
 from ._scoreboard import Scoreboard, ScoreboardView
+
+# The ID you see below is the Events Lead role ID
+TRIVIA_NIGHT_ROLES = MODERATION_ROLES + (778361735739998228,)
 
 
 class TriviaNight(commands.Cog):
@@ -32,18 +35,18 @@ class TriviaNight(commands.Cog):
     @commands.group(aliases=["tn"], invoke_without_command=True)
     async def trivianight(self, ctx: commands.Context) -> None:
         """No-op subcommand group for organizing different commands."""
-        if ctx.invoked_subcommand is None:
-            cog_description = Embed(
-                title="What is .trivianight?",
-                description=(
-                    "This 'cog' is for the Python Discord's TriviaNight (date tentative)! Compete against other"
-                    "players in a trivia about Python!"
-                ),
-                color=Colours.soft_green
-            )
-            await ctx.send(embed=cog_description)
+        cog_description = Embed(
+            title="What is .trivianight?",
+            description=(
+                "This 'cog' is for the Python Discord's TriviaNight (date tentative)! Compete against other"
+                "players in a trivia about Python!"
+            ),
+            color=Colours.soft_green
+        )
+        await ctx.send(embed=cog_description)
 
     @trivianight.command()
+    @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
     async def load(self, ctx: commands.Context, *, to_load: Optional[str]) -> None:
         """
         Loads a JSON file from the provided attachment or argument.
@@ -63,6 +66,8 @@ class TriviaNight(commands.Cog):
         """
         if ctx.message.attachments:
             json_text = (await ctx.message.attachments[0].read()).decode("utf8")
+        elif not to_load:
+            raise commands.BadArgument("You didn't attach an attachment nor link a message!")
         elif to_load.startswith("https://discord.com/channels") or \
                 to_load.startswith("https://discordapp.com/channels"):
             channel_id, message_id = to_load.split("/")[-2:]
@@ -92,6 +97,7 @@ class TriviaNight(commands.Cog):
         await ctx.send(embed=success_embed)
 
     @trivianight.command()
+    @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
     async def reset(self, ctx: commands.Context) -> None:
         """Resets previous questions and scoreboards."""
         self.scoreboard.view = ScoreboardView(self.bot)
@@ -112,6 +118,7 @@ class TriviaNight(commands.Cog):
         await ctx.send(embed=success_embed)
 
     @trivianight.command()
+    @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
     async def next(self, ctx: commands.Context) -> None:
         """Gets a random question from the unanswered question list and lets user choose the answer."""
         if self.questions.view.active_question is True:
@@ -145,6 +152,7 @@ class TriviaNight(commands.Cog):
         await message.edit(embed=question_embed, view=None)
 
     @trivianight.command()
+    @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
     async def question(self, ctx: commands.Context, question_number: int) -> None:
         """Gets a question from the question bank depending on the question number provided."""
         question = self.questions.next_question(question_number)
@@ -169,6 +177,7 @@ class TriviaNight(commands.Cog):
         await message.edit(embed=question_embed, view=None)
 
     @trivianight.command()
+    @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
     async def list(self, ctx: commands.Context) -> None:
         """Displays all the questions from the question bank."""
         question_list = self.questions.list_questions()
@@ -178,6 +187,7 @@ class TriviaNight(commands.Cog):
         await ctx.send(question_list)
 
     @trivianight.command()
+    @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
     async def stop(self, ctx: commands.Context) -> None:
         """End the ongoing question to show the correct question."""
         if self.questions.view.active_question is False:
@@ -192,6 +202,7 @@ class TriviaNight(commands.Cog):
         self.questions.view.active_question = False
 
     @trivianight.command()
+    @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
     async def end(self, ctx: commands.Context) -> None:
         """Ends the trivia night event and displays the scoreboard."""
         scoreboard_embed, scoreboard_view = await self.scoreboard.display()
