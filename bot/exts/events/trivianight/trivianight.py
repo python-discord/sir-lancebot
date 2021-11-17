@@ -24,6 +24,17 @@ class TriviaNight(commands.Cog):
         self.scoreboard = Scoreboard()
         self.questions = Questions(self.scoreboard)
 
+    def setup_views(self, questions: dict) -> None:
+        """
+        Sets up the views for `self.questions` and `self.scoreboard` respectively.
+
+        Parameters:
+            - questions: The dictionary to set the questions for self.questions to use.
+        """
+        self.questions.view = QuestionView()
+        self.scoreboard.view = ScoreboardView(self.bot)
+        self.questions.set_questions(questions)
+
     @staticmethod
     def unicodeify(text: str) -> str:
         """Takes `text` and adds zero-width spaces to prevent copy and pasting the question."""
@@ -86,9 +97,8 @@ class TriviaNight(commands.Cog):
         for idx, question in enumerate(serialized_json):
             serialized_json[idx]["obfuscated_description"] = self.unicodeify(question["description"])
 
-        self.questions.view = QuestionView()
-        self.scoreboard.view = ScoreboardView(self.bot)
-        self.questions.set_questions(serialized_json)
+        self.setup_views(serialized_json)
+
         success_embed = Embed(
             title=choice(POSITIVE_REPLIES),
             description="The JSON was loaded successfully!",
@@ -100,15 +110,13 @@ class TriviaNight(commands.Cog):
     @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
     async def reset(self, ctx: commands.Context) -> None:
         """Resets previous questions and scoreboards."""
-        self.scoreboard.view = ScoreboardView(self.bot)
         all_questions = self.questions.questions
-        self.questions.view = QuestionView()
 
         for question in all_questions:
             if "visited" in question.keys():
                 del question["visited"]
 
-        self.questions.set_questions(list(all_questions))
+        self.setup_views(list(all_questions))
 
         success_embed = Embed(
             title=choice(POSITIVE_REPLIES),
