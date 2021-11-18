@@ -8,7 +8,7 @@ import discord
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Colours
+from bot.constants import Colours, NEGATIVE_REPLIES
 
 TIMEOUT = 60.0
 
@@ -80,7 +80,7 @@ class Madlibs(commands.Cog):
                 message = await self.bot.wait_for(event="message", check=author_check, timeout=TIMEOUT)
             except TimeoutError:
                 timeout_embed = discord.Embed(
-                    title="Timeout!",
+                    title=choice(NEGATIVE_REPLIES),
                     description="Uh oh! You took too long to respond! Please try again later.",
                     color=Colours.soft_red
                 )
