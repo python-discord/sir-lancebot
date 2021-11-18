@@ -1,5 +1,4 @@
 import json
-import time
 from asyncio import TimeoutError
 from pathlib import Path
 from random import choice
@@ -68,7 +67,6 @@ class Madlibs(commands.Cog):
             title="Madlibs", description="Loading your Madlibs game...", color=Colours.python_blue
         )
         original_message = await ctx.send(embed=loading_embed)
-        time.sleep(1)
 
         submitted_words = []
 
