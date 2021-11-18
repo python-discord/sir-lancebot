@@ -180,24 +180,18 @@ class AdventOfCode(commands.Cog):
 
     @in_month(Month.DECEMBER)
     @adventofcode_group.command(
-        name="leaderboard",
-        aliases=("board", "lb"),
-        brief="Get a snapshot of the PyDis private AoC leaderboard",
+        name="dayandstar",
+        aliases=("daynstar", "daystar"),
+        brief="Get a view that lets you filter the leaderboard by day and star",
     )
     @whitelist_override(channels=AOC_WHITELIST_RESTRICTED)
-    async def aoc_leaderboard(
+    async def aoc_day_and_star_leaderboard(
             self,
             ctx: commands.Context,
-            day_and_star: Optional[bool] = False,
-            maximum_scorers: Optional[int] = 10
+            maximum_scorers_day_and_star: Optional[int] = 10
     ) -> None:
-        """
-        Get the current top scorers of the Python Discord Leaderboard.
-
-        Additionally, you can provide an argument `day_and_star` (Boolean) to have the bot send a View
-        that will let you filter by day and star.
-        """
-        if maximum_scorers > AocConfig.max_day_and_star_results or maximum_scorers <= 0:
+        """Have the bot send a View that will let you filter the leaderboard by day and star."""
+        if maximum_scorers_day_and_star > AocConfig.max_day_and_star_results or maximum_scorers_day_and_star <= 0:
             raise commands.BadArgument(
                 f"The maximum number of results you can query is {AocConfig.max_day_and_star_results}"
             )
@@ -207,25 +201,12 @@ class AdventOfCode(commands.Cog):
             except _helpers.FetchingLeaderboardFailedError:
                 await ctx.send(":x: Unable to fetch leaderboard!")
                 return
-        if not day_and_star:
-
-            number_of_participants = leaderboard["number_of_participants"]
-
-            top_count = min(AocConfig.leaderboard_displayed_members, number_of_participants)
-            header = f"Here's our current top {top_count}! {Emojis.christmas_tree * 3}"
-
-            table = f"```\n{leaderboard['top_leaderboard']}\n```"
-            info_embed = _helpers.get_summary_embed(leaderboard)
-
-            await ctx.send(content=f"{header}\n\n{table}", embed=info_embed)
-            return
-
         # This is a dictionary that contains solvers in respect of day, and star.
         # e.g. 1-1 means the solvers of the first star of the first day and their completion time
         per_day_and_star = json.loads(leaderboard['leaderboard_per_day_and_star'])
         view = AoCDropdownView(
             day_and_star_data=per_day_and_star,
-            maximum_scorers=maximum_scorers,
+            maximum_scorers=maximum_scorers_day_and_star,
             original_author=ctx.author
         )
         message = await ctx.send(
@@ -234,6 +215,43 @@ class AdventOfCode(commands.Cog):
         )
         await view.wait()
         await message.edit(view=None)
+
+    @in_month(Month.DECEMBER)
+    @adventofcode_group.command(
+        name="leaderboard",
+        aliases=("board", "lb"),
+        brief="Get a snapshot of the PyDis private AoC leaderboard",
+    )
+    @whitelist_override(channels=AOC_WHITELIST_RESTRICTED)
+    async def aoc_leaderboard(
+            self,
+            ctx: commands.Context,
+            self_placement_name: Optional[str] = None,
+    ) -> None:
+        """
+        Get the current top scorers of the Python Discord Leaderboard.
+
+        Additionaly you can specify a `self_placement_name`
+        that will append the specified profile's personal stats to the top of the leaderboard
+        """
+        async with ctx.typing():
+            try:
+                leaderboard = await _helpers.fetch_leaderboard(self_placement_name=self_placement_name)
+            except _helpers.FetchingLeaderboardFailedError:
+                await ctx.send(":x: Unable to fetch leaderboard!")
+                return
+
+        number_of_participants = leaderboard["number_of_participants"]
+
+        top_count = min(AocConfig.leaderboard_displayed_members, number_of_participants)
+        self_placement_header = "(and your personal stats compared to the top 10)" if self_placement_name else ""
+        header = f"Here's our current top {top_count}{self_placement_header}! {Emojis.christmas_tree * 3}"
+
+        table = f"```\n{leaderboard['top_leaderboard']}\n```"
+        info_embed = _helpers.get_summary_embed(leaderboard)
+
+        await ctx.send(content=f"{header}\n\n{table}", embed=info_embed)
+        return
 
     @in_month(Month.DECEMBER)
     @adventofcode_group.command(
