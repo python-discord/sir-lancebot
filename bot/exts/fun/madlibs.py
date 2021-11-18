@@ -81,7 +81,7 @@ class Madlibs(commands.Cog):
             except TimeoutError:
                 timeout_embed = discord.Embed(
                     title="Timeout!",
-                    description="Uh oh! Looks like the bot timed out! Please try again later.",
+                    description="Uh oh! You took too long to respond! Please try again later.",
                     color=Colours.soft_red
                 )
 
