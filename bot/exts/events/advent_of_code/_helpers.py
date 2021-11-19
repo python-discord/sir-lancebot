@@ -71,6 +71,33 @@ class FetchingLeaderboardFailedError(Exception):
     """Raised when one or more leaderboards could not be fetched at all."""
 
 
+def _format_leaderboard_line(rank: int, data: dict[str, Any], *, is_author: bool) -> str:
+    """
+    Build a string representing a line of the leaderboard.
+
+    Parameters:
+        rank:
+            Rank in the leaderboard of this entry.
+
+        data:
+            Mapping with entry information.
+
+    Keyword arguments:
+        is_author:
+            Whether to address the name displayed in the returned line
+            personally.
+
+    Returns:
+        A formatted line for the leaderboard.
+    """
+    return AOC_TABLE_TEMPLATE.format(
+        rank=rank,
+        name=data['name'] if not is_author else f"(You) {data['name']}",
+        score=str(data['score']),
+        stars=f"({data['star_1']}, {data['star_2']})"
+    )
+
+
 def leaderboard_sorting_function(entry: tuple[str, dict]) -> tuple[int, int]:
     """
     Provide a sorting value for our leaderboard.
@@ -287,7 +314,6 @@ async def fetch_leaderboard(invalidate_cache: bool = False, self_placement_name:
     miss, this function is locked to one call at a time using a decorator.
     """
     cached_leaderboard = await _caches.leaderboard_cache.to_dict()
-
     # Check if the cached leaderboard contains everything we expect it to. If it
     # does not, this probably means the cache has not been created yet or has
     # expired in Redis. This check also accounts for a malformed cache.
@@ -301,11 +327,12 @@ async def fetch_leaderboard(invalidate_cache: bool = False, self_placement_name:
 
         leaderboard = parsed_leaderboard_data["leaderboard"]
         number_of_participants = len(leaderboard)
-        formatted_leaderboard = _format_leaderboard(leaderboard, self_placement_name)
+        formatted_leaderboard = _format_leaderboard(leaderboard)
         full_leaderboard_url = await _upload_leaderboard(formatted_leaderboard)
         leaderboard_fetched_at = datetime.datetime.utcnow().isoformat()
 
         cached_leaderboard = {
+            "placement_leaderboard": json.dumps(raw_leaderboard_data),
             "full_leaderboard": formatted_leaderboard,
             "top_leaderboard": _get_top_leaderboard(formatted_leaderboard),
             "full_leaderboard_url": full_leaderboard_url,
@@ -324,7 +351,13 @@ async def fetch_leaderboard(invalidate_cache: bool = False, self_placement_name:
                 _caches.leaderboard_cache.namespace,
                 AdventOfCode.leaderboard_cache_expiry_seconds
             )
-
+    if self_placement_name:
+        formatted_placement_leaderboard = _parse_raw_leaderboard_data(
+            json.loads(cached_leaderboard["placement_leaderboard"])
+        )["leaderboard"]
+        cached_leaderboard["placement_leaderboard"] = _get_top_leaderboard(
+            _format_leaderboard(formatted_placement_leaderboard, self_placement_name=self_placement_name)
+        )
     return cached_leaderboard
 
 

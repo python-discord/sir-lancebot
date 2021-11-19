@@ -231,7 +231,7 @@ class AdventOfCode(commands.Cog):
         """
         Get the current top scorers of the Python Discord Leaderboard.
 
-        Additionaly you can specify a `self_placement_name`
+        Additionally you can specify a `self_placement_name`
         that will append the specified profile's personal stats to the top of the leaderboard
         """
         async with ctx.typing():
@@ -246,8 +246,9 @@ class AdventOfCode(commands.Cog):
         top_count = min(AocConfig.leaderboard_displayed_members, number_of_participants)
         self_placement_header = "(and your personal stats compared to the top 10)" if self_placement_name else ""
         header = f"Here's our current top {top_count}{self_placement_header}! {Emojis.christmas_tree * 3}"
-
-        table = f"```\n{leaderboard['top_leaderboard']}\n```"
+        table = "```\n" \
+                f"{leaderboard['placement_leaderboard'] if self_placement_name else leaderboard['top_leaderboard']}" \
+                "\n```"
         info_embed = _helpers.get_summary_embed(leaderboard)
 
         await ctx.send(content=f"{header}\n\n{table}", embed=info_embed)
