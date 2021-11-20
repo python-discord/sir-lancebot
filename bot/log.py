@@ -20,10 +20,7 @@ def setup() -> None:
     log_format = logging.Formatter(format_string)
     root_logger = logging.getLogger()
 
-    # Copied from constants file, which we can't import yet since loggers aren't instantiated
-    debug = os.environ.get("BOT_DEBUG", "true").lower() == "true"
-
-    if debug:
+    if Client.file_logs:
         # Set up file logging
         log_file = Path("logs/sir-lancebot.log")
         log_file.parent.mkdir(exist_ok=True)
