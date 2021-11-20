@@ -49,7 +49,6 @@ class Anagram(commands.Cog):
         self.games: dict[int, AnagramGame] = {}
 
     @commands.command(name="anagram", aliases=("anag", "gram", "ag"))
-    @commands.guild_only()
     async def anagram_command(self, ctx: commands.Context) -> None:
         """
         Given shuffled letters, rearrange them into anagrams.
