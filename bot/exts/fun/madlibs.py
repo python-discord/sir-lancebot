@@ -100,7 +100,7 @@ class Madlibs(commands.Cog):
 
         blanks = []
         for msg_id in submitted_words:
-            blanks.append(self.edited_content.pop(msg_id, submitted_words[msg_id] + ' '))
+            blanks.append(self.edited_content.pop(msg_id, submitted_words[msg_id]))
 
         story = []
         for value, blank in zip(random_template["value"], blanks):
