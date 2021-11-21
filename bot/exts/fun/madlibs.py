@@ -27,6 +27,7 @@ class Madlibs(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.templates = self._load_templates()
+        self.edited_content = {}
 
     @staticmethod
     def _load_templates() -> list[MadlibsTemplate]:
@@ -49,6 +50,11 @@ class Madlibs(commands.Cog):
 
         return madlibs_embed
 
+    @commands.Cog.listener()
+    async def on_message_edit(self, after: discord.Message) -> None:
+        """A listener that checks for edits to messages from the user."""
+        self.edited_content[after.id] = after.content
+
     @commands.command()
     async def madlibs(self, ctx: commands.Context) -> None:
         """
@@ -68,7 +74,7 @@ class Madlibs(commands.Cog):
         )
         original_message = await ctx.send(embed=loading_embed)
 
-        submitted_words = []
+        submitted_words = {}
 
         for i, part_of_speech in enumerate(random_template["blanks"]):
             inputs_left = len(random_template["blanks"]) - i
@@ -90,18 +96,22 @@ class Madlibs(commands.Cog):
 
             word = message.content
 
-            submitted_words.append(f" __{word}__")
+            submitted_words[message.id] = word
+
+        blanks = []
+        for msg_id in submitted_words:
+            blanks.append(self.edited_content.pop(msg_id, submitted_words[msg_id] + ' '))
 
         story = []
-        for value, blank in zip(random_template["value"], submitted_words):
-            story.append(f"{value}{blank}")
+        for value, blank in zip(random_template["value"], blanks):
+            story.append(f"{value}__{blank}__")
 
         story.append(random_template["value"][-1])
 
         story_embed = discord.Embed(
             title=random_template["title"],
             description="".join(story),
-            color=Colours.bright_green,
+            color=Colours.bright_green
         )
 
         story_embed.set_footer(text=f"Generated for {ctx.author}", icon_url=ctx.author.display_avatar.url)
