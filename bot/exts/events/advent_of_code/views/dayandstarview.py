@@ -17,14 +17,19 @@ class AoCDropdownView(discord.ui.View):
         self.original_author = original_author
 
     def generate_output(self) -> str:
-        """Generates a formatted codeblock with AoC statistics based on the currently selected day and star."""
+        """
+        Generates a formatted codeblock with AoC statistics based on the currently selected day and star.
+
+        Optionally, when the requested day and star data does not exist yet it returns an error message.
+        """
         header = AOC_DAY_AND_STAR_TEMPLATE.format(
             rank="Rank",
             name="Name", completion_time="Completion time (UTC)"
         )
         lines = [f"{header}\n{'-' * (len(header) + 2)}"]
-
-        for rank, scorer in enumerate(self.data[f"{self.day}-{self.star}"][:self.maximum_scorers]):
+        if not (day_and_star_data := self.data.get(f"{self.day}-{self.star}")):
+            return ":x: The requested data for the specified day and star does not exist yet."
+        for rank, scorer in enumerate(day_and_star_data[:self.maximum_scorers]):
             time_data = datetime.fromtimestamp(scorer['completion_time']).strftime("%I:%M:%S %p")
             lines.append(AOC_DAY_AND_STAR_TEMPLATE.format(
                 datastamp="",
