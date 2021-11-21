@@ -51,7 +51,7 @@ class Madlibs(commands.Cog):
         return madlibs_embed
 
     @commands.Cog.listener()
-    async def on_message_edit(self, after: discord.Message) -> None:
+    async def on_message_edit(self, _: discord.Message, after: discord.Message) -> None:
         """A listener that checks for edits to messages from the user."""
         self.edited_content[after.id] = after.content
 
