@@ -286,7 +286,7 @@ class AvatarModify(commands.Cog):
     @avatar_modify.command(
         aliases=("savatar", "spookify"),
         root_aliases=("spookyavatar", "spookify", "savatar"),
-        brief="Spookify an user's avatar."
+        brief="Spookify a user's avatar."
     )
     async def spookyavatar(self, ctx: commands.Context) -> None:
         """This "spookifies" the user's avatar, with a random *spooky* effect."""
