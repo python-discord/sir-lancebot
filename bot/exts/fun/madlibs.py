@@ -94,9 +94,7 @@ class Madlibs(commands.Cog):
                 await ctx.send(embed=timeout_embed)
                 return
 
-            word = message.content
-
-            submitted_words[message.id] = word
+            submitted_words[message.id] = message.content
 
         blanks = [self.edited_content.pop(msg_id, submitted_words[msg_id] for msg_id in submitted_words]
 
