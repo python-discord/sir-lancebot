@@ -96,7 +96,7 @@ class Madlibs(commands.Cog):
 
             submitted_words[message.id] = message.content
 
-        blanks = [self.edited_content.pop(msg_id, submitted_words[msg_id] for msg_id in submitted_words]
+        blanks = [self.edited_content.pop(msg_id, submitted_words[msg_id]) for msg_id in submitted_words]
 
         story = []
         for value, blank in zip(random_template["value"], blanks):
