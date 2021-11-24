@@ -14,6 +14,7 @@ from discord.ext import commands
 from bot.bot import Bot
 from bot.constants import Colours, Emojis
 from bot.exts.avatar_modification._effects import PfpEffects
+from bot.utils.christmas import christmasifications
 from bot.utils.extensions import invoke_help_command
 from bot.utils.halloween import spookifications
 
@@ -304,6 +305,39 @@ class AvatarModify(commands.Cog):
                 PfpEffects.apply_effect,
                 image_bytes,
                 spookifications.get_random_effect,
+                file_name
+            )
+
+            embed = discord.Embed(
+                title="Is this you or am I just really paranoid?",
+                colour=Colours.soft_red
+            )
+            embed.set_image(url=f"attachment://{file_name}")
+            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=ctx.author.display_avatar.url)
+
+            await ctx.send(file=file, embed=embed)
+
+    @avatar_modify.command(
+        aliases=("christmasify", "cavatar"),
+        root_aliases=("christmasavatar", "christmasify", "cavatar"),
+        brief="Christmasify a user's avatar."
+    )
+    async def christmasavatar(self, ctx: commands.Context) -> None:
+        """This "christmasifies" the user's avatar, with a random *christmasy* effect."""
+        user = await self._fetch_user(ctx.author.id)
+        if not user:
+            await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
+            return
+
+        async with ctx.typing():
+            image_bytes = await user.display_avatar.replace(size=1024).read()
+
+            file_name = file_safe_name("christmas_avatar", ctx.author.display_name)
+
+            file = await in_executor(
+                PfpEffects.apply_effect,
+                image_bytes,
+                christmasifications.get_random_effect,
                 file_name
             )
 
