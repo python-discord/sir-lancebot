@@ -28,6 +28,7 @@ class Madlibs(commands.Cog):
         self.bot = bot
         self.templates = self._load_templates()
         self.edited_content = {}
+        self.checks = set()
 
     @staticmethod
     def _load_templates() -> list[MadlibsTemplate]:
@@ -53,6 +54,12 @@ class Madlibs(commands.Cog):
     @commands.Cog.listener()
     async def on_message_edit(self, _: discord.Message, after: discord.Message) -> None:
         """A listener that checks for edits to messages from the user."""
+        for check in self.checks:
+            if check(after):
+                break
+        else:
+            return
+
         self.edited_content[after.id] = after.content
 
     @commands.command()
@@ -68,6 +75,8 @@ class Madlibs(commands.Cog):
 
         def author_check(message: discord.Message) -> bool:
             return message.channel.id == ctx.channel.id and message.author.id == ctx.author.id
+
+        self.checks.add(author_check)
 
         loading_embed = discord.Embed(
             title="Madlibs", description="Loading your Madlibs game...", color=Colours.python_blue
