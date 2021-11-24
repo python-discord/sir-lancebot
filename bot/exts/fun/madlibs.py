@@ -112,6 +112,9 @@ class Madlibs(commands.Cog):
             story.append(f"{value}__{blank}__")
 
         story.append(random_template["value"][-1])
+        # In each story template, there is always one more "value"
+        # (fragment from the story) than there are blanks (words that the player enters)
+        # so we need to compensate by appending the last line of the story again.
 
         story_embed = discord.Embed(
             title=random_template["title"],
