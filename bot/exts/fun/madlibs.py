@@ -101,6 +101,12 @@ class Madlibs(commands.Cog):
                 )
 
                 await ctx.send(embed=timeout_embed)
+
+                for msg_id in submitted_words:
+                    self.edited_content.pop(msg_id, submitted_words[msg_id])
+
+                self.checks.remove(author_check)
+
                 return
 
             submitted_words[message.id] = message.content
@@ -125,6 +131,8 @@ class Madlibs(commands.Cog):
         story_embed.set_footer(text=f"Generated for {ctx.author}", icon_url=ctx.author.display_avatar.url)
 
         await ctx.send(embed=story_embed)
+
+        self.checks.remove(author_check)
 
 
 def setup(bot: Bot) -> None:
