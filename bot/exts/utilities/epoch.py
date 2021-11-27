@@ -22,7 +22,7 @@ class Epoch(commands.Cog):
 
     @commands.command(name="epoch")
     async def epoch(self, ctx: commands.Context, *, time: Union[RelativeDate, AbsoluteDate]) -> None:
-        pass
+        await ctx.send(f"`{int(time.timestamp())}`")
 
 
 def setup(bot: Bot) -> None:
