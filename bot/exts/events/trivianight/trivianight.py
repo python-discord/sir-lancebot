@@ -254,6 +254,15 @@ class TriviaNight(commands.Cog):
         The scoreboard view also has a button where the user can see their own rank, points and average speed if they
         didn't make it onto the leaderboard.
         """
+        if self.questions.view.active_question is True:
+            error_embed = Embed(
+                title=choice(NEGATIVE_REPLIES),
+                description="You can't end the event while a question is ongoing!",
+                color=Colours.soft_red
+            )
+            await ctx.send(embed=error_embed)
+            return
+
         scoreboard_embed, scoreboard_view = await self.scoreboard.display()
         await ctx.send(embed=scoreboard_embed, view=scoreboard_view)
 
