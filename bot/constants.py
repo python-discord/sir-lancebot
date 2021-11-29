@@ -332,8 +332,8 @@ class Reddit:
 
 
 # Default role combinations
-MODERATION_ROLES = Roles.moderation_team, Roles.admins, Roles.owners
-STAFF_ROLES = Roles.helpers, Roles.moderation_team, Roles.admins, Roles.owners
+MODERATION_ROLES = {Roles.moderation_team, Roles.admins, Roles.owners}
+STAFF_ROLES = {Roles.helpers, Roles.moderation_team, Roles.admins, Roles.owners}
 
 # Whitelisted channels
 WHITELISTED_CHANNELS = (
