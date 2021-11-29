@@ -220,6 +220,7 @@ class TriviaNight(commands.Cog):
         question_list = self.questions.list_questions()
         if isinstance(question_list, Embed):
             await ctx.send(embed=question_list)
+            return
 
         await ctx.send(question_list)
 
