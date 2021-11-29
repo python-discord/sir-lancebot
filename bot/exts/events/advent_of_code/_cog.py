@@ -115,15 +115,11 @@ class AdventOfCode(commands.Cog):
         deltas = (dec_first - datetime_now for dec_first in (this_year, next_year))
         delta = min(delta for delta in deltas if delta >= timedelta())  # timedelta() gives 0 duration delta
 
-        # Add a finer timedelta if there's less than a day left
-        if delta.days == 0:
-            delta_str = f"approximately {delta.seconds // 3600} hours"
-        else:
-            delta_str = f"{delta.days} days"
+        next_aoc_timestamp = int((datetime_now + delta).timestamp())
 
         await ctx.send(
             "The Advent of Code event is not currently running. "
-            f"The next event will start in {delta_str}."
+            f"The next event will start <t:{next_aoc_timestamp}:R>."
         )
 
     @adventofcode_group.command(name="about", aliases=("ab", "info"), brief="Learn about Advent of Code")
