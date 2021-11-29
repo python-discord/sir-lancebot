@@ -100,32 +100,31 @@ class AdventOfCode(commands.Cog):
     @whitelist_override(channels=AOC_WHITELIST)
     async def aoc_countdown(self, ctx: commands.Context) -> None:
         """Return time left until next day."""
-        if not _helpers.is_in_advent():
-            datetime_now = arrow.now(_helpers.EST)
+        if _helpers.is_in_advent():
+            tomorrow, time_left = _helpers.time_left_to_est_midnight()
+            hours, minutes = time_left.seconds // 3600, time_left.seconds // 60 % 60
 
-            # Calculate the delta to this & next year's December 1st to see which one is closest and not in the past
-            this_year = arrow.get(datetime(datetime_now.year, 12, 1), _helpers.EST)
-            next_year = arrow.get(datetime(datetime_now.year + 1, 12, 1), _helpers.EST)
-            deltas = (dec_first - datetime_now for dec_first in (this_year, next_year))
-            delta = min(delta for delta in deltas if delta >= timedelta())  # timedelta() gives 0 duration delta
-
-            # Add a finer timedelta if there's less than a day left
-            if delta.days == 0:
-                delta_str = f"approximately {delta.seconds // 3600} hours"
-            else:
-                delta_str = f"{delta.days} days"
-
-            await ctx.send(
-                "The Advent of Code event is not currently running. "
-                f"The next event will start in {delta_str}."
-            )
+            await ctx.send(f"There are {hours} hours and {minutes} minutes left until day {tomorrow.day}.")
             return
 
-        tomorrow, time_left = _helpers.time_left_to_est_midnight()
+        datetime_now = arrow.now(_helpers.EST)
 
-        hours, minutes = time_left.seconds // 3600, time_left.seconds // 60 % 60
+        # Calculate the delta to this & next year's December 1st to see which one is closest and not in the past
+        this_year = arrow.get(datetime(datetime_now.year, 12, 1), _helpers.EST)
+        next_year = arrow.get(datetime(datetime_now.year + 1, 12, 1), _helpers.EST)
+        deltas = (dec_first - datetime_now for dec_first in (this_year, next_year))
+        delta = min(delta for delta in deltas if delta >= timedelta())  # timedelta() gives 0 duration delta
 
-        await ctx.send(f"There are {hours} hours and {minutes} minutes left until day {tomorrow.day}.")
+        # Add a finer timedelta if there's less than a day left
+        if delta.days == 0:
+            delta_str = f"approximately {delta.seconds // 3600} hours"
+        else:
+            delta_str = f"{delta.days} days"
+
+        await ctx.send(
+            "The Advent of Code event is not currently running. "
+            f"The next event will start in {delta_str}."
+        )
 
     @adventofcode_group.command(name="about", aliases=("ab", "info"), brief="Learn about Advent of Code")
     @whitelist_override(channels=AOC_WHITELIST)
