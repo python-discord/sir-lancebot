@@ -113,6 +113,8 @@ class Madlibs(commands.Cog):
 
         blanks = [self.edited_content.pop(msg_id, submitted_words[msg_id]) for msg_id in submitted_words]
 
+        self.checks.remove(author_check)
+
         story = []
         for value, blank in zip(random_template["value"], blanks):
             story.append(f"{value}__{blank}__")
@@ -131,8 +133,6 @@ class Madlibs(commands.Cog):
         story_embed.set_footer(text=f"Generated for {ctx.author}", icon_url=ctx.author.display_avatar.url)
 
         await ctx.send(embed=story_embed)
-
-        self.checks.remove(author_check)
 
 
 def setup(bot: Bot) -> None:
