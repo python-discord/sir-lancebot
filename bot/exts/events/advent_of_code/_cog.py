@@ -148,7 +148,7 @@ class AdventOfCode(commands.Cog):
         author = ctx.author
         log.info(f"{author.name} ({author.id}) has requested a PyDis AoC leaderboard code")
 
-        if AocConfig.staff_leaderboard_id and any(r.id in STAFF_ROLES for r in author.roles):
+        if AocConfig.staff_leaderboard_id and any(r.id == Roles.helpers for r in author.roles):
             join_code = AocConfig.leaderboards[AocConfig.staff_leaderboard_id].join_code
         else:
             try:
