@@ -88,6 +88,7 @@ class AdventOfCode:
     ignored_days = environ.get("AOC_IGNORED_DAYS", "").split(",")
     leaderboard_displayed_members = 10
     leaderboard_cache_expiry_seconds = 1800
+    max_day_and_star_results = 15
     year = int(environ.get("AOC_YEAR", datetime.utcnow().year))
     role_id = int(environ.get("AOC_ROLE_ID", 518565788744024082))
 
@@ -101,8 +102,8 @@ class Cats:
 
 
 class Channels(NamedTuple):
-    advent_of_code = int(environ.get("AOC_CHANNEL_ID", 782715290437943306))
-    advent_of_code_commands = int(environ.get("AOC_COMMANDS_CHANNEL_ID", 607247579608121354))
+    advent_of_code = int(environ.get("AOC_CHANNEL_ID", 897932085766004786))
+    advent_of_code_commands = int(environ.get("AOC_COMMANDS_CHANNEL_ID", 897932607545823342))
     bot = 267659945086812160
     organisation = 551789653284356126
     devlog = int(environ.get("CHANNEL_DEVLOG", 622895325144940554))
@@ -133,11 +134,12 @@ class Client(NamedTuple):
     guild = int(environ.get("BOT_GUILD", 267624335836053506))
     prefix = environ.get("PREFIX", ".")
     token = environ.get("BOT_TOKEN")
-    sentry_dsn = environ.get("BOT_SENTRY_DSN")
     debug = environ.get("BOT_DEBUG", "true").lower() == "true"
+    file_logs = environ.get("FILE_LOGS", "false").lower() == "true"
     github_bot_repo = "https://github.com/python-discord/sir-lancebot"
     # Override seasonal locks: 1 (January) to 12 (December)
     month_override = int(environ["MONTH_OVERRIDE"]) if "MONTH_OVERRIDE" in environ else None
+    trace_loggers = environ.get("BOT_TRACE_LOGGERS")
 
 
 class Colours:
@@ -345,8 +347,6 @@ WHITELISTED_CHANNELS = (
     Channels.voice_chat_0,
     Channels.voice_chat_1,
 )
-
-GIT_SHA = environ.get("GIT_SHA", "foobar")
 
 # Bot replies
 ERROR_REPLIES = [

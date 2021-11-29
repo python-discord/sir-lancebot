@@ -239,7 +239,7 @@ class AvatarModify(commands.Cog):
                 description=f"Here is your lovely avatar, surrounded by\n a beautiful {option} flag. Enjoy :D"
             )
             embed.set_image(url=f"attachment://{file_name}")
-            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=ctx.author.avatar.url)
+            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=ctx.author.display_avatar.url)
             await ctx.send(file=file, embed=embed)
 
     @avatar_modify.group(
@@ -286,7 +286,7 @@ class AvatarModify(commands.Cog):
     @avatar_modify.command(
         aliases=("savatar", "spookify"),
         root_aliases=("spookyavatar", "spookify", "savatar"),
-        brief="Spookify an user's avatar."
+        brief="Spookify a user's avatar."
     )
     async def spookyavatar(self, ctx: commands.Context) -> None:
         """This "spookifies" the user's avatar, with a random *spooky* effect."""

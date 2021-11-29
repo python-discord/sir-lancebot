@@ -10,6 +10,7 @@ from typing import Any, Optional
 import aiohttp
 import arrow
 import discord
+from discord.ext import commands
 
 from bot.bot import Bot
 from bot.constants import AdventOfCode, Channels, Colours
@@ -70,6 +71,33 @@ class FetchingLeaderboardFailedError(Exception):
     """Raised when one or more leaderboards could not be fetched at all."""
 
 
+def _format_leaderboard_line(rank: int, data: dict[str, Any], *, is_author: bool) -> str:
+    """
+    Build a string representing a line of the leaderboard.
+
+    Parameters:
+        rank:
+            Rank in the leaderboard of this entry.
+
+        data:
+            Mapping with entry information.
+
+    Keyword arguments:
+        is_author:
+            Whether to address the name displayed in the returned line
+            personally.
+
+    Returns:
+        A formatted line for the leaderboard.
+    """
+    return AOC_TABLE_TEMPLATE.format(
+        rank=rank,
+        name=data['name'] if not is_author else f"(You) {data['name']}",
+        score=str(data['score']),
+        stars=f"({data['star_1']}, {data['star_2']})"
+    )
+
+
 def leaderboard_sorting_function(entry: tuple[str, dict]) -> tuple[int, int]:
     """
     Provide a sorting value for our leaderboard.
@@ -105,6 +133,7 @@ def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
     # The data we get from the AoC website is structured by member, not by day/star,
     # which means we need to iterate over the members to transpose the data to a per
     # star view. We need that per star view to compute rank scores per star.
+    per_day_star_stats = collections.defaultdict(list)
     for member in raw_leaderboard_data.values():
         name = member["name"] if member["name"] else f"Anonymous #{member['id']}"
         member_id = member["id"]
@@ -122,6 +151,11 @@ def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
                 star_results[(day, star)].append(
                     StarResult(member_id=member_id, completion_time=completion_time)
                 )
+                per_day_star_stats[f"{day}-{star}"].append(
+                    {'completion_time': int(data["get_star_ts"]), 'member_name': name}
+                )
+    for key in per_day_star_stats:
+        per_day_star_stats[key] = sorted(per_day_star_stats[key], key=operator.itemgetter('completion_time'))
 
     # Now that we have a transposed dataset that holds the completion time of all
     # participants per star, we can compute the rank-based scores each participant
@@ -151,13 +185,26 @@ def _parse_raw_leaderboard_data(raw_leaderboard_data: dict) -> dict:
         # this data to JSON in order to cache it in Redis.
         daily_stats[day] = {"star_one": star_one, "star_two": star_two}
 
-    return {"daily_stats": daily_stats, "leaderboard": sorted_leaderboard}
+    return {"daily_stats": daily_stats, "leaderboard": sorted_leaderboard, 'per_day_and_star': per_day_star_stats}
 
 
-def _format_leaderboard(leaderboard: dict[str, dict]) -> str:
+def _format_leaderboard(leaderboard: dict[str, dict], self_placement_name: str = None) -> str:
     """Format the leaderboard using the AOC_TABLE_TEMPLATE."""
     leaderboard_lines = [HEADER]
+    self_placement_exists = False
     for rank, data in enumerate(leaderboard.values(), start=1):
+        if self_placement_name and data["name"].lower() == self_placement_name.lower():
+            leaderboard_lines.insert(
+                1,
+                AOC_TABLE_TEMPLATE.format(
+                    rank=rank,
+                    name=f"(You) {data['name']}",
+                    score=str(data["score"]),
+                    stars=f"({data['star_1']}, {data['star_2']})"
+                )
+            )
+            self_placement_exists = True
+            continue
         leaderboard_lines.append(
             AOC_TABLE_TEMPLATE.format(
                 rank=rank,
@@ -166,7 +213,10 @@ def _format_leaderboard(leaderboard: dict[str, dict]) -> str:
                 stars=f"({data['star_1']}, {data['star_2']})"
             )
         )
-
+    if self_placement_name and not self_placement_exists:
+        raise commands.BadArgument(
+            "Sorry, your profile does not exist in this leaderboard."
+        )
     return "\n".join(leaderboard_lines)
 
 
@@ -254,7 +304,7 @@ def _get_top_leaderboard(full_leaderboard: str) -> str:
 
 
 @_caches.leaderboard_cache.atomic_transaction
-async def fetch_leaderboard(invalidate_cache: bool = False) -> dict:
+async def fetch_leaderboard(invalidate_cache: bool = False, self_placement_name: str = None) -> dict:
     """
     Get the current Python Discord combined leaderboard.
 
@@ -264,7 +314,6 @@ async def fetch_leaderboard(invalidate_cache: bool = False) -> dict:
     miss, this function is locked to one call at a time using a decorator.
     """
     cached_leaderboard = await _caches.leaderboard_cache.to_dict()
-
     # Check if the cached leaderboard contains everything we expect it to. If it
     # does not, this probably means the cache has not been created yet or has
     # expired in Redis. This check also accounts for a malformed cache.
@@ -283,12 +332,14 @@ async def fetch_leaderboard(invalidate_cache: bool = False) -> dict:
         leaderboard_fetched_at = datetime.datetime.utcnow().isoformat()
 
         cached_leaderboard = {
+            "placement_leaderboard": json.dumps(raw_leaderboard_data),
             "full_leaderboard": formatted_leaderboard,
             "top_leaderboard": _get_top_leaderboard(formatted_leaderboard),
             "full_leaderboard_url": full_leaderboard_url,
             "leaderboard_fetched_at": leaderboard_fetched_at,
             "number_of_participants": number_of_participants,
             "daily_stats": json.dumps(parsed_leaderboard_data["daily_stats"]),
+            "leaderboard_per_day_and_star": json.dumps(parsed_leaderboard_data["per_day_and_star"])
         }
 
         # Store the new values in Redis
@@ -300,7 +351,13 @@ async def fetch_leaderboard(invalidate_cache: bool = False) -> dict:
                 _caches.leaderboard_cache.namespace,
                 AdventOfCode.leaderboard_cache_expiry_seconds
             )
-
+    if self_placement_name:
+        formatted_placement_leaderboard = _parse_raw_leaderboard_data(
+            json.loads(cached_leaderboard["placement_leaderboard"])
+        )["leaderboard"]
+        cached_leaderboard["placement_leaderboard"] = _get_top_leaderboard(
+            _format_leaderboard(formatted_placement_leaderboard, self_placement_name=self_placement_name)
+        )
     return cached_leaderboard
 
 
