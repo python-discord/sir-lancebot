@@ -32,7 +32,13 @@ class QuestionButton(Button):
         super().__init__(label=label, style=discord.ButtonStyle.green)
 
     async def callback(self, interaction: Interaction) -> None:
-        """When a user interacts with the button, this will be called."""
+        """
+        When a user interacts with the button, this will be called.
+
+        Parameters:
+            - interaction: an instance of discord.Interaction representing the interaction between the user and the
+            button.
+        """
         original_message = interaction.message
         original_embed = original_message.embeds[0]
 
@@ -84,8 +90,13 @@ class QuestionView(View):
 
         self.active_question = False
 
-    def create_current_question(self) -> Union[Embed, None]:
-        """Helper function to create the embed for the current question."""
+    def create_current_question(self) -> tuple[Embed, int]:
+        """
+        Helper function to create the embed for the current question.
+
+        Returns an embed containing the question along with each answer choice in the form of a view,
+        along with the integer representing the time limit of the current question.
+        """
         self.current_labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:len(self.current_question["answers"])]
         question_embed = Embed(
             title=f"Question {self.current_question['number']}",
@@ -110,8 +121,16 @@ class QuestionView(View):
 
         return question_embed, time_limit
 
-    def end_question(self) -> tuple[dict, Embed]:
-        """Returns the dictionaries from the corresponding buttons for those who got it correct."""
+    def end_question(self) -> tuple[dict, Embed, int, int]:
+        """
+        Ends the question and displays the statistics on who got the question correct, awards points, etc.
+
+        Returns:
+            - a dictionary containing all the people who answered and whether or not they got it correct
+            - an embed displaying the correct answers and the % of people that chose each answer.
+            - an integer showing the time limit of the current question in seconds
+            - an integer showing the amount of points the question will award* to those that got it correct
+        """
         labels = self.current_labels
         label = labels[self.current_question["answers"].index(self.current_question["correct"])]
         return_dict = {name: (*info, info[0] == label) for name, info in self.users_picked.items()}
@@ -165,7 +184,13 @@ class Questions:
         self.questions = []
 
     def set_questions(self, questions: list) -> None:
-        """Setting `self.questions` dynamically via a function to set it."""
+        """
+        Setting `self.questions` dynamically via a function to set it.
+
+        Parameters:
+            - questions: a list representing all the questions, which is essentially the JSON provided
+            to load the questions
+        """
         self.questions = questions
 
     def next_question(self, number: int = None) -> Union[Embed, None]:
@@ -173,6 +198,9 @@ class Questions:
         Chooses a random unvisited question from the question bank.
 
         If the number parameter is specified, it'll head to that specific question.
+
+        Parameters:
+            - number: An optional integer representing the question number (only used for `.trivianight question` calls)
         """
         if all("visited" in question.keys() for question in self.questions) and number is None:
             return Embed(
@@ -227,7 +255,13 @@ class Questions:
         return self.view.create_current_question(), self.view
 
     def end_question(self) -> Embed:
-        """Terminates answering of the question and displays the correct answer."""
+        """
+        Terminates answering of the question and displays the correct answer.
+
+        The function returns an embed containing the information about the question such as the following:
+            - % of people that chose each option
+            - the correct answer
+        """
         scores, answer_embed, time_limit, total_points = self.view.end_question()
         for user, score in scores.items():
             time_taken = score[2]

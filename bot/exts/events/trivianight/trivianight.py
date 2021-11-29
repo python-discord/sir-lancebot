@@ -37,7 +37,12 @@ class TriviaNight(commands.Cog):
 
     @staticmethod
     def unicodeify(text: str) -> str:
-        """Takes `text` and adds zero-width spaces to prevent copy and pasting the question."""
+        """
+        Takes `text` and adds zero-width spaces to prevent copy and pasting the question.
+
+        Parameters:
+            - text: A string that represents the question description to 'unicodeify'
+        """
         return "".join(
             f"{letter}\u200b" if letter not in ('\n', '\t', '`', 'p', 'y') else letter
             for idx, letter in enumerate(text)
@@ -45,7 +50,11 @@ class TriviaNight(commands.Cog):
 
     @commands.group(aliases=["tn"], invoke_without_command=True)
     async def trivianight(self, ctx: commands.Context) -> None:
-        """No-op subcommand group for organizing different commands."""
+        """
+        The command group for the Python Discord Trivia Night.
+
+        If invoked without a subcommand (i.e. simply .trivianight), it will explain what the Trivia Night event is.
+        """
         cog_description = Embed(
             title="What is .trivianight?",
             description=(
@@ -88,6 +97,8 @@ class TriviaNight(commands.Cog):
                 json_text = (await message.attachments[0].read()).decode("utf8")
             else:
                 json_text = message.content.replace("```", "").replace("json", "").replace("\n", "")
+        else:
+            json_text = to_load.replace("```", "").replace("json", "").replace("\n", "")
 
         try:
             serialized_json = loads(json_text)
@@ -128,7 +139,12 @@ class TriviaNight(commands.Cog):
     @trivianight.command()
     @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
     async def next(self, ctx: commands.Context) -> None:
-        """Gets a random question from the unanswered question list and lets user choose the answer."""
+        """
+        Gets a random question from the unanswered question list and lets the user(s) choose the answer.
+
+        This command will continuously count down until the time limit of the question is exhausted.
+        However, if `.trivianight stop` is invoked, the counting down is interrupted to show the final results.
+        """
         if self.questions.view.active_question is True:
             error_embed = Embed(
                 title=choice(NEGATIVE_REPLIES),
@@ -162,7 +178,15 @@ class TriviaNight(commands.Cog):
     @trivianight.command()
     @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
     async def question(self, ctx: commands.Context, question_number: int) -> None:
-        """Gets a question from the question bank depending on the question number provided."""
+        """
+        Gets a question from the question bank depending on the question number provided.
+
+        The logic of this command is similar to `.trivianight next`, with the only difference being that you need to
+        specify the question number.
+
+        Parameters:
+            - question_number: An integer represents the question number to go to (i.e. .trivianight question 5).
+        """
         question = self.questions.next_question(question_number)
         if isinstance(question, Embed):
             await ctx.send(embed=question)
@@ -187,7 +211,12 @@ class TriviaNight(commands.Cog):
     @trivianight.command()
     @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
     async def list(self, ctx: commands.Context) -> None:
-        """Displays all the questions from the question bank."""
+        """
+        Displays all the questions from the question bank.
+
+        Questions are displayed in the following format:
+        Q(number): Question description | :white_check_mark: if the question was used otherwise :x:.
+        """
         question_list = self.questions.list_questions()
         if isinstance(question_list, Embed):
             await ctx.send(embed=question_list)
@@ -197,7 +226,11 @@ class TriviaNight(commands.Cog):
     @trivianight.command()
     @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
     async def stop(self, ctx: commands.Context) -> None:
-        """End the ongoing question to show the correct question."""
+        """
+        End the ongoing question to show the correct question.
+
+        This command should be used if the question should be ended early or if the time limit fails
+        """
         if self.questions.view.active_question is False:
             error_embed = Embed(
                 title=choice(NEGATIVE_REPLIES),
@@ -212,7 +245,15 @@ class TriviaNight(commands.Cog):
     @trivianight.command()
     @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
     async def end(self, ctx: commands.Context) -> None:
-        """Ends the trivia night event and displays the scoreboard."""
+        """
+        Ends the trivia night event and displays the scoreboard view.
+
+        The scoreboard view consists of the two scoreboards with the 30 players who got the highest points and the
+        30 players who had the fastest average response time to a question where they got the question right.
+
+        The scoreboard view also has a button where the user can see their own rank, points and average speed if they
+        didn't make it onto the leaderboard.
+        """
         scoreboard_embed, scoreboard_view = await self.scoreboard.display()
         await ctx.send(embed=scoreboard_embed, view=scoreboard_view)
 

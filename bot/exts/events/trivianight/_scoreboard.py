@@ -20,7 +20,13 @@ class ScoreboardView(View):
         self.speed = {}
 
     async def create_main_leaderboard(self) -> Embed:
-        """Helper function that iterates through `self.points` to generate the main leaderboard embed."""
+        """
+        Helper function that iterates through `self.points` to generate the main leaderboard embed.
+
+        The main leaderboard would be formatted like the following:
+        **1**. @mention of the user (# of points)
+        along with the 29 other users who made it onto the leaderboard.
+        """
         formatted_string = ""
         self.points = dict(sorted(self.points.items(), key=lambda item: item[-1], reverse=True))
         self.speed = dict(sorted(self.speed.items(), key=lambda item: item[-1]))
@@ -44,7 +50,13 @@ class ScoreboardView(View):
         return main_embed
 
     async def _create_speed_embed(self) -> Embed:
-        """Helper function that iterates through `self.speed` to generate a leaderboard embed."""
+        """
+        Helper function that iterates through `self.speed` to generate a leaderboard embed.
+
+        The speed leaderboard would be formatted like the following:
+        **1**. @mention of the user ([average speed as a float with the precision of one decimal point]s)
+        along with the 29 other users who made it onto the leaderboard.
+        """
         formatted_string = ""
 
         for current_placement, (user, time_taken) in enumerate(self.speed.items()):
@@ -65,7 +77,12 @@ class ScoreboardView(View):
         return speed_embed
 
     def _get_rank(self, member: Member) -> Embed:
-        """Gets the member's rank for the points leaderboard and speed leaderboard."""
+        """
+        Gets the member's rank for the points leaderboard and speed leaderboard.
+
+        Parameters:
+            - member: An instance of discord.Member representing the person who is trying to get their rank.
+        """
         rank_embed = Embed(title=f"Ranks for {member.display_name}", color=Colours.python_blue)
         # These are stored as strings so that the last digit can be determined to choose the suffix
         try:
@@ -99,12 +116,26 @@ class ScoreboardView(View):
 
     @discord.ui.button(label="Scoreboard for Speed", style=ButtonStyle.green)
     async def speed_leaderboard(self, button: Button, interaction: Interaction) -> None:
-        """Send an ephemeral message with the speed leaderboard embed."""
+        """
+        Send an ephemeral message with the speed leaderboard embed.
+
+        Parameters:
+            - button: The discord.ui.Button instance representing the `Speed Leaderboard` button.
+            - interaction: The discord.Interaction instance containing information on the interaction between the user
+            and the button.
+        """
         await interaction.response.send_message(embed=await self._create_speed_embed(), ephemeral=True)
 
     @discord.ui.button(label="What's my rank?", style=ButtonStyle.blurple)
     async def rank_button(self, button: Button, interaction: Interaction) -> None:
-        """Send an ephemeral message with the user's rank for the overall points/average speed."""
+        """
+        Send an ephemeral message with the user's rank for the overall points/average speed.
+
+        Parameters:
+            - button: The discord.ui.Button instance representing the `What's my rank?` button.
+            - interaction: The discord.Interaction instance containing information on the interaction between the user
+            and the button.
+        """
         await interaction.response.send_message(embed=self._get_rank(interaction.user), ephemeral=True)
 
 
