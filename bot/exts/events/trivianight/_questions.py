@@ -103,9 +103,10 @@ class QuestionView(View):
             description=self.current_question["obfuscated_description"],
             color=Colours.python_yellow
         )
-        self.buttons = [QuestionButton(label, self.users_picked, self) for label in self.current_labels]
-        for button in self.buttons:
-            self.add_item(button)
+        if "_previously_visited" not in self.current_question.keys():
+            self.buttons = [QuestionButton(label, self.users_picked, self) for label in self.current_labels]
+            for button in self.buttons:
+                self.add_item(button)
 
         for label, answer in zip(self.current_labels, self.current_question["answers"]):
             question_embed.add_field(name=f"Answer {label}", value=answer, inline=False)
@@ -216,6 +217,8 @@ class Questions:
         else:
             question_number = number - 1
 
+        if "visited" in self.questions[question_number].keys():
+            self.questions[question_number]["_previously_visited"] = True
         self.questions[question_number]["visited"] = True
 
         # The `self.view` refers to the QuestionView
