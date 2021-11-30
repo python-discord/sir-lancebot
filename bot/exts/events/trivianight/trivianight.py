@@ -59,7 +59,7 @@ class TriviaNight(commands.Cog):
             title="What is .trivianight?",
             description=(
                 "This 'cog' is for the Python Discord's TriviaNight (date tentative)! Compete against other"
-                "players in a trivia about Python!"
+                " players in a trivia about Python!"
             ),
             color=Colours.soft_green
         )
