@@ -2,21 +2,26 @@ import asyncio
 import functools
 import logging
 import random
+import types
 from asyncio import Lock
 from collections.abc import Container
+from contextlib import suppress
 from functools import wraps
 from typing import Callable, Optional, Union
 from weakref import WeakValueDictionary
 
-from discord import Colour, Embed
+from discord import Colour, Embed, NotFound
 from discord.ext import commands
 from discord.ext.commands import CheckFailure, Command, Context
 
 from bot.constants import Channels, ERROR_REPLIES, Month, WHITELISTED_CHANNELS
 from bot.utils import human_months, resolve_current_month
 from bot.utils.checks import in_whitelist_check
+from bot.utils.function import command_wraps
 
 ONE_DAY = 24 * 60 * 60
+
+REDIRECT_DELETE_DELAY = 30  # Seconds
 
 log = logging.getLogger(__name__)
 
@@ -333,5 +338,76 @@ def locked() -> Optional[Callable]:
 
             async with func.__locks.setdefault(ctx.author.id, Lock()):
                 return await func(self, ctx, *args, **kwargs)
+        return inner
+    return wrap
+
+
+def redirect_output(
+    destination_channel: int,
+    bypass_roles: Optional[Container[int]] = None,
+    channels: Optional[Container[int]] = None,
+    categories: Optional[Container[int]] = None,
+    ping_user: bool = True,
+    delete_invocation: bool = True,
+) -> Callable:
+    """
+    Changes the channel in the context of the command to redirect the output to a certain channel.
+
+    Redirect is bypassed if the author has a bypass role or if it is in a channel that can bypass redirection.
+
+    If ping_user is False, it will not send a message in the destination channel.
+
+    This decorator must go before (below) the `command` decorator.
+    """
+    def wrap(func: types.FunctionType) -> types.FunctionType:
+        @command_wraps(func)
+        async def inner(self: commands.Cog, ctx: Context, *args, **kwargs) -> None:
+            if ctx.channel.id == destination_channel:
+                log.trace(f"Command {ctx.command} was invoked in destination_channel, not redirecting")
+                await func(self, ctx, *args, **kwargs)
+                return
+
+            if bypass_roles and any(role.id in bypass_roles for role in ctx.author.roles):
+                log.trace(f"{ctx.author} has role to bypass output redirection")
+                await func(self, ctx, *args, **kwargs)
+                return
+
+            elif channels and ctx.channel.id not in channels:
+                log.trace(f"{ctx.author} used {ctx.command} in a channel that can bypass output redirection")
+                await func(self, ctx, *args, **kwargs)
+                return
+
+            elif categories and ctx.channel.category.id not in categories:
+                log.trace(f"{ctx.author} used {ctx.command} in a category that can bypass output redirection")
+                await func(self, ctx, *args, **kwargs)
+                return
+
+            redirect_channel = ctx.guild.get_channel(destination_channel)
+            old_channel = ctx.channel
+
+            log.trace(f"Redirecting output of {ctx.author}'s command '{ctx.command.name}' to {redirect_channel.name}")
+            ctx.channel = redirect_channel
+
+            if ping_user:
+                await ctx.send(f"Here's the output of your command, {ctx.author.mention}")
+            asyncio.create_task(func(self, ctx, *args, **kwargs))
+
+            message = await old_channel.send(
+                f"Hey, {ctx.author.mention}, you can find the output of your command here: "
+                f"{redirect_channel.mention}"
+            )
+
+            if not delete_invocation:
+                return
+
+            await asyncio.sleep(REDIRECT_DELETE_DELAY)
+
+            with suppress(NotFound):
+                await message.delete()
+                log.trace("Redirect output: Deleted user redirection message")
+
+            with suppress(NotFound):
+                await ctx.message.delete()
+                log.trace("Redirect output: Deleted invocation message")
         return inner
     return wrap
