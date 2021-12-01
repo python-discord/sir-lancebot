@@ -10,8 +10,8 @@ import arrow
 from bot.exts.core.extensions import invoke_help_command
 
 # https://discord.com/developers/docs/reference#message-formatting-timestamp-styles
-TIMESTAMP_FORMATS = ["H:mm A", "H:mm:ss A", "MM/DD/YYYY", "MMMM D, YYYY", "MMMM D, YYYY H:mm A",
-                     "dddd, MMMM D, YYYY hh:mm A "]
+TIMESTAMP_FORMATS = ["h:mm A", "h:mm:ss A", "MM/DD/YYYY", "MMMM D, YYYY", "MMMM D, YYYY h:mm A",
+                     "dddd, MMMM D, YYYY h:mm A "]
 STYLES = {"Epoch": "", "Short Time": "t", "Long Time": "T", "Short Date": "d", "Long Date": "D", "Short Date/Time": "f",
           "Long Date/Time": "F", "Relative Time": "R"}
 
