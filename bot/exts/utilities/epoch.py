@@ -79,7 +79,7 @@ class TimeStampDropdown(discord.ui.Select):
         if selected == "Epoch":
             return await interaction.message.edit(content=f"`{self.epoch}`")
         else:
-            return await interaction.message.edit(content=fr"\<t:{self.epoch}:{STYLES[selected]}>")
+            return await interaction.message.edit(content=f"`<t:{self.epoch}:{STYLES[selected]}>`")
 
 
 class TimeStampMenuView(discord.ui.View):
