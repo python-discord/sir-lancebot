@@ -34,7 +34,8 @@ class Epoch(commands.Cog):
         Eg ".epoch in 5 months 4 days and 2 hours"
         or ".epoch 2022/6/15 16:43 -04:00"
 
-        Absolute times must be entered in descending orders of magnitude
+        Absolute times must be entered in descending orders of magnitude.
+        Times in the dropdown are show in UTC
 
         Timezones may take the following forms:
             Z (UTC)
@@ -57,9 +58,10 @@ class Epoch(commands.Cog):
     def _format_dates(self, date: arrow.Arrow) -> list[str]:
         """returns a list of dates formatted according to the discord timestamp styles.
         These are used in the description of each option in the dropdown"""
-        formatted = [date.format(d_format) for d_format in TIMESTAMP_FORMATS]
+        date = date.to('utc')
+        formatted = [str(int(date.timestamp()))]
+        formatted += [date.format(d_format) for d_format in TIMESTAMP_FORMATS]
         formatted.append(date.humanize())
-        formatted.insert(0, str(int(date.timestamp())))
         return formatted
 
 
