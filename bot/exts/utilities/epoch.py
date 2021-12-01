@@ -7,6 +7,7 @@ from typing import Union
 import dateutil
 from dateutil import parser
 import arrow
+from bot.exts.core.extensions import invoke_help_command
 
 # https://discord.com/developers/docs/reference#message-formatting-timestamp-styles
 TIMESTAMP_FORMATS = ["H:mm A", "H:mm:ss A", "MM/DD/YYYY", "MMMM D, YYYY", "MMMM D, YYYY H:mm A",
@@ -28,7 +29,24 @@ class AbsoluteDate(Converter):
 class Epoch(commands.Cog):
 
     @commands.command(name="epoch")
-    async def epoch(self, ctx: commands.Context, *, date_time: Union[RelativeDate, AbsoluteDate]) -> None:
+    async def epoch(self, ctx: commands.Context, *, date_time: Union[RelativeDate, AbsoluteDate] = None) -> None:
+        """Converts an entered time and date to a unix timestamp. Both relative and absolute times are accepted.
+        Eg ".epoch in 5 months 4 days and 2 hours"
+        or ".epoch 2022/6/15 16:43 -04:00"
+
+        Absolute times must be entered in descending orders of magnitude
+
+        Timezones may take the following forms:
+            Z (UTC)
+            ±HH:MM
+            ±HHMM
+            ±HH
+        """
+
+        if not date_time:
+            await invoke_help_command(ctx)
+            return
+
         epoch = int(date_time.timestamp())
         dropdown = TimeStampDropdown(self._format_dates(date_time), epoch)
         view = TimeStampMenuView(ctx, dropdown)
