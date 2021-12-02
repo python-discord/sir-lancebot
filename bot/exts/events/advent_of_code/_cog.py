@@ -229,6 +229,10 @@ class AdventOfCode(commands.Cog):
         Additionally you can specify a `self_placement_name`
         that will append the specified profile's personal stats to the top of the leaderboard
         """
+        # Strip quotes from the self placement name if needed (e.g. "My Name" -> My Name)
+        if self_placement_name and self_placement_name[0] == self_placement_name[-1] == '"':
+            self_placement_name = self_placement_name[1:-1]
+
         async with ctx.typing():
             try:
                 leaderboard = await _helpers.fetch_leaderboard(self_placement_name=self_placement_name)
