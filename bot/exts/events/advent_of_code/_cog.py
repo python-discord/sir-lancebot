@@ -220,6 +220,7 @@ class AdventOfCode(commands.Cog):
     async def aoc_leaderboard(
             self,
             ctx: commands.Context,
+            *,
             self_placement_name: Optional[str] = None,
     ) -> None:
         """
