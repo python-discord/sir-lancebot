@@ -11,14 +11,7 @@ from aiohttp import ClientResponse
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import (
-    Categories,
-    Colours,
-    ERROR_REPLIES,
-    Emojis,
-    NEGATIVE_REPLIES,
-    Tokens,
-)
+from bot.constants import Categories, Colours, ERROR_REPLIES, Emojis, NEGATIVE_REPLIES, Tokens
 from bot.exts.core.extensions import invoke_help_command
 
 log = logging.getLogger(__name__)
@@ -41,7 +34,7 @@ WHITELISTED_CATEGORIES = (
 )
 
 CODE_BLOCK_RE = re.compile(
-    r"^`([^`\n]+)`"  # Inline codeblock
+    r"^`([^`\n]+)`"   # Inline codeblock
     r"|```(.+?)```",  # Multiline codeblock
     re.DOTALL | re.MULTILINE
 )
@@ -56,7 +49,7 @@ AUTOMATIC_REGEX = re.compile(
 )
 
 
-@dataclass
+@dataclass(eq=True, frozen=True)
 class FoundIssue:
     """Dataclass representing an issue found by the regex."""
 
@@ -64,11 +57,8 @@ class FoundIssue:
     repository: str
     number: str
 
-    def __hash__(self) -> int:
-        return hash((self.organisation, self.repository, self.number))
 
-
-@dataclass
+@dataclass(eq=True, frozen=True)
 class FetchError:
     """Dataclass representing an error while fetching an issue."""
 
@@ -76,7 +66,7 @@ class FetchError:
     message: str
 
 
-@dataclass
+@dataclass(eq=True, frozen=True)
 class IssueState:
     """Dataclass representing the state of an issue."""
 
@@ -237,7 +227,7 @@ class GithubInfo(commands.Cog):
 
     async def fetch_data(self, url: str) -> tuple[dict[str], ClientResponse]:
         """Retrieve data as a dictionary and the response in a tuple."""
-        async with self.bot.http_session.get(url, heades=REQUEST_HEADERS) as r:
+        async with self.bot.http_session.get(url, headers=REQUEST_HEADERS) as r:
             return await r.json(), r
 
     @github_group.command(name="user", aliases=("userinfo",))
