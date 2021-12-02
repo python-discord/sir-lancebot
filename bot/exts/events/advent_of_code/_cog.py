@@ -225,6 +225,7 @@ class AdventOfCode(commands.Cog):
         specified profile's personal stats to the top of the leaderboard
         """
         # Strip quotes from the AoC username if needed (e.g. "My Name" -> My Name)
+        # This is to keep compatibility with those already used to wrapping the AoC name in quotes
         # Note: only strips one layer of quotes to allow names with quotes at the start and end
         #      e.g. ""My Name"" -> "My Name"
         if aoc_name and aoc_name.startswith('"') and aoc_name.endswith('"'):
