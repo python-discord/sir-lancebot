@@ -6,6 +6,7 @@ from typing import Optional
 
 import arrow
 import discord
+from async_rediscache import RedisCache
 from discord.ext import commands
 
 from bot.bot import Bot
@@ -28,6 +29,8 @@ AOC_WHITELIST = AOC_WHITELIST_RESTRICTED + (Channels.advent_of_code,)
 
 class AdventOfCode(commands.Cog):
     """Advent of Code festivities! Ho Ho Ho!"""
+
+    account_links = RedisCache()
 
     def __init__(self, bot: Bot):
         self.bot = bot
@@ -171,6 +174,72 @@ class AdventOfCode(commands.Cog):
             await ctx.send(f":x: {author.mention}, please (temporarily) enable DMs to receive the join code")
         else:
             await ctx.message.add_reaction(Emojis.envelope)
+
+    @in_month(Month.NOVEMBER, Month.DECEMBER)
+    @adventofcode_group.command(
+        name="link",
+        aliases=("connect",),
+        brief="Tie your Discord account with your Advent of Code name."
+    )
+    @whitelist_override(channels=AOC_WHITELIST)
+    async def aoc_link_account(self, ctx: commands.Context, aoc_name: str = None) -> None:
+        """
+        Link your Discord Account to your Advent of Code name.
+
+        Stored in a Redis Cache, Discord ID: Advent of Code Name
+        """
+        cache_items = await self.account_links.items()
+
+        # A short circuit in case the cache is empty
+        if len(cache_items) == 0 and aoc_name:
+            log.info(f"{ctx.author} ({ctx.author.id}) is now linked to {aoc_name}.")
+            await self.account_links.set(ctx.author.id, aoc_name)
+            await ctx.reply(f"You have linked your Discord ID to {aoc_name}.")
+            return
+        elif len(cache_items) == 0:
+            await ctx.reply(
+                "You have not linked an Advent of Code account."
+                "Please re-run the command with one specified."
+            )
+            return
+
+        cache_aoc_name = [value for _, value in cache_items]
+
+        if aoc_name:
+            # Let's check the current values in the cache to make sure it isn't already tied to a different account
+            if aoc_name == await self.account_links.get(ctx.author.id):
+                await ctx.reply(f"{aoc_name} is already tied to your account.")
+                return
+            elif aoc_name in cache_aoc_name:
+                log.info(
+                    f"{ctx.author} ({ctx.author.id}) tried to connect their account to {aoc_name},"
+                    " but it's already connected to another user."
+                )
+                await ctx.reply(
+                    f"{aoc_name} is already tied to another account."
+                    " Please contact an admin if you believe this is an error."
+                )
+                return
+
+            # Update an existing link
+            if old_aoc_name := await self.account_links.get(ctx.author.id):
+                log.info(f"{ctx.author} ({ctx.author.id}) has changed their link from {old_aoc_name} to {aoc_name}.")
+                await self.account_links.set(ctx.author.id, aoc_name)
+                await ctx.reply(f"Your linked account has been changed to {aoc_name}.")
+            else:
+                # Create a new link
+                log.info(f"{ctx.author} ({ctx.author.id}) is now linked to {aoc_name}.")
+                await self.account_links.set(ctx.author.id, aoc_name)
+                await ctx.reply(f"You have linked your Discord ID to {aoc_name}.")
+        else:
+            # User has not supplied a name, let's check if they're in the cache or not
+            if cache_name := await self.account_links.get(ctx.author.id):
+                await ctx.reply(f"You have already linked an Advent of Code account: {cache_name}.")
+            else:
+                await ctx.reply(
+                    "You have not linked an Advent of Code account."
+                    " Please re-run the command with one specified."
+                )
 
     @in_month(Month.DECEMBER)
     @adventofcode_group.command(
