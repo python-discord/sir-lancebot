@@ -224,7 +224,9 @@ class AdventOfCode(commands.Cog):
         Additionally you can specify an `aoc_name` that will append the
         specified profile's personal stats to the top of the leaderboard
         """
-        # Strip quotes from the self placement name if needed (e.g. "My Name" -> My Name)
+        # Strip quotes from the AoC username if needed (e.g. "My Name" -> My Name)
+        # Note: only strips one layer of quotes to allow names with quotes at the start and end
+        #      e.g. ""My Name"" -> "My Name"
         if aoc_name and aoc_name.startswith('"') and aoc_name.endswith('"'):
             aoc_name = aoc_name[1:-1]
 
