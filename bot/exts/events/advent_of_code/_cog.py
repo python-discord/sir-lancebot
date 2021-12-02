@@ -55,6 +55,7 @@ class AdventOfCode(commands.Cog):
         if not ctx.invoked_subcommand:
             await invoke_help_command(ctx)
 
+    @commands.guild_only()
     @adventofcode_group.command(
         name="subscribe",
         aliases=("sub", "notifications", "notify", "notifs"),
@@ -84,6 +85,7 @@ class AdventOfCode(commands.Cog):
             )
 
     @in_month(Month.DECEMBER)
+    @commands.guild_only()
     @adventofcode_group.command(name="unsubscribe", aliases=("unsub",), brief="Notifications for new days")
     @whitelist_override(channels=AOC_WHITELIST)
     async def aoc_unsubscribe(self, ctx: commands.Context) -> None:
@@ -127,6 +129,7 @@ class AdventOfCode(commands.Cog):
         """Respond with an explanation of all things Advent of Code."""
         await ctx.send(embed=self.cached_about_aoc)
 
+    @commands.guild_only()
     @adventofcode_group.command(name="join", aliases=("j",), brief="Learn how to join the leaderboard (via DM)")
     @whitelist_override(channels=AOC_WHITELIST)
     async def join_leaderboard(self, ctx: commands.Context) -> None:
@@ -295,7 +298,7 @@ class AdventOfCode(commands.Cog):
             info_embed = _helpers.get_summary_embed(leaderboard)
             await ctx.send(f"```\n{table}\n```", embed=info_embed)
 
-    @with_role(Roles.admin)
+    @with_role(Roles.admins)
     @adventofcode_group.command(
         name="refresh",
         aliases=("fetch",),
