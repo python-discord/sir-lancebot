@@ -35,12 +35,9 @@ class BeMyValentine(commands.Cog):
     @commands.command(name="lovefest", help=f"NOTE: This command has been moved to {MOVED_COMMAND}")
     async def lovefest_role(self, ctx: commands.Context) -> None:
         """
-        Subscribe or unsubscribe from the lovefest role.
+        Deprecated lovefest role command.
 
-        The lovefest role makes you eligible to receive anonymous valentines from other users.
-
-        1) use the command \".lovefest sub\" to get the lovefest role.
-        2) use the command \".lovefest unsub\" to get rid of the lovefest role.
+        This command has been moved to bot, and will be removed in the future.
         """
         raise MovedCommandError(MOVED_COMMAND)
 
