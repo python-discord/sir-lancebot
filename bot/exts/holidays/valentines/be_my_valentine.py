@@ -10,7 +10,6 @@ from bot.bot import Bot
 from bot.constants import Channels, Colours, Lovefest, Month, PYTHON_PREFIX
 from bot.utils.decorators import in_month
 from bot.utils.exceptions import MovedCommandError
-from bot.utils.extensions import invoke_help_command
 
 log = logging.getLogger(__name__)
 
@@ -33,7 +32,7 @@ class BeMyValentine(commands.Cog):
         return loads(p.read_text("utf8"))
 
     @in_month(Month.FEBRUARY)
-    @commands.group(name="lovefest", help=f"This command has been moved to {MOVED_COMMAND}")
+    @commands.command(name="lovefest", help=f"NOTE: This command has been moved to {MOVED_COMMAND}")
     async def lovefest_role(self, ctx: commands.Context) -> None:
         """
         Subscribe or unsubscribe from the lovefest role.
@@ -43,17 +42,6 @@ class BeMyValentine(commands.Cog):
         1) use the command \".lovefest sub\" to get the lovefest role.
         2) use the command \".lovefest unsub\" to get rid of the lovefest role.
         """
-        if not ctx.invoked_subcommand:
-            await invoke_help_command(ctx)
-
-    @lovefest_role.command(name="sub", help=f"This command has been moved to {MOVED_COMMAND}")
-    async def add_role(self, ctx: commands.Context) -> None:
-        """NOTE: This command has been moved to bot."""
-        raise MovedCommandError(MOVED_COMMAND)
-
-    @lovefest_role.command(name="unsub", help=f"This command has been moved to {MOVED_COMMAND}")
-    async def remove_role(self, ctx: commands.Context) -> None:
-        """NOTE: This command has been moved to bot."""
         raise MovedCommandError(MOVED_COMMAND)
 
     @commands.cooldown(1, 1800, commands.BucketType.user)
