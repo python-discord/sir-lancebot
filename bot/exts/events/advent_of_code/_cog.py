@@ -10,10 +10,13 @@ from async_rediscache import RedisCache
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import AdventOfCode as AocConfig, Channels, Colours, Emojis, Month, Roles, WHITELISTED_CHANNELS
+from bot.constants import (
+    AdventOfCode as AocConfig, Channels, Colours, Emojis, Month, PYTHON_PREFIX, Roles, WHITELISTED_CHANNELS
+)
 from bot.exts.events.advent_of_code import _helpers
 from bot.exts.events.advent_of_code.views.dayandstarview import AoCDropdownView
 from bot.utils.decorators import InChannelCheckFailure, in_month, whitelist_override, with_role
+from bot.utils.exceptions import MovedCommandError
 from bot.utils.extensions import invoke_help_command
 
 log = logging.getLogger(__name__)
@@ -25,6 +28,9 @@ AOC_WHITELIST_RESTRICTED = WHITELISTED_CHANNELS + (Channels.advent_of_code_comma
 # Some commands can be run in the regular advent of code channel
 # They aren't spammy and foster discussion
 AOC_WHITELIST = AOC_WHITELIST_RESTRICTED + (Channels.advent_of_code,)
+
+MOVED_COMMAND = f"{PYTHON_PREFIX}subscribe"
+MOVED_HELP = f"NOTE: This command has been moved to {MOVED_COMMAND}"
 
 
 class AdventOfCode(commands.Cog):
@@ -63,44 +69,20 @@ class AdventOfCode(commands.Cog):
     @adventofcode_group.command(
         name="subscribe",
         aliases=("sub", "notifications", "notify", "notifs"),
-        brief="Notifications for new days"
+        help=MOVED_HELP,
     )
     @whitelist_override(channels=AOC_WHITELIST)
     async def aoc_subscribe(self, ctx: commands.Context) -> None:
         """Assign the role for notifications about new days being ready."""
-        current_year = datetime.now().year
-        if current_year != AocConfig.year:
-            await ctx.send(f"You can't subscribe to {current_year}'s Advent of Code announcements yet!")
-            return
-
-        role = ctx.guild.get_role(AocConfig.role_id)
-        unsubscribe_command = f"{ctx.prefix}{ctx.command.root_parent} unsubscribe"
-
-        if role not in ctx.author.roles:
-            await ctx.author.add_roles(role)
-            await ctx.send(
-                "Okay! You have been __subscribed__ to notifications about new Advent of Code tasks. "
-                f"You can run `{unsubscribe_command}` to disable them again for you."
-            )
-        else:
-            await ctx.send(
-                "Hey, you already are receiving notifications about new Advent of Code tasks. "
-                f"If you don't want them any more, run `{unsubscribe_command}` instead."
-            )
+        raise MovedCommandError(MOVED_COMMAND)
 
     @in_month(Month.DECEMBER)
     @commands.guild_only()
-    @adventofcode_group.command(name="unsubscribe", aliases=("unsub",), brief="Notifications for new days")
+    @adventofcode_group.command(name="unsubscribe", aliases=("unsub",), help=MOVED_HELP)
     @whitelist_override(channels=AOC_WHITELIST)
     async def aoc_unsubscribe(self, ctx: commands.Context) -> None:
         """Remove the role for notifications about new days being ready."""
-        role = ctx.guild.get_role(AocConfig.role_id)
-
-        if role in ctx.author.roles:
-            await ctx.author.remove_roles(role)
-            await ctx.send("Okay! You have been __unsubscribed__ from notifications about new Advent of Code tasks.")
-        else:
-            await ctx.send("Hey, you don't even get any notifications about new Advent of Code tasks currently anyway.")
+        raise MovedCommandError(MOVED_COMMAND)
 
     @adventofcode_group.command(name="countdown", aliases=("count", "c"), brief="Return time left until next day")
     @whitelist_override(channels=AOC_WHITELIST)
