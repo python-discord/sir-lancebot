@@ -11,7 +11,7 @@ from aiohttp import ClientResponse
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Categories, Colours, ERROR_REPLIES, Emojis, NEGATIVE_REPLIES, Tokens
+from bot.constants import Colours, ERROR_REPLIES, Emojis, NEGATIVE_REPLIES, Tokens
 from bot.exts.core.extensions import invoke_help_command
 
 log = logging.getLogger(__name__)
@@ -26,12 +26,8 @@ REPOSITORY_ENDPOINT = "https://api.github.com/orgs/{org}/repos?per_page=100&type
 ISSUE_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/issues/{number}"
 PR_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/pulls/{number}"
 
-if GITHUB_TOKEN := Tokens.github:
-    REQUEST_HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
-
-WHITELISTED_CATEGORIES = (
-    Categories.development, Categories.devprojects, Categories.media, Categories.staff
-)
+if Tokens.github:
+    REQUEST_HEADERS["Authorization"] = f"token {Tokens.github}"
 
 CODE_BLOCK_RE = re.compile(
     r"^`([^`\n]+)`"   # Inline codeblock
@@ -102,7 +98,6 @@ class GithubInfo(commands.Cog):
         """
         url = ISSUE_ENDPOINT.format(user=user, repository=repository, number=number)
         pulls_url = PR_ENDPOINT.format(user=user, repository=repository, number=number)
-        log.trace(f"Querying GH issues API: {url}")
 
         json_data, r = await self.fetch_data(url)
 
@@ -130,8 +125,6 @@ class GithubInfo(commands.Cog):
         # we know that a PR has been requested and a call to the pulls API endpoint is necessary
         # to get the desired information for the PR.
         else:
-            log.trace(f"PR provided, querying GH pulls API for additional information: {pulls_url}")
-
             pull_data, _ = await self.fetch_data(pulls_url)
             if pull_data["draft"]:
                 emoji = Emojis.pull_request_draft
@@ -227,6 +220,7 @@ class GithubInfo(commands.Cog):
 
     async def fetch_data(self, url: str) -> tuple[dict[str], ClientResponse]:
         """Retrieve data as a dictionary and the response in a tuple."""
+        log.trace(f"Querying GH issues API: {url}")
         async with self.bot.http_session.get(url, headers=REQUEST_HEADERS) as r:
             return await r.json(), r
 
