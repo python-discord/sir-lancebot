@@ -7,13 +7,16 @@ import discord
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Channels, Colours, Lovefest, Month
+from bot.constants import Channels, Colours, Lovefest, Month, PYTHON_PREFIX
 from bot.utils.decorators import in_month
+from bot.utils.exceptions import MovedCommandError
 from bot.utils.extensions import invoke_help_command
 
 log = logging.getLogger(__name__)
 
 HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_heart:", ":two_hearts:"]
+
+MOVED_COMMAND = f"{PYTHON_PREFIX}subscribe"
 
 
 class BeMyValentine(commands.Cog):
@@ -30,7 +33,7 @@ class BeMyValentine(commands.Cog):
         return loads(p.read_text("utf8"))
 
     @in_month(Month.FEBRUARY)
-    @commands.group(name="lovefest")
+    @commands.group(name="lovefest", help=f"This command has been moved to {MOVED_COMMAND}")
     async def lovefest_role(self, ctx: commands.Context) -> None:
         """
         Subscribe or unsubscribe from the lovefest role.
@@ -43,27 +46,15 @@ class BeMyValentine(commands.Cog):
         if not ctx.invoked_subcommand:
             await invoke_help_command(ctx)
 
-    @lovefest_role.command(name="sub")
+    @lovefest_role.command(name="sub", help=f"This command has been moved to {MOVED_COMMAND}")
     async def add_role(self, ctx: commands.Context) -> None:
-        """Adds the lovefest role."""
-        user = ctx.author
-        role = ctx.guild.get_role(Lovefest.role_id)
-        if role not in ctx.author.roles:
-            await user.add_roles(role)
-            await ctx.send("The Lovefest role has been added !")
-        else:
-            await ctx.send("You already have the role !")
+        """NOTE: This command has been moved to bot."""
+        raise MovedCommandError(MOVED_COMMAND)
 
-    @lovefest_role.command(name="unsub")
+    @lovefest_role.command(name="unsub", help=f"This command has been moved to {MOVED_COMMAND}")
     async def remove_role(self, ctx: commands.Context) -> None:
-        """Removes the lovefest role."""
-        user = ctx.author
-        role = ctx.guild.get_role(Lovefest.role_id)
-        if role not in ctx.author.roles:
-            await ctx.send("You dont have the lovefest role.")
-        else:
-            await user.remove_roles(role)
-            await ctx.send("The lovefest role has been successfully removed!")
+        """NOTE: This command has been moved to bot."""
+        raise MovedCommandError(MOVED_COMMAND)
 
     @commands.cooldown(1, 1800, commands.BucketType.user)
     @commands.group(name="bemyvalentine", invoke_without_command=True)
