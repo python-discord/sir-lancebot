@@ -30,6 +30,7 @@ AOC_WHITELIST = AOC_WHITELIST_RESTRICTED + (Channels.advent_of_code,)
 class AdventOfCode(commands.Cog):
     """Advent of Code festivities! Ho Ho Ho!"""
 
+    # Redis Cache for linking Discord IDs to Advent of Code usernames
     account_links = RedisCache()
 
     def __init__(self, bot: Bot):
@@ -186,23 +187,9 @@ class AdventOfCode(commands.Cog):
         """
         Link your Discord Account to your Advent of Code name.
 
-        Stored in a Redis Cache, Discord ID: Advent of Code Name
+        Stored in a Redis Cache with the format of `Discord ID: Advent of Code Name`
         """
         cache_items = await self.account_links.items()
-
-        # A short circuit in case the cache is empty
-        if len(cache_items) == 0 and aoc_name:
-            log.info(f"{ctx.author} ({ctx.author.id}) is now linked to {aoc_name}.")
-            await self.account_links.set(ctx.author.id, aoc_name)
-            await ctx.reply(f"You have linked your Discord ID to {aoc_name}.")
-            return
-        elif len(cache_items) == 0:
-            await ctx.reply(
-                "You have not linked an Advent of Code account."
-                "Please re-run the command with one specified."
-            )
-            return
-
         cache_aoc_name = [value for _, value in cache_items]
 
         if aoc_name:
