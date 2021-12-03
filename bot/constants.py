@@ -23,6 +23,7 @@ __all__ = (
     "Reddit",
     "RedisConfig",
     "RedirectOutput",
+    "PYTHON_PREFIX"
     "MODERATION_ROLES",
     "STAFF_ROLES",
     "WHITELISTED_CHANNELS",
@@ -33,6 +34,8 @@ __all__ = (
 
 log = logging.getLogger(__name__)
 
+
+PYTHON_PREFIX = "!"
 
 @dataclasses.dataclass
 class AdventOfCodeLeaderboard:
