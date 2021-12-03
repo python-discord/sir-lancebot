@@ -73,7 +73,11 @@ class AdventOfCode(commands.Cog):
     )
     @whitelist_override(channels=AOC_WHITELIST)
     async def aoc_subscribe(self, ctx: commands.Context) -> None:
-        """Assign the role for notifications about new days being ready."""
+        """
+        Deprecated role command.
+
+        This command has been moved to bot, and will be removed in the future.
+        """
         raise MovedCommandError(MOVED_COMMAND)
 
     @in_month(Month.DECEMBER)
@@ -81,7 +85,11 @@ class AdventOfCode(commands.Cog):
     @adventofcode_group.command(name="unsubscribe", aliases=("unsub",), help=MOVED_HELP)
     @whitelist_override(channels=AOC_WHITELIST)
     async def aoc_unsubscribe(self, ctx: commands.Context) -> None:
-        """Remove the role for notifications about new days being ready."""
+        """
+        Deprecated role command.
+
+        This command has been moved to bot, and will be removed in the future.
+        """
         raise MovedCommandError(MOVED_COMMAND)
 
     @adventofcode_group.command(name="countdown", aliases=("count", "c"), brief="Return time left until next day")
