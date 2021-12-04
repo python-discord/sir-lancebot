@@ -193,14 +193,14 @@ class AdventOfCode(commands.Cog):
         Stored in a Redis Cache with the format of `Discord ID: Advent of Code Name`
         """
         cache_items = await self.account_links.items()
-        cache_aoc_name = [value for _, value in cache_items]
+        cache_aoc_names = [value for _, value in cache_items]
 
         if aoc_name:
             # Let's check the current values in the cache to make sure it isn't already tied to a different account
             if aoc_name == await self.account_links.get(ctx.author.id):
                 await ctx.reply(f"{aoc_name} is already tied to your account.")
                 return
-            elif aoc_name in cache_aoc_name:
+            elif aoc_name in cache_aoc_names:
                 log.info(
                     f"{ctx.author} ({ctx.author.id}) tried to connect their account to {aoc_name},"
                     " but it's already connected to another user."
@@ -213,7 +213,7 @@ class AdventOfCode(commands.Cog):
 
             # Update an existing link
             if old_aoc_name := await self.account_links.get(ctx.author.id):
-                log.info(f"Changing link for{ctx.author} ({ctx.author.id}) from {old_aoc_name} to {aoc_name}.")
+                log.info(f"Changing link for {ctx.author} ({ctx.author.id}) from {old_aoc_name} to {aoc_name}.")
                 await self.account_links.set(ctx.author.id, aoc_name)
                 await ctx.reply(f"Your linked account has been changed to {aoc_name}.")
             else:
