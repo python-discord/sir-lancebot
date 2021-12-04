@@ -216,6 +216,9 @@ def _format_leaderboard(leaderboard: dict[str, dict], self_placement_name: str =
     if self_placement_name and not self_placement_exists:
         raise commands.BadArgument(
             "Sorry, your profile does not exist in this leaderboard."
+            "\n\n"
+            "To join our leaderboard, run the command `.aoc join`."
+            " If you've joined recently, please wait up to 30 minutes for our leaderboard to refresh."
         )
     return "\n".join(leaderboard_lines)
 
