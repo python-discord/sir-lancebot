@@ -57,8 +57,10 @@ class Epoch(commands.Cog):
             await original.edit(view=None)
 
     def _format_dates(self, date: arrow.Arrow) -> list[str]:
-        """returns a list of dates formatted according to the discord timestamp styles.
-        These are used in the description of each option in the dropdown"""
+        """
+        returns a list of dates formatted according to the discord timestamp styles.
+        These are used in the description of each option in the dropdown
+        """
         date = date.to('utc')
         formatted = [str(int(date.timestamp()))]
         formatted += [date.format(d_format) for d_format in TIMESTAMP_FORMATS]
