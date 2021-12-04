@@ -183,7 +183,7 @@ class AdventOfCode(commands.Cog):
         brief="Tie your Discord account with your Advent of Code name."
     )
     @whitelist_override(channels=AOC_WHITELIST)
-    async def aoc_link_account(self, ctx: commands.Context, aoc_name: str = None) -> None:
+    async def aoc_link_account(self, ctx: commands.Context, *, aoc_name: str = None) -> None:
         """
         Link your Discord Account to your Advent of Code name.
 
