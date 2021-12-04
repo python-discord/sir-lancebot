@@ -210,12 +210,12 @@ class AdventOfCode(commands.Cog):
 
             # Update an existing link
             if old_aoc_name := await self.account_links.get(ctx.author.id):
-                log.info(f"{ctx.author} ({ctx.author.id}) has changed their link from {old_aoc_name} to {aoc_name}.")
+                log.info(f"Changing link for{ctx.author} ({ctx.author.id}) from {old_aoc_name} to {aoc_name}.")
                 await self.account_links.set(ctx.author.id, aoc_name)
                 await ctx.reply(f"Your linked account has been changed to {aoc_name}.")
             else:
                 # Create a new link
-                log.info(f"{ctx.author} ({ctx.author.id}) is now linked to {aoc_name}.")
+                log.info(f"Linking {ctx.author} ({ctx.author.id}) to account {aoc_name}.")
                 await self.account_links.set(ctx.author.id, aoc_name)
                 await ctx.reply(f"You have linked your Discord ID to {aoc_name}.")
         else:
@@ -246,7 +246,7 @@ class AdventOfCode(commands.Cog):
             await self.account_links.delete(ctx.author.id)
             await ctx.reply(f"We have removed the link between your Discord ID and {aoc_cache_name}.")
         else:
-            log.info(f"Attempted to unlink {ctx.author} ({ctx.author.id}), but not link was found.")
+            log.info(f"Attempted to unlink {ctx.author} ({ctx.author.id}), but no link was found.")
             await ctx.reply("You don't have an Advent of Code account linked.")
 
     @in_month(Month.DECEMBER)
