@@ -59,6 +59,7 @@ class AdventOfCode(commands.Cog):
         if not ctx.invoked_subcommand:
             await invoke_help_command(ctx)
 
+    @commands.guild_only()
     @adventofcode_group.command(
         name="subscribe",
         aliases=("sub", "notifications", "notify", "notifs"),
@@ -88,6 +89,7 @@ class AdventOfCode(commands.Cog):
             )
 
     @in_month(Month.DECEMBER)
+    @commands.guild_only()
     @adventofcode_group.command(name="unsubscribe", aliases=("unsub",), brief="Notifications for new days")
     @whitelist_override(channels=AOC_WHITELIST)
     async def aoc_unsubscribe(self, ctx: commands.Context) -> None:
@@ -131,6 +133,7 @@ class AdventOfCode(commands.Cog):
         """Respond with an explanation of all things Advent of Code."""
         await ctx.send(embed=self.cached_about_aoc)
 
+    @commands.guild_only()
     @adventofcode_group.command(name="join", aliases=("j",), brief="Learn how to join the leaderboard (via DM)")
     @whitelist_override(channels=AOC_WHITELIST)
     async def join_leaderboard(self, ctx: commands.Context) -> None:
@@ -294,20 +297,23 @@ class AdventOfCode(commands.Cog):
         brief="Get a snapshot of the PyDis private AoC leaderboard",
     )
     @whitelist_override(channels=AOC_WHITELIST_RESTRICTED)
-    async def aoc_leaderboard(
-            self,
-            ctx: commands.Context,
-            self_placement_name: Optional[str] = None,
-    ) -> None:
+    async def aoc_leaderboard(self, ctx: commands.Context, *, aoc_name: Optional[str] = None) -> None:
         """
         Get the current top scorers of the Python Discord Leaderboard.
 
-        Additionally you can specify a `self_placement_name`
-        that will append the specified profile's personal stats to the top of the leaderboard
+        Additionally you can specify an `aoc_name` that will append the
+        specified profile's personal stats to the top of the leaderboard
         """
+        # Strip quotes from the AoC username if needed (e.g. "My Name" -> My Name)
+        # This is to keep compatibility with those already used to wrapping the AoC name in quotes
+        # Note: only strips one layer of quotes to allow names with quotes at the start and end
+        #      e.g. ""My Name"" -> "My Name"
+        if aoc_name and aoc_name.startswith('"') and aoc_name.endswith('"'):
+            aoc_name = aoc_name[1:-1]
+
         async with ctx.typing():
             try:
-                leaderboard = await _helpers.fetch_leaderboard(self_placement_name=self_placement_name)
+                leaderboard = await _helpers.fetch_leaderboard(self_placement_name=aoc_name)
             except _helpers.FetchingLeaderboardFailedError:
                 await ctx.send(":x: Unable to fetch leaderboard!")
                 return
@@ -315,10 +321,10 @@ class AdventOfCode(commands.Cog):
         number_of_participants = leaderboard["number_of_participants"]
 
         top_count = min(AocConfig.leaderboard_displayed_members, number_of_participants)
-        self_placement_header = "(and your personal stats compared to the top 10)" if self_placement_name else ""
+        self_placement_header = "(and your personal stats compared to the top 10)" if aoc_name else ""
         header = f"Here's our current top {top_count}{self_placement_header}! {Emojis.christmas_tree * 3}"
         table = "```\n" \
-                f"{leaderboard['placement_leaderboard'] if self_placement_name else leaderboard['top_leaderboard']}" \
+                f"{leaderboard['placement_leaderboard'] if aoc_name else leaderboard['top_leaderboard']}" \
                 "\n```"
         info_embed = _helpers.get_summary_embed(leaderboard)
 
@@ -372,7 +378,7 @@ class AdventOfCode(commands.Cog):
             info_embed = _helpers.get_summary_embed(leaderboard)
             await ctx.send(f"```\n{table}\n```", embed=info_embed)
 
-    @with_role(Roles.admin)
+    @with_role(Roles.admins)
     @adventofcode_group.command(
         name="refresh",
         aliases=("fetch",),
