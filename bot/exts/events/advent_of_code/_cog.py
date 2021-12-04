@@ -311,6 +311,10 @@ class AdventOfCode(commands.Cog):
         if aoc_name and aoc_name.startswith('"') and aoc_name.endswith('"'):
             aoc_name = aoc_name[1:-1]
 
+        # Check if an advent of code account is linked in the Redis Cache if aoc_name is not given
+        if (aoc_cache_name := await self.account_links.get(ctx.author.id)) and aoc_name is None:
+            aoc_name = aoc_cache_name
+
         async with ctx.typing():
             try:
                 leaderboard = await _helpers.fetch_leaderboard(self_placement_name=aoc_name)
@@ -321,7 +325,7 @@ class AdventOfCode(commands.Cog):
         number_of_participants = leaderboard["number_of_participants"]
 
         top_count = min(AocConfig.leaderboard_displayed_members, number_of_participants)
-        self_placement_header = "(and your personal stats compared to the top 10)" if aoc_name else ""
+        self_placement_header = " (and your personal stats compared to the top 10)" if aoc_name else ""
         header = f"Here's our current top {top_count}{self_placement_header}! {Emojis.christmas_tree * 3}"
         table = "```\n" \
                 f"{leaderboard['placement_leaderboard'] if aoc_name else leaderboard['top_leaderboard']}" \
