@@ -30,7 +30,8 @@ class Epoch(commands.Cog):
 
     @commands.command(name="epoch")
     async def epoch(self, ctx: commands.Context, *, date_time: Union[RelativeDate, AbsoluteDate] = None) -> None:
-        """Converts an entered time and date to a unix timestamp. Both relative and absolute times are accepted.
+        """
+        Converts an entered time and date to a unix timestamp. Both relative and absolute times are accepted.
         Eg ".epoch in 5 months 4 days and 2 hours"
         or ".epoch 2022/6/15 16:43 -04:00"
 
