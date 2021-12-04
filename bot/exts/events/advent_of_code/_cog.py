@@ -228,6 +228,27 @@ class AdventOfCode(commands.Cog):
                     " Please re-run the command with one specified."
                 )
 
+    @in_month(Month.NOVEMBER, Month.DECEMBER)
+    @adventofcode_group.command(
+        name="unlink",
+        aliases=("disconnect",),
+        brief="Tie your Discord account with your Advent of Code name."
+    )
+    @whitelist_override(channels=AOC_WHITELIST)
+    async def aoc_unlink_account(self, ctx: commands.Context) -> None:
+        """
+        Unlink your Discord ID with your Advent of Code leaderboard name.
+
+        Deletes the entry that was Stored in the Redis cache.
+        """
+        if aoc_cache_name := await self.account_links.get(ctx.author.id):
+            log.info(f"Unlinking {ctx.author} ({ctx.author.id}) from Advent of Code account {aoc_cache_name}")
+            await self.account_links.delete(ctx.author.id)
+            await ctx.reply(f"We have removed the link between your Discord ID and {aoc_cache_name}.")
+        else:
+            log.info(f"Attempted to unlink {ctx.author} ({ctx.author.id}), but not link was found.")
+            await ctx.reply("You don't have an Advent of Code account linked.")
+
     @in_month(Month.DECEMBER)
     @adventofcode_group.command(
         name="dayandstar",
