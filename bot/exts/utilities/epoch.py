@@ -1,27 +1,40 @@
-import discord
-from discord.ext import commands
-from discord.ext.commands import Converter
-from bot.bot import Bot
 from typing import Union
 
-import dateutil
-from dateutil import parser
 import arrow
+import dateutil
+import discord
+from dateutil import parser
+from discord.ext import commands
+
+from bot.bot import Bot
 from bot.exts.core.extensions import invoke_help_command
 
 # https://discord.com/developers/docs/reference#message-formatting-timestamp-styles
-TIMESTAMP_FORMATS = ["h:mm A", "h:mm:ss A", "MM/DD/YYYY", "MMMM D, YYYY", "MMMM D, YYYY h:mm A",
-                     "dddd, MMMM D, YYYY h:mm A "]
-STYLES = {"Epoch": "", "Short Time": "t", "Long Time": "T", "Short Date": "d", "Long Date": "D", "Short Date/Time": "f",
-          "Long Date/Time": "F", "Relative Time": "R"}
+TIMESTAMP_FORMATS = [
+    "h:mm A",
+    "h:mm:ss A",
+    "MM/DD/YYYY",
+    "MMMM D, YYYY",
+    "MMMM D, YYYY h:mm A",
+    "dddd, MMMM D, YYYY h:mm A "
+]
+STYLES = {"Epoch": "",
+          "Short Time": "t",
+          "Long Time": "T",
+          "Short Date": "d",
+          "Long Date": "D",
+          "Short Date/Time": "f",
+          "Long Date/Time": "F",
+          "Relative Time": "R"
+          }
 
 
-class RelativeDate(Converter):
+class RelativeDate(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str) -> arrow.Arrow:
         return arrow.utcnow().dehumanize(argument)
 
 
-class AbsoluteDate(Converter):
+class AbsoluteDate(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str) -> arrow.Arrow:
         return arrow.get(dateutil.parser.parse(argument))
 
@@ -30,7 +43,8 @@ class Epoch(commands.Cog):
 
     @commands.command(name="epoch")
     async def epoch(self, ctx: commands.Context, *, date_time: Union[RelativeDate, AbsoluteDate] = None) -> None:
-        """Converts an entered time and date to a unix timestamp. Both relative and absolute times are accepted.
+        """
+        Convert an entered time and date to a unix timestamp. Both relative and absolute times are accepted.
         Eg ".epoch in 5 months 4 days and 2 hours"
         or ".epoch 2022/6/15 16:43 -04:00"
 
@@ -56,7 +70,8 @@ class Epoch(commands.Cog):
             await original.edit(view=None)
 
     def _format_dates(self, date: arrow.Arrow) -> list[str]:
-        """returns a list of dates formatted according to the discord timestamp styles.
+        """
+        Return a list of dates formatted according to the discord timestamp styles.
         These are used in the description of each option in the dropdown"""
         date = date.to('utc')
         formatted = [str(int(date.timestamp()))]
@@ -66,7 +81,7 @@ class Epoch(commands.Cog):
 
 
 class TimeStampDropdown(discord.ui.Select):
-    def __init__(self, formatted_times, epoch: int):
+    def __init__(self, formatted_times: list[str], epoch: int):
         self.epoch: int = epoch
         super().__init__(
             placeholder="Format this epoch as a discord timestamp",
