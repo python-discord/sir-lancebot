@@ -139,7 +139,7 @@ class Leaderboard(commands.Cog):
         embed.set_footer(
             text=(
                 f"Page 1/{math.ceil(len(sorted_lb) / 10)}  |"
-                f"  Your rank: {author_rank}/{len(sorted_lb)}"
+                f"  |  Your rank: {author_rank}/{len(sorted_lb)}" if author_rank else ""
             )
         )
         embed.set_thumbnail(url=DUCKY_COINS_THUMBNAIL)
