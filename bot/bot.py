@@ -40,6 +40,8 @@ class Bot(commands.Bot):
             connector=TCPConnector(resolver=AsyncResolver(), family=socket.AF_INET)
         )
         self._guild_available = asyncio.Event()
+        self.leader_board_cache_lock = asyncio.Lock()
+
         self.redis_session = redis_session
         self.loop.create_task(self.check_channels())
         self.loop.create_task(self.send_log(self.name, "Connected!"))
@@ -89,22 +91,25 @@ class Bot(commands.Bot):
             )
             return
 
-        current_points = await _leaderboard_cache.get(user.id, 0)
-        current_points_today = await _per_day_leaderboard.get(user.id, 0)
-        new_points_today = current_points_today + points
+        async with self.leader_board_cache_lock:
+            current_points = await _leaderboard_cache.get(user.id, 0)
+            current_points_today = await _per_day_leaderboard.get(user.id, 0)
+            new_points_today = current_points_today + points
 
-        if new_points_today > MAX_PER_GAME_PER_DAY_POINTS:
-            log.info(f"Member({user.id}) has got maximum possible points for game cog {cog.qualified_name}.")
-            await _per_day_leaderboard.set(user.id, MAX_PER_GAME_PER_DAY_POINTS)
-            await _leaderboard_cache.set(
-                user.id, current_points + (MAX_PER_GAME_PER_DAY_POINTS - current_points_today)
-            )
-        else:
-            await _per_day_leaderboard.set(user.id, new_points_today)
-            await _leaderboard_cache.set(user.id, current_points + points)
-            log.info(
-                f"Added {points} points to Member({user.id}) for game cog {cog.qualified_name}."
-            )
+            if new_points_today > MAX_PER_GAME_PER_DAY_POINTS:
+                log.info(
+                    f"Member({user.id}) has got maximum possible points for game cog {cog.qualified_name}."
+                )
+                await _per_day_leaderboard.set(user.id, MAX_PER_GAME_PER_DAY_POINTS)
+                await _leaderboard_cache.set(
+                    user.id, current_points + (MAX_PER_GAME_PER_DAY_POINTS - current_points_today)
+                )
+            else:
+                await _per_day_leaderboard.set(user.id, new_points_today)
+                await _leaderboard_cache.set(user.id, current_points + points)
+                log.info(
+                    f"Added {points} points to Member({user.id}) for game cog {cog.qualified_name}."
+                )
 
     @property
     def member(self) -> Optional[discord.Member]:
