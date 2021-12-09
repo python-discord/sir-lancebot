@@ -89,8 +89,8 @@ class Bot(commands.Bot):
             )
             return
 
-        current_points = await _leaderboard_cache.get(user.id) or 0
-        current_points_today = await _per_day_leaderboard.get(user.id) or 0
+        current_points = await _leaderboard_cache.get(user.id, 0)
+        current_points_today = await _per_day_leaderboard.get(user.id, 0)
         new_points_today = current_points_today + points
 
         if new_points_today > MAX_PER_GAME_PER_DAY_POINTS:
@@ -197,9 +197,7 @@ class Bot(commands.Bot):
         devlog = self.get_channel(constants.Channels.devlog)
 
         if not devlog:
-            log.info(
-                f"Fetching devlog channel as it wasn't found in the cache (ID: {constants.Channels.devlog})"
-            )
+            log.info(f"Fetching devlog channel as it wasn't found in the cache (ID: {constants.Channels.devlog})")
             try:
                 devlog = await self.fetch_channel(constants.Channels.devlog)
             except discord.HTTPException as discord_exc:

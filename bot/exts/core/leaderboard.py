@@ -1,7 +1,5 @@
-import itertools
 import logging
 import math
-from collections import OrderedDict
 
 import discord
 from async_rediscache import RedisCache
@@ -105,28 +103,24 @@ class Leaderboard(commands.Cog):
     async def make_leaderboard(
         self,
         author: discord.Member,
-        cached_leaderboard: list[RedisCache]
+        cached_leaderboards: list[RedisCache]
     ) -> discord.Embed:
         """Make a discord embed for the current top 10 members in the cached leaderboard."""
-        if len(cached_leaderboard) == 1:
-            unsorted_lb = await cached_leaderboard[0].to_dict()
+        if len(cached_leaderboards) == 1:
+            unsorted_lb = await cached_leaderboards[0].to_dict()
         else:
             unsorted_lb = {}
-            for lb in cached_leaderboard:
+            for lb in cached_leaderboards:
                 async for member, points in lb.to_dict():
-                    exists = unsorted_lb.get(member)
+                    unsorted_lb[member] = unsorted_lb.get(member, 0) + points
 
-                    if exists:
-                        unsorted_lb[member] += points
-                    else:
-                        unsorted_lb[member] = points
+        sorted_lb = sorted(unsorted_lb.items(), key=lambda kv: kv[1], reverse=True)
+        top_ten = sorted_lb[:10]
 
-        sorted_lb = OrderedDict(sorted(unsorted_lb.items(), key=lambda kv: kv[1], reverse=True))
-        top_ten = itertools.islice(sorted_lb.items(), 0, 10)
-
-        try:
-            author_rank = list(sorted_lb).index(author.id) + 1
-        except ValueError:
+        for author_rank in range(len(sorted_lb)):
+            if sorted_lb[author_rank][0] == author.id:
+                break
+        else:
             author_rank = 0
 
         lines = []
@@ -156,28 +150,28 @@ class Leaderboard(commands.Cog):
     async def leaderboard(self, ctx: commands.Context, game: ParentCogConvertor = None) -> None:
         """Get overall leaderboard if not game specified, else leaderboard for that game."""
         if game:
-            leaderboards = self.bot.games_leaderboard.get(game)
-            if not leaderboards:
+            game_leaderboards = self.bot.games_leaderboard.get(game)
+            if not game_leaderboards:
                 raise commands.BadArgument(f"Leaderboard for game {game} not found.")
-            leaderboard = [leaderboards[0]]
+            total_leaderboards = [game_leaderboards[0]]
         else:
-            leaderboard = [lb for lb, _ in self.bot.games_leaderboard.values()]
+            total_leaderboards = [lb for lb, _ in self.bot.games_leaderboard.values()]
 
-        embed = await self.make_leaderboard(ctx.author, leaderboard)
+        embed = await self.make_leaderboard(ctx.author, total_leaderboards)
         await ctx.send(embed=embed)
 
     @leaderboard.command(name="today", aliases=("t",))
     async def per_day_leaderboard(self, ctx: commands.Context, game: ParentCogConvertor = None) -> None:
         """Get today's overall leaderboard if not game specified, else leaderboard for that game."""
         if game:
-            leaderboards = self.bot.games_leaderboard.get(game)
-            if not leaderboards:
-                raise commands.BadArgument(f"Leaderboard for game {game} not found.")
-            leaderboard = [leaderboards[1]]
+            game_leaderboards = self.bot.games_leaderboard.get(game)
+            if not game_leaderboards:
+                raise commands.BadArgument(f"Per Day Leaderboard for game {game} not found.")
+            total_leaderboards = [game_leaderboards[1]]
         else:
-            leaderboard = [lb for _, lb in self.bot.games_leaderboard.values()]
+            total_leaderboards = [lb for _, lb in self.bot.games_leaderboard.values()]
 
-        embed = await self.make_leaderboard(ctx.author, leaderboard)
+        embed = await self.make_leaderboard(ctx.author, total_leaderboards)
         await ctx.send(embed=embed)
 
     @leaderboard.command(name="clear")
