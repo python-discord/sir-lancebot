@@ -29,7 +29,7 @@
                         "noun", "noun", "noun", "part of the body"],
             "value": ["Ye can always pretend to be a bloodthirsty ", ", threatening everyone by waving yer ", " sword in the air, but until ye learn to ",
                       " like a pirate, ye'll never be ", " accepted as an authentic ", ". So here's what ye do: Cleverly work into yer daily conversations ",
-                      " pirate phrases such as \"Ahoy there, ", ", \"\"Avast, ye ", ",\" and \"Shiver me ", ".\" Remember to drop all yer gs when ye say such words as sailin', spittin', and fightin'. This will give ye a/an ",
+                      " pirate phrases such as \"Ahoy there, ", "Avast, ye ", ",\" and \"Shiver me ", ".\" Remember to drop all yer gs when ye say such words as sailin', spittin', and fightin'. This will give ye a/an ",
                       " start to being recognized as a swashbucklin' ", ". Once ye have the lingo down pat, it helps to wear a three-cornered ", " on yer head, stash a/an ",
                       " in yer pants, and keep a/an ", " perched atop yer ", ". Aye, now ye be a real pirate!"]
         },
@@ -64,13 +64,13 @@
         {
             "title": "Weird News",
             "blanks": ["noun", "place", "verb ending in ing", "noun", "name", "verb", "noun", "verb", "noun", "part of body", "type of liquid", "place", " past tense verb ", "foreign country", "verb", "noun", "past tense verb", "adjective", "verb", "noun", "plural noun"],
-            "value": ["A ", " in ", " was arrested this morning after he was caught ", " in front of ", ". ", " had a history of ", ", but no one-not even his ", "-ever imagined he'd ", " with a ", " stuck in his ", ". After drinking a ", ", cops followed him to a ",
-                      " where he reportedly  ", "in the fry machine. Later, a woman from ", " was charged with a similar crime. But rather than ", "with a ", ", she ", "with a ", " dog. Either way, we imagine that after witnessing him ", " with a ", " there are probably a whole lot of ",
+            "value": ["A ", " in a ", " was arrested this morning after he was caught ", " in front of ", ". ", " had a history of ", ", but no one - not even his ", "- ever imagined he'd ", " with a ", " stuck in his ", ". After drinking a ", ", cops followed him to a ",
+                      " where he reportedly ", " in the fry machine. Later, a woman from ", " was charged with a similar crime. But rather than ", " with a ", ", she ", " with a ", " dog. Either way, we imagine that after witnessing him ", " with a ", " there are probably a whole lot of ",
                       " that are going to need some therapy!"]
         },
         {
             "title": "All About Vampires",
-            "blanks": ["adjective", "adjective", "body part", "verb ending in -ing", "verb", "verb", "verb", "noun", "verb", "verb", "body part", "verb", "verb", "verb", "noun", "body part", "adjective"],
+            "blanks": ["adjective", "adjective", "body part", "verb ending in -ing", "verb", "verb", "verb", "noun", "verb", "verb", "body part", "verb (ending with -s)", "verb (ending with -s)", "verb", "noun", "body part", "adjective"],
             "value": ["Vampires are ", "! They have ", " ", " for ", " blood. The sun can ", " vampires, so they only ", " at night and ", " during the day. Vampires also don't like ", " so ", " it or ", " it around your ",
                       " to keep them away. If a vampire ", "s a person and ", "s their blood, they become a vampire, too. The only way to ", " a vampire is with a ", " through the ", ", but ",
                       " luck getting close enough to one!"]
@@ -127,9 +127,9 @@
         {
              "title": "Star Wars",
              "blanks": ["adjective", "noun", "adjective", "noun; place", "adjective", "adjective", "adjective", "adjective", "plural noun", "adjective", "plural noun", "plural noun", "adjective",
-                        "noun", "verb", "adjective", "verb", "plural noun; type of job", "adjective", "verb", "adjective"],
+                        "noun", "verb (ending with -s)", "adjective", "verb", "plural noun; type of job", "adjective", "verb", "adjective"],
              "value": ["Star Wars is a ", " ", " of ", " versus evil in a ", " far far away. There are ", " battles between ", " ships in ", " space and ", " duels with ", " called ",
-                       " sabers. ", " called \"droids\" are helpers and ", " to the heroes. A ", " power called The ", " ", "s people to do ", " things, like ", " ", " use The Force for the ",
+                       " sabers. ", " called \"droids\" are helpers and ", " to the heroes. A ", " power called The ", " ", " people to do ", " things, like ", " ", " use The Force for the ",
                        " side and the Sith ", " it for the ", " side."]
         }
 ]
