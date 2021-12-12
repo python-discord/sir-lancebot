@@ -4,11 +4,13 @@ from random import choice
 from typing import Optional
 
 from discord import Embed
+from discord.colour import Color
 from discord.ext import commands
 
 from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES, POSITIVE_REPLIES, Roles
 
+from ._game import TriviaNightGame
 from ._questions import QuestionView, Questions
 from ._scoreboard import Scoreboard, ScoreboardView
 
@@ -16,37 +18,12 @@ from ._scoreboard import Scoreboard, ScoreboardView
 TRIVIA_NIGHT_ROLES = (Roles.admin, 78361735739998228)
 
 
-class TriviaNight(commands.Cog):
+class TriviaNightCog(commands.Cog):
     """Cog for the Python Trivia Night event."""
 
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.scoreboard = Scoreboard()
-        self.questions = Questions(self.scoreboard)
-
-    def setup_views(self, questions: dict) -> None:
-        """
-        Sets up the views for `self.questions` and `self.scoreboard` respectively.
-
-        Parameters:
-            - questions: The dictionary to set the questions for self.questions to use.
-        """
-        self.questions.view = QuestionView()
-        self.scoreboard.view = ScoreboardView(self.bot)
-        self.questions.set_questions(questions)
-
-    @staticmethod
-    def unicodeify(text: str) -> str:
-        """
-        Takes `text` and adds zero-width spaces to prevent copy and pasting the question.
-
-        Parameters:
-            - text: A string that represents the question description to 'unicodeify'
-        """
-        return "".join(
-            f"{letter}\u200b" if letter not in ('\n', '\t', '`', 'p', 'y') else letter
-            for idx, letter in enumerate(text)
-        )
+        self.game: Optional[TriviaNightGame] = None
 
     @commands.group(aliases=["tn"], invoke_without_command=True)
     async def trivianight(self, ctx: commands.Context) -> None:
@@ -84,6 +61,14 @@ class TriviaNight(commands.Cog):
         - a message link to the attachment/JSON
         - reading the JSON itself via a codeblock or plain text
         """
+        if self.game is not None:
+            await ctx.send(embed=Embed(
+                title=choice(NEGATIVE_REPLIES),
+                description="There is already a trivia night running!",
+                color=Colours.soft_red
+            ))
+            return
+
         if ctx.message.attachments:
             json_text = (await ctx.message.attachments[0].read()).decode("utf8")
         elif not to_load:
@@ -105,10 +90,7 @@ class TriviaNight(commands.Cog):
         except JSONDecodeError:
             raise commands.BadArgument("Invalid JSON")
 
-        for idx, question in enumerate(serialized_json):
-            serialized_json[idx]["obfuscated_description"] = self.unicodeify(question["description"])
-
-        self.setup_views(serialized_json)
+        self.game = TriviaNightGame(serialized_json)
 
         success_embed = Embed(
             title=choice(POSITIVE_REPLIES),
@@ -117,35 +99,24 @@ class TriviaNight(commands.Cog):
         )
         await ctx.send(embed=success_embed)
 
-    @trivianight.command()
+    @trivianight.command(aliases=('next',))
     @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
-    async def reset(self, ctx: commands.Context) -> None:
-        """Resets previous questions and scoreboards."""
-        all_questions = self.questions.questions
-
-        for question in all_questions:
-            if "visited" in question.keys():
-                del question["visited"]
-
-        self.setup_views(list(all_questions))
-
-        success_embed = Embed(
-            title=choice(POSITIVE_REPLIES),
-            description="The scoreboards were reset and questions reset!",
-            color=Colours.soft_green
-        )
-        await ctx.send(embed=success_embed)
-
-    @trivianight.command()
-    @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
-    async def next(self, ctx: commands.Context) -> None:
+    async def question(self, ctx: commands.Context, question_number: str = None) -> None:
         """
         Gets a random question from the unanswered question list and lets the user(s) choose the answer.
 
         This command will continuously count down until the time limit of the question is exhausted.
         However, if `.trivianight stop` is invoked, the counting down is interrupted to show the final results.
         """
-        if self.questions.view.active_question is True:
+        if self.game is None:
+            await ctx.send(embed=Embed(
+                title=choice(NEGATIVE_REPLIES),
+                description="There is no trivia night running!",
+                color=Colours.soft_red
+            ))
+            return
+
+        if self.game.current_question is not None:
             error_embed = Embed(
                 title=choice(NEGATIVE_REPLIES),
                 description="There is already an ongoing question!",
@@ -154,65 +125,40 @@ class TriviaNight(commands.Cog):
             await ctx.send(embed=error_embed)
             return
 
-        next_question = self.questions.next_question()
-        if isinstance(next_question, Embed):
-            await ctx.send(embed=next_question)
-            return
+        next_question = self.game.next_question(question_number)
 
-        (question_embed, time_limit), question_view = self.questions.current_question()
+        question_view = QuestionView(next_question)
+        question_embed = question_view.create_embed()
+
+        next_question.start()
         message = await ctx.send(embed=question_embed, view=question_view)
 
-        for time_remaining in range(time_limit, -1, -1):
-            if self.questions.view.active_question is False:
-                await ctx.send(embed=self.questions.end_question())
-                await message.edit(embed=question_embed, view=None)
-                return
+        # Exponentially sleep less and less until the time limit is reached
+        percentage = 1
+        while True:
+            percentage *= 0.5
+            duration = next_question.time * percentage
 
-            await asyncio.sleep(1)
-            if time_remaining % 5 == 0 and time_remaining not in (time_limit, 0):
-                await ctx.send(f"{time_remaining}s remaining")
+            await asyncio.sleep(duration)
+            if int(duration) > 1:
+                # It is quite ugly to display decimals, the delay for requests to reach Discord
+                # cause sub-second accuracy to be quite pointless.
+                await ctx.send(f"{int(duration)}s remaining...")
+            else:
+                # Since each time we divide the percentage by 2 and sleep one half of the halves (then sleep a
+                # half, of that half) we must sleep both halves at the end.
+                await asyncio.sleep(duration)
+                break
 
-        await ctx.send(embed=self.questions.end_question())
+        await ctx.send(embed=question_view.end_question())
         await message.edit(embed=question_embed, view=None)
-
-    @trivianight.command()
-    @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
-    async def question(self, ctx: commands.Context, question_number: int) -> None:
-        """
-        Gets a question from the question bank depending on the question number provided.
-
-        The logic of this command is similar to `.trivianight next`, with the only difference being that you need to
-        specify the question number.
-
-        Parameters:
-            - question_number: An integer represents the question number to go to (i.e. .trivianight question 5).
-        """
-        question = self.questions.next_question(question_number)
-        if isinstance(question, Embed):
-            await ctx.send(embed=question)
-            return
-
-        (question_embed, time_limit), question_view = self.questions.current_question()
-        message = await ctx.send(embed=question_embed, view=question_view)
-
-        for time_remaining in range(time_limit, -1, -1):
-            if self.questions.view.active_question is False:
-                await ctx.send(embed=self.questions.end_question())
-                await message.edit(embed=question_embed, view=None)
-                return
-
-            await asyncio.sleep(1)
-            if time_remaining % 5 == 0 and time_remaining not in (time_limit, 0):
-                await ctx.send(f"{time_remaining}s remaining")
-
-        await ctx.send(embed=self.questions.end_question())
-        await message.edit(embed=question_embed, view=None)
+        question_view.stop()
 
     @trivianight.command()
     @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
     async def list(self, ctx: commands.Context) -> None:
         """
-        Displays all the questions from the question bank.
+        Display all the questions left in the question bank.
 
         Questions are displayed in the following format:
         Q(number): Question description | :white_check_mark: if the question was used otherwise :x:.
@@ -255,7 +201,15 @@ class TriviaNight(commands.Cog):
         The scoreboard view also has a button where the user can see their own rank, points and average speed if they
         didn't make it onto the leaderboard.
         """
-        if self.questions.view.active_question is True:
+        if self.game is None:
+            await ctx.send(embed=Embed(
+                title=choice(NEGATIVE_REPLIES),
+                description="There is no trivia night running!",
+                color=Colours.soft_red
+            ))
+            return
+
+        if self.game.current_question is not None:
             error_embed = Embed(
                 title=choice(NEGATIVE_REPLIES),
                 description="You can't end the event while a question is ongoing!",
@@ -266,8 +220,9 @@ class TriviaNight(commands.Cog):
 
         scoreboard_embed, scoreboard_view = await self.scoreboard.display()
         await ctx.send(embed=scoreboard_embed, view=scoreboard_view)
+        self.game = None
 
 
 def setup(bot: Bot) -> None:
     """Load the TriviaNight cog."""
-    bot.add_cog(TriviaNight(bot))
+    bot.add_cog(TriviaNightCog(bot))
