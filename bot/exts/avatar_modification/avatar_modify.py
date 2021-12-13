@@ -320,7 +320,7 @@ class AvatarModify(commands.Cog):
     @avatar_modify.command(
         aliases=("christmasify", "cavatar"),
         root_aliases=("christmasavatar", "christmasify", "cavatar"),
-        brief="Christmasify a user's avatar."
+        brief="Christmasify your own avatar."
     )
     async def christmasavatar(self, ctx: commands.Context) -> None:
         """This "christmasifies" the user's avatar, with a random *christmasy* effect."""
