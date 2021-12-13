@@ -342,7 +342,7 @@ class AvatarModify(commands.Cog):
             )
 
             embed = discord.Embed(
-                title="Is this you or am I just really paranoid?",
+                title="Is this you or did you turn into Santa Claus all of a sudden?",
                 colour=Colours.bright_green
             )
             embed.set_image(url=f"attachment://{file_name}")
