@@ -343,7 +343,7 @@ class AvatarModify(commands.Cog):
 
             embed = discord.Embed(
                 title="Is this you or am I just really paranoid?",
-                colour=Colours.soft_red
+                colour=Colours.bright_green
             )
             embed.set_image(url=f"attachment://{file_name}")
             embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=ctx.author.display_avatar.url)
