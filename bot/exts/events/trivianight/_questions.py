@@ -130,7 +130,7 @@ class QuestionView(View):
         if len(guesses) != 0:
             answers_chosen = {
                 answer_choice: len(
-                    tuple(filter(lambda x: x[0] == correct, guesses.values()))
+                    tuple(filter(lambda x: x[0] == answer_choice, guesses.values()))
                 ) / len(guesses)
                 for answer_choice in labels
             }
