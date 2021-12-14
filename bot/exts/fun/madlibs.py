@@ -63,6 +63,7 @@ class Madlibs(commands.Cog):
         self.edited_content[after.id] = after.content
 
     @commands.command()
+    @commands.max_concurrency(1, per=commands.BucketType.user)
     async def madlibs(self, ctx: commands.Context) -> None:
         """
         Play Madlibs with the bot!
@@ -133,6 +134,13 @@ class Madlibs(commands.Cog):
         story_embed.set_footer(text=f"Generated for {ctx.author}", icon_url=ctx.author.display_avatar.url)
 
         await ctx.send(embed=story_embed)
+
+    @madlibs.error
+    async def handle_madlibs_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
+        """Error handler for the Madlibs command."""
+        if isinstance(error, commands.MaxConcurrencyReached):
+            await ctx.send("You are already playing Madlibs!")
+            error.handled = True
 
 
 def setup(bot: Bot) -> None:
