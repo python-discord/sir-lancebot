@@ -140,12 +140,12 @@ class Issues(commands.Cog):
             async with self.bot.http_session.get(pulls_url) as p:
                 pull_data = await p.json()
                 try:
-                    if pull_data["draft"]:
+                    if pull_data.get("draft"):
                         emoji = Emojis.pull_request_draft
-                    elif pull_data["state"] == "open":
+                    elif pull_data.get("state") == "open":
                         emoji = Emojis.pull_request_open
                     # When 'merged_at' is not None, this means that the state of the PR is merged
-                    elif pull_data["merged_at"] is not None:
+                    elif pull_data.get("merged_at") is not None:
                         emoji = Emojis.pull_request_merged
                     else:
                         emoji = Emojis.pull_request_closed
