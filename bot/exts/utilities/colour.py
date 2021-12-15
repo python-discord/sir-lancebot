@@ -11,8 +11,10 @@ import rapidfuzz
 from PIL import Image, ImageColor
 from discord.ext import commands
 
+from bot import constants
 from bot.bot import Bot
 from bot.exts.core.extensions import invoke_help_command
+from bot.utils.decorators import whitelist_override
 
 THUMBNAIL_SIZE = (80, 80)
 
@@ -78,6 +80,11 @@ class Colour(commands.Cog):
         await ctx.send(file=thumbnail_file, embed=colour_embed)
 
     @commands.group(aliases=("color",), invoke_without_command=True)
+    @whitelist_override(
+        channels=constants.WHITELISTED_CHANNELS,
+        roles=constants.STAFF_ROLES,
+        categories=[constants.Categories.development, constants.Categories.media]
+    )
     async def colour(self, ctx: commands.Context, *, colour_input: Optional[str] = None) -> None:
         """
         Create an embed that displays colour information.
