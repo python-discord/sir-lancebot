@@ -139,7 +139,7 @@ class Issues(commands.Cog):
             log.trace(f"PR provided, querying GH pulls API for additional information: {pulls_url}")
             async with self.bot.http_session.get(pulls_url) as p:
                 pull_data = await p.json()
-                if "draft" in pull_data and pull_data["draft"]:
+                if pull_data["draft"]:
                     emoji = Emojis.pull_request_draft
                 elif pull_data["state"] == "open":
                     emoji = Emojis.pull_request_open

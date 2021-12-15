@@ -173,7 +173,6 @@ class CandyCollection(commands.Cog):
     async def candy(self, ctx: commands.Context) -> None:
         """Get the candy leaderboard and save to JSON."""
         records = await self.candy_records.items()
-        user = await self.bot.fetch_user(ctx.author.id)
 
         def generate_leaderboard() -> str:
             top_sorted = sorted(
@@ -190,9 +189,9 @@ class CandyCollection(commands.Cog):
 
         def get_user_candy_score() -> str:
             for user_id, score in records:
-                if user_id == user.id:
-                    return f'<@{user.id}>: {score}'
-            return f'<@{user.id}>: 0'
+                if user_id == ctx.author.id:
+                    return f'<@{ctx.author.id}>: {score}'
+            return f'<@{ctx.author.id}>: 0'
 
         e = discord.Embed(colour=discord.Colour.og_blurple())
         e.add_field(
@@ -201,7 +200,7 @@ class CandyCollection(commands.Cog):
             inline=False
         )
         e.add_field(
-            name=f'{user.name}' + "'s Candy Score",
+            name="Your Candy Score",
             value=get_user_candy_score(),
             inline=False
         )
