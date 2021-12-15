@@ -6,6 +6,7 @@ from typing import Optional
 
 import arrow
 import discord
+from async_rediscache import RedisCache
 from discord.ext import commands
 
 from bot.bot import Bot
@@ -28,6 +29,9 @@ AOC_WHITELIST = AOC_WHITELIST_RESTRICTED + (Channels.advent_of_code,)
 
 class AdventOfCode(commands.Cog):
     """Advent of Code festivities! Ho Ho Ho!"""
+
+    # Redis Cache for linking Discord IDs to Advent of Code usernames
+    account_links = RedisCache()
 
     def __init__(self, bot: Bot):
         self.bot = bot
@@ -175,6 +179,79 @@ class AdventOfCode(commands.Cog):
         else:
             await ctx.message.add_reaction(Emojis.envelope)
 
+    @in_month(Month.NOVEMBER, Month.DECEMBER)
+    @adventofcode_group.command(
+        name="link",
+        aliases=("connect",),
+        brief="Tie your Discord account with your Advent of Code name."
+    )
+    @whitelist_override(channels=AOC_WHITELIST)
+    async def aoc_link_account(self, ctx: commands.Context, *, aoc_name: str = None) -> None:
+        """
+        Link your Discord Account to your Advent of Code name.
+
+        Stored in a Redis Cache with the format of `Discord ID: Advent of Code Name`
+        """
+        cache_items = await self.account_links.items()
+        cache_aoc_names = [value for _, value in cache_items]
+
+        if aoc_name:
+            # Let's check the current values in the cache to make sure it isn't already tied to a different account
+            if aoc_name == await self.account_links.get(ctx.author.id):
+                await ctx.reply(f"{aoc_name} is already tied to your account.")
+                return
+            elif aoc_name in cache_aoc_names:
+                log.info(
+                    f"{ctx.author} ({ctx.author.id}) tried to connect their account to {aoc_name},"
+                    " but it's already connected to another user."
+                )
+                await ctx.reply(
+                    f"{aoc_name} is already tied to another account."
+                    " Please contact an admin if you believe this is an error."
+                )
+                return
+
+            # Update an existing link
+            if old_aoc_name := await self.account_links.get(ctx.author.id):
+                log.info(f"Changing link for {ctx.author} ({ctx.author.id}) from {old_aoc_name} to {aoc_name}.")
+                await self.account_links.set(ctx.author.id, aoc_name)
+                await ctx.reply(f"Your linked account has been changed to {aoc_name}.")
+            else:
+                # Create a new link
+                log.info(f"Linking {ctx.author} ({ctx.author.id}) to account {aoc_name}.")
+                await self.account_links.set(ctx.author.id, aoc_name)
+                await ctx.reply(f"You have linked your Discord ID to {aoc_name}.")
+        else:
+            # User has not supplied a name, let's check if they're in the cache or not
+            if cache_name := await self.account_links.get(ctx.author.id):
+                await ctx.reply(f"You have already linked an Advent of Code account: {cache_name}.")
+            else:
+                await ctx.reply(
+                    "You have not linked an Advent of Code account."
+                    " Please re-run the command with one specified."
+                )
+
+    @in_month(Month.NOVEMBER, Month.DECEMBER)
+    @adventofcode_group.command(
+        name="unlink",
+        aliases=("disconnect",),
+        brief="Tie your Discord account with your Advent of Code name."
+    )
+    @whitelist_override(channels=AOC_WHITELIST)
+    async def aoc_unlink_account(self, ctx: commands.Context) -> None:
+        """
+        Unlink your Discord ID with your Advent of Code leaderboard name.
+
+        Deletes the entry that was Stored in the Redis cache.
+        """
+        if aoc_cache_name := await self.account_links.get(ctx.author.id):
+            log.info(f"Unlinking {ctx.author} ({ctx.author.id}) from Advent of Code account {aoc_cache_name}")
+            await self.account_links.delete(ctx.author.id)
+            await ctx.reply(f"We have removed the link between your Discord ID and {aoc_cache_name}.")
+        else:
+            log.info(f"Attempted to unlink {ctx.author} ({ctx.author.id}), but no link was found.")
+            await ctx.reply("You don't have an Advent of Code account linked.")
+
     @in_month(Month.DECEMBER)
     @adventofcode_group.command(
         name="dayandstar",
@@ -234,6 +311,10 @@ class AdventOfCode(commands.Cog):
         if aoc_name and aoc_name.startswith('"') and aoc_name.endswith('"'):
             aoc_name = aoc_name[1:-1]
 
+        # Check if an advent of code account is linked in the Redis Cache if aoc_name is not given
+        if (aoc_cache_name := await self.account_links.get(ctx.author.id)) and aoc_name is None:
+            aoc_name = aoc_cache_name
+
         async with ctx.typing():
             try:
                 leaderboard = await _helpers.fetch_leaderboard(self_placement_name=aoc_name)
@@ -244,7 +325,7 @@ class AdventOfCode(commands.Cog):
         number_of_participants = leaderboard["number_of_participants"]
 
         top_count = min(AocConfig.leaderboard_displayed_members, number_of_participants)
-        self_placement_header = "(and your personal stats compared to the top 10)" if aoc_name else ""
+        self_placement_header = " (and your personal stats compared to the top 10)" if aoc_name else ""
         header = f"Here's our current top {top_count}{self_placement_header}! {Emojis.christmas_tree * 3}"
         table = "```\n" \
                 f"{leaderboard['placement_leaderboard'] if aoc_name else leaderboard['top_leaderboard']}" \
