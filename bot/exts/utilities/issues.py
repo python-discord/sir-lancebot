@@ -139,15 +139,19 @@ class Issues(commands.Cog):
             log.trace(f"PR provided, querying GH pulls API for additional information: {pulls_url}")
             async with self.bot.http_session.get(pulls_url) as p:
                 pull_data = await p.json()
-                if "draft" in pull_data and pull_data["draft"]:
-                    emoji = Emojis.pull_request_draft
-                elif pull_data["state"] == "open":
-                    emoji = Emojis.pull_request_open
-                # When 'merged_at' is not None, this means that the state of the PR is merged
-                elif pull_data["merged_at"] is not None:
-                    emoji = Emojis.pull_request_merged
-                else:
-                    emoji = Emojis.pull_request_closed
+                try:
+                    if pull_data["draft"]:
+                        emoji = Emojis.pull_request_draft
+                    elif pull_data["state"] == "open":
+                        emoji = Emojis.pull_request_open
+                    # When 'merged_at' is not None, this means that the state of the PR is merged
+                    elif pull_data["merged_at"] is not None:
+                        emoji = Emojis.pull_request_merged
+                    else:
+                        emoji = Emojis.pull_request_closed
+                except KeyError:
+                    # couldn't get pull data
+                    emoji = Emojis.x_square
 
         issue_url = json_data.get("html_url")
 
