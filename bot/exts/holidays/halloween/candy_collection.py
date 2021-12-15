@@ -201,7 +201,7 @@ class CandyCollection(commands.Cog):
             inline=False
         )
         e.add_field(
-            name=f'{user.name}' + "'s Candy Score",
+            name="Your Candy Score",
             value=get_user_candy_score(),
             inline=False
         )
