@@ -190,8 +190,8 @@ class CandyCollection(commands.Cog):
         def get_user_candy_score() -> str:
             for user_id, score in records:
                 if user_id == ctx.author.id:
-                    return f'{ctx.author.mention}: {score}'
-            return f'{ctx.author.mention}: 0'
+                    return f"{ctx.author.mention}: {score}"
+            return f"{ctx.author.mention}: 0"
 
         e = discord.Embed(colour=discord.Colour.og_blurple())
         e.add_field(
