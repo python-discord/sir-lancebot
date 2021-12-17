@@ -69,7 +69,8 @@ class Epoch(commands.Cog):
         if await view.wait():  # wait until expiration and remove the dropdown
             await original.edit(view=None)
 
-    def _format_dates(self, date: arrow.Arrow) -> list[str]:
+    @staticmethod
+    def _format_dates(date: arrow.Arrow) -> list[str]:
         """
         Return a list of dates formatted according to the discord timestamp styles.
         These are used in the description of each option in the dropdown
