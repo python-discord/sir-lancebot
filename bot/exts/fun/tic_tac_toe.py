@@ -13,6 +13,8 @@ CONFIRMATION_MESSAGE = (
     "{opponent}, {requester} wants to play Tic-Tac-Toe against you."
     f"\nReact to this message with {Emojis.confirmation} to accept or with {Emojis.decline} to decline."
 )
+TIMEOUT = 60.0
+INTERACTION_ID_PREFIX = "tic-tac-toe-action-"
 
 
 def check_win(board: dict[int, str]) -> bool:
@@ -48,21 +50,26 @@ class Player:
 
         Return is timeout reached and position of field what user will fill when timeout don't reach.
         """
-        def check_for_move(r: discord.Reaction, u: discord.User) -> bool:
+        def check_for_move(inter: discord.Interaction) -> bool:
             """Check does user who reacted is user who we want, message is board and emoji is in board values."""
-            return (
-                u.id == self.user.id
-                and msg.id == r.message.id
-                and r.emoji in board.values()
-                and r.emoji in Emojis.number_emojis.values()
+            return not any(
+                [
+                    inter.type != discord.InteractionType.component,
+                    not inter.data['custom_id'].startswith(INTERACTION_ID_PREFIX),
+                    inter.user.id != self.user.id,
+                    inter.message.id != msg.id
+                ]
             )
-
         try:
-            react, _ = await self.ctx.bot.wait_for("reaction_add", timeout=30.0, check=check_for_move)
+            inter: discord.Interaction = await self.ctx.bot.wait_for(
+                "interaction",
+                timeout=TIMEOUT,
+                check=check_for_move,
+            )
         except asyncio.TimeoutError:
             return True, None
         else:
-            return False, list(Emojis.number_emojis.keys())[list(Emojis.number_emojis.values()).index(react.emoji)]
+            return False, int(inter.data["custom_id"][len(INTERACTION_ID_PREFIX):])
 
     def __str__(self) -> str:
         """Return mention of user."""
@@ -103,10 +110,10 @@ class AI:
         return self.user.mention
 
 
-class Game:
+class Game(discord.ui.View):
     """Class that contains information and functions about Tic Tac Toe game."""
 
-    def __init__(self, players: list[Union[Player, AI]], ctx: Context):
+    def __init__(self, players: list[Union[Player, AI]], ctx: Context, *, timeout: float = TIMEOUT):
         self.players = players
         self.ctx = ctx
         self.channel = ctx.channel
@@ -121,6 +128,19 @@ class Game:
             8: Emojis.number_emojis[8],
             9: Emojis.number_emojis[9]
         }
+
+        # add the buttons
+        super().__init__(timeout=timeout)
+
+        for k, v in self.board.items():
+            self.add_item(
+                discord.ui.Button(
+                    style=discord.ButtonStyle.grey,
+                    emoji=v,
+                    row=(k-1)//3,
+                    custom_id=INTERACTION_ID_PREFIX + str(k),
+                )
+            )
 
         self.current = self.players[0]
         self.next = self.players[1]
@@ -176,12 +196,6 @@ class Game:
             self.canceled = True
             return False, "User declined"
 
-    @staticmethod
-    async def add_reactions(msg: discord.Message) -> None:
-        """Add number emojis to message."""
-        for nr in Emojis.number_emojis.values():
-            await msg.add_reaction(nr)
-
     def format_board(self) -> str:
         """Get formatted tic-tac-toe board for message."""
         board = list(self.board.values())
@@ -192,18 +206,19 @@ class Game:
     async def play(self) -> None:
         """Start and handle game."""
         await self.ctx.send("It's time for the game! Let's begin.")
-        board = await self.ctx.send(
-            embed=discord.Embed(description=self.format_board())
+        board: discord.Message = await self.ctx.send(
+            "**Tic Tac Toe**",
+            view=self,
         )
-        await self.add_reactions(board)
 
-        for _ in range(9):
+        for _ in range(len(self.board)):
             if isinstance(self.current, Player):
                 announce = await self.ctx.send(
                     f"{self.current.user.mention}, it's your turn! "
-                    "React with an emoji to take your go."
+                    "Click a button to take your go."
                 )
             timeout, pos = await self.current.get_move(self.board, board)
+            print(pos)
             if isinstance(self.current, Player):
                 await announce.delete()
             if timeout:
@@ -212,18 +227,25 @@ class Game:
                 self.canceled = True
                 return
             self.board[pos] = self.current.symbol
-            await board.edit(
-                embed=discord.Embed(description=self.format_board())
-            )
-            await board.clear_reaction(Emojis.number_emojis[pos])
+            button: discord.ui.Button = self.children[pos-1]
+            button.disabled = True
+            button.style = discord.ButtonStyle.blurple
+            button.emoji = self.current.symbol
+            self.children[pos-1] = button
             if check_win(self.board):
+                for i in range(len(self.children)):
+                    button = self.children[i]
+                    button.disabled = True
+                    button.style = discord.ButtonStyle.blurple
+                    self.children[i] = button
+                await board.edit(view=self)
                 self.winner = self.current
                 self.loser = self.next
                 await self.ctx.send(
                     f":tada: {self.current} won this game! :tada:"
                 )
-                await board.clear_reactions()
                 break
+            await board.edit(view=self)
             self.current, self.next = self.next, self.current
         if not self.winner:
             self.draw = True
@@ -258,7 +280,7 @@ class TicTacToe(Cog):
     @is_requester_free()
     @group(name="tictactoe", aliases=("ttt", "tic"), invoke_without_command=True)
     async def tic_tac_toe(self, ctx: Context, opponent: Optional[discord.User]) -> None:
-        """Tic Tac Toe game. Play against friends or AI. Use reactions to add your mark to field."""
+        """Tic Tac Toe game. Play against friends or AI. Use buttons to add your mark to field."""
         if opponent == ctx.author:
             await ctx.send("You can't play against yourself.")
             return
