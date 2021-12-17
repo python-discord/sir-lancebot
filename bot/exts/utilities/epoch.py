@@ -45,17 +45,21 @@ class Epoch(commands.Cog):
     async def epoch(self, ctx: commands.Context, *, date_time: Union[RelativeDate, AbsoluteDate] = None) -> None:
         """
         Convert an entered time and date to a unix timestamp. Both relative and absolute times are accepted.
-        Eg ".epoch in 5 months 4 days and 2 hours"
-        or ".epoch 2022/6/15 16:43 -04:00"
 
-        Absolute times must be entered in descending orders of magnitude.
-        Times in the dropdown are show in UTC
+        **Relative time**
+            accepted units: "seconds", "minutes", "hours", "days", "weeks", "months", "years"
+            Eg ".epoch in a month 4 days and 2 hours"
 
-        Timezones may take the following forms:
-            Z (UTC)
-            ±HH:MM
-            ±HHMM
-            ±HH
+        **Absolute time**
+            eg ".epoch 2022/6/15 16:43 -04:00"
+            Absolute times must be entered in descending orders of magnitude.
+            Timezones may take the following forms:
+                Z (UTC)
+                ±HH:MM
+                ±HHMM
+                ±HH
+
+        Times in the dropdown are shown in GMT
         """
 
         if not date_time:
