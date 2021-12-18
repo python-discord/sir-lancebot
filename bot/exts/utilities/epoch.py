@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Optional
 
 import arrow
 import dateutil
@@ -29,20 +29,28 @@ STYLES = {"Epoch": "",
           }
 
 
-class RelativeDate(commands.Converter):
-    async def convert(self, ctx: commands.Context, argument: str) -> arrow.Arrow:
-        return arrow.utcnow().dehumanize(argument)
-
-
-class AbsoluteDate(commands.Converter):
-    async def convert(self, ctx: commands.Context, argument: str) -> arrow.Arrow:
-        return arrow.get(dateutil.parser.parse(argument))
+class DateString(commands.Converter):
+    """Convert a worded date and time to an arrow.Arrow object"""
+    async def convert(self, ctx: commands.Context, argument: str) -> Union[arrow.Arrow, Optional[tuple]]:
+        """
+        Try to interpret the date string as a relative time. If conversion fails, try to interpret it as an absolute
+        time. Tokens that are not recognised are returned along with the part of the string that was successfully
+        converted to an arrow object. If the date string cannot be parsed, BadArgument is raised.
+        """
+        try:
+            return arrow.utcnow().dehumanize(argument)
+        except ValueError:
+            try:
+                dt, ignored_tokens = parser.parse(argument, fuzzy_with_tokens=True)
+                return arrow.get(dt), ignored_tokens
+            except parser.ParserError:
+                raise commands.BadArgument(f"`{argument}` Could not be parsed to a relative or absolute date")
 
 
 class Epoch(commands.Cog):
 
     @commands.command(name="epoch")
-    async def epoch(self, ctx: commands.Context, *, date_time: Union[RelativeDate, AbsoluteDate] = None) -> None:
+    async def epoch(self, ctx: commands.Context, *, date_time: DateString = None) -> None:
         """
         Convert an entered time and date to a unix timestamp. Both relative and absolute times are accepted.
 
@@ -61,10 +69,15 @@ class Epoch(commands.Cog):
 
         Times in the dropdown are shown in GMT
         """
-
         if not date_time:
             await invoke_help_command(ctx)
             return
+
+        if isinstance(date_time, tuple):
+            ignored_tokens, date_time = list(a.strip() for a in date_time[1] if a.strip()), date_time[0]
+            if ignored_tokens:
+                await ctx.send(f"Could not parse the following token(s): `{', '.join(ignored_tokens)}`")
+                await ctx.send(f"The resulting date and time is: `{date_time.format(arrow.FORMAT_RSS)}`")
 
         epoch = int(date_time.timestamp())
         dropdown = TimeStampDropdown(self._format_dates(date_time), epoch)
