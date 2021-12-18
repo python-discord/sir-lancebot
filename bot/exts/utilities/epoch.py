@@ -1,7 +1,6 @@
-from typing import Union, Optional
+from typing import Optional, Union
 
 import arrow
-import dateutil
 import discord
 from dateutil import parser
 from discord.ext import commands
@@ -31,9 +30,12 @@ DROPDOWN_TIMEOUT = 60
 
 
 class DateString(commands.Converter):
-    """Convert a worded date and time to an arrow.Arrow object"""
+    """Convert a relative or absolute date/time string to an arrow.Arrow object."""
+
     async def convert(self, ctx: commands.Context, argument: str) -> Union[arrow.Arrow, Optional[tuple]]:
         """
+        Convert a relative or absolute date/time string to an arrow.Arrow object.
+
         Try to interpret the date string as a relative time. If conversion fails, try to interpret it as an absolute
         time. Tokens that are not recognised are returned along with the part of the string that was successfully
         converted to an arrow object. If the date string cannot be parsed, BadArgument is raised.
@@ -49,11 +51,12 @@ class DateString(commands.Converter):
 
 
 class Epoch(commands.Cog):
+    """Convert an entered time and date to a unix timestamp."""
 
     @commands.command(name="epoch")
     async def epoch(self, ctx: commands.Context, *, date_time: DateString = None) -> None:
         """
-        Convert an entered time and date to a unix timestamp. Both relative and absolute times are accepted.
+        Convert an entered date/time string to the equivalent epoch.
 
         **Relative time**
             accepted units: "seconds", "minutes", "hours", "days", "weeks", "months", "years"
@@ -68,7 +71,7 @@ class Epoch(commands.Cog):
                 ±HHMM
                 ±HH
 
-        Times in the dropdown are shown in GMT
+        Times in the dropdown are shown in UTC
         """
         if not date_time:
             await invoke_help_command(ctx)
@@ -81,8 +84,8 @@ class Epoch(commands.Cog):
                 await ctx.send(f"The resulting date and time is: `{date_time.format(arrow.FORMAT_RSS)}`")
 
         epoch = int(date_time.timestamp())
-        dropdown = TimeStampDropdown(self._format_dates(date_time), epoch)
-        view = TimeStampMenuView(ctx, dropdown)
+        dropdown = _TimestampDropdown(self._format_dates(date_time), epoch)
+        view = _TimestampMenuView(ctx, dropdown)
         original = await ctx.send(f"`{epoch}`", view=view)
         if await view.wait():  # wait until expiration and remove the dropdown
             await original.edit(view=None)
@@ -90,8 +93,9 @@ class Epoch(commands.Cog):
     @staticmethod
     def _format_dates(date: arrow.Arrow) -> list[str]:
         """
-        Return a list of dates formatted according to the discord timestamp styles.
-        These are used in the description of each option in the dropdown
+        Return a list of date strings formatted according to the discord timestamp styles.
+
+        These are used in the description of each style in the dropdown
         """
         date = date.to('utc')
         formatted = [str(int(date.timestamp()))]
@@ -100,16 +104,16 @@ class Epoch(commands.Cog):
         return formatted
 
 
-class TimeStampDropdown(discord.ui.Select):
+class _TimestampDropdown(discord.ui.Select):
     def __init__(self, formatted_times: list[str], epoch: int):
         self.epoch: int = epoch
         super().__init__(
-            placeholder="Format this epoch as a discord timestamp",
+            placeholder="Select the format of your timestamp",
             options=[discord.SelectOption(label=label, description=date_time) for label, date_time in
                      zip(STYLES.keys(), formatted_times)]
         )
 
-    async def callback(self, interaction: discord.Interaction):
+    async def callback(self, interaction: discord.Interaction) -> discord.Message:
         selected = interaction.data["values"][0]
         if selected == "Epoch":
             return await interaction.message.edit(content=f"`{self.epoch}`")
@@ -117,16 +121,16 @@ class TimeStampDropdown(discord.ui.Select):
             return await interaction.message.edit(content=f"`<t:{self.epoch}:{STYLES[selected]}>`")
 
 
-class TimeStampMenuView(discord.ui.View):
-    def __init__(self, ctx, dropdown: TimeStampDropdown):
+class _TimestampMenuView(discord.ui.View):
+    def __init__(self, ctx: commands.Context, dropdown: _TimestampDropdown):
         super().__init__(timeout=DROPDOWN_TIMEOUT)
         self.ctx = ctx
         self.add_item(dropdown)
 
-    async def interaction_check(self, interaction: discord.Interaction):
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
         """Check to ensure that the interacting user is the user who invoked the command."""
         if interaction.user != self.ctx.author:
-            embed = discord.Embed(description=f"Sorry, but this interaction can only be used by the original author.")
+            embed = discord.Embed(description="Sorry, but this interaction can only be used by the original author.")
             await interaction.response.send_message(embed=embed, ephemeral=True)
             return False
         else:
@@ -134,4 +138,5 @@ class TimeStampMenuView(discord.ui.View):
 
 
 def setup(bot: Bot) -> None:
+    """Load the Epoch cog."""
     bot.add_cog(Epoch())
