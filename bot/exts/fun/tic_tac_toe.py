@@ -284,7 +284,10 @@ class Game(discord.ui.View):
             self.current, self.next = self.next, self.current
         if not self.winner:
             self.draw = True
-            await board.edit(view=self)
+            if inter:
+                await inter.response.edit_message(view=self)
+            else:
+                await board.edit(view=self)
             await self.ctx.send("It's a DRAW!")
         self.over = True
 
