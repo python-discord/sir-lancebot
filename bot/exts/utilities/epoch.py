@@ -27,6 +27,7 @@ STYLES = {"Epoch": "",
           "Long Date/Time": "F",
           "Relative Time": "R"
           }
+DROPDOWN_TIMEOUT = 60
 
 
 class DateString(commands.Converter):
@@ -118,7 +119,7 @@ class TimeStampDropdown(discord.ui.Select):
 
 class TimeStampMenuView(discord.ui.View):
     def __init__(self, ctx, dropdown: TimeStampDropdown):
-        super().__init__(timeout=60.0)
+        super().__init__(timeout=DROPDOWN_TIMEOUT)
         self.ctx = ctx
         self.add_item(dropdown)
 
