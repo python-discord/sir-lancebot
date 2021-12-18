@@ -17,23 +17,20 @@ TIMEOUT = 60.0
 INTERACTION_ID_PREFIX = "tic-tac-toe-action-"
 
 
-def check_win(board: dict[int, str]) -> bool:
+def check_win(board: dict[int, str]) -> tuple[bool, Optional[tuple[int, int, int]]]:
     """Check from board, is any player won game."""
-    return any(
-        (
-            # Horizontal
-            board[1] == board[2] == board[3],
-            board[4] == board[5] == board[6],
-            board[7] == board[8] == board[9],
-            # Vertical
-            board[1] == board[4] == board[7],
-            board[2] == board[5] == board[8],
-            board[3] == board[6] == board[9],
-            # Diagonal
-            board[1] == board[5] == board[9],
-            board[3] == board[5] == board[7],
-        )
-    )
+    winning_combinations: list[tuple[int, int, int]] = [
+        # Horizontal
+        (1, 2, 3), (4, 5, 6), (7, 8, 9),
+        # Vertical
+        (1, 4, 7), (2, 5, 8), (3, 6, 9),
+        # Diagonal
+        (1, 5, 9), (3, 5, 7)
+    ]
+    for a, b, c in winning_combinations:
+        if board[a] == board[b] == board[c]:
+            return True, (a, b, c)
+    return False, None
 
 
 class Player:
@@ -106,7 +103,7 @@ class AI:
             for move in possible_moves:
                 board_copy = board.copy()
                 board_copy[move] = symbol
-                if check_win(board_copy):
+                if check_win(board_copy)[0]:
                     return False, move, None
 
         open_corners = [i for i in possible_moves if i in (1, 3, 7, 9)]
@@ -117,7 +114,7 @@ class AI:
             return False, 5, None
 
         open_edges = [i for i in possible_moves if i in (2, 4, 6, 8)]
-        return False, random.choice(open_edges)
+        return False, random.choice(open_edges), None
 
     def __str__(self) -> str:
         """Return mention of @Sir Lancebot."""
@@ -258,17 +255,19 @@ class Game(discord.ui.View):
             button.style = discord.ButtonStyle.blurple
             button.emoji = self.current.symbol
             self.children[pos-1] = button
-            if check_win(self.board):
-                for button in self.children:
-
+            if (win := check_win(self.board))[0]:
+                for i, button in enumerate(self.children):
                     button.disabled = True
-                    button.style = discord.ButtonStyle.blurple
-                self.winner = self.current
-                self.loser = self.next
+                    if i+1 in win[1]:
+                        button.style = discord.ButtonStyle.green
+                    else:
+                        button.style = discord.ButtonStyle.blurple
                 if inter:
                     await inter.response.edit_message(view=self)
                 else:
                     await board.edit(view=self)
+                self.winner = self.current
+                self.loser = self.next
                 await self.ctx.send(
                     f":tada: {self.current} won this game! :tada:"
                 )
