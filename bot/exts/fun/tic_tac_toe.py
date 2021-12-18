@@ -44,7 +44,9 @@ class Player:
         self.ctx = ctx
         self.symbol = symbol
 
-    async def get_move(self, board: dict[int, str], msg: discord.Message) -> tuple[bool, Optional[int]]:
+    async def get_move(
+        self, board: dict[int, str], msg: discord.Message
+    ) -> tuple[bool, Optional[int], Optional[discord.Interaction]]:
         """
         Get move from user.
 
@@ -56,20 +58,28 @@ class Player:
                 [
                     inter.type != discord.InteractionType.component,
                     not inter.data['custom_id'].startswith(INTERACTION_ID_PREFIX),
-                    inter.user.id != self.user.id,
+                    # inter.user.id != self.user.id,
                     inter.message.id != msg.id
                 ]
             )
-        try:
-            inter: discord.Interaction = await self.ctx.bot.wait_for(
-                "interaction",
-                timeout=TIMEOUT,
-                check=check_for_move,
-            )
-        except asyncio.TimeoutError:
-            return True, None
-        else:
-            return False, int(inter.data["custom_id"][len(INTERACTION_ID_PREFIX):])
+        while True:
+            try:
+                inter: discord.Interaction = await self.ctx.bot.wait_for(
+                    "interaction",
+                    timeout=TIMEOUT,
+                    check=check_for_move,
+                )
+            except asyncio.TimeoutError:
+                return True, None, None
+            else:
+                # its possible to get an interaction by the other person, in which case we should say its not your turn!
+                if inter.user.id != self.user.id:
+                    await inter.response.send_message(
+                        "Its not your turn yet, or you aren't playing this game!",
+                        ephemeral=True,
+                    )
+                    continue
+                return False, int(inter.data["custom_id"][len(INTERACTION_ID_PREFIX):]), inter
 
     def __str__(self) -> str:
         """Return mention of user."""
@@ -84,23 +94,27 @@ class AI:
         self.symbol = symbol
 
     @staticmethod
-    async def get_move(board: dict[int, str], _: discord.Message) -> tuple[bool, int]:
+    async def get_move(board: dict[int, str], msg: discord.Message) -> tuple[bool, int, None]:
         """Get move from AI. AI use Minimax strategy."""
         possible_moves = [i for i, emoji in board.items() if emoji in list(Emojis.number_emojis.values())]
+
+        # give the ai some artifical delay
+        await msg.channel.trigger_typing()
+        await asyncio.sleep(random.random() * 1.5)
 
         for symbol in (Emojis.o_square, Emojis.x_square):
             for move in possible_moves:
                 board_copy = board.copy()
                 board_copy[move] = symbol
                 if check_win(board_copy):
-                    return False, move
+                    return False, move, None
 
         open_corners = [i for i in possible_moves if i in (1, 3, 7, 9)]
         if len(open_corners) > 0:
-            return False, random.choice(open_corners)
+            return False, random.choice(open_corners), None
 
         if 5 in possible_moves:
-            return False, 5
+            return False, 5, None
 
         open_edges = [i for i in possible_moves if i in (2, 4, 6, 8)]
         return False, random.choice(open_edges)
@@ -113,7 +127,7 @@ class AI:
 class Game(discord.ui.View):
     """Class that contains information and functions about Tic Tac Toe game."""
 
-    def __init__(self, players: list[Union[Player, AI]], ctx: Context, *, timeout: float = TIMEOUT):
+    def __init__(self, players: list[Union[Player, AI]], ctx: Context):
         self.players = players
         self.ctx = ctx
         self.channel = ctx.channel
@@ -130,7 +144,8 @@ class Game(discord.ui.View):
         }
 
         # add the buttons
-        super().__init__(timeout=timeout)
+        # hack to not use the callbacks
+        super().__init__(timeout=1)
 
         for k, v in self.board.items():
             self.add_item(
@@ -196,6 +211,12 @@ class Game(discord.ui.View):
             self.canceled = True
             return False, "User declined"
 
+    def disable(self) -> None:
+        """Disable all components in this view."""
+        for item in self.children:
+            if hasattr(item, "disabled"):
+                item.disabled = True
+
     def format_board(self) -> str:
         """Get formatted tic-tac-toe board for message."""
         board = list(self.board.values())
@@ -210,21 +231,26 @@ class Game(discord.ui.View):
             "**Tic Tac Toe**",
             view=self,
         )
-
+        inter = None
         for _ in range(len(self.board)):
             if isinstance(self.current, Player):
                 announce = await self.ctx.send(
                     f"{self.current.user.mention}, it's your turn! "
                     "Click a button to take your go."
                 )
-            timeout, pos = await self.current.get_move(self.board, board)
-            print(pos)
+            # loop the last inter
+            if inter and not inter.response.is_done():
+                await inter.response.defer()
+            # inter is only an interaction if it was a user who didn't timeout
+            timeout, pos, inter = await self.current.get_move(self.board, board)
             if isinstance(self.current, Player):
                 await announce.delete()
             if timeout:
                 await self.ctx.send(f"{self.current.user.mention} ran out of time. Canceling game.")
                 self.over = True
                 self.canceled = True
+                self.disable()
+                await board.edit(view=self)
                 return
             self.board[pos] = self.current.symbol
             button: discord.ui.Button = self.children[pos-1]
@@ -233,22 +259,33 @@ class Game(discord.ui.View):
             button.emoji = self.current.symbol
             self.children[pos-1] = button
             if check_win(self.board):
-                for i in range(len(self.children)):
-                    button = self.children[i]
+                for button in self.children:
+
                     button.disabled = True
                     button.style = discord.ButtonStyle.blurple
-                    self.children[i] = button
-                await board.edit(view=self)
                 self.winner = self.current
                 self.loser = self.next
+                if inter:
+                    await inter.response.edit_message(view=self)
+                else:
+                    await board.edit(view=self)
                 await self.ctx.send(
                     f":tada: {self.current} won this game! :tada:"
                 )
                 break
-            await board.edit(view=self)
+            if inter:
+                if isinstance(self.next, AI):
+                    # this is in order to be able to continue showing the processing animation by discord
+                    # to make it look like the ai is thinking.
+                    await board.edit(view=self)
+                else:
+                    await inter.response.edit_message(view=self)
+            else:
+                await board.edit(view=self)
             self.current, self.next = self.next, self.current
         if not self.winner:
             self.draw = True
+            await board.edit(view=self)
             await self.ctx.send("It's a DRAW!")
         self.over = True
 
