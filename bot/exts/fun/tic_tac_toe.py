@@ -28,7 +28,7 @@ def check_win(board: dict[int, str]) -> tuple[bool, Optional[tuple[int, int, int
         (1, 5, 9), (3, 5, 7)
     ]
     for a, b, c in winning_combinations:
-        if board[a] == board[b] == board[c]:
+        if (board[a] == board[b] == board[c]) and board[a] in (Emojis.x_square, Emojis.o_square):
             return True, (a, b, c)
     return False, None
 
@@ -93,7 +93,7 @@ class AI:
     @staticmethod
     async def get_move(board: dict[int, str], msg: discord.Message) -> tuple[bool, int, None]:
         """Get move from AI. AI use Minimax strategy."""
-        possible_moves = [i for i, emoji in board.items() if emoji in list(Emojis.number_emojis.values())]
+        possible_moves = [i for i, emoji in board.items() if emoji not in (Emojis.o_square, Emojis.x_square)]
 
         # give the ai some artifical delay
         await msg.channel.trigger_typing()
@@ -128,17 +128,7 @@ class Game(discord.ui.View):
         self.players = players
         self.ctx = ctx
         self.channel = ctx.channel
-        self.board = {
-            1: Emojis.number_emojis[1],
-            2: Emojis.number_emojis[2],
-            3: Emojis.number_emojis[3],
-            4: Emojis.number_emojis[4],
-            5: Emojis.number_emojis[5],
-            6: Emojis.number_emojis[6],
-            7: Emojis.number_emojis[7],
-            8: Emojis.number_emojis[8],
-            9: Emojis.number_emojis[9]
-        }
+        self.board = dict.fromkeys(range(1, 10), Emojis.empty_placeholder)
 
         # add the buttons
         # hack to not use the callbacks
@@ -260,7 +250,7 @@ class Game(discord.ui.View):
                     button.disabled = True
                     if i+1 in win[1]:
                         button.style = discord.ButtonStyle.green
-                    else:
+                    elif button.emoji != discord.PartialEmoji.from_str(Emojis.empty_placeholder):
                         button.style = discord.ButtonStyle.blurple
                 if inter:
                     await inter.response.edit_message(view=self)

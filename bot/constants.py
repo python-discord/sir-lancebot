@@ -225,6 +225,7 @@ class Emojis:
 
     x_square = "\U0001f1fd"
     o_square = "\U0001f1f4"
+    empty_placeholder = '<:empty_placeholder:921793702819692564>'
 
     status_online = "<:status_online:470326272351010816>"
     status_idle = "<:status_idle:470326266625785866>"
