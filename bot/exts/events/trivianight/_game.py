@@ -142,7 +142,6 @@ class TriviaNightGame:
             question = self._questions.pop(randrange(len(self._questions)))
 
         self.current_question = question
-        self.current_question.start()
         return question
 
     def end_question(self) -> None:

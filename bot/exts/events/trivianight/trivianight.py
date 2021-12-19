@@ -11,7 +11,7 @@ from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES, POSITIVE_REPLIES, Roles
 
 from ._game import TriviaNightGame
-from ._questions import QuestionView, Questions
+from ._questions import QuestionView
 from ._scoreboard import Scoreboard, ScoreboardView
 
 # The ID you see below is the Events Lead role ID
@@ -152,7 +152,8 @@ class TriviaNightCog(commands.Cog):
 
         await ctx.send(embed=question_view.end_question())
         await message.edit(embed=question_embed, view=None)
-        question_view.stop()
+
+        self.game.end_question()
 
     @trivianight.command()
     @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
@@ -163,6 +164,21 @@ class TriviaNightCog(commands.Cog):
         Questions are displayed in the following format:
         Q(number): Question description | :white_check_mark: if the question was used otherwise :x:.
         """
+        if self.game is None:
+            await ctx.send(embed=Embed(
+                title=choice(NEGATIVE_REPLIES),
+                description="There is no trivia night running!",
+                color=Colours.soft_red
+            ))
+            return
+
+        # TODO: Because of how the game currently works, only the questions left will be able to
+        # be gotten. Iterate through self.game:
+        # 
+        #     for question in self.game:
+        #         # This is an instance of Question from _game.py
+        #         print(question.description)
+
         question_list = self.questions.list_questions()
         if isinstance(question_list, Embed):
             await ctx.send(embed=question_list)
@@ -178,16 +194,27 @@ class TriviaNightCog(commands.Cog):
 
         This command should be used if the question should be ended early or if the time limit fails
         """
-        if self.questions.view.active_question is False:
+        if self.game is None:
+            await ctx.send(embed=Embed(
+                title=choice(NEGATIVE_REPLIES),
+                description="There is no trivia night running!",
+                color=Colours.soft_red
+            ))
+            return
+
+        if self.game.current_question is None:
             error_embed = Embed(
                 title=choice(NEGATIVE_REPLIES),
-                description="There is not an ongoing question to stop!",
+                description="There is no ongoing question!",
                 color=Colours.soft_red
             )
             await ctx.send(embed=error_embed)
             return
 
-        self.questions.view.active_question = False
+        # TODO: We need to tell the 'trivianight next' command that the game has ended, if it is still
+        # running that means it is currently counting down waiting to end the question. Use an asyncio.Event and
+        # asyncio.wait(self.lock.wait(), timeout=duration) as opposed to asyncio.sleep(duration).
+        self.game.end_question()
 
     @trivianight.command()
     @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
@@ -218,6 +245,7 @@ class TriviaNightCog(commands.Cog):
             await ctx.send(embed=error_embed)
             return
 
+        # TODO: Refactor the scoreboard after the game simplification.
         scoreboard_embed, scoreboard_view = await self.scoreboard.display()
         await ctx.send(embed=scoreboard_embed, view=scoreboard_view)
         self.game = None
