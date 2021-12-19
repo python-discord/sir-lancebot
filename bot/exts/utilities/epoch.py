@@ -9,22 +9,14 @@ from bot.bot import Bot
 from bot.exts.core.extensions import invoke_help_command
 
 # https://discord.com/developers/docs/reference#message-formatting-timestamp-styles
-TIMESTAMP_FORMATS = [
-    "h:mm A",
-    "h:mm:ss A",
-    "MM/DD/YYYY",
-    "MMMM D, YYYY",
-    "MMMM D, YYYY h:mm A",
-    "dddd, MMMM D, YYYY h:mm A "
-]
-STYLES = {"Epoch": "",
-          "Short Time": "t",
-          "Long Time": "T",
-          "Short Date": "d",
-          "Long Date": "D",
-          "Short Date/Time": "f",
-          "Long Date/Time": "F",
-          "Relative Time": "R"
+STYLES = {"Epoch": ("",),
+          "Short Time": ("t", "h:mm A",),
+          "Long Time": ("T", "h:mm:ss A"),
+          "Short Date": ("d", "MM/DD/YYYY"),
+          "Long Date": ("D", "MMMM D, YYYY"),
+          "Short Date/Time": ("f", "MMMM D, YYYY h:mm A"),
+          "Long Date/Time": ("F", "dddd, MMMM D, YYYY h:mm A"),
+          "Relative Time": ("R",)
           }
 DROPDOWN_TIMEOUT = 60
 
@@ -99,7 +91,7 @@ class Epoch(commands.Cog):
         """
         date = date.to('utc')
         formatted = [str(int(date.timestamp()))]
-        formatted += [date.format(d_format) for d_format in TIMESTAMP_FORMATS]
+        formatted += [date.format(format[1]) for format in list(STYLES.values())[1:6]]
         formatted.append(date.humanize())
         return formatted
 
@@ -118,7 +110,7 @@ class _TimestampDropdown(discord.ui.Select):
         if selected == "Epoch":
             return await interaction.message.edit(content=f"`{self.epoch}`")
         else:
-            return await interaction.message.edit(content=f"`<t:{self.epoch}:{STYLES[selected]}>`")
+            return await interaction.message.edit(content=f"`<t:{self.epoch}:{STYLES[selected][0]}>`")
 
 
 class _TimestampMenuView(discord.ui.View):
