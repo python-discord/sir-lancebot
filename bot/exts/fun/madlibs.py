@@ -97,11 +97,11 @@ class Madlibs(commands.Cog):
             except TimeoutError:
                 timeout_embed = discord.Embed(
                     title=choice(NEGATIVE_REPLIES),
-                    description="Uh oh! You took too long to respond! Please try again later.",
+                    description="Uh oh! You took too long to respond!",
                     color=Colours.soft_red
                 )
 
-                await ctx.send(embed=timeout_embed)
+                await ctx.send(ctx.author.mention, embed=timeout_embed)
 
                 for msg_id in submitted_words:
                     self.edited_content.pop(msg_id, submitted_words[msg_id])
