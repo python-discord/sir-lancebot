@@ -16,8 +16,6 @@ class ScoreboardView(View):
     def __init__(self, bot: Bot):
         super().__init__()
         self.bot = bot
-        self.points = {}
-        self.speed = {}
 
     async def create_main_leaderboard(self) -> Embed:
         """
@@ -142,19 +140,31 @@ class ScoreboardView(View):
 class Scoreboard:
     """Class for the scoreboard for the Trivia Night event."""
 
-    def __setitem__(self, key: UserScore, value: dict):
-        if value.get("points") and key.user_id not in self.view.points.keys():
-            self.view.points[key.user_id] = value["points"]
-        elif value.get("points"):
-            self.view.points[key.user_id] += self.view.points[key.user_id]
+    def __init__(self, bot: Bot):
+        self.view = ScoreboardView(bot)
+        self._points = {}
+        self._speed = {}
 
-        if value.get("speed") and key.user_id not in self.view.speed.keys():
-            self.view.speed[key.user_id] = [1, value["speed"]]
-        elif value.get("speed"):
-            self.view.speed[key.user_id] = [
-                self.view.speed[key.user_id][0] + 1, self.view.speed[key.user_id][1] + value["speed"]
+    def assign_points(self, user: UserScore, *, points: int = None, speed: float = None) -> None:
+        """
+        Assign points or deduct points to/from a certain user.
+
+        This method should be called once the question has finished and all answers have been registered.
+        """
+        if points is not None and user.user_id not in self._points.keys():
+            self._points[user.user_id] = points
+        elif points is not None:
+            self._points[user.user_id] += self._points[user.user_id]
+
+        if speed is not None and user.user_id not in self._speed.keys():
+            self._speed[user.user_id] = [1, speed]
+        elif speed is not None:
+            self._speed[user.user_id] = [
+                self._speed[user.user_id][0] + 1, self._speed[user.user_id][1] + speed
             ]
 
     async def display(self) -> tuple[Embed, View]:
         """Returns the embed of the main leaderboard along with the ScoreboardView."""
+        self.view.points = self._points
+        self.view.speed = self._speed
         return await self.view.create_main_leaderboard(), self.view

@@ -3,7 +3,6 @@ from random import randrange
 from string import ascii_uppercase
 from typing import Iterable, Optional, TypedDict
 
-
 DEFAULT_QUESTION_POINTS = 10
 DEFAULT_QUESTION_TIME = 10
 
@@ -56,7 +55,8 @@ class Question:
 
     @property
     def answers(self) -> list[tuple[str, str]]:
-        """The possible answers for this answer.
+        """
+        The possible answers for this answer.
 
         This is a property that returns a list of letter, answer pairs.
         """
@@ -119,7 +119,11 @@ class TriviaNightGame:
 
     def __init__(self, data: list[QuestionData]) -> None:
         self._questions = [Question(q) for q in data]
+        # A copy of the questions to keep for `.trivianight list`
+        self._all_questions = list(self._questions)
         self.current_question: Optional[Question] = None
+        self._points = {}
+        self._speed = {}
 
     def __iter__(self) -> Iterable[Question]:
         return iter(self._questions)
@@ -135,7 +139,7 @@ class TriviaNightGame:
 
         if number is not None:
             try:
-                question = [q for q in self._questions if q.number == number][0]
+                question = [q for q in self._all_questions if q.number == number][0]
             except IndexError:
                 raise ValueError(f"Question number {number} does not exist.")
         else:
@@ -156,3 +160,24 @@ class TriviaNightGame:
 
         self.current_question.stop()
         self.current_question = None
+
+    def list_questions(self) -> None:
+        """
+        List all the questions.
+
+        This method should be called when `.trivianight list` is called to display the following information:
+            - Question number
+            - Question description
+            - Visited/not visited
+        """
+        formatted_string = ""
+
+        spaces = max(len(q.description) for q in self._all_questions)
+
+        for question in self._all_questions:
+            visited, not_visited = ":checkmark:", ":x:"
+            formatted_string += f"`Q{question.number}: {question.description}" \
+                                f"{' ' * (spaces - len(question.description))}|`" \
+                                f" {visited if question not in self._all_questions else not_visited}\n"
+
+        return formatted_string

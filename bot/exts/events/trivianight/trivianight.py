@@ -4,7 +4,6 @@ from random import choice
 from typing import Optional
 
 from discord import Embed
-from discord.colour import Color
 from discord.ext import commands
 
 from bot.bot import Bot
@@ -12,7 +11,7 @@ from bot.constants import Colours, NEGATIVE_REPLIES, POSITIVE_REPLIES, Roles
 
 from ._game import TriviaNightGame
 from ._questions import QuestionView
-from ._scoreboard import Scoreboard, ScoreboardView
+from ._scoreboard import Scoreboard
 
 # The ID you see below is the Events Lead role ID
 TRIVIA_NIGHT_ROLES = (Roles.admin, 78361735739998228)
@@ -24,6 +23,8 @@ class TriviaNightCog(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.game: Optional[TriviaNightGame] = None
+        self.scoreboard: Optional[Scoreboard] = None
+        self.question_closed: asyncio.Event = None
 
     @commands.group(aliases=["tn"], invoke_without_command=True)
     async def trivianight(self, ctx: commands.Context) -> None:
@@ -91,12 +92,16 @@ class TriviaNightCog(commands.Cog):
             raise commands.BadArgument("Invalid JSON")
 
         self.game = TriviaNightGame(serialized_json)
+        self.question_closed = asyncio.Event()
 
         success_embed = Embed(
             title=choice(POSITIVE_REPLIES),
             description="The JSON was loaded successfully!",
             color=Colours.soft_green
         )
+
+        self.scoreboard = Scoreboard(self.bot)
+
         await ctx.send(embed=success_embed)
 
     @trivianight.command(aliases=('next',))
@@ -140,6 +145,7 @@ class TriviaNightCog(commands.Cog):
             duration = next_question.time * percentage
 
             await asyncio.sleep(duration)
+
             if int(duration) > 1:
                 # It is quite ugly to display decimals, the delay for requests to reach Discord
                 # cause sub-second accuracy to be quite pointless.
@@ -150,7 +156,7 @@ class TriviaNightCog(commands.Cog):
                 await asyncio.sleep(duration)
                 break
 
-        await ctx.send(embed=question_view.end_question())
+        await ctx.send(embed=question_view.end_question(self.scoreboard))
         await message.edit(embed=question_embed, view=None)
 
         self.game.end_question()
@@ -172,14 +178,7 @@ class TriviaNightCog(commands.Cog):
             ))
             return
 
-        # TODO: Because of how the game currently works, only the questions left will be able to
-        # be gotten. Iterate through self.game:
-        # 
-        #     for question in self.game:
-        #         # This is an instance of Question from _game.py
-        #         print(question.description)
-
-        question_list = self.questions.list_questions()
+        question_list = self.game.list_questions()
         if isinstance(question_list, Embed):
             await ctx.send(embed=question_list)
             return
@@ -211,10 +210,7 @@ class TriviaNightCog(commands.Cog):
             await ctx.send(embed=error_embed)
             return
 
-        # TODO: We need to tell the 'trivianight next' command that the game has ended, if it is still
-        # running that means it is currently counting down waiting to end the question. Use an asyncio.Event and
-        # asyncio.wait(self.lock.wait(), timeout=duration) as opposed to asyncio.sleep(duration).
-        self.game.end_question()
+        self.ongoing_question = False
 
     @trivianight.command()
     @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
@@ -245,7 +241,6 @@ class TriviaNightCog(commands.Cog):
             await ctx.send(embed=error_embed)
             return
 
-        # TODO: Refactor the scoreboard after the game simplification.
         scoreboard_embed, scoreboard_view = await self.scoreboard.display()
         await ctx.send(embed=scoreboard_embed, view=scoreboard_view)
         self.game = None

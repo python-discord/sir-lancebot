@@ -1,7 +1,5 @@
-from random import choice, randrange
+from random import choice
 from string import ascii_uppercase
-from time import perf_counter
-from typing import Optional, TypedDict, Union
 
 import discord
 from discord import Embed, Interaction
@@ -10,7 +8,7 @@ from discord.ui import Button, View
 from bot.constants import Colours, NEGATIVE_REPLIES
 
 from . import UserScore
-from ._game import Question, AlreadyUpdated, QuestionClosed
+from ._game import AlreadyUpdated, Question, QuestionClosed
 from ._scoreboard import Scoreboard
 
 
@@ -110,7 +108,7 @@ class QuestionView(View):
 
         return question_embed
 
-    def end_question(self) -> Embed:
+    def end_question(self, scoreboard: Scoreboard) -> Embed:
         """
         Ends the question and displays the statistics on who got the question correct, awards points, etc.
 
@@ -120,7 +118,6 @@ class QuestionView(View):
         guesses = self.question.stop()
 
         labels = ascii_uppercase[:len(self.question.answers)]
-        correct = [label for (label, description) in self.question.answers if description == self.question.correct]
 
         answer_embed = Embed(
             title=f"The correct answer for Question {self.question.number} was..",
@@ -135,9 +132,13 @@ class QuestionView(View):
                 for answer_choice in labels
             }
 
-            for idx, (answer, percent) in enumerate(answers_chosen.items()):
+            answers_chosen = dict(
+                sorted(list(answers_chosen.items()), key=lambda item: item[1], reverse=True)
+            )
+
+            for answer, percent in answers_chosen.items():
                 # Setting the color of answer_embed to the % of people that got it correct via the mapping
-                if idx == 0:
+                if dict(self.question.answers)[answer[0]] == self.question.correct:
                     # Maps the % of people who got it right to a color, from a range of red to green
                     percentage_to_color = [0xFC94A1, 0xFFCCCB, 0xCDFFCC, 0xB0F5AB, 0xB0F5AB]
                     answer_embed.color = percentage_to_color[round(percent * 100) // 25]
@@ -148,5 +149,24 @@ class QuestionView(View):
                     value=self.question.answers[ord(answer) - 65][1],
                     inline=False
                 )
+
+            # Assign points to users
+            for user_id, answer in guesses.items():
+                if dict(self.question.answers)[answer[0]] == self.question.correct:
+                    scoreboard.assign_points(
+                        UserScore(int(user_id)),
+                        points=(1 - (answer[-1] / self.question.time) / 2) * self.question.max_points,
+                        speed=answer[-1]
+                    )
+                elif answer[-1] <= 2:
+                    scoreboard.assign_points(
+                        UserScore(int(user_id)),
+                        points=-(1 - (answer[-1] / self.question.time) / 2) * self.question.max_points
+                    )
+                else:
+                    scoreboard.assign_points(
+                        UserScore(int(user_id)),
+                        points=0
+                    )
 
         return answer_embed
