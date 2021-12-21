@@ -144,7 +144,15 @@ class TriviaNightCog(commands.Cog):
             percentage *= 0.5
             duration = next_question.time * percentage
 
-            await asyncio.sleep(duration)
+            await asyncio.wait([self.question_closed.wait()], timeout=duration)
+
+            if self.question_closed.is_set():
+                await ctx.send(embed=question_view.end_question(self.scoreboard))
+                await message.edit(embed=question_embed, view=None)
+
+                self.game.end_question()
+                self.question_closed.clear()
+                return
 
             if int(duration) > 1:
                 # It is quite ugly to display decimals, the delay for requests to reach Discord
@@ -153,7 +161,14 @@ class TriviaNightCog(commands.Cog):
             else:
                 # Since each time we divide the percentage by 2 and sleep one half of the halves (then sleep a
                 # half, of that half) we must sleep both halves at the end.
-                await asyncio.sleep(duration)
+                await asyncio.wait([self.question_closed.wait()], timeout=duration)
+                if self.question_closed.is_set():
+                    await ctx.send(embed=question_view.end_question(self.scoreboard))
+                    await message.edit(embed=question_embed, view=None)
+
+                    self.game.end_question()
+                    self.question_closed.clear()
+                    return
                 break
 
         await ctx.send(embed=question_view.end_question(self.scoreboard))
@@ -210,7 +225,7 @@ class TriviaNightCog(commands.Cog):
             await ctx.send(embed=error_embed)
             return
 
-        self.ongoing_question = False
+        self.question_closed.set()
 
     @trivianight.command()
     @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
