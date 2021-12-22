@@ -34,6 +34,8 @@ class DateString(commands.Converter):
         """
         try:
             return arrow.utcnow().dehumanize(argument)
+        except OverflowError:
+            raise commands.BadArgument(f"`{argument}` Could not be parsed to a relative or absolute date")
         except ValueError:
             try:
                 dt, ignored_tokens = parser.parse(argument, fuzzy_with_tokens=True)
