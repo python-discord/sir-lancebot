@@ -91,7 +91,7 @@ class Epoch(commands.Cog):
         """
         date = date.to('utc')
         formatted = [str(int(date.timestamp()))]
-        formatted += [date.format(format[1]) for format in list(STYLES.values())[1:6]]
+        formatted += [date.format(format[1]) for format in list(STYLES.values())[1:7]]
         formatted.append(date.humanize())
         return formatted
 
