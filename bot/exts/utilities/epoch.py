@@ -34,6 +34,8 @@ class DateString(commands.Converter):
         """
         try:
             return arrow.utcnow().dehumanize(argument)
+        except OverflowError:
+            raise commands.BadArgument(f"`{argument}` Could not be parsed to a relative or absolute date")
         except ValueError:
             try:
                 dt, ignored_tokens = parser.parse(argument, fuzzy_with_tokens=True)
@@ -51,13 +53,15 @@ class Epoch(commands.Cog):
         Convert an entered date/time string to the equivalent epoch.
 
         **Relative time**
-            accepted units: "seconds", "minutes", "hours", "days", "weeks", "months", "years"
-            Eg ".epoch in a month 4 days and 2 hours"
+            Must begin with `in...` or end with `...ago`.
+            Accepted units: "seconds", "minutes", "hours", "days", "weeks", "months", "years".
+            eg `.epoch in a month 4 days and 2 hours`
 
         **Absolute time**
-            eg ".epoch 2022/6/15 16:43 -04:00"
+            eg `.epoch 2022/6/15 16:43 -04:00`
             Absolute times must be entered in descending orders of magnitude.
-            Timezones may take the following forms:
+            If AM or PM is left unspecified, the 24-hour clock is assumed.
+            Timezones are optional, and will default to UTC. The following timezone formats are accepted:
                 Z (UTC)
                 ±HH:MM
                 ±HHMM
@@ -70,16 +74,18 @@ class Epoch(commands.Cog):
             return
 
         if isinstance(date_time, tuple):
-            ignored_tokens, date_time = list(a.strip() for a in date_time[1] if a.strip()), date_time[0]
+            # Remove empty strings. Strip extra whitespace from the remaining items
+            ignored_tokens = list(map(str.strip, filter(str.strip, date_time[1])))
+            date_time = date_time[0]
             if ignored_tokens:
                 await ctx.send(f"Could not parse the following token(s): `{', '.join(ignored_tokens)}`")
-                await ctx.send(f"The resulting date and time is: `{date_time.format(arrow.FORMAT_RSS)}`")
+            await ctx.send(f"Date and time parsed as: `{date_time.format(arrow.FORMAT_RSS)}`")
 
         epoch = int(date_time.timestamp())
         dropdown = _TimestampDropdown(self._format_dates(date_time), epoch)
         view = _TimestampMenuView(ctx, dropdown)
         original = await ctx.send(f"`{epoch}`", view=view)
-        if await view.wait():  # wait until expiration and remove the dropdown
+        if await view.wait():  # wait until expiration before removing the dropdown
             await original.edit(view=None)
 
     @staticmethod
@@ -91,7 +97,7 @@ class Epoch(commands.Cog):
         """
         date = date.to('utc')
         formatted = [str(int(date.timestamp()))]
-        formatted += [date.format(format[1]) for format in list(STYLES.values())[1:6]]
+        formatted += [date.format(format[1]) for format in list(STYLES.values())[1:7]]
         formatted.append(date.humanize())
         return formatted
 
