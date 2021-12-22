@@ -62,6 +62,7 @@ class Twemoji(commands.Cog):
             return code.group()
 
     def codepoint_from_input(self, raw_emoji: List[str]):
+        raw_emoji = [emoji.lower() for emoji in raw_emoji]
         if is_emoji(raw_emoji[0]):
             emojis = (self.codepoint(emoji) for emoji in raw_emoji[0])
             return "-".join(emojis)
