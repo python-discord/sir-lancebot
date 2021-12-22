@@ -4,7 +4,8 @@ from typing import List, Literal
 
 import discord
 from discord.ext import commands
-from emoji import is_emoji
+from emoji import is_emoji, UNICODE_EMOJI_ENGLISH
+
 
 from bot.bot import Bot
 from bot.constants import Colours
@@ -29,15 +30,20 @@ class Twemoji(commands.Cog):
         return f"{BASE_URLS[format]}{codepoint}.{format}"
 
     @staticmethod
+    def alias_to_name(alias: str) -> str:
+        name = alias[1:-1].replace("_", " ")
+        return name.capitalize()
+
+    @staticmethod
     def build_embed(codepoint: str) -> discord.Embed:
+        emoji = "".join(Twemoji.emoji(e) for e in codepoint.split("-"))
+
         embed = discord.Embed(
-            title="Twemoji",
-            description=f"[Download svg]({Twemoji.get_url(codepoint, 'svg')})",
+            title=Twemoji.alias_to_name(UNICODE_EMOJI_ENGLISH[emoji]),
+            description=f"{codepoint.replace('-', ' ')}\n[Download svg]({Twemoji.get_url(codepoint, 'svg')})",
             colour=Colours.twitter_blue,
         )
         embed.set_thumbnail(url=Twemoji.get_url(codepoint, "png"))
-        embed.set_footer(text=codepoint.replace("-", " "))
-
         return embed
 
     @staticmethod
