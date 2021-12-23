@@ -1,6 +1,6 @@
 import logging
 import re
-from typing import List, Literal
+from typing import Literal
 
 import discord
 from discord.ext import commands
@@ -96,7 +96,7 @@ class Twemoji(commands.Cog):
         if code := CODE.search(str(codepoint)):
             return code.group()
 
-    def codepoint_from_input(self, raw_emoji: List[str]) -> str:
+    def codepoint_from_input(self, raw_emoji: list[str]) -> str:
         """
         Returns the codepoint corresponding to the passed list, separated by "-".
 
