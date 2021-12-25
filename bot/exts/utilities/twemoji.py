@@ -59,7 +59,7 @@ class Twemoji(commands.Cog):
     @staticmethod
     def emoji(codepoint: str) -> str:
         """
-        Returns the emoji corresponding to a given codepoint.
+        Returns the emoji corresponding to a given `codepoint`.
 
         The return value is an emoji character, such as "🍂". The `codepoint`
         argument can be of any format, since it will be trimmed automatically.
@@ -71,19 +71,21 @@ class Twemoji(commands.Cog):
     @staticmethod
     def codepoint(emoji: str) -> str:
         """
-        Returns the codepoint of a single emoji.
+        Returns the codepoint, in a trimmed format, of a single emoji.
 
         `emoji` should be an emoji character, such as "🐍" and "🥰", and
         not a codepoint like "1f1f8". When working with combined emojis,
-        such as "🇸🇪" and "👨‍👩‍👦", send the component emojis through the
-        method one at a time.
+        such as "🇸🇪" and "👨‍👩‍👦", send the component emojis through the method
+        one at a time.
         """
         return hex(ord(emoji))[2:]
 
     @staticmethod
     def trim_code(codepoint: str) -> str:
         """
-        Extract the meaninful information from codepoints, or None, if no codepoint was found.
+        Returns the meaningful information from the given `codepoint`.
+
+        If no codepoint is found, `None` is returned.
 
         Example usages:
         >>> trim_code("U+1f1f8")
@@ -93,12 +95,12 @@ class Twemoji(commands.Cog):
         >>> trim_code("1f466")
         "1f466"
         """
-        if code := CODE.search(str(codepoint)):
+        if code := CODE.search(codepoint):
             return code.group()
 
-    def codepoint_from_input(self, raw_emoji: list[str]) -> str:
+    def codepoint_from_input(self, raw_emoji: tuple[str, ...]) -> str:
         """
-        Returns the codepoint corresponding to the passed list, separated by "-".
+        Returns the codepoint corresponding to the passed tuple, separated by "-".
 
         The return format matches the format used in URLs for Twemoji source files.
 
@@ -133,7 +135,7 @@ class Twemoji(commands.Cog):
             codepoint = self.codepoint_from_input(raw_emoji)
         except (ValueError, AttributeError):
             raise commands.BadArgument(
-                "please include a valid emoji or emoji code point."
+                "please include a valid emoji or emoji codepoint."
             )
 
         await ctx.send(embed=self.build_embed(codepoint))
