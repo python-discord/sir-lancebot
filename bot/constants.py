@@ -291,6 +291,7 @@ class Roles(NamedTuple):
     helpers = int(environ.get("ROLE_HELPERS", 267630620367257601))
     core_developers = 587606783669829632
     everyone = int(environ.get("BOT_GUILD", 267624335836053506))
+    aoc_completionist = int(environ.get("AOC_COMPLETIONIST_ROLE_ID", 916691790181056532))
 
 
 class Tokens(NamedTuple):

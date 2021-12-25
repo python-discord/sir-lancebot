@@ -7,12 +7,15 @@ from typing import Optional
 import arrow
 import discord
 from async_rediscache import RedisCache
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 from bot.bot import Bot
-from bot.constants import AdventOfCode as AocConfig, Channels, Colours, Emojis, Month, Roles, WHITELISTED_CHANNELS
+from bot.constants import (
+    AdventOfCode as AocConfig, Channels, Client, Colours, Emojis, Month, Roles, WHITELISTED_CHANNELS
+)
 from bot.exts.events.advent_of_code import _helpers
 from bot.exts.events.advent_of_code.views.dayandstarview import AoCDropdownView
+from bot.utils import members
 from bot.utils.decorators import InChannelCheckFailure, in_month, whitelist_override, with_role
 from bot.utils.extensions import invoke_help_command
 
@@ -31,6 +34,7 @@ class AdventOfCode(commands.Cog):
     """Advent of Code festivities! Ho Ho Ho!"""
 
     # Redis Cache for linking Discord IDs to Advent of Code usernames
+    # RedisCache[member_id: aoc_username_string]
     account_links = RedisCache()
 
     def __init__(self, bot: Bot):
@@ -51,6 +55,57 @@ class AdventOfCode(commands.Cog):
         self.status_task = self.bot.loop.create_task(status_coro)
         self.status_task.set_name("AoC Status Countdown")
         self.status_task.add_done_callback(_helpers.background_task_callback)
+
+        self.completionist_task.start()
+
+    @tasks.loop(minutes=10.0)
+    async def completionist_task(self) -> None:
+        """
+        Give members who have completed all 50 AoC stars the completionist role.
+
+        Runs on a schedule, as defined in the task.loop decorator.
+        """
+        await self.bot.wait_until_guild_available()
+        guild = self.bot.get_guild(Client.guild)
+        completionist_role = guild.get_role(Roles.aoc_completionist)
+        if completionist_role is None:
+            log.warning("Could not find the AoC completionist role; cancelling completionist task.")
+            self.completer_task.cancel()
+            return
+
+        aoc_name_to_member_id = {
+            aoc_name: member_id
+            for member_id, aoc_name in await self.account_links.items()
+        }
+
+        try:
+            leaderboard = await _helpers.fetch_leaderboard()
+        except _helpers.FetchingLeaderboardFailedError:
+            await self.bot.send_log("Unable to fetch AoC leaderboard during role sync.")
+            return
+
+        placement_leaderboard = json.loads(leaderboard["placement_leaderboard"])
+
+        for member_aoc_info in placement_leaderboard.values():
+            if not member_aoc_info["stars"] == 50:
+                # Only give the role to people who have completed all 50 stars
+                continue
+
+            member_id = aoc_name_to_member_id[member_aoc_info["name"]]
+            if not member_id:
+                continue
+
+            member = members.get_or_fetch_member(guild, member_id)
+            if member is None:
+                continue
+
+            if completionist_role in member.roles:
+                continue
+
+            if await self.completionist_block_list.contains(member_id):
+                continue
+
+            await members.handle_role_change(member, member.add_roles, completionist_role)
 
     @commands.group(name="adventofcode", aliases=("aoc",))
     @whitelist_override(channels=AOC_WHITELIST)
@@ -408,6 +463,7 @@ class AdventOfCode(commands.Cog):
         log.debug("Unloading the cog and canceling the background task.")
         self.notification_task.cancel()
         self.status_task.cancel()
+        self.completionist_task.cancel()
 
     def _build_about_embed(self) -> discord.Embed:
         """Build and return the informational "About AoC" embed from the resources file."""
