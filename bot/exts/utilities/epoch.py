@@ -35,14 +35,14 @@ class DateString(commands.Converter):
         """
         try:
             return arrow.utcnow().dehumanize(argument)
-        except OverflowError:
-            raise commands.BadArgument(f"`{argument}` Could not be parsed to a relative or absolute date")
         except ValueError:
             try:
                 dt, ignored_tokens = parser.parse(argument, fuzzy_with_tokens=True)
-                return arrow.get(dt), ignored_tokens
             except parser.ParserError:
-                raise commands.BadArgument(f"`{argument}` Could not be parsed to a relative or absolute date")
+                raise commands.BadArgument(f"`{argument}` Could not be parsed to a relative or absolute date.")
+            except OverflowError:
+                raise commands.BadArgument(f"`{argument}` Results in a date outside of the supported range.")
+            return arrow.get(dt), ignored_tokens
 
 
 class Epoch(commands.Cog):
