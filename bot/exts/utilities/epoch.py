@@ -6,7 +6,7 @@ from dateutil import parser
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.exts.core.extensions import invoke_help_command
+from bot.utils.extensions import invoke_help_command
 
 # https://discord.com/developers/docs/reference#message-formatting-timestamp-styles
 STYLES = {"Epoch": ("",),
