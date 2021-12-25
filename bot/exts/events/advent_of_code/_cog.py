@@ -37,6 +37,10 @@ class AdventOfCode(commands.Cog):
     # RedisCache[member_id: aoc_username_string]
     account_links = RedisCache()
 
+    # A dict with keys of member_ids to block from getting the role
+    # RedisCache[member_id: None]
+    completionist_block_list = RedisCache()
+
     def __init__(self, bot: Bot):
         self.bot = bot
 
@@ -91,11 +95,11 @@ class AdventOfCode(commands.Cog):
                 # Only give the role to people who have completed all 50 stars
                 continue
 
-            member_id = aoc_name_to_member_id[member_aoc_info["name"]]
+            member_id = aoc_name_to_member_id.get(member_aoc_info["name"], None)
             if not member_id:
                 continue
 
-            member = members.get_or_fetch_member(guild, member_id)
+            member = await members.get_or_fetch_member(guild, member_id)
             if member is None:
                 continue
 
@@ -113,6 +117,19 @@ class AdventOfCode(commands.Cog):
         """All of the Advent of Code commands."""
         if not ctx.invoked_subcommand:
             await invoke_help_command(ctx)
+
+    @with_role(Roles.admins)
+    @adventofcode_group.command(
+        name="block",
+        brief="Block a user from getting the completionist role.",
+    )
+    async def block_from_role(self, ctx: commands.Context, member: discord.Member) -> None:
+        """Block the given member from receiving the AoC completionist role, removing it from them if needed."""
+        completionist_role = ctx.guild.get_role(Roles.aoc_completionist)
+        if completionist_role in member.roles:
+            await member.remove_roles(completionist_role)
+
+        await self.completionist_block_list.set(member.id, "sentinel")
 
     @commands.guild_only()
     @adventofcode_group.command(
