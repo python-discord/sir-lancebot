@@ -9,15 +9,16 @@ from bot.bot import Bot
 from bot.utils.extensions import invoke_help_command
 
 # https://discord.com/developers/docs/reference#message-formatting-timestamp-styles
-STYLES = {"Epoch": ("",),
-          "Short Time": ("t", "h:mm A",),
-          "Long Time": ("T", "h:mm:ss A"),
-          "Short Date": ("d", "MM/DD/YYYY"),
-          "Long Date": ("D", "MMMM D, YYYY"),
-          "Short Date/Time": ("f", "MMMM D, YYYY h:mm A"),
-          "Long Date/Time": ("F", "dddd, MMMM D, YYYY h:mm A"),
-          "Relative Time": ("R",)
-          }
+STYLES = {
+    "Epoch": ("",),
+    "Short Time": ("t", "h:mm A",),
+    "Long Time": ("T", "h:mm:ss A"),
+    "Short Date": ("d", "MM/DD/YYYY"),
+    "Long Date": ("D", "MMMM D, YYYY"),
+    "Short Date/Time": ("f", "MMMM D, YYYY h:mm A"),
+    "Long Date/Time": ("F", "dddd, MMMM D, YYYY h:mm A"),
+    "Relative Time": ("R",)
+}
 DROPDOWN_TIMEOUT = 60
 
 
