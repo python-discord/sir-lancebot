@@ -85,8 +85,8 @@ class Epoch(commands.Cog):
         epoch = int(date_time.timestamp())
         view = TimestampMenuView(ctx, self._format_dates(date_time), epoch)
         original = await ctx.send(f"`{epoch}`", view=view)
-        if await view.wait():  # wait until expiration before removing the dropdown
-            await original.edit(view=None)
+        await view.wait()  # wait until expiration before removing the dropdown
+        await original.edit(view=None)
 
     @staticmethod
     def _format_dates(date: arrow.Arrow) -> list[str]:
@@ -103,7 +103,7 @@ class Epoch(commands.Cog):
 
 
 class TimestampMenuView(discord.ui.View):
-    """View for the "epoch" command which contains a single `discord.ui.Select`, dropdown component."""
+    """View for the epoch command which contains a single `discord.ui.Select` dropdown component."""
 
     def __init__(self, ctx: commands.Context, formatted_times: list[str], epoch: int):
         super().__init__(timeout=DROPDOWN_TIMEOUT)
@@ -118,8 +118,8 @@ class TimestampMenuView(discord.ui.View):
         """Drop down menu which contains a list of formats which discord timestamps can take."""
         selected = interaction.data["values"][0]
         if selected == "Epoch":
-            return await interaction.message.edit(content=f"`{self.epoch}`")
-        return await interaction.message.edit(content=f"`<t:{self.epoch}:{STYLES[selected][0]}>`")
+            return await interaction.response.edit_message(content=f"`{self.epoch}`")
+        return await interaction.response.edit_message(content=f"`<t:{self.epoch}:{STYLES[selected][0]}>`")
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         """Check to ensure that the interacting user is the user who invoked the command."""
