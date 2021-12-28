@@ -100,16 +100,11 @@ class AdventOfCode(commands.Cog):
                 continue
 
             member = await members.get_or_fetch_member(guild, member_id)
-            if member is None:
+            if member is None or completionist_role in member.roles:
                 continue
 
-            if completionist_role in member.roles:
-                continue
-
-            if await self.completionist_block_list.contains(member_id):
-                continue
-
-            await members.handle_role_change(member, member.add_roles, completionist_role)
+            if not await self.completionist_block_list.contains(member_id):
+                await members.handle_role_change(member, member.add_roles, completionist_role)
 
     @commands.group(name="adventofcode", aliases=("aoc",))
     @whitelist_override(channels=AOC_WHITELIST)
