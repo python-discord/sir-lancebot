@@ -125,6 +125,7 @@ class AdventOfCode(commands.Cog):
             await member.remove_roles(completionist_role)
 
         await self.completionist_block_list.set(member.id, "sentinel")
+        await ctx.send(f":+1: Blocked {member.mention} from getting the AoC completionist role.")
 
     @commands.guild_only()
     @adventofcode_group.command(
