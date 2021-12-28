@@ -7,7 +7,6 @@ from discord.ui import Button, View
 
 from bot.constants import Colours, NEGATIVE_REPLIES
 
-from . import UserScore
 from ._game import AlreadyUpdated, Question, QuestionClosed
 from ._scoreboard import Scoreboard
 
@@ -154,18 +153,18 @@ class QuestionView(View):
             for user_id, answer in guesses.items():
                 if dict(self.question.answers)[answer[0]] == self.question.correct:
                     scoreboard.assign_points(
-                        UserScore(int(user_id)),
+                        int(user_id),
                         points=(1 - (answer[-1] / self.question.time) / 2) * self.question.max_points,
                         speed=answer[-1]
                     )
                 elif answer[-1] <= 2:
                     scoreboard.assign_points(
-                        UserScore(int(user_id)),
+                        int(user_id),
                         points=-(1 - (answer[-1] / self.question.time) / 2) * self.question.max_points
                     )
                 else:
                     scoreboard.assign_points(
-                        UserScore(int(user_id)),
+                        int(user_id),
                         points=0
                     )
 

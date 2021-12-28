@@ -7,8 +7,6 @@ from discord.ui import Button, View
 from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES
 
-from . import UserScore
-
 
 class ScoreboardView(View):
     """View for the scoreboard."""
@@ -145,22 +143,22 @@ class Scoreboard:
         self._points = {}
         self._speed = {}
 
-    def assign_points(self, user: UserScore, *, points: int = None, speed: float = None) -> None:
+    def assign_points(self, user_id: int, *, points: int = None, speed: float = None) -> None:
         """
         Assign points or deduct points to/from a certain user.
 
         This method should be called once the question has finished and all answers have been registered.
         """
-        if points is not None and user.user_id not in self._points.keys():
-            self._points[user.user_id] = points
+        if points is not None and user_id not in self._points.keys():
+            self._points[user_id] = points
         elif points is not None:
-            self._points[user.user_id] += self._points[user.user_id]
+            self._points[user_id] += self._points[user_id]
 
-        if speed is not None and user.user_id not in self._speed.keys():
-            self._speed[user.user_id] = [1, speed]
+        if speed is not None and user_id not in self._speed.keys():
+            self._speed[user_id] = [1, speed]
         elif speed is not None:
-            self._speed[user.user_id] = [
-                self._speed[user.user_id][0] + 1, self._speed[user.user_id][1] + speed
+            self._speed[user_id] = [
+                self._speed[user_id][0] + 1, self._speed[user_id][1] + speed
             ]
 
     async def display(self) -> tuple[Embed, View]:
