@@ -91,19 +91,31 @@ class ScoreboardView(View):
                 color=Colours.soft_red
             )
 
-        suffixes = {"1": "st", "2": "nd", "3": "rd"}
+        suffix = ["th", "st", "nd", "rd", "th"][min(int(points_rank) % 10, 4)]
+        if (int(points_rank) % 100) in {11, 12, 13}:
+            suffix = "th"
+
+        points_rank = str(points_rank) + suffix
+
         rank_embed.add_field(
             name="Total Points",
             value=(
-                f"You got {points_rank}{'th' if not (suffix := suffixes.get(points_rank[-1])) else suffix} place"
+                f"You got {points_rank} place"
                 f" with {self.points[member.id]:.1f} points."
             ),
             inline=False
         )
+
+        suffix = ["th", "st", "nd", "rd", "th"][min(int(speed_rank) % 10, 4)]
+        if (int(speed_rank) % 100) in {11, 12, 13}:
+            suffix = "th"
+
+        speed_rank = str(speed_rank) + suffix
+
         rank_embed.add_field(
             name="Average Speed",
             value=(
-                f"You got {speed_rank}{'th' if not (suffix := suffixes.get(speed_rank[-1])) else suffix} place"
+                f"You got {speed_rank} place"
                 f" with a time of {(self.speed[member.id][1] / self.speed[member.id][0]):.1f} seconds."
             ),
             inline=False
