@@ -74,8 +74,10 @@ class TriviaNightCog(commands.Cog):
             json_text = (await ctx.message.attachments[0].read()).decode("utf8")
         elif not to_load:
             raise commands.BadArgument("You didn't attach an attachment nor link a message!")
-        elif to_load.startswith("https://discord.com/channels") or \
-                to_load.startswith("https://discordapp.com/channels"):
+        elif (
+            to_load.startswith("https://discord.com/channels")
+            or to_load.startswith("https://discordapp.com/channels")
+        ):
             channel_id, message_id = to_load.split("/")[-2:]
             channel = await ctx.guild.fetch_channel(int(channel_id))
             message = await channel.fetch_message(int(message_id))
