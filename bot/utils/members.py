@@ -39,7 +39,7 @@ async def handle_role_change(
     except discord.NotFound:
         log.debug(f"Failed to change role for {member} ({member.id}): member not found")
     except discord.Forbidden:
-        log.debug(
+        log.error(
             f"Forbidden to change role for {member} ({member.id}); "
             f"possibly due to role hierarchy"
         )
