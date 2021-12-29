@@ -74,7 +74,7 @@ class AdventOfCode(commands.Cog):
         completionist_role = guild.get_role(Roles.aoc_completionist)
         if completionist_role is None:
             log.warning("Could not find the AoC completionist role; cancelling completionist task.")
-            self.completer_task.cancel()
+            self.completionist_task.cancel()
             return
 
         aoc_name_to_member_id = {
@@ -97,13 +97,20 @@ class AdventOfCode(commands.Cog):
 
             member_id = aoc_name_to_member_id.get(member_aoc_info["name"], None)
             if not member_id:
+                log.debug(f"Could not find member_id for {member_aoc_info['name']}, not giving role.")
                 continue
 
             member = await members.get_or_fetch_member(guild, member_id)
-            if member is None or completionist_role in member.roles:
+            if member is None:
+                log.debug(f"Could not find {member_id}, not giving role.")
+                continue
+
+            if completionist_role in member.roles:
+                log.debug(f"{member.name} ({member.mention}) already has the completionist role.")
                 continue
 
             if not await self.completionist_block_list.contains(member_id):
+                log.debug(f"Giving completionist role to {member.name} ({member.mention}).")
                 await members.handle_role_change(member, member.add_roles, completionist_role)
 
     @commands.group(name="adventofcode", aliases=("aoc",))
