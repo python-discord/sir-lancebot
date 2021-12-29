@@ -81,7 +81,7 @@ class Twemoji(commands.Cog):
         return hex(ord(emoji))[2:]
 
     @staticmethod
-    def trim_code(codepoint: str) -> str:
+    def trim_code(codepoint: str | None) -> str:
         """
         Returns the meaningful information from the given `codepoint`.
 
@@ -95,6 +95,8 @@ class Twemoji(commands.Cog):
         >>> trim_code("1f466")
         "1f466"
         """
+        if not codepoint:
+            return None
         if code := CODE.search(codepoint):
             return code.group()
 
