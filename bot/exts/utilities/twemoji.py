@@ -1,6 +1,6 @@
 import logging
 import re
-from typing import Literal
+from typing import Literal, Optional
 
 import discord
 from discord.ext import commands
@@ -59,7 +59,7 @@ class Twemoji(commands.Cog):
     @staticmethod
     def emoji(codepoint: str) -> str:
         """
-        Returns the emoji corresponding to a given `codepoint`.
+        Returns the emoji corresponding to a given `codepoint`, or `""` if no emoji was found.
 
         The return value is an emoji character, such as "🍂". The `codepoint`
         argument can be of any format, since it will be trimmed automatically.
@@ -81,7 +81,7 @@ class Twemoji(commands.Cog):
         return hex(ord(emoji))[2:]
 
     @staticmethod
-    def trim_code(codepoint: str | None) -> str:
+    def trim_code(codepoint: Optional[str]) -> Optional[str]:
         """
         Returns the meaningful information from the given `codepoint`.
 
@@ -100,30 +100,29 @@ class Twemoji(commands.Cog):
         if code := CODE.search(codepoint):
             return code.group()
 
-    def codepoint_from_input(self, raw_emoji: tuple[str, ...]) -> str:
+    @staticmethod
+    def codepoint_from_input(raw_emoji: tuple[str, ...]) -> str:
         """
         Returns the codepoint corresponding to the passed tuple, separated by "-".
 
         The return format matches the format used in URLs for Twemoji source files.
 
         Example usages:
-        >>> codepoint_from_input(["🐍"])
+        >>> codepoint_from_input(("🐍",))
         "1f40d"
-        >>> codepoint_from_input(["1f1f8", "1f1ea"])
+        >>> codepoint_from_input(("1f1f8", "1f1ea"))
         "1f1f8-1f1ea"
-        >>> codepoint_from_input(["👨‍👧‍👦"])
+        >>> codepoint_from_input(("👨‍👧‍👦",))
         "1f468-200d-1f467-200d-1f466"
         """
         raw_emoji = [emoji.lower() for emoji in raw_emoji]
         if is_emoji(raw_emoji[0]):
-            emojis = (self.codepoint(emoji) for emoji in raw_emoji[0])
+            emojis = (Twemoji.codepoint(emoji) for emoji in raw_emoji[0])
             return "-".join(emojis)
 
-        raw_first = self.trim_code(raw_emoji[0])
-        if is_emoji("".join(self.emoji(self.trim_code(code)) for code in raw_emoji)):
-            return "-".join(self.trim_code(code) for code in raw_emoji)
-        if is_emoji(self.emoji(raw_first)):
-            return raw_first
+        emoji = "".join(Twemoji.emoji(Twemoji.trim_code(code)) for code in raw_emoji)
+        if is_emoji(emoji):
+            return "-".join(Twemoji.codepoint(e) for e in emoji)
 
         raise ValueError("No codepoint could be obtained from the given input")
 
@@ -135,7 +134,7 @@ class Twemoji(commands.Cog):
             return
         try:
             codepoint = self.codepoint_from_input(raw_emoji)
-        except (ValueError, AttributeError):
+        except ValueError:
             raise commands.BadArgument(
                 "please include a valid emoji or emoji codepoint."
             )
