@@ -23,6 +23,7 @@ __all__ = (
     "Reddit",
     "RedisConfig",
     "RedirectOutput",
+    "PYTHON_PREFIX"
     "MODERATION_ROLES",
     "STAFF_ROLES",
     "WHITELISTED_CHANNELS",
@@ -33,6 +34,8 @@ __all__ = (
 
 log = logging.getLogger(__name__)
 
+
+PYTHON_PREFIX = "!"
 
 @dataclasses.dataclass
 class AdventOfCodeLeaderboard:
@@ -134,11 +137,12 @@ class Client(NamedTuple):
     guild = int(environ.get("BOT_GUILD", 267624335836053506))
     prefix = environ.get("PREFIX", ".")
     token = environ.get("BOT_TOKEN")
-    sentry_dsn = environ.get("BOT_SENTRY_DSN")
     debug = environ.get("BOT_DEBUG", "true").lower() == "true"
+    file_logs = environ.get("FILE_LOGS", "false").lower() == "true"
     github_bot_repo = "https://github.com/python-discord/sir-lancebot"
     # Override seasonal locks: 1 (January) to 12 (December)
     month_override = int(environ["MONTH_OVERRIDE"]) if "MONTH_OVERRIDE" in environ else None
+    trace_loggers = environ.get("BOT_TRACE_LOGGERS")
 
 
 class Colours:
@@ -281,12 +285,13 @@ if Client.month_override is not None:
 
 
 class Roles(NamedTuple):
-    owner = 267627879762755584
-    admin = int(environ.get("BOT_ADMIN_ROLE_ID", 267628507062992896))
-    moderator = 267629731250176001
+    owners = 267627879762755584
+    admins = int(environ.get("BOT_ADMIN_ROLE_ID", 267628507062992896))
+    moderation_team = 267629731250176001
     helpers = int(environ.get("ROLE_HELPERS", 267630620367257601))
     core_developers = 587606783669829632
     everyone = int(environ.get("BOT_GUILD", 267624335836053506))
+    aoc_completionist = int(environ.get("AOC_COMPLETIONIST_ROLE_ID", 916691790181056532))
 
 
 class Tokens(NamedTuple):
@@ -333,8 +338,8 @@ class Reddit:
 
 
 # Default role combinations
-MODERATION_ROLES = Roles.moderator, Roles.admin, Roles.owner
-STAFF_ROLES = Roles.helpers, Roles.moderator, Roles.admin, Roles.owner
+MODERATION_ROLES = {Roles.moderation_team, Roles.admins, Roles.owners}
+STAFF_ROLES = {Roles.helpers, Roles.moderation_team, Roles.admins, Roles.owners}
 
 # Whitelisted channels
 WHITELISTED_CHANNELS = (
@@ -346,8 +351,6 @@ WHITELISTED_CHANNELS = (
     Channels.voice_chat_0,
     Channels.voice_chat_1,
 )
-
-GIT_SHA = environ.get("GIT_SHA", "foobar")
 
 # Bot replies
 ERROR_REPLIES = [
