@@ -213,9 +213,13 @@ class AdventOfCode(commands.Cog):
     @whitelist_override(channels=AOC_WHITELIST)
     async def join_leaderboard(self, ctx: commands.Context) -> None:
         """DM the user the information for joining the Python Discord leaderboard."""
-        current_year = datetime.now().year
-        if current_year != AocConfig.year:
-            await ctx.send(f"The Python Discord leaderboard for {current_year} is not yet available!")
+        current_date = datetime.now()
+        if (
+            current_date.month not in (Month.NOVEMBER, Month.DECEMBER) and current_date.year != AocConfig.year or
+            current_date.month != Month.JANUARY and current_date.year != AocConfig.year + 1
+        ):
+            # Only allow joining the leaderboard in the run up to AOC and the January following.
+            await ctx.send(f"The Python Discord leaderboard for {current_date.year} is not yet available!")
             return
 
         author = ctx.author
