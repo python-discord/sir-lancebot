@@ -43,7 +43,10 @@ class AoCDropdownView(discord.ui.View):
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         """Global check to ensure that the interacting user is the user who invoked the command originally."""
         if interaction.user != self.original_author:
-            await interaction.response.send_message(":x: This is not your view to interact with!", ephemeral=True)
+            await interaction.response.send_message(
+                ":x: You can't interact with someone else's response. Please run the command yourself!",
+                ephemeral=True
+            )
             return False
         return True
 
