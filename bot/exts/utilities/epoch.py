@@ -80,7 +80,7 @@ class Epoch(commands.Cog):
             date_time = date_time[0]
             if ignored_tokens:
                 await ctx.send(f"Could not parse the following token(s): `{', '.join(ignored_tokens)}`")
-            await ctx.send(f"Date and time parsed as: `{date_time.format(arrow.FORMAT_RSS)}`")
+        await ctx.send(f"Date and time parsed as: `{date_time.format(arrow.FORMAT_RSS)}`")
 
         epoch = int(date_time.timestamp())
         view = TimestampMenuView(ctx, self._format_dates(date_time), epoch)
@@ -124,7 +124,7 @@ class TimestampMenuView(discord.ui.View):
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         """Check to ensure that the interacting user is the user who invoked the command."""
         if interaction.user != self.ctx.author:
-            embed = discord.Embed(description="Sorry, but this interaction can only be used by the original author.")
+            embed = discord.Embed(description="Sorry, but this dropdown menu can only be used by the original author.")
             await interaction.response.send_message(embed=embed, ephemeral=True)
             return False
         return True
