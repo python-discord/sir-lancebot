@@ -29,9 +29,6 @@ AOC_WHITELIST_RESTRICTED = WHITELISTED_CHANNELS + (Channels.advent_of_code_comma
 # They aren't spammy and foster discussion
 AOC_WHITELIST = AOC_WHITELIST_RESTRICTED + (Channels.advent_of_code,)
 
-MOVED_COMMAND = f"{PYTHON_PREFIX}subscribe"
-MOVED_HELP = f"NOTE: This command has been moved to {MOVED_COMMAND}"
-
 
 class AdventOfCode(commands.Cog):
     """Advent of Code festivities! Ho Ho Ho!"""
@@ -68,8 +65,8 @@ class AdventOfCode(commands.Cog):
     @commands.guild_only()
     @adventofcode_group.command(
         name="subscribe",
-        aliases=("sub", "notifications", "notify", "notifs"),
-        help=MOVED_HELP,
+        aliases=("sub", "notifications", "notify", "notifs", "unsubscribe", "unsub"),
+        help=f"NOTE: This command has been moved to {PYTHON_PREFIX}subscribe",
     )
     @whitelist_override(channels=AOC_WHITELIST)
     async def aoc_subscribe(self, ctx: commands.Context) -> None:
@@ -78,19 +75,7 @@ class AdventOfCode(commands.Cog):
 
         This command has been moved to bot, and will be removed in the future.
         """
-        raise MovedCommandError(MOVED_COMMAND)
-
-    @in_month(Month.DECEMBER)
-    @commands.guild_only()
-    @adventofcode_group.command(name="unsubscribe", aliases=("unsub",), help=MOVED_HELP)
-    @whitelist_override(channels=AOC_WHITELIST)
-    async def aoc_unsubscribe(self, ctx: commands.Context) -> None:
-        """
-        Deprecated role command.
-
-        This command has been moved to bot, and will be removed in the future.
-        """
-        raise MovedCommandError(MOVED_COMMAND)
+        raise MovedCommandError(f"{PYTHON_PREFIX}subscribe")
 
     @adventofcode_group.command(name="countdown", aliases=("count", "c"), brief="Return time left until next day")
     @whitelist_override(channels=AOC_WHITELIST)
