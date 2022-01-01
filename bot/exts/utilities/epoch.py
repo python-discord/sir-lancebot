@@ -124,7 +124,7 @@ class TimestampMenuView(discord.ui.View):
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         """Check to ensure that the interacting user is the user who invoked the command."""
         if interaction.user != self.ctx.author:
-            embed = discord.Embed(description="Sorry, but this interaction can only be used by the original author.")
+            embed = discord.Embed(description="Sorry, but this dropdown menu can only be used by the original author.")
             await interaction.response.send_message(embed=embed, ephemeral=True)
             return False
         return True
