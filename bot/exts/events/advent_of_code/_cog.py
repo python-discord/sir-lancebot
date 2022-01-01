@@ -254,7 +254,7 @@ class AdventOfCode(commands.Cog):
         else:
             await ctx.message.add_reaction(Emojis.envelope)
 
-    @in_month(Month.NOVEMBER, Month.DECEMBER)
+    @in_month(Month.NOVEMBER, Month.DECEMBER, Month.JANUARY)
     @adventofcode_group.command(
         name="link",
         aliases=("connect",),
@@ -306,7 +306,7 @@ class AdventOfCode(commands.Cog):
                     " Please re-run the command with one specified."
                 )
 
-    @in_month(Month.NOVEMBER, Month.DECEMBER)
+    @in_month(Month.NOVEMBER, Month.DECEMBER, Month.JANUARY)
     @adventofcode_group.command(
         name="unlink",
         aliases=("disconnect",),
@@ -327,7 +327,7 @@ class AdventOfCode(commands.Cog):
             log.info(f"Attempted to unlink {ctx.author} ({ctx.author.id}), but no link was found.")
             await ctx.reply("You don't have an Advent of Code account linked.")
 
-    @in_month(Month.DECEMBER)
+    @in_month(Month.DECEMBER, Month.JANUARY)
     @adventofcode_group.command(
         name="dayandstar",
         aliases=("daynstar", "daystar"),
@@ -365,7 +365,7 @@ class AdventOfCode(commands.Cog):
         await view.wait()
         await message.edit(view=None)
 
-    @in_month(Month.DECEMBER)
+    @in_month(Month.DECEMBER, Month.JANUARY)
     @adventofcode_group.command(
         name="leaderboard",
         aliases=("board", "lb"),
@@ -410,7 +410,7 @@ class AdventOfCode(commands.Cog):
         await ctx.send(content=f"{header}\n\n{table}", embed=info_embed)
         return
 
-    @in_month(Month.DECEMBER)
+    @in_month(Month.DECEMBER, Month.JANUARY)
     @adventofcode_group.command(
         name="global",
         aliases=("globalboard", "gb"),
