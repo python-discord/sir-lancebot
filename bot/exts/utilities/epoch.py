@@ -80,7 +80,7 @@ class Epoch(commands.Cog):
             date_time = date_time[0]
             if ignored_tokens:
                 await ctx.send(f"Could not parse the following token(s): `{', '.join(ignored_tokens)}`")
-            await ctx.send(f"Date and time parsed as: `{date_time.format(arrow.FORMAT_RSS)}`")
+        await ctx.send(f"Date and time parsed as: `{date_time.format(arrow.FORMAT_RSS)}`")
 
         epoch = int(date_time.timestamp())
         view = TimestampMenuView(ctx, self._format_dates(date_time), epoch)
