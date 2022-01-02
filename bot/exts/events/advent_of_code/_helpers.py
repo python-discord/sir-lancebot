@@ -332,7 +332,7 @@ async def fetch_leaderboard(invalidate_cache: bool = False, self_placement_name:
         number_of_participants = len(leaderboard)
         formatted_leaderboard = _format_leaderboard(leaderboard)
         full_leaderboard_url = await _upload_leaderboard(formatted_leaderboard)
-        leaderboard_fetched_at = datetime.datetime.utcnow().isoformat()
+        leaderboard_fetched_at = datetime.datetime.now(datetime.timezone.utc).isoformat()
 
         cached_leaderboard = {
             "placement_leaderboard": json.dumps(raw_leaderboard_data),
