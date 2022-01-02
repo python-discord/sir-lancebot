@@ -44,7 +44,7 @@ class Madlibs(commands.Cog):
 
         madlibs_embed.add_field(
             name="Enter a word that fits the given part of speech!",
-            value=f"Part of speech: {part_of_speech}"
+            value=f"Part of speech: {part_of_speech}\n\nMake sure not to spam, or you may get auto-muted!"
         )
 
         madlibs_embed.set_footer(text=f"Inputs remaining: {number_of_inputs}")
@@ -53,7 +53,7 @@ class Madlibs(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message_edit(self, _: discord.Message, after: discord.Message) -> None:
-        """A listener that checks for edits to messages from the user."""
+        """A listener that checks for message edits from the user."""
         for check in self.checks:
             if check(after):
                 break
