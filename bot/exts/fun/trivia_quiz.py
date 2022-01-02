@@ -16,7 +16,7 @@ from discord.ext import commands, tasks
 from rapidfuzz import fuzz
 
 from bot.bot import Bot
-from bot.constants import Client, Colours, NEGATIVE_REPLIES, Roles
+from bot.constants import Client, Colours, MODERATION_ROLES, NEGATIVE_REPLIES
 
 logger = logging.getLogger(__name__)
 
@@ -550,7 +550,7 @@ class TriviaQuiz(commands.Cog):
             if self.game_status[ctx.channel.id]:
                 # Check if the author is the game starter or a moderator.
                 if ctx.author == self.game_owners[ctx.channel.id] or any(
-                    Roles.moderator == role.id for role in ctx.author.roles
+                    role.id in MODERATION_ROLES for role in getattr(ctx.author, 'roles', [])
                 ):
                     self.game_status[ctx.channel.id] = False
                     del self.game_owners[ctx.channel.id]

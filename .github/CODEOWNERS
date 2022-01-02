@@ -4,10 +4,6 @@ bot/exts/events/hacktoberfest/**                    @ks129
 bot/exts/holidays/halloween/**                      @ks129
 
 # CI & Docker
-.github/workflows/**                    @Akarys42 @SebastiaanZ @Den4200
-Dockerfile                              @Akarys42 @Den4200
-docker-compose.yml                      @Akarys42 @Den4200
-
-# Tools
-poetry.lock                             @Akarys42
-pyproject.toml                          @Akarys42
+.github/workflows/**                    @SebastiaanZ @Den4200
+Dockerfile                              @Den4200
+docker-compose.yml                      @Den4200
