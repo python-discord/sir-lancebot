@@ -7,7 +7,8 @@ from discord.ext import commands
 from emoji import UNICODE_EMOJI_ENGLISH, is_emoji
 
 from bot.bot import Bot
-from bot.constants import Colours
+from bot.constants import Colours, Roles
+from bot.utils.decorators import whitelist_override
 from bot.utils.extensions import invoke_help_command
 
 log = logging.getLogger(__name__)
@@ -127,6 +128,7 @@ class Twemoji(commands.Cog):
         raise ValueError("No codepoint could be obtained from the given input")
 
     @commands.command(aliases=("tw",))
+    @whitelist_override(roles=(Roles.everyone,))
     async def twemoji(self, ctx: commands.Context, *raw_emoji: str) -> None:
         """Sends a preview of a given Twemoji, specified by codepoint or emoji."""
         if len(raw_emoji) == 0:
