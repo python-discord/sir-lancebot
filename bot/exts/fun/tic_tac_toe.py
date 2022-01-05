@@ -3,7 +3,7 @@ import random
 from typing import Callable, Optional, Union
 
 import discord
-from discord.ext.commands import Cog, Context, check, group, guild_only
+from discord.ext.commands import Cog, Context, check, group
 
 from bot.bot import Bot
 from bot.constants import Emojis
@@ -253,7 +253,6 @@ class TicTacToe(Cog):
     def __init__(self):
         self.games: list[Game] = []
 
-    @guild_only()
     @is_channel_free()
     @is_requester_free()
     @group(name="tictactoe", aliases=("ttt", "tic"), invoke_without_command=True)
