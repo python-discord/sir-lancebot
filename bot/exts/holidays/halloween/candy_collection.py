@@ -187,10 +187,21 @@ class CandyCollection(commands.Cog):
                 for index, record in enumerate(top_five)
             ) if top_five else "No Candies"
 
+        def get_user_candy_score() -> str:
+            for user_id, score in records:
+                if user_id == ctx.author.id:
+                    return f"{ctx.author.mention}: {score}"
+            return f"{ctx.author.mention}: 0"
+
         e = discord.Embed(colour=discord.Colour.og_blurple())
         e.add_field(
             name="Top Candy Records",
             value=generate_leaderboard(),
+            inline=False
+        )
+        e.add_field(
+            name="Your Candy Score",
+            value=get_user_candy_score(),
             inline=False
         )
         e.add_field(
