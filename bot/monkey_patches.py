@@ -6,7 +6,7 @@ from discord import Forbidden, http
 from discord.ext import commands
 
 log = logging.getLogger(__name__)
-MESSAGE_ID_RE = re.compile(r'(?P<message_id>[0-9]{15,20})$')
+MESSAGE_ID_RE = re.compile(r"(?P<message_id>[0-9]{15,20})$")
 
 
 class Command(commands.Command):
