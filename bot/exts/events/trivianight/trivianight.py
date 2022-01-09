@@ -9,7 +9,7 @@ from discord.ext import commands
 from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES, POSITIVE_REPLIES, Roles
 
-from ._game import TriviaNightGame
+from ._game import AllQuestionsVisited, TriviaNightGame
 from ._questions import QuestionView
 from ._scoreboard import Scoreboard
 
@@ -132,7 +132,16 @@ class TriviaNightCog(commands.Cog):
             await ctx.send(embed=error_embed)
             return
 
-        next_question = self.game.next_question(question_number)
+        try:
+            next_question = self.game.next_question(question_number)
+        except AllQuestionsVisited:
+            error_embed = Embed(
+                title=choice(NEGATIVE_REPLIES),
+                description="All of the questions have been used.",
+                color=Colours.soft_red
+            )
+            await ctx.send(embed=error_embed)
+            return
 
         question_view = QuestionView(next_question)
         question_embed = question_view.create_embed()
@@ -196,10 +205,6 @@ class TriviaNightCog(commands.Cog):
             return
 
         question_list = self.game.list_questions()
-        if isinstance(question_list, Embed):
-            await ctx.send(embed=question_list)
-            return
-
         await ctx.send(question_list)
 
     @trivianight.command()

@@ -33,6 +33,10 @@ class AlreadyUpdated(RuntimeError):
     """Exception raised when the user has already updated their guess once."""
 
 
+class AllQuestionsVisited(RuntimeError):
+    """Exception raised when all of the questions have been visited."""
+
+
 class Question:
     """Interface for one question in a trivia night game."""
 
@@ -142,6 +146,8 @@ class TriviaNightGame:
                 question = [q for q in self._all_questions if q.number == number][0]
             except IndexError:
                 raise ValueError(f"Question number {number} does not exist.")
+        elif len(self._questions) == 0:
+            raise AllQuestionsVisited("All of the questions have been visited.")
         else:
             question = self._questions.pop(randrange(len(self._questions)))
 
@@ -161,7 +167,7 @@ class TriviaNightGame:
         self.current_question.stop()
         self.current_question = None
 
-    def list_questions(self) -> None:
+    def list_questions(self) -> str:
         """
         List all the questions.
 
