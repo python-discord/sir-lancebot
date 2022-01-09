@@ -137,15 +137,22 @@ class QuestionView(View):
             )
 
             for answer, people_answered in answers_chosen.items():
+                is_correct_answer = dict(self.question.answers)[answer[0]] == self.question.correct
+
                 # Setting the color of answer_embed to the % of people that got it correct via the mapping
-                if dict(self.question.answers)[answer[0]] == self.question.correct:
+                if is_correct_answer:
                     # Maps the % of people who got it right to a color, from a range of red to green
                     percentage_to_color = [0xFC94A1, 0xFFCCCB, 0xCDFFCC, 0xB0F5AB, 0xB0F5AB]
                     answer_embed.color = percentage_to_color[round(people_answered / len(guesses) * 100) // 25]
 
+                field_title = (
+                    (":white_check_mark: " if is_correct_answer else "")
+                    + f"{people_answered} players (or {people_answered / len(guesses) * 100:.1f}% of players) chose"
+                )
+
                 # The `ord` function is used here to change the letter to its corresponding position
                 answer_embed.add_field(
-                    name=f"{people_answered / len(guesses) * 100:.1f}% of players chose",
+                    name=field_title,
                     value=self.question.answers[ord(answer) - 65][1],
                     inline=False
                 )
