@@ -162,7 +162,7 @@ class Scoreboard:
         if points is not None and user_id not in self._points.keys():
             self._points[user_id] = points
         elif points is not None:
-            self._points[user_id] += self._points[user_id]
+            self._points[user_id] += points
 
         if speed is not None and user_id not in self._speed.keys():
             self._speed[user_id] = [1, speed]
