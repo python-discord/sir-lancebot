@@ -178,6 +178,6 @@ class TriviaNightGame:
             visited, not_visited = ":checkmark:", ":x:"
             formatted_string += f"`Q{question.number}: {question.description}" \
                                 f"{' ' * (spaces - len(question.description))}|`" \
-                                f" {visited if question not in self._all_questions else not_visited}\n"
+                                f" {visited if question not in self._questions else not_visited}\n"
 
         return formatted_string
