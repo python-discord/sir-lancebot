@@ -24,8 +24,6 @@ class ScoreboardView(View):
         along with the 29 other users who made it onto the leaderboard.
         """
         formatted_string = ""
-        self.points = dict(sorted(self.points.items(), key=lambda item: item[-1], reverse=True))
-        self.speed = dict(sorted(self.speed.items(), key=lambda item: item[-1]))
 
         for current_placement, (user, points) in enumerate(self.points.items()):
             if current_placement + 1 > 30:
@@ -175,6 +173,7 @@ class Scoreboard:
 
     async def display(self) -> tuple[Embed, View]:
         """Returns the embed of the main leaderboard along with the ScoreboardView."""
-        self.view.points = self._points
-        self.view.speed = self._speed
+        self.view.points = dict(sorted(self._points.items(), key=lambda item: item[-1], reverse=True))
+        self.view.speed = dict(sorted(self._speed.items(), key=lambda item: item[-1][1] / item[-1][0]))
+
         return await self.view.create_main_leaderboard(), self.view
