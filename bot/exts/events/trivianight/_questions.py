@@ -128,7 +128,7 @@ class QuestionView(View):
             answers_chosen = {
                 answer_choice: len(
                     tuple(filter(lambda x: x[0] == answer_choice, guesses.values()))
-                ) / len(guesses)
+                )
                 for answer_choice in labels
             }
 
@@ -136,16 +136,16 @@ class QuestionView(View):
                 sorted(list(answers_chosen.items()), key=lambda item: item[1], reverse=True)
             )
 
-            for answer, percent in answers_chosen.items():
+            for answer, people_answered in answers_chosen.items():
                 # Setting the color of answer_embed to the % of people that got it correct via the mapping
                 if dict(self.question.answers)[answer[0]] == self.question.correct:
                     # Maps the % of people who got it right to a color, from a range of red to green
                     percentage_to_color = [0xFC94A1, 0xFFCCCB, 0xCDFFCC, 0xB0F5AB, 0xB0F5AB]
-                    answer_embed.color = percentage_to_color[round(percent * 100) // 25]
+                    answer_embed.color = percentage_to_color[round(people_answered / len(guesses) * 100) // 25]
 
                 # The `ord` function is used here to change the letter to its corresponding position
                 answer_embed.add_field(
-                    name=f"{percent * 100:.1f}% of players chose",
+                    name=f"{people_answered / len(guesses) * 100:.1f}% of players chose",
                     value=self.question.answers[ord(answer) - 65][1],
                     inline=False
                 )

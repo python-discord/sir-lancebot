@@ -175,7 +175,7 @@ class TriviaNightGame:
         spaces = max(len(q.description) for q in self._all_questions)
 
         for question in self._all_questions:
-            visited, not_visited = ":checkmark:", ":x:"
+            visited, not_visited = ":white_check_mark:", ":x:"
             formatted_string += f"`Q{question.number}: {question.description}" \
                                 f"{' ' * (spaces - len(question.description))}|`" \
                                 f" {visited if question not in self._questions else not_visited}\n"
