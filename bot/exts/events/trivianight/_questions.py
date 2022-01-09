@@ -46,6 +46,7 @@ class AnswerButton(Button):
                     description="The question is no longer accepting guesses!",
                     color=Colours.soft_red
                 ),
+                ephemeral=True
             )
             return
 
