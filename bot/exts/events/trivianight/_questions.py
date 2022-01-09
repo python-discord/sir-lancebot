@@ -147,7 +147,7 @@ class QuestionView(View):
 
                 field_title = (
                     (":white_check_mark: " if is_correct_answer else "")
-                    + f"{people_answered} players (or {people_answered / len(guesses) * 100:.1f}% of players) chose"
+                    + f"{people_answered} players ({people_answered / len(guesses) * 100:.1f}%) chose"
                 )
 
                 # The `ord` function is used here to change the letter to its corresponding position
