@@ -1,5 +1,4 @@
 import sys
-
 from pathlib import Path
 from typing import BinaryIO
 
@@ -19,7 +18,9 @@ plt.rcParams.update(
 
 def render(text: str, file_handle: BinaryIO) -> None:
     """
-    Saves rendered image in `file_handle`. In case the input is invalid latex, it prints the error to `stderr`.
+    Saves rendered image in `file_handle`.
+
+    In case the input is invalid latex, it prints the error to `stderr`.
     """
     fig = plt.figure()
     fig.text(0, 1, text, horizontalalignment="left", verticalalignment="top")
@@ -30,9 +31,10 @@ def render(text: str, file_handle: BinaryIO) -> None:
         sys.exit(err)
 
 
-def main():
+def main() -> None:
     """
     Renders a latex query and saves the output in a specified file.
+
     Expects two command line arguments: the query and the path to the output file.
     """
     query = sys.argv[1]

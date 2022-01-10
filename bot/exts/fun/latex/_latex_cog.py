@@ -1,12 +1,11 @@
 import asyncio
 import hashlib
+import re
 import sys
 from pathlib import Path
-import re
 
 import discord
 from discord.ext import commands
-
 
 FORMATTED_CODE_REGEX = re.compile(
     r"(?P<delim>(?P<block>```)|``?)"        # code delimiter: 1-3 backticks; (?P=block) only matches if it's a block
@@ -34,6 +33,7 @@ def _prepare_input(text: str) -> str:
 
 class Latex(commands.Cog):
     """Renders latex."""
+
     @commands.command()
     @commands.max_concurrency(1, commands.BucketType.guild, wait=True)
     async def latex(self, ctx: commands.Context, *, query: str) -> None:
