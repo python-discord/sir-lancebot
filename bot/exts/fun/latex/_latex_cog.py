@@ -3,6 +3,7 @@ import hashlib
 import re
 import sys
 from pathlib import Path
+from textwrap import dedent
 
 import discord
 from discord.ext import commands
@@ -31,6 +32,18 @@ def _prepare_input(text: str) -> str:
         return text
 
 
+def _format_err(text: str) -> str:
+    # prevent escaping the codeblock by inserting a zero-width-joiner
+    text = text.replace("`", "`\u200d")
+    return dedent(
+        f"""
+        ```
+        {text}
+        ```
+        """
+    ).strip()
+
+
 class Latex(commands.Cog):
     """Renders latex."""
 
@@ -55,6 +68,6 @@ class Latex(commands.Cog):
                 if return_code != 0:
                     image_path.unlink()
                     err = (await proc.stderr.read()).decode()
-                    raise commands.BadArgument(err)
+                    raise commands.BadArgument(_format_err(err))
 
             await ctx.send(file=discord.File(image_path, "latex.png"))
