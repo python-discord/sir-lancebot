@@ -4,7 +4,7 @@ from string import ascii_uppercase
 from typing import Iterable, Optional, TypedDict
 
 DEFAULT_QUESTION_POINTS = 10
-DEFAULT_QUESTION_TIME = 10
+DEFAULT_QUESTION_TIME = 20
 
 
 class QuestionData(TypedDict):
