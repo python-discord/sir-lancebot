@@ -53,7 +53,7 @@ class AnswerButton(Button):
         if guess[1]:
             await interaction.response.send_message(
                 embed=Embed(
-                    title="Confirming that..",
+                    title="Confirming that...",
                     description=f"You chose answer {self.label}.",
                     color=Colours.soft_green
                 ),
@@ -64,7 +64,7 @@ class AnswerButton(Button):
             # indicates that they changed it this time around.
             await interaction.response.send_message(
                 embed=Embed(
-                    title="Confirming that..",
+                    title="Confirming that...",
                     description=f"You changed your answer to answer {self.label}.",
                     color=Colours.soft_green
                 ),
@@ -120,7 +120,7 @@ class QuestionView(View):
         labels = ascii_uppercase[:len(self.question.answers)]
 
         answer_embed = Embed(
-            title=f"The correct answer for Question {self.question.number} was..",
+            title=f"The correct answer for Question {self.question.number} was...",
             description=self.question.correct
         )
 
