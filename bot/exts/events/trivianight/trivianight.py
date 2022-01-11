@@ -143,6 +143,9 @@ class TriviaNightCog(commands.Cog):
             await ctx.send(embed=error_embed)
             return
 
+        await ctx.send("Next question in 3 seconds! Get ready...")
+        await asyncio.sleep(3)
+
         question_view = QuestionView(next_question)
         question_embed = question_view.create_embed()
 
