@@ -18,11 +18,10 @@ class QuestionData(TypedDict):
     time: Optional[int]
 
 
-UserGuess = tuple[
-    str,  # The answer that was guessed
-    bool,  # Whether the answer can be changed again
-    float  # The time it took to guess
-]
+class UserGuess(NamedTuple):
+    answer: str
+    editable: bool
+    elapsed: float
 
 
 class QuestionClosed(RuntimeError):

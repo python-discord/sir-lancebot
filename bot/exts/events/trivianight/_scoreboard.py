@@ -80,8 +80,8 @@ class ScoreboardView(View):
         rank_embed = Embed(title=f"Ranks for {member.display_name}", color=Colours.python_blue)
         # These are stored as strings so that the last digit can be determined to choose the suffix
         try:
-            points_rank = str(list(self.points.keys()).index(member.id) + 1)
-            speed_rank = str(list(self.speed.keys()).index(member.id) + 1)
+            points_rank = str(list(self.points).index(member.id) + 1)
+            speed_rank = str(list(self.speed).index(member.id) + 1)
         except ValueError:
             return Embed(
                 title=choice(NEGATIVE_REPLIES),
