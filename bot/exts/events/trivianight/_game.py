@@ -1,7 +1,7 @@
 import time
 from random import randrange
 from string import ascii_uppercase
-from typing import Iterable, Optional, TypedDict
+from typing import Iterable, NamedTuple, Optional, TypedDict
 
 DEFAULT_QUESTION_POINTS = 10
 DEFAULT_QUESTION_TIME = 20
@@ -18,11 +18,12 @@ class QuestionData(TypedDict):
     time: Optional[int]
 
 
-UserGuess = tuple[
-    str,  # Represents the answer choice the user chose.
-    bool,  # Represents if the user can edit their answer.
-    float  # Represents the amount of time passed since the question began.
-]
+class UserGuess(NamedTuple):
+    """Represents the user's guess for a question."""
+
+    answer: str
+    editable: bool
+    elapsed: float
 
 
 class QuestionClosed(RuntimeError):
