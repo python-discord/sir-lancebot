@@ -96,7 +96,9 @@ class AdventOfCode(commands.Cog):
                 # Only give the role to people who have completed all 50 stars
                 continue
 
-            member_id = aoc_name_to_member_id.get(member_aoc_info["name"], None)
+            aoc_name = member_aoc_info["name"] or f"Anonymous #{member_aoc_info['id']}"
+
+            member_id = aoc_name_to_member_id.get(aoc_name)
             if not member_id:
                 log.debug(f"Could not find member_id for {member_aoc_info['name']}, not giving role.")
                 continue
