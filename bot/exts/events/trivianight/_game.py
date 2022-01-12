@@ -18,10 +18,11 @@ class QuestionData(TypedDict):
     time: Optional[int]
 
 
-class UserGuess(NamedTuple):
-    answer: str
-    editable: bool
-    elapsed: float
+UserGuess = tuple[
+    str,  # Represents the answer choice the user chose.
+    bool,  # Represents if the user can edit their answer.
+    float  # Represents the amount of time passed since the question began.
+]
 
 
 class QuestionClosed(RuntimeError):

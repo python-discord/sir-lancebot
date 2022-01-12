@@ -17,7 +17,12 @@ class ScoreboardView(View):
 
     @staticmethod
     def _int_to_ordinal(number: int) -> str:
-        """Converts an integer into an ordinal number, i.e. 1 to 1st."""
+        """
+        Converts an integer into an ordinal number, i.e. 1 to 1st.
+
+        Parameters:
+            - number: an integer representing the number to convert to an ordinal number.
+        """
         suffix = ["th", "st", "nd", "rd", "th"][min(number % 10, 4)]
         if (number % 100) in {11, 12, 13}:
             suffix = "th"
