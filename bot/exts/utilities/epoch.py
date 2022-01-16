@@ -35,7 +35,7 @@ class DateString(commands.Converter):
         """
         try:
             return arrow.utcnow().dehumanize(argument)
-        except ValueError:
+        except (ValueError, OverflowError):
             try:
                 dt, ignored_tokens = parser.parse(argument, fuzzy_with_tokens=True)
             except parser.ParserError:
