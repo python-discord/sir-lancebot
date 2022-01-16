@@ -96,7 +96,9 @@ class AdventOfCode(commands.Cog):
                 # Only give the role to people who have completed all 50 stars
                 continue
 
-            member_id = aoc_name_to_member_id.get(member_aoc_info["name"], None)
+            aoc_name = member_aoc_info["name"] or f"Anonymous #{member_aoc_info['id']}"
+
+            member_id = aoc_name_to_member_id.get(aoc_name)
             if not member_id:
                 log.debug(f"Could not find member_id for {member_aoc_info['name']}, not giving role.")
                 continue
@@ -187,9 +189,10 @@ class AdventOfCode(commands.Cog):
     async def join_leaderboard(self, ctx: commands.Context) -> None:
         """DM the user the information for joining the Python Discord leaderboard."""
         current_date = datetime.now()
-        if (
-            current_date.month not in (Month.NOVEMBER, Month.DECEMBER) and current_date.year != AocConfig.year or
-            current_date.month != Month.JANUARY and current_date.year != AocConfig.year + 1
+        allowed_months = (Month.NOVEMBER.value, Month.DECEMBER.value)
+        if not (
+            current_date.month in allowed_months and current_date.year == AocConfig.year or
+            current_date.month == Month.JANUARY.value and current_date.year == AocConfig.year + 1
         ):
             # Only allow joining the leaderboard in the run up to AOC and the January following.
             await ctx.send(f"The Python Discord leaderboard for {current_date.year} is not yet available!")
