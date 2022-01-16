@@ -23,6 +23,7 @@ __all__ = (
     "Reddit",
     "RedisConfig",
     "RedirectOutput",
+    "PYTHON_PREFIX"
     "MODERATION_ROLES",
     "STAFF_ROLES",
     "WHITELISTED_CHANNELS",
@@ -33,6 +34,8 @@ __all__ = (
 
 log = logging.getLogger(__name__)
 
+
+PYTHON_PREFIX = "!"
 
 @dataclasses.dataclass
 class AdventOfCodeLeaderboard:
@@ -194,7 +197,7 @@ class Emojis:
 
     # These icons are from Github's repo https://github.com/primer/octicons/
     issue_open = "<:IssueOpen:852596024777506817>"
-    issue_closed = "<:IssueClosed:852596024739758081>"
+    issue_closed = "<:IssueClosed:927326162861039626>"
     issue_draft = "<:IssueDraft:852596025147523102>"  # Not currently used by Github, but here for future.
     pull_request_open = "<:PROpen:852596471505223781>"
     pull_request_closed = "<:PRClosed:852596024732286976>"
@@ -288,6 +291,7 @@ class Roles(NamedTuple):
     helpers = int(environ.get("ROLE_HELPERS", 267630620367257601))
     core_developers = 587606783669829632
     everyone = int(environ.get("BOT_GUILD", 267624335836053506))
+    aoc_completionist = int(environ.get("AOC_COMPLETIONIST_ROLE_ID", 916691790181056532))
 
 
 class Tokens(NamedTuple):
