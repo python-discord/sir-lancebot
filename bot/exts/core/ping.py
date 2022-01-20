@@ -29,15 +29,15 @@ class Ping(commands.Cog):
     @commands.command(name="uptime")
     async def uptime(self, ctx: commands.Context) -> None:
         """Get the current uptime of the bot."""
-        difference = relativedelta(start_time - arrow.utcnow())
-        uptime_string = start_time.shift(
-            seconds=-difference.seconds,
-            minutes=-difference.minutes,
-            hours=-difference.hours,
-            days=-difference.days
-        ).humanize()
-
-        await ctx.send(f"I started up {uptime_string}.")
+        # difference = relativedelta(start_time - arrow.utcnow())
+        # uptime_string = start_time.shift(
+        #     seconds=-difference.seconds,
+        #     minutes=-difference.minutes,
+        #     hours=-difference.hours,
+        #     days=-difference.days
+        # ).humanize()
+        _timestamp = start_time.timestamp()
+        await ctx.send(f"I started up <t:{int(_timestamp)}:R>.")
 
 
 def setup(bot: Bot) -> None:
