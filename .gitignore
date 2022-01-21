@@ -1,7 +1,7 @@
 # bot (project-specific)
 log/*
 data/*
-bot/exts/fun/latex/cache/*
+bot/exts/fun/_latex_cache/*
 
 
 

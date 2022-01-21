@@ -23,9 +23,9 @@ LATEX_API_URL = "https://rtex.probablyaweb.site/api/v2"
 PASTEBIN_URL = "https://paste.pythondiscord.com"
 
 THIS_DIR = Path(__file__).parent
-CACHE_DIRECTORY = THIS_DIR / "cache"
+CACHE_DIRECTORY = THIS_DIR / "_latex_cache"
 CACHE_DIRECTORY.mkdir(exist_ok=True)
-TEMPLATE = string.Template((THIS_DIR / "template.txt").read_text())
+TEMPLATE = string.Template(Path("bot/resources/fun/latex_template.txt").read_text())
 
 
 def _prepare_input(text: str) -> str:
@@ -101,3 +101,8 @@ class Latex(commands.Cog):
                     image_path.unlink()
                     return
             await ctx.send(file=discord.File(image_path, "latex.png"))
+
+
+def setup(bot: Bot) -> None:
+    """Load the Latex Cog."""
+    bot.add_cog(Latex(bot))
