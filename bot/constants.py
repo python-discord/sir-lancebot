@@ -55,7 +55,7 @@ class AdventOfCodeLeaderboard:
     def session(self) -> str:
         """Return either the actual `session` cookie or the fallback cookie."""
         if self.use_fallback_session:
-            log.info(f"Returning fallback cookie for board `{self.id}`.")
+            log.trace(f"Returning fallback cookie for board `{self.id}`.")
             return AdventOfCode.fallback_session
 
         return self._session

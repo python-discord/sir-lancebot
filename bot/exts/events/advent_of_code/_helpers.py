@@ -255,7 +255,7 @@ async def _fetch_leaderboard_data() -> dict[str, Any]:
 
         # Two attempts, one with the original session cookie and one with the fallback session
         for attempt in range(1, 3):
-            log.info(f"Attempting to fetch leaderboard `{leaderboard.id}` ({attempt}/2)")
+            log.debug(f"Attempting to fetch leaderboard `{leaderboard.id}` ({attempt}/2)")
             cookies = {"session": leaderboard.session}
             try:
                 raw_data = await _leaderboard_request(leaderboard_url, leaderboard.id, cookies)
