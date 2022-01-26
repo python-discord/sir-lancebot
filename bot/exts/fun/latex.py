@@ -1,10 +1,12 @@
 import hashlib
 import re
 import string
+from io import BytesIO
 from pathlib import Path
 from typing import BinaryIO, Optional
 
 import discord
+from PIL import Image
 from discord.ext import commands
 
 from bot.bot import Bot
@@ -27,12 +29,23 @@ CACHE_DIRECTORY = THIS_DIR / "_latex_cache"
 CACHE_DIRECTORY.mkdir(exist_ok=True)
 TEMPLATE = string.Template(Path("bot/resources/fun/latex_template.txt").read_text())
 
+BG_COLOR = (54, 57, 63, 255)
+PAD = 10
+
 
 def _prepare_input(text: str) -> str:
     if match := FORMATTED_CODE_REGEX.match(text):
         return match.group("code")
     else:
         return text
+
+
+def _process_image(data: bytes, out_file: BinaryIO) -> None:
+    image = Image.open(BytesIO(data)).convert("RGBA")
+    width, height = image.size
+    background = Image.new("RGBA", (width + 2 * PAD, height + 2 * PAD), "WHITE")
+    background.paste(image, (PAD, PAD), image)
+    background.save(out_file)
 
 
 class InvalidLatexError(Exception):
@@ -58,10 +71,9 @@ class Latex(commands.Cog):
             raise InvalidLatexError(logs=response_json["log"])
         async with self.bot.http_session.get(
             f"{LATEX_API_URL}/{response_json['filename']}",
-            data=payload,
             raise_for_status=True
         ) as response:
-            out_file.write(await response.read())
+            _process_image(await response.read(), out_file)
 
     async def _upload_to_pastebin(self, text: str) -> Optional[str]:
         """Uploads `text` to the paste service, returning the url if successful."""
