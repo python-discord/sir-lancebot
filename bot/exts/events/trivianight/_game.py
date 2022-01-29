@@ -144,7 +144,7 @@ class TriviaNightGame:
 
         if number is not None:
             try:
-                question = [q for q in self._all_questions if q.number == number][0]
+                question = [q for q in self._all_questions if q.number == int(number)][0]
             except IndexError:
                 raise ValueError(f"Question number {number} does not exist.")
         elif len(self._questions) == 0:
