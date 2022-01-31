@@ -151,7 +151,7 @@ class Scoreboard:
     """Class for the scoreboard for the Trivia Night event."""
 
     def __init__(self, bot: Bot):
-        self.view = ScoreboardView(bot)
+        self._bot = bot
         self._points = {}
         self._speed = {}
 
@@ -175,7 +175,9 @@ class Scoreboard:
 
     async def display(self) -> tuple[Embed, View]:
         """Returns the embed of the main leaderboard along with the ScoreboardView."""
-        self.view.points = dict(sorted(self._points.items(), key=lambda item: item[-1], reverse=True))
-        self.view.speed = dict(sorted(self._speed.items(), key=lambda item: item[-1][1] / item[-1][0]))
+        view = ScoreboardView(self._bot)
 
-        return await self.view.create_main_leaderboard(), self.view
+        view.points = dict(sorted(self._points.items(), key=lambda item: item[-1], reverse=True))
+        view.speed = dict(sorted(self._speed.items(), key=lambda item: item[-1][1] / item[-1][0]))
+
+        return await view.create_main_leaderboard(), view
