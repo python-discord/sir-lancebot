@@ -29,11 +29,11 @@ CACHE_DIRECTORY = THIS_DIR / "_latex_cache"
 CACHE_DIRECTORY.mkdir(exist_ok=True)
 TEMPLATE = string.Template(Path("bot/resources/fun/latex_template.txt").read_text())
 
-BG_COLOR = (54, 57, 63, 255)
 PAD = 10
 
 
 def _prepare_input(text: str) -> str:
+    """Extract latex from a codeblock, if it is in one."""
     if match := FORMATTED_CODE_REGEX.match(text):
         return match.group("code")
     else:
@@ -41,9 +41,14 @@ def _prepare_input(text: str) -> str:
 
 
 def _process_image(data: bytes, out_file: BinaryIO) -> None:
+    """Read `data` as an image file, and paste it on a white background."""
     image = Image.open(BytesIO(data)).convert("RGBA")
     width, height = image.size
     background = Image.new("RGBA", (width + 2 * PAD, height + 2 * PAD), "WHITE")
+
+    # paste the image on the background, using the same image as the mask
+    # when an RGBA image is passed as the mask, its alpha band is used.
+    # this has the effect of skipping pasting the pixels where the image is transparent.
     background.paste(image, (PAD, PAD), image)
     background.save(out_file)
 
@@ -95,6 +100,8 @@ class Latex(commands.Cog):
     async def latex(self, ctx: commands.Context, *, query: str) -> None:
         """Renders the text in latex and sends the image."""
         query = _prepare_input(query)
+
+        # the hash of the query is used as the filename in the cache.
         query_hash = hashlib.md5(query.encode()).hexdigest()
         image_path = CACHE_DIRECTORY / f"{query_hash}.png"
         async with ctx.typing():
