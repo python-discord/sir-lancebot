@@ -173,11 +173,14 @@ class Scoreboard:
                 self._speed[user_id][0] + 1, self._speed[user_id][1] + speed
             ]
 
-    async def display(self) -> tuple[Embed, View]:
+    async def display(self, speed_leaderboard: bool = False) -> tuple[Embed, View]:
         """Returns the embed of the main leaderboard along with the ScoreboardView."""
         view = ScoreboardView(self._bot)
 
         view.points = dict(sorted(self._points.items(), key=lambda item: item[-1], reverse=True))
         view.speed = dict(sorted(self._speed.items(), key=lambda item: item[-1][1] / item[-1][0]))
 
-        return await view.create_main_leaderboard(), view
+        return (
+            await view.create_main_leaderboard(),
+            view if not speed_leaderboard else await view._create_speed_embed()
+        )

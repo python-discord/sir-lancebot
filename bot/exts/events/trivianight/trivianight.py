@@ -241,7 +241,7 @@ class TriviaNightCog(commands.Cog):
     @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
     async def end(self, ctx: commands.Context) -> None:
         """
-        Ends the trivia night event and displays the scoreboard view.
+        Displays the scoreboard view.
 
         The scoreboard view consists of the two scoreboards with the 30 players who got the highest points and the
         30 players who had the fastest average response time to a question where they got the question right.
@@ -268,7 +268,47 @@ class TriviaNightCog(commands.Cog):
 
         scoreboard_embed, scoreboard_view = await self.scoreboard.display()
         await ctx.send(embed=scoreboard_embed, view=scoreboard_view)
+
+    @trivianight.command()
+    @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
+    async def scoreboard(self, ctx: commands.Context) -> None:
+        """
+        Displays the scoreboard.
+
+        The scoreboard consists of the two scoreboards with the 30 players who got the highest points and the
+        30 players who had the fastest average response time to a question where they got the question right.
+        """
+        if self.game is None:
+            await ctx.send(embed=Embed(
+                title=choice(NEGATIVE_REPLIES),
+                description="There is no trivia night running!",
+                color=Colours.soft_red
+            ))
+            return
+
+        if self.game.current_question is not None:
+            error_embed = Embed(
+                title=choice(NEGATIVE_REPLIES),
+                description="You can't end the event while a question is ongoing!",
+                color=Colours.soft_red
+            )
+            await ctx.send(embed=error_embed)
+            return
+
+        scoreboard_embed, speed_scoreboard = await self.scoreboard.display(speed_leaderboard=True)
+        await ctx.send(embeds=(scoreboard_embed, speed_scoreboard))
+
+    @trivianight.command()
+    @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
+    async def end_game(self, ctx: commands.Context) -> None:
+        """Ends the ongoing game."""
         self.game = None
+
+        await ctx.send(embed=Embed(
+            title=choice(POSITIVE_REPLIES),
+            description="The game has been stopped.",
+            color=Colours.soft_green
+        ))
 
 
 def setup(bot: Bot) -> None:
