@@ -12,7 +12,7 @@ from discord.ext import commands
 from discord.ext.commands import BadArgument, Cog, clean_content
 
 from bot.bot import Bot
-from bot.constants import Channels, Client, Lovefest, Month, PYTHON_PREFIX
+from bot.constants import Channels, Lovefest, Month, PYTHON_PREFIX
 from bot.utils.decorators import in_month
 
 log = logging.getLogger(__name__)
