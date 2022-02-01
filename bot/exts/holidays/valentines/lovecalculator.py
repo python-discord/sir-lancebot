@@ -90,7 +90,7 @@ class LoveCalculator(Cog):
             name="A letter from Dr. Love:",
             value=data["text"]
         )
-        embed.set_footer(text="You can unsubscribe from lovefest by using !subscribe")
+        embed.set_footer(text="You can unsubscribe from lovefest by using !subscribe.")
 
         await ctx.send(embed=embed)
 
