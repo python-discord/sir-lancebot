@@ -12,7 +12,7 @@ from discord.ext import commands
 from discord.ext.commands import BadArgument, Cog, clean_content
 
 from bot.bot import Bot
-from bot.constants import Channels, Client, Lovefest, Month
+from bot.constants import Channels, Lovefest, Month, PYTHON_PREFIX
 from bot.utils.decorators import in_month
 
 log = logging.getLogger(__name__)
@@ -51,7 +51,7 @@ class LoveCalculator(Cog):
             raise BadArgument(
                 "This command can only be ran against members with the lovefest role! "
                 "This role be can assigned by running "
-                f"`{Client.prefix}lovefest sub` in <#{Channels.community_bot_commands}>."
+                f"`{PYTHON_PREFIX}subscribe` in <#{Channels.bot}>."
             )
 
         if whom is None:
@@ -90,7 +90,7 @@ class LoveCalculator(Cog):
             name="A letter from Dr. Love:",
             value=data["text"]
         )
-        embed.set_footer(text=f"You can unsubscribe from lovefest by using {Client.prefix}lovefest unsub")
+        embed.set_footer(text=f"You can unsubscribe from lovefest by using {PYTHON_PREFIX}subscribe.")
 
         await ctx.send(embed=embed)
 
