@@ -8,6 +8,7 @@ from discord.ext import commands
 
 from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES, POSITIVE_REPLIES, Roles
+from bot.utils.pagination import LinePaginator
 
 from ._game import AllQuestionsVisited, TriviaNightGame
 from ._questions import QuestionView
@@ -207,8 +208,19 @@ class TriviaNightCog(commands.Cog):
             ))
             return
 
-        question_list = self.game.list_questions()
-        await ctx.send(question_list)
+        question_list = self.game.list_questions().split("\n")
+
+        list_embed = Embed(title="All Trivia Night Questions")
+
+        if len(question_list) <= 5:
+            list_embed.description = "\n".join(question_list)
+            await ctx.send(embed=list_embed)
+        else:
+            await LinePaginator.paginate(
+                ("\n".join(question_list[idx:idx+5]) for idx in range(0, len(question_list), 5)),
+                ctx,
+                list_embed
+            )
 
     @trivianight.command()
     @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
