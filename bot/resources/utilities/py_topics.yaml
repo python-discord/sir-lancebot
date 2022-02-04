@@ -1,5 +1,12 @@
 # Conversation starters for Python-related channels.
 
+# programming-pedagogy
+934931964509691966:
+    - Is X a good approach for teaching OOP?
+    - How does the legacy of C-style languages affect how X aspect of Python is taught?
+    - How important is it for a programmer to learn some amount of assembly?
+    - Is it better for someone to learn concept X before concept Y?
+
 # python-general
 267624335836053506:
     - What's your favorite PEP?
