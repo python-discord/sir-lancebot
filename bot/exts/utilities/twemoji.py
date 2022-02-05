@@ -16,7 +16,7 @@ BASE_URLS = {
     "png": "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/",
     "svg": "https://raw.githubusercontent.com/twitter/twemoji/master/assets/svg/",
 }
-CODE = re.compile(r"[a-f1-9][a-f0-9]{3,5}$")
+CODEPOINT_REGEX = re.compile(r"[a-f1-9][a-f0-9]{3,5}$")
 
 
 class Twemoji(commands.Cog):
@@ -41,13 +41,13 @@ class Twemoji(commands.Cog):
         >>> alias_to_name(":family_man_girl_boy:")
         "Family man girl boy"
         """
-        name = alias[1:-1].replace("_", " ")
+        name = alias.strip(":").replace("_", " ")
         return name.capitalize()
 
     @staticmethod
     def build_embed(codepoint: str) -> discord.Embed:
         """Returns the main embed for the `twemoji` commmand."""
-        emoji = "".join(Twemoji.emoji(e) for e in codepoint.split("-"))
+        emoji = "".join(Twemoji.emoji(e) or "" for e in codepoint.split("-"))
 
         embed = discord.Embed(
             title=Twemoji.alias_to_name(UNICODE_EMOJI_ENGLISH[emoji]),
@@ -58,19 +58,18 @@ class Twemoji(commands.Cog):
         return embed
 
     @staticmethod
-    def emoji(codepoint: str) -> str:
+    def emoji(codepoint: Optional[str]) -> Optional[str]:
         """
-        Returns the emoji corresponding to a given `codepoint`, or `""` if no emoji was found.
+        Returns the emoji corresponding to a given `codepoint`, or `None` if no emoji was found.
 
         The return value is an emoji character, such as "🍂". The `codepoint`
         argument can be of any format, since it will be trimmed automatically.
         """
         if code := Twemoji.trim_code(codepoint):
             return chr(int(code, 16))
-        return ""
 
     @staticmethod
-    def codepoint(emoji: str) -> str:
+    def codepoint(emoji: Optional[str]) -> Optional[str]:
         """
         Returns the codepoint, in a trimmed format, of a single emoji.
 
@@ -79,7 +78,9 @@ class Twemoji(commands.Cog):
         such as "🇸🇪" and "👨‍👩‍👦", send the component emojis through the method
         one at a time.
         """
-        return hex(ord(emoji))[2:]
+        if emoji is None:
+            return None
+        return hex(ord(emoji)).removeprefix("0x")
 
     @staticmethod
     def trim_code(codepoint: Optional[str]) -> Optional[str]:
@@ -96,9 +97,7 @@ class Twemoji(commands.Cog):
         >>> trim_code("1f466")
         "1f466"
         """
-        if not codepoint:
-            return None
-        if code := CODE.search(codepoint):
+        if code := CODEPOINT_REGEX.search(codepoint or ""):
             return code.group()
 
     @staticmethod
@@ -118,12 +117,14 @@ class Twemoji(commands.Cog):
         """
         raw_emoji = [emoji.lower() for emoji in raw_emoji]
         if is_emoji(raw_emoji[0]):
-            emojis = (Twemoji.codepoint(emoji) for emoji in raw_emoji[0])
+            emojis = (Twemoji.codepoint(emoji) or "" for emoji in raw_emoji[0])
             return "-".join(emojis)
 
-        emoji = "".join(Twemoji.emoji(Twemoji.trim_code(code)) for code in raw_emoji)
+        emoji = "".join(
+            Twemoji.emoji(Twemoji.trim_code(code)) or "" for code in raw_emoji
+        )
         if is_emoji(emoji):
-            return "-".join(Twemoji.codepoint(e) for e in emoji)
+            return "-".join(Twemoji.codepoint(e) or "" for e in emoji)
 
         raise ValueError("No codepoint could be obtained from the given input")
 
