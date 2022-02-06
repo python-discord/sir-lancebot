@@ -7,13 +7,17 @@ from typing import Optional
 import arrow
 import discord
 from async_rediscache import RedisCache
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 from bot.bot import Bot
-from bot.constants import AdventOfCode as AocConfig, Channels, Colours, Emojis, Month, Roles, WHITELISTED_CHANNELS
+from bot.constants import (
+    AdventOfCode as AocConfig, Channels, Client, Colours, Emojis, Month, PYTHON_PREFIX, Roles, WHITELISTED_CHANNELS
+)
 from bot.exts.events.advent_of_code import _helpers
 from bot.exts.events.advent_of_code.views.dayandstarview import AoCDropdownView
+from bot.utils import members
 from bot.utils.decorators import InChannelCheckFailure, in_month, whitelist_override, with_role
+from bot.utils.exceptions import MovedCommandError
 from bot.utils.extensions import invoke_help_command
 
 log = logging.getLogger(__name__)
@@ -31,7 +35,12 @@ class AdventOfCode(commands.Cog):
     """Advent of Code festivities! Ho Ho Ho!"""
 
     # Redis Cache for linking Discord IDs to Advent of Code usernames
+    # RedisCache[member_id: aoc_username_string]
     account_links = RedisCache()
+
+    # A dict with keys of member_ids to block from getting the role
+    # RedisCache[member_id: None]
+    completionist_block_list = RedisCache()
 
     def __init__(self, bot: Bot):
         self.bot = bot
@@ -52,6 +61,61 @@ class AdventOfCode(commands.Cog):
         self.status_task.set_name("AoC Status Countdown")
         self.status_task.add_done_callback(_helpers.background_task_callback)
 
+        self.completionist_task.start()
+
+    @tasks.loop(minutes=10.0)
+    async def completionist_task(self) -> None:
+        """
+        Give members who have completed all 50 AoC stars the completionist role.
+
+        Runs on a schedule, as defined in the task.loop decorator.
+        """
+        await self.bot.wait_until_guild_available()
+        guild = self.bot.get_guild(Client.guild)
+        completionist_role = guild.get_role(Roles.aoc_completionist)
+        if completionist_role is None:
+            log.warning("Could not find the AoC completionist role; cancelling completionist task.")
+            self.completionist_task.cancel()
+            return
+
+        aoc_name_to_member_id = {
+            aoc_name: member_id
+            for member_id, aoc_name in await self.account_links.items()
+        }
+
+        try:
+            leaderboard = await _helpers.fetch_leaderboard()
+        except _helpers.FetchingLeaderboardFailedError:
+            await self.bot.send_log("Unable to fetch AoC leaderboard during role sync.")
+            return
+
+        placement_leaderboard = json.loads(leaderboard["placement_leaderboard"])
+
+        for member_aoc_info in placement_leaderboard.values():
+            if not member_aoc_info["stars"] == 50:
+                # Only give the role to people who have completed all 50 stars
+                continue
+
+            aoc_name = member_aoc_info["name"] or f"Anonymous #{member_aoc_info['id']}"
+
+            member_id = aoc_name_to_member_id.get(aoc_name)
+            if not member_id:
+                log.debug(f"Could not find member_id for {member_aoc_info['name']}, not giving role.")
+                continue
+
+            member = await members.get_or_fetch_member(guild, member_id)
+            if member is None:
+                log.debug(f"Could not find {member_id}, not giving role.")
+                continue
+
+            if completionist_role in member.roles:
+                log.debug(f"{member.name} ({member.mention}) already has the completionist role.")
+                continue
+
+            if not await self.completionist_block_list.contains(member_id):
+                log.debug(f"Giving completionist role to {member.name} ({member.mention}).")
+                await members.handle_role_change(member, member.add_roles, completionist_role)
+
     @commands.group(name="adventofcode", aliases=("aoc",))
     @whitelist_override(channels=AOC_WHITELIST)
     async def adventofcode_group(self, ctx: commands.Context) -> None:
@@ -59,48 +123,34 @@ class AdventOfCode(commands.Cog):
         if not ctx.invoked_subcommand:
             await invoke_help_command(ctx)
 
+    @with_role(Roles.admins)
+    @adventofcode_group.command(
+        name="block",
+        brief="Block a user from getting the completionist role.",
+    )
+    async def block_from_role(self, ctx: commands.Context, member: discord.Member) -> None:
+        """Block the given member from receiving the AoC completionist role, removing it from them if needed."""
+        completionist_role = ctx.guild.get_role(Roles.aoc_completionist)
+        if completionist_role in member.roles:
+            await member.remove_roles(completionist_role)
+
+        await self.completionist_block_list.set(member.id, "sentinel")
+        await ctx.send(f":+1: Blocked {member.mention} from getting the AoC completionist role.")
+
     @commands.guild_only()
     @adventofcode_group.command(
         name="subscribe",
-        aliases=("sub", "notifications", "notify", "notifs"),
-        brief="Notifications for new days"
+        aliases=("sub", "notifications", "notify", "notifs", "unsubscribe", "unsub"),
+        help=f"NOTE: This command has been moved to {PYTHON_PREFIX}subscribe",
     )
     @whitelist_override(channels=AOC_WHITELIST)
     async def aoc_subscribe(self, ctx: commands.Context) -> None:
-        """Assign the role for notifications about new days being ready."""
-        current_year = datetime.now().year
-        if current_year != AocConfig.year:
-            await ctx.send(f"You can't subscribe to {current_year}'s Advent of Code announcements yet!")
-            return
+        """
+        Deprecated role command.
 
-        role = ctx.guild.get_role(AocConfig.role_id)
-        unsubscribe_command = f"{ctx.prefix}{ctx.command.root_parent} unsubscribe"
-
-        if role not in ctx.author.roles:
-            await ctx.author.add_roles(role)
-            await ctx.send(
-                "Okay! You have been __subscribed__ to notifications about new Advent of Code tasks. "
-                f"You can run `{unsubscribe_command}` to disable them again for you."
-            )
-        else:
-            await ctx.send(
-                "Hey, you already are receiving notifications about new Advent of Code tasks. "
-                f"If you don't want them any more, run `{unsubscribe_command}` instead."
-            )
-
-    @in_month(Month.DECEMBER)
-    @commands.guild_only()
-    @adventofcode_group.command(name="unsubscribe", aliases=("unsub",), brief="Notifications for new days")
-    @whitelist_override(channels=AOC_WHITELIST)
-    async def aoc_unsubscribe(self, ctx: commands.Context) -> None:
-        """Remove the role for notifications about new days being ready."""
-        role = ctx.guild.get_role(AocConfig.role_id)
-
-        if role in ctx.author.roles:
-            await ctx.author.remove_roles(role)
-            await ctx.send("Okay! You have been __unsubscribed__ from notifications about new Advent of Code tasks.")
-        else:
-            await ctx.send("Hey, you don't even get any notifications about new Advent of Code tasks currently anyway.")
+        This command has been moved to bot, and will be removed in the future.
+        """
+        raise MovedCommandError(f"{PYTHON_PREFIX}subscribe")
 
     @adventofcode_group.command(name="countdown", aliases=("count", "c"), brief="Return time left until next day")
     @whitelist_override(channels=AOC_WHITELIST)
@@ -138,9 +188,14 @@ class AdventOfCode(commands.Cog):
     @whitelist_override(channels=AOC_WHITELIST)
     async def join_leaderboard(self, ctx: commands.Context) -> None:
         """DM the user the information for joining the Python Discord leaderboard."""
-        current_year = datetime.now().year
-        if current_year != AocConfig.year:
-            await ctx.send(f"The Python Discord leaderboard for {current_year} is not yet available!")
+        current_date = datetime.now()
+        allowed_months = (Month.NOVEMBER.value, Month.DECEMBER.value)
+        if not (
+            current_date.month in allowed_months and current_date.year == AocConfig.year or
+            current_date.month == Month.JANUARY.value and current_date.year == AocConfig.year + 1
+        ):
+            # Only allow joining the leaderboard in the run up to AOC and the January following.
+            await ctx.send(f"The Python Discord leaderboard for {current_date.year} is not yet available!")
             return
 
         author = ctx.author
@@ -179,7 +234,7 @@ class AdventOfCode(commands.Cog):
         else:
             await ctx.message.add_reaction(Emojis.envelope)
 
-    @in_month(Month.NOVEMBER, Month.DECEMBER)
+    @in_month(Month.NOVEMBER, Month.DECEMBER, Month.JANUARY)
     @adventofcode_group.command(
         name="link",
         aliases=("connect",),
@@ -231,7 +286,7 @@ class AdventOfCode(commands.Cog):
                     " Please re-run the command with one specified."
                 )
 
-    @in_month(Month.NOVEMBER, Month.DECEMBER)
+    @in_month(Month.NOVEMBER, Month.DECEMBER, Month.JANUARY)
     @adventofcode_group.command(
         name="unlink",
         aliases=("disconnect",),
@@ -252,7 +307,7 @@ class AdventOfCode(commands.Cog):
             log.info(f"Attempted to unlink {ctx.author} ({ctx.author.id}), but no link was found.")
             await ctx.reply("You don't have an Advent of Code account linked.")
 
-    @in_month(Month.DECEMBER)
+    @in_month(Month.DECEMBER, Month.JANUARY)
     @adventofcode_group.command(
         name="dayandstar",
         aliases=("daynstar", "daystar"),
@@ -290,7 +345,7 @@ class AdventOfCode(commands.Cog):
         await view.wait()
         await message.edit(view=None)
 
-    @in_month(Month.DECEMBER)
+    @in_month(Month.DECEMBER, Month.JANUARY)
     @adventofcode_group.command(
         name="leaderboard",
         aliases=("board", "lb"),
@@ -335,7 +390,7 @@ class AdventOfCode(commands.Cog):
         await ctx.send(content=f"{header}\n\n{table}", embed=info_embed)
         return
 
-    @in_month(Month.DECEMBER)
+    @in_month(Month.DECEMBER, Month.JANUARY)
     @adventofcode_group.command(
         name="global",
         aliases=("globalboard", "gb"),
@@ -408,6 +463,7 @@ class AdventOfCode(commands.Cog):
         log.debug("Unloading the cog and canceling the background task.")
         self.notification_task.cancel()
         self.status_task.cancel()
+        self.completionist_task.cancel()
 
     def _build_about_embed(self) -> discord.Embed:
         """Build and return the informational "About AoC" embed from the resources file."""

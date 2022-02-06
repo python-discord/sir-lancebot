@@ -26,6 +26,9 @@ jobs:
         Mozilla Public License 2.0 (MPL 2.0);
         Public Domain;
         Python Software Foundation License
+      # See https://github.com/pre-commit/pre-commit/issues/2178#issuecomment-1002163763
+      # for why we set this.
+      SETUPTOOLS_USE_DISTUTILS: stdlib
 
 # Configure pip to cache dependencies and do a user install
       PIP_NO_CACHE_DIR: false
