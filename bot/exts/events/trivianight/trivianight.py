@@ -208,16 +208,16 @@ class TriviaNightCog(commands.Cog):
             ))
             return
 
-        question_list = self.game.list_questions().split("\n")
+        question_list = self.game.list_questions()
 
         list_embed = Embed(title="All Trivia Night Questions")
 
-        if len(question_list) <= 5:
-            list_embed.description = "\n".join(question_list)
+        if len(question_list) == 1:
+            list_embed.description = question_list[0]
             await ctx.send(embed=list_embed)
         else:
             await LinePaginator.paginate(
-                ("\n".join(question_list[idx:idx+5]) for idx in range(0, len(question_list), 5)),
+                question_list,
                 ctx,
                 list_embed
             )

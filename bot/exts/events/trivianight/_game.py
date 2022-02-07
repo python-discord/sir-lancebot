@@ -177,14 +177,22 @@ class TriviaNightGame:
             - Question description
             - Visited/not visited
         """
+        question_list = []
         formatted_string = ""
 
-        spaces = max(len(q.description) for q in self._all_questions)
+        visited = ":white_check_mark:"
+        not_visited = ":x:"
 
         for question in self._all_questions:
-            visited, not_visited = ":white_check_mark:", ":x:"
-            formatted_string += f"`Q{question.number}: {question.description}" \
-                                f"{' ' * (spaces - len(question.description))}|`" \
-                                f" {visited if question not in self._questions else not_visited}\n"
+            formatted_string += (
+                f"**Q{question.number}** {not_visited if question in self._questions else visited}"
+                f"\n{question.description}\n\n"
+            )
+            if question.number % 5 == 0:
+                question_list.append(formatted_string.rstrip())
+                formatted_string = ""
 
-        return formatted_string
+        if formatted_string:
+            question_list.append(formatted_string)
+
+        return question_list
