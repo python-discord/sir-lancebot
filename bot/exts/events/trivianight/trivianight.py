@@ -14,8 +14,8 @@ from ._game import AllQuestionsVisited, TriviaNightGame
 from ._questions import QuestionView
 from ._scoreboard import Scoreboard
 
-# The ID you see below is the Events Lead role ID
-TRIVIA_NIGHT_ROLES = (Roles.admin, 78361735739998228)
+# The ID you see below are the Events Lead role ID and the Event Runner Role ID
+TRIVIA_NIGHT_ROLES = (Roles.admin, 78361735739998228, 940911658799333408)
 
 
 class TriviaNightCog(commands.Cog):
