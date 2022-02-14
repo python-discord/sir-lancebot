@@ -216,6 +216,9 @@ def _format_leaderboard(leaderboard: dict[str, dict], self_placement_name: str =
     if self_placement_name and not self_placement_exists:
         raise commands.BadArgument(
             "Sorry, your profile does not exist in this leaderboard."
+            "\n\n"
+            "To join our leaderboard, run the command `.aoc join`."
+            " If you've joined recently, please wait up to 30 minutes for our leaderboard to refresh."
         )
     return "\n".join(leaderboard_lines)
 
@@ -252,7 +255,7 @@ async def _fetch_leaderboard_data() -> dict[str, Any]:
 
         # Two attempts, one with the original session cookie and one with the fallback session
         for attempt in range(1, 3):
-            log.info(f"Attempting to fetch leaderboard `{leaderboard.id}` ({attempt}/2)")
+            log.debug(f"Attempting to fetch leaderboard `{leaderboard.id}` ({attempt}/2)")
             cookies = {"session": leaderboard.session}
             try:
                 raw_data = await _leaderboard_request(leaderboard_url, leaderboard.id, cookies)
@@ -329,7 +332,7 @@ async def fetch_leaderboard(invalidate_cache: bool = False, self_placement_name:
         number_of_participants = len(leaderboard)
         formatted_leaderboard = _format_leaderboard(leaderboard)
         full_leaderboard_url = await _upload_leaderboard(formatted_leaderboard)
-        leaderboard_fetched_at = datetime.datetime.utcnow().isoformat()
+        leaderboard_fetched_at = datetime.datetime.now(datetime.timezone.utc).isoformat()
 
         cached_leaderboard = {
             "placement_leaderboard": json.dumps(raw_leaderboard_data),
@@ -365,11 +368,13 @@ def get_summary_embed(leaderboard: dict) -> discord.Embed:
     """Get an embed with the current summary stats of the leaderboard."""
     leaderboard_url = leaderboard["full_leaderboard_url"]
     refresh_minutes = AdventOfCode.leaderboard_cache_expiry_seconds // 60
+    refreshed_unix = int(datetime.datetime.fromisoformat(leaderboard["leaderboard_fetched_at"]).timestamp())
 
-    aoc_embed = discord.Embed(
-        colour=Colours.soft_green,
-        timestamp=datetime.datetime.fromisoformat(leaderboard["leaderboard_fetched_at"]),
-        description=f"*The leaderboard is refreshed every {refresh_minutes} minutes.*"
+    aoc_embed = discord.Embed(colour=Colours.soft_green)
+
+    aoc_embed.description = (
+        f"The leaderboard is refreshed every {refresh_minutes} minutes.\n"
+        f"Last Updated: <t:{refreshed_unix}:t>"
     )
     aoc_embed.add_field(
         name="Number of Participants",
@@ -383,7 +388,6 @@ def get_summary_embed(leaderboard: dict) -> discord.Embed:
             inline=True,
         )
     aoc_embed.set_author(name="Advent of Code", url=leaderboard_url)
-    aoc_embed.set_footer(text="Last Updated")
     aoc_embed.set_thumbnail(url=AOC_EMBED_THUMBNAIL)
 
     return aoc_embed

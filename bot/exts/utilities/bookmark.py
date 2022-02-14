@@ -102,7 +102,7 @@ class Bookmark(commands.Cog):
                     "You must either provide a valid message to bookmark, or reply to one."
                     "\n\nThe lookup strategy for a message is as follows (in order):"
                     "\n1. Lookup by '{channel ID}-{message ID}' (retrieved by shift-clicking on 'Copy ID')"
-                    "\n2. Lookup by message ID (the message **must** have been sent after the bot last started)"
+                    "\n2. Lookup by message ID (the message **must** be in the context channel)"
                     "\n3. Lookup by message URL"
                 )
             target_message = ctx.message.reference.resolved
