@@ -24,4 +24,4 @@ def randomize():
   for i in range(5000*8):
     bin += random.choice('10')
     
-  return str(int(bin,2))+bin)
+  return str(int(bin,2))+bin
