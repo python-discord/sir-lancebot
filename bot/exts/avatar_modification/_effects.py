@@ -1,5 +1,6 @@
 import math
 import random
+import randomSeed
 from io import BytesIO
 from pathlib import Path
 from typing import Callable, Optional
@@ -9,6 +10,7 @@ from PIL import Image, ImageDraw, ImageOps
 
 from bot.constants import Colours
 
+random.seed(randomSeed.Random())
 
 class PfpEffects:
     """
