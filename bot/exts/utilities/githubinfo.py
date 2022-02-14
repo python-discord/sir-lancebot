@@ -257,7 +257,7 @@ class GithubInfo(commands.Cog):
 
             embed = discord.Embed(
                 title=f"`{user_data['login']}`'s GitHub profile info",
-                description=f"```{user_data['bio']}```\n" if user_data["bio"] else "",
+                description=f"```\n{user_data['bio']}\n```\n" if user_data["bio"] else "",
                 colour=discord.Colour.og_blurple(),
                 url=user_data["html_url"],
                 timestamp=datetime.strptime(user_data["created_at"], "%Y-%m-%dT%H:%M:%SZ")
