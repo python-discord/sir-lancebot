@@ -59,7 +59,8 @@ class AdventOfCode(commands.Cog):
         status_coro = _helpers.countdown_status(self.bot)
         self.status_task = self.bot.loop.create_task(status_coro)
         self.status_task.set_name("AoC Status Countdown")
-        self.status_task.add_done_callback(_helpers.background_task_callback)
+        # Don't start task while event isn't running
+        # self.status_task.add_done_callback(_helpers.background_task_callback)
 
         self.completionist_task.start()
 
