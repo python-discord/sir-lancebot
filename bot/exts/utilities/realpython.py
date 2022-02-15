@@ -38,7 +38,7 @@ class RealPython(commands.Cog):
         By default the top 5 matches are sent, this can be overwritten to
         a number between 1 and 5 by specifying an amount before the search query.
         """
-        if user_search is None:
+        if (user_search is None):
             await ctx.send(HOME_URL)
             return
     
