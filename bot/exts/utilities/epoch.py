@@ -88,7 +88,7 @@ class Epoch(commands.Cog):
         await view.wait()  # wait until expiration before removing the dropdown
         try:
             await original.edit(view=None)
-        except:
+        except discord.NotFound:
             pass
 
     @staticmethod
