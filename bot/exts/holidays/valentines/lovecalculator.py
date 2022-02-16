@@ -51,7 +51,7 @@ class LoveCalculator(Cog):
             raise BadArgument(
                 "This command can only be ran against members with the lovefest role! "
                 "This role be can assigned by running "
-                f"`{Client.prefix}lovefest sub` in <#{Channels.community_bot_commands}>."
+                f"`{Client.prefix}lovefest sub` in <#{Channels.sir_lancebot_playground}>."
             )
 
         if whom is None:

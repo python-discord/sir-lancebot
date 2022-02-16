@@ -243,7 +243,7 @@ class Issues(commands.Cog):
                         title=random.choice(NEGATIVE_REPLIES),
                         description=(
                             "You can't retrieve issues from DMs. "
-                            f"Try again in <#{Channels.community_bot_commands}>"
+                            f"Try again in <#{Channels.sir_lancebot_playground}>"
                         ),
                         colour=Colours.soft_red
                     )

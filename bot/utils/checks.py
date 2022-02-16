@@ -40,7 +40,7 @@ def in_whitelist_check(
     channels: Container[int] = (),
     categories: Container[int] = (),
     roles: Container[int] = (),
-    redirect: Optional[int] = constants.Channels.community_bot_commands,
+    redirect: Optional[int] = constants.Channels.sir_lancebot_playground,
     fail_silently: bool = False,
 ) -> bool:
     """

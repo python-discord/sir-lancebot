@@ -83,7 +83,7 @@ class PrideLeader(commands.Cog):
         embed.add_field(
             name="For More Information",
             value=f"Do `{constants.Client.prefix}wiki {name}`"
-                  f" in <#{constants.Channels.community_bot_commands}>",
+                  f" in <#{constants.Channels.sir_lancebot_playground}>",
             inline=False
         )
         embed.set_thumbnail(url=pride_leader["url"])

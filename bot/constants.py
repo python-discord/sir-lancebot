@@ -114,7 +114,7 @@ class Channels(NamedTuple):
     off_topic_0 = 291284109232308226
     off_topic_1 = 463035241142026251
     off_topic_2 = 463035268514185226
-    community_bot_commands = int(environ.get("CHANNEL_COMMUNITY_BOT_COMMANDS", 607247579608121354))
+    sir_lancebot_playground = int(environ.get("CHANNEL_COMMUNITY_BOT_COMMANDS", 607247579608121354))
     voice_chat_0 = 412357430186344448
     voice_chat_1 = 799647045886541885
     staff_voice = 541638762007101470
@@ -340,7 +340,7 @@ STAFF_ROLES = Roles.helpers, Roles.moderator, Roles.admin, Roles.owner
 # Whitelisted channels
 WHITELISTED_CHANNELS = (
     Channels.bot_commands,
-    Channels.community_bot_commands,
+    Channels.sir_lancebot_playground,
     Channels.off_topic_0,
     Channels.off_topic_1,
     Channels.off_topic_2,
