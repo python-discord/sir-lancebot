@@ -61,7 +61,8 @@ class AdventOfCode(commands.Cog):
         self.status_task.set_name("AoC Status Countdown")
         self.status_task.add_done_callback(_helpers.background_task_callback)
 
-        self.completionist_task.start()
+        # Don't start task while event isn't running
+        # self.completionist_task.start()
 
     @tasks.loop(minutes=10.0)
     async def completionist_task(self) -> None:

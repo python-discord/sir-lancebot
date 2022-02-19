@@ -12,6 +12,7 @@ __all__ = (
     "Channels",
     "Categories",
     "Client",
+    "Logging",
     "Colours",
     "Emojis",
     "Icons",
@@ -23,7 +24,7 @@ __all__ = (
     "Reddit",
     "RedisConfig",
     "RedirectOutput",
-    "PYTHON_PREFIX"
+    "PYTHON_PREFIX",
     "MODERATION_ROLES",
     "STAFF_ROLES",
     "WHITELISTED_CHANNELS",
@@ -36,6 +37,7 @@ log = logging.getLogger(__name__)
 
 
 PYTHON_PREFIX = "!"
+
 
 @dataclasses.dataclass
 class AdventOfCodeLeaderboard:
@@ -53,7 +55,7 @@ class AdventOfCodeLeaderboard:
     def session(self) -> str:
         """Return either the actual `session` cookie or the fallback cookie."""
         if self.use_fallback_session:
-            log.info(f"Returning fallback cookie for board `{self.id}`.")
+            log.trace(f"Returning fallback cookie for board `{self.id}`.")
             return AdventOfCode.fallback_session
 
         return self._session
@@ -130,7 +132,9 @@ class Categories(NamedTuple):
     media = 799054581991997460
     staff = 364918151625965579
 
+
 codejam_categories_name = "Code Jam"  # Name of the codejam team categories
+
 
 class Client(NamedTuple):
     name = "Sir Lancebot"
@@ -138,10 +142,14 @@ class Client(NamedTuple):
     prefix = environ.get("PREFIX", ".")
     token = environ.get("BOT_TOKEN")
     debug = environ.get("BOT_DEBUG", "true").lower() == "true"
-    file_logs = environ.get("FILE_LOGS", "false").lower() == "true"
     github_bot_repo = "https://github.com/python-discord/sir-lancebot"
     # Override seasonal locks: 1 (January) to 12 (December)
     month_override = int(environ["MONTH_OVERRIDE"]) if "MONTH_OVERRIDE" in environ else None
+
+
+class Logging(NamedTuple):
+    debug = Client.debug
+    file_logs = environ.get("FILE_LOGS", "false").lower() == "true"
     trace_loggers = environ.get("BOT_TRACE_LOGGERS")
 
 
@@ -230,7 +238,6 @@ class Emojis:
     status_idle = "<:status_idle:470326266625785866>"
     status_dnd = "<:status_dnd:470326272082313216>"
     status_offline = "<:status_offline:470326266537705472>"
-
 
     stackoverflow_tag = "<:stack_tag:870926975307501570>"
     stackoverflow_views = "<:stack_eye:870926992692879371>"
