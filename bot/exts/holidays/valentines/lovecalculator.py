@@ -32,7 +32,7 @@ class LoveCalculator(Cog):
         Tells you how much the two love each other.
 
         This command requires at least one member as input, if two are given love will be calculated between
-        those two users, if only one is given, the second member is asusmed to be the invoker.
+        those two users, if only one is given, the second member is assumed to be the invoker.
         Members are converted from:
           - User ID
           - Mention
@@ -51,7 +51,7 @@ class LoveCalculator(Cog):
             raise BadArgument(
                 "This command can only be ran against members with the lovefest role! "
                 "This role be can assigned by running "
-                f"`{PYTHON_PREFIX}subscribe` in <#{Channels.bot}>."
+                f"`{PYTHON_PREFIX}subscribe` in <#{Channels.bot_commands}>."
             )
 
         if whom is None:

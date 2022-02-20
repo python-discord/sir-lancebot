@@ -98,7 +98,8 @@ class CommandErrorHandler(commands.Cog):
         if isinstance(error, commands.NoPrivateMessage):
             await ctx.send(
                 embed=self.error_embed(
-                    f"This command can only be used in the server. Go to <#{Channels.community_bot_commands}> instead!",
+                    "This command can only be used in the server. "
+                    f"Go to <#{Channels.sir_lancebot_playground}> instead!",
                     NEGATIVE_REPLIES
                 )
             )

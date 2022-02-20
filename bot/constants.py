@@ -109,7 +109,8 @@ class Cats:
 class Channels(NamedTuple):
     advent_of_code = int(environ.get("AOC_CHANNEL_ID", 897932085766004786))
     advent_of_code_commands = int(environ.get("AOC_COMMANDS_CHANNEL_ID", 897932607545823342))
-    bot = 267659945086812160
+    bot_commands = 267659945086812160
+    community_meta = 267659945086812160
     organisation = 551789653284356126
     devlog = int(environ.get("CHANNEL_DEVLOG", 622895325144940554))
     dev_contrib = 635950537262759947
@@ -118,7 +119,7 @@ class Channels(NamedTuple):
     off_topic_0 = 291284109232308226
     off_topic_1 = 463035241142026251
     off_topic_2 = 463035268514185226
-    community_bot_commands = int(environ.get("CHANNEL_COMMUNITY_BOT_COMMANDS", 607247579608121354))
+    sir_lancebot_playground = int(environ.get("CHANNEL_COMMUNITY_BOT_COMMANDS", 607247579608121354))
     voice_chat_0 = 412357430186344448
     voice_chat_1 = 799647045886541885
     staff_voice = 541638762007101470
@@ -350,8 +351,8 @@ STAFF_ROLES = {Roles.helpers, Roles.moderation_team, Roles.admins, Roles.owners}
 
 # Whitelisted channels
 WHITELISTED_CHANNELS = (
-    Channels.bot,
-    Channels.community_bot_commands,
+    Channels.bot_commands,
+    Channels.sir_lancebot_playground,
     Channels.off_topic_0,
     Channels.off_topic_1,
     Channels.off_topic_2,
