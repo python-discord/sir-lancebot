@@ -15,7 +15,7 @@ class BotSource(commands.Cog):
     """Displays information about the bot's source code."""
 
     @commands.command(name="source", aliases=("src",))
-    @whitelist_override(channels=WHITELISTED_CHANNELS+[Channels.community_meta, Channels.dev_contrib])
+    @whitelist_override(channels=WHITELISTED_CHANNELS+(Channels.community_meta, Channels.dev_contrib))
     async def source_command(self, ctx: commands.Context, *, source_item: SourceConverter = None) -> None:
         """Display information and a GitHub link to the source code of a command, tag, or cog."""
         if not source_item:
