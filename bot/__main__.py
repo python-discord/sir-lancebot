@@ -12,4 +12,5 @@ bot.add_check(whitelist_check(channels=WHITELISTED_CHANNELS, roles=STAFF_ROLES))
 for ext in walk_extensions():
     bot.load_extension(ext)
 
-bot.run(Client.token)
+if not Client.in_ci:
+    bot.run(Client.token)
