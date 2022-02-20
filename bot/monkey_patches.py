@@ -1,21 +1,12 @@
 import logging
+import re
 from datetime import datetime, timedelta
 
 from discord import Forbidden, http
 from discord.ext import commands
 
 log = logging.getLogger(__name__)
-
-
-def trace_log(self: logging.Logger, msg: str, *args, **kwargs) -> None:
-    """
-    Log 'msg % args' with severity 'TRACE'.
-
-    To pass exception information, use the keyword argument exc_info with a true value, e.g.
-    logger.trace("Houston, we have an %s", "interesting problem", exc_info=1)
-    """
-    if self.isEnabledFor(logging.TRACE):
-        self._log(logging.TRACE, msg, args, **kwargs)
+MESSAGE_ID_RE = re.compile(r"(?P<message_id>[0-9]{15,20})$")
 
 
 class Command(commands.Command):
@@ -76,3 +67,25 @@ def patch_typing() -> None:
             pass
 
     http.HTTPClient.send_typing = honeybadger_type
+
+
+class FixedPartialMessageConverter(commands.PartialMessageConverter):
+    """
+    Make the Message converter infer channelID from the given context if only a messageID is given.
+
+    Discord.py's Message converter is supposed to infer channelID based
+    on ctx.channel if only a messageID is given. A refactor commit, linked below,
+    a few weeks before d.py's archival broke this defined behaviour of the converter.
+    Currently, if only a messageID is given to the converter, it will only find that message
+    if it's in the bot's cache.
+
+    https://github.com/Rapptz/discord.py/commit/1a4e73d59932cdbe7bf2c281f25e32529fc7ae1f
+    """
+
+    @staticmethod
+    def _get_id_matches(ctx: commands.Context, argument: str) -> tuple[int, int, int]:
+        """Inserts ctx.channel.id before calling super method if argument is just a messageID."""
+        match = MESSAGE_ID_RE.match(argument)
+        if match:
+            argument = f"{ctx.channel.id}-{match.group('message_id')}"
+        return commands.PartialMessageConverter._get_id_matches(ctx, argument)

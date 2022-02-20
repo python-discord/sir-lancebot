@@ -53,7 +53,7 @@ class ConvoStarters(commands.Cog):
         # No matter what, the form will be shown.
         embed = discord.Embed(
             description=f"Suggest more topics [here]({SUGGESTION_FORM})!",
-            color=discord.Color.blurple()
+            color=discord.Colour.og_blurple()
         )
 
         try:

@@ -33,15 +33,33 @@
     - How often do you program in Python?
     - How would you learn a new library if needed to do so?
     - Have you ever worked with a microcontroller or anything physical with Python before?
-    - How good would you say you are at Python so far? Beginner, intermediate, or advanced?
     - Have you ever tried making your own programming language?
     - Has a recently discovered Python module changed your general use of Python?
+    - What is your motivation for programming?
+    - What's your favorite Python related book?
+    - What's your favorite use of recursion in Python?
+    - If you could change one thing in Python, what would it be?
+    - What third-party library do you wish was in the Python standard library?
+    - Which package do you use the most and why?
+    - Which Python feature do you love the most?
+    - Do you have any plans for future projects?
+    - What modules/libraries do you want to see more projects using?
+    - What's the most ambitious thing you've done with Python so far?
+
+# programming-pedagogy
+934931964509691966:
+    - What is the best way to teach/learn OOP?
+    - What benefits are there to teaching programming to students who aren't training to become developers?
+    - What are some basic concepts that we need to know before teaching programming to others?
+    - What are the most common difficulties/misconceptions students encounter while learning to program?
+    - What makes a project a good learning experience for beginners?
+    - What can make difficult concepts more fun for students to learn?
 
 # algos-and-data-structs
 650401909852864553:
     -
 
-# async
+# async-and-concurrency
 630504881542791169:
     - Are there any frameworks you wish were async?
     - How have coroutines changed the way you write Python?
@@ -55,12 +73,13 @@
 342318764227821568:
     - Where do you get your best data?
     - What is your preferred database and for what use?
+    - What is the least safe use of databases you've seen?
 
-# data-science
+# data-science-and-ai
 366673247892275221:
     -
 
-# discord.py
+# discord-bots
 343944376055103488:
     - What unique features does your bot contain, if any?
     - What commands/features are you proud of making?
@@ -79,6 +98,8 @@
     - What's a common part of programming we can make harder?
     - What are the pros and cons of messing with __magic__()?
     - What's your favorite Python hack?
+    - What's the weirdest language feature that Python doesn't have, and how can we change that?
+    - What is the most esoteric code you've written?
 
 # game-development
 660625198390837248:
@@ -111,6 +132,10 @@
     - How often do you use GitHub Actions and workflows to automate your repositories?
     - What's your favorite app on GitHub?
 
+# type-hinting
+891788761371906108:
+    -
+
 # unit-testing
 463035728335732738:
     -
@@ -121,6 +146,7 @@
     - What's your most used Bash command?
     - How often do you update your Unix machine?
     - How often do you upgrade on production?
+    - What is your least favorite thing about interoperability amongst *NIX operating systems and/or platforms?
 
 # user-interfaces
 338993628049571840:
@@ -129,6 +155,7 @@
     - Do you perfer Command Line Interfaces (CLI) or Graphic User Interfaces (GUI)?
     - What's your favorite CLI (Command Line Interface) or TUI (Terminal Line Interface)?
     - What's your best GUI project?
+    - What the best-looking app you've used?
 
 # web-development
 366673702533988363:
@@ -137,3 +164,4 @@
     - What is your favorite API library?
     - What do you use for your frontend?
     - What does your stack look like?
+    - What's the best-looking website you've visited?

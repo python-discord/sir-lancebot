@@ -111,7 +111,7 @@ class Emojis(commands.Cog):
                 **Date:** {datetime.strftime(emoji.created_at.replace(tzinfo=None), "%d/%m/%Y")}
                 **ID:** {emoji.id}
             """),
-            color=Color.blurple(),
+            color=Color.og_blurple(),
             url=str(emoji.url),
         ).set_thumbnail(url=emoji.url)
 

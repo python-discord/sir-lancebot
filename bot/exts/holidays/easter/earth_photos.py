@@ -4,8 +4,7 @@ import discord
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Colours
-from bot.constants import Tokens
+from bot.constants import Colours, Tokens
 
 log = logging.getLogger(__name__)
 

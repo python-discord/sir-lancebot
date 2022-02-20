@@ -4,14 +4,7 @@ from collections.abc import Container, Iterable
 from typing import Callable, Optional
 
 from discord.ext.commands import (
-    BucketType,
-    CheckFailure,
-    Cog,
-    Command,
-    CommandOnCooldown,
-    Context,
-    Cooldown,
-    CooldownMapping,
+    BucketType, CheckFailure, Cog, Command, CommandOnCooldown, Context, Cooldown, CooldownMapping
 )
 
 from bot import constants

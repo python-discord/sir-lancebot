@@ -12,7 +12,7 @@ from discord.ext import commands
 from discord.ext.commands import BadArgument, Cog, clean_content
 
 from bot.bot import Bot
-from bot.constants import Channels, Client, Lovefest, Month
+from bot.constants import Channels, Lovefest, Month, PYTHON_PREFIX
 from bot.utils.decorators import in_month
 
 log = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ class LoveCalculator(Cog):
         Tells you how much the two love each other.
 
         This command requires at least one member as input, if two are given love will be calculated between
-        those two users, if only one is given, the second member is asusmed to be the invoker.
+        those two users, if only one is given, the second member is assumed to be the invoker.
         Members are converted from:
           - User ID
           - Mention
@@ -51,7 +51,7 @@ class LoveCalculator(Cog):
             raise BadArgument(
                 "This command can only be ran against members with the lovefest role! "
                 "This role be can assigned by running "
-                f"`{Client.prefix}lovefest sub` in <#{Channels.sir_lancebot_playground}>."
+                f"`{PYTHON_PREFIX}subscribe` in <#{Channels.bot_commands}>."
             )
 
         if whom is None:
@@ -90,7 +90,7 @@ class LoveCalculator(Cog):
             name="A letter from Dr. Love:",
             value=data["text"]
         )
-        embed.set_footer(text=f"You can unsubscribe from lovefest by using {Client.prefix}lovefest unsub")
+        embed.set_footer(text=f"You can unsubscribe from lovefest by using {PYTHON_PREFIX}subscribe.")
 
         await ctx.send(embed=embed)
 

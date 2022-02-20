@@ -21,45 +21,41 @@ class HanukkahEmbed(commands.Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.hanukkah_days = []
-        self.hanukkah_months = []
-        self.hanukkah_years = []
+        self.hanukkah_dates: list[datetime.date] = []
 
-    async def get_hanukkah_dates(self) -> list[str]:
+    def _parse_time_to_datetime(self, date: list[str]) -> datetime.datetime:
+        """Format the times provided by the api to datetime forms."""
+        try:
+            return datetime.datetime.strptime(date, "%Y-%m-%dT%H:%M:%S%z")
+        except ValueError:
+            # there is a possibility of an event not having a time, just a day
+            # to catch this, we try again without time information
+            return datetime.datetime.strptime(date, "%Y-%m-%d")
+
+    async def fetch_hanukkah_dates(self) -> list[datetime.date]:
         """Gets the dates for hanukkah festival."""
-        hanukkah_dates = []
+        # clear the datetime objects to prevent a memory link
+        self.hanukkah_dates = []
         async with self.bot.http_session.get(HEBCAL_URL) as response:
             json_data = await response.json()
         festivals = json_data["items"]
         for festival in festivals:
             if festival["title"].startswith("Chanukah"):
                 date = festival["date"]
-                hanukkah_dates.append(date)
-        return hanukkah_dates
+                self.hanukkah_dates.append(self._parse_time_to_datetime(date).date())
+        return self.hanukkah_dates
 
     @in_month(Month.NOVEMBER, Month.DECEMBER)
     @commands.command(name="hanukkah", aliases=("chanukah",))
     async def hanukkah_festival(self, ctx: commands.Context) -> None:
         """Tells you about the Hanukkah Festivaltime of festival, festival day, etc)."""
-        hanukkah_dates = await self.get_hanukkah_dates()
-        self.hanukkah_dates_split(hanukkah_dates)
-        hanukkah_start_day = int(self.hanukkah_days[0])
-        hanukkah_start_month = int(self.hanukkah_months[0])
-        hanukkah_start_year = int(self.hanukkah_years[0])
-        hanukkah_end_day = int(self.hanukkah_days[8])
-        hanukkah_end_month = int(self.hanukkah_months[8])
-        hanukkah_end_year = int(self.hanukkah_years[8])
-
-        hanukkah_start = datetime.date(hanukkah_start_year, hanukkah_start_month, hanukkah_start_day)
-        hanukkah_end = datetime.date(hanukkah_end_year, hanukkah_end_month, hanukkah_end_day)
+        hanukkah_dates = await self.fetch_hanukkah_dates()
+        start_day = hanukkah_dates[0]
+        end_day = hanukkah_dates[-1]
         today = datetime.date.today()
-        # today = datetime.date(2019, 12, 24) (for testing)
-        day = str(today.day)
-        month = str(today.month)
-        year = str(today.year)
         embed = Embed(title="Hanukkah", colour=Colours.blue)
-        if day in self.hanukkah_days and month in self.hanukkah_months and year in self.hanukkah_years:
-            if int(day) == hanukkah_start_day:
+        if start_day <= today <= end_day:
+            if start_day == today:
                 now = datetime.datetime.utcnow()
                 hours = now.hour + 4  # using only hours
                 hanukkah_start_hour = 18
@@ -77,35 +73,27 @@ class HanukkahEmbed(commands.Cog):
                     )
                     await ctx.send(embed=embed)
                     return
-            festival_day = self.hanukkah_days.index(day)
+            festival_day = hanukkah_dates.index(today)
             number_suffixes = ["st", "nd", "rd", "th"]
             suffix = number_suffixes[festival_day - 1 if festival_day <= 3 else 3]
             message = ":menorah:" * festival_day
-            embed.description = f"It is the {festival_day}{suffix} day of Hanukkah!\n{message}"
-            await ctx.send(embed=embed)
+            embed.description = (
+                f"It is the {festival_day}{suffix} day of Hanukkah!\n{message}"
+            )
+        elif today < start_day:
+            format_start = start_day.strftime("%d of %B")
+            embed.description = (
+                "Hanukkah has not started yet. "
+                f"Hanukkah will start at sundown on {format_start}."
+            )
         else:
-            if today < hanukkah_start:
-                festival_starting_month = hanukkah_start.strftime("%B")
-                embed.description = (
-                    f"Hanukkah has not started yet. "
-                    f"Hanukkah will start at sundown on {hanukkah_start_day}th "
-                    f"of {festival_starting_month}."
-                )
-            else:
-                festival_end_month = hanukkah_end.strftime("%B")
-                embed.description = (
-                    f"Looks like you missed Hanukkah!"
-                    f"Hanukkah ended on {hanukkah_end_day}th of {festival_end_month}."
-                )
+            format_end = end_day.strftime("%d of %B")
+            embed.description = (
+                "Looks like you missed Hanukkah! "
+                f"Hanukkah ended on {format_end}."
+            )
 
-            await ctx.send(embed=embed)
-
-    def hanukkah_dates_split(self, hanukkah_dates: list[str]) -> None:
-        """We are splitting the dates for hanukkah into days, months and years."""
-        for date in hanukkah_dates:
-            self.hanukkah_days.append(date[8:10])
-            self.hanukkah_months.append(date[5:7])
-            self.hanukkah_years.append(date[0:4])
+        await ctx.send(embed=embed)
 
 
 def setup(bot: Bot) -> None:

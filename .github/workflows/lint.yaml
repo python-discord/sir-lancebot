@@ -26,6 +26,9 @@ jobs:
         Mozilla Public License 2.0 (MPL 2.0);
         Public Domain;
         Python Software Foundation License
+      # See https://github.com/pre-commit/pre-commit/issues/2178#issuecomment-1002163763
+      # for why we set this.
+      SETUPTOOLS_USE_DISTUTILS: stdlib
 
 # Configure pip to cache dependencies and do a user install
       PIP_NO_CACHE_DIR: false
@@ -74,12 +77,14 @@ jobs:
           pip install poetry
           poetry install --no-interaction --no-ansi
 
-      # Check all the dependencies are compatible with the MIT license.
+      # Check all of our dev dependencies are compatible with the MIT license.
       # If you added a new dependencies that is being rejected,
       # please make sure it is compatible with the license for this project,
       # and add it to the ALLOWED_LICENSE variable
       - name: Check Dependencies License
-        run: pip-licenses --allow-only="$ALLOWED_LICENSES"
+        run: |
+          pip-licenses --allow-only="$ALLOWED_LICENSE" \
+            --package $(poetry export -f requirements.txt --without-hashes | sed "s/==.*//g" | tr "\n" " ")
 
       # This step caches our pre-commit environment. To make sure we
       # do create a new environment when our pre-commit setup changes,

@@ -162,13 +162,20 @@ class Challenges(commands.Cog):
             kata_description = "\n".join(kata_description[:1000].split("\n")[:-1]) + "..."
             kata_description += f" [continue reading]({kata_url})"
 
+        if kata_information["rank"]["name"] is None:
+            embed_color = 8
+            kata_difficulty = "Unable to retrieve difficulty for beta languages."
+        else:
+            embed_color = int(kata_information["rank"]["name"].replace(" kyu", ""))
+            kata_difficulty = kata_information["rank"]["name"]
+
         kata_embed = Embed(
             title=kata_information["name"],
             description=kata_description,
-            color=MAPPING_OF_KYU[int(kata_information["rank"]["name"].replace(" kyu", ""))],
+            color=MAPPING_OF_KYU[embed_color],
             url=kata_url
         )
-        kata_embed.add_field(name="Difficulty", value=kata_information["rank"]["name"], inline=False)
+        kata_embed.add_field(name="Difficulty", value=kata_difficulty, inline=False)
         return kata_embed
 
     @staticmethod
@@ -268,30 +275,29 @@ class Challenges(commands.Cog):
         `.challenge <language> <query>, <difficulty>` - Pulls a random challenge with the query provided,
         under that difficulty within the language's scope.
         """
-        if language.lower() not in SUPPORTED_LANGUAGES["stable"] + SUPPORTED_LANGUAGES["beta"]:
+        language = language.lower()
+        if language not in SUPPORTED_LANGUAGES["stable"] + SUPPORTED_LANGUAGES["beta"]:
             raise commands.BadArgument("This is not a recognized language on codewars.com!")
 
         get_kata_link = f"https://codewars.com/kata/search/{language}"
         params = {}
 
-        if language and not query:
-            level = f"-{choice([1, 2, 3, 4, 5, 6, 7, 8])}"
-            params["r[]"] = level
-        elif "," in query:
-            query_splitted = query.split("," if ", " not in query else ", ")
+        if query is not None:
+            if "," in query:
+                query_splitted = query.split("," if ", " not in query else ", ")
 
-            if len(query_splitted) > 2:
-                raise commands.BadArgument(
-                    "There can only be one comma within the query, separating the difficulty and the query itself."
-                )
+                if len(query_splitted) > 2:
+                    raise commands.BadArgument(
+                        "There can only be one comma within the query, separating the difficulty and the query itself."
+                    )
 
-            query, level = query_splitted
-            params["q"] = query
-            params["r[]"] = f"-{level}"
-        elif query.isnumeric():
-            params["r[]"] = f"-{query}"
-        else:
-            params["q"] = query
+                query, level = query_splitted
+                params["q"] = query
+                params["r[]"] = f"-{level}"
+            elif query.isnumeric():
+                params["r[]"] = f"-{query}"
+            else:
+                params["q"] = query
 
         params["beta"] = str(language in SUPPORTED_LANGUAGES["beta"]).lower()
 

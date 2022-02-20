@@ -244,7 +244,7 @@ class Reddit(Cog):
 
         # Use only starting summary page for #reddit channel posts.
         embed.description = self.build_pagination_pages(posts, paginate=False)
-        embed.colour = Colour.blurple()
+        embed.colour = Colour.og_blurple()
         return embed
 
     @loop()
@@ -312,7 +312,7 @@ class Reddit(Cog):
 
         await ctx.send(f"Here are the top {subreddit} posts of all time!")
         embed = Embed(
-            color=Colour.blurple()
+            color=Colour.og_blurple()
         )
 
         await ImagePaginator.paginate(pages, ctx, embed)
@@ -325,7 +325,7 @@ class Reddit(Cog):
 
         await ctx.send(f"Here are today's top {subreddit} posts!")
         embed = Embed(
-            color=Colour.blurple()
+            color=Colour.og_blurple()
         )
 
         await ImagePaginator.paginate(pages, ctx, embed)
@@ -338,7 +338,7 @@ class Reddit(Cog):
 
         await ctx.send(f"Here are this week's top {subreddit} posts!")
         embed = Embed(
-            color=Colour.blurple()
+            color=Colour.og_blurple()
         )
 
         await ImagePaginator.paginate(pages, ctx, embed)
@@ -349,7 +349,7 @@ class Reddit(Cog):
         """Send a paginated embed of all the subreddits we're relaying."""
         embed = Embed()
         embed.title = "Relayed subreddits."
-        embed.colour = Colour.blurple()
+        embed.colour = Colour.og_blurple()
 
         await LinePaginator.paginate(
             RedditConfig.subreddits,
