@@ -1,5 +1,4 @@
 import hashlib
-import logging
 import re
 import string
 from io import BytesIO
@@ -11,8 +10,6 @@ from PIL import Image
 from discord.ext import commands
 
 from bot.bot import Bot
-
-logger = logging.getLogger(__name__)
 
 FORMATTED_CODE_REGEX = re.compile(
     r"(?P<delim>(?P<block>```)|``?)"        # code delimiter: 1-3 backticks; (?P=block) only matches if it's a block
@@ -122,7 +119,6 @@ class Latex(commands.Cog):
                             embed.description = f"[View Logs]({logs_paste_url})"
                         else:
                             embed.description = "Couldn't upload logs."
-                            logger.warning("Failed to upload latex error logs to paste service.")
                     await ctx.send(embed=embed)
                     image_path.unlink()
                     return
