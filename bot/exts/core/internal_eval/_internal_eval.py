@@ -87,7 +87,7 @@ class InternalEval(commands.Cog):
         """Upload `internal eval` output to our pastebin and return the url."""
         try:
             async with self.bot.http_session.post(
-                "https://paste.pythondiscord.com/documents", data=output, raise_for_status=True
+                "https://paste.pythondiscord.com/documents", data=self.shorten_output(output, max_length=99980), raise_for_status=True
             ) as resp:
                 data = await resp.json()
 
