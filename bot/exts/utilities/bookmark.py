@@ -27,18 +27,31 @@ class Bookmark(commands.Cog):
     @staticmethod
     def build_bookmark_dm(target_message: discord.Message, title: str) -> discord.Embed:
         """Build the embed to DM the bookmark requester."""
-        embed = discord.Embed(
-            title=title,
-            description=target_message.content,
-            colour=Colours.soft_green
-        )
-        embed.add_field(
-            name="Wanna give it a visit?",
-            value=f"[Visit original message]({target_message.jump_url})"
-        )
-        embed.set_author(name=target_message.author, icon_url=target_message.author.display_avatar.url)
-        embed.set_thumbnail(url=Icons.bookmark)
-
+        if len(message.embeds) == 0:
+            embed = discord.Embed(
+                title=title,
+                description=target_message.content,
+                colour=Colours.soft_green
+            )
+            embed.add_field(
+                name="Wanna give it a visit?",
+                value=f"[Visit original message]({target_message.jump_url})"
+            )
+            embed.set_author(name=target_message.author, icon_url=target_message.author.display_avatar.url)
+            embed.set_thumbnail(url=Icons.bookmark)
+        else:
+            embed = discord.Embed(
+                title=title,
+                description=(target_message.embeds[0]).description,
+                colour=Colours.soft_green
+            )
+            embed.add_field(
+                name="Wanna give it a visit?",
+                value=f"[Visit original message]({target_message.jump_url})"
+            )
+            embed.set_author(name=target_message.author, icon_url=target_message.author.display_avatar.url)
+            embed.set_thumbnail(url=Icons.bookmark)
+    
         return embed
 
     @staticmethod
