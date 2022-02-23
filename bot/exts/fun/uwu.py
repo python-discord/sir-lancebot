@@ -10,7 +10,7 @@ from bot.exts.fun.fun import Fun
 from bot.utils import helpers
 
 
-WORD_REPLACE_HASH = {
+WORD_REPLACE = {
     "small": "smol",
     "cute": "kawaii~",
     "fluff": "floof",
@@ -22,7 +22,7 @@ WORD_REPLACE_HASH = {
     "roar": "rawrr~",
 }
 
-EMOJI_LUT = [
+EMOJIS = [
     "rawr x3",
     "OwO",
     "UwU",
@@ -62,7 +62,7 @@ class Uwu(Cog):
 
     def _word_replace(self, input_string: str) -> str:
         """Replaces words that are keys in the word replacement hash to the values specified."""
-        for word, replacement in WORD_REPLACE_HASH.items():
+        for word, replacement in WORD_REPLACE.items():
             input_string = input_string.replace(word, replacement)
         return input_string
 
@@ -93,7 +93,7 @@ class Uwu(Cog):
         """Replaces a punctuation character with an emoticon."""
         match_string = match.group()
         if random.random() < strength:
-            return f" {EMOJI_LUT[random.randint(0, len(EMOJI_LUT) - 1)]} "
+            return f" {EMOJIS[random.randint(0, len(EMOJIS) - 1)]} "
         return match_string
 
     def _uwuify(self, input_string: str, *, stutter_strength: float = 0.2, emoji_strength: float = 0.1) -> str:
