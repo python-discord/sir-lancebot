@@ -50,8 +50,8 @@ REGEX_PUNCTUATION = re.compile(r"[.!?\r\n\t]")
 REGEX_STUTTER = re.compile(r"(\s)([a-zA-Z])")
 SUBSTITUTE_STUTTER = r"\g<1>\g<2>-\g<2>"
 
-REGEX_NYA = re.compile(r"n([aeou])([^aeiou])")
-SUBSTITUTE_NYA = re.compile(r"ny\g<1>\g<2>")
+REGEX_NYA = re.compile(r"n([aeou][^aeiou])")
+SUBSTITUTE_NYA = r"ny\1"
 
 
 class Uwu(Cog):
