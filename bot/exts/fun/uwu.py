@@ -51,7 +51,7 @@ REGEX_STUTTER = re.compile(r"(\s)([a-zA-Z])")
 SUBSTITUTE_STUTTER = r"\g<1>\g<2>-\g<2>"
 
 REGEX_NYA = re.compile(r"n([aeou])([^aeiou])")
-SUBSTITUTE_NYA = r"ny\g<1>\g<2>"
+SUBSTITUTE_NYA = re.compile(r"ny\g<1>\g<2>")
 
 
 class Uwu(Cog):
