@@ -1,7 +1,6 @@
 import random
 import re
 from functools import partial
-from typing import Callable
 
 from discord.ext import commands
 from discord.ext.commands import Cog, Context, clean_content
