@@ -9,7 +9,6 @@ from bot.bot import Bot
 from bot.exts.fun.fun import Fun
 from bot.utils import helpers
 
-
 WORD_REPLACE = {
     "small": "smol",
     "cute": "kawaii~",
