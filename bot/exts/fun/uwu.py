@@ -118,8 +118,8 @@ class Uwu(Cog):
             text, embed = await fun_cog._get_text_and_embed(ctx, text)
 
            # Grabs the text from the embed for uwuification.
-           if embed is not None:
-               embed = fun_cog._convert_embed(self._uwuify, embed)
+            if embed is not None:
+                embed = fun_cog._convert_embed(self._uwuify, embed)
         else:
             embed = None
         converted_text = self._uwuify(text)
