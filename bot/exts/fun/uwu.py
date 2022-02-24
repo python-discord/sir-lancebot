@@ -81,7 +81,7 @@ class Uwu(Cog):
         return match_string
 
     def _nyaify(self, input_string: str) -> str:
-        """Nyaifies a string."""
+        """Nyaifies a string by adding a 'y' between an 'n' and a vowel."""
         return REGEX_NYA.sub(SUBSTITUTE_NYA, input_string, 0)
 
     def _emoji(self, strength: float, input_string: str) -> str:
