@@ -6,7 +6,6 @@ from discord.ext import commands
 from discord.ext.commands import Cog, Context, clean_content
 
 from bot.bot import Bot
-from bot.exts.fun.fun import Fun
 from bot.utils import helpers
 
 WORD_REPLACE = {
@@ -117,7 +116,7 @@ class Uwu(Cog):
         if (fun_cog := ctx.bot.get_cog("Fun")):
             text, embed = await fun_cog._get_text_and_embed(ctx, text)
 
-           # Grabs the text from the embed for uwuification.
+            # Grabs the text from the embed for uwuification.
             if embed is not None:
                 embed = fun_cog._convert_embed(self._uwuify, embed)
         else:
