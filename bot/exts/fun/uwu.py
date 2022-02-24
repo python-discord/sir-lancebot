@@ -114,11 +114,14 @@ class Uwu(Cog):
         '.uwu Hello, my name is John' returns something like
         'hewwo, m-my name is j-john nyaa~'.
         """
-        text, embed = await Fun._get_text_and_embed(ctx, text)
+        if (fun_cog := ctx.bot.get_cog("Fun")):
+            text, embed = await fun_cog._get_text_and_embed(ctx, text)
 
-        # Grabs the text from the embed for uwuification.
-        if embed is not None:
-            embed = Fun._convert_embed(self._uwuify, embed)
+           # Grabs the text from the embed for uwuification.
+           if embed is not None:
+               embed = fun_cog._convert_embed(self._uwuify, embed)
+       else:
+            embed = None
         converted_text = self._uwuify(text)
         converted_text = helpers.suppress_links(converted_text)
 
