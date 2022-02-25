@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   lint:
-    name: Run pre-commit & flake8
+    name: Run linting & tests
     runs-on: ubuntu-latest
     env:
       # List of licenses that are compatible with the MIT License and
@@ -26,6 +26,9 @@ jobs:
         Mozilla Public License 2.0 (MPL 2.0);
         Public Domain;
         Python Software Foundation License
+      # See https://github.com/pre-commit/pre-commit/issues/2178#issuecomment-1002163763
+      # for why we set this.
+      SETUPTOOLS_USE_DISTUTILS: stdlib
 
 # Configure pip to cache dependencies and do a user install
       PIP_NO_CACHE_DIR: false
@@ -82,6 +85,14 @@ jobs:
         run: |
           pip-licenses --allow-only="$ALLOWED_LICENSE" \
             --package $(poetry export -f requirements.txt --without-hashes | sed "s/==.*//g" | tr "\n" " ")
+
+      # Attempt to run the bot. Setting `IN_CI` to true, so bot.run() is never called.
+      # This is to catch import and cog setup errors that may appear in PRs, to avoid crash loops if merged.
+      - name: Attempt bot setup
+        run: "python -m bot"
+        env:
+          USE_FAKEREDIS: true
+          IN_CI: true
 
       # This step caches our pre-commit environment. To make sure we
       # do create a new environment when our pre-commit setup changes,
