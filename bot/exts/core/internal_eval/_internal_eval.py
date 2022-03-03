@@ -34,6 +34,8 @@ RAW_CODE_REGEX = re.compile(
     re.DOTALL                               # "." also matches newlines
 )
 
+MAX_LENGTH = 99980
+
 
 class InternalEval(commands.Cog):
     """Top secret code evaluation for admins and owners."""
@@ -48,7 +50,7 @@ class InternalEval(commands.Cog):
     @staticmethod
     def shorten_output(
             output: str,
-            max_length: int = 99980,
+            max_length: int = 1900,
             placeholder: str = "\n[output truncated]"
     ) -> str:
         """
@@ -85,7 +87,7 @@ class InternalEval(commands.Cog):
 
     async def _upload_output(self, output: str) -> Optional[str]:
         """Upload `internal eval` output to our pastebin and return the url."""
-        data = self.shorten_output(output)
+        data = self.shorten_output(output, max_length=MAX_LENGTH)
         try:
             async with self.bot.http_session.post(
                 "https://paste.pythondiscord.com/documents", data=data, raise_for_status=True
