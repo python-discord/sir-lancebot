@@ -31,7 +31,7 @@ class EasterFacts(commands.Cog):
         """A background task that sends an easter egg fact in the event channel everyday."""
         await self.bot.wait_until_guild_available()
 
-        channel = self.bot.get_channel(Channels.community_bot_commands)
+        channel = self.bot.get_channel(Channels.sir_lancebot_playground)
         await channel.send(embed=self.make_embed())
 
     @commands.command(name="eggfact", aliases=("fact",))
