@@ -86,7 +86,10 @@ class Epoch(commands.Cog):
         view = TimestampMenuView(ctx, self._format_dates(date_time), epoch)
         original = await ctx.send(f"`{epoch}`", view=view)
         await view.wait()  # wait until expiration before removing the dropdown
-        await original.edit(view=None)
+        try:
+            await original.edit(view=None)
+        except discord.NotFound:  # disregard the error message if the message is deleled
+            pass
 
     @staticmethod
     def _format_dates(date: arrow.Arrow) -> list[str]:
