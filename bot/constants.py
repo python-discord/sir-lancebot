@@ -157,6 +157,7 @@ class Logging(NamedTuple):
 
 class Colours:
     blue = 0x0279FD
+    twitter_blue = 0x1DA1F2
     bright_green = 0x01D277
     dark_green = 0x1F8B4C
     orange = 0xE67E22
