@@ -203,6 +203,17 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "emoji"
+version = "1.6.3"
+description = "Emoji for Python"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.extras]
+dev = ["pytest", "coverage", "coveralls"]
+
+[[package]]
 name = "emojis"
 version = "0.6.0"
 description = "Emojis for Python"
@@ -824,7 +835,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "e824a5fa909d43e861478178ad7e77ee04be05a60cd3028bda8bd4754c848616"
+content-hash = "27075494e06333e5934e751f9847f419efb712b6d4d4e6173785d47319de1f29"
 
 [metadata.files]
 aiodns = [
@@ -974,6 +985,9 @@ deprecated = [
 distlib = [
     {file = "distlib-0.3.4-py2.py3-none-any.whl", hash = "sha256:6564fe0a8f51e734df6333d08b8b94d4ea8ee6b99b5ed50613f731fd4089f34b"},
     {file = "distlib-0.3.4.zip", hash = "sha256:e4b58818180336dc9c529bfb9a0b58728ffc09ad92027a3f30b7cd91e3458579"},
+]
+emoji = [
+    {file = "emoji-1.6.3.tar.gz", hash = "sha256:cc28bdc1010b1c03c241f69c7af1e8715144ef45a273bfadc14dc89319ba26d0"},
 ]
 emojis = [
     {file = "emojis-0.6.0-py3-none-any.whl", hash = "sha256:7da34c8a78ae262fd68cef9e2c78a3c1feb59784489eeea0f54ba1d4b7111c7c"},

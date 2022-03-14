@@ -56,7 +56,7 @@ def _process_image(data: bytes, out_file: BinaryIO) -> None:
 class InvalidLatexError(Exception):
     """Represents an error caused by invalid latex."""
 
-    def __init__(self, logs: str):
+    def __init__(self, logs: Optional[str]):
         super().__init__(logs)
         self.logs = logs
 
@@ -73,7 +73,7 @@ class Latex(commands.Cog):
         async with self.bot.http_session.post(LATEX_API_URL, data=payload, raise_for_status=True) as response:
             response_json = await response.json()
         if response_json["status"] != "success":
-            raise InvalidLatexError(logs=response_json["log"])
+            raise InvalidLatexError(logs=response_json.get("log"))
         async with self.bot.http_session.get(
             f"{LATEX_API_URL}/{response_json['filename']}",
             raise_for_status=True
@@ -110,12 +110,15 @@ class Latex(commands.Cog):
                     with open(image_path, "wb") as out_file:
                         await self._generate_image(TEMPLATE.substitute(text=query), out_file)
                 except InvalidLatexError as err:
-                    logs_paste_url = await self._upload_to_pastebin(err.logs)
                     embed = discord.Embed(title="Failed to render input.")
-                    if logs_paste_url:
-                        embed.description = f"[View Logs]({logs_paste_url})"
+                    if err.logs is None:
+                        embed.description = "No logs available."
                     else:
-                        embed.description = "Couldn't upload logs."
+                        logs_paste_url = await self._upload_to_pastebin(err.logs)
+                        if logs_paste_url:
+                            embed.description = f"[View Logs]({logs_paste_url})"
+                        else:
+                            embed.description = "Couldn't upload logs."
                     await ctx.send(embed=embed)
                     image_path.unlink()
                     return
