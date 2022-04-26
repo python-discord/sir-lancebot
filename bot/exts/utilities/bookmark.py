@@ -75,7 +75,8 @@ class Bookmark(commands.Cog):
             return
         await channel.send(embed=error_embed)
 
-    @commands.command(name="bookmark", aliases=("bm", "pin"))
+    @commands.group(name="bookmark", aliases=("bm", "pin"), invoke_without_command=True)
+    @commands.guild_only()
     @whitelist_override(roles=(Roles.everyone,))
     async def bookmark(
         self,
@@ -145,6 +146,30 @@ class Bookmark(commands.Cog):
             bookmarked_users.append(user.id)
 
         await reaction_message.delete()
+
+    @commands.dm_only()
+    @bookmark.command(name="delete", aliases=("del", "rm"), root_aliases=("unbm", "unbookmark", "dmdelete", "dmdel"))
+    async def delete_bookmark(
+        self,
+        ctx: commands.Context,
+        target_message: Optional[WrappedMessageConverter]
+    ) -> None:
+        """
+        Delete the referenced DM message by the member.
+
+        Members can either give a message as an argument, or reply to a message.
+        This allows deleting any message in the user's DM with sir-lancebot.
+        """
+        target_message: Optional[discord.Message] = target_message or getattr(ctx.message.reference, "resolved", None)
+        if target_message is None:
+            raise commands.UserInputError(MESSAGE_NOT_FOUND_ERROR)
+
+        if target_message.channel != ctx.channel:
+            raise commands.UserInputError(":x: You can only delete messages in your own DMs!")
+        elif target_message.author != self.bot.user:
+            raise commands.UserInputError(":x: You can only delete messages sent by Sir Lancebot!")
+
+        await target_message.delete()
 
 
 def setup(bot: Bot) -> None:
