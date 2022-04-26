@@ -75,25 +75,6 @@ class Bookmark(commands.Cog):
             return
         await channel.send(embed=error_embed)
 
-    @staticmethod
-    async def send_reaction_embed(
-        channel: discord.TextChannel,
-        target_message: discord.Message
-    ) -> discord.Message:
-        """Sends an embed, with a reaction, so users can react to bookmark the message too."""
-        message = await channel.send(
-            embed=discord.Embed(
-                description=(
-                    f"React with {BOOKMARK_EMOJI} to be sent your very own bookmark to "
-                    f"[this message]({target_message.jump_url})."
-                ),
-                colour=Colours.soft_green
-            )
-        )
-
-        await message.add_reaction(BOOKMARK_EMOJI)
-        return message
-
     @commands.command(name="bookmark", aliases=("bm", "pin"))
     @whitelist_override(roles=(Roles.everyone,))
     async def bookmark(
@@ -122,6 +103,21 @@ class Bookmark(commands.Cog):
             await ctx.send(embed=embed)
             return
 
+        await self.action_bookmark(ctx.channel, ctx.author, target_message, title)
+
+        # Keep track of who has already bookmarked, so users can't spam reactions and cause loads of DMs
+        bookmarked_users = [ctx.author.id]
+
+        reaction_embed = discord.Embed(
+            description=(
+                f"React with {BOOKMARK_EMOJI} to be sent your very own bookmark to "
+                f"[this message]({ctx.message.jump_url})."
+            ),
+            colour=Colours.soft_green
+        )
+        reaction_message = await ctx.send(embed=reaction_embed)
+        await reaction_message.add_reaction(BOOKMARK_EMOJI)
+
         def event_check(reaction: discord.Reaction, user: discord.Member) -> bool:
             """Make sure that this reaction is what we want to operate on."""
             return (
@@ -137,11 +133,6 @@ class Bookmark(commands.Cog):
                     user.id != self.bot.user.id
                 ))
             )
-        await self.action_bookmark(ctx.channel, ctx.author, target_message, title)
-
-        # Keep track of who has already bookmarked, so users can't spam reactions and cause loads of DMs
-        bookmarked_users = [ctx.author.id]
-        reaction_message = await self.send_reaction_embed(ctx.channel, target_message)
 
         while True:
             try:
