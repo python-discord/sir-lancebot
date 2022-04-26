@@ -16,6 +16,13 @@ log = logging.getLogger(__name__)
 # Number of seconds to wait for other users to bookmark the same message
 TIMEOUT = 120
 BOOKMARK_EMOJI = "📌"
+MESSAGE_NOT_FOUND_ERROR = (
+    "You must either provide a valid message to bookmark, or reply to one."
+    "\n\nThe lookup strategy for a message is as follows (in order):"
+    "\n1. Lookup by '{channel ID}-{message ID}' (retrieved by shift-clicking on 'Copy ID')"
+    "\n2. Lookup by message ID (the message **must** be in the current channel)"
+    "\n3. Lookup by message URL"
+)
 
 
 class Bookmark(commands.Cog):
@@ -95,17 +102,16 @@ class Bookmark(commands.Cog):
         *,
         title: str = "Bookmark"
     ) -> None:
-        """Send the author a link to `target_message` via DMs."""
-        if not target_message:
-            if not ctx.message.reference:
-                raise commands.UserInputError(
-                    "You must either provide a valid message to bookmark, or reply to one."
-                    "\n\nThe lookup strategy for a message is as follows (in order):"
-                    "\n1. Lookup by '{channel ID}-{message ID}' (retrieved by shift-clicking on 'Copy ID')"
-                    "\n2. Lookup by message ID (the message **must** be in the context channel)"
-                    "\n3. Lookup by message URL"
-                )
-            target_message = ctx.message.reference.resolved
+        """
+        Send the author a link to the specified message via DMs.
+
+        Members can either give a message as an argument, or reply to a message.
+
+        Bookmarks can subsequently be deleted by using the `bookmark delete` command.
+        """
+        target_message: Optional[discord.Message] = target_message or getattr(ctx.message.reference, "resolved", None)
+        if target_message is None:
+            raise commands.UserInputError(MESSAGE_NOT_FOUND_ERROR)
 
         # Prevent users from bookmarking a message in a channel they don't have access to
         permissions = target_message.channel.permissions_for(ctx.author)
