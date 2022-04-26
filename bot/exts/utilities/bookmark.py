@@ -64,7 +64,11 @@ class Bookmark(commands.Cog):
         target_message: discord.Message,
         title: str
     ) -> None:
-        """Sends the bookmark DM, or sends an error embed when a member bookmarks a message."""
+        """
+        Sends the given target_message as a bookmark to the member in DMs to the user.
+
+        Send an error embed instead if the member has DMs disabled.
+        """
         embed = self.build_bookmark_dm(target_message, title)
         try:
             await member.send(embed=embed)
