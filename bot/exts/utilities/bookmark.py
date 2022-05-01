@@ -151,27 +151,31 @@ class Bookmark(commands.Cog):
 
         await reaction_message.delete()
 
-    @commands.dm_only()
     @bookmark.command(name="delete", aliases=("del", "rm"), root_aliases=("unbm", "unbookmark", "dmdelete", "dmdel"))
+    @whitelist_override(bypass_defaults=True, allow_dm=True)
     async def delete_bookmark(
         self,
         ctx: commands.Context,
         target_message: Optional[WrappedMessageConverter]
     ) -> None:
         """
-        Delete the referenced DM message by the member.
+        Delete the target message specified by the member. Must be ran in DMs targetting a message sent by Sir-Lancebot.
 
-        Members can either give a message as an argument, or reply to a message.
-        This allows deleting any message in the user's DM with sir-lancebot.
+        `target_message` may be a message link, or an ID that references the message,
+        Instead of giving a `target_message` the user may also reply to the message to delete.
+
+        This command allows deleting any message sent by Sir-Lancebot in the user's DMs.
         """
         target_message: Optional[discord.Message] = target_message or getattr(ctx.message.reference, "resolved", None)
         if target_message is None:
             raise commands.UserInputError(MESSAGE_NOT_FOUND_ERROR)
 
-        if target_message.channel != ctx.channel:
-            raise commands.UserInputError(":x: You can only delete messages in your own DMs!")
+        if not isinstance(ctx.channel, discord.DMChannel):
+            raise commands.UserInputError("You can only run this command your own DMs!")
+        elif target_message.channel != ctx.channel:
+            raise commands.UserInputError("You can only delete messages in your own DMs!")
         elif target_message.author != self.bot.user:
-            raise commands.UserInputError(":x: You can only delete messages sent by Sir Lancebot!")
+            raise commands.UserInputError("You can only delete messages sent by Sir Lancebot!")
 
         await target_message.delete()
 
