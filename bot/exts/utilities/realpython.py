@@ -1,5 +1,6 @@
 import logging
 from html import unescape
+from typing import Optional
 from urllib.parse import quote_plus
 
 from discord import Embed
@@ -31,9 +32,18 @@ class RealPython(commands.Cog):
 
     @commands.command(aliases=["rp"])
     @commands.cooldown(1, 10, commands.cooldowns.BucketType.user)
-    async def realpython(self, ctx: commands.Context, *, user_search: str) -> None:
-        """Send 5 articles that match the user's search terms."""
-        params = {"q": user_search, "limit": 5, "kind": "article"}
+    async def realpython(self, ctx: commands.Context, amount: Optional[int] = 5, *, user_search: str) -> None:
+        """
+        Send some articles from RealPython that match the search terms.
+
+        By default the top 5 matches are sent, this can be overwritten to
+        a number between 1 and 5 by specifying an amount before the search query.
+        """
+        if not 1 <= amount <= 5:
+            await ctx.send("`amount` must be between 1 and 5 (inclusive).")
+            return
+
+        params = {"q": user_search, "limit": amount, "kind": "article"}
         async with self.bot.http_session.get(url=API_ROOT, params=params) as response:
             if response.status != 200:
                 logger.error(

@@ -30,7 +30,7 @@ class PrideFacts(commands.Cog):
         """Background task to post the daily pride fact every day."""
         await self.bot.wait_until_guild_available()
 
-        channel = self.bot.get_channel(Channels.community_bot_commands)
+        channel = self.bot.get_channel(Channels.sir_lancebot_playground)
         await self.send_select_fact(channel, datetime.utcnow())
 
     async def send_random_fact(self, ctx: commands.Context) -> None:

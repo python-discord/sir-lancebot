@@ -47,12 +47,12 @@ class SpookyReact(Cog):
         Short-circuit helper check.
 
         Return True if:
-          * author is the bot
+          * author is a bot
           * prefix is not None
         """
-        # Check for self reaction
-        if message.author == self.bot.user:
-            log.debug(f"Ignoring reactions on self message. Message ID: {message.id}")
+        # Check if message author is a bot
+        if message.author.bot:
+            log.debug(f"Ignoring reactions on bot message. Message ID: {message.id}")
             return True
 
         # Check for command invocation

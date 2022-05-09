@@ -143,7 +143,7 @@ class SpookyNameRate(Cog):
             if data["author"] == ctx.author.id:
                 await ctx.send(
                     "But you have already added an entry! Type "
-                    f"`{self.bot.command_prefix}spookynamerate "
+                    f"`{Client.prefix}spookynamerate "
                     "delete` to delete it, and then you can add it again"
                 )
                 return
@@ -185,7 +185,7 @@ class SpookyNameRate(Cog):
                 return
 
         await ctx.send(
-            f"But you don't have an entry... :eyes: Type `{self.bot.command_prefix}spookynamerate add your entry`"
+            f"But you don't have an entry... :eyes: Type `{Client.prefix}spookynamerate add your entry`"
         )
 
     @Cog.listener()
@@ -223,9 +223,9 @@ class SpookyNameRate(Cog):
         if self.first_time:
             await channel.send(
                 "Okkey... Welcome to the **Spooky Name Rate Game**! It's a relatively simple game.\n"
-                f"Everyday, a random name will be sent in <#{Channels.community_bot_commands}> "
+                f"Everyday, a random name will be sent in <#{Channels.sir_lancebot_playground}> "
                 "and you need to try and spookify it!\nRegister your name using "
-                f"`{self.bot.command_prefix}spookynamerate add spookified name`"
+                f"`{Client.prefix}spookynamerate add spookified name`"
             )
 
             await self.data.set("first_time", False)
@@ -359,10 +359,10 @@ class SpookyNameRate(Cog):
         """Gets the sir-lancebot-channel after waiting until ready."""
         await self.bot.wait_until_ready()
         channel = self.bot.get_channel(
-            Channels.community_bot_commands
-        ) or await self.bot.fetch_channel(Channels.community_bot_commands)
+            Channels.sir_lancebot_playground
+        ) or await self.bot.fetch_channel(Channels.sir_lancebot_playground)
         if not channel:
-            logger.warning("Bot is unable to get the #seasonalbot-commands channel. Please check the channel ID.")
+            logger.warning("Bot is unable to get the #sir-lancebot-playground channel. Please check the channel ID.")
         return channel
 
     @staticmethod

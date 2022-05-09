@@ -7,7 +7,7 @@ import discord
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Categories, Colours, ERROR_REPLIES, Icons, WHITELISTED_CHANNELS
+from bot.constants import Colours, ERROR_REPLIES, Icons, Roles
 from bot.utils.converters import WrappedMessageConverter
 from bot.utils.decorators import whitelist_override
 
@@ -16,7 +16,6 @@ log = logging.getLogger(__name__)
 # Number of seconds to wait for other users to bookmark the same message
 TIMEOUT = 120
 BOOKMARK_EMOJI = "📌"
-WHITELISTED_CATEGORIES = (Categories.help_in_use,)
 
 
 class Bookmark(commands.Cog):
@@ -87,8 +86,8 @@ class Bookmark(commands.Cog):
         await message.add_reaction(BOOKMARK_EMOJI)
         return message
 
-    @whitelist_override(channels=WHITELISTED_CHANNELS, categories=WHITELISTED_CATEGORIES)
     @commands.command(name="bookmark", aliases=("bm", "pin"))
+    @whitelist_override(roles=(Roles.everyone,))
     async def bookmark(
         self,
         ctx: commands.Context,
@@ -99,7 +98,13 @@ class Bookmark(commands.Cog):
         """Send the author a link to `target_message` via DMs."""
         if not target_message:
             if not ctx.message.reference:
-                raise commands.UserInputError("You must either provide a valid message to bookmark, or reply to one.")
+                raise commands.UserInputError(
+                    "You must either provide a valid message to bookmark, or reply to one."
+                    "\n\nThe lookup strategy for a message is as follows (in order):"
+                    "\n1. Lookup by '{channel ID}-{message ID}' (retrieved by shift-clicking on 'Copy ID')"
+                    "\n2. Lookup by message ID (the message **must** be in the context channel)"
+                    "\n3. Lookup by message URL"
+                )
             target_message = ctx.message.reference.resolved
 
         # Prevent users from bookmarking a message in a channel they don't have access to

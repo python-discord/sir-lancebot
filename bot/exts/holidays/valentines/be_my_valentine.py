@@ -7,13 +7,15 @@ import discord
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Channels, Colours, Lovefest, Month
+from bot.constants import Channels, Colours, Lovefest, Month, PYTHON_PREFIX
 from bot.utils.decorators import in_month
-from bot.utils.extensions import invoke_help_command
+from bot.utils.exceptions import MovedCommandError
 
 log = logging.getLogger(__name__)
 
 HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_heart:", ":two_hearts:"]
+
+MOVED_COMMAND = f"{PYTHON_PREFIX}subscribe"
 
 
 class BeMyValentine(commands.Cog):
@@ -30,40 +32,14 @@ class BeMyValentine(commands.Cog):
         return loads(p.read_text("utf8"))
 
     @in_month(Month.FEBRUARY)
-    @commands.group(name="lovefest")
+    @commands.command(name="lovefest", help=f"NOTE: This command has been moved to {MOVED_COMMAND}")
     async def lovefest_role(self, ctx: commands.Context) -> None:
         """
-        Subscribe or unsubscribe from the lovefest role.
+        Deprecated lovefest role command.
 
-        The lovefest role makes you eligible to receive anonymous valentines from other users.
-
-        1) use the command \".lovefest sub\" to get the lovefest role.
-        2) use the command \".lovefest unsub\" to get rid of the lovefest role.
+        This command has been moved to bot, and will be removed in the future.
         """
-        if not ctx.invoked_subcommand:
-            await invoke_help_command(ctx)
-
-    @lovefest_role.command(name="sub")
-    async def add_role(self, ctx: commands.Context) -> None:
-        """Adds the lovefest role."""
-        user = ctx.author
-        role = ctx.guild.get_role(Lovefest.role_id)
-        if role not in ctx.author.roles:
-            await user.add_roles(role)
-            await ctx.send("The Lovefest role has been added !")
-        else:
-            await ctx.send("You already have the role !")
-
-    @lovefest_role.command(name="unsub")
-    async def remove_role(self, ctx: commands.Context) -> None:
-        """Removes the lovefest role."""
-        user = ctx.author
-        role = ctx.guild.get_role(Lovefest.role_id)
-        if role not in ctx.author.roles:
-            await ctx.send("You dont have the lovefest role.")
-        else:
-            await user.remove_roles(role)
-            await ctx.send("The lovefest role has been successfully removed!")
+        raise MovedCommandError(MOVED_COMMAND)
 
     @commands.cooldown(1, 1800, commands.BucketType.user)
     @commands.group(name="bemyvalentine", invoke_without_command=True)
@@ -94,7 +70,7 @@ class BeMyValentine(commands.Cog):
             raise commands.UserInputError("Come on, you can't send a valentine to yourself :expressionless:")
 
         emoji_1, emoji_2 = self.random_emoji()
-        channel = self.bot.get_channel(Channels.community_bot_commands)
+        channel = self.bot.get_channel(Channels.sir_lancebot_playground)
         valentine, title = self.valentine_check(valentine_type)
 
         embed = discord.Embed(

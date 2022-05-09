@@ -11,7 +11,7 @@ from PIL import Image, ImageDraw, ImageFont
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Colours, MODERATION_ROLES
+from bot.constants import MODERATION_ROLES
 from bot.utils.decorators import with_role
 
 DECK = list(product(*[(0, 1, 2)]*4))
@@ -130,6 +130,9 @@ class DuckGame:
         while len(self.solutions) < minimum_solutions:
             self.board = random.sample(DECK, size)
 
+        self.board_msg = None
+        self.found_msg = None
+
     @property
     def board(self) -> list[tuple[int]]:
         """Accesses board property."""
@@ -181,7 +184,7 @@ class DuckGamesDirector(commands.Cog):
     )
     @commands.cooldown(rate=1, per=2, type=commands.BucketType.channel)
     async def start_game(self, ctx: commands.Context) -> None:
-        """Generate a board, send the game embed, and end the game after a time limit."""
+        """Start a new Duck Duck Duck Goose game."""
         if ctx.channel.id in self.current_games:
             await ctx.send("There's already a game running!")
             return
@@ -191,8 +194,8 @@ class DuckGamesDirector(commands.Cog):
         game.running = True
         self.current_games[ctx.channel.id] = game
 
-        game.msg_content = ""
-        game.embed_msg = await self.send_board_embed(ctx, game)
+        game.board_msg = await self.send_board_embed(ctx, game)
+        game.found_msg = await self.send_found_embed(ctx)
         await asyncio.sleep(GAME_DURATION)
 
         # Checking for the channel ID in the currently running games is not sufficient.
@@ -245,13 +248,13 @@ class DuckGamesDirector(commands.Cog):
         if answer in game.solutions:
             game.claimed_answers[answer] = msg.author
             game.scores[msg.author] += CORRECT_SOLN
-            await self.display_claimed_answer(game, msg.author, answer)
+            await self.append_to_found_embed(game, f"{str(answer):12s}  -  {msg.author.display_name}")
         else:
             await msg.add_reaction(EMOJI_WRONG)
             game.scores[msg.author] += INCORRECT_SOLN
 
     async def send_board_embed(self, ctx: commands.Context, game: DuckGame) -> discord.Message:
-        """Create and send the initial game embed. This will be edited as the game goes on."""
+        """Create and send an embed to display the board."""
         image = assemble_board_image(game.board, game.rows, game.columns)
         with BytesIO() as image_stream:
             image.save(image_stream, format="png")
@@ -259,19 +262,27 @@ class DuckGamesDirector(commands.Cog):
             file = discord.File(fp=image_stream, filename="board.png")
         embed = discord.Embed(
             title="Duck Duck Duck Goose!",
-            color=Colours.bright_green,
+            color=discord.Color.dark_purple(),
         )
         embed.set_image(url="attachment://board.png")
         return await ctx.send(embed=embed, file=file)
 
-    async def display_claimed_answer(self, game: DuckGame, author: discord.Member, answer: tuple[int]) -> None:
-        """Add a claimed answer to the game embed."""
+    async def send_found_embed(self, ctx: commands.Context) -> discord.Message:
+        """Create and send an embed to display claimed answers. This will be edited as the game goes on."""
+        # Can't be part of the board embed because of discord.py limitations with editing an embed with an image.
+        embed = discord.Embed(
+            title="Flights Found",
+            color=discord.Color.dark_purple(),
+        )
+        return await ctx.send(embed=embed)
+
+    async def append_to_found_embed(self, game: DuckGame, text: str) -> None:
+        """Append text to the claimed answers embed."""
         async with game.editing_embed:
-            # We specifically edit the message contents instead of the embed
-            # Because we load in the image from the file, editing any portion of the embed
-            # Does weird things to the image and this works around that weirdness
-            game.msg_content = f"{game.msg_content}\n{str(answer):12s}  -  {author.display_name}"
-            await game.embed_msg.edit(content=game.msg_content)
+            found_embed, = game.found_msg.embeds
+            old_desc = found_embed.description or ""
+            found_embed.description = f"{old_desc.rstrip()}\n{text}"
+            await game.found_msg.edit(embed=found_embed)
 
     async def end_game(self, channel: discord.TextChannel, game: DuckGame, end_message: str) -> None:
         """Edit the game embed to reflect the end of the game and mark the game as not running."""
@@ -296,8 +307,7 @@ class DuckGamesDirector(commands.Cog):
             missed_text = "Flights everyone missed:\n" + "\n".join(f"{ans}" for ans in missed)
         else:
             missed_text = "All the flights were found!"
-
-        await game.embed_msg.edit(content=f"{missed_text}")
+        await self.append_to_found_embed(game, f"\n{missed_text}")
 
     @start_game.command(name="help")
     async def show_rules(self, ctx: commands.Context) -> None:

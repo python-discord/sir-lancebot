@@ -18,7 +18,7 @@ from bot.utils.pagination import LinePaginator
 log = logging.getLogger(__name__)
 
 
-UNLOAD_BLACKLIST = {f"{exts.__name__}.utils.extensions"}
+UNLOAD_BLACKLIST = {f"{exts.__name__}.core.extensions"}
 BASE_PATH_LEN = len(exts.__name__.split("."))
 
 
@@ -152,7 +152,7 @@ class Extensions(commands.Cog):
         Grey indicates that the extension is unloaded.
         Green indicates that the extension is currently loaded.
         """
-        embed = Embed(colour=Colour.blurple())
+        embed = Embed(colour=Colour.og_blurple())
         embed.set_author(
             name="Extensions List",
             url=Client.github_bot_repo,

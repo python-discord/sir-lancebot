@@ -3,7 +3,7 @@ import random
 from typing import Callable, Optional, Union
 
 import discord
-from discord.ext.commands import Cog, Context, check, group, guild_only
+from discord.ext.commands import Cog, Context, check, group
 
 from bot.bot import Bot
 from bot.constants import Emojis
@@ -72,10 +72,12 @@ class Player:
 class AI:
     """Tic Tac Toe AI class for against computer gaming."""
 
-    def __init__(self, symbol: str):
+    def __init__(self, bot_user: discord.Member, symbol: str):
+        self.user = bot_user
         self.symbol = symbol
 
-    async def get_move(self, board: dict[int, str], _: discord.Message) -> tuple[bool, int]:
+    @staticmethod
+    async def get_move(board: dict[int, str], _: discord.Message) -> tuple[bool, int]:
         """Get move from AI. AI use Minimax strategy."""
         possible_moves = [i for i, emoji in board.items() if emoji in list(Emojis.number_emojis.values())]
 
@@ -97,8 +99,8 @@ class AI:
         return False, random.choice(open_edges)
 
     def __str__(self) -> str:
-        """Return `AI` as user name."""
-        return "AI"
+        """Return mention of @Sir Lancebot."""
+        return self.user.mention
 
 
 class Game:
@@ -107,6 +109,7 @@ class Game:
     def __init__(self, players: list[Union[Player, AI]], ctx: Context):
         self.players = players
         self.ctx = ctx
+        self.channel = ctx.channel
         self.board = {
             1: Emojis.number_emojis[1],
             2: Emojis.number_emojis[2],
@@ -173,7 +176,8 @@ class Game:
             self.canceled = True
             return False, "User declined"
 
-    async def add_reactions(self, msg: discord.Message) -> None:
+    @staticmethod
+    async def add_reactions(msg: discord.Message) -> None:
         """Add number emojis to message."""
         for nr in Emojis.number_emojis.values():
             await msg.add_reaction(nr)
@@ -249,7 +253,6 @@ class TicTacToe(Cog):
     def __init__(self):
         self.games: list[Game] = []
 
-    @guild_only()
     @is_channel_free()
     @is_requester_free()
     @group(name="tictactoe", aliases=("ttt", "tic"), invoke_without_command=True)
@@ -265,7 +268,7 @@ class TicTacToe(Cog):
             return
         if opponent is None:
             game = Game(
-                [Player(ctx.author, ctx, Emojis.x_square), AI(Emojis.o_square)],
+                [Player(ctx.author, ctx, Emojis.x_square), AI(ctx.me, Emojis.o_square)],
                 ctx
             )
         else:

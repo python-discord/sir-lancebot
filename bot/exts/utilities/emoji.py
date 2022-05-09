@@ -107,11 +107,11 @@ class Emojis(commands.Cog):
             title=f"Emoji Information: {emoji.name}",
             description=textwrap.dedent(f"""
                 **Name:** {emoji.name}
-                **Created:** {time_since(emoji.created_at, precision="hours")}
-                **Date:** {datetime.strftime(emoji.created_at, "%d/%m/%Y")}
+                **Created:** {time_since(emoji.created_at.replace(tzinfo=None), precision="hours")}
+                **Date:** {datetime.strftime(emoji.created_at.replace(tzinfo=None), "%d/%m/%Y")}
                 **ID:** {emoji.id}
             """),
-            color=Color.blurple(),
+            color=Color.og_blurple(),
             url=str(emoji.url),
         ).set_thumbnail(url=emoji.url)
 

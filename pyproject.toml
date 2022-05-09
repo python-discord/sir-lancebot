@@ -12,24 +12,28 @@ aiodns = "~=2.0"
 aioredis = "~1.3"
 rapidfuzz = "~=1.4"
 arrow = "~=1.1.0"
-pillow = "~=8.1"
+beautifulsoup4 = "~=4.9"
+pillow = "~=9.0"
 sentry-sdk = "~=0.19"
 PyYAML = "~=5.4"
 async-rediscache = {extras = ["fakeredis"], version = "~=0.1.4"}
 emojis = "~=0.6.0"
-matplotlib = "~=3.4.1"
+coloredlogs = "~=15.0"
+colorama = { version = "~=0.4.3", markers = "sys_platform == 'win32'" }
+lxml = "~=4.6"
+emoji = "^1.6.1"
 
 [tool.poetry.dev-dependencies]
 flake8 = "~=3.8"
 flake8-annotations = "~=2.3"
 flake8-bugbear = "~=20.1"
 flake8-docstrings = "~=1.5"
-flake8-import-order = "~=0.18"
 flake8-string-format = "~=0.3"
 flake8-tidy-imports = "~=4.1"
 flake8-todo = "~=0.7"
+flake8-isort = "~=4.0"
 pep8-naming = "~=0.11"
-pip-licenses = "~=3.5.2"
+pip-licenses = "~=3.5"
 pre-commit = "~=2.1"
 python-dotenv = "~=0.15"
 taskipy = "~=1.6"
@@ -38,7 +42,17 @@ taskipy = "~=1.6"
 start = "python -m bot"
 lint = "pre-commit run --all-files"
 precommit = "pre-commit install"
+isort = "isort ."
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+multi_line_output = 6
+order_by_type = false
+case_sensitive = true
+combine_as_imports = true
+line_length = 120
+atomic = true
+known_first_party = ["bot"]
