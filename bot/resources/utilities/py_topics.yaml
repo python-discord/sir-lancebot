@@ -111,9 +111,12 @@
 
 # media-processing
 971142229462777926:
-    - Which Python package do you prefer for media processing?
+    - Which Python package/library do you prefer for media processing?
     - What exactly is media processing and how can Python be used for it?
-    - What are some ways you could create and manipulate a video using Python?
+    - What are some ways you could create and manipulate an image or a video using Python?
+    - What is a good algorithm to use for manipulating images and videos in Python?
+    - What is the most surprising result you got after manipulating an image or a video with Python?
+    - What is your most advanced media processing related achievement?
 
 # microcontrollers
 545603026732318730:
