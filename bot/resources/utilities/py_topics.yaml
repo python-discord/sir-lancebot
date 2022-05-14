@@ -112,13 +112,13 @@
 # media-processing
 971142229462777926:
     - Where do you start with media processing? What is a good beginner project for first-timers in media processing?
-    - What are some ways you could manipulate an image or a video using Python?
-    - What is your favorite / a good algorithm to use for manipulating images and videos with Python?
-    - What is the most surprising result you have gotten after manipulating an image or a video with Python?
-    - What is the worst outcome you have gotten after manipulating an image or a video with Python?
+    - What are some ways you could manipulate media using Python?
+    - What is your favorite / a good algorithm to use for manipulating media with Python?
+    - What is the most surprising result you have gotten after manipulating media with Python?
+    - What is the worst outcome you have gotten after manipulating media with Python?
     - What is your most advanced media processing related achievement?
-    - Do you know any cool tricks for manipulating an image or a video with Python?
-    - Can a computer truly generate and understand art?
+    - Do you know any cool tricks or optimizations for manipulating media with Python?
+    - Can a computer truly generate and/or understand art?
 
 # microcontrollers
 545603026732318730:
