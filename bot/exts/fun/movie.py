@@ -12,10 +12,13 @@ from bot.constants import Tokens
 from bot.utils.extensions import invoke_help_command
 from bot.utils.pagination import ImagePaginator
 
+logger = logging.getLogger(__name__)
+
 # Define base URL of TMDB
 BASE_URL = "https://api.themoviedb.org/3/"
 
-logger = logging.getLogger(__name__)
+# Logo of TMDB
+THUMBNAIL_URL = "https://i.imgur.com/LtFtC8H.png"
 
 # Define movie params, that will be used for every movie request
 MOVIE_PARAMS = {
@@ -196,7 +199,7 @@ class Movie(Cog):
         """Return embed of random movies. Uses name in title."""
         embed = Embed(title=f"Random {name} Movies")
         embed.set_footer(text="This product uses the TMDb API but is not endorsed or certified by TMDb.")
-        embed.set_thumbnail(url="https://i.imgur.com/LtFtC8H.png")
+        embed.set_thumbnail(url=THUMBNAIL_URL)
         return embed
 
 
