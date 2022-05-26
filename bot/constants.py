@@ -112,6 +112,7 @@ class Channels(NamedTuple):
     bot_commands = 267659945086812160
     community_meta = 267659945086812160
     organisation = 551789653284356126
+    data_science_and_ai = 366673247892275221
     devlog = int(environ.get("CHANNEL_DEVLOG", 622895325144940554))
     dev_contrib = 635950537262759947
     mod_meta = 775412552795947058
