@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 TIMEOUT = 120
 BOOKMARK_EMOJI = "📌"
 MESSAGE_NOT_FOUND_ERROR = (
-    "You must either provide a valid message to bookmark, or reply to one."
+    "You must either provide a reference to a valid message, or reply to one."
     "\n\nThe lookup strategy for a message is as follows (in order):"
     "\n1. Lookup by '{channel ID}-{message ID}' (retrieved by shift-clicking on 'Copy ID')"
     "\n2. Lookup by message ID (the message **must** be in the current channel)"
@@ -94,7 +94,7 @@ class Bookmark(commands.Cog):
 
         Members can either give a message as an argument, or reply to a message.
 
-        Bookmarks can subsequently be deleted by using the `bookmark delete` command.
+        Bookmarks can subsequently be deleted by using the `bookmark delete` command in DMs.
         """
         target_message: Optional[discord.Message] = target_message or getattr(ctx.message.reference, "resolved", None)
         if target_message is None:
