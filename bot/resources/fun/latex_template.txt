@@ -1,5 +1,5 @@
 \documentclass{article}
-\usepackage{amsmath}
+\usepackage{amsmath, amssymb}
 \begin{document}
     \pagenumbering{gobble}
     $text
