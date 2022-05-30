@@ -10,6 +10,8 @@ from PIL import Image
 from discord.ext import commands
 
 from bot.bot import Bot
+from bot.constants import Channels, WHITELISTED_CHANNELS
+from bot.utils.decorators import whitelist_override
 
 FORMATTED_CODE_REGEX = re.compile(
     r"(?P<delim>(?P<block>```)|``?)"        # code delimiter: 1-3 backticks; (?P=block) only matches if it's a block
@@ -30,6 +32,10 @@ CACHE_DIRECTORY.mkdir(exist_ok=True)
 TEMPLATE = string.Template(Path("bot/resources/fun/latex_template.txt").read_text())
 
 PAD = 10
+
+LATEX_ALLOWED_CHANNNELS = WHITELISTED_CHANNELS + (
+    Channels.data_science_and_ai,
+)
 
 
 def _prepare_input(text: str) -> str:
@@ -97,6 +103,7 @@ class Latex(commands.Cog):
 
     @commands.command()
     @commands.max_concurrency(1, commands.BucketType.guild, wait=True)
+    @whitelist_override(channels=LATEX_ALLOWED_CHANNNELS)
     async def latex(self, ctx: commands.Context, *, query: str) -> None:
         """Renders the text in latex and sends the image."""
         query = _prepare_input(query)
