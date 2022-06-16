@@ -31,7 +31,8 @@ class RealPython(commands.Cog):
 
     @commands.command(aliases=["rp"])
     @commands.cooldown(1, 10, commands.cooldowns.BucketType.user)
-    async def realpython(self, ctx: commands.Context, amount: Optional[int] = 5, *, user_search: str = None) -> None:
+    async def realpython(self, ctx: commands.Context, amount: Optional[int] = 5, *,
+                         user_search: Optional[str] = None) -> None:
         """
         Send some articles from RealPython that match the search terms.
 
