@@ -41,7 +41,10 @@ class HelpQueryNotFound(ValueError):
     """
     Raised when a HelpSession Query doesn't match a command or cog.
 
-    Contains the custom attribute of ``possible_matches`` which is a list of similar command names.
+    Params:
+    possible_matches: list of similar command names.
+    parent_command: parent command of an invalid subcommand. Only available when an invalid subcommand
+                    has been passed.
     """
 
     def __init__(
