@@ -44,7 +44,9 @@ class HelpQueryNotFound(ValueError):
     Contains the custom attribute of ``possible_matches`` which is a list of similar command names.
     """
 
-    def __init__(self, arg: str, possible_matches: list[str] = None, *, parent_command=None):
+    def __init__(
+            self, arg: str, possible_matches: list[str] = None, *, parent_command: Command = None
+    ) -> None:
         super().__init__(arg)
         self.possible_matches = possible_matches
         self.parent_command = parent_command
