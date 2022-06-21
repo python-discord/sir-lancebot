@@ -8,11 +8,11 @@ from typing import NamedTuple, Union
 from discord import Colour, Embed, HTTPException, Message, Reaction, User
 from discord.ext import commands
 from discord.ext.commands import CheckFailure, Cog as DiscordCog, Command, Context
-from rapidfuzz import process
 
 from bot import constants
 from bot.bot import Bot
 from bot.constants import Emojis
+from bot.utils.commands import get_command_suggestions
 from bot.utils.pagination import FIRST_EMOJI, LAST_EMOJI, LEFT_EMOJI, LinePaginator, RIGHT_EMOJI
 
 DELETE_EMOJI = Emojis.trashcan
@@ -41,14 +41,13 @@ class HelpQueryNotFound(ValueError):
     """
     Raised when a HelpSession Query doesn't match a command or cog.
 
-    Contains the custom attribute of ``possible_matches``.
-    Instances of this object contain a dictionary of any command(s) that were close to matching the
-    query, where keys are the possible matched command names and values are the likeness match scores.
+    Contains the custom attribute of ``possible_matches`` which is a list of similar command names.
     """
 
-    def __init__(self, arg: str, possible_matches: dict = None):
+    def __init__(self, arg: str, possible_matches: list[str] = None, *, parent_command=None):
         super().__init__(arg)
         self.possible_matches = possible_matches
+        self.parent_command = parent_command
 
 
 class HelpSession:
@@ -115,6 +114,9 @@ class HelpSession:
     def _get_query(self, query: str) -> Union[Command, Cog]:
         """Attempts to match the provided query with a valid command or cog."""
         command = self._bot.get_command(query)
+
+        log.info(query)
+        log.info(command)
         if command:
             return command
 
@@ -153,12 +155,17 @@ class HelpSession:
 
         Will pass on possible close matches along with the `HelpQueryNotFound` exception.
         """
-        # Combine command and cog names
-        choices = list(self._bot.all_commands) + list(self._bot.cogs)
+        # Check if parent command in valid incase subcommand is invalid.
+        if " " in query:
+            parent, sub_command = query.split()
+            parent_command = self._bot.get_command(parent)
 
-        result = process.extract(query, choices, score_cutoff=90)
+            if parent_command:
+                raise HelpQueryNotFound(f'Invalid Subcommand.', parent_command=parent_command)
 
-        raise HelpQueryNotFound(f'Query "{query}" not found.', dict(result))
+        similar_commands = get_command_suggestions(list(self._bot.all_commands.keys()), query)
+
+        raise HelpQueryNotFound(f'Query "{query}" not found.', similar_commands)
 
     async def timeout(self, seconds: int = 30) -> None:
         """Waits for a set number of seconds, then stops the help session."""
@@ -507,13 +514,20 @@ class Help(DiscordCog):
         try:
             await HelpSession.start(ctx, *commands)
         except HelpQueryNotFound as error:
+
+            # Send help message of parent command if subcommand is invalid.
+            if cmd := error.parent_command:
+                await ctx.send(str(error))
+                await self.new_help(ctx, cmd.qualified_name)
+                return
+
             embed = Embed()
             embed.colour = Colour.red()
             embed.title = str(error)
 
             if error.possible_matches:
-                matches = "\n".join(error.possible_matches.keys())
-                embed.description = f"**Did you mean:**\n`{matches}`"
+                matches = "\n".join(error.possible_matches)
+                embed.description = f"**Did you mean:**\n{matches}"
 
             await ctx.send(embed=embed)
 

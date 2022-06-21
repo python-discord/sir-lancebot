@@ -1,4 +1,3 @@
-import difflib
 import logging
 import math
 import random
@@ -11,6 +10,7 @@ from sentry_sdk import push_scope
 
 from bot.bot import Bot
 from bot.constants import Channels, Colours, ERROR_REPLIES, NEGATIVE_REPLIES, RedirectOutput
+from bot.utils.commands import get_command_suggestions
 from bot.utils.decorators import InChannelCheckFailure, InMonthCheckFailure
 from bot.utils.exceptions import APIError, MovedCommandError, UserNotPlayingError
 
@@ -158,11 +158,7 @@ class CommandErrorHandler(commands.Cog):
 
     async def send_command_suggestion(self, ctx: commands.Context, command_name: str) -> None:
         """Sends user similar commands if any can be found."""
-        raw_commands = []
-        for cmd in self.bot.walk_commands():
-            if not cmd.hidden:
-                raw_commands += (cmd.name, *cmd.aliases)
-        if similar_command_data := difflib.get_close_matches(command_name, raw_commands, 1):
+        if similar_command_data := get_command_suggestions(list(self.bot.all_commands.keys()), command_name, limit=1):
             similar_command_name = similar_command_data[0]
             similar_command = self.bot.get_command(similar_command_name)
 
