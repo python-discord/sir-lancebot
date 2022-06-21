@@ -161,7 +161,7 @@ class HelpSession:
             parent_command = self._bot.get_command(parent)
 
             if parent_command:
-                raise HelpQueryNotFound(f'Invalid Subcommand.', parent_command=parent_command)
+                raise HelpQueryNotFound('Invalid Subcommand.', parent_command=parent_command)
 
         similar_commands = get_command_suggestions(list(self._bot.all_commands.keys()), query)
 
