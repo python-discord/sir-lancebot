@@ -119,9 +119,6 @@ class HelpSession:
     def _get_query(self, query: str) -> Union[Command, Cog]:
         """Attempts to match the provided query with a valid command or cog."""
         command = self._bot.get_command(query)
-
-        log.info(query)
-        log.info(command)
         if command:
             return command
 
