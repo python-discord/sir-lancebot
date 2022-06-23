@@ -159,7 +159,7 @@ class HelpSession:
         """
         # Check if parent command in valid incase subcommand is invalid.
         if " " in query:
-            parent, sub_command = query.split()
+            parent, *_ = query.split()
             parent_command = self._bot.get_command(parent)
 
             if parent_command:
