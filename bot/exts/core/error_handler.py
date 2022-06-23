@@ -164,17 +164,17 @@ class CommandErrorHandler(commands.Cog):
                 similar_command = self.bot.get_command(similar_command_name)
 
                 if not similar_command:
-                    return
+                    continue
 
                 log_msg = "Cancelling attempt to suggest a command due to failed checks."
                 try:
                     if not await similar_command.can_run(ctx):
                         log.debug(log_msg)
-                        return
+                        continue
                 except commands.errors.CommandError as cmd_error:
                     log.debug(log_msg)
                     await self.on_command_error(ctx, cmd_error)
-                    return
+                    continue
 
                 command_suggestions.append(similar_command_name)
 
