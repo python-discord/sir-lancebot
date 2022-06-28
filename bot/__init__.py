@@ -8,6 +8,7 @@ except ModuleNotFoundError:
 import asyncio
 import logging
 import os
+from typing import TYPE_CHECKING
 
 import arrow
 import sentry_sdk
@@ -16,6 +17,9 @@ from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.redis import RedisIntegration
 
 from bot import log
+
+if TYPE_CHECKING:
+    from bot.bot import Bot
 
 sentry_logging = LoggingIntegration(
     level=logging.DEBUG,
@@ -41,3 +45,5 @@ if os.name == "nt":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 apply_monkey_patches()
+
+instance: "Bot" = None  # Global Bot instance.
