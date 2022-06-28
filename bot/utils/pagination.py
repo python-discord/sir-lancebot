@@ -5,7 +5,6 @@ from typing import Optional
 
 from discord import Embed, Member, Reaction
 from discord.abc import User
-from discord.embeds import EmptyEmbed
 from discord.ext.commands import Context, Paginator
 
 from bot.constants import Emojis
@@ -422,7 +421,7 @@ class ImagePaginator(Paginator):
             # Magic happens here, after page and reaction_type is set
             embed.description = paginator.pages[current_page]
 
-            image = paginator.images[current_page] or EmptyEmbed
+            image = paginator.images[current_page] or None
             embed.set_image(url=image)
 
             embed.set_footer(text=f"Page {current_page + 1}/{len(paginator.pages)}")
