@@ -40,33 +40,10 @@ class Bot(BotBase):
         else:
             await super().on_command_error(context, exception)
 
-    async def check_channels(self) -> None:
-        """Verifies that all channel constants refer to channels which exist."""
-        await self.wait_until_guild_available()
-
-        if constants.Client.debug:
-            log.info("Skipping Channels Check.")
-            return
-
-        all_channels_ids = [channel.id for channel in self.get_all_channels()]
-        for name, channel_id in vars(constants.Channels).items():
-            if name.startswith("_"):
-                continue
-            if channel_id not in all_channels_ids:
-                log.error(f'Channel "{name}" with ID {channel_id} missing')
-
-    async def send_log(self, title: str, details: str = None, *, icon: str = None) -> None:
-        """Send an embed message to the devlog channel."""
+    async def log_to_dev_log(self, title: str, details: str = None, *, icon: str = None) -> None:
+        """Send an embed message to the dev-log channel."""
         await self.wait_until_guild_available()
         devlog = self.get_channel(constants.Channels.devlog)
-
-        if not devlog:
-            log.info(f"Fetching devlog channel as it wasn't found in the cache (ID: {constants.Channels.devlog})")
-            try:
-                devlog = await self.fetch_channel(constants.Channels.devlog)
-            except discord.HTTPException as discord_exc:
-                log.exception("Fetch failed", exc_info=discord_exc)
-                return
 
         if not icon:
             icon = self.user.display_avatar.url
@@ -80,10 +57,6 @@ class Bot(BotBase):
         """Default async initialisation method for discord.py."""
         await super().setup_hook()
 
-        await self.check_channels()
-
         # This is not awaited to avoid a deadlock with any cogs that have
         # wait_until_guild_available in their cog_load method.
         scheduling.create_task(self.load_extensions(exts))
-
-        await self.send_log(self.name, "Connected!")

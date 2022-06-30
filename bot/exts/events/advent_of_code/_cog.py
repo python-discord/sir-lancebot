@@ -87,7 +87,7 @@ class AdventOfCode(commands.Cog):
         try:
             leaderboard = await _helpers.fetch_leaderboard()
         except _helpers.FetchingLeaderboardFailedError:
-            await self.bot.send_log("Unable to fetch AoC leaderboard during role sync.")
+            await self.bot.log_to_dev_log("Unable to fetch AoC leaderboard during role sync.")
             return
 
         placement_leaderboard = json.loads(leaderboard["placement_leaderboard"])
