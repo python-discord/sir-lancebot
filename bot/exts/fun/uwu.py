@@ -116,14 +116,10 @@ class Uwu(Cog):
         'hewwo, m-my name is j-john nyaa~'.
         """
         # If `text` isn't provided then we try to get message content of a replied message
-        if not text:
-            if reference := ctx.message.reference:
-                if isinstance((resolved_message := reference.resolved), discord.Message):
-                    text = resolved_message.content
+        text = text or getattr(ctx.message.reference, "resolved", None)
+        if text is None:
             # If we weren't able to get the content of a replied message
-            if text is None:
-                await ctx.send(content="Your message must have content or you must reply to a message.")
-                return
+            raise commands.UserInputError("Your message must have content or you must reply to a message.")
 
         if fun_cog := ctx.bot.get_cog("Fun"):
             text, embed = await fun_cog._get_text_and_embed(ctx, text)
