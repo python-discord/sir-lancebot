@@ -183,7 +183,7 @@ class GithubInfo(commands.Cog):
         if not issues:
             return
 
-        log.trace(f"Found {issues = }")
+        log.trace("Found %s", issues)
 
         if len(issues) > MAXIMUM_ISSUES:
             embed = discord.Embed(
