@@ -3,9 +3,8 @@ import re
 import typing as t
 from functools import partial
 
-import discord
 from discord.ext import commands
-from discord.ext.commands import Cog, Context
+from discord.ext.commands import Cog, Context, clean_content
 
 from bot.bot import Bot
 from bot.utils import helpers
@@ -120,6 +119,8 @@ class Uwu(Cog):
         if text is None:
             # If we weren't able to get the content of a replied message
             raise commands.UserInputError("Your message must have content or you must reply to a message.")
+
+        await clean_content(fix_channel_mentions=True).convert(ctx, text)
 
         if fun_cog := ctx.bot.get_cog("Fun"):
             text, embed = await fun_cog._get_text_and_embed(ctx, text)
