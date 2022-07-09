@@ -20,7 +20,7 @@ async-rediscache = {extras = ["fakeredis"], version = "~=0.1.4"}
 emojis = "~=0.6.0"
 coloredlogs = "~=15.0"
 colorama = { version = "~=0.4.3", markers = "sys_platform == 'win32'" }
-lxml = "~=4.6"
+lxml = "~=4.9"
 emoji = "^1.6.1"
 
 [tool.poetry.dev-dependencies]
