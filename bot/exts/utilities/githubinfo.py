@@ -7,7 +7,6 @@ from datetime import datetime
 from urllib.parse import quote
 
 import discord
-from aiohttp import ClientResponse
 from discord.ext import commands
 
 from bot.bot import Bot
@@ -55,14 +54,6 @@ class FoundIssue:
 
 
 @dataclass(eq=True, frozen=True)
-class FetchError:
-    """Dataclass representing an error while fetching an issue."""
-
-    return_code: int
-    message: str
-
-
-@dataclass(eq=True, frozen=True)
 class IssueState:
     """Dataclass representing the state of an issue."""
 
@@ -71,6 +62,14 @@ class IssueState:
     url: str
     title: str
     emoji: str
+
+
+class FetchError(Exception):
+    """Error while fetching GitHub content."""
+
+    def __init__(self, return_code: int, message: str):
+        self.return_code = return_code
+        self.message = message
 
 
 class GithubInfo(commands.Cog):
@@ -90,26 +89,16 @@ class GithubInfo(commands.Cog):
         number: int,
         repository: str,
         user: str
-    ) -> t.Union[IssueState, FetchError]:
+    ) -> IssueState:
         """
         Retrieve an issue from a GitHub repository.
 
-        Returns IssueState on success, FetchError on failure.
+        Returns IssueState on success, raises FetchError on error.
         """
         url = ISSUE_ENDPOINT.format(user=user, repository=repository, number=number)
         pulls_url = PR_ENDPOINT.format(user=user, repository=repository, number=number)
 
-        json_data, r = await self.fetch_data(url)
-
-        if r.status == 403:
-            if r.headers.get("X-RateLimit-Remaining") == "0":
-                log.info(f"Ratelimit reached while fetching {url}")
-                return FetchError(403, "Ratelimit reached, please retry in a few minutes.")
-            return FetchError(403, "Cannot access issue.")
-        elif r.status in (404, 410):
-            return FetchError(r.status, "Issue not found.")
-        elif r.status != 200:
-            return FetchError(r.status, "Error while fetching issue.")
+        json_data = await self.fetch_data(url)
 
         # The initial API request is made to the issues API endpoint, which will return information
         # if the issue or PR is present. However, the scope of information returned for PRs differs
@@ -125,16 +114,23 @@ class GithubInfo(commands.Cog):
         # we know that a PR has been requested and a call to the pulls API endpoint is necessary
         # to get the desired information for the PR.
         else:
-            pull_data, _ = await self.fetch_data(pulls_url)
-            if pull_data["draft"]:
-                emoji = Emojis.pull_request_draft
-            elif pull_data["state"] == "open":
-                emoji = Emojis.pull_request_open
-            # When 'merged_at' is not None, this means that the state of the PR is merged
-            elif pull_data["merged_at"] is not None:
-                emoji = Emojis.pull_request_merged
-            else:
-                emoji = Emojis.pull_request_closed
+            pull_data = await self.fetch_data(pulls_url)
+
+            try:
+                if pull_data["draft"]:
+                    emoji = Emojis.pull_request_draft
+                elif pull_data["state"] == "open":
+                    emoji = Emojis.pull_request_open
+                # When 'merged_at' is not None, this means that the state of the PR is merged
+                elif pull_data["merged_at"] is not None:
+                    emoji = Emojis.pull_request_merged
+                else:
+                    emoji = Emojis.pull_request_closed
+
+            except KeyError:
+                log.error("GitHub request sent back malformed data: %s", pull_data)
+
+                raise FetchError(400, "GitHub sent malformed data.")
 
         issue_url = json_data.get("html_url")
 
@@ -175,42 +171,38 @@ class GithubInfo(commands.Cog):
 
         Listener to retrieve issue(s) from a GitHub repository using automatic linking if matching <org>/<repo>#<issue>.
         """
-        # Ignore bots
-        if message.author.bot:
+        # Ignore bots and DMs
+        if message.author.bot or not message.guild:
             return
 
-        issues = [
+        issues = {
             FoundIssue(*match.group("org", "repo", "number"))
             for match in AUTOMATIC_REGEX.finditer(self.remove_codeblocks(message.content))
-        ]
+        }
+
+        if not issues:
+            return
+
+        log.trace(f"Found {issues = }")
+
+        if len(issues) > MAXIMUM_ISSUES:
+            embed = discord.Embed(
+                title=random.choice(ERROR_REPLIES),
+                color=Colours.soft_red,
+                description=f"Too many issues/PRs! (maximum of {MAXIMUM_ISSUES})"
+            )
+            await message.channel.send(embed=embed, delete_after=5)
+            return
+
         links = []
 
-        if issues:
-            # Block this from working in DMs
-            if not message.guild:
-                return
-
-            log.trace(f"Found {issues = }")
-            # Remove duplicates
-            issues = set(issues)
-
-            if len(issues) > MAXIMUM_ISSUES:
-                embed = discord.Embed(
-                    title=random.choice(ERROR_REPLIES),
-                    color=Colours.soft_red,
-                    description=f"Too many issues/PRs! (maximum of {MAXIMUM_ISSUES})"
-                )
-                await message.channel.send(embed=embed, delete_after=5)
-                return
-
-            for repo_issue in issues:
-                result = await self.fetch_issue(
-                    int(repo_issue.number),
-                    repo_issue.repository,
-                    repo_issue.organisation or "python-discord"
-                )
-                if isinstance(result, IssueState):
-                    links.append(result)
+        for repo_issue in issues:
+            result = await self.fetch_issue(
+                int(repo_issue.number),
+                repo_issue.repository,
+                repo_issue.organisation or "python-discord"
+            )
+            links.append(result)
 
         if not links:
             return
@@ -218,17 +210,31 @@ class GithubInfo(commands.Cog):
         resp = self.format_embed(links)
         await message.channel.send(embed=resp)
 
-    async def fetch_data(self, url: str) -> tuple[dict[str], ClientResponse]:
-        """Retrieve data as a dictionary and the response in a tuple."""
+    async def fetch_data(self, url: str) -> dict[str]:
+        """
+        Retrieve data as a dictionary and the response in a tuple.
+
+        Handles HTTP status errors by raising FetchErrors on non-200 status codes.
+        """
         log.trace(f"Querying GH issues API: {url}")
         async with self.bot.http_session.get(url, headers=REQUEST_HEADERS) as r:
-            return await r.json(), r
+            if r.status == 403:
+                if r.headers.get("X-RateLimit-Remaining") == "0":
+                    log.info(f"Ratelimit reached while fetching {url}")
+                    raise FetchError(403, "Ratelimit reached, please retry in a few minutes.")
+                raise FetchError(403, "Requested GitHub content is forbidden.")
+            elif r.status in (404, 410):
+                raise FetchError(r.status, "GitHub content not found.")
+            elif r.status != 200:
+                raise FetchError(r.status, "Error while fetching GitHub content.")
+
+            return await r.json()
 
     @github_group.command(name="user", aliases=("userinfo",))
     async def github_user_info(self, ctx: commands.Context, username: str) -> None:
         """Fetches a user's GitHub information."""
         async with ctx.typing():
-            user_data, _ = await self.fetch_data(f"{GITHUB_API_URL}/users/{username}")
+            user_data = await self.fetch_data(f"{GITHUB_API_URL}/users/{username}")
 
             # User_data will not have a message key if the user exists
             if "message" in user_data:
@@ -241,7 +247,7 @@ class GithubInfo(commands.Cog):
                 await ctx.send(embed=embed)
                 return
 
-            org_data, _ = await self.fetch_data(user_data["organizations_url"])
+            org_data = await self.fetch_data(user_data["organizations_url"])
             orgs = [f"[{org['login']}](https://github.com/{org['login']})" for org in org_data]
             orgs_to_add = " | ".join(orgs)
 
@@ -311,7 +317,7 @@ class GithubInfo(commands.Cog):
             return
 
         async with ctx.typing():
-            repo_data, _ = await self.fetch_data(f"{GITHUB_API_URL}/repos/{quote(repo)}")
+            repo_data = await self.fetch_data(f"{GITHUB_API_URL}/repos/{quote(repo)}")
 
             # There won't be a message key if this repo exists
             if "message" in repo_data:
