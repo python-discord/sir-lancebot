@@ -201,7 +201,7 @@ def whitelist_check(**default_kwargs: Container[int]) -> Callable[[Context], boo
 
         # determine which command's overrides we will use
         # as we have groups, we want to ensure that group commands inherit from the parent
-        overridden_command: Union[commands.Command, commands.Group] = None
+        overridden_command: Optional[commands.Command] = None
         for command in [ctx.command, *ctx.command.parents]:
             if hasattr(command.callback, "override"):
                 overridden_command = command
