@@ -3,6 +3,7 @@ import re
 import typing as t
 from functools import partial
 
+import discord
 from discord.ext import commands
 from discord.ext.commands import Cog, Context, clean_content
 
@@ -116,6 +117,9 @@ class Uwu(Cog):
         """
         # If `text` isn't provided then we try to get message content of a replied message
         text = text or getattr(ctx.message.reference, "resolved", None)
+        if isinstance(text, discord.Message):
+            text = text.content
+
         if text is None:
             # If we weren't able to get the content of a replied message
             raise commands.UserInputError("Your message must have content or you must reply to a message.")
