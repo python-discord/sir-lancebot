@@ -1,7 +1,9 @@
 import random
 import re
+import typing as t
 from functools import partial
 
+import discord
 from discord.ext import commands
 from discord.ext.commands import Cog, Context, clean_content
 
@@ -105,7 +107,7 @@ class Uwu(Cog):
         return input_string
 
     @commands.command(name="uwu", aliases=("uwuwize", "uwuify",))
-    async def uwu_command(self, ctx: Context, *, text: clean_content(fix_channel_mentions=True)) -> None:
+    async def uwu_command(self, ctx: Context, *, text: t.Optional[str] = None) -> None:
         """
         Echo an uwuified version the passed text.
 
@@ -113,7 +115,18 @@ class Uwu(Cog):
         '.uwu Hello, my name is John' returns something like
         'hewwo, m-my name is j-john nyaa~'.
         """
-        if (fun_cog := ctx.bot.get_cog("Fun")):
+        # If `text` isn't provided then we try to get message content of a replied message
+        text = text or getattr(ctx.message.reference, "resolved", None)
+        if isinstance(text, discord.Message):
+            text = text.content
+
+        if text is None:
+            # If we weren't able to get the content of a replied message
+            raise commands.UserInputError("Your message must have content or you must reply to a message.")
+
+        await clean_content(fix_channel_mentions=True).convert(ctx, text)
+
+        if fun_cog := ctx.bot.get_cog("Fun"):
             text, embed = await fun_cog._get_text_and_embed(ctx, text)
 
             # Grabs the text from the embed for uwuification.
