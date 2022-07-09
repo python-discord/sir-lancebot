@@ -5,7 +5,7 @@ from functools import partial
 
 import discord
 from discord.ext import commands
-from discord.ext.commands import Cog, Context, clean_content
+from discord.ext.commands import Cog, Context
 
 from bot.bot import Bot
 from bot.utils import helpers
