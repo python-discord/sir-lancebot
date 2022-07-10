@@ -26,6 +26,9 @@ MOVIE_PARAMS = {
     "language": "en-US"
 }
 
+# Define maximum value for `pages` param
+MAX_PAGES = 500
+
 
 class MovieGenres(Enum):
     """Movies Genre names and IDs."""
@@ -91,7 +94,7 @@ class Movie(Cog):
             logger.warning(err_msg)
 
         # Get random page. Max page is last page where is movies with this genre.
-        page = random.randint(1, result["total_pages"])
+        page = random.randint(1, min(result["total_pages"], MAX_PAGES))
 
         # Get movies list from TMDB, check if results key in result. When not, raise error.
         movies, status = await self.get_movies_data(self.http_session, MovieGenres[genre].value, page)
