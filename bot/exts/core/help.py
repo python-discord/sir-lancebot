@@ -286,7 +286,7 @@ class HelpSession:
             else:
                 results.append(f"<{name}>")
 
-        return f"{cmd.name} {' '.join(results)}"
+        return f"{cmd.qualified_name} {' '.join(results)}"
 
     async def build_pages(self) -> None:
         """Builds the list of content pages to be paginated through in the help message, as a list of str."""
@@ -313,6 +313,8 @@ class HelpSession:
         prefix = constants.Client.prefix
 
         signature = self._get_command_params(self.query)
+        paginator.add_line(f"**```\n{prefix}{signature}\n```**")
+
         parent = self.query.full_parent_name + " " if self.query.parent else ""
         paginator.add_line(f"**```\n{prefix}{parent}{signature}\n```**")
         aliases = [f"`{alias}`" if not parent else f"`{parent}{alias}`" for alias in self.query.aliases]
