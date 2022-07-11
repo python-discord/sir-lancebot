@@ -3,7 +3,7 @@ import asyncio
 import itertools
 import logging
 from contextlib import suppress
-from typing import NamedTuple, Union
+from typing import NamedTuple, Optional, Union
 
 from discord import Colour, Embed, HTTPException, Message, Reaction, User
 from discord.ext import commands
@@ -48,7 +48,7 @@ class HelpQueryNotFound(ValueError):
     """
 
     def __init__(
-            self, arg: str, possible_matches: list[str] = None, *, parent_command: Command = None
+            self, arg: str, possible_matches: Optional[list[str]] = None, *, parent_command: Optional[Command] = None
     ) -> None:
         super().__init__(arg)
         self.possible_matches = possible_matches
