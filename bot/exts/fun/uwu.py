@@ -46,7 +46,7 @@ EMOJIS = [
     "^^;;",
 ]
 
-REGEX_WORD_REPLACE = re.compile(r"(?<![w])[lr](?![w])")
+REGEX_WORD_REPLACE = re.compile(r"(?<!w)[lr](?!w)")
 
 REGEX_PUNCTUATION = re.compile(r"[.!?\r\n\t]")
 
