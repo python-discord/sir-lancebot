@@ -62,6 +62,8 @@ RE_EMOJI = re.compile(r"<(a?)?:(\w+):(\d{18})>?")
 
 @dataclass(frozen=True, eq=True)
 class Emoji:
+    """Data class for an Emoji."""
+
     name: str
     uid: int
     animated: bool = False
@@ -125,7 +127,7 @@ class Uwu(Cog):
         return match_string
 
     def _ext_emoji_replace(self, input_string: str) -> str:
-        """Replaces external emojis with emoticons"""
+        """Replaces external emojis with emoticons."""
         groups = RE_EMOJI.findall(input_string)
         emojis = {Emoji.from_match(match) for match in groups}
         # Replace with random emoticon if unable to display
