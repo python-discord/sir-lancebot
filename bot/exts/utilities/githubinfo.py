@@ -149,7 +149,9 @@ class GithubInfo(commands.Cog):
 
         for result in results:
             if isinstance(result, IssueState):
-                description_list.append(f"{result.emoji} [{result.title}]({result.url})")
+                description_list.append(
+                    f"{result.emoji} [[{result.repository}] #{result.number} {result.title}]({result.url})"
+                )
             elif isinstance(result, FetchError):
                 description_list.append(f":x: [{result.return_code}] {result.message}")
 
