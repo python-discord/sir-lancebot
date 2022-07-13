@@ -195,7 +195,7 @@ class GithubInfo(commands.Cog):
 
             log.trace(f"Found {issues = }")
             # Remove duplicates
-            issues = unique_everseen(issues)
+            issues = list(unique_everseen(issues))
 
             if len(issues) > MAXIMUM_ISSUES:
                 embed = discord.Embed(
