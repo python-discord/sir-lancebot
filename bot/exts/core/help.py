@@ -157,7 +157,7 @@ class HelpSession:
 
         Will pass on possible close matches along with the `HelpQueryNotFound` exception.
         """
-        # Check if parent command in valid incase subcommand is invalid.
+        # Check if parent command is valid in case subcommand is invalid.
         if " " in query:
             parent, *_ = query.split()
             parent_command = self._bot.get_command(parent)
