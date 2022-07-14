@@ -5,6 +5,7 @@ from typing import Optional, Union
 
 import discord
 import emojis
+from discord import ClientUser, Member
 from discord.ext import commands
 
 from bot.bot import Bot
@@ -71,7 +72,7 @@ class Game:
             await self.message.add_reaction(CROSS_EMOJI)
             await self.message.edit(content=None, embed=embed)
 
-    async def game_over(self, action: str, player1: discord.User, player2: discord.User) -> None:
+    async def game_over(self, action: str, player1: Union[ClientUser, Member], player2: Union[ClientUser, Member]) -> None:
         """Announces to public chat."""
         if action == "win":
             await self.channel.send(f"Game Over! {player1.mention} won against {player2.mention}")
