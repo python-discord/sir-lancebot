@@ -57,7 +57,7 @@ SUBSTITUTE_STUTTER = r"\g<1>\g<2>-\g<2>"
 REGEX_NYA = re.compile(r"n([aeou][^aeiou])")
 SUBSTITUTE_NYA = r"ny\1"
 
-RE_EMOJI = re.compile(r"<(a?)?:(\w+):(\d{18})>?")
+REGEX_EMOJI = re.compile(r"<(a?)?:(\w+):(\d{18})>?")
 
 
 @dataclass(frozen=True, eq=True)
