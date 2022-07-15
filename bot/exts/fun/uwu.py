@@ -57,7 +57,7 @@ SUBSTITUTE_STUTTER = r"\g<1>\g<2>-\g<2>"
 REGEX_NYA = re.compile(r"n([aeou][^aeiou])")
 SUBSTITUTE_NYA = r"ny\1"
 
-REGEX_EMOJI = re.compile(r"<(a?)?:(\w+):(\d{18})>?")
+REGEX_EMOJI = re.compile(r"<(a?)?:(\w+):(\d{18})>?", re.ASCII)
 
 
 @dataclass(frozen=True, eq=True)
@@ -79,7 +79,7 @@ class Emoji:
     @classmethod
     def from_match(cls, match: tuple[str, str, str]) -> t.Optional['Emoji']:
         """Creates an Emoji from a regex match tuple."""
-        if not match or len(match) != 3 or not match[2].isdigit():
+        if not match or len(match) != 3 or not match[2].isdecimal():
             return None
         return cls(match[1], int(match[2]), match[0] == "a")
 
