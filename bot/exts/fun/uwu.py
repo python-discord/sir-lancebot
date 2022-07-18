@@ -126,19 +126,19 @@ class Uwu(Cog):
         if text is None:
             # If we weren't able to get the content of a replied message
             raise commands.UserInputError("Your message must have content or you must reply to a message.")
-        
+
         await clean_content(fix_channel_mentions=True).convert(ctx, text)
-        
+
         fun_cog = ctx.bot.get_cog("Fun")
         if fun_cog:
             text, embed = await fun_cog._get_text_and_embed(ctx, text)
-            
+
             # Grabs the text from the embed for uwuification
             if embed is not None:
                 embed = fun_cog._convert_embed(self._uwuify, embed)
             else:
                 # Only use the first embed since only a single one can be sent
-                embed = fun_cog._convert_embed(self._uwuify, embeds[0]) if embeds else None 
+                embed = fun_cog._convert_embed(self._uwuify, embeds[0]) if embeds else None
         else:
             embed = None
 
