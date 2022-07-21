@@ -127,7 +127,7 @@ class Uwu(Cog):
         return match_string
 
     def _ext_emoji_replace(self, input_string: str) -> str:
-        """Replaces external emojis with emoticons."""
+        """Replaces any emoji the bot cannot send in input_text with a random emoticons."""
         groups = REGEX_EMOJI.findall(input_string)
         emojis = {Emoji.from_match(match) for match in groups}
         # Replace with random emoticon if unable to display
