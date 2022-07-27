@@ -1,0 +1,41 @@
+[33mcommit 1b1df0c190880bbdb40be60016a975c4a9a5e706[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Diabolical5777 <84365102+Diabolical5777@users.noreply.github.com>
+Date:   Wed Jul 27 15:48:54 2022 +0400
+
+    Fix lint and add pre-commit hooks
+
+[1mdiff --git a/bot/exts/fun/fun.py b/bot/exts/fun/fun.py[m
+[1mindex c86de677..0fb9f296 100644[m
+[1m--- a/bot/exts/fun/fun.py[m
+[1m+++ b/bot/exts/fun/fun.py[m
+[36m@@ -4,8 +4,8 @@[m [mimport random[m
+ from collections.abc import Iterable[m
+ from pathlib import Path[m
+ from typing import Callable, Optional, Union[m
+[31m-import pyjokes[m
+ [m
+[32m+[m[32mimport pyjokes[m
+ from discord import Embed, Message[m
+ from discord.ext import commands[m
+ from discord.ext.commands import BadArgument, Cog, Context, MessageConverter, clean_content[m
+[36m@@ -213,19 +213,16 @@[m [mclass Fun(Cog):[m
+ [m
+         return Embed.from_dict(embed_dict)[m
+ [m
+[31m-[m
+[31m-    [m
+     @commands.command()[m
+     async def joke(self, ctx: commands.Context, category: str = "all") -> None:[m
+         """Retrieves a joke of the specified `category` from the pyjokes api."""[m
+         if category not in self.JOKE_CATEGORIES:[m
+             raise commands.BadArgument(f"`{category}` is not a valid joke category")[m
+[31m-        [m
+[32m+[m
+         joke = pyjokes.get_joke(category=category)[m
+         await ctx.send(joke)[m
+ [m
+ [m
+[31m-[m
+ def setup(bot: Bot) -> None:[m
+     """Load the Fun cog."""[m
+     bot.add_cog(Fun(bot))[m

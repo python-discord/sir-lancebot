@@ -3,7 +3,7 @@ import logging
 import random
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Callable, Optional, Union
+from typing import Callable, Literal, Optional, Union
 
 import pyjokes
 from discord import Embed, Message
@@ -43,7 +43,6 @@ class Fun(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         self._caesar_cipher_embed = json.loads(Path("bot/resources/fun/caesar_info.json").read_text("UTF-8"))
-        self.JOKE_CATEGORIES = {"neutral", "chuck", "all"}
 
     @staticmethod
     def _get_random_die() -> str:
@@ -214,11 +213,8 @@ class Fun(Cog):
         return Embed.from_dict(embed_dict)
 
     @commands.command()
-    async def joke(self, ctx: commands.Context, category: str = "all") -> None:
+    async def joke(self, ctx: commands.Context, category: Literal["neutral", "chuck", "all"] = "all") -> None:
         """Retrieves a joke of the specified `category` from the pyjokes api."""
-        if category not in self.JOKE_CATEGORIES:
-            raise commands.BadArgument(f"`{category}` is not a valid joke category")
-
         joke = pyjokes.get_joke(category=category)
         await ctx.send(joke)
 
