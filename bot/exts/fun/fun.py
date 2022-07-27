@@ -4,8 +4,8 @@ import random
 from collections.abc import Iterable
 from pathlib import Path
 from typing import Callable, Optional, Union
-import pyjokes
 
+import pyjokes
 from discord import Embed, Message
 from discord.ext import commands
 from discord.ext.commands import BadArgument, Cog, Context, MessageConverter, clean_content
@@ -213,17 +213,14 @@ class Fun(Cog):
 
         return Embed.from_dict(embed_dict)
 
-
-    
     @commands.command()
     async def joke(self, ctx: commands.Context, category: str = "all") -> None:
         """Retrieves a joke of the specified `category` from the pyjokes api."""
         if category not in self.JOKE_CATEGORIES:
             raise commands.BadArgument(f"`{category}` is not a valid joke category")
-        
+
         joke = pyjokes.get_joke(category=category)
         await ctx.send(joke)
-
 
 
 def setup(bot: Bot) -> None:
