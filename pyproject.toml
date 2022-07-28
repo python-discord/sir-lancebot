@@ -22,7 +22,6 @@ coloredlogs = "~=15.0"
 colorama = { version = "~=0.4.3", markers = "sys_platform == 'win32'" }
 lxml = "~=4.9"
 emoji = "^1.6.1"
-more-itertools = "^8.13.0"
 
 [tool.poetry.dev-dependencies]
 flake8 = "~=3.8"
