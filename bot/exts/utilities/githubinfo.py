@@ -9,7 +9,6 @@ from urllib.parse import quote
 import discord
 from aiohttp import ClientResponse
 from discord.ext import commands
-from more_itertools import unique_everseen
 
 from bot.bot import Bot
 from bot.constants import Colours, ERROR_REPLIES, Emojis, NEGATIVE_REPLIES, Tokens
