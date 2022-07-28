@@ -3,8 +3,9 @@ import logging
 import random
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Callable, Optional, Union
+from typing import Callable, Literal, Optional, Union
 
+import pyjokes
 from discord import Embed, Message
 from discord.ext import commands
 from discord.ext.commands import BadArgument, Cog, Context, MessageConverter, clean_content
@@ -41,7 +42,6 @@ class Fun(Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
-
         self._caesar_cipher_embed = json.loads(Path("bot/resources/fun/caesar_info.json").read_text("UTF-8"))
 
     @staticmethod
@@ -211,6 +211,12 @@ class Fun(Cog):
                 field["value"] = func(field.get("value", ""))
 
         return Embed.from_dict(embed_dict)
+
+    @commands.command()
+    async def joke(self, ctx: commands.Context, category: Literal["neutral", "chuck", "all"] = "all") -> None:
+        """Retrieves a joke of the specified `category` from the pyjokes api."""
+        joke = pyjokes.get_joke(category=category)
+        await ctx.send(joke)
 
 
 def setup(bot: Bot) -> None:
