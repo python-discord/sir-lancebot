@@ -1,6 +1,7 @@
 import random
 import re
 import typing as t
+from dataclasses import dataclass
 from functools import partial
 
 import discord
@@ -9,6 +10,9 @@ from discord.ext.commands import Cog, Context, clean_content
 
 from bot.bot import Bot
 from bot.utils import helpers
+
+if t.TYPE_CHECKING:
+    from bot.exts.fun.fun import Fun  # pragma: no cover
 
 WORD_REPLACE = {
     "small": "smol",
@@ -43,7 +47,7 @@ EMOJIS = [
     "^^;;",
 ]
 
-REGEX_WORD_REPLACE = re.compile(r"(?<![w])[lr](?![w])")
+REGEX_WORD_REPLACE = re.compile(r"(?<!w)[lr](?!w)")
 
 REGEX_PUNCTUATION = re.compile(r"[.!?\r\n\t]")
 
@@ -52,6 +56,32 @@ SUBSTITUTE_STUTTER = r"\g<1>\g<2>-\g<2>"
 
 REGEX_NYA = re.compile(r"n([aeou][^aeiou])")
 SUBSTITUTE_NYA = r"ny\1"
+
+REGEX_EMOJI = re.compile(r"<(a)?:(\w+?):(\d{15,21}?)>", re.ASCII)
+
+
+@dataclass(frozen=True, eq=True)
+class Emoji:
+    """Data class for an Emoji."""
+
+    name: str
+    uid: int
+    animated: bool = False
+
+    def __str__(self):
+        anim_bit = "a" if self.animated else ""
+        return f"<{anim_bit}:{self.name}:{self.uid}>"
+
+    def can_display(self, bot: Bot) -> bool:
+        """Determines if a bot is in a server with the emoji."""
+        return bot.get_emoji(self.uid) is not None
+
+    @classmethod
+    def from_match(cls, match: tuple[str, str, str]) -> t.Optional['Emoji']:
+        """Creates an Emoji from a regex match tuple."""
+        if not match or len(match) != 3 or not match[2].isdecimal():
+            return None
+        return cls(match[1], int(match[2]), match[0] == "a")
 
 
 class Uwu(Cog):
@@ -96,6 +126,26 @@ class Uwu(Cog):
             return f" {random.choice(EMOJIS)} "
         return match_string
 
+    def _ext_emoji_replace(self, input_string: str) -> str:
+        """Replaces any emoji the bot cannot send in input_text with a random emoticons."""
+        groups = REGEX_EMOJI.findall(input_string)
+        emojis = {Emoji.from_match(match) for match in groups}
+        # Replace with random emoticon if unable to display
+        emojis_map = {
+            re.escape(str(e)): random.choice(EMOJIS)
+            for e in emojis if e and not e.can_display(self.bot)
+        }
+        if emojis_map:
+            # Pattern for all emoji markdowns to be replaced
+            emojis_re = re.compile("|".join(emojis_map.keys()))
+            # Replace matches with random emoticon
+            return emojis_re.sub(
+                lambda m: emojis_map[re.escape(m.group())],
+                input_string
+            )
+        # Return original if no replacement
+        return input_string
+
     def _uwuify(self, input_string: str, *, stutter_strength: float = 0.2, emoji_strength: float = 0.1) -> str:
         """Takes a string and returns an uwuified version of it."""
         input_string = input_string.lower()
@@ -104,6 +154,7 @@ class Uwu(Cog):
         input_string = self._char_replace(input_string)
         input_string = self._stutter(stutter_strength, input_string)
         input_string = self._emoji(emoji_strength, input_string)
+        input_string = self._ext_emoji_replace(input_string)
         return input_string
 
     @commands.command(name="uwu", aliases=("uwuwize", "uwuify",))
@@ -126,7 +177,8 @@ class Uwu(Cog):
 
         await clean_content(fix_channel_mentions=True).convert(ctx, text)
 
-        if fun_cog := ctx.bot.get_cog("Fun"):
+        fun_cog: t.Optional[Fun] = ctx.bot.get_cog("Fun")
+        if fun_cog:
             text, embed = await fun_cog._get_text_and_embed(ctx, text)
 
             # Grabs the text from the embed for uwuification.
