@@ -109,6 +109,7 @@ class Cats:
 class Channels(NamedTuple):
     advent_of_code = int(environ.get("AOC_CHANNEL_ID", 897932085766004786))
     advent_of_code_commands = int(environ.get("AOC_COMMANDS_CHANNEL_ID", 897932607545823342))
+    algos_and_data_structs = 650401909852864553
     bot_commands = 267659945086812160
     community_meta = 267659945086812160
     organisation = 551789653284356126
