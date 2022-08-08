@@ -183,22 +183,23 @@ class Uwu(Cog):
         fun_cog: t.Optional[Fun] = ctx.bot.get_cog("Fun")
 
         if fun_cog:
-            text, embed = await fun_cog._get_text_and_embed(ctx, text)
-
             # Grabs the text from the embed for uwuification
-            if embed is not None:
-                embed = fun_cog._convert_embed(self._uwuify, embed)
+            if embeds:
+                embed = fun_cog._convert_embed(self._uwuify, embeds[0])
             else:
-                # Only use the first embed since only a single one can be sent
-                embed = fun_cog._convert_embed(self._uwuify, embeds[0]) if embeds else None
+                # Parse potential message links in text
+                text, embed = await fun_cog._get_text_and_embed(ctx, text)
+
+                # If an embed is found, grab and uwuify its text
+                if embed:
+                    embed = fun_cog._convert_embed(self._uwuify, embed)
         else:
             embed = None
 
-        converted_text = self._uwuify(text)
-        converted_text = helpers.suppress_links(converted_text)
-
         # Adds the text harvested from an embed to be put into another quote block.
         if text:
+            converted_text = self._uwuify(text)
+            converted_text = helpers.suppress_links(converted_text)
             converted_text = f">>> {converted_text.lstrip('> ')}"
         else:
             converted_text = None
