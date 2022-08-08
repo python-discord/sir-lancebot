@@ -9,7 +9,7 @@ from discord.ext import commands
 from discord.ext.commands import Cog, Context, clean_content
 
 from bot.bot import Bot
-from bot.utils import helpers
+from bot.utils import helpers, messages
 
 if t.TYPE_CHECKING:
     from bot.exts.fun.fun import Fun  # pragma: no cover
@@ -185,14 +185,14 @@ class Uwu(Cog):
         if fun_cog:
             # Grabs the text from the embed for uwuification
             if embeds:
-                embed = fun_cog._convert_embed(self._uwuify, embeds[0])
+                embed = messages.convert_embed(self._uwuify, embeds[0])
             else:
                 # Parse potential message links in text
-                text, embed = await fun_cog._get_text_and_embed(ctx, text)
+                text, embed = await messages.get_text_and_embed(ctx, text)
 
                 # If an embed is found, grab and uwuify its text
                 if embed:
-                    embed = fun_cog._convert_embed(self._uwuify, embed)
+                    embed = messages.convert_embed(self._uwuify, embed)
         else:
             embed = None
 
