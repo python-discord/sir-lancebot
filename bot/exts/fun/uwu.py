@@ -10,6 +10,9 @@ from discord.ext.commands import Cog, Context, clean_content
 from bot.bot import Bot
 from bot.utils import helpers
 
+if t.TYPE_CHECKING:
+    from bot.exts.fun.fun import Fun  # pragma: no cover
+
 WORD_REPLACE = {
     "small": "smol",
     "cute": "kawaii~",
@@ -129,7 +132,8 @@ class Uwu(Cog):
 
         await clean_content(fix_channel_mentions=True).convert(ctx, text)
 
-        fun_cog = ctx.bot.get_cog("Fun")
+        fun_cog: t.Optional[Fun] = ctx.bot.get_cog("Fun")
+
         if fun_cog:
             text, embed = await fun_cog._get_text_and_embed(ctx, text)
 
