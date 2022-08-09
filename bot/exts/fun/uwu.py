@@ -11,9 +11,6 @@ from discord.ext.commands import Cog, Context, clean_content
 from bot.bot import Bot
 from bot.utils import helpers, messages
 
-if t.TYPE_CHECKING:
-    from bot.exts.fun.fun import Fun  # pragma: no cover
-
 WORD_REPLACE = {
     "small": "smol",
     "cute": "kawaii~",
@@ -180,21 +177,16 @@ class Uwu(Cog):
 
         await clean_content(fix_channel_mentions=True).convert(ctx, text)
 
-        fun_cog: t.Optional[Fun] = ctx.bot.get_cog("Fun")
-
-        if fun_cog:
-            # Grabs the text from the embed for uwuification
-            if embeds:
-                embed = messages.convert_embed(self._uwuify, embeds[0])
-            else:
-                # Parse potential message links in text
-                text, embed = await messages.get_text_and_embed(ctx, text)
-
-                # If an embed is found, grab and uwuify its text
-                if embed:
-                    embed = messages.convert_embed(self._uwuify, embed)
+        # Grabs the text from the embed for uwuification
+        if embeds:
+            embed = messages.convert_embed(self._uwuify, embeds[0])
         else:
-            embed = None
+            # Parse potential message links in text
+            text, embed = await messages.get_text_and_embed(ctx, text)
+
+            # If an embed is found, grab and uwuify its text
+            if embed:
+                embed = messages.convert_embed(self._uwuify, embed)
 
         # Adds the text harvested from an embed to be put into another quote block.
         if text:

@@ -3,7 +3,6 @@ import re
 from typing import Callable, Optional, Union
 
 from discord import Embed, Message
-from discord.ext import commands
 from discord.ext.commands import Context, MessageConverter
 
 log = logging.getLogger(__name__)
@@ -33,10 +32,7 @@ async def get_discord_message(ctx: Context, text: str) -> Union[Message, str]:
     Conversion will succeed if given a discord Message ID or link.
     Returns `text` if the conversion fails.
     """
-    try:
-        text = await MessageConverter().convert(ctx, text)
-    except commands.BadArgument:
-        log.debug(f"Input '{text:.20}...' is not a valid Discord Message")
+    text = await MessageConverter().convert(ctx, text)
 
     return text
 
@@ -64,7 +60,7 @@ async def get_text_and_embed(ctx: Context, text: str) -> tuple[str, Optional[Emb
             if msg.embeds:
                 embed = msg.embeds[0]
 
-    return (text, embed)
+    return text, embed
 
 
 def convert_embed(func: Callable[[str, ], str], embed: Embed) -> Embed:
