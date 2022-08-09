@@ -3,6 +3,7 @@ import re
 from typing import Callable, Optional, Union
 
 from discord import Embed, Message
+from discord.ext import commands
 from discord.ext.commands import Context, MessageConverter
 
 log = logging.getLogger(__name__)
@@ -32,7 +33,10 @@ async def get_discord_message(ctx: Context, text: str) -> Union[Message, str]:
     Conversion will succeed if given a discord Message ID or link.
     Returns `text` if the conversion fails.
     """
-    text = await MessageConverter().convert(ctx, text)
+    try:
+        text = await MessageConverter().convert(ctx, text)
+    except commands.BadArgument:
+        pass
 
     return text
 
