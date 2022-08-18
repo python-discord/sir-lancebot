@@ -35,6 +35,7 @@ PAD = 10
 
 LATEX_ALLOWED_CHANNNELS = WHITELISTED_CHANNELS + (
     Channels.data_science_and_ai,
+    Channels.algos_and_data_structs,
 )
 
 
