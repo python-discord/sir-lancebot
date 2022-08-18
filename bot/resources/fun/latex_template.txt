@@ -1,5 +1,12 @@
 \documentclass{article}
-\usepackage{amsmath, amssymb}
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage{bm}  % nice bold symbols for matrices and vectors
+\usepackage{bbm}  % bold and calligraphic numbers
+\usepackage[binary-units=true]{siunitx}  % SI unit handling
+\usepackage{tikz}  % from here on, to make nice diagrams with tikz
+\usepackage{ifthen}
+\usetikzlibrary{patterns}
+\usetikzlibrary{shapes, arrows, chains, fit, positioning, calc, decorations.pathreplacing}
 \begin{document}
     \pagenumbering{gobble}
     $text
