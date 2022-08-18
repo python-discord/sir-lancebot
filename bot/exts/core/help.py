@@ -13,6 +13,7 @@ from bot import constants
 from bot.bot import Bot
 from bot.constants import Emojis
 from bot.utils.commands import get_command_suggestions
+from bot.utils.decorators import whitelist_override
 from bot.utils.pagination import FIRST_EMOJI, LAST_EMOJI, LEFT_EMOJI, LinePaginator, RIGHT_EMOJI
 
 DELETE_EMOJI = Emojis.trashcan
@@ -512,6 +513,7 @@ class Help(DiscordCog):
     """Custom Embed Pagination Help feature."""
 
     @commands.command("help")
+    @whitelist_override(allow_dm=True)
     async def new_help(self, ctx: Context, *commands) -> None:
         """Shows Command Help."""
         try:
