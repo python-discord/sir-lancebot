@@ -9,10 +9,7 @@ from discord.ext import commands
 from discord.ext.commands import Cog, Context, clean_content
 
 from bot.bot import Bot
-from bot.utils import helpers
-
-if t.TYPE_CHECKING:
-    from bot.exts.fun.fun import Fun  # pragma: no cover
+from bot.utils import helpers, messages
 
 WORD_REPLACE = {
     "small": "smol",
@@ -169,7 +166,10 @@ class Uwu(Cog):
         # If `text` isn't provided then we try to get message content of a replied message
         text = text or getattr(ctx.message.reference, "resolved", None)
         if isinstance(text, discord.Message):
+            embeds = text.embeds
             text = text.content
+        else:
+            embeds = None
 
         if text is None:
             # If we weren't able to get the content of a replied message
@@ -177,20 +177,25 @@ class Uwu(Cog):
 
         await clean_content(fix_channel_mentions=True).convert(ctx, text)
 
-        fun_cog: t.Optional[Fun] = ctx.bot.get_cog("Fun")
-        if fun_cog:
-            text, embed = await fun_cog._get_text_and_embed(ctx, text)
-
-            # Grabs the text from the embed for uwuification.
-            if embed is not None:
-                embed = fun_cog._convert_embed(self._uwuify, embed)
+        # Grabs the text from the embed for uwuification
+        if embeds:
+            embed = messages.convert_embed(self._uwuify, embeds[0])
         else:
-            embed = None
-        converted_text = self._uwuify(text)
-        converted_text = helpers.suppress_links(converted_text)
+            # Parse potential message links in text
+            text, embed = await messages.get_text_and_embed(ctx, text)
+
+            # If an embed is found, grab and uwuify its text
+            if embed:
+                embed = messages.convert_embed(self._uwuify, embed)
 
         # Adds the text harvested from an embed to be put into another quote block.
-        converted_text = f">>> {converted_text.lstrip('> ')}"
+        if text:
+            converted_text = self._uwuify(text)
+            converted_text = helpers.suppress_links(converted_text)
+            converted_text = f">>> {converted_text.lstrip('> ')}"
+        else:
+            converted_text = None
+
         await ctx.send(content=converted_text, embed=embed)
 
 
