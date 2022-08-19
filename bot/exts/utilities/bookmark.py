@@ -74,10 +74,9 @@ class Bookmark(commands.Cog):
             await member.send(embed=embed)
         except discord.Forbidden:
             error_embed = self.build_error_embed(f"{member.mention}, please enable your DMs to receive the bookmark.")
+            await channel.send(embed=error_embed)
         else:
             log.info(f"{member} bookmarked {target_message.jump_url} with title '{title}'")
-            return
-        await channel.send(embed=error_embed)
 
     @commands.group(name="bookmark", aliases=("bm", "pin"), invoke_without_command=True)
     @commands.guild_only()
