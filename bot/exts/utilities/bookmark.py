@@ -155,19 +155,16 @@ class Bookmark(commands.Cog):
     async def delete_bookmark(
         self,
         ctx: commands.Context,
-        target_message: Optional[WrappedMessageConverter]
     ) -> None:
         """
-        Delete the target message specified by the member. Must be ran in DMs targetting a message sent by Sir-Lancebot.
+        Delete the Sir-Lancebot message that the command invocation is replying to.
 
-        `target_message` may be a message link, or an ID that references the message,
-        Instead of giving a `target_message` the user may also reply to the message to delete.
-
-        This command allows deleting any message sent by Sir-Lancebot in the user's DMs.
+        This command allows deleting any message sent by Sir-Lancebot in the user's DM channel with the bot.
+        The command invocation must be a reply to the message that is to be deleted.
         """
-        target_message: Optional[discord.Message] = target_message or getattr(ctx.message.reference, "resolved", None)
+        target_message: Optional[discord.Message] = getattr(ctx.message.reference, "resolved", None)
         if target_message is None:
-            raise commands.UserInputError(MESSAGE_NOT_FOUND_ERROR)
+            raise commands.UserInputError("You must reply to the message from Sir-Lancebot you wish to delete.")
 
         if not isinstance(ctx.channel, discord.DMChannel):
             raise commands.UserInputError("You can only run this command your own DMs!")
