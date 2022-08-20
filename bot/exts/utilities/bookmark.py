@@ -55,7 +55,7 @@ class SendBookmark(discord.ui.Button):
         super().__init__(label="Receive Bookmark", style=discord.ButtonStyle.green)
 
     async def callback(self, interaction: discord.Interaction) -> None:
-        """The callback to the function."""
+        """The button callback."""
         if interaction.user.id in self.clicked:
             return await interaction.response.send_message(
                 "You have already received a bookmark to that message", ephemeral=True
