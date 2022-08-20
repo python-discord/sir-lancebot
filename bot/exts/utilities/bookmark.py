@@ -28,7 +28,7 @@ class LinkTargetMessage(discord.ui.View):
 
     def __init__(
         self,
-        target_message: discord.Message
+        target_message: discord.Message,
     ):
         super().__init__()
         self.add_item(discord.ui.Button(label="View Message", url=target_message.jump_url))
