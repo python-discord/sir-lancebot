@@ -11,7 +11,6 @@ from bot.bot import Bot
 from bot.constants import Client
 from bot.utils.converters import CoordinateConverter
 from bot.utils.exceptions import UserNotPlayingError
-from bot.utils.extensions import invoke_help_command
 
 MESSAGE_MAPPING = {
     0: ":stop_button:",
@@ -51,13 +50,14 @@ class Game:
 class Minesweeper(commands.Cog):
     """Play a game of Minesweeper."""
 
-    def __init__(self):
+    def __init__(self, bot: Bot):
+        self.bot = bot
         self.games: dict[int, Game] = {}
 
     @commands.group(name="minesweeper", aliases=("ms",), invoke_without_command=True)
     async def minesweeper_group(self, ctx: commands.Context) -> None:
         """Commands for Playing Minesweeper."""
-        await invoke_help_command(ctx)
+        await self.bot.invoke_help_command(ctx)
 
     @staticmethod
     def get_neighbours(x: int, y: int) -> Iterator[tuple[int, int]]:
@@ -267,4 +267,4 @@ class Minesweeper(commands.Cog):
 
 def setup(bot: Bot) -> None:
     """Load the Minesweeper cog."""
-    bot.add_cog(Minesweeper())
+    bot.add_cog(Minesweeper(bot))

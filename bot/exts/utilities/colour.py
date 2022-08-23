@@ -13,7 +13,6 @@ from discord.ext import commands
 
 from bot import constants
 from bot.bot import Bot
-from bot.exts.core.extensions import invoke_help_command
 from bot.utils.decorators import whitelist_override
 
 THUMBNAIL_SIZE = (80, 80)
@@ -99,7 +98,7 @@ class Colour(commands.Cog):
             extra_colour = ImageColor.getrgb(colour_input)
             await self.send_colour_response(ctx, extra_colour)
         except ValueError:
-            await invoke_help_command(ctx)
+            await self.bot.invoke_help_command(ctx)
 
     @colour.command()
     async def rgb(self, ctx: commands.Context, red: int, green: int, blue: int) -> None:

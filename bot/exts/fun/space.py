@@ -11,7 +11,6 @@ from discord.ext.commands import Cog, Context, group
 from bot.bot import Bot
 from bot.constants import Tokens
 from bot.utils.converters import DateConverter
-from bot.utils.extensions import invoke_help_command
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +26,7 @@ class Space(Cog):
 
     def __init__(self, bot: Bot):
         self.http_session = bot.http_session
+        self.bot = bot
 
         self.rovers = {}
         self.get_rovers.start()
@@ -50,7 +50,7 @@ class Space(Cog):
     @group(name="space", invoke_without_command=True)
     async def space(self, ctx: Context) -> None:
         """Head command that contains commands about space."""
-        await invoke_help_command(ctx)
+        await self.bot.invoke_help_command(ctx)
 
     @space.command(name="apod")
     async def apod(self, ctx: Context, date: Optional[str]) -> None:

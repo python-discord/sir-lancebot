@@ -4,6 +4,7 @@ from collections.abc import Mapping
 from enum import Enum
 from typing import Optional
 
+from botcore.utils._extensions import unqualify
 from discord import Colour, Embed
 from discord.ext import commands
 from discord.ext.commands import Context, group
@@ -12,7 +13,6 @@ from bot import exts
 from bot.bot import Bot
 from bot.constants import Client, Emojis, MODERATION_ROLES, Roles
 from bot.utils.checks import with_role_check
-from bot.utils.extensions import EXTENSIONS, invoke_help_command, unqualify
 from bot.utils.pagination import LinePaginator
 
 log = logging.getLogger(__name__)
@@ -46,13 +46,13 @@ class Extension(commands.Converter):
 
         argument = argument.lower()
 
-        if argument in EXTENSIONS:
+        if argument in ctx.bot.all_extensions:
             return argument
-        elif (qualified_arg := f"{exts.__name__}.{argument}") in EXTENSIONS:
+        elif (qualified_arg := f"{exts.__name__}.{argument}") in ctx.bot.all_extensions:
             return qualified_arg
 
         matches = []
-        for ext in EXTENSIONS:
+        for ext in ctx.bot.all_extensions:
             if argument == unqualify(ext):
                 matches.append(ext)
 
@@ -78,7 +78,7 @@ class Extensions(commands.Cog):
     @group(name="extensions", aliases=("ext", "exts", "c", "cogs"), invoke_without_command=True)
     async def extensions_group(self, ctx: Context) -> None:
         """Load, unload, reload, and list loaded extensions."""
-        await invoke_help_command(ctx)
+        await self.bot.invoke_help_command(ctx)
 
     @extensions_group.command(name="load", aliases=("l",))
     async def load_command(self, ctx: Context, *extensions: Extension) -> None:
@@ -88,11 +88,11 @@ class Extensions(commands.Cog):
         If '\*' or '\*\*' is given as the name, all unloaded extensions will be loaded.
         """  # noqa: W605
         if not extensions:
-            await invoke_help_command(ctx)
+            await self.bot.invoke_help_command(ctx)
             return
 
         if "*" in extensions or "**" in extensions:
-            extensions = set(EXTENSIONS) - set(self.bot.extensions.keys())
+            extensions = set(self.bot.all_extensions) - set(self.bot.extensions.keys())
 
         msg = self.batch_manage(Action.LOAD, *extensions)
         await ctx.send(msg)
@@ -105,7 +105,7 @@ class Extensions(commands.Cog):
         If '\*' or '\*\*' is given as the name, all loaded extensions will be unloaded.
         """  # noqa: W605
         if not extensions:
-            await invoke_help_command(ctx)
+            await self.bot.invoke_help_command(ctx)
             return
 
         blacklisted = "\n".join(UNLOAD_BLACKLIST & set(extensions))
@@ -131,11 +131,11 @@ class Extensions(commands.Cog):
         If '\*\*' is given as the name, all extensions, including unloaded ones, will be reloaded.
         """  # noqa: W605
         if not extensions:
-            await invoke_help_command(ctx)
+            await self.bot.invoke_help_command(ctx)
             return
 
         if "**" in extensions:
-            extensions = EXTENSIONS
+            extensions = self.bot.all_extensions
         elif "*" in extensions:
             extensions = set(self.bot.extensions.keys()) | set(extensions)
             extensions.remove("*")
@@ -175,7 +175,7 @@ class Extensions(commands.Cog):
         """Return a mapping of extension names and statuses to their categories."""
         categories = {}
 
-        for ext in EXTENSIONS:
+        for ext in self.bot.all_extensions:
             if ext in self.bot.extensions:
                 status = Emojis.status_online
             else:

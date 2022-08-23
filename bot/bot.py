@@ -60,3 +60,11 @@ class Bot(BotBase):
         # This is not awaited to avoid a deadlock with any cogs that have
         # wait_until_guild_available in their cog_load method.
         scheduling.create_task(self.load_extensions(exts))
+
+    async def invoke_help_command(self, ctx: commands.Context) -> None:
+        """Invoke the help command or default help command if help extensions is not loaded."""
+        if "bot.exts.core.help" in ctx.bot.extensions:
+            help_command = ctx.bot.get_command("help")
+            await ctx.invoke(help_command, ctx.command.qualified_name)
+            return
+        await ctx.send_help(ctx.command)

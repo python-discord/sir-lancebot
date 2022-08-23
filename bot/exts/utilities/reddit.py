@@ -15,7 +15,6 @@ from discord.utils import escape_markdown, sleep_until
 from bot.bot import Bot
 from bot.constants import Channels, ERROR_REPLIES, Emojis, Reddit as RedditConfig, STAFF_ROLES
 from bot.utils.converters import Subreddit
-from bot.utils.extensions import invoke_help_command
 from bot.utils.messages import sub_clyde
 from bot.utils.pagination import ImagePaginator, LinePaginator
 
@@ -302,7 +301,7 @@ class Reddit(Cog):
     @group(name="reddit", invoke_without_command=True)
     async def reddit_group(self, ctx: Context) -> None:
         """View the top posts from various subreddits."""
-        await invoke_help_command(ctx)
+        await self.bot.invoke_help_command(ctx)
 
     @reddit_group.command(name="top")
     async def top_command(self, ctx: Context, subreddit: Subreddit = "r/Python") -> None:

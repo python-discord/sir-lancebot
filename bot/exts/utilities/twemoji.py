@@ -9,7 +9,6 @@ from emoji import UNICODE_EMOJI_ENGLISH, is_emoji
 from bot.bot import Bot
 from bot.constants import Colours, Roles
 from bot.utils.decorators import whitelist_override
-from bot.utils.extensions import invoke_help_command
 
 log = logging.getLogger(__name__)
 BASE_URLS = {
@@ -133,7 +132,7 @@ class Twemoji(commands.Cog):
     async def twemoji(self, ctx: commands.Context, *raw_emoji: str) -> None:
         """Sends a preview of a given Twemoji, specified by codepoint or emoji."""
         if len(raw_emoji) == 0:
-            await invoke_help_command(ctx)
+            await self.bot.invoke_help_command(ctx)
             return
         try:
             codepoint = self.codepoint_from_input(raw_emoji)

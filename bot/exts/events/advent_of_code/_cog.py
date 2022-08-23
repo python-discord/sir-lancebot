@@ -18,7 +18,6 @@ from bot.exts.events.advent_of_code.views.dayandstarview import AoCDropdownView
 from bot.utils import members
 from bot.utils.decorators import InChannelCheckFailure, in_month, whitelist_override, with_role
 from bot.utils.exceptions import MovedCommandError
-from bot.utils.extensions import invoke_help_command
 
 log = logging.getLogger(__name__)
 
@@ -122,7 +121,7 @@ class AdventOfCode(commands.Cog):
     async def adventofcode_group(self, ctx: commands.Context) -> None:
         """All of the Advent of Code commands."""
         if not ctx.invoked_subcommand:
-            await invoke_help_command(ctx)
+            await self.bot.invoke_help_command(ctx)
 
     @with_role(Roles.admins)
     @adventofcode_group.command(
