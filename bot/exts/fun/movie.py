@@ -26,7 +26,8 @@ MOVIE_PARAMS = {
     "language": "en-US"
 }
 
-# Define maximum value for `pages` param
+# Maximum value for `pages` API parameter. The maximum is documented as 1000 but
+# anything over 500 returns an error.
 MAX_PAGES = 500
 
 
@@ -85,7 +86,7 @@ class Movie(Cog):
         # Check if "results" is in result. If not, throw error.
         if "results" not in result:
             err_msg = (
-                f"There is problem while making TMDB API request. Response Code: {status}, "
+                f"There was a problem making the TMDB API request. Response Code: {status}, "
                 f"TMDB: Status Code: {result.get('status_code', None)} "
                 f"TMDB: Status Message: {result.get('status_message', None)}, "
                 f"TMDB: Errors: {result.get('errors', None)}, "
@@ -119,7 +120,7 @@ class Movie(Cog):
         """Show all currently available genres for .movies command."""
         await ctx.send(f"Current available genres: {', '.join('`' + genre.name + '`' for genre in MovieGenres)}")
 
-    async def get_movies_data(self, client: ClientSession, genre_id: str, page: int) -> tuple[dict[str, Any], int]:
+    async def get_movies_data(self, client: ClientSession, genre_id: str, page: int) -> tuple[list[dict[str, Any]], int]:
         """Return JSON of TMDB discover request."""
         # Define params of request
         params = {
