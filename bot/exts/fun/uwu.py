@@ -199,6 +199,6 @@ class Uwu(Cog):
         await ctx.send(content=converted_text, embed=embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the uwu cog."""
-    bot.add_cog(Uwu(bot))
+    await bot.add_cog(Uwu(bot))

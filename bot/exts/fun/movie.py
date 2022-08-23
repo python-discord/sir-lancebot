@@ -200,6 +200,6 @@ class Movie(Cog):
         return embed
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Movie Cog."""
-    bot.add_cog(Movie(bot))
+    await bot.add_cog(Movie(bot))

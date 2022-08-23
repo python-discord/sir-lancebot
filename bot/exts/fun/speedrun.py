@@ -21,6 +21,6 @@ class Speedrun(commands.Cog):
         await ctx.send(choice(LINKS))
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Speedrun cog."""
-    bot.add_cog(Speedrun())
+    await bot.add_cog(Speedrun())

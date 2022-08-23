@@ -227,10 +227,10 @@ class Space(Cog):
         ).set_image(url=image).set_footer(text="Powered by NASA API" + footer)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Space cog."""
     if not Tokens.nasa:
         logger.warning("Can't find NASA API key. Not loading Space Cog.")
         return
 
-    bot.add_cog(Space(bot))
+    await bot.add_cog(Space(bot))

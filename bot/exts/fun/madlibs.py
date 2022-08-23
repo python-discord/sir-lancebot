@@ -143,6 +143,6 @@ class Madlibs(commands.Cog):
             error.handled = True
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Madlibs cog."""
-    bot.add_cog(Madlibs(bot))
+    await bot.add_cog(Madlibs(bot))

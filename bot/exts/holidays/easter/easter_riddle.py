@@ -107,6 +107,6 @@ class EasterRiddle(commands.Cog):
             self.winners.add(message.author.mention)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Easter Riddle Cog load."""
-    bot.add_cog(EasterRiddle(bot))
+    await bot.add_cog(EasterRiddle(bot))

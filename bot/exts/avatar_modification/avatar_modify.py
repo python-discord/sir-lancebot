@@ -366,6 +366,6 @@ class AvatarModify(commands.Cog):
             await ctx.send(file=file, embed=embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the AvatarModify cog."""
-    bot.add_cog(AvatarModify(bot))
+    await bot.add_cog(AvatarModify(bot))

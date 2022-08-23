@@ -144,6 +144,6 @@ class Twemoji(commands.Cog):
         await ctx.send(embed=self.build_embed(codepoint))
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Twemoji cog."""
-    bot.add_cog(Twemoji(bot))
+    await bot.add_cog(Twemoji(bot))

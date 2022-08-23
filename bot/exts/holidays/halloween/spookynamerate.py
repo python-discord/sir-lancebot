@@ -386,6 +386,6 @@ class SpookyNameRate(Cog):
         self.announce_name.cancel()
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the SpookyNameRate Cog."""
-    bot.add_cog(SpookyNameRate(bot))
+    await bot.add_cog(SpookyNameRate(bot))

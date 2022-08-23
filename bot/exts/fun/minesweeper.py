@@ -265,6 +265,6 @@ class Minesweeper(commands.Cog):
         del self.games[ctx.author.id]
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Minesweeper cog."""
-    bot.add_cog(Minesweeper(bot))
+    await bot.add_cog(Minesweeper(bot))

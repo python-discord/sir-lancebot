@@ -65,6 +65,6 @@ class SpookyReact(Cog):
         return False
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Spooky Reaction Cog."""
-    bot.add_cog(SpookyReact(bot))
+    await bot.add_cog(SpookyReact(bot))

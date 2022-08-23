@@ -120,6 +120,6 @@ class Emojis(commands.Cog):
         await ctx.send(embed=emoji_information)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Emojis cog."""
-    bot.add_cog(Emojis(bot))
+    await bot.add_cog(Emojis(bot))

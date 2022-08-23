@@ -547,7 +547,7 @@ def unload(bot: Bot) -> None:
     bot.add_command(bot._old_help)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """
     The setup for the help extension.
 
@@ -562,7 +562,7 @@ def setup(bot: Bot) -> None:
     bot.remove_command("help")
 
     try:
-        bot.add_cog(Help())
+        await bot.add_cog(Help())
     except Exception:
         unload(bot)
         raise

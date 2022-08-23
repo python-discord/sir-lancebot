@@ -50,6 +50,6 @@ class EasterFacts(commands.Cog):
         )
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Easter Egg facts Cog."""
-    bot.add_cog(EasterFacts(bot))
+    await bot.add_cog(EasterFacts(bot))

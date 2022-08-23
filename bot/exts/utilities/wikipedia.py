@@ -93,6 +93,6 @@ class WikipediaSearch(commands.Cog):
             )
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the WikipediaSearch cog."""
-    bot.add_cog(WikipediaSearch(bot))
+    await bot.add_cog(WikipediaSearch(bot))

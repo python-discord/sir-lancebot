@@ -135,6 +135,6 @@ class TimestampMenuView(discord.ui.View):
         return True
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Epoch cog."""
-    bot.add_cog(Epoch(bot))
+    await bot.add_cog(Epoch(bot))

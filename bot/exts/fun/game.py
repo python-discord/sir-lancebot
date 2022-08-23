@@ -504,7 +504,7 @@ class Games(Cog):
         return sorted((item for item in results if item[0] >= 0.60), reverse=True)[:4]
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Games cog."""
     # Check does IGDB API key exist, if not, log warning and don't load cog
     if not Tokens.igdb_client_id:
@@ -513,4 +513,4 @@ def setup(bot: Bot) -> None:
     if not Tokens.igdb_client_secret:
         logger.warning("No IGDB client secret. Not loading Games cog.")
         return
-    bot.add_cog(Games(bot))
+    await bot.add_cog(Games(bot))

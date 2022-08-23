@@ -33,6 +33,6 @@ class SpookyGif(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Spooky GIF Cog load."""
-    bot.add_cog(SpookyGif(bot))
+    await bot.add_cog(SpookyGif(bot))

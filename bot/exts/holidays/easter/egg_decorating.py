@@ -114,6 +114,6 @@ class EggDecorating(commands.Cog):
         return new_im
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Egg decorating Cog."""
-    bot.add_cog(EggDecorating())
+    await bot.add_cog(EggDecorating())

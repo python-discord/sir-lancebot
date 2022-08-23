@@ -260,6 +260,6 @@ class Colour(commands.Cog):
         return f"#{self.colour_mapping[match]}"
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Colour cog."""
-    bot.add_cog(Colour(bot))
+    await bot.add_cog(Colour(bot))

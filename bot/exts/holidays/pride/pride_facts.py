@@ -94,6 +94,6 @@ class PrideFacts(commands.Cog):
         )
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Pride Facts Cog."""
-    bot.add_cog(PrideFacts(bot))
+    await bot.add_cog(PrideFacts(bot))
