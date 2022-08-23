@@ -38,16 +38,15 @@ class Reddit(Cog):
         self.access_token = None
         self.client_auth = BasicAuth(RedditConfig.client_id, RedditConfig.secret)
 
-        bot.loop.create_task(self.init_reddit_ready())
         self.auto_poster_loop.start()
 
-    def cog_unload(self) -> None:
+    async def cog_unload(self) -> None:
         """Stop the loop task and revoke the access token when the cog is unloaded."""
         self.auto_poster_loop.cancel()
         if self.access_token and self.access_token.expires_at > datetime.utcnow():
             asyncio.create_task(self.revoke_access_token())
 
-    async def init_reddit_ready(self) -> None:
+    async def cog_load(self) -> None:
         """Sets the reddit webhook when the cog is loaded."""
         await self.bot.wait_until_guild_available()
         if not self.webhook:

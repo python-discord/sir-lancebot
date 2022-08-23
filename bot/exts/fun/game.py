@@ -185,9 +185,7 @@ class Games(Cog):
         self.genres: dict[str, int] = {}
         self.headers = BASE_HEADERS
 
-        self.bot.loop.create_task(self.renew_access_token())
-
-    async def renew_access_token(self) -> None:
+    async def cog_load(self) -> None:
         """Refeshes V4 access token a number of seconds before expiry. See `ACCESS_TOKEN_RENEWAL_WINDOW`."""
         while True:
             async with self.http_session.post(OAUTH_URL, params=OAUTH_PARAMS) as resp:
