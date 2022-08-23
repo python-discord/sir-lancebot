@@ -6,6 +6,7 @@ import discord
 from async_rediscache import RedisSession
 from botcore import StartupError
 from discord.ext import commands
+from redis import RedisError
 
 import bot
 from bot import constants
@@ -18,18 +19,18 @@ log = logging.getLogger(__name__)
 async def _create_redis_session() -> RedisSession:
     """Create and connect to a redis session."""
     redis_session = RedisSession(
-        address=(constants.RedisConfig.host, constants.RedisConfig.port),
+        host=constants.RedisConfig.host,
+        port=constants.RedisConfig.port,
         password=constants.RedisConfig.password,
-        minsize=1,
-        maxsize=20,
+        max_connections=20,
         use_fakeredis=constants.RedisConfig.use_fakeredis,
         global_namespace="bot",
+        decode_responses=True,
     )
     try:
-        await redis_session.connect()
-    except OSError as e:
+        return await redis_session.connect()
+    except RedisError as e:
         raise StartupError(e)
-    return redis_session
 
 
 async def main() -> None:
