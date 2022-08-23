@@ -62,7 +62,8 @@ class Movie(Cog):
     @group(name="movies", aliases=("movie",), invoke_without_command=True)
     async def movies(self, ctx: Context, genre: str = "", amount: int = 5) -> None:
         """
-        Get random movies by specifying genre. Also support amount parameter, that define how much movies will be shown.
+        Get random movies by specifying genre. Also support amount parameter,\
+        that define how much movies will be shown.
 
         Default 5. Use .movies genres to get all available genres.
         """
@@ -101,7 +102,7 @@ class Movie(Cog):
         movies, status = await self.get_movies_data(self.http_session, MovieGenres[genre].value, page)
         if "results" not in movies:
             err_msg = (
-                f"There is problem while making TMDB API request. Response Code: {status}, "
+                f"There was a problem making the TMDB API request. Response Code: {status}, "
                 f"TMDB: Status Code: {movies.get('status_code', None)} "
                 f"TMDB: Status Message: {movies.get('status_message', None)}, "
                 f"TMDB: Errors: {movies.get('errors', None)}, "
@@ -120,7 +121,8 @@ class Movie(Cog):
         """Show all currently available genres for .movies command."""
         await ctx.send(f"Current available genres: {', '.join('`' + genre.name + '`' for genre in MovieGenres)}")
 
-    async def get_movies_data(self, client: ClientSession, genre_id: str, page: int) -> tuple[list[dict[str, Any]], int]:
+    async def get_movies_data(self, client: ClientSession, genre_id: str, page: int)\
+            -> tuple[list[dict[str, Any]], int]:
         """Return JSON of TMDB discover request."""
         # Define params of request
         params = {
