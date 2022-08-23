@@ -4,7 +4,7 @@ from typing import Literal, Optional
 
 import discord
 from discord.ext import commands
-from emoji import UNICODE_EMOJI_ENGLISH, is_emoji
+from emoji import EMOJI_DATA, is_emoji
 
 from bot.bot import Bot
 from bot.constants import Colours, Roles
@@ -49,7 +49,7 @@ class Twemoji(commands.Cog):
         emoji = "".join(Twemoji.emoji(e) or "" for e in codepoint.split("-"))
 
         embed = discord.Embed(
-            title=Twemoji.alias_to_name(UNICODE_EMOJI_ENGLISH[emoji]),
+            title=Twemoji.alias_to_name(EMOJI_DATA[emoji]["en"]),
             description=f"{codepoint.replace('-', ' ')}\n[Download svg]({Twemoji.get_url(codepoint, 'svg')})",
             colour=Colours.twitter_blue,
         )
