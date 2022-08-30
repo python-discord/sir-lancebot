@@ -48,12 +48,11 @@ class SendBookmark(discord.ui.View):
     ):
         super().__init__()
 
-        self.bookmark_function = bookmark_function # The function is the 'action_bookmark'
+        self.bookmark_function = bookmark_function  # The function is the 'action_bookmark'
         self.clicked: list[int] = [author.id]
         self.channel = channel
         self.target_message = target_message
 
-    
     @discord.ui.button(label="Receive Bookmark", style=discord.ButtonStyle.green)
     async def button_callback(self, button: discord.Button, interaction: discord.Interaction) -> None:
         """The button callback."""
@@ -169,7 +168,7 @@ class Bookmark(commands.Cog):
         await self.action_bookmark(ctx.channel, ctx.author, target_message, title)
 
         view = SendBookmark(self.action_bookmark, ctx.author, ctx.channel, target_message)
-        
+
         embed = self.create_button_embed(target_message)
         await ctx.send(embed=embed, view=view)
 
