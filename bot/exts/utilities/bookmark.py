@@ -39,9 +39,7 @@ class SendBookmark(discord.ui.View):
 
     def __init__(
         self,
-        bookmark_function: Callable[
-            [discord.TextChannel, discord.Member, discord.Message, str], None
-        ],
+        bookmark_function: Callable[[discord.TextChannel, discord.Member, discord.Message, str], None],
         author: discord.Member,
         channel: discord.TextChannel,
         target_message: discord.Message,
@@ -64,9 +62,7 @@ class SendBookmark(discord.ui.View):
         await self.bookmark_function(
             self.channel, interaction.user, self.target_message
         )
-        await interaction.response.send_message(
-            "You have received a bookmark to that message.", ephemeral=True
-        )
+        await interaction.response.send_message("You have received a bookmark to that message.", ephemeral=True)
         self.clicked.append(interaction.user.id)
 
 
@@ -80,7 +76,9 @@ class Bookmark(commands.Cog):
     def build_bookmark_dm(target_message: discord.Message, title: str) -> discord.Embed:
         """Build the embed to DM the bookmark requester."""
         embed = discord.Embed(
-            title=title, description=target_message.content, colour=Colours.soft_green
+            title=title, 
+            description=target_message.content, 
+            colour=Colours.soft_green
         )
         embed.set_author(
             name=target_message.author,
