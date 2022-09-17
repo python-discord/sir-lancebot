@@ -199,8 +199,8 @@ def whitelist_check(**default_kwargs: Container[int]) -> Callable[[Context], boo
         kwargs = default_kwargs.copy()
         allow_dms = False
 
-        # determine which command's overrides we will use
-        # as we have groups, we want to ensure that group commands inherit from the parent
+        # Determine which command's overrides we will use. Group commands will
+        # inherit from their parents if they don't define their own overrides
         overridden_command: Optional[commands.Command] = None
         for command in [ctx.command, *ctx.command.parents]:
             if hasattr(command.callback, "override"):
