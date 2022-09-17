@@ -215,7 +215,7 @@ def whitelist_check(**default_kwargs: Container[int]) -> Callable[[Context], boo
                 )
 
         # Update kwargs based on override, if one exists
-        if overridden_command and hasattr(overridden_command.callback, "override"):
+        if overridden_command:
             # Handle DM invocations
             allow_dms = overridden_command.callback.override_dm
 
