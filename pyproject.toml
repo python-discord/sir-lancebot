@@ -9,27 +9,27 @@ license = "MIT"
 python = "3.10.*"
 
 # See https://bot-core.pythondiscord.com/ for docs.
-bot-core = {url = "https://github.com/python-discord/bot-core/archive/refs/tags/v8.2.0.zip", extras = ["async-rediscache"]}
+bot-core = {url = "https://github.com/python-discord/bot-core/archive/refs/tags/v8.2.1.zip", extras = ["async-rediscache"]}
 
 aiodns = "3.0.0"
 aioredis = "2.0.1"
-rapidfuzz = "2.6.0"
-arrow = "1.2.2"
+rapidfuzz = "2.9.0"
+arrow = "1.2.3"
 beautifulsoup4 = "4.11.1"
 pillow = "9.2.0"
-sentry-sdk = "1.9.5"
+sentry-sdk = "1.9.8"
 PyYAML = "6.0"
 emojis = "0.6.0"
 coloredlogs = "15.0.1"
 colorama = { version = "0.4.5", markers = "sys_platform == 'win32'" }
 lxml = "4.9.1"
-emoji = "2.0.0"
+emoji = "2.1.0"
 pyjokes = "0.6.0"
 
 [tool.poetry.dev-dependencies]
 flake8 = "5.0.4"
 flake8-annotations = "2.9.1"
-flake8-bugbear = "22.8.23"
+flake8-bugbear = "22.9.11"
 flake8-docstrings = "1.6.0"
 flake8-string-format = "0.3.0"
 flake8-tidy-imports = "4.8.0"
@@ -38,8 +38,8 @@ flake8-isort = "4.2.0"
 pep8-naming = "0.13.2"
 pip-licenses = "3.5.4"
 pre-commit = "2.20.0"
-python-dotenv = "0.20.0"
-taskipy = "1.10.2"
+python-dotenv = "0.21.0"
+taskipy = "1.10.3"
 
 [tool.taskipy.tasks]
 start = "python -m bot"
