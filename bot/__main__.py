@@ -12,4 +12,8 @@ bot.add_check(whitelist_check(channels=WHITELISTED_CHANNELS, roles=STAFF_ROLES))
 for ext in walk_extensions():
     bot.load_extension(ext)
 
-bot.run(Client.token)
+if not Client.in_ci:
+    # Manually enable the message content intent. This is required until the below PR is merged
+    # https://github.com/python-discord/sir-lancebot/pull/1092
+    bot._connection._intents.value += 1 << 15
+    bot.run(Client.token)

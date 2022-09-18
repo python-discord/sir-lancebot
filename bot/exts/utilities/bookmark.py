@@ -16,6 +16,13 @@ log = logging.getLogger(__name__)
 # Number of seconds to wait for other users to bookmark the same message
 TIMEOUT = 120
 BOOKMARK_EMOJI = "📌"
+MESSAGE_NOT_FOUND_ERROR = (
+    "You must either provide a reference to a valid message, or reply to one."
+    "\n\nThe lookup strategy for a message is as follows (in order):"
+    "\n1. Lookup by '{channel ID}-{message ID}' (retrieved by shift-clicking on 'Copy ID')"
+    "\n2. Lookup by message ID (the message **must** be in the current channel)"
+    "\n3. Lookup by message URL"
+)
 
 
 class Bookmark(commands.Cog):
@@ -42,51 +49,37 @@ class Bookmark(commands.Cog):
         return embed
 
     @staticmethod
-    def build_error_embed(user: discord.Member) -> discord.Embed:
-        """Builds an error embed for when a bookmark requester has DMs disabled."""
+    def build_error_embed(message: str) -> discord.Embed:
+        """Builds an error embed for a given message."""
         return discord.Embed(
             title=random.choice(ERROR_REPLIES),
-            description=f"{user.mention}, please enable your DMs to receive the bookmark.",
+            description=message,
             colour=Colours.soft_red
         )
 
     async def action_bookmark(
         self,
         channel: discord.TextChannel,
-        user: discord.Member,
+        member: discord.Member,
         target_message: discord.Message,
         title: str
     ) -> None:
-        """Sends the bookmark DM, or sends an error embed when a user bookmarks a message."""
+        """
+        Sends the given target_message as a bookmark to the member in DMs to the user.
+
+        Send an error embed instead if the member has DMs disabled.
+        """
+        embed = self.build_bookmark_dm(target_message, title)
         try:
-            embed = self.build_bookmark_dm(target_message, title)
-            await user.send(embed=embed)
+            await member.send(embed=embed)
         except discord.Forbidden:
-            error_embed = self.build_error_embed(user)
+            error_embed = self.build_error_embed(f"{member.mention}, please enable your DMs to receive the bookmark.")
             await channel.send(embed=error_embed)
         else:
-            log.info(f"{user} bookmarked {target_message.jump_url} with title '{title}'")
+            log.info(f"{member} bookmarked {target_message.jump_url} with title '{title}'")
 
-    @staticmethod
-    async def send_reaction_embed(
-        channel: discord.TextChannel,
-        target_message: discord.Message
-    ) -> discord.Message:
-        """Sends an embed, with a reaction, so users can react to bookmark the message too."""
-        message = await channel.send(
-            embed=discord.Embed(
-                description=(
-                    f"React with {BOOKMARK_EMOJI} to be sent your very own bookmark to "
-                    f"[this message]({target_message.jump_url})."
-                ),
-                colour=Colours.soft_green
-            )
-        )
-
-        await message.add_reaction(BOOKMARK_EMOJI)
-        return message
-
-    @commands.command(name="bookmark", aliases=("bm", "pin"))
+    @commands.group(name="bookmark", aliases=("bm", "pin"), invoke_without_command=True)
+    @commands.guild_only()
     @whitelist_override(roles=(Roles.everyone,))
     async def bookmark(
         self,
@@ -95,29 +88,39 @@ class Bookmark(commands.Cog):
         *,
         title: str = "Bookmark"
     ) -> None:
-        """Send the author a link to `target_message` via DMs."""
-        if not target_message:
-            if not ctx.message.reference:
-                raise commands.UserInputError(
-                    "You must either provide a valid message to bookmark, or reply to one."
-                    "\n\nThe lookup strategy for a message is as follows (in order):"
-                    "\n1. Lookup by '{channel ID}-{message ID}' (retrieved by shift-clicking on 'Copy ID')"
-                    "\n2. Lookup by message ID (the message **must** be in the context channel)"
-                    "\n3. Lookup by message URL"
-                )
-            target_message = ctx.message.reference.resolved
+        """
+        Send the author a link to the specified message via DMs.
+
+        Members can either give a message as an argument, or reply to a message.
+
+        Bookmarks can subsequently be deleted by using the `bookmark delete` command in DMs.
+        """
+        target_message: Optional[discord.Message] = target_message or getattr(ctx.message.reference, "resolved", None)
+        if target_message is None:
+            raise commands.UserInputError(MESSAGE_NOT_FOUND_ERROR)
 
         # Prevent users from bookmarking a message in a channel they don't have access to
         permissions = target_message.channel.permissions_for(ctx.author)
         if not permissions.read_messages:
             log.info(f"{ctx.author} tried to bookmark a message in #{target_message.channel} but has no permissions.")
-            embed = discord.Embed(
-                title=random.choice(ERROR_REPLIES),
-                color=Colours.soft_red,
-                description="You don't have permission to view this channel."
-            )
+            embed = self.build_error_embed(f"{ctx.author.mention} You don't have permission to view this channel.")
             await ctx.send(embed=embed)
             return
+
+        await self.action_bookmark(ctx.channel, ctx.author, target_message, title)
+
+        # Keep track of who has already bookmarked, so users can't spam reactions and cause loads of DMs
+        bookmarked_users = [ctx.author.id]
+
+        reaction_embed = discord.Embed(
+            description=(
+                f"React with {BOOKMARK_EMOJI} to be sent your very own bookmark to "
+                f"[this message]({ctx.message.jump_url})."
+            ),
+            colour=Colours.soft_green
+        )
+        reaction_message = await ctx.send(embed=reaction_embed)
+        await reaction_message.add_reaction(BOOKMARK_EMOJI)
 
         def event_check(reaction: discord.Reaction, user: discord.Member) -> bool:
             """Make sure that this reaction is what we want to operate on."""
@@ -134,11 +137,6 @@ class Bookmark(commands.Cog):
                     user.id != self.bot.user.id
                 ))
             )
-        await self.action_bookmark(ctx.channel, ctx.author, target_message, title)
-
-        # Keep track of who has already bookmarked, so users can't spam reactions and cause loads of DMs
-        bookmarked_users = [ctx.author.id]
-        reaction_message = await self.send_reaction_embed(ctx.channel, target_message)
 
         while True:
             try:
@@ -151,6 +149,31 @@ class Bookmark(commands.Cog):
             bookmarked_users.append(user.id)
 
         await reaction_message.delete()
+
+    @bookmark.command(name="delete", aliases=("del", "rm"), root_aliases=("unbm", "unbookmark", "dmdelete", "dmdel"))
+    @whitelist_override(bypass_defaults=True, allow_dm=True)
+    async def delete_bookmark(
+        self,
+        ctx: commands.Context,
+    ) -> None:
+        """
+        Delete the Sir-Lancebot message that the command invocation is replying to.
+
+        This command allows deleting any message sent by Sir-Lancebot in the user's DM channel with the bot.
+        The command invocation must be a reply to the message that is to be deleted.
+        """
+        target_message: Optional[discord.Message] = getattr(ctx.message.reference, "resolved", None)
+        if target_message is None:
+            raise commands.UserInputError("You must reply to the message from Sir-Lancebot you wish to delete.")
+
+        if not isinstance(ctx.channel, discord.DMChannel):
+            raise commands.UserInputError("You can only run this command your own DMs!")
+        elif target_message.channel != ctx.channel:
+            raise commands.UserInputError("You can only delete messages in your own DMs!")
+        elif target_message.author != self.bot.user:
+            raise commands.UserInputError("You can only delete messages sent by Sir Lancebot!")
+
+        await target_message.delete()
 
 
 def setup(bot: Bot) -> None:

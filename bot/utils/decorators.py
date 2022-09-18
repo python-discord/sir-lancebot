@@ -272,10 +272,10 @@ def whitelist_check(**default_kwargs: Container[int]) -> Callable[[Context], boo
         channels = set(kwargs.get("channels") or {})
         categories = kwargs.get("categories")
 
-        # Only output override channels + community_bot_commands
+        # Only output override channels + sir_lancebot_playground
         if channels:
             default_whitelist_channels = set(WHITELISTED_CHANNELS)
-            default_whitelist_channels.discard(Channels.community_bot_commands)
+            default_whitelist_channels.discard(Channels.sir_lancebot_playground)
             channels.difference_update(default_whitelist_channels)
 
         # Add all whitelisted category channels, but skip if we're in DMs
