@@ -33,6 +33,22 @@ async def _create_redis_session() -> RedisSession:
         raise StartupError(e)
 
 
+async def test_bot_in_ci(bot: Bot) -> None:
+    """
+    Attempt to import all extensions and then return.
+
+    This is to ensure that all extensions can at least be
+    imported and have a setup function within our CI.
+    """
+    from botcore.utils._extensions import walk_extensions
+
+    from bot import exts
+
+    for _ in walk_extensions(exts):
+        # walk_extensions does all the heavy lifting within the generator.
+        pass
+
+
 async def main() -> None:
     """Entry async method for starting the bot."""
     allowed_roles = list({discord.Object(id_) for id_ in constants.MODERATION_ROLES})
@@ -62,7 +78,10 @@ async def main() -> None:
                 channels=constants.WHITELISTED_CHANNELS,
                 roles=constants.STAFF_ROLES,
             ))
-            await _bot.start(constants.Client.token)
+            if constants.Client.in_ci:
+                await test_bot_in_ci(_bot)
+            else:
+                await _bot.start(constants.Client.token)
 
 
 asyncio.run(main())
