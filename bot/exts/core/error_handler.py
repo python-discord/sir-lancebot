@@ -171,9 +171,8 @@ class CommandErrorHandler(commands.Cog):
                     if not await similar_command.can_run(ctx):
                         log.debug(log_msg)
                         continue
-                except commands.errors.CommandError as cmd_error:
+                except commands.errors.CommandError:
                     log.debug(log_msg)
-                    await self.on_command_error(ctx, cmd_error)
                     continue
 
                 command_suggestions.append(similar_command_name)
