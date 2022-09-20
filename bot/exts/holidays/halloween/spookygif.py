@@ -25,7 +25,7 @@ class SpookyGif(commands.Cog):
             # Make a GET request to the Giphy API to get a random halloween gif.
             async with self.bot.http_session.get(API_URL, params=params) as resp:
                 data = await resp.json()
-            url = data["data"]["image_url"]
+            url = data["data"]["images"]["downsized"]["url"]
 
             embed = discord.Embed(title="A spooooky gif!", colour=Colours.purple)
             embed.set_image(url=url)
