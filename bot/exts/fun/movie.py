@@ -121,8 +121,12 @@ class Movie(Cog):
         """Show all currently available genres for .movies command."""
         await ctx.send(f"Current available genres: {', '.join('`' + genre.name + '`' for genre in MovieGenres)}")
 
-    async def get_movies_data(self, client: ClientSession, genre_id: str, page: int)\
-            -> tuple[list[dict[str, Any]], int]:
+    async def get_movies_data(
+        self,
+        client: ClientSession,
+        genre_id: str,
+        page: int
+    ) -> tuple[list[dict[str, Any]], int]:
         """Return JSON of TMDB discover request."""
         # Define params of request
         params = {
