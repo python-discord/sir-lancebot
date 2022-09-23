@@ -22,7 +22,6 @@ from bot.constants import ERROR_REPLIES, Tokens
 from bot.exts.fun.snakes import _utils as utils
 from bot.exts.fun.snakes._converter import Snake
 from bot.utils.decorators import locked
-from bot.utils.extensions import invoke_help_command
 
 log = logging.getLogger(__name__)
 
@@ -440,7 +439,7 @@ class Snakes(Cog):
     @group(name="snakes", aliases=("snake",), invoke_without_command=True)
     async def snakes_group(self, ctx: Context) -> None:
         """Commands from our first code jam."""
-        await invoke_help_command(ctx)
+        await self.bot.invoke_help_command(ctx)
 
     @bot_has_permissions(manage_messages=True)
     @snakes_group.command(name="antidote")

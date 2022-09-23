@@ -94,6 +94,6 @@ class RealPython(commands.Cog):
         await ctx.send(embed=article_embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Real Python Cog."""
-    bot.add_cog(RealPython(bot))
+    await bot.add_cog(RealPython(bot))

@@ -177,6 +177,6 @@ class Hangman(commands.Cog):
         await ctx.send(embed=win_embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Hangman cog."""
-    bot.add_cog(Hangman(bot))
+    await bot.add_cog(Hangman(bot))

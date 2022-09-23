@@ -70,6 +70,6 @@ class Quackstack(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Loads the Quack cog."""
-    bot.add_cog(Quackstack(bot))
+    await bot.add_cog(Quackstack(bot))

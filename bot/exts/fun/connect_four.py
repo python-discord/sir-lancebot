@@ -447,6 +447,6 @@ class ConnectFour(commands.Cog):
         await self._play_game(ctx, None, board_size, str(emoji1), str(emoji2))
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load ConnectFour Cog."""
-    bot.add_cog(ConnectFour(bot))
+    await bot.add_cog(ConnectFour(bot))

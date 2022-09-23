@@ -176,6 +176,6 @@ class Bookmark(commands.Cog):
         await target_message.delete()
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Bookmark cog."""
-    bot.add_cog(Bookmark(bot))
+    await bot.add_cog(Bookmark(bot))

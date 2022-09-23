@@ -49,6 +49,6 @@ class MonsterBio(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Monster Bio Cog."""
-    bot.add_cog(MonsterBio())
+    await bot.add_cog(MonsterBio())

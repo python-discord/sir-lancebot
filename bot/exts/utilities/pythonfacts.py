@@ -31,6 +31,6 @@ class PythonFacts(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the PythonFacts Cog."""
-    bot.add_cog(PythonFacts())
+    await bot.add_cog(PythonFacts())

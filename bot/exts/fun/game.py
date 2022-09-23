@@ -2,12 +2,12 @@ import difflib
 import logging
 import random
 import re
-from asyncio import sleep
 from datetime import datetime as dt, timedelta
 from enum import IntEnum
 from typing import Any, Optional
 
 from aiohttp import ClientSession
+from botcore.utils import scheduling
 from discord import Embed
 from discord.ext import tasks
 from discord.ext.commands import Cog, Context, group
@@ -15,7 +15,6 @@ from discord.ext.commands import Cog, Context, group
 from bot.bot import Bot
 from bot.constants import STAFF_ROLES, Tokens
 from bot.utils.decorators import with_role
-from bot.utils.extensions import invoke_help_command
 from bot.utils.pagination import ImagePaginator, LinePaginator
 
 # Base URL of IGDB API
@@ -185,46 +184,45 @@ class Games(Cog):
 
         self.genres: dict[str, int] = {}
         self.headers = BASE_HEADERS
+        self.token_refresh_scheduler = scheduling.Scheduler(__name__)
 
-        self.bot.loop.create_task(self.renew_access_token())
+    async def cog_load(self) -> None:
+        """Get an auth token and start the refresh task on cog load."""
+        await self.refresh_token()
+        self.refresh_genres_task.start()
 
-    async def renew_access_token(self) -> None:
-        """Refeshes V4 access token a number of seconds before expiry. See `ACCESS_TOKEN_RENEWAL_WINDOW`."""
-        while True:
-            async with self.http_session.post(OAUTH_URL, params=OAUTH_PARAMS) as resp:
-                result = await resp.json()
-                if resp.status != 200:
-                    # If there is a valid access token continue to use that,
-                    # otherwise unload cog.
-                    if "Authorization" in self.headers:
-                        time_delta = timedelta(seconds=ACCESS_TOKEN_RENEWAL_WINDOW)
-                        logger.error(
-                            "Failed to renew IGDB access token. "
-                            f"Current token will last for {time_delta} "
-                            f"OAuth response message: {result['message']}"
-                        )
-                    else:
-                        logger.warning(
-                            "Invalid OAuth credentials. Unloading Games cog. "
-                            f"OAuth response message: {result['message']}"
-                        )
-                        self.bot.remove_cog("Games")
+    async def refresh_token(self) -> None:
+        """
+        Refresh the IGDB V4 access token.
 
-                    return
+        Once a new token has been created, schedule another refresh `ACCESS_TOKEN_RENEWAL_WINDOW` seconds before expiry.
+        """
+        async with self.http_session.post(OAUTH_URL, params=OAUTH_PARAMS) as resp:
+            result = await resp.json()
+            if resp.status != 200:
+                # If there is a valid access token continue to use that,
+                # otherwise unload cog.
+                if "Authorization" in self.headers:
+                    time_delta = timedelta(seconds=ACCESS_TOKEN_RENEWAL_WINDOW)
+                    logger.error(
+                        "Failed to renew IGDB access token. "
+                        f"Current token will last for {time_delta} "
+                        f"OAuth response message: {result['message']}"
+                    )
+                else:
+                    logger.warning(
+                        "Invalid OAuth credentials. Unloading Games cog. "
+                        f"OAuth response message: {result['message']}"
+                    )
+                    self.bot.remove_cog("Games")
+                return
 
-            self.headers["Authorization"] = f"Bearer {result['access_token']}"
+        self.headers["Authorization"] = f"Bearer {result['access_token']}"
 
-            # Attempt to renew before the token expires
-            next_renewal = result["expires_in"] - ACCESS_TOKEN_RENEWAL_WINDOW
-
-            time_delta = timedelta(seconds=next_renewal)
-            logger.info(f"Successfully renewed access token. Refreshing again in {time_delta}")
-
-            # This will be true the first time this loop runs.
-            # Since we now have an access token, its safe to start this task.
-            if self.genres == {}:
-                self.refresh_genres_task.start()
-            await sleep(next_renewal)
+        # Attempt to renew before the token expires
+        seconds_until_next_renewal = result["expires_in"] - ACCESS_TOKEN_RENEWAL_WINDOW
+        logger.info(f"Successfully renewed access token. Refreshing again in {seconds_until_next_renewal} seconds")
+        self.token_refresh_scheduler.schedule_later(seconds_until_next_renewal, __name__, self.refresh_token())
 
     @tasks.loop(hours=24.0)
     async def refresh_genres_task(self) -> None:
@@ -267,7 +265,7 @@ class Games(Cog):
         """
         # When user didn't specified genre, send help message
         if genre is None:
-            await invoke_help_command(ctx)
+            await self.bot.invoke_help_command(ctx)
             return
 
         # Capitalize genre for check
@@ -505,7 +503,7 @@ class Games(Cog):
         return sorted((item for item in results if item[0] >= 0.60), reverse=True)[:4]
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Games cog."""
     # Check does IGDB API key exist, if not, log warning and don't load cog
     if not Tokens.igdb_client_id:
@@ -514,4 +512,4 @@ def setup(bot: Bot) -> None:
     if not Tokens.igdb_client_secret:
         logger.warning("No IGDB client secret. Not loading Games cog.")
         return
-    bot.add_cog(Games(bot))
+    await bot.add_cog(Games(bot))

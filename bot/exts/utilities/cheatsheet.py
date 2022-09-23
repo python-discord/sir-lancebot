@@ -107,6 +107,6 @@ class CheatSheet(commands.Cog):
                 await ctx.send(content=description)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the CheatSheet cog."""
-    bot.add_cog(CheatSheet(bot))
+    await bot.add_cog(CheatSheet(bot))

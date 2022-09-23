@@ -6,7 +6,6 @@ from dateutil import parser
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.utils.extensions import invoke_help_command
 
 # https://discord.com/developers/docs/reference#message-formatting-timestamp-styles
 STYLES = {
@@ -48,6 +47,9 @@ class DateString(commands.Converter):
 class Epoch(commands.Cog):
     """Convert an entered time and date to a unix timestamp."""
 
+    def __init__(self, bot: Bot) -> None:
+        self.bot = bot
+
     @commands.command(name="epoch")
     async def epoch(self, ctx: commands.Context, *, date_time: DateString = None) -> None:
         """
@@ -71,7 +73,7 @@ class Epoch(commands.Cog):
         Times in the dropdown are shown in UTC
         """
         if not date_time:
-            await invoke_help_command(ctx)
+            await self.bot.invoke_help_command(ctx)
             return
 
         if isinstance(date_time, tuple):
@@ -133,6 +135,6 @@ class TimestampMenuView(discord.ui.View):
         return True
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Epoch cog."""
-    bot.add_cog(Epoch())
+    await bot.add_cog(Epoch(bot))

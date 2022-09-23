@@ -186,6 +186,6 @@ class CommandErrorHandler(commands.Cog):
             await ctx.send(embed=e, delete_after=RedirectOutput.delete_delay)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the ErrorHandler cog."""
-    bot.add_cog(CommandErrorHandler(bot))
+    await bot.add_cog(CommandErrorHandler(bot))

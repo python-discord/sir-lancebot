@@ -4,12 +4,11 @@ from typing import Literal, Optional
 
 import discord
 from discord.ext import commands
-from emoji import UNICODE_EMOJI_ENGLISH, is_emoji
+from emoji import EMOJI_DATA, is_emoji
 
 from bot.bot import Bot
 from bot.constants import Colours, Roles
 from bot.utils.decorators import whitelist_override
-from bot.utils.extensions import invoke_help_command
 
 log = logging.getLogger(__name__)
 BASE_URLS = {
@@ -50,7 +49,7 @@ class Twemoji(commands.Cog):
         emoji = "".join(Twemoji.emoji(e) or "" for e in codepoint.split("-"))
 
         embed = discord.Embed(
-            title=Twemoji.alias_to_name(UNICODE_EMOJI_ENGLISH[emoji]),
+            title=Twemoji.alias_to_name(EMOJI_DATA[emoji]["en"]),
             description=f"{codepoint.replace('-', ' ')}\n[Download svg]({Twemoji.get_url(codepoint, 'svg')})",
             colour=Colours.twitter_blue,
         )
@@ -133,7 +132,7 @@ class Twemoji(commands.Cog):
     async def twemoji(self, ctx: commands.Context, *raw_emoji: str) -> None:
         """Sends a preview of a given Twemoji, specified by codepoint or emoji."""
         if len(raw_emoji) == 0:
-            await invoke_help_command(ctx)
+            await self.bot.invoke_help_command(ctx)
             return
         try:
             codepoint = self.codepoint_from_input(raw_emoji)
@@ -145,6 +144,6 @@ class Twemoji(commands.Cog):
         await ctx.send(embed=self.build_embed(codepoint))
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Twemoji cog."""
-    bot.add_cog(Twemoji(bot))
+    await bot.add_cog(Twemoji(bot))

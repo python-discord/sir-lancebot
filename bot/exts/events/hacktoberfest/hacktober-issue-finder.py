@@ -113,6 +113,6 @@ class HacktoberIssues(commands.Cog):
         return embed
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the HacktoberIssue finder."""
-    bot.add_cog(HacktoberIssues(bot))
+    await bot.add_cog(HacktoberIssues(bot))

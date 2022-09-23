@@ -157,6 +157,6 @@ class Fun(Cog):
         await ctx.send(joke)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Fun cog."""
-    bot.add_cog(Fun(bot))
+    await bot.add_cog(Fun(bot))

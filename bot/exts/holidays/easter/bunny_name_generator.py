@@ -89,6 +89,6 @@ class BunnyNameGenerator(commands.Cog):
         await ctx.send(bunnified_name)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Bunny Name Generator Cog."""
-    bot.add_cog(BunnyNameGenerator())
+    await bot.add_cog(BunnyNameGenerator())

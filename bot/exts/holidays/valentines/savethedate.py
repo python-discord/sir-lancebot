@@ -33,6 +33,6 @@ class SaveTheDate(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Save the date Cog."""
-    bot.add_cog(SaveTheDate())
+    await bot.add_cog(SaveTheDate())
