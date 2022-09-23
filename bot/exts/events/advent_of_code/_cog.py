@@ -70,7 +70,6 @@ class AdventOfCode(commands.Cog):
 
         Runs on a schedule, as defined in the task.loop decorator.
         """
-        await self.bot.wait_until_guild_available()
         guild = self.bot.get_guild(Client.guild)
         completionist_role = guild.get_role(Roles.aoc_completionist)
         if completionist_role is None:

@@ -48,9 +48,7 @@ class Reddit(Cog):
 
     async def cog_load(self) -> None:
         """Sets the reddit webhook when the cog is loaded."""
-        await self.bot.wait_until_guild_available()
-        if not self.webhook:
-            self.webhook = await self.bot.fetch_webhook(RedditConfig.webhook)
+        self.webhook = await self.bot.fetch_webhook(RedditConfig.webhook)
 
     @property
     def channel(self) -> TextChannel:
@@ -256,7 +254,6 @@ class Reddit(Cog):
 
         await sleep_until(midnight_tomorrow)
 
-        await self.bot.wait_until_guild_available()
         if not self.webhook:
             await self.bot.fetch_webhook(RedditConfig.webhook)
 

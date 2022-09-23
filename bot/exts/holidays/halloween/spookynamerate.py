@@ -355,7 +355,6 @@ class SpookyNameRate(Cog):
 
     async def get_channel(self) -> Optional[TextChannel]:
         """Gets the sir-lancebot-channel after waiting until ready."""
-        await self.bot.wait_until_ready()
         channel = self.bot.get_channel(
             Channels.sir_lancebot_playground
         ) or await self.bot.fetch_channel(Channels.sir_lancebot_playground)

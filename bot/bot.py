@@ -42,7 +42,6 @@ class Bot(BotBase):
 
     async def log_to_dev_log(self, title: str, details: str = None, *, icon: str = None) -> None:
         """Send an embed message to the dev-log channel."""
-        await self.wait_until_guild_available()
         devlog = self.get_channel(constants.Channels.devlog)
 
         if not icon:
