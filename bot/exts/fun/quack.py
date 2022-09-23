@@ -50,13 +50,12 @@ class Quackstack(commands.Cog):
                 description="The request failed. Please try again later.",
                 color=Colours.soft_red,
             )
-            if response.status != 200:
+            if response.status != 201:
                 log.error(f"Response to Quackstack returned code {response.status}")
                 await ctx.send(embed=error_embed)
                 return
 
-            data = await response.json()
-            file = data["file"]
+            file = response.headers["Location"]
 
         embed = discord.Embed(
             title=f"Quack! Here's a {ducktype} for you.",
@@ -65,7 +64,7 @@ class Quackstack(commands.Cog):
             url=f"{API_URL}/docs"
         )
 
-        embed.set_image(url=API_URL + file)
+        embed.set_image(url=file)
 
         await ctx.send(embed=embed)
 
