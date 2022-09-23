@@ -2,12 +2,12 @@ import difflib
 import logging
 import random
 import re
-from asyncio import sleep
 from datetime import datetime as dt, timedelta
 from enum import IntEnum
 from typing import Any, Optional
 
 from aiohttp import ClientSession
+from botcore.utils import scheduling
 from discord import Embed
 from discord.ext import tasks
 from discord.ext.commands import Cog, Context, group
@@ -184,44 +184,45 @@ class Games(Cog):
 
         self.genres: dict[str, int] = {}
         self.headers = BASE_HEADERS
+        self.token_refresh_scheduler = scheduling.Scheduler(__name__)
 
     async def cog_load(self) -> None:
-        """Refeshes V4 access token a number of seconds before expiry. See `ACCESS_TOKEN_RENEWAL_WINDOW`."""
-        while True:
-            async with self.http_session.post(OAUTH_URL, params=OAUTH_PARAMS) as resp:
-                result = await resp.json()
-                if resp.status != 200:
-                    # If there is a valid access token continue to use that,
-                    # otherwise unload cog.
-                    if "Authorization" in self.headers:
-                        time_delta = timedelta(seconds=ACCESS_TOKEN_RENEWAL_WINDOW)
-                        logger.error(
-                            "Failed to renew IGDB access token. "
-                            f"Current token will last for {time_delta} "
-                            f"OAuth response message: {result['message']}"
-                        )
-                    else:
-                        logger.warning(
-                            "Invalid OAuth credentials. Unloading Games cog. "
-                            f"OAuth response message: {result['message']}"
-                        )
-                        self.bot.remove_cog("Games")
+        """Get an auth token and start the refresh task on cog load."""
+        await self.refresh_token()
+        self.refresh_genres_task.start()
 
-                    return
+    async def refresh_token(self) -> None:
+        """
+        Refresh the IGDB V4 access token.
 
-            self.headers["Authorization"] = f"Bearer {result['access_token']}"
+        Once a new token has been created, schedule another refresh `ACCESS_TOKEN_RENEWAL_WINDOW` seconds before expiry.
+        """
+        async with self.http_session.post(OAUTH_URL, params=OAUTH_PARAMS) as resp:
+            result = await resp.json()
+            if resp.status != 200:
+                # If there is a valid access token continue to use that,
+                # otherwise unload cog.
+                if "Authorization" in self.headers:
+                    time_delta = timedelta(seconds=ACCESS_TOKEN_RENEWAL_WINDOW)
+                    logger.error(
+                        "Failed to renew IGDB access token. "
+                        f"Current token will last for {time_delta} "
+                        f"OAuth response message: {result['message']}"
+                    )
+                else:
+                    logger.warning(
+                        "Invalid OAuth credentials. Unloading Games cog. "
+                        f"OAuth response message: {result['message']}"
+                    )
+                    self.bot.remove_cog("Games")
+                return
 
-            # Attempt to renew before the token expires
-            next_renewal = result["expires_in"] - ACCESS_TOKEN_RENEWAL_WINDOW
+        self.headers["Authorization"] = f"Bearer {result['access_token']}"
 
-            time_delta = timedelta(seconds=next_renewal)
-            logger.info(f"Successfully renewed access token. Refreshing again in {time_delta}")
-
-            # This will be true the first time this loop runs.
-            # Since we now have an access token, its safe to start this task.
-            if self.genres == {}:
-                self.refresh_genres_task.start()
-            await sleep(next_renewal)
+        # Attempt to renew before the token expires
+        seconds_until_next_renewal = result["expires_in"] - ACCESS_TOKEN_RENEWAL_WINDOW
+        logger.info(f"Successfully renewed access token. Refreshing again in {seconds_until_next_renewal} seconds")
+        self.token_refresh_scheduler.schedule_later(seconds_until_next_renewal, __name__, self.refresh_token())
 
     @tasks.loop(hours=24.0)
     async def refresh_genres_task(self) -> None:
