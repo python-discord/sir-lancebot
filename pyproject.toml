@@ -13,7 +13,7 @@ bot-core = {url = "https://github.com/python-discord/bot-core/archive/refs/tags/
 
 aiodns = "3.0.0"
 aioredis = "2.0.1"
-rapidfuzz = "2.10.0"
+rapidfuzz = "2.10.1"
 arrow = "1.2.3"
 beautifulsoup4 = "4.11.1"
 pillow = "9.2.0"
