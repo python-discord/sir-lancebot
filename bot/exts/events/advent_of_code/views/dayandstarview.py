@@ -55,7 +55,7 @@ class AoCDropdownView(discord.ui.View):
         options=[discord.SelectOption(label=str(i)) for i in range(1, 26)],
         custom_id="day_select"
     )
-    async def day_select(self, select: discord.ui.Select, interaction: discord.Interaction) -> None:
+    async def day_select(self, _: discord.Interaction, select: discord.ui.Select) -> None:
         """Dropdown to choose a Day of the AoC."""
         self.day = select.values[0]
 
@@ -64,12 +64,12 @@ class AoCDropdownView(discord.ui.View):
         options=[discord.SelectOption(label=str(i)) for i in range(1, 3)],
         custom_id="star_select"
     )
-    async def star_select(self, select: discord.ui.Select, interaction: discord.Interaction) -> None:
+    async def star_select(self, _: discord.Interaction, select: discord.ui.Select) -> None:
         """Dropdown to choose either the first or the second star."""
         self.star = select.values[0]
 
     @discord.ui.button(label="Fetch", style=discord.ButtonStyle.blurple)
-    async def fetch(self, button: discord.ui.Button, interaction: discord.Interaction) -> None:
+    async def fetch(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
         """Button that fetches the statistics based on the dropdown values."""
         if self.day == 0 or self.star == 0:
             await interaction.response.send_message(
