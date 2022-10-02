@@ -119,7 +119,7 @@ class TimestampMenuView(discord.ui.View):
             self.dropdown.add_option(label=label, description=date_time)
 
     @discord.ui.select(placeholder="Select the format of your timestamp")
-    async def select_format(self, _: discord.ui.Select, interaction: discord.Interaction) -> discord.Message:
+    async def select_format(self, interaction: discord.Interaction, _: discord.ui.Select) -> discord.Message:
         """Drop down menu which contains a list of formats which discord timestamps can take."""
         selected = interaction.data["values"][0]
         if selected == "Epoch":
