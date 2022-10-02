@@ -128,7 +128,7 @@ class ScoreboardView(View):
         Send an ephemeral message with the speed leaderboard embed.
 
         Parameters:
-             - interaction: The discord.Interaction instance containing information on the interaction between the user
+            - interaction: The discord.Interaction instance containing information on the interaction between the user
             and the button.
             - button: The discord.ui.Button instance representing the `Speed Leaderboard` button.
         """
