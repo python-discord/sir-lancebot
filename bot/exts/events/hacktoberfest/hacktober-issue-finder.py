@@ -100,8 +100,9 @@ class HacktoberIssues(commands.Cog):
         """Format the issue data into a embed."""
         title = issue["title"]
         issue_url = issue["url"].replace("api.", "").replace("/repos/", "/")
-        # issues can have empty bodies, which in that case GitHub doesn't include the key in the API response
-        body = issue.get("body", "")
+        # Issues can have empty bodies, resulting in the value being a literal `null` (parsed as `None`).
+        # For this reason, we can't use the default arg of `dict.get`, and so instead use `or` logic.
+        body = issue.get("body") or ""
         labels = [label["name"] for label in issue["labels"]]
 
         embed = discord.Embed(title=title)
