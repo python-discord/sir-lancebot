@@ -110,7 +110,7 @@ class Hangman(commands.Cog):
 
             try:
                 message = await self.bot.wait_for(
-                    event="message",
+                    "message",
                     timeout=60.0,
                     check=check
                 )
