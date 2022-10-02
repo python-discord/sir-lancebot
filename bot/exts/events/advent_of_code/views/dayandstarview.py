@@ -69,7 +69,7 @@ class AoCDropdownView(discord.ui.View):
         self.star = select.values[0]
 
     @discord.ui.button(label="Fetch", style=discord.ButtonStyle.blurple)
-    async def fetch(self, _: discord.ui.Button, interaction: discord.Interaction) -> None:
+    async def fetch(self, interaction: discord.Interaction, _: discord.ui.Button) -> None:
         """Button that fetches the statistics based on the dropdown values."""
         if self.day == 0 or self.star == 0:
             await interaction.response.send_message(
