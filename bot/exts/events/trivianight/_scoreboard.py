@@ -123,26 +123,26 @@ class ScoreboardView(View):
         return rank_embed
 
     @discord.ui.button(label="Scoreboard for Speed", style=ButtonStyle.green)
-    async def speed_leaderboard(self, button: Button, interaction: Interaction) -> None:
+    async def speed_leaderboard(self, interaction: Interaction, _: Button) -> None:
         """
         Send an ephemeral message with the speed leaderboard embed.
 
         Parameters:
-            - button: The discord.ui.Button instance representing the `Speed Leaderboard` button.
             - interaction: The discord.Interaction instance containing information on the interaction between the user
             and the button.
+            - button: The discord.ui.Button instance representing the `Speed Leaderboard` button.
         """
         await interaction.response.send_message(embed=await self._create_speed_embed(), ephemeral=True)
 
     @discord.ui.button(label="What's my rank?", style=ButtonStyle.blurple)
-    async def rank_button(self, button: Button, interaction: Interaction) -> None:
+    async def rank_button(self, interaction: Interaction, _: Button) -> None:
         """
         Send an ephemeral message with the user's rank for the overall points/average speed.
 
         Parameters:
-            - button: The discord.ui.Button instance representing the `What's my rank?` button.
             - interaction: The discord.Interaction instance containing information on the interaction between the user
             and the button.
+            - button: The discord.ui.Button instance representing the `What's my rank?` button.
         """
         await interaction.response.send_message(embed=self._get_rank(interaction.user), ephemeral=True)
 
