@@ -10,6 +10,8 @@ from PIL import Image
 from discord.ext import commands
 
 from bot.bot import Bot
+from bot.constants import Channels, WHITELISTED_CHANNELS
+from bot.utils.decorators import whitelist_override
 
 FORMATTED_CODE_REGEX = re.compile(
     r"(?P<delim>(?P<block>```)|``?)"        # code delimiter: 1-3 backticks; (?P=block) only matches if it's a block
@@ -30,6 +32,11 @@ CACHE_DIRECTORY.mkdir(exist_ok=True)
 TEMPLATE = string.Template(Path("bot/resources/fun/latex_template.txt").read_text())
 
 PAD = 10
+
+LATEX_ALLOWED_CHANNNELS = WHITELISTED_CHANNELS + (
+    Channels.data_science_and_ai,
+    Channels.algos_and_data_structs,
+)
 
 
 def _prepare_input(text: str) -> str:
@@ -56,7 +63,7 @@ def _process_image(data: bytes, out_file: BinaryIO) -> None:
 class InvalidLatexError(Exception):
     """Represents an error caused by invalid latex."""
 
-    def __init__(self, logs: str):
+    def __init__(self, logs: Optional[str]):
         super().__init__(logs)
         self.logs = logs
 
@@ -73,7 +80,7 @@ class Latex(commands.Cog):
         async with self.bot.http_session.post(LATEX_API_URL, data=payload, raise_for_status=True) as response:
             response_json = await response.json()
         if response_json["status"] != "success":
-            raise InvalidLatexError(logs=response_json["log"])
+            raise InvalidLatexError(logs=response_json.get("log"))
         async with self.bot.http_session.get(
             f"{LATEX_API_URL}/{response_json['filename']}",
             raise_for_status=True
@@ -97,6 +104,7 @@ class Latex(commands.Cog):
 
     @commands.command()
     @commands.max_concurrency(1, commands.BucketType.guild, wait=True)
+    @whitelist_override(channels=LATEX_ALLOWED_CHANNNELS)
     async def latex(self, ctx: commands.Context, *, query: str) -> None:
         """Renders the text in latex and sends the image."""
         query = _prepare_input(query)
@@ -110,18 +118,21 @@ class Latex(commands.Cog):
                     with open(image_path, "wb") as out_file:
                         await self._generate_image(TEMPLATE.substitute(text=query), out_file)
                 except InvalidLatexError as err:
-                    logs_paste_url = await self._upload_to_pastebin(err.logs)
                     embed = discord.Embed(title="Failed to render input.")
-                    if logs_paste_url:
-                        embed.description = f"[View Logs]({logs_paste_url})"
+                    if err.logs is None:
+                        embed.description = "No logs available."
                     else:
-                        embed.description = "Couldn't upload logs."
+                        logs_paste_url = await self._upload_to_pastebin(err.logs)
+                        if logs_paste_url:
+                            embed.description = f"[View Logs]({logs_paste_url})"
+                        else:
+                            embed.description = "Couldn't upload logs."
                     await ctx.send(embed=embed)
                     image_path.unlink()
                     return
             await ctx.send(file=discord.File(image_path, "latex.png"))
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Latex Cog."""
-    bot.add_cog(Latex(bot))
+    await bot.add_cog(Latex(bot))

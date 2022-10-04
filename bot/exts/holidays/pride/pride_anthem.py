@@ -46,6 +46,6 @@ class PrideAnthem(commands.Cog):
             await ctx.send("I couldn't find a video, sorry!")
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Pride Anthem Cog."""
-    bot.add_cog(PrideAnthem())
+    await bot.add_cog(PrideAnthem())

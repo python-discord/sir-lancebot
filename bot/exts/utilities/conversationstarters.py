@@ -121,6 +121,6 @@ class ConvoStarters(commands.Cog):
         self.bot.loop.create_task(self._listen_for_refresh(ctx.author, message))
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the ConvoStarters cog."""
-    bot.add_cog(ConvoStarters(bot))
+    await bot.add_cog(ConvoStarters(bot))

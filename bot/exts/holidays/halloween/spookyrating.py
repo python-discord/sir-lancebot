@@ -62,6 +62,6 @@ class SpookyRating(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Spooky Rating Cog."""
-    bot.add_cog(SpookyRating())
+    await bot.add_cog(SpookyRating())

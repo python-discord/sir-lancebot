@@ -120,6 +120,6 @@ class ScaryMovie(commands.Cog):
         return embed
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Scary Movie Cog."""
-    bot.add_cog(ScaryMovie(bot))
+    await bot.add_cog(ScaryMovie(bot))

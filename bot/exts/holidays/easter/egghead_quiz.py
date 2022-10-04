@@ -113,6 +113,6 @@ class EggheadQuiz(commands.Cog):
             return await reaction.message.remove_reaction(reaction, user)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Egghead Quiz Cog."""
-    bot.add_cog(EggheadQuiz())
+    await bot.add_cog(EggheadQuiz())

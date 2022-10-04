@@ -23,6 +23,6 @@ class Traditions(commands.Cog):
         await ctx.send(f"{random_country}:\n{traditions[random_country]}")
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Traditions Cog."""
-    bot.add_cog(Traditions())
+    await bot.add_cog(Traditions())

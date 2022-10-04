@@ -57,9 +57,9 @@ class EarthPhotos(commands.Cog):
             await ctx.send(embed=embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Earth Photos cog."""
     if not Tokens.unsplash_access_key:
         log.warning("No Unsplash access key found. Cog not loading.")
         return
-    bot.add_cog(EarthPhotos(bot))
+    await bot.add_cog(EarthPhotos(bot))

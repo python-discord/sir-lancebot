@@ -40,6 +40,6 @@ class Ping(commands.Cog):
         await ctx.send(f"I started up {uptime_string}.")
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Ping cog."""
-    bot.add_cog(Ping(bot))
+    await bot.add_cog(Ping(bot))

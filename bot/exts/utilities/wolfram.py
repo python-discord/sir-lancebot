@@ -288,6 +288,6 @@ class Wolfram(Cog):
             await send_embed(ctx, message, color)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Wolfram cog."""
-    bot.add_cog(Wolfram(bot))
+    await bot.add_cog(Wolfram(bot))

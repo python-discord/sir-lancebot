@@ -10,7 +10,6 @@ from discord.ext import commands
 
 from bot.bot import Bot
 from bot.constants import Colours, ERROR_REPLIES
-from bot.utils.extensions import invoke_help_command
 from bot.utils.pagination import LinePaginator
 from bot.utils.time import time_since
 
@@ -19,6 +18,9 @@ log = logging.getLogger(__name__)
 
 class Emojis(commands.Cog):
     """A collection of commands related to emojis in the server."""
+
+    def __init__(self, bot: Bot) -> None:
+        self.bot = bot
 
     @staticmethod
     def embed_builder(emoji: dict) -> tuple[Embed, list[str]]:
@@ -74,7 +76,7 @@ class Emojis(commands.Cog):
         if emoji is not None:
             await ctx.invoke(self.info_command, emoji)
         else:
-            await invoke_help_command(ctx)
+            await self.bot.invoke_help_command(ctx)
 
     @emoji_group.command(name="count", aliases=("c",))
     async def count_command(self, ctx: commands.Context, *, category_query: str = None) -> None:
@@ -118,6 +120,6 @@ class Emojis(commands.Cog):
         await ctx.send(embed=emoji_information)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Emojis cog."""
-    bot.add_cog(Emojis())
+    await bot.add_cog(Emojis(bot))

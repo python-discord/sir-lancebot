@@ -14,7 +14,6 @@ from discord.ext import commands
 from bot.bot import Bot
 from bot.constants import Colours, Emojis
 from bot.exts.avatar_modification._effects import PfpEffects
-from bot.utils.extensions import invoke_help_command
 from bot.utils.halloween import spookifications
 
 log = logging.getLogger(__name__)
@@ -89,7 +88,7 @@ class AvatarModify(commands.Cog):
     async def avatar_modify(self, ctx: commands.Context) -> None:
         """Groups all of the pfp modifying commands to allow a single concurrency limit."""
         if not ctx.invoked_subcommand:
-            await invoke_help_command(ctx)
+            await self.bot.invoke_help_command(ctx)
 
     @avatar_modify.command(name="8bitify", root_aliases=("8bitify",))
     async def eightbit_command(self, ctx: commands.Context) -> None:
@@ -367,6 +366,6 @@ class AvatarModify(commands.Cog):
             await ctx.send(file=file, embed=embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the AvatarModify cog."""
-    bot.add_cog(AvatarModify(bot))
+    await bot.add_cog(AvatarModify(bot))

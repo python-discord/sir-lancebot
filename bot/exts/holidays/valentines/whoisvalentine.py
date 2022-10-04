@@ -44,6 +44,6 @@ class ValentineFacts(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Who is Valentine Cog."""
-    bot.add_cog(ValentineFacts())
+    await bot.add_cog(ValentineFacts())

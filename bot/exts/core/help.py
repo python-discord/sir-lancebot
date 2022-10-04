@@ -3,16 +3,17 @@ import asyncio
 import itertools
 import logging
 from contextlib import suppress
-from typing import NamedTuple, Union
+from typing import NamedTuple, Optional, Union
 
 from discord import Colour, Embed, HTTPException, Message, Reaction, User
 from discord.ext import commands
 from discord.ext.commands import CheckFailure, Cog as DiscordCog, Command, Context
-from rapidfuzz import process
 
 from bot import constants
 from bot.bot import Bot
 from bot.constants import Emojis
+from bot.utils.commands import get_command_suggestions
+from bot.utils.decorators import whitelist_override
 from bot.utils.pagination import FIRST_EMOJI, LAST_EMOJI, LEFT_EMOJI, LinePaginator, RIGHT_EMOJI
 
 DELETE_EMOJI = Emojis.trashcan
@@ -41,14 +42,18 @@ class HelpQueryNotFound(ValueError):
     """
     Raised when a HelpSession Query doesn't match a command or cog.
 
-    Contains the custom attribute of ``possible_matches``.
-    Instances of this object contain a dictionary of any command(s) that were close to matching the
-    query, where keys are the possible matched command names and values are the likeness match scores.
+    Params:
+    possible_matches: list of similar command names.
+    parent_command: parent command of an invalid subcommand. Only available when an invalid subcommand
+                    has been passed.
     """
 
-    def __init__(self, arg: str, possible_matches: dict = None):
+    def __init__(
+            self, arg: str, possible_matches: Optional[list[str]] = None, *, parent_command: Optional[Command] = None
+    ) -> None:
         super().__init__(arg)
         self.possible_matches = possible_matches
+        self.parent_command = parent_command
 
 
 class HelpSession:
@@ -153,12 +158,17 @@ class HelpSession:
 
         Will pass on possible close matches along with the `HelpQueryNotFound` exception.
         """
-        # Combine command and cog names
-        choices = list(self._bot.all_commands) + list(self._bot.cogs)
+        # Check if parent command is valid in case subcommand is invalid.
+        if " " in query:
+            parent, *_ = query.split()
+            parent_command = self._bot.get_command(parent)
 
-        result = process.extract(query, choices, score_cutoff=90)
+            if parent_command:
+                raise HelpQueryNotFound('Invalid Subcommand.', parent_command=parent_command)
 
-        raise HelpQueryNotFound(f'Query "{query}" not found.', dict(result))
+        similar_commands = get_command_suggestions(list(self._bot.all_commands.keys()), query)
+
+        raise HelpQueryNotFound(f'Query "{query}" not found.', similar_commands)
 
     async def timeout(self, seconds: int = 30) -> None:
         """Waits for a set number of seconds, then stops the help session."""
@@ -277,7 +287,7 @@ class HelpSession:
             else:
                 results.append(f"<{name}>")
 
-        return f"{cmd.name} {' '.join(results)}"
+        return f"{cmd.qualified_name} {' '.join(results)}"
 
     async def build_pages(self) -> None:
         """Builds the list of content pages to be paginated through in the help message, as a list of str."""
@@ -304,9 +314,10 @@ class HelpSession:
         prefix = constants.Client.prefix
 
         signature = self._get_command_params(self.query)
+        paginator.add_line(f"**```\n{prefix}{signature}\n```**")
+
         parent = self.query.full_parent_name + " " if self.query.parent else ""
-        paginator.add_line(f"**```\n{prefix}{parent}{signature}\n```**")
-        aliases = [f"`{alias}`" if not parent else f"`{parent} {alias}`" for alias in self.query.aliases]
+        aliases = [f"`{alias}`" if not parent else f"`{parent}{alias}`" for alias in self.query.aliases]
         aliases += [f"`{alias}`" for alias in getattr(self.query, "root_aliases", ())]
         aliases = ", ".join(sorted(aliases))
         if aliases:
@@ -502,18 +513,26 @@ class Help(DiscordCog):
     """Custom Embed Pagination Help feature."""
 
     @commands.command("help")
+    @whitelist_override(allow_dm=True)
     async def new_help(self, ctx: Context, *commands) -> None:
         """Shows Command Help."""
         try:
             await HelpSession.start(ctx, *commands)
         except HelpQueryNotFound as error:
+
+            # Send help message of parent command if subcommand is invalid.
+            if cmd := error.parent_command:
+                await ctx.send(str(error))
+                await self.new_help(ctx, cmd.qualified_name)
+                return
+
             embed = Embed()
             embed.colour = Colour.red()
             embed.title = str(error)
 
             if error.possible_matches:
-                matches = "\n".join(error.possible_matches.keys())
-                embed.description = f"**Did you mean:**\n`{matches}`"
+                matches = "\n".join(error.possible_matches)
+                embed.description = f"**Did you mean:**\n{matches}"
 
             await ctx.send(embed=embed)
 
@@ -528,7 +547,7 @@ def unload(bot: Bot) -> None:
     bot.add_command(bot._old_help)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """
     The setup for the help extension.
 
@@ -543,7 +562,7 @@ def setup(bot: Bot) -> None:
     bot.remove_command("help")
 
     try:
-        bot.add_cog(Help())
+        await bot.add_cog(Help())
     except Exception:
         unload(bot)
         raise

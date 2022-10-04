@@ -5,6 +5,7 @@ from typing import Optional, Union
 
 import discord
 import emojis
+from discord import ClientUser, Member
 from discord.ext import commands
 
 from bot.bot import Bot
@@ -71,7 +72,9 @@ class Game:
             await self.message.add_reaction(CROSS_EMOJI)
             await self.message.edit(content=None, embed=embed)
 
-    async def game_over(self, action: str, player1: discord.user, player2: discord.user) -> None:
+    async def game_over(
+        self, action: str, player1: Union[ClientUser, Member], player2: Union[ClientUser, Member]
+    ) -> None:
         """Announces to public chat."""
         if action == "win":
             await self.channel.send(f"Game Over! {player1.mention} won against {player2.mention}")
@@ -444,6 +447,6 @@ class ConnectFour(commands.Cog):
         await self._play_game(ctx, None, board_size, str(emoji1), str(emoji2))
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load ConnectFour Cog."""
-    bot.add_cog(ConnectFour(bot))
+    await bot.add_cog(ConnectFour(bot))

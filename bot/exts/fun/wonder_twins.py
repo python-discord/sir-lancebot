@@ -44,6 +44,6 @@ class WonderTwins(Cog):
         await ctx.send(f"Form of {self.format_phrase()}!")
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the WonderTwins cog."""
-    bot.add_cog(WonderTwins())
+    await bot.add_cog(WonderTwins())

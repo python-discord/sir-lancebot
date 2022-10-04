@@ -49,6 +49,6 @@ class CoinFlip(commands.Cog):
         await ctx.send(message)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Loads the coinflip cog."""
-    bot.add_cog(CoinFlip())
+    await bot.add_cog(CoinFlip())

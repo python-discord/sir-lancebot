@@ -432,6 +432,6 @@ class HacktoberStats(commands.Cog):
         return author_id, author_mention
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Hacktober Stats Cog."""
-    bot.add_cog(HacktoberStats(bot))
+    await bot.add_cog(HacktoberStats(bot))

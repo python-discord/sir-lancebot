@@ -25,6 +25,6 @@ class AprilFoolVideos(commands.Cog):
         await ctx.send(f"Check out this April Fools' video by {channel}.\n\n{url}")
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the April Fools' Cog."""
-    bot.add_cog(AprilFoolVideos())
+    await bot.add_cog(AprilFoolVideos())
