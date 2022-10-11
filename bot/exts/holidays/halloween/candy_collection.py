@@ -214,6 +214,6 @@ class CandyCollection(commands.Cog):
         await ctx.send(embed=e)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Candy Collection Cog."""
-    bot.add_cog(CandyCollection(bot))
+    await bot.add_cog(CandyCollection(bot))

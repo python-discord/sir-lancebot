@@ -10,7 +10,6 @@ from discord.ext.commands import Cog, Context, group
 from bot.bot import Bot
 from bot.constants import Tokens
 from bot.utils.exceptions import APIError
-from bot.utils.extensions import invoke_help_command
 from bot.utils.pagination import ImagePaginator
 
 logger = logging.getLogger(__name__)
@@ -58,6 +57,7 @@ class Movie(Cog):
     """Movie Cog contains movies command that grab random movies from TMDB."""
 
     def __init__(self, bot: Bot):
+        self.bot = bot
         self.http_session: ClientSession = bot.http_session
 
     @group(name="movies", aliases=("movie",), invoke_without_command=True)
@@ -82,7 +82,7 @@ class Movie(Cog):
         try:
             result = await self.get_movies_data(self.http_session, MovieGenres[genre].value, 1)
         except KeyError:
-            await invoke_help_command(ctx)
+            await self.bot.invoke_help_command(ctx)
             return
 
         # Get random page. Max page is last page where is movies with this genre.
@@ -206,6 +206,6 @@ class Movie(Cog):
         return embed
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Movie Cog."""
-    bot.add_cog(Movie(bot))
+    await bot.add_cog(Movie(bot))

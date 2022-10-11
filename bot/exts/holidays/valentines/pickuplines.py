@@ -36,6 +36,6 @@ class PickupLine(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Pickup lines Cog."""
-    bot.add_cog(PickupLine())
+    await bot.add_cog(PickupLine())

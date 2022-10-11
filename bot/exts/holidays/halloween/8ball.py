@@ -26,6 +26,6 @@ class SpookyEightBall(commands.Cog):
             await msg.edit(content=f"{choice[0]} \n{choice[1]}")
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Spooky Eight Ball Cog."""
-    bot.add_cog(SpookyEightBall())
+    await bot.add_cog(SpookyEightBall())

@@ -112,6 +112,6 @@ class PrideLeader(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Pride Leader Cog."""
-    bot.add_cog(PrideLeader(bot))
+    await bot.add_cog(PrideLeader(bot))

@@ -323,6 +323,6 @@ class TriviaNightCog(commands.Cog):
         ))
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the TriviaNight cog."""
-    bot.add_cog(TriviaNightCog(bot))
+    await bot.add_cog(TriviaNightCog(bot))

@@ -86,6 +86,6 @@ class XKCD(Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the XKCD cog."""
-    bot.add_cog(XKCD(bot))
+    await bot.add_cog(XKCD(bot))

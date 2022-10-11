@@ -341,6 +341,6 @@ class DuckGamesDirector(commands.Cog):
         return await ctx.send(file=file, embed=embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the DuckGamesDirector cog."""
-    bot.add_cog(DuckGamesDirector(bot))
+    await bot.add_cog(DuckGamesDirector(bot))

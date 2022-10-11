@@ -43,6 +43,6 @@ class TimedCommands(commands.Cog):
         await ctx.send(f"Command execution for `{new_ctx.command}` finished in {(t_end - t_start):.4f} seconds.")
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Timed cog."""
-    bot.add_cog(TimedCommands())
+    await bot.add_cog(TimedCommands())

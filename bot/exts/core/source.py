@@ -82,6 +82,6 @@ class BotSource(commands.Cog):
         return embed
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the BotSource cog."""
-    bot.add_cog(BotSource())
+    await bot.add_cog(BotSource())

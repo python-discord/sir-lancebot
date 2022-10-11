@@ -110,8 +110,8 @@ class Game:
 
         self.gameover: bool = False
 
-        self.turn: Optional[discord.Member] = None
-        self.next: Optional[discord.Member] = None
+        self.turn: Optional[Player] = None
+        self.next: Optional[Player] = None
 
         self.match: Optional[re.Match] = None
         self.surrender: bool = False
@@ -442,6 +442,6 @@ class Battleship(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Battleship Cog."""
-    bot.add_cog(Battleship(bot))
+    await bot.add_cog(Battleship(bot))

@@ -1,12 +1,15 @@
 import random
 import re
+import typing as t
+from dataclasses import dataclass
 from functools import partial
 
+import discord
 from discord.ext import commands
 from discord.ext.commands import Cog, Context, clean_content
 
 from bot.bot import Bot
-from bot.utils import helpers
+from bot.utils import helpers, messages
 
 WORD_REPLACE = {
     "small": "smol",
@@ -41,7 +44,7 @@ EMOJIS = [
     "^^;;",
 ]
 
-REGEX_WORD_REPLACE = re.compile(r"(?<![w])[lr](?![w])")
+REGEX_WORD_REPLACE = re.compile(r"(?<!w)[lr](?!w)")
 
 REGEX_PUNCTUATION = re.compile(r"[.!?\r\n\t]")
 
@@ -50,6 +53,32 @@ SUBSTITUTE_STUTTER = r"\g<1>\g<2>-\g<2>"
 
 REGEX_NYA = re.compile(r"n([aeou][^aeiou])")
 SUBSTITUTE_NYA = r"ny\1"
+
+REGEX_EMOJI = re.compile(r"<(a)?:(\w+?):(\d{15,21}?)>", re.ASCII)
+
+
+@dataclass(frozen=True, eq=True)
+class Emoji:
+    """Data class for an Emoji."""
+
+    name: str
+    uid: int
+    animated: bool = False
+
+    def __str__(self):
+        anim_bit = "a" if self.animated else ""
+        return f"<{anim_bit}:{self.name}:{self.uid}>"
+
+    def can_display(self, bot: Bot) -> bool:
+        """Determines if a bot is in a server with the emoji."""
+        return bot.get_emoji(self.uid) is not None
+
+    @classmethod
+    def from_match(cls, match: tuple[str, str, str]) -> t.Optional['Emoji']:
+        """Creates an Emoji from a regex match tuple."""
+        if not match or len(match) != 3 or not match[2].isdecimal():
+            return None
+        return cls(match[1], int(match[2]), match[0] == "a")
 
 
 class Uwu(Cog):
@@ -94,6 +123,26 @@ class Uwu(Cog):
             return f" {random.choice(EMOJIS)} "
         return match_string
 
+    def _ext_emoji_replace(self, input_string: str) -> str:
+        """Replaces any emoji the bot cannot send in input_text with a random emoticons."""
+        groups = REGEX_EMOJI.findall(input_string)
+        emojis = {Emoji.from_match(match) for match in groups}
+        # Replace with random emoticon if unable to display
+        emojis_map = {
+            re.escape(str(e)): random.choice(EMOJIS)
+            for e in emojis if e and not e.can_display(self.bot)
+        }
+        if emojis_map:
+            # Pattern for all emoji markdowns to be replaced
+            emojis_re = re.compile("|".join(emojis_map.keys()))
+            # Replace matches with random emoticon
+            return emojis_re.sub(
+                lambda m: emojis_map[re.escape(m.group())],
+                input_string
+            )
+        # Return original if no replacement
+        return input_string
+
     def _uwuify(self, input_string: str, *, stutter_strength: float = 0.2, emoji_strength: float = 0.1) -> str:
         """Takes a string and returns an uwuified version of it."""
         input_string = input_string.lower()
@@ -102,10 +151,11 @@ class Uwu(Cog):
         input_string = self._char_replace(input_string)
         input_string = self._stutter(stutter_strength, input_string)
         input_string = self._emoji(emoji_strength, input_string)
+        input_string = self._ext_emoji_replace(input_string)
         return input_string
 
     @commands.command(name="uwu", aliases=("uwuwize", "uwuify",))
-    async def uwu_command(self, ctx: Context, *, text: clean_content(fix_channel_mentions=True)) -> None:
+    async def uwu_command(self, ctx: Context, *, text: t.Optional[str] = None) -> None:
         """
         Echo an uwuified version the passed text.
 
@@ -113,22 +163,42 @@ class Uwu(Cog):
         '.uwu Hello, my name is John' returns something like
         'hewwo, m-my name is j-john nyaa~'.
         """
-        if (fun_cog := ctx.bot.get_cog("Fun")):
-            text, embed = await fun_cog._get_text_and_embed(ctx, text)
-
-            # Grabs the text from the embed for uwuification.
-            if embed is not None:
-                embed = fun_cog._convert_embed(self._uwuify, embed)
+        # If `text` isn't provided then we try to get message content of a replied message
+        text = text or getattr(ctx.message.reference, "resolved", None)
+        if isinstance(text, discord.Message):
+            embeds = text.embeds
+            text = text.content
         else:
-            embed = None
-        converted_text = self._uwuify(text)
-        converted_text = helpers.suppress_links(converted_text)
+            embeds = None
+
+        if text is None:
+            # If we weren't able to get the content of a replied message
+            raise commands.UserInputError("Your message must have content or you must reply to a message.")
+
+        await clean_content(fix_channel_mentions=True).convert(ctx, text)
+
+        # Grabs the text from the embed for uwuification
+        if embeds:
+            embed = messages.convert_embed(self._uwuify, embeds[0])
+        else:
+            # Parse potential message links in text
+            text, embed = await messages.get_text_and_embed(ctx, text)
+
+            # If an embed is found, grab and uwuify its text
+            if embed:
+                embed = messages.convert_embed(self._uwuify, embed)
 
         # Adds the text harvested from an embed to be put into another quote block.
-        converted_text = f">>> {converted_text.lstrip('> ')}"
+        if text:
+            converted_text = self._uwuify(text)
+            converted_text = helpers.suppress_links(converted_text)
+            converted_text = f">>> {converted_text.lstrip('> ')}"
+        else:
+            converted_text = None
+
         await ctx.send(content=converted_text, embed=embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the uwu cog."""
-    bot.add_cog(Uwu(bot))
+    await bot.add_cog(Uwu(bot))

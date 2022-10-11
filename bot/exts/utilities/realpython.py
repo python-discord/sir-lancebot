@@ -11,11 +11,10 @@ from bot.constants import Colours
 
 logger = logging.getLogger(__name__)
 
-
 API_ROOT = "https://realpython.com/search/api/v1/"
 ARTICLE_URL = "https://realpython.com{article_url}"
 SEARCH_URL = "https://realpython.com/search?q={user_search}"
-
+HOME_URL = "https://realpython.com/"
 
 ERROR_EMBED = Embed(
     title="Error while searching Real Python",
@@ -32,13 +31,22 @@ class RealPython(commands.Cog):
 
     @commands.command(aliases=["rp"])
     @commands.cooldown(1, 10, commands.cooldowns.BucketType.user)
-    async def realpython(self, ctx: commands.Context, amount: Optional[int] = 5, *, user_search: str) -> None:
+    async def realpython(self, ctx: commands.Context, amount: Optional[int] = 5, *,
+                         user_search: Optional[str] = None) -> None:
         """
         Send some articles from RealPython that match the search terms.
 
-        By default the top 5 matches are sent, this can be overwritten to
+        By default, the top 5 matches are sent. This can be overwritten to
         a number between 1 and 5 by specifying an amount before the search query.
+        If no search query is specified by the user, the home page is sent.
         """
+        if user_search is None:
+            home_page_embed = Embed(title="Real Python Home Page", url=HOME_URL, colour=Colours.orange)
+
+            await ctx.send(embed=home_page_embed)
+
+            return
+
         if not 1 <= amount <= 5:
             await ctx.send("`amount` must be between 1 and 5 (inclusive).")
             return
@@ -86,6 +94,6 @@ class RealPython(commands.Cog):
         await ctx.send(embed=article_embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Real Python Cog."""
-    bot.add_cog(RealPython(bot))
+    await bot.add_cog(RealPython(bot))

@@ -3,15 +3,16 @@ import logging
 import random
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Callable, Optional, Union
+from typing import Literal
 
-from discord import Embed, Message
+import pyjokes
+from discord import Embed
 from discord.ext import commands
-from discord.ext.commands import BadArgument, Cog, Context, MessageConverter, clean_content
+from discord.ext.commands import BadArgument, Cog, Context, clean_content
 
 from bot.bot import Bot
 from bot.constants import Client, Colours, Emojis
-from bot.utils import helpers
+from bot.utils import helpers, messages
 
 log = logging.getLogger(__name__)
 
@@ -41,7 +42,6 @@ class Fun(Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
-
         self._caesar_cipher_embed = json.loads(Path("bot/resources/fun/caesar_info.json").read_text("UTF-8"))
 
     @staticmethod
@@ -67,10 +67,10 @@ class Fun(Cog):
             return "".join(
                 char.upper() if round(random.random()) else char.lower() for char in text
             )
-        text, embed = await Fun._get_text_and_embed(ctx, text)
+        text, embed = await messages.get_text_and_embed(ctx, text)
         # Convert embed if it exists
         if embed is not None:
-            embed = Fun._convert_embed(conversion_func, embed)
+            embed = messages.convert_embed(conversion_func, embed)
         converted_text = conversion_func(text)
         converted_text = helpers.suppress_links(converted_text)
         # Don't put >>> if only embed present
@@ -116,10 +116,10 @@ class Fun(Cog):
             """Encrypts the given string using the Caesar Cipher."""
             return "".join(caesar_cipher(text, offset))
 
-        text, embed = await Fun._get_text_and_embed(ctx, msg)
+        text, embed = await messages.get_text_and_embed(ctx, msg)
 
         if embed is not None:
-            embed = Fun._convert_embed(conversion_func, embed)
+            embed = messages.convert_embed(conversion_func, embed)
 
         converted_text = conversion_func(text)
 
@@ -150,69 +150,13 @@ class Fun(Cog):
         """
         await self._caesar_cipher(ctx, offset, msg, left_shift=True)
 
-    @staticmethod
-    async def _get_text_and_embed(ctx: Context, text: str) -> tuple[str, Optional[Embed]]:
-        """
-        Attempts to extract the text and embed from a possible link to a discord Message.
-
-        Does not retrieve the text and embed from the Message if it is in a channel the user does
-        not have read permissions in.
-
-        Returns a tuple of:
-            str: If `text` is a valid discord Message, the contents of the message, else `text`.
-            Optional[Embed]: The embed if found in the valid Message, else None
-        """
-        embed = None
-
-        msg = await Fun._get_discord_message(ctx, text)
-        # Ensure the user has read permissions for the channel the message is in
-        if isinstance(msg, Message):
-            permissions = msg.channel.permissions_for(ctx.author)
-            if permissions.read_messages:
-                text = msg.clean_content
-                # Take first embed because we can't send multiple embeds
-                if msg.embeds:
-                    embed = msg.embeds[0]
-
-        return (text, embed)
-
-    @staticmethod
-    async def _get_discord_message(ctx: Context, text: str) -> Union[Message, str]:
-        """
-        Attempts to convert a given `text` to a discord Message object and return it.
-
-        Conversion will succeed if given a discord Message ID or link.
-        Returns `text` if the conversion fails.
-        """
-        try:
-            text = await MessageConverter().convert(ctx, text)
-        except commands.BadArgument:
-            log.debug(f"Input '{text:.20}...' is not a valid Discord Message")
-        return text
-
-    @staticmethod
-    def _convert_embed(func: Callable[[str, ], str], embed: Embed) -> Embed:
-        """
-        Converts the text in an embed using a given conversion function, then return the embed.
-
-        Only modifies the following fields: title, description, footer, fields
-        """
-        embed_dict = embed.to_dict()
-
-        embed_dict["title"] = func(embed_dict.get("title", ""))
-        embed_dict["description"] = func(embed_dict.get("description", ""))
-
-        if "footer" in embed_dict:
-            embed_dict["footer"]["text"] = func(embed_dict["footer"].get("text", ""))
-
-        if "fields" in embed_dict:
-            for field in embed_dict["fields"]:
-                field["name"] = func(field.get("name", ""))
-                field["value"] = func(field.get("value", ""))
-
-        return Embed.from_dict(embed_dict)
+    @commands.command()
+    async def joke(self, ctx: commands.Context, category: Literal["neutral", "chuck", "all"] = "all") -> None:
+        """Retrieves a joke of the specified `category` from the pyjokes api."""
+        joke = pyjokes.get_joke(category=category)
+        await ctx.send(joke)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Fun cog."""
-    bot.add_cog(Fun(bot))
+    await bot.add_cog(Fun(bot))

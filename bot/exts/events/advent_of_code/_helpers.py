@@ -523,13 +523,6 @@ async def countdown_status(bot: Bot) -> None:
     # Log that we're going to start with the countdown status.
     log.info("The Advent of Code has started or will start soon, starting countdown status.")
 
-    # Trying to change status too early in the bot's startup sequence will fail
-    # the task because the websocket instance has not yet been created. Waiting
-    # for this event means that both the websocket instance has been initialized
-    # and that the connection to Discord is mature enough to change the presence
-    # of the bot.
-    await bot.wait_until_guild_available()
-
     # Calculate when the task needs to stop running. To prevent the task from
     # sleeping for the entire year, it will only wait in the currently
     # configured year. This means that the task will only start hibernating once
@@ -578,9 +571,6 @@ async def new_puzzle_notification(bot: Bot) -> None:
 
     log.info("The Advent of Code has started or will start soon, waking up notification task.")
 
-    # Ensure that the guild cache is loaded so we can get the Advent of Code
-    # channel and role.
-    await bot.wait_until_guild_available()
     aoc_channel = bot.get_channel(Channels.advent_of_code)
     aoc_role = aoc_channel.guild.get_role(AdventOfCode.role_id)
 

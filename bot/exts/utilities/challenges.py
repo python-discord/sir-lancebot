@@ -336,6 +336,6 @@ class Challenges(commands.Cog):
             await original_message.edit(embed=kata_embed, view=None)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Challenges cog."""
-    bot.add_cog(Challenges(bot))
+    await bot.add_cog(Challenges(bot))

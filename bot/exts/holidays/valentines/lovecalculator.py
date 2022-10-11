@@ -95,6 +95,6 @@ class LoveCalculator(Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Love calculator Cog."""
-    bot.add_cog(LoveCalculator())
+    await bot.add_cog(LoveCalculator())

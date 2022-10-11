@@ -83,6 +83,6 @@ class Stackoverflow(commands.Cog):
             await ctx.send(embed=search_query_too_long)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Stackoverflow Cog."""
-    bot.add_cog(Stackoverflow(bot))
+    await bot.add_cog(Stackoverflow(bot))

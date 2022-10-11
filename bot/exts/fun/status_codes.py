@@ -82,6 +82,6 @@ class HTTPStatusCodes(commands.Cog):
                 )
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the HTTPStatusCodes cog."""
-    bot.add_cog(HTTPStatusCodes(bot))
+    await bot.add_cog(HTTPStatusCodes(bot))
