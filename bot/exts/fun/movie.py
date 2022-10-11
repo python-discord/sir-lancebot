@@ -9,6 +9,7 @@ from discord.ext.commands import Cog, Context, group
 
 from bot.bot import Bot
 from bot.constants import Tokens
+from bot.utils.exceptions import APIError
 from bot.utils.extensions import invoke_help_command
 from bot.utils.pagination import ImagePaginator
 
@@ -79,36 +80,16 @@ class Movie(Cog):
         # Capitalize genre for getting data from Enum, get random page, send help when genre don't exist.
         genre = genre.capitalize()
         try:
-            result, status = await self.get_movies_data(self.http_session, MovieGenres[genre].value, 1)
+            result = await self.get_movies_data(self.http_session, MovieGenres[genre].value, 1)
         except KeyError:
             await invoke_help_command(ctx)
             return
-
-        # Check if "results" is in result. If not, throw error.
-        if "results" not in result:
-            err_msg = (
-                f"There was a problem making the TMDB API request. Response Code: {status}, "
-                f"TMDB: Status Code: {result.get('status_code', None)} "
-                f"TMDB: Status Message: {result.get('status_message', None)}, "
-                f"TMDB: Errors: {result.get('errors', None)}, "
-            )
-            await ctx.send(err_msg)
-            logger.warning(err_msg)
 
         # Get random page. Max page is last page where is movies with this genre.
         page = random.randint(1, min(result["total_pages"], MAX_PAGES))
 
         # Get movies list from TMDB, check if results key in result. When not, raise error.
-        movies, status = await self.get_movies_data(self.http_session, MovieGenres[genre].value, page)
-        if "results" not in movies:
-            err_msg = (
-                f"There was a problem making the TMDB API request. Response Code: {status}, "
-                f"TMDB: Status Code: {movies.get('status_code', None)} "
-                f"TMDB: Status Message: {movies.get('status_message', None)}, "
-                f"TMDB: Errors: {movies.get('errors', None)}, "
-            )
-            await ctx.send(err_msg)
-            logger.warning(err_msg)
+        movies = await self.get_movies_data(self.http_session, MovieGenres[genre].value, page)
 
         # Get all pages and embed
         pages = await self.get_pages(self.http_session, movies, amount)
@@ -121,12 +102,7 @@ class Movie(Cog):
         """Show all currently available genres for .movies command."""
         await ctx.send(f"Current available genres: {', '.join('`' + genre.name + '`' for genre in MovieGenres)}")
 
-    async def get_movies_data(
-        self,
-        client: ClientSession,
-        genre_id: str,
-        page: int
-    ) -> tuple[list[dict[str, Any]], int]:
+    async def get_movies_data(self, client: ClientSession, genre_id: str, page: int) -> list[dict[str, Any]]:
         """Return JSON of TMDB discover request."""
         # Define params of request
         params = {
@@ -143,7 +119,18 @@ class Movie(Cog):
 
         # Make discover request to TMDB, return result
         async with client.get(url, params=params) as resp:
-            return await resp.json(), resp.status
+            result, status = await resp.json(), resp.status
+            # Check if "results" is in result. If not, throw error.
+            if "results" not in result:
+                err_msg = (
+                    f"There was a problem making the TMDB API request. Response Code: {status}, "
+                    f"TMDB: Status Code: {result.get('status_code', None)} "
+                    f"TMDB: Status Message: {result.get('status_message', None)}, "
+                    f"TMDB: Errors: {result.get('errors', None)}, "
+                )
+                logger.error(err_msg)
+                raise APIError("TMDB API", status, err_msg)
+            return result
 
     async def get_pages(self, client: ClientSession, movies: dict[str, Any], amount: int) -> list[tuple[str, str]]:
         """Fetch all movie pages from movies dictionary. Return list of pages."""
