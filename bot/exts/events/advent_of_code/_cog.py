@@ -18,7 +18,6 @@ from bot.exts.events.advent_of_code.views.dayandstarview import AoCDropdownView
 from bot.utils import members
 from bot.utils.decorators import InChannelCheckFailure, in_month, whitelist_override, with_role
 from bot.utils.exceptions import MovedCommandError
-from bot.utils.extensions import invoke_help_command
 
 log = logging.getLogger(__name__)
 
@@ -61,7 +60,8 @@ class AdventOfCode(commands.Cog):
         self.status_task.set_name("AoC Status Countdown")
         self.status_task.add_done_callback(_helpers.background_task_callback)
 
-        self.completionist_task.start()
+        # Don't start task while event isn't running
+        # self.completionist_task.start()
 
     @tasks.loop(minutes=10.0)
     async def completionist_task(self) -> None:
@@ -70,7 +70,6 @@ class AdventOfCode(commands.Cog):
 
         Runs on a schedule, as defined in the task.loop decorator.
         """
-        await self.bot.wait_until_guild_available()
         guild = self.bot.get_guild(Client.guild)
         completionist_role = guild.get_role(Roles.aoc_completionist)
         if completionist_role is None:
@@ -86,7 +85,7 @@ class AdventOfCode(commands.Cog):
         try:
             leaderboard = await _helpers.fetch_leaderboard()
         except _helpers.FetchingLeaderboardFailedError:
-            await self.bot.send_log("Unable to fetch AoC leaderboard during role sync.")
+            await self.bot.log_to_dev_log("Unable to fetch AoC leaderboard during role sync.")
             return
 
         placement_leaderboard = json.loads(leaderboard["placement_leaderboard"])
@@ -121,7 +120,7 @@ class AdventOfCode(commands.Cog):
     async def adventofcode_group(self, ctx: commands.Context) -> None:
         """All of the Advent of Code commands."""
         if not ctx.invoked_subcommand:
-            await invoke_help_command(ctx)
+            await self.bot.invoke_help_command(ctx)
 
     @with_role(Roles.admins)
     @adventofcode_group.command(

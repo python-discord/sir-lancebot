@@ -78,7 +78,7 @@ class WTFPython(commands.Cog):
         match, certainty, _ = rapidfuzz.process.extractOne(query, self.headers.keys())
         return match if certainty > MINIMUM_CERTAINTY else None
 
-    @commands.command(aliases=("wtf", "WTF"))
+    @commands.command(aliases=("wtf",))
     async def wtf_python(self, ctx: commands.Context, *, query: Optional[str] = None) -> None:
         """
         Search WTF Python repository.
@@ -133,6 +133,6 @@ class WTFPython(commands.Cog):
         self.fetch_readme.cancel()
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the WTFPython Cog."""
-    bot.add_cog(WTFPython(bot))
+    await bot.add_cog(WTFPython(bot))

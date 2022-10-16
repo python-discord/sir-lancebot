@@ -81,6 +81,6 @@ class Catify(commands.Cog):
             )
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Loads the catify cog."""
-    bot.add_cog(Catify())
+    await bot.add_cog(Catify())

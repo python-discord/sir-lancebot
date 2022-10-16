@@ -28,9 +28,7 @@ class PrideFacts(commands.Cog):
     @seasonal_task(Month.JUNE)
     async def send_pride_fact_daily(self) -> None:
         """Background task to post the daily pride fact every day."""
-        await self.bot.wait_until_guild_available()
-
-        channel = self.bot.get_channel(Channels.community_bot_commands)
+        channel = self.bot.get_channel(Channels.sir_lancebot_playground)
         await self.send_select_fact(channel, datetime.utcnow())
 
     async def send_random_fact(self, ctx: commands.Context) -> None:
@@ -94,6 +92,6 @@ class PrideFacts(commands.Cog):
         )
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Pride Facts Cog."""
-    bot.add_cog(PrideFacts(bot))
+    await bot.add_cog(PrideFacts(bot))

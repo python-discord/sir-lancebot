@@ -15,7 +15,6 @@ from discord.utils import escape_markdown, sleep_until
 from bot.bot import Bot
 from bot.constants import Channels, ERROR_REPLIES, Emojis, Reddit as RedditConfig, STAFF_ROLES
 from bot.utils.converters import Subreddit
-from bot.utils.extensions import invoke_help_command
 from bot.utils.messages import sub_clyde
 from bot.utils.pagination import ImagePaginator, LinePaginator
 
@@ -39,20 +38,17 @@ class Reddit(Cog):
         self.access_token = None
         self.client_auth = BasicAuth(RedditConfig.client_id, RedditConfig.secret)
 
-        bot.loop.create_task(self.init_reddit_ready())
         self.auto_poster_loop.start()
 
-    def cog_unload(self) -> None:
+    async def cog_unload(self) -> None:
         """Stop the loop task and revoke the access token when the cog is unloaded."""
         self.auto_poster_loop.cancel()
         if self.access_token and self.access_token.expires_at > datetime.utcnow():
             asyncio.create_task(self.revoke_access_token())
 
-    async def init_reddit_ready(self) -> None:
+    async def cog_load(self) -> None:
         """Sets the reddit webhook when the cog is loaded."""
-        await self.bot.wait_until_guild_available()
-        if not self.webhook:
-            self.webhook = await self.bot.fetch_webhook(RedditConfig.webhook)
+        self.webhook = await self.bot.fetch_webhook(RedditConfig.webhook)
 
     @property
     def channel(self) -> TextChannel:
@@ -258,7 +254,6 @@ class Reddit(Cog):
 
         await sleep_until(midnight_tomorrow)
 
-        await self.bot.wait_until_guild_available()
         if not self.webhook:
             await self.bot.fetch_webhook(RedditConfig.webhook)
 
@@ -302,7 +297,7 @@ class Reddit(Cog):
     @group(name="reddit", invoke_without_command=True)
     async def reddit_group(self, ctx: Context) -> None:
         """View the top posts from various subreddits."""
-        await invoke_help_command(ctx)
+        await self.bot.invoke_help_command(ctx)
 
     @reddit_group.command(name="top")
     async def top_command(self, ctx: Context, subreddit: Subreddit = "r/Python") -> None:
@@ -360,9 +355,9 @@ class Reddit(Cog):
         )
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Reddit cog."""
     if not RedditConfig.secret or not RedditConfig.client_id:
         log.error("Credentials not provided, cog not loaded.")
         return
-    bot.add_cog(Reddit(bot))
+    await bot.add_cog(Reddit(bot))

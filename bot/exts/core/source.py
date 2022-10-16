@@ -6,14 +6,16 @@ from discord import Embed
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Source
+from bot.constants import Channels, Source, WHITELISTED_CHANNELS
 from bot.utils.converters import SourceConverter, SourceType
+from bot.utils.decorators import whitelist_override
 
 
 class BotSource(commands.Cog):
     """Displays information about the bot's source code."""
 
     @commands.command(name="source", aliases=("src",))
+    @whitelist_override(channels=WHITELISTED_CHANNELS+(Channels.community_meta, Channels.dev_contrib))
     async def source_command(self, ctx: commands.Context, *, source_item: SourceConverter = None) -> None:
         """Display information and a GitHub link to the source code of a command, tag, or cog."""
         if not source_item:
@@ -80,6 +82,6 @@ class BotSource(commands.Cog):
         return embed
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the BotSource cog."""
-    bot.add_cog(BotSource())
+    await bot.add_cog(BotSource())

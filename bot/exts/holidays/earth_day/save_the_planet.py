@@ -20,6 +20,6 @@ class SaveThePlanet(commands.Cog):
         await ctx.send(embed=return_embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Save the Planet Cog."""
-    bot.add_cog(SaveThePlanet())
+    await bot.add_cog(SaveThePlanet())

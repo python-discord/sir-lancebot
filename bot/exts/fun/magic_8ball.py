@@ -25,6 +25,6 @@ class Magic8ball(commands.Cog):
             await ctx.send("Usage: .8ball <question> (minimum length of 3 eg: `will I win?`)")
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Magic8Ball Cog."""
-    bot.add_cog(Magic8ball())
+    await bot.add_cog(Magic8ball())

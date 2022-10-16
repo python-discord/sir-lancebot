@@ -50,6 +50,6 @@ class HalloweenFacts(commands.Cog):
         return discord.Embed(title=title, description=fact, color=PUMPKIN_ORANGE)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Halloween Facts Cog."""
-    bot.add_cog(HalloweenFacts())
+    await bot.add_cog(HalloweenFacts())

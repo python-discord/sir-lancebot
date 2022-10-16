@@ -29,9 +29,7 @@ class EasterFacts(commands.Cog):
     @seasonal_task(Month.APRIL)
     async def send_egg_fact_daily(self) -> None:
         """A background task that sends an easter egg fact in the event channel everyday."""
-        await self.bot.wait_until_guild_available()
-
-        channel = self.bot.get_channel(Channels.community_bot_commands)
+        channel = self.bot.get_channel(Channels.sir_lancebot_playground)
         await channel.send(embed=self.make_embed())
 
     @commands.command(name="eggfact", aliases=("fact",))
@@ -50,6 +48,6 @@ class EasterFacts(commands.Cog):
         )
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Easter Egg facts Cog."""
-    bot.add_cog(EasterFacts(bot))
+    await bot.add_cog(EasterFacts(bot))

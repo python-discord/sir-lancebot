@@ -1,4 +1,3 @@
-import difflib
 import logging
 import math
 import random
@@ -11,6 +10,7 @@ from sentry_sdk import push_scope
 
 from bot.bot import Bot
 from bot.constants import Channels, Colours, ERROR_REPLIES, NEGATIVE_REPLIES, RedirectOutput
+from bot.utils.commands import get_command_suggestions
 from bot.utils.decorators import InChannelCheckFailure, InMonthCheckFailure
 from bot.utils.exceptions import APIError, MovedCommandError, UserNotPlayingError
 
@@ -98,7 +98,8 @@ class CommandErrorHandler(commands.Cog):
         if isinstance(error, commands.NoPrivateMessage):
             await ctx.send(
                 embed=self.error_embed(
-                    f"This command can only be used in the server. Go to <#{Channels.community_bot_commands}> instead!",
+                    "This command can only be used in the server. "
+                    f"Go to <#{Channels.sir_lancebot_playground}> instead!",
                     NEGATIVE_REPLIES
                 )
             )
@@ -157,34 +158,34 @@ class CommandErrorHandler(commands.Cog):
 
     async def send_command_suggestion(self, ctx: commands.Context, command_name: str) -> None:
         """Sends user similar commands if any can be found."""
-        raw_commands = []
-        for cmd in self.bot.walk_commands():
-            if not cmd.hidden:
-                raw_commands += (cmd.name, *cmd.aliases)
-        if similar_command_data := difflib.get_close_matches(command_name, raw_commands, 1):
-            similar_command_name = similar_command_data[0]
-            similar_command = self.bot.get_command(similar_command_name)
+        command_suggestions = []
+        if similar_command_names := get_command_suggestions(list(self.bot.all_commands.keys()), command_name):
+            for similar_command_name in similar_command_names:
+                similar_command = self.bot.get_command(similar_command_name)
 
-            if not similar_command:
-                return
+                if not similar_command:
+                    continue
 
-            log_msg = "Cancelling attempt to suggest a command due to failed checks."
-            try:
-                if not await similar_command.can_run(ctx):
+                log_msg = "Cancelling attempt to suggest a command due to failed checks."
+                try:
+                    if not await similar_command.can_run(ctx):
+                        log.debug(log_msg)
+                        continue
+                except commands.errors.CommandError:
                     log.debug(log_msg)
-                    return
-            except commands.errors.CommandError as cmd_error:
-                log.debug(log_msg)
-                await self.on_command_error(ctx, cmd_error)
-                return
+                    continue
+
+                command_suggestions.append(similar_command_name)
 
             misspelled_content = ctx.message.content
             e = Embed()
             e.set_author(name="Did you mean:", icon_url=QUESTION_MARK_ICON)
-            e.description = misspelled_content.replace(command_name, similar_command_name, 1)
+            e.description = "\n".join(
+                misspelled_content.replace(command_name, cmd, 1) for cmd in command_suggestions
+            )
             await ctx.send(embed=e, delete_after=RedirectOutput.delete_delay)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the ErrorHandler cog."""
-    bot.add_cog(CommandErrorHandler(bot))
+    await bot.add_cog(CommandErrorHandler(bot))

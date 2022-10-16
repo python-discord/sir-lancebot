@@ -70,7 +70,7 @@ class BeMyValentine(commands.Cog):
             raise commands.UserInputError("Come on, you can't send a valentine to yourself :expressionless:")
 
         emoji_1, emoji_2 = self.random_emoji()
-        channel = self.bot.get_channel(Channels.community_bot_commands)
+        channel = self.bot.get_channel(Channels.sir_lancebot_playground)
         valentine, title = self.valentine_check(valentine_type)
 
         embed = discord.Embed(
@@ -163,6 +163,6 @@ class BeMyValentine(commands.Cog):
         return random.choice(self.valentines["valentine_compliments"])
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Be my Valentine Cog."""
-    bot.add_cog(BeMyValentine(bot))
+    await bot.add_cog(BeMyValentine(bot))

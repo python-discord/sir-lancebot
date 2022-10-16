@@ -199,13 +199,28 @@ def whitelist_check(**default_kwargs: Container[int]) -> Callable[[Context], boo
         kwargs = default_kwargs.copy()
         allow_dms = False
 
-        # Update kwargs based on override
-        if hasattr(ctx.command.callback, "override"):
+        # Determine which command's overrides we will use. Group commands will
+        # inherit from their parents if they don't define their own overrides
+        overridden_command: Optional[commands.Command] = None
+        for command in [ctx.command, *ctx.command.parents]:
+            if hasattr(command.callback, "override"):
+                overridden_command = command
+                break
+        if overridden_command is not None:
+            log.debug(f'Command {overridden_command} has overrides')
+            if overridden_command is not ctx.command:
+                log.debug(
+                    f"Command '{ctx.command.qualified_name}' inherited overrides "
+                    "from parent command '{overridden_command.qualified_name}'"
+                )
+
+        # Update kwargs based on override, if one exists
+        if overridden_command:
             # Handle DM invocations
-            allow_dms = ctx.command.callback.override_dm
+            allow_dms = overridden_command.callback.override_dm
 
             # Remove default kwargs if reset is True
-            if ctx.command.callback.override_reset:
+            if overridden_command.callback.override_reset:
                 kwargs = {}
                 log.debug(
                     f"{ctx.author} called the '{ctx.command.name}' command and "
@@ -213,9 +228,9 @@ def whitelist_check(**default_kwargs: Container[int]) -> Callable[[Context], boo
                 )
 
             # Merge overwrites and defaults
-            for arg in ctx.command.callback.override:
+            for arg in overridden_command.callback.override:
                 default_value = kwargs.get(arg)
-                new_value = ctx.command.callback.override[arg]
+                new_value = overridden_command.callback.override[arg]
 
                 # Skip values that don't need merging, or can't be merged
                 if default_value is None or isinstance(arg, int):
@@ -257,10 +272,10 @@ def whitelist_check(**default_kwargs: Container[int]) -> Callable[[Context], boo
         channels = set(kwargs.get("channels") or {})
         categories = kwargs.get("categories")
 
-        # Only output override channels + community_bot_commands
+        # Only output override channels + sir_lancebot_playground
         if channels:
             default_whitelist_channels = set(WHITELISTED_CHANNELS)
-            default_whitelist_channels.discard(Channels.community_bot_commands)
+            default_whitelist_channels.discard(Channels.sir_lancebot_playground)
             channels.difference_update(default_whitelist_channels)
 
         # Add all whitelisted category channels, but skip if we're in DMs

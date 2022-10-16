@@ -110,7 +110,7 @@ class Hangman(commands.Cog):
 
             try:
                 message = await self.bot.wait_for(
-                    event="message",
+                    "message",
                     timeout=60.0,
                     check=check
                 )
@@ -177,6 +177,6 @@ class Hangman(commands.Cog):
         await ctx.send(embed=win_embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Hangman cog."""
-    bot.add_cog(Hangman(bot))
+    await bot.add_cog(Hangman(bot))

@@ -62,6 +62,6 @@ class TimeLeft(commands.Cog):
             )
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Time Left Cog."""
-    bot.add_cog(TimeLeft())
+    await bot.add_cog(TimeLeft())

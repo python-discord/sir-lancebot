@@ -9,7 +9,6 @@ from discord.ext import commands
 from bot.bot import Bot
 from bot.constants import Client, Roles
 from bot.utils.decorators import with_role
-from bot.utils.extensions import invoke_help_command
 
 from ._helpers import EvalContext
 
@@ -33,6 +32,8 @@ RAW_CODE_REGEX = re.compile(
     r"\s*$",                                # any trailing whitespace until the end of the string
     re.DOTALL                               # "." also matches newlines
 )
+
+MAX_LENGTH = 99980
 
 
 class InternalEval(commands.Cog):
@@ -85,9 +86,10 @@ class InternalEval(commands.Cog):
 
     async def _upload_output(self, output: str) -> Optional[str]:
         """Upload `internal eval` output to our pastebin and return the url."""
+        data = self.shorten_output(output, max_length=MAX_LENGTH)
         try:
             async with self.bot.http_session.post(
-                "https://paste.pythondiscord.com/documents", data=output, raise_for_status=True
+                "https://paste.pythondiscord.com/documents", data=data, raise_for_status=True
             ) as resp:
                 data = await resp.json()
 
@@ -151,7 +153,7 @@ class InternalEval(commands.Cog):
     async def internal_group(self, ctx: commands.Context) -> None:
         """Internal commands. Top secret!"""
         if not ctx.invoked_subcommand:
-            await invoke_help_command(ctx)
+            await self.bot.invoke_help_command(ctx)
 
     @internal_group.command(name="eval", aliases=("e",))
     @with_role(Roles.admins)
