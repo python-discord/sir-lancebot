@@ -90,7 +90,7 @@ class CandyCollection(commands.Cog):
 
             recent_message_ids = map(
                 lambda m: m.id,
-                await self.hacktober_channel.history(limit=10).flatten()
+                [message async for message in self.hacktober_channel.history(limit=10)]
             )
             if message.id in recent_message_ids:
                 await self.reacted_msg_chance(message)
