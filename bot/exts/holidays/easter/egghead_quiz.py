@@ -100,6 +100,10 @@ class EggheadQuiz(commands.Cog):
             async for user in reaction.users():
                 users.append(user)
 
+            # At this point we've added everyone who reacted
+            # with the correct answer, so stop looping over reactions.
+            break
+
         mentions = " ".join([
             u.mention for u in users if not u.bot
         ])
