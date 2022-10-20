@@ -9,18 +9,26 @@ from discord.ext.commands import Cog, Context, group
 
 from bot.bot import Bot
 from bot.constants import Tokens
+from bot.utils.exceptions import APIError
 from bot.utils.pagination import ImagePaginator
+
+logger = logging.getLogger(__name__)
 
 # Define base URL of TMDB
 BASE_URL = "https://api.themoviedb.org/3/"
 
-logger = logging.getLogger(__name__)
+# Logo of TMDB
+THUMBNAIL_URL = "https://i.imgur.com/LtFtC8H.png"
 
 # Define movie params, that will be used for every movie request
 MOVIE_PARAMS = {
     "api_key": Tokens.tmdb,
     "language": "en-US"
 }
+
+# Maximum value for `pages` API parameter. The maximum is documented as 1000 but
+# anything over 500 returns an error.
+MAX_PAGES = 500
 
 
 class MovieGenres(Enum):
@@ -55,7 +63,8 @@ class Movie(Cog):
     @group(name="movies", aliases=("movie",), invoke_without_command=True)
     async def movies(self, ctx: Context, genre: str = "", amount: int = 5) -> None:
         """
-        Get random movies by specifying genre. Also support amount parameter, that define how much movies will be shown.
+        Get random movies by specifying genre. Also support amount parameter,\
+        that define how much movies will be shown.
 
         Default 5. Use .movies genres to get all available genres.
         """
@@ -76,25 +85,11 @@ class Movie(Cog):
             await self.bot.invoke_help_command(ctx)
             return
 
-        # Check if "results" is in result. If not, throw error.
-        if "results" not in result:
-            err_msg = (
-                f"There is problem while making TMDB API request. Response Code: {result['status_code']}, "
-                f"{result['status_message']}."
-            )
-            await ctx.send(err_msg)
-            logger.warning(err_msg)
-
         # Get random page. Max page is last page where is movies with this genre.
-        page = random.randint(1, result["total_pages"])
+        page = random.randint(1, min(result["total_pages"], MAX_PAGES))
 
         # Get movies list from TMDB, check if results key in result. When not, raise error.
         movies = await self.get_movies_data(self.http_session, MovieGenres[genre].value, page)
-        if "results" not in movies:
-            err_msg = f"There is problem while making TMDB API request. Response Code: {result['status_code']}, " \
-                      f"{result['status_message']}."
-            await ctx.send(err_msg)
-            logger.warning(err_msg)
 
         # Get all pages and embed
         pages = await self.get_pages(self.http_session, movies, amount)
@@ -124,7 +119,18 @@ class Movie(Cog):
 
         # Make discover request to TMDB, return result
         async with client.get(url, params=params) as resp:
-            return await resp.json()
+            result, status = await resp.json(), resp.status
+            # Check if "results" is in result. If not, throw error.
+            if "results" not in result:
+                err_msg = (
+                    f"There was a problem making the TMDB API request. Response Code: {status}, "
+                    f"TMDB: Status Code: {result.get('status_code', None)} "
+                    f"TMDB: Status Message: {result.get('status_message', None)}, "
+                    f"TMDB: Errors: {result.get('errors', None)}, "
+                )
+                logger.error(err_msg)
+                raise APIError("TMDB API", status, err_msg)
+            return result
 
     async def get_pages(self, client: ClientSession, movies: dict[str, Any], amount: int) -> list[tuple[str, str]]:
         """Fetch all movie pages from movies dictionary. Return list of pages."""
@@ -196,7 +202,7 @@ class Movie(Cog):
         """Return embed of random movies. Uses name in title."""
         embed = Embed(title=f"Random {name} Movies")
         embed.set_footer(text="This product uses the TMDb API but is not endorsed or certified by TMDb.")
-        embed.set_thumbnail(url="https://i.imgur.com/LtFtC8H.png")
+        embed.set_thumbnail(url=THUMBNAIL_URL)
         return embed
 
 
