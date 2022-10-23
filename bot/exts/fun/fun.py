@@ -62,7 +62,7 @@ class Fun(Cog):
 
     @commands.command(name="randomcase", aliases=("rcase", "randomcaps", "rcaps",))
     async def randomcase_command(self, ctx: Context, *, text: str | None) -> None:
-        """Randomly converts the casing of a given `text`."""
+        """Randomly converts the casing of a given `text`, or the replied message."""
         def conversion_func(text: str) -> str:
             """Randomly converts the casing of a given string."""
             return "".join(
