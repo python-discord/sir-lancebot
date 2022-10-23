@@ -6,9 +6,10 @@ from pathlib import Path
 from typing import Literal
 
 import pyjokes
+from botcore.utils.commands import clean_text_or_reply
 from discord import Embed
 from discord.ext import commands
-from discord.ext.commands import BadArgument, Cog, Context, clean_content
+from discord.ext.commands import BadArgument, Cog, Context
 
 from bot.bot import Bot
 from bot.constants import Client, Colours, Emojis
@@ -60,13 +61,14 @@ class Fun(Cog):
             raise BadArgument(f"`{Client.prefix}roll` only supports between 1 and 6 rolls.")
 
     @commands.command(name="randomcase", aliases=("rcase", "randomcaps", "rcaps",))
-    async def randomcase_command(self, ctx: Context, *, text: clean_content(fix_channel_mentions=True)) -> None:
+    async def randomcase_command(self, ctx: Context, *, text: str | None) -> None:
         """Randomly converts the casing of a given `text`."""
         def conversion_func(text: str) -> str:
             """Randomly converts the casing of a given string."""
             return "".join(
                 char.upper() if round(random.random()) else char.lower() for char in text
             )
+        text = await clean_text_or_reply(ctx, text)
         text, embed = await messages.get_text_and_embed(ctx, text)
         # Convert embed if it exists
         if embed is not None:
