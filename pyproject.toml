@@ -21,7 +21,7 @@ sentry-sdk = "1.10.1"
 PyYAML = "6.0"
 emojis = "0.6.0"
 coloredlogs = "15.0.1"
-colorama = { version = "0.4.5", markers = "sys_platform == 'win32'" }
+colorama = { version = "0.4.6", markers = "sys_platform == 'win32'" }
 lxml = "4.9.1"
 emoji = "2.1.0"
 pyjokes = "0.6.0"
