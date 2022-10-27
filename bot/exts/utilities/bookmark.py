@@ -26,10 +26,7 @@ MESSAGE_NOT_FOUND_ERROR = (
 class LinkTargetMessage(discord.ui.View):
     """The button that relays the user to the bookmarked message."""
 
-    def __init__(
-        self,
-        target_message: discord.Message,
-    ):
+    def __init__(self, target_message: discord.Message):
         super().__init__()
         self.add_item(discord.ui.Button(label="View Message", url=target_message.jump_url))
 
@@ -38,30 +35,32 @@ class SendBookmark(discord.ui.View):
     """The button that sends the bookmark to other users."""
 
     def __init__(
-        self,
-        bookmark_function: Callable[[discord.TextChannel, discord.Member, discord.Message, str], None],
-        author: discord.Member,
-        channel: discord.TextChannel,
-        target_message: discord.Message,
+            self,
+            action_bookmark_function: Callable[[discord.TextChannel, discord.Member, discord.Message, str], None],
+            author: discord.Member,
+            channel: discord.TextChannel,
+            target_message: discord.Message,
+            title: str,
     ):
         super().__init__()
 
-        self.bookmark_function = bookmark_function  # The function is the 'action_bookmark'
-        self.clicked: list[int] = [author.id]
+        self.bookmark_function = action_bookmark_function
+        self.clicked = [author.id]
         self.channel = channel
         self.target_message = target_message
+        self.title = title
 
     @discord.ui.button(label="Receive Bookmark", style=discord.ButtonStyle.green)
     async def button_callback(self, button: discord.Button, interaction: discord.Interaction) -> None:
         """The button callback."""
         if interaction.user.id in self.clicked:
-            return await interaction.response.send_message(
+            await interaction.response.send_message(
                 "You have already received a bookmark to that message.", ephemeral=True
             )
+            return
 
-        await self.bookmark_function(
-            self.channel, interaction.user, self.target_message
-        )
+        await self.bookmark_function(self.channel, interaction.user, self.target_message, self.title)
+
         await interaction.response.send_message("You have received a bookmark to that message.", ephemeral=True)
         self.clicked.append(interaction.user.id)
 
@@ -76,8 +75,8 @@ class Bookmark(commands.Cog):
     def build_bookmark_dm(target_message: discord.Message, title: str) -> discord.Embed:
         """Build the embed to DM the bookmark requester."""
         embed = discord.Embed(
-            title=title, 
-            description=target_message.content, 
+            title=title,
+            description=target_message.content,
             colour=Colours.soft_green
         )
         embed.set_author(
@@ -96,23 +95,12 @@ class Bookmark(commands.Cog):
             colour=Colours.soft_red
         )
 
-    @staticmethod
-    def create_button_embed(target_message: discord.Message) -> discord.Embed:
-        """Generates the embed which is sent with the button, so other users can receive the bookmark too."""
-        return discord.Embed(
-            description=(
-                f"Click the button to be sent your very own bookmark to "
-                f"[this message]({target_message.jump_url})."
-            ),
-            colour=Colours.soft_green,
-        )
-
     async def action_bookmark(
-        self,
-        channel: discord.TextChannel,
-        member: discord.Member,
-        target_message: discord.Message,
-        title: str
+            self,
+            channel: discord.TextChannel,
+            member: discord.Member,
+            target_message: discord.Message,
+            title: str
     ) -> None:
         """
         Sends the given target_message as a bookmark to the member in DMs to the user.
@@ -132,11 +120,11 @@ class Bookmark(commands.Cog):
     @commands.guild_only()
     @whitelist_override(roles=(Roles.everyone,))
     async def bookmark(
-        self,
-        ctx: commands.Context,
-        target_message: Optional[WrappedMessageConverter],
-        *,
-        title: str = "Bookmark"
+            self,
+            ctx: commands.Context,
+            target_message: Optional[WrappedMessageConverter],
+            *,
+            title: str = "Bookmark"
     ) -> None:
         """
         Send the author a link to the specified message via DMs.
@@ -152,9 +140,7 @@ class Bookmark(commands.Cog):
         # Prevent users from bookmarking a message in a channel they don't have access to
         permissions = target_message.channel.permissions_for(ctx.author)
         if not permissions.read_messages:
-            log.info(
-                f"{ctx.author} tried to bookmark a message in #{target_message.channel} but has no permissions."
-            )
+            log.info(f"{ctx.author} tried to bookmark a message in #{target_message.channel} but has no permissions.")
             embed = discord.Embed(
                 title=random.choice(ERROR_REPLIES),
                 color=Colours.soft_red,
@@ -165,16 +151,22 @@ class Bookmark(commands.Cog):
 
         await self.action_bookmark(ctx.channel, ctx.author, target_message, title)
 
-        view = SendBookmark(self.action_bookmark, ctx.author, ctx.channel, target_message)
+        view = SendBookmark(self.action_bookmark, ctx.author, ctx.channel, target_message, title)
 
-        embed = self.create_button_embed(target_message)
+        embed = discord.Embed(
+            description=(
+                f"Click the button to be sent your very own bookmark to "
+                f"[this message]({target_message.jump_url})."
+            ),
+            colour=Colours.soft_green,
+        )
         await ctx.send(embed=embed, view=view)
 
     @bookmark.command(name="delete", aliases=("del", "rm"), root_aliases=("unbm", "unbookmark", "dmdelete", "dmdel"))
     @whitelist_override(bypass_defaults=True, allow_dm=True)
     async def delete_bookmark(
-        self,
-        ctx: commands.Context,
+            self,
+            ctx: commands.Context,
     ) -> None:
         """
         Delete the Sir-Lancebot message that the command invocation is replying to.
