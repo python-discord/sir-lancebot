@@ -35,12 +35,12 @@ class SendBookmark(discord.ui.View):
     """The button that sends the bookmark to other users."""
 
     def __init__(
-            self,
-            action_bookmark_function: Callable[[discord.TextChannel, discord.Member, discord.Message, str], None],
-            author: discord.Member,
-            channel: discord.TextChannel,
-            target_message: discord.Message,
-            title: str,
+        self,
+        action_bookmark_function: Callable[[discord.TextChannel, discord.Member, discord.Message, str], None],
+        author: discord.Member,
+        channel: discord.TextChannel,
+        target_message: discord.Message,
+        title: str
     ):
         super().__init__()
 
@@ -55,7 +55,8 @@ class SendBookmark(discord.ui.View):
         """The button callback."""
         if interaction.user.id in self.clicked:
             await interaction.response.send_message(
-                "You have already received a bookmark to that message.", ephemeral=True
+                "You have already received a bookmark to that message.",
+                ephemeral=True,
             )
             return
 
@@ -96,11 +97,11 @@ class Bookmark(commands.Cog):
         )
 
     async def action_bookmark(
-            self,
-            channel: discord.TextChannel,
-            member: discord.Member,
-            target_message: discord.Message,
-            title: str
+        self,
+        channel: discord.TextChannel,
+        member: discord.Member,
+        target_message: discord.Message,
+        title: str
     ) -> None:
         """
         Sends the given target_message as a bookmark to the member in DMs to the user.
@@ -120,11 +121,11 @@ class Bookmark(commands.Cog):
     @commands.guild_only()
     @whitelist_override(roles=(Roles.everyone,))
     async def bookmark(
-            self,
-            ctx: commands.Context,
-            target_message: Optional[WrappedMessageConverter],
-            *,
-            title: str = "Bookmark"
+        self,
+        ctx: commands.Context,
+        target_message: Optional[WrappedMessageConverter],
+        *,
+        title: str = "Bookmark"
     ) -> None:
         """
         Send the author a link to the specified message via DMs.
@@ -165,8 +166,8 @@ class Bookmark(commands.Cog):
     @bookmark.command(name="delete", aliases=("del", "rm"), root_aliases=("unbm", "unbookmark", "dmdelete", "dmdel"))
     @whitelist_override(bypass_defaults=True, allow_dm=True)
     async def delete_bookmark(
-            self,
-            ctx: commands.Context,
+        self,
+        ctx: commands.Context,
     ) -> None:
         """
         Delete the Sir-Lancebot message that the command invocation is replying to.
