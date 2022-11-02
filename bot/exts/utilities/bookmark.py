@@ -51,7 +51,7 @@ class SendBookmark(discord.ui.View):
         self.title = title
 
     @discord.ui.button(label="Receive Bookmark", style=discord.ButtonStyle.green)
-    async def button_callback(self, button: discord.Button, interaction: discord.Interaction) -> None:
+    async def button_callback(self, interaction: discord.Interaction, button: discord.Button) -> None:
         """The button callback."""
         if interaction.user.id in self.clicked:
             await interaction.response.send_message(
