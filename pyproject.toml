@@ -23,7 +23,7 @@ emojis = "0.6.0"
 coloredlogs = "15.0.1"
 colorama = { version = "0.4.6", markers = "sys_platform == 'win32'" }
 lxml = "4.9.1"
-emoji = "2.1.0"
+emoji = "2.2.0"
 pyjokes = "0.6.0"
 
 [tool.poetry.dev-dependencies]
