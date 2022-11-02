@@ -93,7 +93,7 @@ class Madlibs(commands.Cog):
             await original_message.edit(embed=madlibs_embed)
 
             try:
-                message = await self.bot.wait_for(event="message", check=author_check, timeout=TIMEOUT)
+                message = await self.bot.wait_for("message", check=author_check, timeout=TIMEOUT)
             except TimeoutError:
                 timeout_embed = discord.Embed(
                     title=choice(NEGATIVE_REPLIES),
@@ -143,6 +143,6 @@ class Madlibs(commands.Cog):
             error.handled = True
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Madlibs cog."""
-    bot.add_cog(Madlibs(bot))
+    await bot.add_cog(Madlibs(bot))

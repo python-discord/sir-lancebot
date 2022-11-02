@@ -141,6 +141,6 @@ class ValentineZodiac(commands.Cog):
         log.trace("Embed from date successfully sent.")
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Valentine zodiac Cog."""
-    bot.add_cog(ValentineZodiac())
+    await bot.add_cog(ValentineZodiac())

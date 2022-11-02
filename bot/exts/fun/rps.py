@@ -52,6 +52,6 @@ class RPS(commands.Cog):
             await ctx.send(f"Sir Lancebot played {bot_move}! {player_mention} lost!")
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the RPS Cog."""
-    bot.add_cog(RPS(bot))
+    await bot.add_cog(RPS(bot))

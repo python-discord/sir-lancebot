@@ -133,6 +133,6 @@ class Latex(commands.Cog):
             await ctx.send(file=discord.File(image_path, "latex.png"))
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Latex Cog."""
-    bot.add_cog(Latex(bot))
+    await bot.add_cog(Latex(bot))

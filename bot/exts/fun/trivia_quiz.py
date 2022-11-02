@@ -435,7 +435,7 @@ class TriviaQuiz(commands.Cog):
                 def contains_correct_answer(m: discord.Message) -> bool:
                     return m.channel == ctx.channel and any(
                         fuzz.ratio(answer.lower(), m.content.lower()) > variation_tolerance
-                        for answer in quiz_entry.answers
+                        for answer in quiz_entry.answers  # noqa: B023
                     )
 
                 return contains_correct_answer
@@ -670,6 +670,6 @@ class TriviaQuiz(commands.Cog):
         await channel.send(embed=embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the TriviaQuiz cog."""
-    bot.add_cog(TriviaQuiz(bot))
+    await bot.add_cog(TriviaQuiz(bot))

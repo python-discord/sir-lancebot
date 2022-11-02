@@ -12,7 +12,6 @@ from discord.ext import commands
 
 from bot.bot import Bot
 from bot.constants import Colours, ERROR_REPLIES, Emojis, NEGATIVE_REPLIES, Tokens
-from bot.exts.core.extensions import invoke_help_command
 
 log = logging.getLogger(__name__)
 
@@ -168,7 +167,7 @@ class GithubInfo(commands.Cog):
     async def github_group(self, ctx: commands.Context) -> None:
         """Commands for finding information related to GitHub."""
         if ctx.invoked_subcommand is None:
-            await invoke_help_command(ctx)
+            await self.bot.invoke_help_command(ctx)
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message) -> None:
@@ -363,6 +362,6 @@ class GithubInfo(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the GithubInfo cog."""
-    bot.add_cog(GithubInfo(bot))
+    await bot.add_cog(GithubInfo(bot))

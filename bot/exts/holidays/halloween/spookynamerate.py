@@ -95,8 +95,6 @@ class SpookyNameRate(Cog):
         self.bot = bot
         self.name = None
 
-        self.bot.loop.create_task(self.load_vars())
-
         self.first_time = None
         self.poll = False
         self.announce_name.start()
@@ -104,7 +102,7 @@ class SpookyNameRate(Cog):
         # Define an asyncio.Lock() to make sure the dictionary isn't changed
         # when checking the messages for duplicate emojis'
 
-    async def load_vars(self) -> None:
+    async def cog_load(self) -> None:
         """Loads the variables that couldn't be loaded in __init__."""
         self.first_time = await self.data.get("first_time", True)
         self.name = await self.data.get("name")
@@ -357,7 +355,6 @@ class SpookyNameRate(Cog):
 
     async def get_channel(self) -> Optional[TextChannel]:
         """Gets the sir-lancebot-channel after waiting until ready."""
-        await self.bot.wait_until_ready()
         channel = self.bot.get_channel(
             Channels.sir_lancebot_playground
         ) or await self.bot.fetch_channel(Channels.sir_lancebot_playground)
@@ -386,6 +383,6 @@ class SpookyNameRate(Cog):
         self.announce_name.cancel()
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the SpookyNameRate Cog."""
-    bot.add_cog(SpookyNameRate(bot))
+    await bot.add_cog(SpookyNameRate(bot))

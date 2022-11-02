@@ -333,6 +333,6 @@ class TicTacToe(Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the TicTacToe cog."""
-    bot.add_cog(TicTacToe())
+    await bot.add_cog(TicTacToe())

@@ -200,6 +200,6 @@ class MonsterSurvey(Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Monster Survey Cog."""
-    bot.add_cog(MonsterSurvey())
+    await bot.add_cog(MonsterSurvey())

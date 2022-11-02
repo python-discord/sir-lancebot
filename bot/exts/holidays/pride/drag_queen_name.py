@@ -21,6 +21,6 @@ class DragNames(commands.Cog):
         await ctx.send(random.choice(NAMES))
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Drag Names Cog."""
-    bot.add_cog(DragNames())
+    await bot.add_cog(DragNames())

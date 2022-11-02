@@ -96,6 +96,6 @@ class HanukkahEmbed(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Hanukkah Embed Cog."""
-    bot.add_cog(HanukkahEmbed(bot))
+    await bot.add_cog(HanukkahEmbed(bot))

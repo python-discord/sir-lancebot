@@ -220,11 +220,11 @@ class HelpSession:
     async def prepare(self) -> None:
         """Sets up the help session pages, events, message and reactions."""
         await self.build_pages()
+        await self.update_page()
 
         self._bot.add_listener(self.on_reaction_add)
         self._bot.add_listener(self.on_message_delete)
 
-        await self.update_page()
         self.add_reactions()
 
     def add_reactions(self) -> None:
@@ -547,7 +547,7 @@ def unload(bot: Bot) -> None:
     bot.add_command(bot._old_help)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """
     The setup for the help extension.
 
@@ -562,7 +562,7 @@ def setup(bot: Bot) -> None:
     bot.remove_command("help")
 
     try:
-        bot.add_cog(Help())
+        await bot.add_cog(Help())
     except Exception:
         unload(bot)
         raise

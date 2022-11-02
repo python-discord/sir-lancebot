@@ -171,9 +171,8 @@ class CommandErrorHandler(commands.Cog):
                     if not await similar_command.can_run(ctx):
                         log.debug(log_msg)
                         continue
-                except commands.errors.CommandError as cmd_error:
+                except commands.errors.CommandError:
                     log.debug(log_msg)
-                    await self.on_command_error(ctx, cmd_error)
                     continue
 
                 command_suggestions.append(similar_command_name)
@@ -187,6 +186,6 @@ class CommandErrorHandler(commands.Cog):
             await ctx.send(embed=e, delete_after=RedirectOutput.delete_delay)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the ErrorHandler cog."""
-    bot.add_cog(CommandErrorHandler(bot))
+    await bot.add_cog(CommandErrorHandler(bot))

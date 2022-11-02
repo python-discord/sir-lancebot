@@ -17,7 +17,8 @@ SPOOKY_TRIGGERS = {
     "pumpkin": (r"\bpumpkin\b", "\U0001F383"),
     "halloween": (r"\bhalloween\b", "\U0001F383"),
     "jack-o-lantern": (r"\bjack-o-lantern\b", "\U0001F383"),
-    "danger": (r"\bdanger\b", "\U00002620")
+    "danger": (r"\bdanger\b", "\U00002620"),
+    "bat": (r"\bbat((wo)?m[ae]n|persons?|people|s)?\b", "\U0001F987"),
 }
 
 
@@ -65,6 +66,6 @@ class SpookyReact(Cog):
         return False
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Spooky Reaction Cog."""
-    bot.add_cog(SpookyReact(bot))
+    await bot.add_cog(SpookyReact(bot))

@@ -104,6 +104,6 @@ class Anagram(commands.Cog):
         await game.message_creation(message)
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Anagram cog."""
-    bot.add_cog(Anagram(bot))
+    await bot.add_cog(Anagram(bot))

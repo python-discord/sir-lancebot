@@ -163,6 +163,6 @@ class BeMyValentine(commands.Cog):
         return random.choice(self.valentines["valentine_compliments"])
 
 
-def setup(bot: Bot) -> None:
+async def setup(bot: Bot) -> None:
     """Load the Be my Valentine Cog."""
-    bot.add_cog(BeMyValentine(bot))
+    await bot.add_cog(BeMyValentine(bot))
