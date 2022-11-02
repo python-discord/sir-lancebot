@@ -60,7 +60,7 @@ class SendBookmark(discord.ui.View):
             )
             return
         self.clicked.append(interaction.user.id)
-        
+
         await self.bookmark_function(self.channel, interaction.user, self.target_message, self.title)
 
         await interaction.response.send_message("You have received a bookmark to that message.", ephemeral=True)
