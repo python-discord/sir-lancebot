@@ -240,7 +240,7 @@ python-versions = "*"
 
 [[package]]
 name = "emoji"
-version = "2.1.0"
+version = "2.2.0"
 description = "Emoji for Python"
 category = "main"
 optional = false
@@ -908,7 +908,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "3.10.*"
-content-hash = "dbb0e8f73e74a6398239171c8f8fe10b96936968f5768335f9303f1ac6796031"
+content-hash = "470d2aeb031d4f8fd616b1f81b8b0c7de69403f08b61b32856667e0be6750e27"
 
 [metadata.files]
 aiodns = [
@@ -1117,7 +1117,7 @@ distlib = [
     {file = "distlib-0.3.6.tar.gz", hash = "sha256:14bad2d9b04d3a36127ac97f30b12a19268f211063d8f8ee4f47108896e11b46"},
 ]
 emoji = [
-    {file = "emoji-2.1.0.tar.gz", hash = "sha256:56a8c5e906c11694eb7694b78e5452d745030869b3945f6306a8151ff5cdbc39"},
+    {file = "emoji-2.2.0.tar.gz", hash = "sha256:a2986c21e4aba6b9870df40ef487a17be863cb7778dcf1c01e25917b7cd210bb"},
 ]
 emojis = [
     {file = "emojis-0.6.0-py3-none-any.whl", hash = "sha256:7da34c8a78ae262fd68cef9e2c78a3c1feb59784489eeea0f54ba1d4b7111c7c"},
