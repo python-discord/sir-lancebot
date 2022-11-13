@@ -11,7 +11,7 @@ from bot.utils.decorators import in_month
 log = logging.getLogger(__name__)
 
 SPOOKY_TRIGGERS = {
-    "spooky": (r"\bspo{2,}ky\b", "\U0001F47B"),
+    "spooky": (r"\bspo{2,}[k|p][i|y](er|est)?\b", "\U0001F47B"),
     "skeleton": (r"\bskeleton\b", "\U0001F480"),
     "doot": (r"\bdo{2,}t\b", "\U0001F480"),
     "pumpkin": (r"\bpumpkin\b", "\U0001F383"),
