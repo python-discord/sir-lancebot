@@ -43,7 +43,7 @@ class ConvoStarters(commands.Cog):
         self.bot = bot
 
     @staticmethod
-    def _build_topic_embed(channel_id: int) -> discord.Embed:
+    def _build_topic_embed(channel_id: int, previous_topic: None | str) -> discord.Embed:
         """
         Build an embed containing a conversation topic.
 
@@ -56,21 +56,46 @@ class ConvoStarters(commands.Cog):
             color=discord.Colour.og_blurple()
         )
 
-        try:
-            channel_topics = TOPICS[channel_id]
-        except KeyError:
-            # Channel doesn't have any topics.
-            embed.title = f"**{next(TOPICS['default'])}**"
+        if previous_topic is None:
+            # Message first sent
+            try:
+                channel_topics = TOPICS[channel_id]
+            except KeyError:
+                # Channel doesn't have any topics.
+                embed.title = f"**{next(TOPICS['default'])}**"
+            else:
+                embed.title = f"**{next(channel_topics)}**"
         else:
-            embed.title = f"**{next(channel_topics)}**"
+            # Message is being edited
+
+            try:
+                channel_topics = TOPICS[channel_id]
+            except KeyError:
+                # Channel doesn't have any topics.
+                new_topic = f"**{next(TOPICS['default'])}**"
+            else:
+                new_topic = f"\n**{next(channel_topics)}**"
+
+            total_topics = previous_topic.count("\n") + 1
+
+            # Add 1 before first topic
+            if total_topics == 1:
+                previous_topic = f"1. {previous_topic}"
+
+            embed.title = previous_topic + f"\n{total_topics + 1}. {new_topic}"
+
+            # When the embed will be larger than the limit, use the previous embed instead
+            if len(embed.title) > 256:
+                embed.title = previous_topic
+
         return embed
 
     @staticmethod
     def _predicate(
-        command_invoker: Union[discord.User, discord.Member],
-        message: discord.Message,
-        reaction: discord.Reaction,
-        user: discord.User
+            command_invoker: Union[discord.User, discord.Member],
+            message: discord.Message,
+            reaction: discord.Reaction,
+            user: discord.User
     ) -> bool:
         user_is_moderator = any(role.id in MODERATION_ROLES for role in getattr(user, "roles", []))
         user_is_invoker = user.id == command_invoker.id
@@ -83,9 +108,9 @@ class ConvoStarters(commands.Cog):
         return is_right_reaction
 
     async def _listen_for_refresh(
-        self,
-        command_invoker: Union[discord.User, discord.Member],
-        message: discord.Message
+            self,
+            command_invoker: Union[discord.User, discord.Member],
+            message: discord.Message
     ) -> None:
         await message.add_reaction("🔄")
         while True:
@@ -101,7 +126,9 @@ class ConvoStarters(commands.Cog):
                 break
 
             try:
-                await message.edit(embed=self._build_topic_embed(message.channel.id))
+                # The returned discord.Message object from discord.Message.edit is different than the current
+                # discord.Message object, so it must be reassigned to update properly
+                message = await message.edit(embed=self._build_topic_embed(message.channel.id, message.embeds[0].title))
             except discord.NotFound:
                 break
 
@@ -109,7 +136,7 @@ class ConvoStarters(commands.Cog):
                 await message.remove_reaction(reaction, user)
 
     @commands.command()
-    @commands.cooldown(1, 60*2, commands.BucketType.channel)
+    @commands.cooldown(1, 60 * 2, commands.BucketType.channel)
     @whitelist_override(channels=ALL_ALLOWED_CHANNELS)
     async def topic(self, ctx: commands.Context) -> None:
         """
@@ -117,7 +144,7 @@ class ConvoStarters(commands.Cog):
 
         Allows the refresh of a topic by pressing an emoji.
         """
-        message = await ctx.send(embed=self._build_topic_embed(ctx.channel.id))
+        message = await ctx.send(embed=self._build_topic_embed(ctx.channel.id, None))
         self.bot.loop.create_task(self._listen_for_refresh(ctx.author, message))
 
 
