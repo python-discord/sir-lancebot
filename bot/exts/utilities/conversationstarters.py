@@ -67,14 +67,13 @@ class ConvoStarters(commands.Cog):
                 embed.title = f"**{next(channel_topics)}**"
         else:
             # Message is being edited
-
             try:
                 channel_topics = TOPICS[channel_id]
             except KeyError:
                 # Channel doesn't have any topics.
                 new_topic = f"**{next(TOPICS['default'])}**"
             else:
-                new_topic = f"\n**{next(channel_topics)}**"
+                new_topic = f"**{next(channel_topics)}**"
 
             total_topics = previous_topic.count("\n") + 1
 
@@ -126,7 +125,7 @@ class ConvoStarters(commands.Cog):
                 break
 
             try:
-                # The returned discord.Message object from discord.Message.edit is different than the current
+                # The returned discord.Message object from discord.Message.edit is different from the current
                 # discord.Message object, so it must be reassigned to update properly
                 message = await message.edit(embed=self._build_topic_embed(message.channel.id, message.embeds[0].title))
             except discord.NotFound:
