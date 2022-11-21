@@ -1,4 +1,5 @@
 import hashlib
+import os
 import re
 import string
 from io import BytesIO
@@ -23,7 +24,7 @@ FORMATTED_CODE_REGEX = re.compile(
     re.DOTALL | re.IGNORECASE,              # "." also matches newlines, case insensitive
 )
 
-LATEX_API_URL = "https://rtex.probablyaweb.site/api/v2"
+LATEX_API_URL = os.getenv("LATEX_API_URL", "https://rtex.probablyaweb.site/api/v2")
 PASTEBIN_URL = "https://paste.pythondiscord.com"
 
 THIS_DIR = Path(__file__).parent
