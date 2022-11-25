@@ -341,7 +341,7 @@ pydocstyle = ">=2.1"
 
 [[package]]
 name = "flake8-isort"
-version = "5.0.0"
+version = "5.0.3"
 description = "flake8 plugin that integrates isort ."
 category = "dev"
 optional = false
@@ -532,7 +532,7 @@ tests = ["check-manifest", "coverage", "defusedxml", "markdown2", "olefile", "pa
 
 [[package]]
 name = "pip-licenses"
-version = "4.0.0"
+version = "4.0.1"
 description = "Dump the software license list of Python packages installed with pip."
 category = "dev"
 optional = false
@@ -740,7 +740,7 @@ ocsp = ["cryptography (>=36.0.1)", "pyopenssl (==20.0.1)", "requests (>=2.26.0)"
 
 [[package]]
 name = "sentry-sdk"
-version = "1.10.1"
+version = "1.11.1"
 description = "Python client for Sentry (https://sentry.io)"
 category = "main"
 optional = false
@@ -762,6 +762,7 @@ fastapi = ["fastapi (>=0.79.0)"]
 flask = ["blinker (>=1.1)", "flask (>=0.11)"]
 httpx = ["httpx (>=0.16.0)"]
 pure-eval = ["asttokens", "executing", "pure-eval"]
+pymongo = ["pymongo (>=3.1)"]
 pyspark = ["pyspark (>=2.4.4)"]
 quart = ["blinker (>=1.1)", "quart (>=0.16.1)"]
 rq = ["rq (>=0.6)"]
@@ -922,7 +923,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "3.10.*"
-content-hash = "8f1feaa9728f49011c1e333bb8303d5edc36675c01575e2cc22bd6e435dd4e1d"
+content-hash = "ef0279d517b0fca8bdf5c5eb72292403454a90b7798cc26962b2a9db15579921"
 
 [metadata.files]
 aiodns = [
@@ -1162,8 +1163,8 @@ flake8-docstrings = [
     {file = "flake8_docstrings-1.6.0-py2.py3-none-any.whl", hash = "sha256:99cac583d6c7e32dd28bbfbef120a7c0d1b6dde4adb5a9fd441c4227a6534bde"},
 ]
 flake8-isort = [
-    {file = "flake8-isort-5.0.0.tar.gz", hash = "sha256:e336f928c7edc509684930ab124414194b7f4e237c712af8fcbdf49d8747b10c"},
-    {file = "flake8_isort-5.0.0-py3-none-any.whl", hash = "sha256:c73f9cbd1bf209887f602a27b827164ccfeba1676801b2aa23cb49051a1be79c"},
+    {file = "flake8-isort-5.0.3.tar.gz", hash = "sha256:0951398c343c67f4933407adbbfb495d4df7c038650c5d05753a006efcfeb390"},
+    {file = "flake8_isort-5.0.3-py3-none-any.whl", hash = "sha256:8c4ab431d87780d0c8336e9614e50ef11201bc848ef64ca017532dec39d4bf49"},
 ]
 flake8-string-format = [
     {file = "flake8-string-format-0.3.0.tar.gz", hash = "sha256:65f3da786a1461ef77fca3780b314edb2853c377f2e35069723348c8917deaa2"},
@@ -1538,8 +1539,8 @@ pillow = [
     {file = "Pillow-9.3.0.tar.gz", hash = "sha256:c935a22a557a560108d780f9a0fc426dd7459940dc54faa49d83249c8d3e760f"},
 ]
 pip-licenses = [
-    {file = "pip-licenses-4.0.0.tar.gz", hash = "sha256:8b84c0b2831081f3fba8f6ccebddd6e8789de276d8ba9bf81cabdb4342b04371"},
-    {file = "pip_licenses-4.0.0-py3-none-any.whl", hash = "sha256:6718f1db6bc03dee3367a517fe5daa530cabb3bd47b9598755810bfa6c0100af"},
+    {file = "pip-licenses-4.0.1.tar.gz", hash = "sha256:05a180f5610b262e2d56eea99f04e380db7080e79655abf1c916125f39fe207d"},
+    {file = "pip_licenses-4.0.1-py3-none-any.whl", hash = "sha256:5896c18b7897e38fdd7be9a9ea0de02d6ff3264b7411967d6b679019ddc31878"},
 ]
 platformdirs = [
     {file = "platformdirs-2.5.2-py3-none-any.whl", hash = "sha256:027d8e83a2d7de06bbac4e5ef7e023c02b863d7ea5d079477e722bb41ab25788"},
@@ -1812,8 +1813,8 @@ redis = [
     {file = "redis-4.3.4.tar.gz", hash = "sha256:ddf27071df4adf3821c4f2ca59d67525c3a82e5f268bed97b813cb4fabf87880"},
 ]
 sentry-sdk = [
-    {file = "sentry-sdk-1.10.1.tar.gz", hash = "sha256:105faf7bd7b7fa25653404619ee261527266b14103fe1389e0ce077bd23a9691"},
-    {file = "sentry_sdk-1.10.1-py2.py3-none-any.whl", hash = "sha256:06c0fa9ccfdc80d7e3b5d2021978d6eb9351fa49db9b5847cf4d1f2a473414ad"},
+    {file = "sentry-sdk-1.11.1.tar.gz", hash = "sha256:675f6279b6bb1fea09fd61751061f9a90dca3b5929ef631dd50dc8b3aeb245e9"},
+    {file = "sentry_sdk-1.11.1-py2.py3-none-any.whl", hash = "sha256:8b4ff696c0bdcceb3f70bbb87a57ba84fd3168b1332d493fcd16c137f709578c"},
 ]
 setuptools = [
     {file = "setuptools-65.3.0-py3-none-any.whl", hash = "sha256:2e24e0bec025f035a2e72cdd1961119f557d78ad331bb00ff82efb2ab8da8e82"},
