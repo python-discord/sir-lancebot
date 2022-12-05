@@ -532,7 +532,7 @@ tests = ["check-manifest", "coverage", "defusedxml", "markdown2", "olefile", "pa
 
 [[package]]
 name = "pip-licenses"
-version = "4.0.1"
+version = "4.0.2"
 description = "Dump the software license list of Python packages installed with pip."
 category = "dev"
 optional = false
@@ -542,7 +542,7 @@ python-versions = "~=3.8"
 prettytable = ">=2.3.0"
 
 [package.extras]
-test = ["docutils", "pytest-cov", "pytest-pycodestyle", "pytest-runner"]
+test = ["docutils", "mypy", "pytest-cov", "pytest-pycodestyle", "pytest-runner"]
 
 [[package]]
 name = "platformdirs"
@@ -922,8 +922,8 @@ multidict = ">=4.0"
 
 [metadata]
 lock-version = "1.1"
-python-versions = "~3.10"
-content-hash = "09b0fcd1b90b0201426f95bfb60c0bdfe53bf9715f5ecbdfdcf31b5c8f1378b1"
+python-versions = "3.10.*"
+content-hash = "ea53147950a96488b19d2b71aa642917a3ea0ad619fa17fad8bd6d111b0b38bf"
 
 [metadata.files]
 aiodns = [
@@ -1539,8 +1539,8 @@ pillow = [
     {file = "Pillow-9.3.0.tar.gz", hash = "sha256:c935a22a557a560108d780f9a0fc426dd7459940dc54faa49d83249c8d3e760f"},
 ]
 pip-licenses = [
-    {file = "pip-licenses-4.0.1.tar.gz", hash = "sha256:05a180f5610b262e2d56eea99f04e380db7080e79655abf1c916125f39fe207d"},
-    {file = "pip_licenses-4.0.1-py3-none-any.whl", hash = "sha256:5896c18b7897e38fdd7be9a9ea0de02d6ff3264b7411967d6b679019ddc31878"},
+    {file = "pip-licenses-4.0.2.tar.gz", hash = "sha256:099911b9bf4709053f1fea2f5421c6692a82bb8885054043ae9222b07bf29b4e"},
+    {file = "pip_licenses-4.0.2-py3-none-any.whl", hash = "sha256:bcd89e9832dfad79e35bce0fe8ebc20706b50eea6fb43f70395ec927b800f367"},
 ]
 platformdirs = [
     {file = "platformdirs-2.5.2-py3-none-any.whl", hash = "sha256:027d8e83a2d7de06bbac4e5ef7e023c02b863d7ea5d079477e722bb41ab25788"},
