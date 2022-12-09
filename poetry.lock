@@ -251,7 +251,7 @@ dev = ["coverage", "coveralls", "pytest"]
 
 [[package]]
 name = "emojis"
-version = "0.6.0"
+version = "0.7.0"
 description = "Emojis for Python"
 category = "main"
 optional = false
@@ -923,7 +923,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "3.10.*"
-content-hash = "a77be04b068ecae669e28cc1e0c5b8fa1b0f07c97b6478c90f34c3aa33c986e9"
+content-hash = "347a38fdb3f84908b42e4ee5e338c24d84ff1b7f3b388f15ed2f695349d0157a"
 
 [metadata.files]
 aiodns = [
@@ -1135,8 +1135,8 @@ emoji = [
     {file = "emoji-2.2.0.tar.gz", hash = "sha256:a2986c21e4aba6b9870df40ef487a17be863cb7778dcf1c01e25917b7cd210bb"},
 ]
 emojis = [
-    {file = "emojis-0.6.0-py3-none-any.whl", hash = "sha256:7da34c8a78ae262fd68cef9e2c78a3c1feb59784489eeea0f54ba1d4b7111c7c"},
-    {file = "emojis-0.6.0.tar.gz", hash = "sha256:bf605d1f1a27a81cd37fe82eb65781c904467f569295a541c33710b97e4225ec"},
+    {file = "emojis-0.7.0-py3-none-any.whl", hash = "sha256:a777926d8ab0bfdd51250e899a3b3524a1e969275ac8e747b4a05578fa597367"},
+    {file = "emojis-0.7.0.tar.gz", hash = "sha256:5f437674da878170239af9a8196e50240b5922d6797124928574008442196b52"},
 ]
 fakeredis = [
     {file = "fakeredis-1.9.1-py3-none-any.whl", hash = "sha256:b9830f68dafafc0abe6c037775765166e9e2ff6b0da8abd3838eb2c3910f8e65"},
