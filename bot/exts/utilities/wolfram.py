@@ -202,6 +202,13 @@ class Wolfram(Cog):
                 message = "Wolfram API key is invalid or missing."
                 footer = ""
                 color = Colours.soft_red
+            elif status != 200:
+                # Handle all other possible status codes here
+                message = f"Unexpected status code from Wolfram API: {status}"
+                footer = ""
+                color = Colours.soft_red
+
+                log.warning(f"Unexpected status code from Wolfram API: {status}\nInput: {query}")
             else:
                 message = ""
                 footer = "View original for a bigger picture."
@@ -281,6 +288,12 @@ class Wolfram(Cog):
             elif response_text == "Error 1: Invalid appid.":
                 message = "Wolfram API key is invalid or missing."
                 color = Colours.soft_red
+            elif status != 200:
+                # Handle all other possible status codes here
+                message = f"Unexpected status code from Wolfram API: {status}"
+                color = Colours.soft_red
+
+                log.warning(f"Unexpected status code from Wolfram API: {status}\nInput: {query}")
             else:
                 message = response_text
                 color = Colours.soft_orange

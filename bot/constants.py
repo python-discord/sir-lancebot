@@ -1,12 +1,9 @@
-import dataclasses
 import enum
 import logging
-from datetime import datetime
 from os import environ
 from typing import NamedTuple
 
 __all__ = (
-    "AdventOfCode",
     "Branding",
     "Cats",
     "Channels",
@@ -39,65 +36,6 @@ log = logging.getLogger(__name__)
 PYTHON_PREFIX = "!"
 
 
-@dataclasses.dataclass
-class AdventOfCodeLeaderboard:
-    id: str
-    _session: str
-    join_code: str
-
-    # If we notice that the session for this board expired, we set
-    # this attribute to `True`. We will emit a Sentry error so we
-    # can handle it, but, in the meantime, we'll try using the
-    # fallback session to make sure the commands still work.
-    use_fallback_session: bool = False
-
-    @property
-    def session(self) -> str:
-        """Return either the actual `session` cookie or the fallback cookie."""
-        if self.use_fallback_session:
-            log.trace(f"Returning fallback cookie for board `{self.id}`.")
-            return AdventOfCode.fallback_session
-
-        return self._session
-
-
-def _parse_aoc_leaderboard_env() -> dict[str, AdventOfCodeLeaderboard]:
-    """
-    Parse the environment variable containing leaderboard information.
-
-    A leaderboard should be specified in the format `id,session,join_code`,
-    without the backticks. If more than one leaderboard needs to be added to
-    the constant, separate the individual leaderboards with `::`.
-
-    Example ENV: `id1,session1,join_code1::id2,session2,join_code2`
-    """
-    raw_leaderboards = environ.get("AOC_LEADERBOARDS", "")
-    if not raw_leaderboards:
-        return {}
-
-    leaderboards = {}
-    for leaderboard in raw_leaderboards.split("::"):
-        leaderboard_id, session, join_code = leaderboard.split(",")
-        leaderboards[leaderboard_id] = AdventOfCodeLeaderboard(leaderboard_id, session, join_code)
-
-    return leaderboards
-
-
-class AdventOfCode:
-    # Information for the several leaderboards we have
-    leaderboards = _parse_aoc_leaderboard_env()
-    staff_leaderboard_id = environ.get("AOC_STAFF_LEADERBOARD_ID", "")
-    fallback_session = environ.get("AOC_FALLBACK_SESSION", "")
-
-    # Other Advent of Code constants
-    ignored_days = environ.get("AOC_IGNORED_DAYS", "").split(",")
-    leaderboard_displayed_members = 10
-    leaderboard_cache_expiry_seconds = 1800
-    max_day_and_star_results = 15
-    year = int(environ.get("AOC_YEAR", datetime.utcnow().year))
-    role_id = int(environ.get("AOC_ROLE_ID", 518565788744024082))
-
-
 class Branding:
     cycle_frequency = int(environ.get("CYCLE_FREQUENCY", 3))  # 0: never, 1: every day, 2: every other day, ...
 
@@ -107,8 +45,6 @@ class Cats:
 
 
 class Channels(NamedTuple):
-    advent_of_code = int(environ.get("AOC_CHANNEL_ID", 897932085766004786))
-    advent_of_code_commands = int(environ.get("AOC_COMMANDS_CHANNEL_ID", 897932607545823342))
     algos_and_data_structs = 650401909852864553
     bot_commands = 267659945086812160
     community_meta = 267659945086812160
@@ -193,8 +129,6 @@ class Colours:
 
 class Emojis:
     cross_mark = "\u274C"
-    star = "\u2B50"
-    christmas_tree = "\U0001F384"
     check = "\u2611"
     envelope = "\U0001F4E8"
     trashcan = environ.get("TRASHCAN_EMOJI", "<:trashcan:637136429717389331>")
@@ -303,7 +237,6 @@ class Roles(NamedTuple):
     helpers = int(environ.get("ROLE_HELPERS", 267630620367257601))
     core_developers = 587606783669829632
     everyone = int(environ.get("BOT_GUILD", 267624335836053506))
-    aoc_completionist = int(environ.get("AOC_COMPLETIONIST_ROLE_ID", 916691790181056532))
 
 
 class Tokens(NamedTuple):

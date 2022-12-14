@@ -220,11 +220,11 @@ class HelpSession:
     async def prepare(self) -> None:
         """Sets up the help session pages, events, message and reactions."""
         await self.build_pages()
+        await self.update_page()
 
         self._bot.add_listener(self.on_reaction_add)
         self._bot.add_listener(self.on_message_delete)
 
-        await self.update_page()
         self.add_reactions()
 
     def add_reactions(self) -> None:

@@ -65,23 +65,47 @@ class EggheadQuiz(commands.Cog):
 
         msg = await ctx.fetch_message(msg.id)  # Refreshes message
 
-        total_no = sum([len(await r.users().flatten()) for r in msg.reactions]) - len(valid_emojis)  # - bot's reactions
+        users = []
+        for reaction in msg.reactions:
+            async for user in reaction.users():
+                users.append(user)
+
+        total_no = len(users) - len(valid_emojis)  # - bot's reactions
 
         if total_no == 0:
             return await msg.delete()  # To avoid ZeroDivisionError if nobody reacts
 
         results = ["**VOTES:**"]
         for emoji, _ in answers:
-            num = [len(await r.users().flatten()) for r in msg.reactions if str(r.emoji) == emoji][0] - 1
+            users = []
+            for reaction in msg.reactions:
+                if str(reaction.emoji) != emoji:
+                    continue
+
+                async for user in reaction.users():
+                    users.append(user)
+                break
+
+            num = len(users) - 1
             percent = round(100 * num / total_no)
             s = "" if num == 1 else "s"
             string = f"{emoji} - {num} vote{s} ({percent}%)"
             results.append(string)
 
+        users = []
+        for reaction in msg.reactions:
+            if str(reaction.emoji) != correct:
+                continue
+
+            async for user in reaction.users():
+                users.append(user)
+
+            # At this point we've added everyone who reacted
+            # with the correct answer, so stop looping over reactions.
+            break
+
         mentions = " ".join([
-            u.mention for u in [
-                await r.users().flatten() for r in msg.reactions if str(r.emoji) == correct
-            ][0] if not u.bot
+            u.mention for u in users if not u.bot
         ])
 
         content = f"Well done {mentions} for getting it correct!" if mentions else "Nobody got it right..."
@@ -95,10 +119,16 @@ class EggheadQuiz(commands.Cog):
         await ctx.send(content, embed=a_embed)
 
     @staticmethod
-    async def already_reacted(message: discord.Message, user: Union[discord.Member, discord.User]) -> bool:
+    async def already_reacted(new_reaction: discord.Reaction, user: Union[discord.Member, discord.User]) -> bool:
         """Returns whether a given user has reacted more than once to a given message."""
-        users = [u.id for reaction in [await r.users().flatten() for r in message.reactions] for u in reaction]
-        return users.count(user.id) > 1  # Old reaction plus new reaction
+        message = new_reaction.message
+        for reaction in message.reactions:
+            if reaction.emoji == new_reaction.emoji:
+                continue  # can't react with same emoji twice so skip 2nd reaction check
+            async for usr in reaction.users():
+                if usr.id == user.id:  # user also reacted with the emoji, i.e. has already reacted
+                    return True
+        return False
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction: discord.Reaction, user: Union[discord.Member, discord.User]) -> None:
@@ -109,7 +139,7 @@ class EggheadQuiz(commands.Cog):
             return
         if str(reaction.emoji) not in self.quiz_messages[reaction.message.id]:
             return await reaction.message.remove_reaction(reaction, user)
-        if await self.already_reacted(reaction.message, user):
+        if await self.already_reacted(reaction, user):
             return await reaction.message.remove_reaction(reaction, user)
 
 
