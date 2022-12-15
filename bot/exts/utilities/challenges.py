@@ -118,7 +118,7 @@ class Challenges(commands.Cog):
                 return error_embed
 
             soup = BeautifulSoup(await response.text(), features="lxml")
-            first_kata_div = await to_thread(soup.find_all, "div", class_="item-title px-0")
+            first_kata_div = await to_thread(soup.find_all, "div", class_="list-item-kata")
 
             if not first_kata_div:
                 raise commands.BadArgument("No katas could be found with the filters provided.")
