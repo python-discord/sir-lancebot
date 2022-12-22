@@ -91,10 +91,10 @@ class ConvoStarters(commands.Cog):
 
     @staticmethod
     def _predicate(
-            command_invoker: Union[discord.User, discord.Member],
-            message: discord.Message,
-            reaction: discord.Reaction,
-            user: discord.User
+        command_invoker: Union[discord.User, discord.Member],
+        message: discord.Message,
+        reaction: discord.Reaction,
+        user: discord.User
     ) -> bool:
         user_is_moderator = any(role.id in MODERATION_ROLES for role in getattr(user, "roles", []))
         user_is_invoker = user.id == command_invoker.id
@@ -107,9 +107,9 @@ class ConvoStarters(commands.Cog):
         return is_right_reaction
 
     async def _listen_for_refresh(
-            self,
-            command_invoker: Union[discord.User, discord.Member],
-            message: discord.Message
+        self,
+        command_invoker: Union[discord.User, discord.Member],
+        message: discord.Message
     ) -> None:
         await message.add_reaction("🔄")
         while True:
@@ -135,7 +135,7 @@ class ConvoStarters(commands.Cog):
                 await message.remove_reaction(reaction, user)
 
     @commands.command()
-    @commands.cooldown(1, 60 * 2, commands.BucketType.channel)
+    @commands.cooldown(1, 60*2, commands.BucketType.channel)
     @whitelist_override(channels=ALL_ALLOWED_CHANNELS)
     async def topic(self, ctx: commands.Context) -> None:
         """
