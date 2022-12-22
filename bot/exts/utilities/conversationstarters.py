@@ -56,36 +56,28 @@ class ConvoStarters(commands.Cog):
             color=discord.Colour.og_blurple()
         )
 
-        if previous_topic is None:
-            # Message first sent
-            try:
-                channel_topics = TOPICS[channel_id]
-            except KeyError:
-                # Channel doesn't have any topics.
-                embed.title = f"**{next(TOPICS['default'])}**"
-            else:
-                embed.title = f"**{next(channel_topics)}**"
+        try:
+            channel_topics = TOPICS[channel_id]
+        except KeyError:
+            # Channel doesn't have any topics.
+            embed.title = f"**{next(TOPICS['default'])}**"
         else:
-            # Message is being edited
-            try:
-                channel_topics = TOPICS[channel_id]
-            except KeyError:
-                # Channel doesn't have any topics.
-                new_topic = f"**{next(TOPICS['default'])}**"
-            else:
-                new_topic = f"**{next(channel_topics)}**"
+            embed.title = f"**{next(channel_topics)}**"
 
-            total_topics = previous_topic.count("\n") + 1
+        if previous_topic is None:
+            # This is the first topic being sent
+            return embed
 
-            # Add 1 before first topic
-            if total_topics == 1:
-                previous_topic = f"1. {previous_topic}"
+        total_topics = previous_topic.count("\n") + 1
+        # Add 1 before first topic
+        if total_topics == 1:
+            previous_topic = f"1. {previous_topic}"
 
-            embed.title = previous_topic + f"\n{total_topics + 1}. {new_topic}"
+        embed.title = previous_topic + f"\n{total_topics + 1}. {embed.title}"
 
-            # When the embed will be larger than the limit, use the previous embed instead
-            if len(embed.title) > 256:
-                embed.title = previous_topic
+        # When the embed will be larger than the limit, use the previous embed instead
+        if len(embed.title) > 256:
+            embed.title = previous_topic
 
         return embed
 
