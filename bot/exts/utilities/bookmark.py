@@ -121,6 +121,24 @@ class Bookmark(commands.Cog):
         else:
             log.info(f"{member} bookmarked {target_message.jump_url} with title '{title}'")
 
+    @staticmethod
+    async def run_permission_check(author: discord.Member | discord.User, channel: discord.TextChannel):
+        """Check if users have the right to bookmark a message in a particular channel.
+
+        This also notifies users in case they don't have the right to.
+        """
+        permissions = channel.permissions_for(author)
+        if not permissions.read_messages:
+            log.info(f"{author} tried to bookmark a message in #{channel} but has no permissions.")
+            embed = discord.Embed(
+                title=random.choice(ERROR_REPLIES),
+                color=Colours.soft_red,
+                description="You don't have permission to view this channel.",
+            )
+            await channel.send(embed=embed)
+            return False
+        return True
+
     @commands.group(name="bookmark", aliases=("bm", "pin"), invoke_without_command=True)
     @commands.guild_only()
     @whitelist_override(roles=(Roles.everyone,))
@@ -142,16 +160,7 @@ class Bookmark(commands.Cog):
         if target_message is None:
             raise commands.UserInputError(MESSAGE_NOT_FOUND_ERROR)
 
-        # Prevent users from bookmarking a message in a channel they don't have access to
-        permissions = target_message.channel.permissions_for(ctx.author)
-        if not permissions.read_messages:
-            log.info(f"{ctx.author} tried to bookmark a message in #{target_message.channel} but has no permissions.")
-            embed = discord.Embed(
-                title=random.choice(ERROR_REPLIES),
-                color=Colours.soft_red,
-                description="You don't have permission to view this channel.",
-            )
-            await ctx.send(embed=embed)
+        if not await self.run_permission_check(ctx.author, target_message.channel):
             return
 
         await self.action_bookmark(ctx.channel, ctx.author, target_message, title)
