@@ -138,7 +138,10 @@ class Bookmark(commands.Cog):
             log.info(f"{member} bookmarked {target_message.jump_url} with title '{title}'")
 
     @staticmethod
-    async def run_permission_check(author: discord.Member | discord.User, channel: discord.TextChannel) -> bool:
+    async def user_is_permitted_to_bookmark(
+            author: discord.Member | discord.User,
+            channel: discord.TextChannel
+    ) -> bool:
         """
         Check if users have the right to bookmark a message in a particular channel.
 
@@ -158,7 +161,7 @@ class Bookmark(commands.Cog):
 
     async def book_mark_context_menu_callback(self, interaction: discord.Interaction, message: discord.Message) -> None:
         """The callback that will be invoked upon using the bookmark's context menu command."""
-        if not await self.run_permission_check(interaction.user, message.channel):
+        if not await self.user_is_permitted_to_bookmark(interaction.user, message.channel):
             return
 
         title = "Bookmark"
@@ -189,7 +192,7 @@ class Bookmark(commands.Cog):
         if target_message is None:
             raise commands.UserInputError(MESSAGE_NOT_FOUND_ERROR)
 
-        if not await self.run_permission_check(ctx.author, target_message.channel):
+        if not await self.user_is_permitted_to_bookmark(ctx.author, target_message.channel):
             return
 
         await self.action_bookmark(ctx.channel, ctx.author, target_message, title)
