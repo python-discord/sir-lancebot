@@ -82,7 +82,8 @@ class Bookmark(commands.Cog):
         await self.bot.tree.sync()
 
     @staticmethod
-    def build_bookmark_embed(target_message: discord.Message):
+    def build_bookmark_embed(target_message: discord.Message) -> discord.Embed:
+        """Build the channel embed to the bookmark requester."""
         return discord.Embed(
             description=(
                 f"Click the button to be sent your very own bookmark to "
@@ -137,8 +138,9 @@ class Bookmark(commands.Cog):
             log.info(f"{member} bookmarked {target_message.jump_url} with title '{title}'")
 
     @staticmethod
-    async def run_permission_check(author: discord.Member | discord.User, channel: discord.TextChannel):
-        """Check if users have the right to bookmark a message in a particular channel.
+    async def run_permission_check(author: discord.Member | discord.User, channel: discord.TextChannel) -> bool:
+        """
+        Check if users have the right to bookmark a message in a particular channel.
 
         This also notifies users in case they don't have the right to.
         """
@@ -154,7 +156,8 @@ class Bookmark(commands.Cog):
             return False
         return True
 
-    async def book_mark_context_menu_callback(self, interaction: discord.Interaction, message: discord.Message):
+    async def book_mark_context_menu_callback(self, interaction: discord.Interaction, message: discord.Message) -> None:
+        """The callback that will be invoked upon using the bookmark's context menu command."""
         if not await self.run_permission_check(interaction.user, message.channel):
             return
 
@@ -164,7 +167,6 @@ class Bookmark(commands.Cog):
         view = SendBookmark(self.action_bookmark, interaction.user, message.channel, message, title)
         embed = self.build_bookmark_embed(message)
         await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
-
 
     @commands.group(name="bookmark", aliases=("bm", "pin"), invoke_without_command=True)
     @commands.guild_only()
