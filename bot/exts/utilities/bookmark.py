@@ -72,6 +72,10 @@ class Bookmark(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
+    async def cog_load(self) -> None:
+        """Carry out cog asynchronous initialisation."""
+        await self.bot.tree.sync()
+
     @staticmethod
     def build_bookmark_dm(target_message: discord.Message, title: str) -> discord.Embed:
         """Build the embed to DM the bookmark requester."""
