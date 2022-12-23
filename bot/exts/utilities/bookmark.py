@@ -73,7 +73,7 @@ class Bookmark(commands.Cog):
         self.bot = bot
         self.book_mark_context_menu = discord.app_commands.ContextMenu(
             name="Bookmark",
-            callback=self.book_mark_context_menu_callback
+            callback=self._bookmark_context_menu_callback
         )
         self.bot.tree.add_command(self.book_mark_context_menu)
 
@@ -159,7 +159,7 @@ class Bookmark(commands.Cog):
             return False
         return True
 
-    async def book_mark_context_menu_callback(self, interaction: discord.Interaction, message: discord.Message) -> None:
+    async def _bookmark_context_menu_callback(self, interaction: discord.Interaction, message: discord.Message) -> None:
         """The callback that will be invoked upon using the bookmark's context menu command."""
         if not await self.user_is_permitted_to_bookmark(interaction.user, message.channel):
             return
