@@ -77,6 +77,16 @@ class Bookmark(commands.Cog):
         await self.bot.tree.sync()
 
     @staticmethod
+    def build_bookmark_embed(target_message: discord.Message):
+        return discord.Embed(
+            description=(
+                f"Click the button to be sent your very own bookmark to "
+                f"[this message]({target_message.jump_url})."
+            ),
+            colour=Colours.soft_green,
+        )
+
+    @staticmethod
     def build_bookmark_dm(target_message: discord.Message, title: str) -> discord.Embed:
         """Build the embed to DM the bookmark requester."""
         embed = discord.Embed(
@@ -166,14 +176,8 @@ class Bookmark(commands.Cog):
         await self.action_bookmark(ctx.channel, ctx.author, target_message, title)
 
         view = SendBookmark(self.action_bookmark, ctx.author, ctx.channel, target_message, title)
+        embed = self.build_bookmark_embed(target_message)
 
-        embed = discord.Embed(
-            description=(
-                f"Click the button to be sent your very own bookmark to "
-                f"[this message]({target_message.jump_url})."
-            ),
-            colour=Colours.soft_green,
-        )
         await ctx.send(embed=embed, view=view)
 
     @bookmark.command(name="delete", aliases=("del", "rm"), root_aliases=("unbm", "unbookmark", "dmdelete", "dmdel"))
