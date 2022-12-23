@@ -71,6 +71,11 @@ class Bookmark(commands.Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
+        self.book_mark_context_menu = discord.app_commands.ContextMenu(
+            name="Bookmark",
+            callback=self.book_mark_context_menu_callback
+        )
+        self.bot.tree.add_command(self.book_mark_context_menu)
 
     async def cog_load(self) -> None:
         """Carry out cog asynchronous initialisation."""
@@ -148,6 +153,18 @@ class Bookmark(commands.Cog):
             await channel.send(embed=embed)
             return False
         return True
+
+    async def book_mark_context_menu_callback(self, interaction: discord.Interaction, message: discord.Message):
+        if not await self.run_permission_check(interaction.user, message.channel):
+            return
+
+        title = "Bookmark"
+        await self.action_bookmark(message.channel, interaction.user, message, title)
+
+        view = SendBookmark(self.action_bookmark, interaction.user, message.channel, message, title)
+        embed = self.build_bookmark_embed(message)
+        await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+
 
     @commands.group(name="bookmark", aliases=("bm", "pin"), invoke_without_command=True)
     @commands.guild_only()
