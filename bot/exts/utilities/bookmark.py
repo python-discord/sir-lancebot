@@ -138,7 +138,7 @@ class Bookmark(commands.Cog):
         """The callback that will be invoked upon using the bookmark's context menu command."""
         permissions = interaction.channel.permissions_for(interaction.user)
         if not permissions.read_messages:
-            log.info(f"{interaction.user.author} tried to bookmark a message in #{interaction.channel}"
+            log.info(f"{interaction.user} tried to bookmark a message in #{interaction.channel}"
                      f"but has no permissions.")
             embed = Bookmark.build_error_embed("You don't have permission to view this channel.")
             await interaction.response.send_message(embed=embed)
