@@ -77,20 +77,17 @@ class Bookmark(commands.Cog):
         )
         self.bot.tree.add_command(self.book_mark_context_menu)
 
-    async def cog_load(self) -> None:
-        """Carry out cog asynchronous initialisation."""
-        await self.bot.tree.sync()
-
     @staticmethod
     def build_bookmark_embed(target_message: discord.Message) -> discord.Embed:
         """Build the channel embed to the bookmark requester."""
-        return discord.Embed(
+        embed = discord.Embed(
             description=(
                 f"Click the button to be sent your very own bookmark to "
                 f"[this message]({target_message.jump_url})."
             ),
             colour=Colours.soft_green,
         )
+        return embed
 
     @staticmethod
     def build_bookmark_dm(target_message: discord.Message, title: str) -> discord.Embed:
