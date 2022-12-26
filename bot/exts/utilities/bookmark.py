@@ -134,31 +134,14 @@ class Bookmark(commands.Cog):
         else:
             log.info(f"{member} bookmarked {target_message.jump_url} with title '{title}'")
 
-    @staticmethod
-    async def user_is_permitted_to_bookmark(
-            author: discord.Member | discord.User,
-            channel: discord.TextChannel
-    ) -> bool:
-        """
-        Check if users have the right to bookmark a message in a particular channel.
-
-        This also notifies users in case they don't have the right to.
-        """
-        permissions = channel.permissions_for(author)
-        if not permissions.read_messages:
-            log.info(f"{author} tried to bookmark a message in #{channel} but has no permissions.")
-            embed = discord.Embed(
-                title=random.choice(ERROR_REPLIES),
-                color=Colours.soft_red,
-                description="You don't have permission to view this channel.",
-            )
-            await channel.send(embed=embed)
-            return False
-        return True
-
     async def _bookmark_context_menu_callback(self, interaction: discord.Interaction, message: discord.Message) -> None:
         """The callback that will be invoked upon using the bookmark's context menu command."""
-        if not await self.user_is_permitted_to_bookmark(interaction.user, message.channel):
+        permissions = interaction.channel.channel.permissions_for(interaction.user)
+        if not permissions.read_messages:
+            log.info(f"{interaction.user.author} tried to bookmark a message in #{interaction.channel}"
+                     f"but has no permissions.")
+            embed = Bookmark.build_error_embed("You don't have permission to view this channel.")
+            await interaction.response.send_message(embed=embed)
             return
 
         title = "Bookmark"
@@ -189,7 +172,11 @@ class Bookmark(commands.Cog):
         if target_message is None:
             raise commands.UserInputError(MESSAGE_NOT_FOUND_ERROR)
 
-        if not await self.user_is_permitted_to_bookmark(ctx.author, target_message.channel):
+        permissions = ctx.channel.permissions_for(ctx.author)
+        if not permissions.read_messages:
+            log.info(f"{ctx.author} tried to bookmark a message in #{ctx.channel} but has no permissions.")
+            embed = Bookmark.build_error_embed("You don't have permission to view this channel.")
+            await ctx.send(embed=embed)
             return
 
         await self.action_bookmark(ctx.channel, ctx.author, target_message, title)
