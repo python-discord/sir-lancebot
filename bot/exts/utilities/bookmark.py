@@ -136,7 +136,7 @@ class Bookmark(commands.Cog):
 
     async def _bookmark_context_menu_callback(self, interaction: discord.Interaction, message: discord.Message) -> None:
         """The callback that will be invoked upon using the bookmark's context menu command."""
-        permissions = interaction.channel.channel.permissions_for(interaction.user)
+        permissions = interaction.channel.permissions_for(interaction.user)
         if not permissions.read_messages:
             log.info(f"{interaction.user.author} tried to bookmark a message in #{interaction.channel}"
                      f"but has no permissions.")
