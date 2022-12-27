@@ -23,6 +23,40 @@ MESSAGE_NOT_FOUND_ERROR = (
 )
 
 
+class BookmarkTitleSelectionForm(discord.ui.Modal):
+    """
+    The form where a user can fill in a custom title for their bookmark & submit it.
+
+    This form is only available when the command is invoked from a context menu.
+    """
+
+    def __init__(
+            self,
+            message: discord.Message,
+            action_bookmark_function: Callable[[discord.TextChannel, discord.Member, discord.Message, str], None],
+    ):
+        super().__init__(timeout=1000, title="Name your bookmark")
+        self.message = message
+        self.action_bookmark = action_bookmark_function
+
+    bookmark_title = discord.ui.TextInput(
+        label="Choose a title for you bookmark",
+        placeholder="Type your bookmark title here",
+        default="Bookmark",
+        max_length=50,
+        min_length=0,
+        required=False
+    )
+
+    async def on_submit(self, interaction: discord.Interaction) -> None:
+        """Sends the bookmark embed to the user with the newly chosen title."""
+        title = self.bookmark_title.value or self.bookmark_title.default
+        await self.action_bookmark(interaction.channel, interaction.user, self.message, title)
+        view = SendBookmark(self.action_bookmark, interaction.user, interaction.channel, self.message, title)
+        embed = Bookmark.build_bookmark_embed(self.message)
+        await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+
+
 class LinkTargetMessage(discord.ui.View):
     """The button that relays the user to the bookmarked message."""
 
@@ -144,12 +178,11 @@ class Bookmark(commands.Cog):
             await interaction.response.send_message(embed=embed)
             return
 
-        title = "Bookmark"
-        await self.action_bookmark(message.channel, interaction.user, message, title)
-
-        view = SendBookmark(self.action_bookmark, interaction.user, message.channel, message, title)
-        embed = self.build_bookmark_embed(message)
-        await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+        bookmark_title_form = BookmarkTitleSelectionForm(
+            message=message,
+            action_bookmark_function=self.action_bookmark
+        )
+        await interaction.response.send_modal(bookmark_title_form)
 
     @commands.group(name="bookmark", aliases=("bm", "pin"), invoke_without_command=True)
     @commands.guild_only()
