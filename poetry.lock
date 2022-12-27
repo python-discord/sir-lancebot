@@ -582,7 +582,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "pydis-core"
-version = "9.3.0"
+version = "9.3.1"
 description = "PyDis core provides core functionality and utility to the bots of the Python Discord community."
 category = "main"
 optional = false
@@ -865,7 +865,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "3.10.*"
-content-hash = "391f46e540dc13bfe0d1efad5235cf2990dfbc16211ebe99a210796109ab63fb"
+content-hash = "97ebf41d27ad00a1650a2e02d3c3a0198593d6cc13243ce23ada61b283f4cda3"
 
 [metadata.files]
 aiodns = [
@@ -1627,8 +1627,8 @@ pycparser = [
     {file = "pycparser-2.21.tar.gz", hash = "sha256:e644fdec12f7872f86c58ff790da456218b10f863970249516d60a5eaca77206"},
 ]
 pydis-core = [
-    {file = "pydis_core-9.3.0-py3-none-any.whl", hash = "sha256:eecac3c66a3a05dcd4772acb6f4857c5bb689bd0b58cb68625fbbfeffed21062"},
-    {file = "pydis_core-9.3.0.tar.gz", hash = "sha256:3dabaafcd884dce1a5c4b36e83e74030bfa9b2bc47e9a9530101b66109902cec"},
+    {file = "pydis_core-9.3.1-py3-none-any.whl", hash = "sha256:9dd75ab5a4845bee2b5a85ab69ea06d1b0f0d85822f7955185cf00b1ca70772d"},
+    {file = "pydis_core-9.3.1.tar.gz", hash = "sha256:30703e517bc1986fa042f4c7dd63f2ee02405733141ac083ffe9415a3d6f593a"},
 ]
 pydocstyle = [
     {file = "pydocstyle-6.1.1-py3-none-any.whl", hash = "sha256:6987826d6775056839940041beef5c08cc7e3d71d63149b48e36727f70144dc4"},
