@@ -31,7 +31,7 @@ class BookmarkTitleSelectionForm(discord.ui.Modal):
     """
 
     bookmark_title = discord.ui.TextInput(
-        label="Choose a title for you bookmark",
+        label="Choose a title for you bookmark (optional)",
         placeholder="Type your bookmark title here",
         default="Bookmark",
         max_length=50,
