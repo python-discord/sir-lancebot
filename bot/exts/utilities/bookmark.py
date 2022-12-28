@@ -30,15 +30,6 @@ class BookmarkTitleSelectionForm(discord.ui.Modal):
     This form is only available when the command is invoked from a context menu.
     """
 
-    def __init__(
-            self,
-            message: discord.Message,
-            action_bookmark_function: Callable[[discord.TextChannel, discord.Member, discord.Message, str], None],
-    ):
-        super().__init__(timeout=1000, title="Name your bookmark")
-        self.message = message
-        self.action_bookmark = action_bookmark_function
-
     bookmark_title = discord.ui.TextInput(
         label="Choose a title for you bookmark",
         placeholder="Type your bookmark title here",
@@ -47,6 +38,15 @@ class BookmarkTitleSelectionForm(discord.ui.Modal):
         min_length=0,
         required=False
     )
+
+    def __init__(
+            self,
+            message: discord.Message,
+            action_bookmark_function: Callable[[discord.TextChannel, discord.Member, discord.Message, str], None],
+    ):
+        super().__init__(timeout=1000, title="Name your bookmark")
+        self.message = message
+        self.action_bookmark = action_bookmark_function
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
         """Sends the bookmark embed to the user with the newly chosen title."""
