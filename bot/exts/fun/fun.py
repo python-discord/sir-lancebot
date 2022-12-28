@@ -6,10 +6,10 @@ from pathlib import Path
 from typing import Literal
 
 import pyjokes
-from botcore.utils.commands import clean_text_or_reply
 from discord import Embed
 from discord.ext import commands
 from discord.ext.commands import BadArgument, Cog, Context
+from pydis_core.utils.commands import clean_text_or_reply
 
 from bot.bot import Bot
 from bot.constants import Client, Colours, Emojis
