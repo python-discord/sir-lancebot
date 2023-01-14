@@ -52,9 +52,8 @@ class BookmarkTitleSelectionForm(discord.ui.Modal):
         """Sends the bookmark embed to the user with the newly chosen title."""
         title = self.bookmark_title.value or self.bookmark_title.default
         await self.action_bookmark(interaction.channel, interaction.user, self.message, title)
-        view = SendBookmark(self.action_bookmark, interaction.user, interaction.channel, self.message, title)
-        embed = Bookmark.build_bookmark_embed(self.message)
-        await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+        embed = Bookmark.build_ephemeral_bookmark_embed(self.message)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
 class LinkTargetMessage(discord.ui.View):
@@ -118,6 +117,18 @@ class Bookmark(commands.Cog):
             description=(
                 f"Click the button to be sent your very own bookmark to "
                 f"[this message]({target_message.jump_url})."
+            ),
+            colour=Colours.soft_green,
+        )
+
+    @staticmethod
+    def build_ephemeral_bookmark_embed(target_message: discord.Message) -> discord.Embed:
+        """Build the ephemeral embed to the bookmark requester."""
+        return discord.Embed(
+            description=(
+                f"A bookmark for [this message]({target_message.jump_url})"
+                f"has been successfully sent your way"
+                f"Please check your DMs to retrieve it."
             ),
             colour=Colours.soft_green,
         )
