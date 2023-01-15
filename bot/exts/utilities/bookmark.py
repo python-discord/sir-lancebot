@@ -128,7 +128,6 @@ class Bookmark(commands.Cog):
             description=(
                 f"A bookmark for [this message]({target_message.jump_url}) "
                 f"has been successfully sent your way.\n"
-                f"Please check your DMs to retrieve it."
             ),
             colour=Colours.soft_green,
         )
