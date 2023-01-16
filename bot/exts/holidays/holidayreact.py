@@ -22,7 +22,7 @@ SPOOKY_TRIGGERS = {
 }
 
 
-class SpookyReact(Cog):
+class HolidayReact(Cog):
     """A cog that makes the bot react to message triggers."""
 
     def __init__(self, bot: Bot):
@@ -31,7 +31,7 @@ class SpookyReact(Cog):
     @in_month(Month.OCTOBER)
     @Cog.listener()
     async def on_message(self, message: discord.Message) -> None:
-        """Triggered when the bot sees a message in October."""
+        """Triggered when the bot sees a message in a holiday month."""
         for name, trigger in SPOOKY_TRIGGERS.items():
             trigger_test = re.search(trigger[0], message.content.lower())
             if trigger_test:
@@ -67,5 +67,5 @@ class SpookyReact(Cog):
 
 
 async def setup(bot: Bot) -> None:
-    """Load the Spooky Reaction Cog."""
-    await bot.add_cog(SpookyReact(bot))
+    """Load the Holiday Reaction Cog."""
+    await bot.add_cog(HolidayReact(bot))
