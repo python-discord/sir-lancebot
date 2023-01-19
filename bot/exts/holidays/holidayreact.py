@@ -29,16 +29,16 @@ class Holiday(NamedTuple):
 
 
 Valentines = Holiday([Month.FEBRUARY], {
-    "heart": Trigger(r"\blove|heart\b", ["\u2764\uFE0F"]),
+    "heart": Trigger(r"\b(love|heart)\b", ["\u2764\uFE0F"]),
     }
 )
 Easter = Holiday([Month.APRIL], {
-    "bunny": Trigger(r"\beaster|bunny|rabbit\b", ["\U0001F430", "\U0001F407"]),
+    "bunny": Trigger(r"\b(easter|bunny|rabbit)\b", ["\U0001F430", "\U0001F407"]),
     "egg": Trigger(r"\begg\b", ["\U0001F95A"]),
     }
 )
 EarthDay = Holiday([Month.FEBRUARY], {
-    "earth": Trigger(r"\bearth|planet\b", ["\U0001F30E", "\U0001F30D", "\U0001F30F"]),
+    "earth": Trigger(r"\b(earth|planet)\b", ["\U0001F30E", "\U0001F30D", "\U0001F30F"]),
     }
 )
 Pride = Holiday([Month.JUNE], {
@@ -57,12 +57,12 @@ Halloween = Holiday([Month.OCTOBER], {
     }
 )
 Hanukkah = Holiday([Month.NOVEMBER, Month.DECEMBER], {
-    "menorah": Trigger(r"\bc?hanukkah|menorah\b", ["\U0001F54E"]),
+    "menorah": Trigger(r"\b(c?hanukkah|menorah)\b", ["\U0001F54E"]),
     }
 )
 Christmas = Holiday([Month.DECEMBER], {
-    "christmas tree": Trigger(r"\b(christ|x)mas|tree\b", ["\U0001F384"]),
-    "reindeer": Trigger(r"\breindeer|caribou|buck|stag\b", ["\U0001F98C"]),
+    "christmas tree": Trigger(r"\b((christ|x)mas|tree)\b", ["\U0001F384"]),
+    "reindeer": Trigger(r"\b(reindeer|caribou|buck|stag)\b", ["\U0001F98C"]),
     "santa": Trigger(r"\bsanta\b", ["\U0001F385"]),
     "snowflake": Trigger(r"\b(snow ?)?flake(?! ?8)\b", ["\u2744\uFE0F"]),
     "snowman": Trigger(r"\bsnow(man|angel)\b", ["\u2603\uFE0F", "\u26C4"]),
