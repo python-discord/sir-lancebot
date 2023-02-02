@@ -37,7 +37,7 @@ Easter = Holiday([Month.APRIL], {
     "egg": Trigger(r"\begg\b", ["\U0001F95A"]),
     }
 )
-EarthDay = Holiday([Month.FEBRUARY], {
+EarthDay = Holiday([Month.APRIL], {
     "earth": Trigger(r"\b(earth|planet)\b", ["\U0001F30E", "\U0001F30D", "\U0001F30F"]),
     }
 )
