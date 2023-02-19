@@ -57,16 +57,11 @@ class BookmarkForm(discord.ui.Modal):
         Raises ``discord.Forbidden`` if the user's DMs are closed.
         """
         embed = Bookmark.build_bookmark_dm(target_message, title)
-        await interaction.user.send(embed=embed, view=LinkTargetMessage(target_message))
+        message_url_view = discord.ui.View().add_item(
+            discord.ui.Button(label="View Message", url=target_message.jump_url)
+        )
+        await interaction.user.send(embed=embed, view=message_url_view)
         log.info(f"{interaction.user} bookmarked {target_message.jump_url} with title {title!r}")
-
-
-class LinkTargetMessage(discord.ui.View):
-    """The button that relays the user to the bookmarked message."""
-
-    def __init__(self, target_message: discord.Message):
-        super().__init__()
-        self.add_item(discord.ui.Button(label="View Message", url=target_message.jump_url))
 
 
 class Bookmark(commands.Cog):
