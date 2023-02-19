@@ -106,9 +106,9 @@ class Bookmark(commands.Cog):
         self.bot = bot
         self.book_mark_context_menu = discord.app_commands.ContextMenu(
             name="Bookmark",
-            callback=self._bookmark_context_menu_callback
+            callback=self._bookmark_context_menu_callback,
         )
-        self.bot.tree.add_command(self.book_mark_context_menu)
+        self.bot.tree.add_command(self.book_mark_context_menu, guild=discord.Object(bot.guild_id))
 
     @staticmethod
     def build_bookmark_embed(target_message: discord.Message) -> discord.Embed:
@@ -180,11 +180,6 @@ class Bookmark(commands.Cog):
     async def _bookmark_context_menu_callback(self, interaction: discord.Interaction, message: discord.Message) -> None:
         """The callback that will be invoked upon using the bookmark's context menu command."""
         permissions = interaction.channel.permissions_for(interaction.user)
-        if not interaction.channel.guild:
-            embed = Bookmark.build_error_embed("This command cannot be used in DMs.")
-            await interaction.response.send_message(embed=embed)
-            return
-
         if not permissions.read_messages:
             log.info(f"{interaction.user} tried to bookmark a message in #{interaction.channel}"
                      f"but has no permissions.")
