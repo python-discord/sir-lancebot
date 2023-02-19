@@ -31,32 +31,34 @@ class BookmarkForm(discord.ui.Modal):
     async def on_submit(self, interaction: discord.Interaction) -> None:
         """Sends the bookmark embed to the user with the newly chosen title."""
         title = self.bookmark_title.value or self.bookmark_title.default
-        await self.action_bookmark(interaction.channel, interaction.user, self.message, title)
-        embed = Bookmark.build_success_reply_embed(self.message)
-        await interaction.response.send_message(embed=embed, ephemeral=True)
-
-    async def action_bookmark(
-        self,
-        channel: discord.TextChannel,
-        member: discord.Member,
-        target_message: discord.Message,
-        title: str
-    ) -> None:
-        """
-        Sends the given target_message as a bookmark to the member in DMs to the user.
-
-        Send an error embed instead if the member has DMs disabled.
-        """
-        embed = Bookmark.build_bookmark_dm(target_message, title)
         try:
-            await member.send(embed=embed, view=LinkTargetMessage(target_message))
+            await self.dm_bookmark(interaction, self.message, title)
         except discord.Forbidden:
-            await channel.send(
+            await interaction.response.send_message(
                 embed=Bookmark.build_error_embed("Enable your DMs to receive the bookmark."),
                 ephemeral=True,
             )
-        else:
-            log.info(f"{member} bookmarked {target_message.jump_url} with title '{title}'")
+            return
+
+        await interaction.response.send_message(
+            embed=Bookmark.build_success_reply_embed(self.message),
+            ephemeral=True,
+        )
+
+    async def dm_bookmark(
+        self,
+        interaction: discord.Interaction,
+        target_message: discord.Message,
+        title: str,
+    ) -> None:
+        """
+        Sends the target_message as a bookmark to the interaction user's DMs.
+
+        Raises ``discord.Forbidden`` if the user's DMs are closed.
+        """
+        embed = Bookmark.build_bookmark_dm(target_message, title)
+        await interaction.user.send(embed=embed, view=LinkTargetMessage(target_message))
+        log.info(f"{interaction.user} bookmarked {target_message.jump_url} with title {title!r}")
 
 
 class LinkTargetMessage(discord.ui.View):
