@@ -24,14 +24,9 @@ class BookmarkForm(discord.ui.Modal):
         required=False,
     )
 
-    def __init__(
-        self,
-        message: discord.Message,
-        action_bookmark_function: Callable[[discord.TextChannel, discord.Member, discord.Message, str], None],
-    ):
+    def __init__(self, message: discord.Message):
         super().__init__(timeout=1000, title="Name your bookmark")
         self.message = message
-        self.action_bookmark = action_bookmark_function
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
         """Sends the bookmark embed to the user with the newly chosen title."""
@@ -39,6 +34,29 @@ class BookmarkForm(discord.ui.Modal):
         await self.action_bookmark(interaction.channel, interaction.user, self.message, title)
         embed = Bookmark.build_success_reply_embed(self.message)
         await interaction.response.send_message(embed=embed, ephemeral=True)
+
+    async def action_bookmark(
+        self,
+        channel: discord.TextChannel,
+        member: discord.Member,
+        target_message: discord.Message,
+        title: str
+    ) -> None:
+        """
+        Sends the given target_message as a bookmark to the member in DMs to the user.
+
+        Send an error embed instead if the member has DMs disabled.
+        """
+        embed = Bookmark.build_bookmark_dm(target_message, title)
+        try:
+            await member.send(embed=embed, view=LinkTargetMessage(target_message))
+        except discord.Forbidden:
+            await channel.send(
+                embed=Bookmark.build_error_embed("Enable your DMs to receive the bookmark."),
+                ephemeral=True,
+            )
+        else:
+            log.info(f"{member} bookmarked {target_message.jump_url} with title '{title}'")
 
 
 class LinkTargetMessage(discord.ui.View):
@@ -89,27 +107,6 @@ class Bookmark(commands.Cog):
             description=message,
             colour=Colours.soft_red,
         )
-
-    async def action_bookmark(
-        self,
-        channel: discord.TextChannel,
-        member: discord.Member,
-        target_message: discord.Message,
-        title: str
-    ) -> None:
-        """
-        Sends the given target_message as a bookmark to the member in DMs to the user.
-
-        Send an error embed instead if the member has DMs disabled.
-        """
-        embed = self.build_bookmark_dm(target_message, title)
-        try:
-            await member.send(embed=embed, view=LinkTargetMessage(target_message))
-        except discord.Forbidden:
-            error_embed = self.build_error_embed(f"{member.mention}, please enable your DMs to receive the bookmark.")
-            await channel.send(embed=error_embed)
-        else:
-            log.info(f"{member} bookmarked {target_message.jump_url} with title '{title}'")
 
     async def _bookmark_context_menu_callback(self, interaction: discord.Interaction, message: discord.Message) -> None:
         """The callback that will be invoked upon using the bookmark's context menu command."""
