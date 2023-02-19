@@ -23,6 +23,39 @@ MESSAGE_NOT_FOUND_ERROR = (
 )
 
 
+class BookmarkTitleSelectionForm(discord.ui.Modal):
+    """
+    The form where a user can fill in a custom title for their bookmark & submit it.
+
+    This form is only available when the command is invoked from a context menu.
+    """
+
+    bookmark_title = discord.ui.TextInput(
+        label="Choose a title for you bookmark (optional)",
+        placeholder="Type your bookmark title here",
+        default="Bookmark",
+        max_length=50,
+        min_length=0,
+        required=False
+    )
+
+    def __init__(
+            self,
+            message: discord.Message,
+            action_bookmark_function: Callable[[discord.TextChannel, discord.Member, discord.Message, str], None],
+    ):
+        super().__init__(timeout=1000, title="Name your bookmark")
+        self.message = message
+        self.action_bookmark = action_bookmark_function
+
+    async def on_submit(self, interaction: discord.Interaction) -> None:
+        """Sends the bookmark embed to the user with the newly chosen title."""
+        title = self.bookmark_title.value or self.bookmark_title.default
+        await self.action_bookmark(interaction.channel, interaction.user, self.message, title)
+        embed = Bookmark.build_ephemeral_bookmark_embed(self.message)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+
+
 class LinkTargetMessage(discord.ui.View):
     """The button that relays the user to the bookmarked message."""
 
@@ -71,6 +104,33 @@ class Bookmark(commands.Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
+        self.book_mark_context_menu = discord.app_commands.ContextMenu(
+            name="Bookmark",
+            callback=self._bookmark_context_menu_callback
+        )
+        self.bot.tree.add_command(self.book_mark_context_menu)
+
+    @staticmethod
+    def build_bookmark_embed(target_message: discord.Message) -> discord.Embed:
+        """Build the channel embed to the bookmark requester."""
+        return discord.Embed(
+            description=(
+                f"Click the button to be sent your very own bookmark to "
+                f"[this message]({target_message.jump_url})."
+            ),
+            colour=Colours.soft_green,
+        )
+
+    @staticmethod
+    def build_ephemeral_bookmark_embed(target_message: discord.Message) -> discord.Embed:
+        """Build the ephemeral embed to the bookmark requester."""
+        return discord.Embed(
+            description=(
+                f"A bookmark for [this message]({target_message.jump_url}) "
+                f"has been successfully sent your way.\n"
+            ),
+            colour=Colours.soft_green,
+        )
 
     @staticmethod
     def build_bookmark_dm(target_message: discord.Message, title: str) -> discord.Embed:
@@ -117,6 +177,27 @@ class Bookmark(commands.Cog):
         else:
             log.info(f"{member} bookmarked {target_message.jump_url} with title '{title}'")
 
+    async def _bookmark_context_menu_callback(self, interaction: discord.Interaction, message: discord.Message) -> None:
+        """The callback that will be invoked upon using the bookmark's context menu command."""
+        permissions = interaction.channel.permissions_for(interaction.user)
+        if not interaction.channel.guild:
+            embed = Bookmark.build_error_embed("This command cannot be used in DMs.")
+            await interaction.response.send_message(embed=embed)
+            return
+
+        if not permissions.read_messages:
+            log.info(f"{interaction.user} tried to bookmark a message in #{interaction.channel}"
+                     f"but has no permissions.")
+            embed = Bookmark.build_error_embed("You don't have permission to view this channel.")
+            await interaction.response.send_message(embed=embed)
+            return
+
+        bookmark_title_form = BookmarkTitleSelectionForm(
+            message=message,
+            action_bookmark_function=self.action_bookmark
+        )
+        await interaction.response.send_modal(bookmark_title_form)
+
     @commands.group(name="bookmark", aliases=("bm", "pin"), invoke_without_command=True)
     @commands.guild_only()
     @whitelist_override(roles=(Roles.everyone,))
@@ -138,29 +219,18 @@ class Bookmark(commands.Cog):
         if target_message is None:
             raise commands.UserInputError(MESSAGE_NOT_FOUND_ERROR)
 
-        # Prevent users from bookmarking a message in a channel they don't have access to
-        permissions = target_message.channel.permissions_for(ctx.author)
+        permissions = ctx.channel.permissions_for(ctx.author)
         if not permissions.read_messages:
-            log.info(f"{ctx.author} tried to bookmark a message in #{target_message.channel} but has no permissions.")
-            embed = discord.Embed(
-                title=random.choice(ERROR_REPLIES),
-                color=Colours.soft_red,
-                description="You don't have permission to view this channel.",
-            )
+            log.info(f"{ctx.author} tried to bookmark a message in #{ctx.channel} but has no permissions.")
+            embed = Bookmark.build_error_embed("You don't have permission to view this channel.")
             await ctx.send(embed=embed)
             return
 
         await self.action_bookmark(ctx.channel, ctx.author, target_message, title)
 
         view = SendBookmark(self.action_bookmark, ctx.author, ctx.channel, target_message, title)
+        embed = self.build_bookmark_embed(target_message)
 
-        embed = discord.Embed(
-            description=(
-                f"Click the button to be sent your very own bookmark to "
-                f"[this message]({target_message.jump_url})."
-            ),
-            colour=Colours.soft_green,
-        )
         await ctx.send(embed=embed, view=view)
 
     @bookmark.command(name="delete", aliases=("del", "rm"), root_aliases=("unbm", "unbookmark", "dmdelete", "dmdel"))
