@@ -134,7 +134,7 @@ class Emojis:
 
     trashcan = environ.get(
         "TRASHCAN_EMOJI",
-        f"\N{WASTEBASKET}" if Client.debug else "<:trashcan:637136429717389331>",
+        "\N{WASTEBASKET}" if Client.debug else "<:trashcan:637136429717389331>",
     )
 
     ok_hand = ":ok_hand:"
