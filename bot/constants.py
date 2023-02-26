@@ -131,7 +131,12 @@ class Emojis:
     cross_mark = "\u274C"
     check = "\u2611"
     envelope = "\U0001F4E8"
-    trashcan = environ.get("TRASHCAN_EMOJI", "<:trashcan:637136429717389331>")
+
+    trashcan = environ.get(
+        "TRASHCAN_EMOJI",
+        "\N{WASTEBASKET}" if Client.debug else "<:trashcan:637136429717389331>",
+    )
+
     ok_hand = ":ok_hand:"
     hand_raised = "\U0001F64B"
 
