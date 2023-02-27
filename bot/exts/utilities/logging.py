@@ -1,5 +1,5 @@
-from botcore.utils.logging import get_logger
 from discord.ext.commands import Cog
+from pydis_core.utils.logging import get_logger
 
 from bot import constants
 from bot.bot import Bot
