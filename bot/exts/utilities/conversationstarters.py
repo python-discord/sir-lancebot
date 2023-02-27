@@ -77,7 +77,6 @@ class ConvoStarters(commands.Cog):
 
         embed.title = previous_topic + f"\n{total_topics + 1}. {embed.title}"
 
-        # When the embed will be larger than the limit, use the previous embed instead
         if len(embed.title) > 256:
             embed.title = previous_topic
             return embed, True
