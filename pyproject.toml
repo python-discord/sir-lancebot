@@ -38,7 +38,7 @@ flake8-isort = "6.0.0"
 pep8-naming = "0.13.3"
 pip-licenses = "4.0.3"
 pre-commit = "3.1.0"
-python-dotenv = "0.21.1"
+python-dotenv = "1.0.0"
 taskipy = "1.10.3"
 
 [tool.taskipy.tasks]
