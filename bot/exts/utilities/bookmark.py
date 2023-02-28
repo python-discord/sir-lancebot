@@ -1,15 +1,77 @@
 import logging
 import random
-from typing import Optional
+from typing import Awaitable, Callable, Optional, Union
 
 import discord
 from discord.ext import commands
 
 from bot.bot import Bot
 from bot.constants import Colours, ERROR_REPLIES, Icons, Roles
+from bot.utils.converters import WrappedMessageConverter
 from bot.utils.decorators import whitelist_override
 
 log = logging.getLogger(__name__)
+
+MESSAGE_NOT_FOUND_ERROR = (
+    "You must either provide a reference to a valid message, or reply to one."
+    "\n\nThe lookup strategy for a message is as follows (in order):"
+    "\n1. Lookup by '{channel ID}-{message ID}' (retrieved by shift-clicking on 'Copy ID')"
+    "\n2. Lookup by message ID (the message **must** be in the current channel)"
+    "\n3. Lookup by message URL"
+)
+
+
+async def dm_bookmark(
+    target_user: Union[discord.Member, discord.User],
+    target_message: discord.Message,
+    title: str,
+) -> None:
+    """
+    Sends the `target_message` as a bookmark to the `target_user` DMs, with `title` as the embed title..
+
+    Raises ``discord.Forbidden`` if the user's DMs are closed.
+    """
+    embed = Bookmark.build_bookmark_dm(target_message, title)
+    message_url_view = discord.ui.View().add_item(
+        discord.ui.Button(label="View Message", url=target_message.jump_url)
+    )
+    await target_user.send(embed=embed, view=message_url_view)
+    log.info(f"{target_user} bookmarked {target_message.jump_url} with title {title!r}")
+
+
+class SendBookmark(discord.ui.View):
+    """The button that sends the bookmark to other users."""
+
+    def __init__(
+        self,
+        action_bookmark_function:
+            Callable[[Union[discord.Member, discord.User], discord.Message, str], Awaitable[None]],
+        author: discord.Member,
+        channel: discord.TextChannel,
+        target_message: discord.Message,
+        title: str,
+    ):
+        super().__init__()
+
+        self.action_bookmark_function = action_bookmark_function
+        self.clicked = [author.id]
+        self.channel = channel
+        self.target_message = target_message
+        self.title = title
+
+    @discord.ui.button(label="Receive Bookmark", style=discord.ButtonStyle.green)
+    async def button_callback(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+        """The button callback."""
+        if interaction.user.id in self.clicked:
+            await interaction.response.send_message(
+                "You have already received a bookmark to that message.",
+                ephemeral=True,
+            )
+            return
+
+        self.clicked.append(interaction.user.id)
+        await self.action_bookmark_function(interaction.user, self.target_message, self.title)
+        await interaction.response.send_message("You have received a bookmark to that message.", ephemeral=True)
 
 
 class BookmarkForm(discord.ui.Modal):
@@ -32,7 +94,7 @@ class BookmarkForm(discord.ui.Modal):
         """Sends the bookmark embed to the user with the newly chosen title."""
         title = self.bookmark_title.value or self.bookmark_title.default
         try:
-            await self.dm_bookmark(interaction, self.message, title)
+            await dm_bookmark(interaction.user, self.message, title)
         except discord.Forbidden:
             await interaction.response.send_message(
                 embed=Bookmark.build_error_embed("Enable your DMs to receive the bookmark."),
@@ -44,24 +106,6 @@ class BookmarkForm(discord.ui.Modal):
             embed=Bookmark.build_success_reply_embed(self.message),
             ephemeral=True,
         )
-
-    async def dm_bookmark(
-        self,
-        interaction: discord.Interaction,
-        target_message: discord.Message,
-        title: str,
-    ) -> None:
-        """
-        Sends the target_message as a bookmark to the interaction user's DMs.
-
-        Raises ``discord.Forbidden`` if the user's DMs are closed.
-        """
-        embed = Bookmark.build_bookmark_dm(target_message, title)
-        message_url_view = discord.ui.View().add_item(
-            discord.ui.Button(label="View Message", url=target_message.jump_url)
-        )
-        await interaction.user.send(embed=embed, view=message_url_view)
-        log.info(f"{interaction.user} bookmarked {target_message.jump_url} with title {title!r}")
 
 
 class Bookmark(commands.Cog):
@@ -105,6 +149,17 @@ class Bookmark(commands.Cog):
             colour=Colours.soft_red,
         )
 
+    @staticmethod
+    def build_bookmark_embed(target_message: discord.Message) -> discord.Embed:
+        """Build the channel embed to the bookmark requester."""
+        return discord.Embed(
+            description=(
+                f"Click the button to be sent your very own bookmark to"
+                f"[this message]({target_message.jump_url})."
+            ),
+            colour=Colours.soft_green,
+        )
+
     async def _bookmark_context_menu_callback(self, interaction: discord.Interaction, message: discord.Message) -> None:
         """The callback that will be invoked upon using the bookmark's context menu command."""
         permissions = interaction.channel.permissions_for(interaction.user)
@@ -123,15 +178,45 @@ class Bookmark(commands.Cog):
     @commands.guild_only()
     @whitelist_override(roles=(Roles.everyone,))
     @commands.cooldown(1, 30, commands.BucketType.channel)
-    async def bookmark(self, ctx: commands.Context) -> None:
-        """Teach the invoker how to use the new context-menu based command for a smooth migration."""
-        await ctx.send(
-            embed=self.build_error_embed(
-                "The bookmark text command has been replaced with a context menu command!\n\n"
-                "To bookmark a message simply right-click (press and hold on mobile) "
-                "on a message, open the 'Apps' menu, and click 'Bookmark'."
+    async def bookmark(
+        self,
+        ctx: commands.Context,
+        target_message: Optional[WrappedMessageConverter],
+        *,
+        title: str = "Bookmark",
+    ) -> None:
+        """
+        Send the author a link to the specified message via DMs.
+
+        Members can either give a message as an argument, or reply to a message.
+
+        Bookmarks can subsequently be deleted by using the `bookmark delete` command in DMs.
+        """
+        target_message: Optional[discord.Message] = target_message or getattr(ctx.message.reference, "resolved", None)
+        if target_message is None:
+            raise commands.UserInputError(MESSAGE_NOT_FOUND_ERROR)
+
+        permissions = ctx.channel.permissions_for(ctx.author)
+        if not permissions.read_messages:
+            log.info(f"{ctx.author} tried to bookmark a message in #{ctx.channel} but has no permissions.")
+            embed = Bookmark.build_error_embed("You don't have permission to view this channel.")
+            await ctx.send(embed=embed)
+            return
+
+        try:
+            await dm_bookmark(ctx.author, target_message, title)
+        except discord.Forbidden:
+            error_embed = self.build_error_embed(
+                    f"{ctx.author.mention}, please enable your DMs to receive the bookmark."
             )
-        )
+            await ctx.send(embed=error_embed)
+        else:
+            log.info(f"{ctx.author.mention} bookmarked {target_message.jump_url} with title '{title}'")
+
+        view = SendBookmark(dm_bookmark, ctx.author, ctx.channel, target_message, title)
+        embed = self.build_bookmark_embed(target_message)
+
+        await ctx.send(embed=embed, view=view)
 
     @bookmark.command(name="delete", aliases=("del", "rm"), root_aliases=("unbm", "unbookmark", "dmdelete", "dmdel"))
     @whitelist_override(bypass_defaults=True, allow_dm=True)
