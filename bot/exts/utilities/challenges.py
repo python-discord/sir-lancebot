@@ -84,6 +84,7 @@ class InformationDropdown(ui.Select):
         # The attribute is not set during initialization.
         result_embed = self.mapping_of_embeds[self.values[0]]
         await self.original_message.edit(embed=result_embed)
+        await interaction.response.defer()
 
 
 class Challenges(commands.Cog):
@@ -122,12 +123,8 @@ class Challenges(commands.Cog):
 
             if not first_kata_div:
                 raise commands.BadArgument("No katas could be found with the filters provided.")
-            elif len(first_kata_div) >= 3:
-                first_kata_div = choice(first_kata_div[:3])
-            elif "q=" not in search_link:
-                first_kata_div = choice(first_kata_div)
             else:
-                first_kata_div = first_kata_div[0]
+                first_kata_div = choice(first_kata_div)
 
             # There are numerous divs before arriving at the id of the kata, which can be used for the link.
             first_kata_id = first_kata_div.a["href"].split("/")[-1]
