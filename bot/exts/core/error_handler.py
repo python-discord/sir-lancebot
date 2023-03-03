@@ -66,7 +66,9 @@ class CommandErrorHandler(commands.Cog):
         )
 
         if isinstance(error, commands.CommandNotFound):
-            await self.send_command_suggestion(ctx, ctx.invoked_with)
+            # Ignore messages that start with "..", as they were likely not meant to be commands
+            if not ctx.invoked_with.startswith("."):
+                await self.send_command_suggestion(ctx, ctx.invoked_with)
             return
 
         if isinstance(error, (InChannelCheckFailure, InMonthCheckFailure)):

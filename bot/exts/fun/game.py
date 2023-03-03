@@ -7,10 +7,10 @@ from enum import IntEnum
 from typing import Any, Optional
 
 from aiohttp import ClientSession
-from botcore.utils import scheduling
 from discord import Embed
 from discord.ext import tasks
 from discord.ext.commands import Cog, Context, group
+from pydis_core.utils import scheduling
 
 from bot.bot import Bot
 from bot.constants import STAFF_ROLES, Tokens

@@ -4,8 +4,8 @@ import logging
 import aiohttp
 import discord
 from async_rediscache import RedisSession
-from botcore import StartupError
 from discord.ext import commands
+from pydis_core import StartupError
 from redis import RedisError
 
 import bot
@@ -40,7 +40,7 @@ async def test_bot_in_ci(bot: Bot) -> None:
     This is to ensure that all extensions can at least be
     imported and have a setup function within our CI.
     """
-    from botcore.utils._extensions import walk_extensions
+    from pydis_core.utils._extensions import walk_extensions
 
     from bot import exts
 

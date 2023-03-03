@@ -2,10 +2,10 @@ import logging
 from typing import Optional
 
 import discord
-from botcore import BotBase
-from botcore.utils import scheduling
 from discord import DiscordException, Embed
 from discord.ext import commands
+from pydis_core import BotBase
+from pydis_core.utils import scheduling
 
 from bot import constants, exts
 

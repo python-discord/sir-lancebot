@@ -4,10 +4,10 @@ from collections.abc import Mapping
 from enum import Enum
 from typing import Optional
 
-from botcore.utils._extensions import unqualify
 from discord import Colour, Embed
 from discord.ext import commands
 from discord.ext.commands import Context, group
+from pydis_core.utils._extensions import unqualify
 
 from bot import exts
 from bot.bot import Bot

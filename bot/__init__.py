@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING
 
 import arrow
 import sentry_sdk
-from botcore.utils import apply_monkey_patches
+from pydis_core.utils import apply_monkey_patches
 from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.redis import RedisIntegration
 
