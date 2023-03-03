@@ -154,7 +154,7 @@ class Bookmark(commands.Cog):
         """Build the channel embed to the bookmark requester."""
         return discord.Embed(
             description=(
-                f"Click the button to be sent your very own bookmark to"
+                f"Click the button to be sent your very own bookmark to "
                 f"[this message]({target_message.jump_url})."
             ),
             colour=Colours.soft_green,
