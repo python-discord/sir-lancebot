@@ -1168,14 +1168,14 @@ tests = ["check-manifest", "coverage", "defusedxml", "markdown2", "olefile", "pa
 
 [[package]]
 name = "pip-licenses"
-version = "4.0.3"
+version = "4.1.0"
 description = "Dump the software license list of Python packages installed with pip."
 category = "dev"
 optional = false
 python-versions = "~=3.8"
 files = [
-    {file = "pip-licenses-4.0.3.tar.gz", hash = "sha256:f57c064fa2044685348b72b7adf1e81fc9f87b9b56257b0bc14fe63d3346a56a"},
-    {file = "pip_licenses-4.0.3-py3-none-any.whl", hash = "sha256:2862c136b2aeb8791a5cd8ea6ca1eddda278502172155f68b4883da413186eaf"},
+    {file = "pip-licenses-4.1.0.tar.gz", hash = "sha256:6905abcc8b3ca45548a7a33b24abbee0e7a6eb451463acc676eaa879f1130598"},
+    {file = "pip_licenses-4.1.0-py3-none-any.whl", hash = "sha256:0aef43fa605aaed17342f74c325b5b1a15be034c9b12bcc97ff290de1a8bc0af"},
 ]
 
 [package.dependencies]
@@ -1937,4 +1937,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "3.10.*"
-content-hash = "2c3cdcdb06a11dfc9e5d5802145eeb6e435cc86c614e7e690069ca1bad87b69b"
+content-hash = "c2477ffebffddbc289b12a48d4b3204531b225e6bbe6ee796905b6b0ac6af0c6"
