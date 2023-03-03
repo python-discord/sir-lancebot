@@ -1,6 +1,6 @@
 import logging
 import random
-from typing import Awaitable, Callable, Optional, Union
+from typing import Awaitable, Callable, Optional
 
 import discord
 from discord.ext import commands
@@ -22,7 +22,7 @@ MESSAGE_NOT_FOUND_ERROR = (
 
 
 async def dm_bookmark(
-    target_user: Union[discord.Member, discord.User],
+    target_user: discord.Member | discord.User,
     target_message: discord.Message,
     title: str,
 ) -> None:
@@ -45,7 +45,7 @@ class SendBookmark(discord.ui.View):
     def __init__(
         self,
         action_bookmark_function:
-            Callable[[Union[discord.Member, discord.User], discord.Message, str], Awaitable[None]],
+            Callable[[discord.Member | discord.User, discord.Message, str], Awaitable[None]],
         author: discord.Member,
         channel: discord.TextChannel,
         target_message: discord.Message,
