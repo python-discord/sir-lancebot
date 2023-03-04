@@ -6,7 +6,7 @@ authors = ["Python Discord <info@pythondiscord.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "3.10.*"
+python = "3.11.*"
 
 # See https://bot-core.pythondiscord.com/ for docs.
 pydis_core = { version = "9.5.0", extras = ["async-rediscache"] }
