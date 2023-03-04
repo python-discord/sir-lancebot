@@ -1,42 +1,29 @@
-name: Build
+name: Build & Deploy
 
 on:
-  workflow_run:
-    workflows: ["Lint"]
-    branches:
-      - main
-    types:
-      - completed
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_call:
+    inputs:
+      sha-tag:
+        description: "A short-form SHA tag for the commit that triggered this flow"
+        required: true
+        type: string
 
 jobs:
   build:
-    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'
     name: Build & Push
     runs-on: ubuntu-latest
 
     steps:
-      # Create a commit SHA-based tag for the container repositories
-      - name: Create SHA Container Tag
-        id: sha_tag
-        run: |
-          tag=$(cut -c 1-7 <<< $GITHUB_SHA)
-          echo "::set-output name=tag::$tag"
 
       # Check out the current repository in the `sir-lancebot` subdirectory
       - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          path: sir-lancebot
+        uses: actions/checkout@v3
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
 
       - name: Login to Github Container Registry
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -46,16 +33,16 @@ jobs:
       # Repository. The container will be tagged as "latest"
       # and with the short SHA of the commit.
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
-          context: sir-lancebot/
-          file: sir-lancebot/Dockerfile
+          context: .
+          file: ./Dockerfile
           push: true
           cache-from: type=registry,ref=ghcr.io/python-discord/sir-lancebot:latest
           cache-to: type=inline
           tags: |
             ghcr.io/python-discord/sir-lancebot:latest
-            ghcr.io/python-discord/sir-lancebot:${{ steps.sha_tag.outputs.tag }}
+            ghcr.io/python-discord/sir-lancebot:${{ inputs.sha-tag }}
           build-args: |
             git_sha=${{ github.sha }}
 
@@ -66,31 +53,25 @@ jobs:
     environment: production
 
     steps:
-      # Create a commit SHA-based tag for the container repositories
-      - name: Create SHA Container Tag
-        id: sha_tag
-        run: |
-          tag=$(cut -c 1-7 <<< $GITHUB_SHA)
-          echo "::set-output name=tag::$tag"
-
       # Check out the private "kubernetes" repository in the `kubernetes`
       # subdirectory using a GitHub Personal Access Token
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Checkout Kubernetes Repository
+        uses: actions/checkout@v3
         with:
           repository: python-discord/kubernetes
           path: kubernetes
 
+      - uses: azure/setup-kubectl@v3
+
       - name: Authenticate with Kubernetes
-        uses: azure/k8s-set-context@v1
+        uses: azure/k8s-set-context@v3
         with:
           method: kubeconfig
           kubeconfig: ${{ secrets.KUBECONFIG }}
 
       - name: Deploy to Kubernetes
-        uses: Azure/k8s-deploy@v1
+        uses: Azure/k8s-deploy@v4
         with:
           manifests: |
               kubernetes/namespaces/default/sir-lancebot/deployment.yaml
-          images: 'ghcr.io/python-discord/sir-lancebot:${{ steps.sha_tag.outputs.tag }}'
-          kubectl-version: 'latest'
+          images: 'ghcr.io/python-discord/sir-lancebot:${{ inputs.sha-tag }}'
