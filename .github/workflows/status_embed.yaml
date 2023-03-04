@@ -5,6 +5,7 @@ on:
     workflows:
       - Lint
       - Build
+      - CI
     types:
       - completed
 
