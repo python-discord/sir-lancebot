@@ -57,6 +57,7 @@ class Channels(NamedTuple):
     off_topic_0 = 291284109232308226
     off_topic_1 = 463035241142026251
     off_topic_2 = 463035268514185226
+    python_help = 1035199133436354600
     sir_lancebot_playground = int(environ.get("CHANNEL_COMMUNITY_BOT_COMMANDS", 607247579608121354))
     voice_chat_0 = 412357430186344448
     voice_chat_1 = 799647045886541885
