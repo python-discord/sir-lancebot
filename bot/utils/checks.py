@@ -3,6 +3,7 @@ import logging
 from collections.abc import Container, Iterable
 from typing import Callable, Optional
 
+from discord import Thread
 from discord.ext.commands import (
     BucketType, CheckFailure, Cog, Command, CommandOnCooldown, Context, Cooldown, CooldownMapping
 )
@@ -59,6 +60,10 @@ def in_whitelist_check(
         # there's no easy way to check that and as a channel can easily be moved in and out of
         # categories, it's probably not wise to rely on its category in any case.
         channels = tuple(channels) + (redirect,)
+
+    # If it's a thread, and its parent is whitelisted, we whitelist the thread as well
+    if channels and isinstance(ctx.channel, Thread) and ctx.channel.parent_id in channels:
+        channels = channels + (ctx.channel.id,)
 
     if channels and ctx.channel.id in channels:
         log.trace(f"{ctx.author} may use the `{ctx.command.name}` command as they are in a whitelisted channel.")
