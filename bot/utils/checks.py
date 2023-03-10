@@ -3,7 +3,6 @@ import logging
 from collections.abc import Container, Iterable
 from typing import Callable, Optional
 
-from discord import Thread
 from discord.ext.commands import (
     BucketType, CheckFailure, Cog, Command, CommandOnCooldown, Context, Cooldown, CooldownMapping
 )
@@ -61,20 +60,20 @@ def in_whitelist_check(
         # categories, it's probably not wise to rely on its category in any case.
         channels = tuple(channels) + (redirect,)
 
-    # If it's a thread, and its parent is whitelisted, we whitelist the thread as well
-    if channels and isinstance(ctx.channel, Thread) and ctx.channel.parent_id in channels:
-        channels = channels + (ctx.channel.id,)
+    ctx_channel = ctx.channel
+    if hasattr(ctx_channel, "parent"):
+        ctx_channel = ctx_channel.parent
 
-    if channels and ctx.channel.id in channels:
+    if channels and ctx_channel.id in channels:
         log.trace(f"{ctx.author} may use the `{ctx.command.name}` command as they are in a whitelisted channel.")
         return True
 
     # Only check the category id if we have a category whitelist and the channel has a `category_id`
-    if categories and hasattr(ctx.channel, "category_id") and ctx.channel.category_id in categories:
+    if categories and hasattr(ctx_channel, "category_id") and ctx_channel.category_id in categories:
         log.trace(f"{ctx.author} may use the `{ctx.command.name}` command as they are in a whitelisted category.")
         return True
 
-    category = getattr(ctx.channel, "category", None)
+    category = getattr(ctx_channel, "category", None)
     if category and category.name == constants.codejam_categories_name:
         log.trace(f"{ctx.author} may use the `{ctx.command.name}` command as they are in a codejam team channel.")
         return True
