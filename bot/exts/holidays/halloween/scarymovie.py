@@ -24,7 +24,7 @@ class ScaryMovie(commands.Cog):
             if not selection:
                 await ctx.send(embed=Embed(
                     title=random.choice(NEGATIVE_REPLIES),
-                    description=f":warning: Failed to select a movie from the API",
+                    description=":warning: Failed to select a movie from the API",
                     color=Colours.soft_red
                 ))
                 return
@@ -55,13 +55,12 @@ class ScaryMovie(commands.Cog):
         async with self.bot.http_session.get(url=url, params=params, headers=headers) as response:
             data = await response.json()
             if (results := data.get("results")) is None:
-                log.warning(f"Failed to select a movie - data returned from API has no 'results' key")
+                log.warning("Failed to select a movie - data returned from API has no 'results' key")
                 return {}
             selection_id = random.choice(results).get("id")
             if selection_id is None:
-                log.warning(f"Failed to select a movie - selected film didn't have an id")
+                log.warning("Failed to select a movie - selected film didn't have an id")
                 return {}
-
 
         # Get full details and credits
         async with self.bot.http_session.get(
