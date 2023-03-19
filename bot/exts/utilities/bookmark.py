@@ -66,9 +66,17 @@ class SendBookmark(discord.ui.View):
             )
             return
 
-        self.clicked.append(interaction.user.id)
-        await dm_bookmark(interaction.user, self.target_message, self.title)
-        await interaction.response.send_message("You have received a bookmark to that message.", ephemeral=True)
+        try:
+            self.clicked.append(interaction.user.id)
+            await dm_bookmark(interaction.user, self.target_message, self.title)
+        except discord.Forbidden:
+            await interaction.response.send_message(
+                embed=Bookmark.build_error_embed("Enable your DMs to receive the bookmark."),
+                ephemeral=True,
+            )
+        else:
+            self.clicked.append(interaction.user.id)
+            await interaction.response.send_message("You have received a bookmark to that message.", ephemeral=True)
 
 
 class BookmarkForm(discord.ui.Modal):
