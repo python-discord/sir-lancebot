@@ -1,6 +1,6 @@
 import logging
 import random
-from typing import Awaitable, Callable, Optional
+from typing import Optional
 
 import discord
 from discord.ext import commands
@@ -44,8 +44,6 @@ class SendBookmark(discord.ui.View):
 
     def __init__(
         self,
-        action_bookmark_function:
-            Callable[[discord.Member | discord.User, discord.Message, str], Awaitable[None]],
         author: discord.Member,
         channel: discord.TextChannel,
         target_message: discord.Message,
@@ -53,7 +51,6 @@ class SendBookmark(discord.ui.View):
     ):
         super().__init__()
 
-        self.action_bookmark_function = action_bookmark_function
         self.clicked = [author.id]
         self.channel = channel
         self.target_message = target_message
@@ -70,7 +67,7 @@ class SendBookmark(discord.ui.View):
             return
 
         self.clicked.append(interaction.user.id)
-        await self.action_bookmark_function(interaction.user, self.target_message, self.title)
+        await dm_bookmark(interaction.user, self.target_message, self.title)
         await interaction.response.send_message("You have received a bookmark to that message.", ephemeral=True)
 
 
@@ -213,7 +210,7 @@ class Bookmark(commands.Cog):
         else:
             log.info(f"{ctx.author.mention} bookmarked {target_message.jump_url} with title '{title}'")
 
-        view = SendBookmark(dm_bookmark, ctx.author, ctx.channel, target_message, title)
+        view = SendBookmark(ctx.author, ctx.channel, target_message, title)
         embed = self.build_bookmark_embed(target_message)
 
         await ctx.send(embed=embed, view=view)
