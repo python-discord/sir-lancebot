@@ -213,7 +213,7 @@ class Bookmark(commands.Cog):
         view = SendBookmark(ctx.author, ctx.channel, target_message, title)
         embed = self.build_bookmark_embed(target_message)
 
-        await ctx.send(embed=embed, view=view)
+        await ctx.send(embed=embed, view=view, delete_after=180)
 
     @bookmark.command(name="delete", aliases=("del", "rm"), root_aliases=("unbm", "unbookmark", "dmdelete", "dmdel"))
     @whitelist_override(bypass_defaults=True, allow_dm=True)
