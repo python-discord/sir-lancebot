@@ -51,7 +51,7 @@ class ScaryMovie(commands.Cog):
             total_pages = data.get("total_pages")
 
         # Get movie details from one random result on a random page
-        params["page"] = min(random.randint(1, total_pages), 500)
+        params["page"] = random.randint(1, min(total_pages, 500))
         async with self.bot.http_session.get(url=url, params=params, headers=headers) as response:
             data = await response.json()
             if (results := data.get("results")) is None:
