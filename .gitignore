@@ -116,3 +116,10 @@ venv.bak/
 
 # vscode
 .vscode/
+
+# local
+Scripts/
+pyvenv.cfg
+lib/
+bin/
+.gitignore

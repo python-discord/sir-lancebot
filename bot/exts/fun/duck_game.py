@@ -5,6 +5,7 @@ from collections import defaultdict
 from io import BytesIO
 from itertools import product
 from pathlib import Path
+from urllib.parse import urlparse
 
 import discord
 from PIL import Image, ImageDraw, ImageFont
@@ -108,7 +109,7 @@ class DuckGame:
         rows: int = 4,
         columns: int = 3,
         minimum_solutions: int = 1,
-    ):
+    ) -> None:
         """
         Take samples from the deck to generate a board.
 
@@ -173,7 +174,7 @@ class DuckGame:
 class DuckGamesDirector(commands.Cog):
     """A cog for running Duck Duck Duck Goose games."""
 
-    def __init__(self, bot: Bot):
+    def __init__(self, bot: Bot) -> None:
         self.bot = bot
         self.current_games = {}
 
@@ -339,6 +340,13 @@ class DuckGamesDirector(commands.Cog):
             text="Tip: using Discord's compact message display mode can help keep the board on the screen"
         )
         return await ctx.send(file=file, embed=embed)
+
+    @staticmethod
+    async def edit_embed_with_image(msg: discord.Message, embed: discord.Embed) -> None:
+        """Edit an embed without the attached image going wonky."""
+        attach_name = urlparse(embed.image.url).path.split("/")[-1]
+        embed.set_image(url=f"attachment://{attach_name}")
+        await msg.edit(embed=embed)
 
 
 async def setup(bot: Bot) -> None:

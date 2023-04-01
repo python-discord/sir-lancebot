@@ -51,6 +51,16 @@ class RealPython(commands.Cog):
             await ctx.send("`amount` must be between 1 and 5 (inclusive).")
             return
 
+        if user_search is None:
+            homepage_embed = Embed(
+                title="Real Python",
+                url=ARTICLE_URL.format(article_url=""),
+                description="Real Python ",
+                color=Colours.orange,
+            )
+
+            await ctx.send(embed=homepage_embed)
+
         params = {"q": user_search, "limit": amount, "kind": "article"}
         async with self.bot.http_session.get(url=API_ROOT, params=params) as response:
             if response.status != 200:
