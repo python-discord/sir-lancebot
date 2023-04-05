@@ -1691,14 +1691,14 @@ ocsp = ["cryptography (>=36.0.1)", "pyopenssl (==20.0.1)", "requests (>=2.26.0)"
 
 [[package]]
 name = "sentry-sdk"
-version = "1.18.0"
+version = "1.19.0"
 description = "Python client for Sentry (https://sentry.io)"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "sentry-sdk-1.18.0.tar.gz", hash = "sha256:d07b9569a151033b462f7a7113ada94cc41ecf49daa83d35f5f852a0b9cf3b44"},
-    {file = "sentry_sdk-1.18.0-py2.py3-none-any.whl", hash = "sha256:714203a9adcac4a4a35e348dc9d3e294ad0200a66cdca26c068967d728f34fcb"},
+    {file = "sentry-sdk-1.19.0.tar.gz", hash = "sha256:6732b59a55051646587acce21f6a00b53d05df9282d54886ad88b59b4e9b82ad"},
+    {file = "sentry_sdk-1.19.0-py2.py3-none-any.whl", hash = "sha256:8dcffbbb963963567384d6eb49c76b8fb05753540715cbee5e5ca5bc8327ded4"},
 ]
 
 [package.dependencies]
@@ -1716,6 +1716,7 @@ django = ["django (>=1.8)"]
 falcon = ["falcon (>=1.4)"]
 fastapi = ["fastapi (>=0.79.0)"]
 flask = ["blinker (>=1.1)", "flask (>=0.11)"]
+grpcio = ["grpcio (>=1.21.1)"]
 httpx = ["httpx (>=0.16.0)"]
 huey = ["huey (>=2)"]
 opentelemetry = ["opentelemetry-distro (>=0.35b0)"]
@@ -1978,4 +1979,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "3.11.*"
-content-hash = "3a90ef0876499383cfd432f59075ebd416e5c0e3b3abc49696369c7de6579db5"
+content-hash = "b5737e4d241910041cab25a6b72fc325076bf96b69c3c16694c6c3b12fcfe151"
