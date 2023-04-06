@@ -1691,14 +1691,14 @@ ocsp = ["cryptography (>=36.0.1)", "pyopenssl (==20.0.1)", "requests (>=2.26.0)"
 
 [[package]]
 name = "sentry-sdk"
-version = "1.19.0"
+version = "1.19.1"
 description = "Python client for Sentry (https://sentry.io)"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "sentry-sdk-1.19.0.tar.gz", hash = "sha256:6732b59a55051646587acce21f6a00b53d05df9282d54886ad88b59b4e9b82ad"},
-    {file = "sentry_sdk-1.19.0-py2.py3-none-any.whl", hash = "sha256:8dcffbbb963963567384d6eb49c76b8fb05753540715cbee5e5ca5bc8327ded4"},
+    {file = "sentry-sdk-1.19.1.tar.gz", hash = "sha256:7ae78bd921981a5010ab540d6bdf3b793659a4db8cccf7f16180702d48a80d84"},
+    {file = "sentry_sdk-1.19.1-py2.py3-none-any.whl", hash = "sha256:885a11c69df23e53eb281d003b9ff15a5bdfa43d8a2a53589be52104a1b4582f"},
 ]
 
 [package.dependencies]
@@ -1979,4 +1979,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "3.11.*"
-content-hash = "3ccc909780bac15eb57e5c075d026658955a54c67e3d90760fb2581db605ca02"
+content-hash = "439a8b2c91c0e08f739d09e3dc3b38c812a72d79c38389d511277a0c28933c2a"
