@@ -12,7 +12,7 @@ python = "3.11.*"
 pydis_core = { version = "9.5.1", extras = ["async-rediscache"] }
 
 aiodns = "3.0.0"
-rapidfuzz = "2.15.1"
+rapidfuzz = "3.0.0"
 arrow = "1.2.3"
 beautifulsoup4 = "4.12.2"
 pillow = "9.5.0"
