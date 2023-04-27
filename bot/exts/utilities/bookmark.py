@@ -27,9 +27,9 @@ async def dm_bookmark(
     title: str,
 ) -> None:
     """
-    Sends the `target_message` as a bookmark to the `target_user` DMs, with `title` as the embed title..
+    Sends the `target_message` as a bookmark to the `target_user` DMs, with `title` as the embed title.
 
-    Raises ``discord.Forbidden`` if the user's DMs are closed.
+    Raises `discord.Forbidden` if the user's DMs are closed.
     """
     embed = Bookmark.build_bookmark_dm(target_message, title)
     message_url_view = discord.ui.View().add_item(
@@ -40,7 +40,7 @@ async def dm_bookmark(
 
 
 class SendBookmark(discord.ui.View):
-    """The button that sends the bookmark to other users."""
+    """The button that sends a bookmark to other users."""
 
     def __init__(
         self,
