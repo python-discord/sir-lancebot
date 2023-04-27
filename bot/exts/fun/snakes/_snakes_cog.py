@@ -598,7 +598,7 @@ class Snakes(Cog):
         Written by Momo and kel.
         Modified by juan and lemon.
         """
-        with ctx.typing():
+        async with ctx.typing():
 
             # Generate random snake attributes
             width = random.randint(6, 10)
@@ -637,7 +637,7 @@ class Snakes(Cog):
 
         Created by Ava and eivl.
         """
-        with ctx.typing():
+        async with ctx.typing():
             if name is None:
                 name = await Snake.random()
 
@@ -693,7 +693,7 @@ class Snakes(Cog):
         Made by Ava and eivl.
         Modified by lemon.
         """
-        with ctx.typing():
+        async with ctx.typing():
 
             image = None
 
@@ -1047,7 +1047,7 @@ class Snakes(Cog):
         Written by Momo and kel.
         Modified by lemon.
         """
-        with ctx.typing():
+        async with ctx.typing():
             embed = Embed()
             user = ctx.author
 
