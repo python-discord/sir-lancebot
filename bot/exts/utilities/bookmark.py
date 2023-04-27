@@ -67,7 +67,6 @@ class SendBookmark(discord.ui.View):
             return
 
         try:
-            self.clicked.append(interaction.user.id)
             await dm_bookmark(interaction.user, self.target_message, self.title)
         except discord.Forbidden:
             await interaction.response.send_message(
