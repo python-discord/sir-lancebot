@@ -1,7 +1,9 @@
 import enum
 import logging
 from os import environ
-from typing import NamedTuple
+
+from pydantic import BaseSettings
+
 
 __all__ = (
     "Branding",
@@ -36,8 +38,23 @@ log = logging.getLogger(__name__)
 PYTHON_PREFIX = "!"
 
 
-class Branding:
-    cycle_frequency = int(environ.get("CYCLE_FREQUENCY", 3))  # 0: never, 1: every day, 2: every other day, ...
+class EnvConfig(BaseSettings):
+    """Our default configuration for models that should load from .env files."""
+
+    class Config:
+        """Specify what .env files to load, and how to load them."""
+
+        env_file = ".env.server", ".env",
+        env_file_encoding = "utf-8"
+
+
+class _Branding(EnvConfig):
+    EnvConfig.Config.env_prefix = "branding_"
+
+    cycle_frequency = 3  # 0: never, 1: every day, 2: every other day, ...
+
+
+Branding = _Branding()
 
 
 class Cats:
