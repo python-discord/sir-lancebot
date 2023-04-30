@@ -61,13 +61,15 @@ class Cats:
     cats = ["ᓚᘏᗢ", "ᘡᘏᗢ", "🐈", "ᓕᘏᗢ", "ᓇᘏᗢ", "ᓂᘏᗢ", "ᘣᘏᗢ", "ᕦᘏᗢ", "ᕂᘏᗢ"]
 
 
-class Channels(NamedTuple):
+class _Channels(EnvConfig):
+    EnvConfig.Config.env_prefix = "channels_"
+
     algos_and_data_structs = 650401909852864553
     bot_commands = 267659945086812160
     community_meta = 267659945086812160
     organisation = 551789653284356126
     data_science_and_ai = 366673247892275221
-    devlog = int(environ.get("CHANNEL_DEVLOG", 622895325144940554))
+    devlog = 622895325144940554
     dev_contrib = 635950537262759947
     mod_meta = 775412552795947058
     mod_tools = 775413915391098921
@@ -75,12 +77,14 @@ class Channels(NamedTuple):
     off_topic_1 = 463035241142026251
     off_topic_2 = 463035268514185226
     python_help = 1035199133436354600
-    sir_lancebot_playground = int(environ.get("CHANNEL_COMMUNITY_BOT_COMMANDS", 607247579608121354))
+    sir_lancebot_playground = 607247579608121354
     voice_chat_0 = 412357430186344448
     voice_chat_1 = 799647045886541885
     staff_voice = 541638762007101470
-    reddit = int(environ.get("CHANNEL_REDDIT", 458224812528238616))
+    reddit = 458224812528238616
 
+
+Channels = _Channels()
 
 class Categories(NamedTuple):
     help_in_use = 696958401460043776
