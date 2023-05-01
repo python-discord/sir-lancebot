@@ -244,8 +244,14 @@ class Icons:
     )
 
 
-class Lovefest:
-    role_id = int(environ.get("LOVEFEST_ROLE_ID", 542431903886606399))
+class _Lovefest(EnvConfig):
+
+    EnvConfig.Config.env_prefix = "lovefest_"
+
+    role_id = 542431903886606399
+
+
+Lovefest = _Lovefest()
 
 
 class Month(enum.IntEnum):
