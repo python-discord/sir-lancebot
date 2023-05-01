@@ -171,7 +171,7 @@ class Emojis:
 
     trashcan = environ.get(
         "TRASHCAN_EMOJI",
-        "\N{WASTEBASKET}" if Client.debug else "<:trashcan:637136429717389331>",
+        "\N{WASTEBASKET}" if Bot.debug else "<:trashcan:637136429717389331>",
     )
 
     ok_hand = ":ok_hand:"
@@ -268,8 +268,9 @@ class Month(enum.IntEnum):
 
 # If a month override was configured, check that it's a valid Month
 # Prevents delaying an exception after the bot starts
-if Client.month_override is not None:
-    Month(Client.month_override)
+if Bot.month_override is not None:
+    Month(Bot.month_override)
+
 
 
 class Roles(NamedTuple):
