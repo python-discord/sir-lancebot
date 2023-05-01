@@ -19,11 +19,11 @@ log = logging.getLogger(__name__)
 async def _create_redis_session() -> RedisSession:
     """Create and connect to a redis session."""
     redis_session = RedisSession(
-        host=constants.RedisConfig.host,
-        port=constants.RedisConfig.port,
-        password=constants.RedisConfig.password,
+        host=constants.Redis.host,
+        port=constants.Redis.port,
+        password=constants.Redis.password,
         max_connections=20,
-        use_fakeredis=constants.RedisConfig.use_fakeredis,
+        use_fakeredis=constants.Redis.use_fakeredis,
         global_namespace="bot",
         decode_responses=True,
     )

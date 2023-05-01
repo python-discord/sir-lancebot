@@ -21,7 +21,7 @@ __all__ = (
     "Tokens",
     "Wolfram",
     "Reddit",
-    "RedisConfig",
+    "Redis",
     "RedirectOutput",
     "PYTHON_PREFIX",
     "MODERATION_ROLES",
@@ -321,17 +321,16 @@ class _Wolfram(EnvConfig):
 Wolfram = _Wolfram()
 
 
-class Wolfram(NamedTuple):
-    user_limit_day = int(environ.get("WOLFRAM_USER_LIMIT_DAY", 10))
-    guild_limit_day = int(environ.get("WOLFRAM_GUILD_LIMIT_DAY", 67))
-    key = environ.get("WOLFRAM_API_KEY")
+class _Redis(EnvConfig):
+    EnvConfig.Config.env_prefix = "redis_"
+
+    host = "redis.default.svc.cluster.local"
+    port = 6379
+    password = ""
+    use_fakeredis = False
 
 
-class RedisConfig(NamedTuple):
-    host = environ.get("REDIS_HOST", "redis.default.svc.cluster.local")
-    port = environ.get("REDIS_PORT", 6379)
-    password = environ.get("REDIS_PASSWORD")
-    use_fakeredis = environ.get("USE_FAKEREDIS", "false").lower() == "true"
+Redis = _Redis()
 
 
 class Source:
