@@ -7,7 +7,7 @@ import discord
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Channels, Colours, Lovefest, Month, PYTHON_PREFIX
+from bot.constants import Channels, Colours, Month, PYTHON_PREFIX, Roles
 from bot.utils.decorators import in_month
 from bot.utils.exceptions import MovedCommandError
 
@@ -60,7 +60,7 @@ class BeMyValentine(commands.Cog):
             # This command should only be used in the server
             raise commands.UserInputError("You are supposed to use this command in the server.")
 
-        if Lovefest.role_id not in [role.id for role in user.roles]:
+        if Roles.lovefest not in [role.id for role in user.roles]:
             raise commands.UserInputError(
                 f"You cannot send a valentine to {user} as they do not have the lovefest role!"
             )
@@ -95,7 +95,7 @@ class BeMyValentine(commands.Cog):
         example : .bemyvalentine secret Iceman#6508 Hey I love you, wanna hang around ? (sends the custom message to
         Iceman in DM making you anonymous)
         """
-        if Lovefest.role_id not in [role.id for role in user.roles]:
+        if Roles.lovefest not in [role.id for role in user.roles]:
             await ctx.message.delete()
             raise commands.UserInputError(
                 f"You cannot send a valentine to {user} as they do not have the lovefest role!"

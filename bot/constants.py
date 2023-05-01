@@ -14,7 +14,6 @@ __all__ = (
     "Colours",
     "Emojis",
     "Icons",
-    "Lovefest",
     "Month",
     "Roles",
     "Tokens",
@@ -243,16 +242,6 @@ class Icons:
     )
 
 
-class _Lovefest(EnvConfig):
-
-    EnvConfig.Config.env_prefix = "lovefest_"
-
-    role_id = 542431903886606399
-
-
-Lovefest = _Lovefest()
-
-
 class Month(enum.IntEnum):
     JANUARY = 1
     FEBRUARY = 2
@@ -287,6 +276,8 @@ class _Roles(EnvConfig):
     helpers = 267630620367257601
     core_developers = 587606783669829632
     everyone = Client.guild
+
+    lovefest = 542431903886606399
 
 
 Roles = _Roles()
