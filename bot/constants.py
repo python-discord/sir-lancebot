@@ -342,13 +342,17 @@ class RedirectOutput:
     delete_delay: int = 10
 
 
-class Reddit:
+class _Reddit(EnvConfig):
+    EnvConfig.Config.env_prefix = "reddit_"
+
     subreddits = ["r/Python"]
 
-    client_id = environ.get("REDDIT_CLIENT_ID")
-    secret = environ.get("REDDIT_SECRET")
-    webhook = int(environ.get("REDDIT_WEBHOOK", 635408384794951680))
+    client_id = ""
+    secret = ""
+    webhook = 635408384794951680
 
+
+Reddit = _Reddit()
 
 # Default role combinations
 MODERATION_ROLES = {Roles.moderation_team, Roles.admins, Roles.owners}
