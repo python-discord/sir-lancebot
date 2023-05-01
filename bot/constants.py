@@ -278,14 +278,19 @@ if Bot.month_override is not None:
     Month(Bot.month_override)
 
 
+class _Roles(EnvConfig):
 
-class Roles(NamedTuple):
+    EnvConfig.Config.env_prefix = "roles_"
+
     owners = 267627879762755584
-    admins = int(environ.get("BOT_ADMIN_ROLE_ID", 267628507062992896))
+    admins = 267628507062992896
     moderation_team = 267629731250176001
-    helpers = int(environ.get("ROLE_HELPERS", 267630620367257601))
+    helpers = 267630620367257601
     core_developers = 587606783669829632
-    everyone = int(environ.get("BOT_GUILD", 267624335836053506))
+    everyone = Bot.guild
+
+
+Roles = _Roles()
 
 
 class Tokens(NamedTuple):
