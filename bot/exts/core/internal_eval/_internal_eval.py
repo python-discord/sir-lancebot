@@ -7,7 +7,7 @@ import discord
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Client, Roles
+from bot.constants import Bot, Roles
 from bot.utils.decorators import with_role
 
 from ._helpers import EvalContext
