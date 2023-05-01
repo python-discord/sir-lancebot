@@ -21,9 +21,9 @@ Unknown WTF Python Query. Please try to reformulate your query.
 
 **Examples**:
 ```md
-{constants.Client.prefix}wtf wild imports
-{constants.Client.prefix}wtf subclass
-{constants.Client.prefix}wtf del
+{constants.Bot.prefix}wtf wild imports
+{constants.Bot.prefix}wtf subclass
+{constants.Bot.prefix}wtf del
 ```
 If the problem persists send a message in <#{constants.Channels.dev_contrib}>
 """

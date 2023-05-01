@@ -43,7 +43,7 @@ class InternalEval(commands.Cog):
         self.bot = bot
         self.locals = {}
 
-        if Client.debug:
+        if Bot.debug:
             self.internal_group.add_check(commands.is_owner().predicate)
 
     @staticmethod

@@ -12,7 +12,7 @@ from discord.ext.commands import BadArgument, Cog, Context
 from pydis_core.utils.commands import clean_text_or_reply
 
 from bot.bot import Bot
-from bot.constants import Client, Colours, Emojis
+from bot.constants import Bot, Colours, Emojis
 from bot.utils import helpers, messages
 
 log = logging.getLogger(__name__)
@@ -58,7 +58,7 @@ class Fun(Cog):
             dice = " ".join(self._get_random_die() for _ in range(num_rolls))
             await ctx.send(dice)
         else:
-            raise BadArgument(f"`{Client.prefix}roll` only supports between 1 and 6 rolls.")
+            raise BadArgument(f"`{Bot.prefix}roll` only supports between 1 and 6 rolls.")
 
     @commands.command(name="randomcase", aliases=("rcase", "randomcaps", "rcaps",))
     async def randomcase_command(self, ctx: Context, *, text: str | None) -> None:

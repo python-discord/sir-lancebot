@@ -82,7 +82,7 @@ class PrideLeader(commands.Cog):
         )
         embed.add_field(
             name="For More Information",
-            value=f"Do `{constants.Client.prefix}wiki {name}`"
+            value=f"Do `{constants.Bot.prefix}wiki {name}`"
                   f" in <#{constants.Channels.sir_lancebot_playground}>",
             inline=False
         )

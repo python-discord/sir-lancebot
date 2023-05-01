@@ -10,7 +10,7 @@ __all__ = (
     "Cats",
     "Channels",
     "Categories",
-    "Client",
+    "Bot",
     "Logging",
     "Colours",
     "Emojis",
@@ -102,17 +102,21 @@ Categories = _Categories()
 CODEJAM_CATEGORY_NAME = "Code Jam"  # Name of the codejam team categories
 
 
-class Client(NamedTuple):
-    name = "Sir Lancebot"
-    guild = int(environ.get("BOT_GUILD", 267624335836053506))
-    prefix = environ.get("PREFIX", ".")
-    token = environ.get("BOT_TOKEN")
-    debug = environ.get("BOT_DEBUG", "true").lower() == "true"
-    in_ci = environ.get("IN_CI", "false").lower() == "true"
-    github_bot_repo = "https://github.com/python-discord/sir-lancebot"
-    # Override seasonal locks: 1 (January) to 12 (December)
-    month_override = int(environ["MONTH_OVERRIDE"]) if "MONTH_OVERRIDE" in environ else None
+class _Bot(EnvConfig):
+    EnvConfig.Config.env_prefix = "bot_"
 
+    name = "Sir Lancebot"
+    guild = 267624335836053506
+    prefix = "."
+    token = ""
+    debug = True
+    in_ci = False
+    github_repo = "https://github.com/python-discord/sir-lancebot"
+    # Override seasonal locks: 1 (January) to 12 (December)
+    month_override: int | None = None
+
+
+Bot = _Bot()
 
 class Logging(NamedTuple):
     debug = Client.debug

@@ -9,7 +9,7 @@ from typing import Optional
 import discord
 from discord.ext.commands import BadArgument, Context
 
-from bot.constants import Client, Month
+from bot.constants import Bot, Month
 from bot.utils.pagination import LinePaginator
 
 
@@ -25,8 +25,8 @@ def resolve_current_month() -> Month:
     If the env variable was set, current month always resolves to the configured value.
     Otherwise, the current UTC month is given.
     """
-    if Client.month_override is not None:
-        return Month(Client.month_override)
+    if Bot.month_override is not None:
+        return Month(Bot.month_override)
     else:
         return Month(datetime.utcnow().month)
 
