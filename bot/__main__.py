@@ -62,11 +62,11 @@ async def main() -> None:
 
     async with aiohttp.ClientSession() as session:
         bot.instance = Bot(
-            guild_id=constants.Bot.guild,
+            guild_id=constants.Client.guild,
             http_session=session,
             redis_session=await _create_redis_session(),
-            command_prefix=commands.when_mentioned_or(constants.Bot.prefix),
-            activity=discord.Game(name=f"Commands: {constants.Bot.prefix}help"),
+            command_prefix=commands.when_mentioned_or(constants.Client.prefix),
+            activity=discord.Game(name=f"Commands: {constants.Client.prefix}help"),
             case_insensitive=True,
             allowed_mentions=discord.AllowedMentions(everyone=False, roles=allowed_roles),
             intents=intents,
@@ -78,10 +78,10 @@ async def main() -> None:
                 channels=constants.WHITELISTED_CHANNELS,
                 roles=constants.STAFF_ROLES,
             ))
-            if constants.Bot.in_ci:
+            if constants.Client.in_ci:
                 await test_bot_in_ci(_bot)
             else:
-                await _bot.start(constants.Bot.token)
+                await _bot.start(constants.Client.token)
 
 
 asyncio.run(main())

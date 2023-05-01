@@ -4,13 +4,12 @@ from os import environ
 
 from pydantic import BaseSettings
 
-
 __all__ = (
     "Branding",
     "Cats",
     "Channels",
     "Categories",
-    "Bot",
+    "Client",
     "Logging",
     "Colours",
     "Emojis",
@@ -102,8 +101,8 @@ Categories = _Categories()
 CODEJAM_CATEGORY_NAME = "Code Jam"  # Name of the codejam team categories
 
 
-class _Bot(EnvConfig):
-    EnvConfig.Config.env_prefix = "bot_"
+class _Client(EnvConfig):
+    EnvConfig.Config.env_prefix = "client_"
 
     name = "Sir Lancebot"
     guild = 267624335836053506
@@ -116,13 +115,13 @@ class _Bot(EnvConfig):
     month_override: int | None = None
 
 
-Bot = _Bot()
+Client = _Client()
 
 
 class _Logging(EnvConfig):
     EnvConfig.Config.env_prefix = "logging_"
 
-    debug = Bot.debug
+    debug = Client.debug
     file_logs = False
     trace_loggers = ""
 
@@ -277,6 +276,7 @@ class Month(enum.IntEnum):
 if Client.month_override is not None:
     Month(Client.month_override)
 
+
 class _Roles(EnvConfig):
 
     EnvConfig.Config.env_prefix = "roles_"
@@ -286,7 +286,7 @@ class _Roles(EnvConfig):
     moderation_team = 267629731250176001
     helpers = 267630620367257601
     core_developers = 587606783669829632
-    everyone = Bot.guild
+    everyone = Client.guild
 
 
 Roles = _Roles()

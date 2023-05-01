@@ -8,7 +8,7 @@ import discord
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Bot
+from bot.constants import Client
 from bot.utils.converters import CoordinateConverter
 from bot.utils.exceptions import UserNotPlayingError
 
@@ -117,8 +117,8 @@ class Minesweeper(commands.Cog):
 
         try:
             await ctx.author.send(
-                f"Play by typing: `{Bot.prefix}ms reveal xy [xy]` or `{Bot.prefix}ms flag xy [xy]` \n"
-                f"Close the game with `{Bot.prefix}ms end`\n"
+                f"Play by typing: `{Client.prefix}ms reveal xy [xy]` or `{Client.prefix}ms flag xy [xy]` \n"
+                f"Close the game with `{Client.prefix}ms end`\n"
             )
         except discord.errors.Forbidden:
             log.debug(f"{ctx.author.name} ({ctx.author.id}) has disabled DMs from server members.")

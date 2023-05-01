@@ -11,7 +11,7 @@ from pydis_core.utils._extensions import unqualify
 
 from bot import exts
 from bot.bot import Bot
-from bot.constants import Bot, Emojis, MODERATION_ROLES, Roles
+from bot.constants import Client, Emojis, MODERATION_ROLES, Roles
 from bot.utils.checks import with_role_check
 from bot.utils.pagination import LinePaginator
 
@@ -155,7 +155,7 @@ class Extensions(commands.Cog):
         embed = Embed(colour=Colour.og_blurple())
         embed.set_author(
             name="Extensions List",
-            url=Bot.github_repo,
+            url=Client.github_bot_repo,
             icon_url=str(self.bot.user.display_avatar.url)
         )
 

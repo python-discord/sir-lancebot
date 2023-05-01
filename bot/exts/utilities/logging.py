@@ -23,7 +23,7 @@ class Logging(Cog):
 
     async def check_channels(self) -> None:
         """Verifies that all channel constants refer to channels which exist."""
-        if constants.Bot.debug:
+        if constants.Client.debug:
             log.info("Skipping Channels Check.")
             return
 

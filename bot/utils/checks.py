@@ -74,7 +74,7 @@ def in_whitelist_check(
         return True
 
     category = getattr(ctx_channel, "category", None)
-    if category and category.name == constants.CODEJAM_CATEGORY_NAME:
+    if category and category.name == constants.codejam_categories_name:
         log.trace(f"{ctx.author} may use the `{ctx.command.name}` command as they are in a codejam team channel.")
         return True
 

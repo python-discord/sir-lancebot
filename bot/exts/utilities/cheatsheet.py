@@ -17,9 +17,9 @@ Unknown cheat sheet. Please try to reformulate your query.
 
 **Examples**:
 ```md
-{constants.Bot.prefix}cht read json
-{constants.Bot.prefix}cht hello world
-{constants.Bot.prefix}cht lambda
+{constants.Client.prefix}cht read json
+{constants.Client.prefix}cht hello world
+{constants.Client.prefix}cht lambda
 ```
 If the problem persists send a message in <#{Channels.dev_contrib}>
 """

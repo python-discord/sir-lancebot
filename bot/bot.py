@@ -23,12 +23,12 @@ class Bot(BotBase):
     that the upload was successful. See the `mock_in_debug` decorator for further details.
     """
 
-    name = constants.Bot.name
+    name = constants.Client.name
 
     @property
     def member(self) -> Optional[discord.Member]:
         """Retrieves the guild member object for the bot."""
-        guild = self.get_guild(constants.Bot.guild)
+        guild = self.get_guild(constants.Client.guild)
         if not guild:
             return None
         return guild.me

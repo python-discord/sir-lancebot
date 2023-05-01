@@ -311,7 +311,7 @@ class HelpSession:
         self._pages = paginator.pages
 
     async def _add_command_signature(self, paginator: LinePaginator) -> None:
-        prefix = constants.Bot.prefix
+        prefix = constants.Client.prefix
 
         signature = self._get_command_params(self.query)
         paginator.add_line(f"**```\n{prefix}{signature}\n```**")
@@ -405,7 +405,7 @@ class HelpSession:
         if isinstance(self.query, commands.Command):
             prefix = ""
         else:
-            prefix = constants.Bot.prefix
+            prefix = constants.Client.prefix
 
         signature = self._get_command_params(command)
         info = f"{strikeout}**`{prefix}{signature}`**{strikeout}"

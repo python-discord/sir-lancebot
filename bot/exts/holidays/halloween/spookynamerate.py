@@ -15,7 +15,7 @@ from discord.ext import tasks
 from discord.ext.commands import Cog, Context, group
 
 from bot.bot import Bot
-from bot.constants import Channels, Bot, Colours, Month
+from bot.constants import Channels, Client, Colours, Month
 from bot.utils.decorators import InMonthCheckFailure
 
 logger = getLogger(__name__)
@@ -38,7 +38,7 @@ PING = "<@{id}>"
 EMOJI_MESSAGE = "\n".join(f"- {emoji} {val}" for emoji, val in EMOJIS_VAL.items())
 HELP_MESSAGE_DICT = {
     "title": "Spooky Name Rate",
-    "description": f"Help for the `{Bot.prefix}spookynamerate` command",
+    "description": f"Help for the `{Client.prefix}spookynamerate` command",
     "color": Colours.soft_orange,
     "fields": [
         {
@@ -54,12 +54,12 @@ HELP_MESSAGE_DICT = {
         },
         {
             "name": "How do I add my spookified name?",
-            "value": f"Simply type `{Bot.prefix}spookynamerate add my name`",
+            "value": f"Simply type `{Client.prefix}spookynamerate add my name`",
             "inline": False,
         },
         {
             "name": "How do I *delete* my spookified name?",
-            "value": f"Simply type `{Bot.prefix}spookynamerate delete`",
+            "value": f"Simply type `{Client.prefix}spookynamerate delete`",
             "inline": False,
         },
     ],
@@ -141,7 +141,7 @@ class SpookyNameRate(Cog):
             if data["author"] == ctx.author.id:
                 await ctx.send(
                     "But you have already added an entry! Type "
-                    f"`{Bot.prefix}spookynamerate "
+                    f"`{Client.prefix}spookynamerate "
                     "delete` to delete it, and then you can add it again"
                 )
                 return
@@ -183,7 +183,7 @@ class SpookyNameRate(Cog):
                 return
 
         await ctx.send(
-            f"But you don't have an entry... :eyes: Type `{Bot.prefix}spookynamerate add your entry`"
+            f"But you don't have an entry... :eyes: Type `{Client.prefix}spookynamerate add your entry`"
         )
 
     @Cog.listener()
@@ -223,7 +223,7 @@ class SpookyNameRate(Cog):
                 "Okkey... Welcome to the **Spooky Name Rate Game**! It's a relatively simple game.\n"
                 f"Everyday, a random name will be sent in <#{Channels.sir_lancebot_playground}> "
                 "and you need to try and spookify it!\nRegister your name using "
-                f"`{Bot.prefix}spookynamerate add spookified name`"
+                f"`{Client.prefix}spookynamerate add spookified name`"
             )
 
             await self.data.set("first_time", False)
@@ -348,7 +348,7 @@ class SpookyNameRate(Cog):
 
             embed.add_field(
                 name=(self.bot.get_user(data["author"]) or await self.bot.fetch_user(data["author"])).name,
-                value=f"[{(data)['name']}](https://discord.com/channels/{Bot.guild}/{channel.id}/{message_id})",
+                value=f"[{(data)['name']}](https://discord.com/channels/{Client.guild}/{channel.id}/{message_id})",
             )
 
         return embed
@@ -368,9 +368,9 @@ class SpookyNameRate(Cog):
         if SpookyNameRate.debug:
             return True
 
-        if not Bot.month_override:
+        if not Client.month_override:
             return datetime.utcnow().month == Month.OCTOBER
-        return Bot.month_override == Month.OCTOBER
+        return Client.month_override == Month.OCTOBER
 
     def cog_check(self, ctx: Context) -> bool:
         """A command to check whether the command is being called in October."""
