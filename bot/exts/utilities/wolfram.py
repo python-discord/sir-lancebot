@@ -10,12 +10,12 @@ from discord.ext import commands
 from discord.ext.commands import BucketType, Cog, Context, check, group
 
 from bot.bot import Bot
-from bot.constants import Colours, STAFF_ROLES, Wolfram
+from bot.constants import Colours, STAFF_ROLES, Tokens, Wolfram
 from bot.utils.pagination import ImagePaginator
 
 log = logging.getLogger(__name__)
 
-APPID = Wolfram.key
+APPID = Tokens.wolfram
 DEFAULT_OUTPUT_FORMAT = "JSON"
 QUERY = "http://api.wolframalpha.com/v2/{request}"
 WOLF_IMAGE = "https://www.symbols.com/gi.php?type=1&id=2886&i=1"

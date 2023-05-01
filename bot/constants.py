@@ -293,17 +293,32 @@ class _Roles(EnvConfig):
 Roles = _Roles()
 
 
-class Tokens(NamedTuple):
-    giphy = environ.get("GIPHY_TOKEN")
-    aoc_session_cookie = environ.get("AOC_SESSION_COOKIE")
-    omdb = environ.get("OMDB_API_KEY")
-    youtube = environ.get("YOUTUBE_API_KEY")
-    tmdb = environ.get("TMDB_API_KEY")
-    nasa = environ.get("NASA_API_KEY")
-    igdb_client_id = environ.get("IGDB_CLIENT_ID")
-    igdb_client_secret = environ.get("IGDB_CLIENT_SECRET")
-    github = environ.get("GITHUB_TOKEN")
-    unsplash_access_key = environ.get("UNSPLASH_KEY")
+class _Tokens(EnvConfig):
+    EnvConfig.Config.env_prefix = "tokens_"
+
+    giphy = ""
+    aoc_session_cookie = ""
+    omdb = ""
+    youtube = ""
+    tmdb = ""
+    nasa = ""
+    igdb_client_id = ""
+    igdb_client_secret = ""
+    github = ""
+    unsplash = ""
+    wolfram = ""
+
+
+Tokens = _Tokens()
+
+
+class _Wolfram(EnvConfig):
+    EnvConfig.Config.env_prefix = "wolfram_"
+    user_limit_day = 10
+    guild_limit_day = 67
+
+
+Wolfram = _Wolfram()
 
 
 class Wolfram(NamedTuple):
