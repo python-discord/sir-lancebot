@@ -118,10 +118,16 @@ class _Bot(EnvConfig):
 
 Bot = _Bot()
 
-class Logging(NamedTuple):
-    debug = Client.debug
-    file_logs = environ.get("FILE_LOGS", "false").lower() == "true"
-    trace_loggers = environ.get("BOT_TRACE_LOGGERS")
+
+class _Logging(EnvConfig):
+    EnvConfig.Config.env_prefix = "logging_"
+
+    debug = Bot.debug
+    file_logs = False
+    trace_loggers = ""
+
+
+Logging = _Logging()
 
 
 class Colours:
