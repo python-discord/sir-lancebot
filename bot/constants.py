@@ -86,15 +86,20 @@ class _Channels(EnvConfig):
 
 Channels = _Channels()
 
-class Categories(NamedTuple):
-    help_in_use = 696958401460043776
+
+class _Categories(EnvConfig):
+    EnvConfig.Config.env_prefix = "categories_"
+
+    python_help_system = 691405807388196926
     development = 411199786025484308
     devprojects = 787641585624940544
     media = 799054581991997460
     staff = 364918151625965579
 
 
-codejam_categories_name = "Code Jam"  # Name of the codejam team categories
+Categories = _Categories()
+
+CODEJAM_CATEGORY_NAME = "Code Jam"  # Name of the codejam team categories
 
 
 class Client(NamedTuple):
