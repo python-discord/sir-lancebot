@@ -21,7 +21,7 @@ class SpookyGif(commands.Cog):
     async def spookygif(self, ctx: commands.Context) -> None:
         """Fetches a random gif from the GIPHY API and responds with it."""
         async with ctx.typing():
-            params = {"api_key": Tokens.giphy, "tag": "halloween", "rating": "g"}
+            params = {"api_key": Tokens.giphy.get_secret_value(), "tag": "halloween", "rating": "g"}
             # Make a GET request to the Giphy API to get a random halloween gif.
             async with self.bot.http_session.get(API_URL, params=params) as resp:
                 data = await resp.json()

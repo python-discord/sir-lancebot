@@ -26,7 +26,7 @@ ISSUE_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/issues/{numbe
 PR_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/pulls/{number}"
 
 if Tokens.github:
-    REQUEST_HEADERS["Authorization"] = f"token {Tokens.github}"
+    REQUEST_HEADERS["Authorization"] = f"token {Tokens.github.get_secret_value()}"
 
 CODE_BLOCK_RE = re.compile(
     r"^`([^`\n]+)`"   # Inline codeblock

@@ -21,7 +21,7 @@ async def _create_redis_session() -> RedisSession:
     redis_session = RedisSession(
         host=constants.Redis.host,
         port=constants.Redis.port,
-        password=constants.Redis.password,
+        password=constants.Redis.password.get_secret_value(),
         max_connections=20,
         use_fakeredis=constants.Redis.use_fakeredis,
         global_namespace="bot",

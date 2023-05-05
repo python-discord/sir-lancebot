@@ -210,7 +210,7 @@ class Space(Cog):
         """Fetch information from NASA API, return result."""
         params = {}
         if use_api_key:
-            params["api_key"] = Tokens.nasa
+            params["api_key"] = Tokens.nasa.get_secret_value()
 
         # Add additional parameters to request parameters only when they provided by user
         if additional_params is not None:

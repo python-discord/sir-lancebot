@@ -2,7 +2,7 @@ import enum
 import logging
 from os import environ
 
-from pydantic import BaseSettings
+from pydantic import BaseSettings, SecretStr
 
 __all__ = (
     "Branding",
@@ -106,7 +106,7 @@ class _Client(EnvConfig):
     name = "Sir Lancebot"
     guild = 267624335836053506
     prefix = "."
-    token = ""
+    token: SecretStr
     debug = True
     in_ci = False
     github_repo = "https://github.com/python-discord/sir-lancebot"
@@ -115,6 +115,9 @@ class _Client(EnvConfig):
 
 
 Client = _Client()
+
+print(Client.token)
+print(Client.token.get_secret_value())
 
 
 class _Logging(EnvConfig):
@@ -286,17 +289,15 @@ Roles = _Roles()
 class _Tokens(EnvConfig):
     EnvConfig.Config.env_prefix = "tokens_"
 
-    giphy = ""
-    aoc_session_cookie = ""
-    omdb = ""
-    youtube = ""
-    tmdb = ""
-    nasa = ""
-    igdb_client_id = ""
-    igdb_client_secret = ""
-    github = ""
-    unsplash = ""
-    wolfram = ""
+    giphy: SecretStr | None
+    youtube: SecretStr | None
+    tmdb: SecretStr | None
+    nasa: SecretStr | None
+    igdb_client_id: SecretStr | None
+    igdb_client_secret: SecretStr | None
+    github: SecretStr | None
+    unsplash: SecretStr | None
+    wolfram: SecretStr | None
 
 
 Tokens = _Tokens()
@@ -316,7 +317,7 @@ class _Redis(EnvConfig):
 
     host = "redis.default.svc.cluster.local"
     port = 6379
-    password = ""
+    password: SecretStr | None
     use_fakeredis = False
 
 
@@ -337,8 +338,8 @@ class _Reddit(EnvConfig):
 
     subreddits = ["r/Python"]
 
-    client_id = ""
-    secret = ""
+    client_id: SecretStr | None
+    secret: SecretStr | None
     webhook = 635408384794951680
 
 

@@ -20,8 +20,8 @@ from bot.utils.pagination import ImagePaginator, LinePaginator
 # Base URL of IGDB API
 BASE_URL = "https://api.igdb.com/v4"
 
-CLIENT_ID = Tokens.igdb_client_id
-CLIENT_SECRET = Tokens.igdb_client_secret
+CLIENT_ID = Tokens.igdb_client_id.get_secret_value()
+CLIENT_SECRET = Tokens.igdb_client_secret.get_secret_value()
 
 # The number of seconds before expiry that we attempt to re-fetch a new access token
 ACCESS_TOKEN_RENEWAL_WINDOW = 60*60*24*2

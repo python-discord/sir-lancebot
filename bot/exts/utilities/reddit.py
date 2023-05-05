@@ -36,7 +36,7 @@ class Reddit(Cog):
 
         self.webhook = None
         self.access_token = None
-        self.client_auth = BasicAuth(RedditConfig.client_id, RedditConfig.secret)
+        self.client_auth = BasicAuth(RedditConfig.client_id.get_secret_value(), RedditConfig.secret.get_secret_value())
 
         self.auto_poster_loop.start()
 

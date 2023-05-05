@@ -22,7 +22,7 @@ THUMBNAIL_URL = "https://i.imgur.com/LtFtC8H.png"
 
 # Define movie params, that will be used for every movie request
 MOVIE_PARAMS = {
-    "api_key": Tokens.tmdb,
+    "api_key": Tokens.tmdb.get_secret_value(),
     "language": "en-US"
 }
 
@@ -106,7 +106,7 @@ class Movie(Cog):
         """Return JSON of TMDB discover request."""
         # Define params of request
         params = {
-            "api_key": Tokens.tmdb,
+            "api_key": Tokens.tmdb.get_secret_value(),
             "language": "en-US",
             "sort_by": "popularity.desc",
             "include_adult": "false",

@@ -36,7 +36,7 @@ class ScaryMovie(commands.Cog):
         """Selects a random movie and returns a JSON of movie details from TMDb."""
         url = "https://api.themoviedb.org/3/discover/movie"
         params = {
-            "api_key": Tokens.tmdb,
+            "api_key": Tokens.tmdb.get_secret_value(),
             "with_genres": "27",
             "vote_count.gte": "5",
             "include_adult": "false"
@@ -65,7 +65,7 @@ class ScaryMovie(commands.Cog):
         # Get full details and credits
         async with self.bot.http_session.get(
             url=f"https://api.themoviedb.org/3/movie/{selection_id}",
-            params={"api_key": Tokens.tmdb, "append_to_response": "credits"}
+            params={"api_key": Tokens.tmdb.get_secret_value(), "append_to_response": "credits"}
         ) as selection:
 
             return await selection.json()
