@@ -773,7 +773,7 @@ class Snakes(Cog):
                     "query": "snake",
                     "page": page,
                     "language": "en-US",
-                    "api_key": Tokens.tmdb,
+                    "api_key": Tokens.tmdb.get_secret_value(),
                 }
             )
             data = await response.json()
@@ -785,7 +785,7 @@ class Snakes(Cog):
                 f"https://api.themoviedb.org/3/movie/{movie}",
                 params={
                     "language": "en-US",
-                    "api_key": Tokens.tmdb,
+                    "api_key": Tokens.tmdb.get_secret_value(),
                 }
             )
             data = await response.json()
@@ -1095,7 +1095,7 @@ class Snakes(Cog):
                 "part": "snippet",
                 "q": urllib.parse.quote_plus(query),
                 "type": "video",
-                "key": Tokens.youtube
+                "key": Tokens.youtube.get_secret_value()
             }
         )
         response = await response.json()

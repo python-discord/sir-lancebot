@@ -12,7 +12,7 @@ from discord.ext import commands
 from discord.ext.commands import BadArgument, Cog, clean_content
 
 from bot.bot import Bot
-from bot.constants import Channels, Lovefest, Month, PYTHON_PREFIX
+from bot.constants import Channels, Month, PYTHON_PREFIX, Roles
 from bot.utils.decorators import in_month
 
 log = logging.getLogger(__name__)
@@ -45,8 +45,8 @@ class LoveCalculator(Cog):
           Running .love @chrisjl#2655 @joe#6000 will yield the same result as before.
         """
         if (
-            Lovefest.role_id not in [role.id for role in who.roles]
-            or (whom is not None and Lovefest.role_id not in [role.id for role in whom.roles])
+            Roles.lovefest not in [role.id for role in who.roles]
+            or (whom is not None and Roles.lovefest not in [role.id for role in whom.roles])
         ):
             raise BadArgument(
                 "This command can only be ran against members with the lovefest role! "

@@ -24,8 +24,8 @@ REQUEST_HEADERS = {"User-Agent": "Python Discord Hacktoberbot"}
 # using repo topics API during preview period requires an accept header
 GITHUB_TOPICS_ACCEPT_HEADER = {"Accept": "application/vnd.github.mercy-preview+json"}
 if GITHUB_TOKEN := Tokens.github:
-    REQUEST_HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
-    GITHUB_TOPICS_ACCEPT_HEADER["Authorization"] = f"token {GITHUB_TOKEN}"
+    REQUEST_HEADERS["Authorization"] = f"token {GITHUB_TOKEN.get_secret_value()}"
+    GITHUB_TOPICS_ACCEPT_HEADER["Authorization"] = f"token {GITHUB_TOKEN.get_secret_value()}"
 
 GITHUB_NONEXISTENT_USER_MESSAGE = (
     "The listed users cannot be searched either because the users do not exist "

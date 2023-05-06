@@ -80,7 +80,7 @@ class CheatSheet(commands.Cog):
         aliases=("cht.sh", "cheatsheet", "cheat-sheet", "cht"),
     )
     @commands.cooldown(1, 10, BucketType.user)
-    @whitelist_override(categories=[Categories.help_in_use])
+    @whitelist_override(categories=[Categories.python_help_system])
     async def cheat_sheet(self, ctx: Context, *search_terms: str) -> None:
         """
         Search cheat.sh.

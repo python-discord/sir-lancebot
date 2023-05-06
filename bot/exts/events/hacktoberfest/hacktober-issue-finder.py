@@ -18,7 +18,7 @@ REQUEST_HEADERS = {
     "User-Agent": "Python Discord Hacktoberbot",
     "Accept": "application / vnd.github.v3 + json"
 }
-if GITHUB_TOKEN := Tokens.github:
+if GITHUB_TOKEN := Tokens.github.get_secret_value():
     REQUEST_HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
 
 

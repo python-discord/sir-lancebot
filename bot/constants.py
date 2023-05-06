@@ -1,7 +1,8 @@
 import enum
 import logging
 from os import environ
-from typing import NamedTuple
+
+from pydantic import BaseSettings, SecretStr
 
 __all__ = (
     "Branding",
@@ -13,13 +14,12 @@ __all__ = (
     "Colours",
     "Emojis",
     "Icons",
-    "Lovefest",
     "Month",
     "Roles",
     "Tokens",
     "Wolfram",
     "Reddit",
-    "RedisConfig",
+    "Redis",
     "RedirectOutput",
     "PYTHON_PREFIX",
     "MODERATION_ROLES",
@@ -36,21 +36,38 @@ log = logging.getLogger(__name__)
 PYTHON_PREFIX = "!"
 
 
-class Branding:
-    cycle_frequency = int(environ.get("CYCLE_FREQUENCY", 3))  # 0: never, 1: every day, 2: every other day, ...
+class EnvConfig(BaseSettings):
+    """Our default configuration for models that should load from .env files."""
+
+    class Config:
+        """Specify what .env files to load, and how to load them."""
+
+        env_file = ".env",
+        env_file_encoding = "utf-8"
+
+
+class _Branding(EnvConfig):
+    EnvConfig.Config.env_prefix = "branding_"
+
+    cycle_frequency = 3  # 0: never, 1: every day, 2: every other day, ...
+
+
+Branding = _Branding()
 
 
 class Cats:
     cats = ["ᓚᘏᗢ", "ᘡᘏᗢ", "🐈", "ᓕᘏᗢ", "ᓇᘏᗢ", "ᓂᘏᗢ", "ᘣᘏᗢ", "ᕦᘏᗢ", "ᕂᘏᗢ"]
 
 
-class Channels(NamedTuple):
+class _Channels(EnvConfig):
+    EnvConfig.Config.env_prefix = "channels_"
+
     algos_and_data_structs = 650401909852864553
     bot_commands = 267659945086812160
     community_meta = 267659945086812160
     organisation = 551789653284356126
     data_science_and_ai = 366673247892275221
-    devlog = int(environ.get("CHANNEL_DEVLOG", 622895325144940554))
+    devlog = 622895325144940554
     dev_contrib = 635950537262759947
     mod_meta = 775412552795947058
     mod_tools = 775413915391098921
@@ -58,40 +75,57 @@ class Channels(NamedTuple):
     off_topic_1 = 463035241142026251
     off_topic_2 = 463035268514185226
     python_help = 1035199133436354600
-    sir_lancebot_playground = int(environ.get("CHANNEL_COMMUNITY_BOT_COMMANDS", 607247579608121354))
+    sir_lancebot_playground = 607247579608121354
     voice_chat_0 = 412357430186344448
     voice_chat_1 = 799647045886541885
     staff_voice = 541638762007101470
-    reddit = int(environ.get("CHANNEL_REDDIT", 458224812528238616))
+    reddit = 458224812528238616
 
 
-class Categories(NamedTuple):
-    help_in_use = 696958401460043776
+Channels = _Channels()
+
+
+class _Categories(EnvConfig):
+    EnvConfig.Config.env_prefix = "categories_"
+
+    python_help_system = 691405807388196926
     development = 411199786025484308
     devprojects = 787641585624940544
     media = 799054581991997460
     staff = 364918151625965579
 
 
-codejam_categories_name = "Code Jam"  # Name of the codejam team categories
+Categories = _Categories()
+
+CODEJAM_CATEGORY_NAME = "Code Jam"  # Name of the codejam team categories
 
 
-class Client(NamedTuple):
+class _Client(EnvConfig):
+    EnvConfig.Config.env_prefix = "client_"
+
     name = "Sir Lancebot"
-    guild = int(environ.get("BOT_GUILD", 267624335836053506))
-    prefix = environ.get("PREFIX", ".")
-    token = environ.get("BOT_TOKEN")
-    debug = environ.get("BOT_DEBUG", "true").lower() == "true"
-    in_ci = environ.get("IN_CI", "false").lower() == "true"
-    github_bot_repo = "https://github.com/python-discord/sir-lancebot"
+    guild = 267624335836053506
+    prefix = "."
+    token: SecretStr
+    debug = True
+    in_ci = False
+    github_repo = "https://github.com/python-discord/sir-lancebot"
     # Override seasonal locks: 1 (January) to 12 (December)
-    month_override = int(environ["MONTH_OVERRIDE"]) if "MONTH_OVERRIDE" in environ else None
+    month_override: int | None = None
 
 
-class Logging(NamedTuple):
+Client = _Client()
+
+
+class _Logging(EnvConfig):
+    EnvConfig.Config.env_prefix = "logging_"
+
     debug = Client.debug
-    file_logs = environ.get("FILE_LOGS", "false").lower() == "true"
-    trace_loggers = environ.get("BOT_TRACE_LOGGERS")
+    file_logs = False
+    trace_loggers = ""
+
+
+Logging = _Logging()
 
 
 class Colours:
@@ -208,10 +242,6 @@ class Icons:
     )
 
 
-class Lovefest:
-    role_id = int(environ.get("LOVEFEST_ROLE_ID", 542431903886606399))
-
-
 class Month(enum.IntEnum):
     JANUARY = 1
     FEBRUARY = 2
@@ -236,39 +266,59 @@ if Client.month_override is not None:
     Month(Client.month_override)
 
 
-class Roles(NamedTuple):
+class _Roles(EnvConfig):
+
+    EnvConfig.Config.env_prefix = "roles_"
+
     owners = 267627879762755584
-    admins = int(environ.get("BOT_ADMIN_ROLE_ID", 267628507062992896))
+    admins = 267628507062992896
     moderation_team = 267629731250176001
-    helpers = int(environ.get("ROLE_HELPERS", 267630620367257601))
+    helpers = 267630620367257601
     core_developers = 587606783669829632
-    everyone = int(environ.get("BOT_GUILD", 267624335836053506))
+    everyone = Client.guild
+
+    lovefest = 542431903886606399
 
 
-class Tokens(NamedTuple):
-    giphy = environ.get("GIPHY_TOKEN")
-    aoc_session_cookie = environ.get("AOC_SESSION_COOKIE")
-    omdb = environ.get("OMDB_API_KEY")
-    youtube = environ.get("YOUTUBE_API_KEY")
-    tmdb = environ.get("TMDB_API_KEY")
-    nasa = environ.get("NASA_API_KEY")
-    igdb_client_id = environ.get("IGDB_CLIENT_ID")
-    igdb_client_secret = environ.get("IGDB_CLIENT_SECRET")
-    github = environ.get("GITHUB_TOKEN")
-    unsplash_access_key = environ.get("UNSPLASH_KEY")
+Roles = _Roles()
 
 
-class Wolfram(NamedTuple):
-    user_limit_day = int(environ.get("WOLFRAM_USER_LIMIT_DAY", 10))
-    guild_limit_day = int(environ.get("WOLFRAM_GUILD_LIMIT_DAY", 67))
-    key = environ.get("WOLFRAM_API_KEY")
+class _Tokens(EnvConfig):
+    EnvConfig.Config.env_prefix = "tokens_"
+
+    giphy: SecretStr = ""
+    youtube: SecretStr = ""
+    tmdb: SecretStr = ""
+    nasa: SecretStr = ""
+    igdb_client_id: SecretStr = ""
+    igdb_client_secret: SecretStr = ""
+    github: SecretStr = ""
+    unsplash: SecretStr = ""
 
 
-class RedisConfig(NamedTuple):
-    host = environ.get("REDIS_HOST", "redis.default.svc.cluster.local")
-    port = environ.get("REDIS_PORT", 6379)
-    password = environ.get("REDIS_PASSWORD")
-    use_fakeredis = environ.get("USE_FAKEREDIS", "false").lower() == "true"
+Tokens = _Tokens()
+
+
+class _Wolfram(EnvConfig):
+    EnvConfig.Config.env_prefix = "wolfram_"
+    user_limit_day = 10
+    guild_limit_day = 67
+    key: SecretStr = ""
+
+
+Wolfram = _Wolfram()
+
+
+class _Redis(EnvConfig):
+    EnvConfig.Config.env_prefix = "redis_"
+
+    host = "redis.default.svc.cluster.local"
+    port = 6379
+    password: SecretStr = ""
+    use_fakeredis = False
+
+
+Redis = _Redis()
 
 
 class Source:
@@ -280,13 +330,17 @@ class RedirectOutput:
     delete_delay: int = 10
 
 
-class Reddit:
+class _Reddit(EnvConfig):
+    EnvConfig.Config.env_prefix = "reddit_"
+
     subreddits = ["r/Python"]
 
-    client_id = environ.get("REDDIT_CLIENT_ID")
-    secret = environ.get("REDDIT_SECRET")
-    webhook = int(environ.get("REDDIT_WEBHOOK", 635408384794951680))
+    client_id: SecretStr = ""
+    secret: SecretStr = ""
+    webhook = 635408384794951680
 
+
+Reddit = _Reddit()
 
 # Default role combinations
 MODERATION_ROLES = {Roles.moderation_team, Roles.admins, Roles.owners}

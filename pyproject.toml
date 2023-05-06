@@ -9,7 +9,7 @@ license = "MIT"
 python = "3.11.*"
 
 # See https://bot-core.pythondiscord.com/ for docs.
-pydis_core = { version = "9.5.1", extras = ["async-rediscache"] }
+pydis_core = { version = "9.6.0", extras = ["async-rediscache"] }
 
 aiodns = "3.0.0"
 rapidfuzz = "3.0.0"
@@ -24,6 +24,8 @@ colorama = { version = "0.4.6", markers = "sys_platform == 'win32'" }
 lxml = "4.9.2"
 emoji = "2.2.0"
 pyjokes = "0.6.0"
+pydantic = { version = "1.10.7", extras = ["dotenv"]}
+
 
 [tool.poetry.dev-dependencies]
 flake8 = "6.0.0"

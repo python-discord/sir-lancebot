@@ -19,11 +19,11 @@ log = logging.getLogger(__name__)
 async def _create_redis_session() -> RedisSession:
     """Create and connect to a redis session."""
     redis_session = RedisSession(
-        host=constants.RedisConfig.host,
-        port=constants.RedisConfig.port,
-        password=constants.RedisConfig.password,
+        host=constants.Redis.host,
+        port=constants.Redis.port,
+        password=constants.Redis.password.get_secret_value(),
         max_connections=20,
-        use_fakeredis=constants.RedisConfig.use_fakeredis,
+        use_fakeredis=constants.Redis.use_fakeredis,
         global_namespace="bot",
         decode_responses=True,
     )
@@ -81,7 +81,7 @@ async def main() -> None:
             if constants.Client.in_ci:
                 await test_bot_in_ci(_bot)
             else:
-                await _bot.start(constants.Client.token)
+                await _bot.start(constants.Client.token.get_secret_value())
 
 
 asyncio.run(main())

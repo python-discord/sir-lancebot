@@ -15,7 +15,7 @@ from bot.utils.pagination import ImagePaginator
 
 log = logging.getLogger(__name__)
 
-APPID = Wolfram.key
+APPID = Wolfram.key.get_secret_value()
 DEFAULT_OUTPUT_FORMAT = "JSON"
 QUERY = "http://api.wolframalpha.com/v2/{request}"
 WOLF_IMAGE = "https://www.symbols.com/gi.php?type=1&id=2886&i=1"
