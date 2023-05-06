@@ -358,6 +358,6 @@ class Reddit(Cog):
 async def setup(bot: Bot) -> None:
     """Load the Reddit cog."""
     if not RedditConfig.secret or not RedditConfig.client_id:
-        log.error("Credentials not provided, cog not loaded.")
+        log.warning("Credentials not provided, cog not loaded.")
         return
     await bot.add_cog(Reddit(bot))

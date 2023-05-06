@@ -208,4 +208,7 @@ class Movie(Cog):
 
 async def setup(bot: Bot) -> None:
     """Load the Movie Cog."""
+    if not Tokens.tmdb:
+        logger.warning("No TMDB token. Not loading Movie Cog.")
+        return
     await bot.add_cog(Movie(bot))
