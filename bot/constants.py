@@ -294,7 +294,6 @@ class _Tokens(EnvConfig):
     igdb_client_secret: SecretStr = ""
     github: SecretStr = ""
     unsplash: SecretStr = ""
-    wolfram: SecretStr = ""
 
 
 Tokens = _Tokens()
