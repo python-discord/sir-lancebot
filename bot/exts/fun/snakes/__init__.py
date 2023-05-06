@@ -9,6 +9,6 @@ log = logging.getLogger(__name__)
 
 async def setup(bot: Bot) -> None:
     """Load the Snakes Cog."""
-    if not Tokens.giphy:
-        log.warning("No Youtube token. All youtube related commands in Snakes cog won't work.")
+    if not Tokens.youtube:
+        log.warning("No Youtube token. All YouTube related commands in Snakes cog won't work.")
     await bot.add_cog(Snakes(bot))
