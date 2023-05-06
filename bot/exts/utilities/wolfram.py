@@ -10,12 +10,12 @@ from discord.ext import commands
 from discord.ext.commands import BucketType, Cog, Context, check, group
 
 from bot.bot import Bot
-from bot.constants import Colours, STAFF_ROLES, Wolfram
+from bot.constants import Colours, STAFF_ROLES, Wolfram as WolframConfig
 from bot.utils.pagination import ImagePaginator
 
 log = logging.getLogger(__name__)
 
-APPID = Wolfram.key.get_secret_value()
+APPID = WolframConfig.key.get_secret_value()
 DEFAULT_OUTPUT_FORMAT = "JSON"
 QUERY = "http://api.wolframalpha.com/v2/{request}"
 WOLF_IMAGE = "https://www.symbols.com/gi.php?type=1&id=2886&i=1"
@@ -23,10 +23,10 @@ WOLF_IMAGE = "https://www.symbols.com/gi.php?type=1&id=2886&i=1"
 MAX_PODS = 20
 
 # Allows for 10 wolfram calls pr user pr day
-usercd = commands.CooldownMapping.from_cooldown(Wolfram.user_limit_day, 60 * 60 * 24, BucketType.user)
+usercd = commands.CooldownMapping.from_cooldown(WolframConfig.user_limit_day, 60 * 60 * 24, BucketType.user)
 
 # Allows for max api requests / days in month per day for the entire guild (Temporary)
-guildcd = commands.CooldownMapping.from_cooldown(Wolfram.guild_limit_day, 60 * 60 * 24, BucketType.guild)
+guildcd = commands.CooldownMapping.from_cooldown(WolframConfig.guild_limit_day, 60 * 60 * 24, BucketType.guild)
 
 
 async def send_embed(
@@ -303,7 +303,7 @@ class Wolfram(Cog):
 
 async def setup(bot: Bot) -> None:
     """Load the Wolfram cog."""
-    if not Wolfram.key:
+    if not WolframConfig.key:
         log.warning("No Wolfram API Key was provided. Not loading Wolfram Cog.")
         return
     await bot.add_cog(Wolfram(bot))
