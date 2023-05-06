@@ -81,7 +81,7 @@ async def main() -> None:
             if constants.Client.in_ci:
                 await test_bot_in_ci(_bot)
             else:
-                await _bot.start(constants.Client.token)
+                await _bot.start(constants.Client.token.get_secret_value())
 
 
 asyncio.run(main())
