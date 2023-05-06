@@ -1,6 +1,5 @@
 import inspect
 from pathlib import Path
-from typing import Optional
 
 from discord import Embed
 from discord.ext import commands
@@ -28,7 +27,7 @@ class BotSource(commands.Cog):
         embed = await self.build_embed(source_item)
         await ctx.send(embed=embed)
 
-    def get_source_link(self, source_item: SourceType) -> tuple[str, str, Optional[int]]:
+    def get_source_link(self, source_item: SourceType) -> tuple[str, str, int | None]:
         """
         Build GitHub link of source item, return this link, file location and first line number.
 
@@ -62,7 +61,7 @@ class BotSource(commands.Cog):
 
         return url, file_location, first_line_no or None
 
-    async def build_embed(self, source_object: SourceType) -> Optional[Embed]:
+    async def build_embed(self, source_object: SourceType) -> Embed | None:
         """Build embed based on source object."""
         url, location, first_line = self.get_source_link(source_object)
 

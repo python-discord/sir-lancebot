@@ -9,8 +9,8 @@ from discord.ext.commands import Bot, Cog, Context
 log = logging.getLogger(__name__)
 
 EMOJIS = {
-    "SUCCESS": u"\u2705",
-    "ERROR": u"\u274C"
+    "SUCCESS": "\u2705",
+    "ERROR": "\u274C"
 }
 
 

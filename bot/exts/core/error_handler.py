@@ -2,7 +2,6 @@ import logging
 import math
 import random
 from collections.abc import Iterable
-from typing import Union
 
 from discord import Embed, Message
 from discord.ext import commands
@@ -35,7 +34,7 @@ class CommandErrorHandler(commands.Cog):
             logging.debug("Cooldown counter reverted as the command was not used correctly.")
 
     @staticmethod
-    def error_embed(message: str, title: Union[Iterable, str] = ERROR_REPLIES) -> Embed:
+    def error_embed(message: str, title: Iterable | str = ERROR_REPLIES) -> Embed:
         """Build a basic embed with red colour and either a random error title or a title provided."""
         embed = Embed(colour=Colours.soft_red)
         if isinstance(title, str):
@@ -71,7 +70,7 @@ class CommandErrorHandler(commands.Cog):
                 await self.send_command_suggestion(ctx, ctx.invoked_with)
             return
 
-        if isinstance(error, (InChannelCheckFailure, InMonthCheckFailure)):
+        if isinstance(error, InChannelCheckFailure | InMonthCheckFailure):
             await ctx.send(embed=self.error_embed(str(error), NEGATIVE_REPLIES), delete_after=7.5)
             return
 

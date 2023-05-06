@@ -1,4 +1,4 @@
-import datetime
+from datetime import UTC, datetime
 
 from dateutil.relativedelta import relativedelta
 
@@ -17,12 +17,11 @@ def _stringify_time_unit(value: int, unit: str) -> str:
     """
     if unit == "seconds" and value == 0:
         return "0 seconds"
-    elif value == 1:
+    if value == 1:
         return f"{value} {unit[:-1]}"
-    elif value == 0:
+    if value == 0:
         return f"less than a {unit[:-1]}"
-    else:
-        return f"{value} {unit}"
+    return f"{value} {unit}"
 
 
 def humanize_delta(delta: relativedelta, precision: str = "seconds", max_units: int = 6) -> str:
@@ -69,14 +68,14 @@ def humanize_delta(delta: relativedelta, precision: str = "seconds", max_units: 
     return humanized
 
 
-def time_since(past_datetime: datetime.datetime, precision: str = "seconds", max_units: int = 6) -> str:
+def time_since(past_datetime: datetime, precision: str = "seconds", max_units: int = 6) -> str:
     """
     Takes a datetime and returns a human-readable string that describes how long ago that datetime was.
 
     precision specifies the smallest unit of time to include (e.g. "seconds", "minutes").
     max_units specifies the maximum number of units of time to include (e.g. 1 may include days but not hours).
     """
-    now = datetime.datetime.utcnow()
+    now = datetime.now(tz=UTC)
     delta = abs(relativedelta(now, past_datetime))
 
     humanized = humanize_delta(delta, precision, max_units)

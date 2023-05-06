@@ -1,7 +1,6 @@
 import logging
 import re
 from random import randint
-from typing import Optional, Union
 
 from discord import Embed
 from discord.ext import tasks
@@ -21,7 +20,7 @@ class XKCD(Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.latest_comic_info: dict[str, Union[str, int]] = {}
+        self.latest_comic_info: dict[str, str | int] = {}
         self.get_latest_comic_info.start()
 
     def cog_unload(self) -> None:
@@ -38,7 +37,7 @@ class XKCD(Cog):
                 log.debug(f"Failed to get latest XKCD comic information. Status code {resp.status}")
 
     @command(name="xkcd")
-    async def fetch_xkcd_comics(self, ctx: Context, comic: Optional[str]) -> None:
+    async def fetch_xkcd_comics(self, ctx: Context, comic: str | None) -> None:
         """
         Getting an xkcd comic's information along with the image.
 

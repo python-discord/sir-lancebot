@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 TIME_LIMIT = 60
 
 # anagram.json file contains all the anagrams
-with open(Path("bot/resources/fun/anagram.json"), "r") as f:
+with open(Path("bot/resources/fun/anagram.json")) as f:
     ANAGRAMS_ALL = json.load(f)
 
 

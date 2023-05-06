@@ -42,10 +42,10 @@ class Stackoverflow(commands.Cog):
             if response.status == 200:
                 data = await response.json()
             else:
-                logger.error(f'Status code is not 200, it is {response.status}')
+                logger.error(f"Status code is not 200, it is {response.status}")
                 await ctx.send(embed=ERR_EMBED)
                 return
-        if not data['items']:
+        if not data["items"]:
             no_search_result = Embed(
                 title=f"No search results found for {search_query}",
                 color=Colours.soft_red
@@ -63,7 +63,7 @@ class Stackoverflow(commands.Cog):
         )
         for item in top5:
             embed.add_field(
-                name=unescape(item['title']),
+                name=unescape(item["title"]),
                 value=(
                     f"[{Emojis.reddit_upvote} {item['score']}    "
                     f"{Emojis.stackoverflow_views} {item['view_count']}     "

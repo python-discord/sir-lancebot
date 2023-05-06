@@ -2,9 +2,9 @@ import difflib
 import logging
 import random
 import re
-from datetime import datetime as dt, timedelta
+from datetime import UTC, datetime, timedelta
 from enum import IntEnum
-from typing import Any, Optional
+from typing import Any
 
 from aiohttp import ClientSession
 from discord import Embed
@@ -255,7 +255,7 @@ class Games(Cog):
                 self.genres[genre_name] = genre
 
     @group(name="games", aliases=("game",), invoke_without_command=True)
-    async def games(self, ctx: Context, amount: Optional[int] = 5, *, genre: Optional[str]) -> None:
+    async def games(self, ctx: Context, amount: int | None = 5, *, genre: str | None) -> None:
         """
         Get random game(s) by genre from IGDB. Use .games genres command to get all available genres.
 
@@ -293,7 +293,8 @@ class Games(Cog):
                     f"{f'Maybe you meant `{display_possibilities}`?' if display_possibilities else ''}"
                 )
                 return
-            elif len(possibilities) == 1:
+
+            if len(possibilities) == 1:
                 games = await self.get_games_list(
                     amount, self.genres[possibilities[0][1]], offset=random.randint(0, 150)
                 )
@@ -368,8 +369,8 @@ class Games(Cog):
     async def get_games_list(
         self,
         amount: int,
-        genre: Optional[str] = None,
-        sort: Optional[str] = None,
+        genre: str | None = None,
+        sort: str | None = None,
         additional_body: str = "",
         offset: int = 0
     ) -> list[dict[str, Any]]:
@@ -398,10 +399,13 @@ class Games(Cog):
     async def create_page(self, data: dict[str, Any]) -> tuple[str, str]:
         """Create content of Game Page."""
         # Create cover image URL from template
-        url = COVER_URL.format(**{"image_id": data["cover"]["image_id"] if "cover" in data else ""})
+        url = COVER_URL.format(image_id=data.get("cover", {}).get("image_id", ""))
 
         # Get release date separately with checking
-        release_date = dt.utcfromtimestamp(data["first_release_date"]).date() if "first_release_date" in data else "?"
+        if "first_release_date" in data:
+            release_date = datetime.fromtimestamp(data["first_release_date"], tz=UTC).date()
+        else:
+            release_date = "?"
 
         # Create Age Ratings value
         rating = ", ".join(
@@ -434,7 +438,7 @@ class Games(Cog):
         lines = []
 
         # Define request body of IGDB API request and do request
-        body = SEARCH_BODY.format(**{"term": search_term})
+        body = SEARCH_BODY.format(term=search_term)
 
         async with self.http_session.post(url=f"{BASE_URL}/games", data=body, headers=self.headers) as resp:
             data = await resp.json()
@@ -460,10 +464,10 @@ class Games(Cog):
         returning results.
         """
         # Create request body from template
-        body = COMPANIES_LIST_BODY.format(**{
-            "limit": limit,
-            "offset": offset
-        })
+        body = COMPANIES_LIST_BODY.format(
+            limit=limit,
+            offset=offset,
+        )
 
         async with self.http_session.post(url=f"{BASE_URL}/companies", data=body, headers=self.headers) as resp:
             return await resp.json()
@@ -471,10 +475,10 @@ class Games(Cog):
     async def create_company_page(self, data: dict[str, Any]) -> tuple[str, str]:
         """Create good formatted Game Company page."""
         # Generate URL of company logo
-        url = LOGO_URL.format(**{"image_id": data["logo"]["image_id"] if "logo" in data else ""})
+        url = LOGO_URL.format(image_id=data.get("logo", {}).get("image_id", ""))
 
         # Try to get found date of company
-        founded = dt.utcfromtimestamp(data["start_date"]).date() if "start_date" in data else "?"
+        founded = datetime.fromtimestamp(data["start_date"], tz=UTC).date() if "start_date" in data else "?"
 
         # Generate list of games, that company have developed or published
         developed = ", ".join(game["name"] for game in data["developed"]) if "developed" in data else "?"

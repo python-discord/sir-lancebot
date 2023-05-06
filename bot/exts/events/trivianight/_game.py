@@ -1,7 +1,8 @@
 import time
+from collections.abc import Iterable
 from random import randrange
 from string import ascii_uppercase
-from typing import Iterable, NamedTuple, Optional, TypedDict
+from typing import NamedTuple, TypedDict
 
 DEFAULT_QUESTION_POINTS = 10
 DEFAULT_QUESTION_TIME = 20
@@ -14,8 +15,8 @@ class QuestionData(TypedDict):
     description: str
     answers: list[str]
     correct: str
-    points: Optional[int]
-    time: Optional[int]
+    points: int | None
+    time: int | None
 
 
 class UserGuess(NamedTuple):
@@ -26,15 +27,15 @@ class UserGuess(NamedTuple):
     elapsed: float
 
 
-class QuestionClosed(RuntimeError):
+class QuestionClosedError(RuntimeError):
     """Exception raised when the question is not open for guesses anymore."""
 
 
-class AlreadyUpdated(RuntimeError):
+class AlreadyUpdatedError(RuntimeError):
     """Exception raised when the user has already updated their guess once."""
 
 
-class AllQuestionsVisited(RuntimeError):
+class AllQuestionsVisitedError(RuntimeError):
     """Exception raised when all of the questions have been visited."""
 
 
@@ -90,10 +91,10 @@ class Question:
     def _update_guess(self, user: int, answer: str) -> UserGuess:
         """Update an already existing guess."""
         if self._started is None:
-            raise QuestionClosed("Question is not open for answers.")
+            raise QuestionClosedError("Question is not open for answers.")
 
         if self._guesses[user][1] is False:
-            raise AlreadyUpdated(f"User({user}) has already updated their guess once.")
+            raise AlreadyUpdatedError(f"User({user}) has already updated their guess once.")
 
         self._guesses[user] = (answer, False, time.perf_counter() - self._started)
         return self._guesses[user]
@@ -104,7 +105,7 @@ class Question:
             return self._update_guess(user, answer)
 
         if self._started is None:
-            raise QuestionClosed("Question is not open for answers.")
+            raise QuestionClosedError("Question is not open for answers.")
 
         self._guesses[user] = (answer, True, time.perf_counter() - self._started)
         return self._guesses[user]
@@ -126,7 +127,7 @@ class TriviaNightGame:
         self._questions = [Question(q) for q in data]
         # A copy of the questions to keep for `.trivianight list`
         self._all_questions = list(self._questions)
-        self.current_question: Optional[Question] = None
+        self.current_question: Question | None = None
         self._points = {}
         self._speed = {}
 
@@ -148,7 +149,7 @@ class TriviaNightGame:
             except IndexError:
                 raise ValueError(f"Question number {number} does not exist.")
         elif len(self._questions) == 0:
-            raise AllQuestionsVisited("All of the questions have been visited.")
+            raise AllQuestionsVisitedError("All of the questions have been visited.")
         else:
             question = self._questions.pop(randrange(len(self._questions)))
 

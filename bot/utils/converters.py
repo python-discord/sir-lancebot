@@ -1,5 +1,4 @@
-from datetime import datetime
-from typing import Union
+from datetime import UTC, datetime
 
 import discord
 from discord.ext import commands
@@ -47,7 +46,7 @@ class CoordinateConverter(commands.Converter):
         return x, y
 
 
-SourceType = Union[commands.Command, commands.Cog]
+SourceType = commands.Command | commands.Cog
 
 
 class SourceConverter(commands.Converter):
@@ -73,12 +72,12 @@ class DateConverter(commands.Converter):
     """Parse SOL or earth date (in format YYYY-MM-DD) into `int` or `datetime`. When invalid input, raise error."""
 
     @staticmethod
-    async def convert(ctx: commands.Context, argument: str) -> Union[int, datetime]:
+    async def convert(ctx: commands.Context, argument: str) -> int | datetime:
         """Parse date (SOL or earth) into `datetime` or `int`. When invalid value, raise error."""
         if argument.isdecimal():
             return int(argument)
         try:
-            date = datetime.strptime(argument, "%Y-%m-%d")
+            date = datetime.strptime(argument, "%Y-%m-%d").replace(tzinfo=UTC)
         except ValueError:
             raise commands.BadArgument(
                 f"Can't convert `{argument}` to `datetime` in format `YYYY-MM-DD` or `int` in SOL."

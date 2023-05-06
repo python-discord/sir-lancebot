@@ -1,6 +1,6 @@
 import logging
+from collections.abc import Callable
 from io import BytesIO
-from typing import Callable, Optional
 from urllib.parse import urlencode
 
 import arrow
@@ -64,10 +64,10 @@ def custom_cooldown(*ignore: int) -> Callable:
         if ctx.invoked_with == "help":
             # if the invoked command is help we don't want to increase the ratelimits since it's not actually
             # invoking the command/making a request, so instead just check if the user/guild are on cooldown.
-            guild_cooldown = not guildcd.get_bucket(ctx.message).get_tokens() == 0  # if guild is on cooldown
+            guild_cooldown = guildcd.get_bucket(ctx.message).get_tokens() != 0  # if guild is on cooldown
             # check the message is in a guild, and check user bucket if user is not ignored
             if ctx.guild and not any(r.id in ignore for r in ctx.author.roles):
-                return guild_cooldown and not usercd.get_bucket(ctx.message).get_tokens() == 0
+                return guild_cooldown and usercd.get_bucket(ctx.message).get_tokens() != 0
             return guild_cooldown
 
         user_bucket = usercd.get_bucket(ctx.message)
@@ -105,7 +105,7 @@ def custom_cooldown(*ignore: int) -> Callable:
     return check(predicate)
 
 
-async def get_pod_pages(ctx: Context, bot: Bot, query: str) -> Optional[list[tuple[str, str]]]:
+async def get_pod_pages(ctx: Context, bot: Bot, query: str) -> list[tuple[str, str]] | None:
     """Get the Wolfram API pod pages for the provided query."""
     async with ctx.typing():
         params = {
@@ -253,10 +253,7 @@ class Wolfram(Cog):
         if not pages:
             return
 
-        if len(pages) >= 2:
-            page = pages[1]
-        else:
-            page = pages[0]
+        page = pages[1] if len(pages) >= 2 else pages[0]
 
         await send_embed(ctx, page[0], colour=Colours.soft_orange, img_url=page[1])
 

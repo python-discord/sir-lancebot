@@ -1,7 +1,9 @@
 import itertools
 import random
 from collections.abc import Iterable
-from typing import Any
+from typing import TypeVar
+
+T = TypeVar("T")
 
 
 class RandomCycle:
@@ -11,11 +13,11 @@ class RandomCycle:
     The iterable is reshuffled after each full cycle.
     """
 
-    def __init__(self, iterable: Iterable):
+    def __init__(self, iterable: Iterable[T]):
         self.iterable = list(iterable)
         self.index = itertools.cycle(range(len(iterable)))
 
-    def __next__(self) -> Any:
+    def __next__(self) -> T:
         idx = next(self.index)
 
         if idx == 0:

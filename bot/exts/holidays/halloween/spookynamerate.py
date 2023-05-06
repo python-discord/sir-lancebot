@@ -2,11 +2,10 @@ import asyncio
 import json
 import random
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from logging import getLogger
 from os import getenv
 from pathlib import Path
-from typing import Optional
 
 from async_rediscache import RedisCache
 from discord import Embed, Reaction, TextChannel, User
@@ -146,7 +145,7 @@ class SpookyNameRate(Cog):
                 )
                 return
 
-            elif data["name"] == name:
+            if data["name"] == name:
                 await ctx.send("TOO LATE. Someone has already added this name.")
                 return
 
@@ -261,12 +260,8 @@ class SpookyNameRate(Cog):
             winners = []
             for i, winner in enumerate(winner_messages):
                 winners.append(winner)
-                if len(winner_messages) > i + 1:
-                    if winner_messages[i + 1][1]["score"] != winner[1]["score"]:
-                        break
-                elif len(winner_messages) == (i + 1) + 1:  # The next element is the last element
-                    if winner_messages[i + 1][1]["score"] != winner[1]["score"]:
-                        break
+                if len(winner_messages) > i + 1 and winner_messages[i + 1][1]["score"] != winner[1]["score"]:
+                    break
 
             # one iteration is complete
             await channel.send("Today's Spooky Name Rate Game ends now, and the winner(s) is(are)...")
@@ -313,7 +308,7 @@ class SpookyNameRate(Cog):
         if SpookyNameRate.debug:
             return
 
-        now = datetime.utcnow()
+        now = datetime.now(tz=UTC)
         if now.hour < 12:
             twelve_pm = now.replace(hour=12, minute=0, second=0, microsecond=0)
             time_left = twelve_pm - now
@@ -353,7 +348,7 @@ class SpookyNameRate(Cog):
 
         return embed
 
-    async def get_channel(self) -> Optional[TextChannel]:
+    async def get_channel(self) -> TextChannel | None:
         """Gets the sir-lancebot-channel after waiting until ready."""
         channel = self.bot.get_channel(
             Channels.sir_lancebot_playground
@@ -369,7 +364,7 @@ class SpookyNameRate(Cog):
             return True
 
         if not Client.month_override:
-            return datetime.utcnow().month == Month.OCTOBER
+            return datetime.now(tz=UTC).month == Month.OCTOBER
         return Client.month_override == Month.OCTOBER
 
     def cog_check(self, ctx: Context) -> bool:

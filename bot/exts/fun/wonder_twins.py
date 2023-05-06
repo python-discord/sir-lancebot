@@ -11,8 +11,8 @@ class WonderTwins(Cog):
     """Cog for a Wonder Twins inspired command."""
 
     def __init__(self):
-        with open(Path.cwd() / "bot" / "resources" / "fun" / "wonder_twins.yaml", "r", encoding="utf-8") as f:
-            info = yaml.load(f, Loader=yaml.FullLoader)
+        with open(Path.cwd() / "bot" / "resources" / "fun" / "wonder_twins.yaml", encoding="utf-8") as f:
+            info = yaml.safe_load(f)
             self.water_types = info["water_types"]
             self.objects = info["objects"]
             self.adjectives = info["adjectives"]

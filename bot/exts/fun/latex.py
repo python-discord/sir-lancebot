@@ -1,19 +1,22 @@
 import hashlib
+import logging
 import os
 import re
 import string
 from io import BytesIO
 from pathlib import Path
-from typing import BinaryIO, Optional
+from typing import BinaryIO
 
 import discord
 from PIL import Image
+from aiohttp import web
 from discord.ext import commands
 
 from bot.bot import Bot
 from bot.constants import Channels, WHITELISTED_CHANNELS
 from bot.utils.decorators import whitelist_override
 
+log = logging.getLogger(__name__)
 FORMATTED_CODE_REGEX = re.compile(
     r"(?P<delim>(?P<block>```)|``?)"        # code delimiter: 1-3 backticks; (?P=block) only matches if it's a block
     r"(?(block)(?:(?P<lang>[a-z]+)\n)?)"    # if we're in a block, match optional language (only letters plus newline)
@@ -45,8 +48,7 @@ def _prepare_input(text: str) -> str:
     """Extract latex from a codeblock, if it is in one."""
     if match := FORMATTED_CODE_REGEX.match(text):
         return match.group("code")
-    else:
-        return text
+    return text
 
 
 def _process_image(data: bytes, out_file: BinaryIO) -> None:
@@ -65,7 +67,7 @@ def _process_image(data: bytes, out_file: BinaryIO) -> None:
 class InvalidLatexError(Exception):
     """Represents an error caused by invalid latex."""
 
-    def __init__(self, logs: Optional[str]):
+    def __init__(self, logs: str | None):
         super().__init__(logs)
         self.logs = logs
 
@@ -89,7 +91,7 @@ class Latex(commands.Cog):
         ) as response:
             _process_image(await response.read(), out_file)
 
-    async def _upload_to_pastebin(self, text: str) -> Optional[str]:
+    async def _upload_to_pastebin(self, text: str) -> str | None:
         """Uploads `text` to the paste service, returning the url if successful."""
         try:
             async with self.bot.http_session.post(
@@ -100,9 +102,8 @@ class Latex(commands.Cog):
                 response_json = await response.json()
             if "key" in response_json:
                 return f"{PASTEBIN_URL}/{response_json['key']}.txt?noredirect"
-        except Exception:
-            # 400 (Bad Request) means there are too many characters
-            pass
+        except web.HTTPClientError as e:
+            log.info("Error when uploading latex output to pastebin. %s", e)
 
     @commands.command()
     @commands.max_concurrency(1, commands.BucketType.guild, wait=True)
@@ -112,7 +113,7 @@ class Latex(commands.Cog):
         query = _prepare_input(query)
 
         # the hash of the query is used as the filename in the cache.
-        query_hash = hashlib.md5(query.encode()).hexdigest()
+        query_hash = hashlib.md5(query.encode()).hexdigest()  # noqa: S324
         image_path = CACHE_DIRECTORY / f"{query_hash}.png"
         async with ctx.typing():
             if not image_path.exists():

@@ -4,7 +4,6 @@ import pathlib
 import random
 import string
 from io import BytesIO
-from typing import Optional
 
 import discord
 import rapidfuzz
@@ -25,7 +24,7 @@ class Colour(commands.Cog):
         self.bot = bot
         with open(pathlib.Path("bot/resources/utilities/ryanzec_colours.json")) as f:
             self.colour_mapping = json.load(f)
-            del self.colour_mapping['_']  # Delete source credit entry
+            del self.colour_mapping["_"]  # Delete source credit entry
 
     async def send_colour_response(self, ctx: commands.Context, rgb: tuple[int, int, int]) -> None:
         """Create and send embed from user given colour information."""
@@ -84,7 +83,7 @@ class Colour(commands.Cog):
         roles=constants.STAFF_ROLES,
         categories=[constants.Categories.development, constants.Categories.media]
     )
-    async def colour(self, ctx: commands.Context, *, colour_input: Optional[str] = None) -> None:
+    async def colour(self, ctx: commands.Context, *, colour_input: str | None = None) -> None:
         """
         Create an embed that displays colour information.
 
@@ -209,7 +208,7 @@ class Colour(commands.Cog):
     def _rgb_to_hsl(rgb: tuple[int, int, int]) -> tuple[int, int, int]:
         """Convert RGB values to HSL values."""
         rgb_list = [val / 255.0 for val in rgb]
-        h, l, s = colorsys.rgb_to_hls(*rgb_list)
+        h, l, s = colorsys.rgb_to_hls(*rgb_list)  # noqa: E741
         hsl = (round(h * 360), round(s * 100), round(l * 100))
         return hsl
 
@@ -233,7 +232,7 @@ class Colour(commands.Cog):
         hex_code = f"#{hex_}".upper()
         return hex_code
 
-    def _rgb_to_name(self, rgb: tuple[int, int, int]) -> Optional[str]:
+    def _rgb_to_name(self, rgb: tuple[int, int, int]) -> str | None:
         """Convert RGB values to a fuzzy matched name."""
         input_hex_colour = self._rgb_to_hex(rgb)
         try:
@@ -247,7 +246,7 @@ class Colour(commands.Cog):
             colour_name = None
         return colour_name
 
-    def match_colour_name(self, ctx: commands.Context, input_colour_name: str) -> Optional[str]:
+    def match_colour_name(self, ctx: commands.Context, input_colour_name: str) -> str | None:
         """Convert a colour name to HEX code."""
         try:
             match, certainty, _ = rapidfuzz.process.extractOne(
@@ -256,7 +255,7 @@ class Colour(commands.Cog):
                 score_cutoff=80
             )
         except (ValueError, TypeError):
-            return
+            return None
         return f"#{self.colour_mapping[match]}"
 
 

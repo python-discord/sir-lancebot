@@ -4,7 +4,6 @@ import random
 import re
 from dataclasses import dataclass
 from functools import partial
-from typing import Optional
 
 import discord
 from discord.ext import commands
@@ -19,7 +18,7 @@ log = logging.getLogger(__name__)
 class Square:
     """Each square on the battleship grid - if they contain a boat and if they've been aimed at."""
 
-    boat: Optional[str]
+    boat: str | None
     aimed: bool
 
 
@@ -31,8 +30,8 @@ EmojiSet = dict[tuple[bool, bool], str]
 class Player:
     """Each player in the game - their messages for the boards and their current grid."""
 
-    user: Optional[discord.Member]
-    board: Optional[discord.Message]
+    user: discord.Member | None
+    board: discord.Message | None
     opponent_board: discord.Message
     grid: Grid
 
@@ -110,10 +109,10 @@ class Game:
 
         self.gameover: bool = False
 
-        self.turn: Optional[Player] = None
-        self.next: Optional[Player] = None
+        self.turn: Player | None = None
+        self.next: Player | None = None
 
-        self.match: Optional[re.Match] = None
+        self.match: re.Match | None = None
         self.surrender: bool = False
 
         self.setup_grids()
@@ -135,7 +134,7 @@ class Game:
             for row in player.grid
         ]
 
-        rows = ["".join([number] + row) for number, row in zip(NUMBERS, grid)]
+        rows = ["".join([number] + row) for number, row in zip(NUMBERS, grid, strict=True)]
         return "\n".join([LETTERS] + rows)
 
     @staticmethod
@@ -215,7 +214,7 @@ class Game:
             (self.p1, "board"), (self.p2, "board")
         )
 
-        for board, location in zip(boards, locations):
+        for board, location in zip(boards, locations, strict=True):
             player, attr = location
             if getattr(player, attr):
                 await getattr(player, attr).edit(content=board)
@@ -232,8 +231,9 @@ class Game:
             if not self.match:
                 self.bot.loop.create_task(message.add_reaction(CROSS_EMOJI))
             return bool(self.match)
+        return None
 
-    async def take_turn(self) -> Optional[Square]:
+    async def take_turn(self) -> Square | None:
         """Lets the player who's turn it is choose a square."""
         square = None
         turn_message = await self.turn.user.send(

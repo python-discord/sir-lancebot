@@ -12,7 +12,7 @@ API_URL = "https://api.unsplash.com/photos/random"
 
 
 class EarthPhotos(commands.Cog):
-    """This cog contains the command for earth photos."""
+    """The earth photos cog."""
 
     def __init__(self, bot: Bot):
         self.bot = bot

@@ -3,8 +3,8 @@ import hashlib
 import json
 import logging
 import random
+from collections.abc import Coroutine
 from pathlib import Path
-from typing import Coroutine, Optional
 
 import discord
 from discord import Member
@@ -27,7 +27,7 @@ class LoveCalculator(Cog):
     @in_month(Month.FEBRUARY)
     @commands.command(aliases=("love_calculator", "love_calc"))
     @commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
-    async def love(self, ctx: commands.Context, who: Member, whom: Optional[Member] = None) -> None:
+    async def love(self, ctx: commands.Context, who: Member, whom: Member | None = None) -> None:
         """
         Tells you how much the two love each other.
 

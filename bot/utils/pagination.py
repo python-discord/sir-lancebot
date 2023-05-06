@@ -1,7 +1,6 @@
 import asyncio
 import logging
 from collections.abc import Iterable
-from typing import Optional
 
 from discord import Embed, Member, Reaction
 from discord.abc import User
@@ -29,10 +28,10 @@ class LinePaginator(Paginator):
 
     def __init__(
             self,
-            prefix: str = '```',
-            suffix: str = '```',
+            prefix: str = "```",
+            suffix: str = "```",
             max_size: int = 2000,
-            max_lines: Optional[int] = None,
+            max_lines: int | None = None,
             linesep: str = "\n"
     ):
         """
@@ -87,11 +86,13 @@ class LinePaginator(Paginator):
             self._count += 1
 
     @classmethod
-    async def paginate(cls, lines: Iterable[str], ctx: Context, embed: Embed,
-                       prefix: str = "", suffix: str = "", max_lines: Optional[int] = None,
-                       max_size: int = 500, empty: bool = True, restrict_to_user: User = None,
-                       timeout: int = 300, footer_text: str = None, url: str = None,
-                       exception_on_empty_embed: bool = False) -> None:
+    async def paginate(
+        cls, lines: Iterable[str], ctx: Context,
+        embed: Embed, prefix: str = "", suffix: str = "",
+        max_lines: int | None = None, max_size: int = 500, empty: bool = True,
+        restrict_to_user: User = None, timeout: int = 300, footer_text: str = None,
+        url: str = None, exception_on_empty_embed: bool = False
+    ) -> None:
         """
         Use a paginator and set of reactions to provide pagination over a set of lines.
 
@@ -170,20 +171,20 @@ class LinePaginator(Paginator):
 
             log.debug("There's less than two pages, so we won't paginate - sending single page on its own")
             await ctx.send(embed=embed)
-            return
+            return None
+
+        if footer_text:
+            embed.set_footer(text=f"{footer_text} (Page {current_page + 1}/{len(paginator.pages)})")
         else:
-            if footer_text:
-                embed.set_footer(text=f"{footer_text} (Page {current_page + 1}/{len(paginator.pages)})")
-            else:
-                embed.set_footer(text=f"Page {current_page + 1}/{len(paginator.pages)}")
-            log.trace(f"Setting embed footer to '{embed.footer.text}'")
+            embed.set_footer(text=f"Page {current_page + 1}/{len(paginator.pages)}")
+        log.trace(f"Setting embed footer to '{embed.footer.text}'")
 
-            if url:
-                embed.url = url
-                log.trace(f"Setting embed url to '{url}'")
+        if url:
+            embed.url = url
+            log.trace(f"Setting embed url to '{url}'")
 
-            log.debug("Sending first page to channel...")
-            message = await ctx.send(embed=embed)
+        log.debug("Sending first page to channel...")
+        message = await ctx.send(embed=embed)
 
         log.debug("Adding emoji reactions to message...")
 
@@ -270,6 +271,7 @@ class LinePaginator(Paginator):
 
         log.debug("Ending pagination and clearing reactions...")
         await message.clear_reactions()
+        return None
 
 
 class ImagePaginator(Paginator):
@@ -358,7 +360,7 @@ class ImagePaginator(Paginator):
 
         if len(paginator.pages) <= 1:
             await ctx.send(embed=embed)
-            return
+            return None
 
         embed.set_footer(text=f"Page {current_page + 1}/{len(paginator.pages)}")
         message = await ctx.send(embed=embed)
@@ -431,3 +433,4 @@ class ImagePaginator(Paginator):
 
         log.debug("Ending pagination and clearing reactions...")
         await message.clear_reactions()
+        return None

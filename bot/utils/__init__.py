@@ -3,8 +3,7 @@ import contextlib
 import re
 import string
 from collections.abc import Iterable
-from datetime import datetime
-from typing import Optional
+from datetime import UTC, datetime
 
 import discord
 from discord.ext.commands import BadArgument, Context
@@ -27,8 +26,7 @@ def resolve_current_month() -> Month:
     """
     if Client.month_override is not None:
         return Month(Client.month_override)
-    else:
-        return Month(datetime.utcnow().month)
+    return Month(datetime.now(tz=UTC).month)
 
 
 async def disambiguate(
@@ -38,7 +36,7 @@ async def disambiguate(
     timeout: float = 30,
     entries_per_page: int = 20,
     empty: bool = False,
-    embed: Optional[discord.Embed] = None
+    embed: discord.Embed | None = None
 ) -> str:
     """
     Has the user choose between multiple entries in case one could not be chosen automatically.
@@ -130,9 +128,9 @@ def replace_many(
         assert var == "That WAS a sentence"
     """
     if ignore_case:
-        replacements = dict(
-            (word.lower(), replacement) for word, replacement in replacements.items()
-        )
+        replacements = {
+            word.lower(): replacement for word, replacement in replacements.items()
+        }
 
     words_to_replace = sorted(replacements, key=lambda s: (-len(s), s))
 
@@ -152,10 +150,9 @@ def replace_many(
         cleaned_word = word.translate(str.maketrans("", "", string.punctuation))
         if cleaned_word.isupper():
             return replacement.upper()
-        elif cleaned_word[0].isupper():
+        if cleaned_word[0].isupper():
             return replacement.capitalize()
-        else:
-            return replacement.lower()
+        return replacement.lower()
 
     return regex.sub(_repl, sentence)
 

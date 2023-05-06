@@ -63,17 +63,17 @@ class Movie(Cog):
     @group(name="movies", aliases=("movie",), invoke_without_command=True)
     async def movies(self, ctx: Context, genre: str = "", amount: int = 5) -> None:
         """
-        Get random movies by specifying genre. Also support amount parameter,\
-        that define how much movies will be shown.
+        Get random movies by specifying genre.
 
-        Default 5. Use .movies genres to get all available genres.
+        The amount parameter, that defines how many movies will be shown, defaults to 5.
+        Use `.movies genres` to get all available genres.
         """
         # Check is there more than 20 movies specified, due TMDB return 20 movies
         # per page, so this is max. Also you can't get less movies than 1, just logic
         if amount > 20:
             await ctx.send("You can't get more than 20 movies at once. (TMDB limits)")
             return
-        elif amount < 1:
+        if amount < 1:
             await ctx.send("You can't get less than 1 movie.")
             return
 
@@ -179,8 +179,8 @@ class Movie(Cog):
 
         text += "__**Some Numbers**__\n"
 
-        budget = f"{movie['budget']:,d}" if movie['budget'] else "?"
-        revenue = f"{movie['revenue']:,d}" if movie['revenue'] else "?"
+        budget = f"{movie['budget']:,d}" if movie["budget"] else "?"
+        revenue = f"{movie['revenue']:,d}" if movie["revenue"] else "?"
 
         if movie["runtime"] is not None:
             duration = divmod(movie["runtime"], 60)
