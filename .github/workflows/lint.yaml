@@ -44,6 +44,7 @@ jobs:
         env:
           REDIS_USE_FAKEREDIS: true
           CLIENT_IN_CI: true
+          CLIENT_TOKEN: ""
 
       # We will not run `flake8` here, as we will use a separate flake8
       # action.
