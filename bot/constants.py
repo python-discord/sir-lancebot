@@ -42,7 +42,7 @@ class EnvConfig(BaseSettings):
     class Config:
         """Specify what .env files to load, and how to load them."""
 
-        env_file = ".env.server", ".env",
+        env_file = ".env",
         env_file_encoding = "utf-8"
 
 
