@@ -116,9 +116,6 @@ class _Client(EnvConfig):
 
 Client = _Client()
 
-print(Client.token)
-print(Client.token.get_secret_value())
-
 
 class _Logging(EnvConfig):
     EnvConfig.Config.env_prefix = "logging_"
@@ -289,15 +286,15 @@ Roles = _Roles()
 class _Tokens(EnvConfig):
     EnvConfig.Config.env_prefix = "tokens_"
 
-    giphy: SecretStr | None
-    youtube: SecretStr | None
-    tmdb: SecretStr | None
-    nasa: SecretStr | None
-    igdb_client_id: SecretStr | None
-    igdb_client_secret: SecretStr | None
-    github: SecretStr | None
-    unsplash: SecretStr | None
-    wolfram: SecretStr | None
+    giphy: SecretStr = ""
+    youtube: SecretStr = ""
+    tmdb: SecretStr = ""
+    nasa: SecretStr = ""
+    igdb_client_id: SecretStr = ""
+    igdb_client_secret: SecretStr = ""
+    github: SecretStr = ""
+    unsplash: SecretStr = ""
+    wolfram: SecretStr = ""
 
 
 Tokens = _Tokens()
@@ -307,6 +304,7 @@ class _Wolfram(EnvConfig):
     EnvConfig.Config.env_prefix = "wolfram_"
     user_limit_day = 10
     guild_limit_day = 67
+    key: SecretStr = ""
 
 
 Wolfram = _Wolfram()
@@ -317,7 +315,7 @@ class _Redis(EnvConfig):
 
     host = "redis.default.svc.cluster.local"
     port = 6379
-    password: SecretStr | None
+    password: SecretStr = ""
     use_fakeredis = False
 
 
@@ -338,8 +336,8 @@ class _Reddit(EnvConfig):
 
     subreddits = ["r/Python"]
 
-    client_id: SecretStr | None
-    secret: SecretStr | None
+    client_id: SecretStr = ""
+    secret: SecretStr = ""
     webhook = 635408384794951680
 
 
