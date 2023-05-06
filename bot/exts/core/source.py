@@ -5,9 +5,12 @@ from discord import Embed
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Channels, Source, WHITELISTED_CHANNELS
+from bot.constants import Channels, WHITELISTED_CHANNELS
 from bot.utils.converters import SourceConverter, SourceType
 from bot.utils.decorators import whitelist_override
+
+GITHUB_BOT_URL = "https://github.com/python-discord/sir-lancebot"
+BOT_AVATAR_URL = "https://avatars1.githubusercontent.com/u/9919"
 
 
 class BotSource(commands.Cog):
@@ -19,8 +22,8 @@ class BotSource(commands.Cog):
         """Display information and a GitHub link to the source code of a command, tag, or cog."""
         if not source_item:
             embed = Embed(title="Sir Lancebot's GitHub Repository")
-            embed.add_field(name="Repository", value=f"[Go to GitHub]({Source.github})")
-            embed.set_thumbnail(url=Source.github_avatar_url)
+            embed.add_field(name="Repository", value=f"[Go to GitHub]({GITHUB_BOT_URL})")
+            embed.set_thumbnail(url=BOT_AVATAR_URL)
             await ctx.send(embed=embed)
             return
 
@@ -57,7 +60,7 @@ class BotSource(commands.Cog):
 
         file_location = Path(filename).relative_to(Path.cwd()).as_posix()
 
-        url = f"{Source.github}/blob/main/{file_location}{lines_extension}"
+        url = f"{GITHUB_BOT_URL}/blob/main/{file_location}{lines_extension}"
 
         return url, file_location, first_line_no or None
 
@@ -73,7 +76,7 @@ class BotSource(commands.Cog):
             description = source_object.description.splitlines()[0]
 
         embed = Embed(title=title, description=description)
-        embed.set_thumbnail(url=Source.github_avatar_url)
+        embed.set_thumbnail(url=BOT_AVATAR_URL)
         embed.add_field(name="Source Code", value=f"[Go to GitHub]({url})")
         line_text = f":{first_line}" if first_line else ""
         embed.set_footer(text=f"{location}{line_text}")

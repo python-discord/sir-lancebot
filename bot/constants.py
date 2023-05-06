@@ -5,8 +5,6 @@ from os import environ
 from pydantic import BaseSettings, SecretStr
 
 __all__ = (
-    "Branding",
-    "Cats",
     "Channels",
     "Categories",
     "Client",
@@ -20,7 +18,6 @@ __all__ = (
     "Wolfram",
     "Reddit",
     "Redis",
-    "RedirectOutput",
     "PYTHON_PREFIX",
     "MODERATION_ROLES",
     "STAFF_ROLES",
@@ -44,19 +41,6 @@ class EnvConfig(BaseSettings):
 
         env_file = ".env",
         env_file_encoding = "utf-8"
-
-
-class _Branding(EnvConfig):
-    EnvConfig.Config.env_prefix = "branding_"
-
-    cycle_frequency = 3  # 0: never, 1: every day, 2: every other day, ...
-
-
-Branding = _Branding()
-
-
-class Cats:
-    cats = ["ᓚᘏᗢ", "ᘡᘏᗢ", "🐈", "ᓕᘏᗢ", "ᓇᘏᗢ", "ᓂᘏᗢ", "ᘣᘏᗢ", "ᕦᘏᗢ", "ᕂᘏᗢ"]
 
 
 class _Channels(EnvConfig):
@@ -96,8 +80,6 @@ class _Categories(EnvConfig):
 
 
 Categories = _Categories()
-
-CODEJAM_CATEGORY_NAME = "Code Jam"  # Name of the codejam team categories
 
 
 class _Client(EnvConfig):
@@ -327,15 +309,6 @@ class _Redis(EnvConfig):
 
 
 Redis = _Redis()
-
-
-class Source:
-    github = "https://github.com/python-discord/sir-lancebot"
-    github_avatar_url = "https://avatars1.githubusercontent.com/u/9919"
-
-
-class RedirectOutput:
-    delete_delay: int = 10
 
 
 class _Reddit(EnvConfig):

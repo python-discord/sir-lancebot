@@ -8,7 +8,7 @@ from discord.ext import commands
 from sentry_sdk import push_scope
 
 from bot.bot import Bot
-from bot.constants import Channels, Colours, ERROR_REPLIES, NEGATIVE_REPLIES, RedirectOutput
+from bot.constants import Channels, Colours, ERROR_REPLIES, NEGATIVE_REPLIES
 from bot.utils.commands import get_command_suggestions
 from bot.utils.decorators import InChannelCheckFailure, InMonthCheckFailure
 from bot.utils.exceptions import APIError, MovedCommandError, UserNotPlayingError
@@ -16,6 +16,7 @@ from bot.utils.exceptions import APIError, MovedCommandError, UserNotPlayingErro
 log = logging.getLogger(__name__)
 
 
+DELETE_DELAY = 10
 QUESTION_MARK_ICON = "https://cdn.discordapp.com/emojis/512367613339369475.png"
 
 
@@ -184,7 +185,7 @@ class CommandErrorHandler(commands.Cog):
             e.description = "\n".join(
                 misspelled_content.replace(command_name, cmd, 1) for cmd in command_suggestions
             )
-            await ctx.send(embed=e, delete_after=RedirectOutput.delete_delay)
+            await ctx.send(embed=e, delete_after=DELETE_DELAY)
 
 
 async def setup(bot: Bot) -> None:

@@ -5,8 +5,10 @@ from discord import AllowedMentions, Embed, Forbidden
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Cats, Colours, NEGATIVE_REPLIES
+from bot.constants import Colours, NEGATIVE_REPLIES
 from bot.utils import helpers
+
+CATS = ["ᓚᘏᗢ", "ᘡᘏᗢ", "🐈", "ᓕᘏᗢ", "ᓇᘏᗢ", "ᓂᘏᗢ", "ᘣᘏᗢ", "ᕦᘏᗢ", "ᕂᘏᗢ"]
 
 
 class Catify(commands.Cog):
@@ -35,7 +37,7 @@ class Catify(commands.Cog):
                 await ctx.send(embed=embed)
                 return
 
-            display_name += f" | {random.choice(Cats.cats)}"
+            display_name += f" | {random.choice(CATS)}"
 
             await ctx.send(f"Your catified nickname is: `{display_name}`", allowed_mentions=AllowedMentions.none())
 
@@ -56,10 +58,10 @@ class Catify(commands.Cog):
                 name = name.lower()
                 if "cat" in name:
                     if random.randint(0, 5) == 5:
-                        string_list[index] = name.replace("cat", f"**{random.choice(Cats.cats)}**")
+                        string_list[index] = name.replace("cat", f"**{random.choice(CATS)}**")
                     else:
-                        string_list[index] = name.replace("cat", random.choice(Cats.cats))
-                for cat in Cats.cats:
+                        string_list[index] = name.replace("cat", random.choice(CATS))
+                for cat in CATS:
                     if cat in name:
                         string_list[index] = name.replace(cat, "cat")
 
@@ -68,9 +70,9 @@ class Catify(commands.Cog):
             for _ in range(random.randint(1, string_len)):
                 # insert cat at random index
                 if random.randint(0, 5) == 5:
-                    string_list.insert(random.randint(0, len(string_list)), f"**{random.choice(Cats.cats)}**")
+                    string_list.insert(random.randint(0, len(string_list)), f"**{random.choice(CATS)}**")
                 else:
-                    string_list.insert(random.randint(0, len(string_list)), random.choice(Cats.cats))
+                    string_list.insert(random.randint(0, len(string_list)), random.choice(CATS))
 
             text = helpers.suppress_links(" ".join(string_list))
             await ctx.send(

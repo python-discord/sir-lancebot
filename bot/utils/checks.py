@@ -9,6 +9,7 @@ from discord.ext.commands import (
 from bot import constants
 
 log = logging.getLogger(__name__)
+CODEJAM_CATEGORY_NAME = "Code Jam"
 
 
 class InWhitelistCheckFailure(CheckFailure):
@@ -73,7 +74,7 @@ def in_whitelist_check(
         return True
 
     category = getattr(ctx_channel, "category", None)
-    if category and category.name == constants.CODEJAM_CATEGORY_NAME:
+    if category and category.name == CODEJAM_CATEGORY_NAME:
         log.trace(f"{ctx.author} may use the `{ctx.command.name}` command as they are in a codejam team channel.")
         return True
 
