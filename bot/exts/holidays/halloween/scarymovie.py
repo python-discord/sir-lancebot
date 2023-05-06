@@ -135,4 +135,7 @@ class ScaryMovie(commands.Cog):
 
 async def setup(bot: Bot) -> None:
     """Load the Scary Movie Cog."""
+    if not Tokens.tmdb:
+        log.warning("No TMDB Token. Not loading ScaryMovie Cog.")
+        return
     await bot.add_cog(ScaryMovie(bot))

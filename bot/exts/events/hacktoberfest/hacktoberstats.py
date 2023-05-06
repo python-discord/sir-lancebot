@@ -434,4 +434,6 @@ class HacktoberStats(commands.Cog):
 
 async def setup(bot: Bot) -> None:
     """Load the Hacktober Stats Cog."""
+    if not Tokens.github:
+        log.warning("No GitHub token was provided. The HacktoberStats Cog won't be fully functional.")
     await bot.add_cog(HacktoberStats(bot))

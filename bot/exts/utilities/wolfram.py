@@ -303,4 +303,7 @@ class Wolfram(Cog):
 
 async def setup(bot: Bot) -> None:
     """Load the Wolfram cog."""
+    if not Wolfram.key:
+        log.warning("No Wolfram API Key was provided. Not loading Wolfram Cog.")
+        return
     await bot.add_cog(Wolfram(bot))

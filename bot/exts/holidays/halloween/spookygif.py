@@ -35,4 +35,7 @@ class SpookyGif(commands.Cog):
 
 async def setup(bot: Bot) -> None:
     """Spooky GIF Cog load."""
+    if not Tokens.giphy:
+        log.warning("No Giphy token. Not loading Giphy cog.")
+        return
     await bot.add_cog(SpookyGif(bot))
