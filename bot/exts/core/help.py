@@ -286,8 +286,7 @@ class HelpSession:
             # if required
             else:
                 results.append(f"<{name}>")
-
-        return f"{cmd.qualified_name} {' '.join(results)}"
+        return " ".join([cmd.qualified_name, *results])
 
     async def build_pages(self) -> None:
         """Builds the list of content pages to be paginated through in the help message, as a list of str."""
