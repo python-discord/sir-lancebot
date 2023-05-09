@@ -1,7 +1,6 @@
 import asyncio
 import random
 from functools import partial
-from typing import Optional, Union
 
 import discord
 import emojis
@@ -14,8 +13,8 @@ from bot.constants import Emojis
 NUMBERS = list(Emojis.number_emojis.values())
 CROSS_EMOJI = Emojis.incident_unactioned
 
-Coordinate = Optional[tuple[int, int]]
-EMOJI_CHECK = Union[discord.Emoji, str]
+Coordinate = tuple[int, int] | None
+EMOJI_CHECK = discord.Emoji | str
 
 
 class Game:
@@ -26,7 +25,7 @@ class Game:
         bot: Bot,
         channel: discord.TextChannel,
         player1: discord.Member,
-        player2: Optional[discord.Member],
+        player2: discord.Member | None,
         tokens: list[str],
         size: int = 7
     ):
@@ -73,7 +72,7 @@ class Game:
             await self.message.edit(content=None, embed=embed)
 
     async def game_over(
-        self, action: str, player1: Union[ClientUser, Member], player2: Union[ClientUser, Member]
+        self, action: str, player1: ClientUser | Member, player2: ClientUser | Member
     ) -> None:
         """Announces to public chat."""
         if action == "win":
@@ -134,12 +133,12 @@ class Game:
                 reaction, user = await self.bot.wait_for("reaction_add", check=self.predicate, timeout=30.0)
             except asyncio.TimeoutError:
                 await self.channel.send(f"{self.player_active.mention}, you took too long. Game over!")
-                return
+                return None
             else:
                 await message.delete()
                 if str(reaction.emoji) == CROSS_EMOJI:
                     await self.game_over("quit", self.player_active, self.player_inactive)
-                    return
+                    return None
 
                 await self.message.remove_reaction(reaction, user)
 
@@ -197,7 +196,7 @@ class AI:
                     break
         return possible_coords
 
-    def check_ai_win(self, coord_list: list[Coordinate]) -> Optional[Coordinate]:
+    def check_ai_win(self, coord_list: list[Coordinate]) -> Coordinate:
         """
         Check AI win.
 
@@ -205,12 +204,13 @@ class AI:
         with 10% chance of not winning and returning None
         """
         if random.randint(1, 10) == 1:
-            return
+            return None
         for coords in coord_list:
             if self.game.check_win(coords, 2):
                 return coords
+        return None
 
-    def check_player_win(self, coord_list: list[Coordinate]) -> Optional[Coordinate]:
+    def check_player_win(self, coord_list: list[Coordinate]) -> Coordinate | None:
         """
         Check Player win.
 
@@ -218,17 +218,18 @@ class AI:
         from winning with 25% of not blocking them  and returning None.
         """
         if random.randint(1, 4) == 1:
-            return
+            return None
         for coords in coord_list:
             if self.game.check_win(coords, 1):
                 return coords
+        return None
 
     @staticmethod
     def random_coords(coord_list: list[Coordinate]) -> Coordinate:
         """Picks a random coordinate from the possible ones."""
         return random.choice(coord_list)
 
-    def play(self) -> Union[Coordinate, bool]:
+    def play(self) -> Coordinate | bool:
         """
         Plays for the AI.
 
@@ -331,7 +332,7 @@ class ConnectFour(commands.Cog):
     @staticmethod
     def check_emojis(
         e1: EMOJI_CHECK, e2: EMOJI_CHECK
-    ) -> tuple[bool, Optional[str]]:
+    ) -> tuple[bool, str | None]:
         """Validate the emojis, the user put."""
         if isinstance(e1, str) and emojis.count(e1) != 1:
             return False, e1
@@ -342,7 +343,7 @@ class ConnectFour(commands.Cog):
     async def _play_game(
         self,
         ctx: commands.Context,
-        user: Optional[discord.Member],
+        user: discord.Member | None,
         board_size: int,
         emoji1: str,
         emoji2: str

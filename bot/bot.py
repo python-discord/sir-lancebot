@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 import discord
 from discord import DiscordException, Embed
@@ -26,7 +25,7 @@ class Bot(BotBase):
     name = constants.Client.name
 
     @property
-    def member(self) -> Optional[discord.Member]:
+    def member(self) -> discord.Member | None:
         """Retrieves the guild member object for the bot."""
         guild = self.get_guild(constants.Client.guild)
         if not guild:

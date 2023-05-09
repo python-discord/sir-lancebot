@@ -5,8 +5,6 @@ from os import environ
 from pydantic import BaseSettings, SecretStr
 
 __all__ = (
-    "Branding",
-    "Cats",
     "Channels",
     "Categories",
     "Client",
@@ -20,7 +18,6 @@ __all__ = (
     "Wolfram",
     "Reddit",
     "Redis",
-    "RedirectOutput",
     "PYTHON_PREFIX",
     "MODERATION_ROLES",
     "STAFF_ROLES",
@@ -44,19 +41,6 @@ class EnvConfig(BaseSettings):
 
         env_file = ".env",
         env_file_encoding = "utf-8"
-
-
-class _Branding(EnvConfig):
-    EnvConfig.Config.env_prefix = "branding_"
-
-    cycle_frequency = 3  # 0: never, 1: every day, 2: every other day, ...
-
-
-Branding = _Branding()
-
-
-class Cats:
-    cats = ["ᓚᘏᗢ", "ᘡᘏᗢ", "🐈", "ᓕᘏᗢ", "ᓇᘏᗢ", "ᓂᘏᗢ", "ᘣᘏᗢ", "ᕦᘏᗢ", "ᕂᘏᗢ"]
 
 
 class _Channels(EnvConfig):
@@ -97,8 +81,6 @@ class _Categories(EnvConfig):
 
 Categories = _Categories()
 
-CODEJAM_CATEGORY_NAME = "Code Jam"  # Name of the codejam team categories
-
 
 class _Client(EnvConfig):
     EnvConfig.Config.env_prefix = "client_"
@@ -129,6 +111,8 @@ Logging = _Logging()
 
 
 class Colours:
+    """Lookups for commonly used colours."""
+
     blue = 0x0279FD
     twitter_blue = 0x1DA1F2
     bright_green = 0x01D277
@@ -163,6 +147,8 @@ class Colours:
 
 
 class Emojis:
+    """Commonly used emojis."""
+
     cross_mark = "\u274C"
     check = "\u2611"
     envelope = "\U0001F4E8"
@@ -235,6 +221,8 @@ class Emojis:
 
 
 class Icons:
+    """URLs to commonly used icons."""
+
     questionmark = "https://cdn.discordapp.com/emojis/512367613339369475.png"
     bookmark = (
         "https://images-ext-2.discordapp.net/external/zl4oDwcmxUILY7sD9ZWE2fU5R7n6QcxEmPYSE5eddbg/"
@@ -243,6 +231,8 @@ class Icons:
 
 
 class Month(enum.IntEnum):
+    """Month of the year lookup. Used for in_month checks."""
+
     JANUARY = 1
     FEBRUARY = 2
     MARCH = 3
@@ -319,15 +309,6 @@ class _Redis(EnvConfig):
 
 
 Redis = _Redis()
-
-
-class Source:
-    github = "https://github.com/python-discord/sir-lancebot"
-    github_avatar_url = "https://avatars1.githubusercontent.com/u/9919"
-
-
-class RedirectOutput:
-    delete_delay: int = 10
 
 
 class _Reddit(EnvConfig):

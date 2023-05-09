@@ -18,7 +18,7 @@ TIMELIMIT = 10
 
 
 class EasterRiddle(commands.Cog):
-    """This cog contains the command for the Easter quiz!"""
+    """The Easter quiz cog."""
 
     def __init__(self, bot: Bot):
         self.bot = bot

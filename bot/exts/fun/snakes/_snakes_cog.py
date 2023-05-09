@@ -9,7 +9,7 @@ import textwrap
 import urllib
 from functools import partial
 from io import BytesIO
-from typing import Any, Optional
+from typing import Any
 
 import async_timeout
 from PIL import Image, ImageDraw, ImageFont
@@ -274,7 +274,7 @@ class Snakes(Cog):
 
         return message
 
-    async def _fetch(self, url: str, params: Optional[dict] = None) -> dict:
+    async def _fetch(self, url: str, params: dict | None = None) -> dict:
         """Asynchronous web request helper method."""
         if params is None:
             params = {}
@@ -518,52 +518,51 @@ class Snakes(Cog):
                 log.debug("Antidote timed out waiting for a reaction")
                 break  # We're done, no reactions for the last 5 minutes
 
-            if antidote_tries < 10:
-                if antidote_guess_count < 4:
-                    if reaction.emoji in ANTIDOTE_EMOJI:
-                        antidote_guess_list.append(reaction.emoji)
-                        antidote_guess_count += 1
+            if antidote_tries < 10 and antidote_guess_count < 4:
+                if reaction.emoji in ANTIDOTE_EMOJI:
+                    antidote_guess_list.append(reaction.emoji)
+                    antidote_guess_count += 1
 
-                    if antidote_guess_count == 4:  # Guesses complete
-                        antidote_guess_count = 0
-                        page_guess_list[antidote_tries] = " ".join(antidote_guess_list)
+                if antidote_guess_count == 4:  # Guesses complete
+                    antidote_guess_count = 0
+                    page_guess_list[antidote_tries] = " ".join(antidote_guess_list)
 
-                        # Now check guess
-                        for i in range(0, len(antidote_answer)):
-                            if antidote_guess_list[i] == antidote_answer[i]:
-                                guess_result.append(TICK_EMOJI)
-                            elif antidote_guess_list[i] in antidote_answer:
-                                guess_result.append(BLANK_EMOJI)
-                            else:
-                                guess_result.append(CROSS_EMOJI)
-                        guess_result.sort()
-                        page_result_list[antidote_tries] = " ".join(guess_result)
+                    # Now check guess
+                    for i in range(0, len(antidote_answer)):
+                        if antidote_guess_list[i] == antidote_answer[i]:
+                            guess_result.append(TICK_EMOJI)
+                        elif antidote_guess_list[i] in antidote_answer:
+                            guess_result.append(BLANK_EMOJI)
+                        else:
+                            guess_result.append(CROSS_EMOJI)
+                    guess_result.sort()
+                    page_result_list[antidote_tries] = " ".join(guess_result)
 
-                        # Rebuild the board
-                        board = []
-                        for i in range(0, 10):
-                            board.append(f"`{i+1:02d}` "
-                                         f"{page_guess_list[i]} - "
-                                         f"{page_result_list[i]}")
-                            board.append(EMPTY_UNICODE)
+                    # Rebuild the board
+                    board = []
+                    for i in range(0, 10):
+                        board.append(f"`{i+1:02d}` "
+                                     f"{page_guess_list[i]} - "
+                                     f"{page_result_list[i]}")
+                        board.append(EMPTY_UNICODE)
 
-                        # Remove Reactions
-                        for emoji in antidote_guess_list:
-                            await board_id.remove_reaction(emoji, user)
+                    # Remove Reactions
+                    for emoji in antidote_guess_list:
+                        await board_id.remove_reaction(emoji, user)
 
-                        if antidote_guess_list == antidote_answer:
-                            win = True
+                    if antidote_guess_list == antidote_answer:
+                        win = True
 
-                        antidote_tries += 1
-                        guess_result = []
-                        antidote_guess_list = []
+                    antidote_tries += 1
+                    guess_result = []
+                    antidote_guess_list = []
 
-                        antidote_embed.clear_fields()
-                        antidote_embed.add_field(name=f"{10 - antidote_tries} "
-                                                      f"guesses remaining",
-                                                 value="\n".join(board))
-                        # Redisplay the board
-                        await board_id.edit(embed=antidote_embed)
+                    antidote_embed.clear_fields()
+                    antidote_embed.add_field(name=f"{10 - antidote_tries} "
+                                                  f"guesses remaining",
+                                             value="\n".join(board))
+                    # Redisplay the board
+                    await board_id.edit(embed=antidote_embed)
 
         # Winning / Ending Screen
         if win is True:
@@ -746,10 +745,10 @@ class Snakes(Cog):
         await message.delete()
 
         # Build and send the embed.
-        my_snake_embed = Embed(description=":tada: Congrats! You hatched: **{0}**".format(snake_name))
+        my_snake_embed = Embed(description=f":tada: Congrats! You hatched: **{snake_name}**")
         my_snake_embed.set_thumbnail(url=snake_image)
         my_snake_embed.set_footer(
-            text=" Owner: {0}#{1}".format(ctx.author.name, ctx.author.discriminator)
+            text=f" Owner: {ctx.author.name}#{ctx.author.discriminator}"
         )
 
         await ctx.send(embed=my_snake_embed)
@@ -832,7 +831,7 @@ class Snakes(Cog):
         # Prepare a question.
         question = random.choice(self.snake_quizzes)
         answer = question["answerkey"]
-        options = {key: question["options"][key] for key in ANSWERS_EMOJI.keys()}
+        options = {key: question["options"][key] for key in ANSWERS_EMOJI}
 
         # Build and send the embed.
         embed = Embed(
@@ -879,10 +878,7 @@ class Snakes(Cog):
             snake_name = snake_name.split()[-1]
 
         # If no name is provided, use whoever called the command.
-        if name:
-            user_name = name
-        else:
-            user_name = ctx.author.display_name
+        user_name = name if name else ctx.author.display_name
 
         # Get the index of the vowel to slice the username at
         user_slice_index = len(user_name)
@@ -1148,3 +1144,4 @@ class Snakes(Cog):
             embed.description = "Could not generate the snake card! Please try again."
             embed.title = random.choice(ERROR_REPLIES)
             await ctx.send(embed=embed)
+    # endregion

@@ -2,14 +2,13 @@ import logging
 import math
 import random
 from collections.abc import Iterable
-from typing import Union
 
 from discord import Embed, Message
 from discord.ext import commands
 from sentry_sdk import push_scope
 
 from bot.bot import Bot
-from bot.constants import Channels, Colours, ERROR_REPLIES, NEGATIVE_REPLIES, RedirectOutput
+from bot.constants import Channels, Colours, ERROR_REPLIES, NEGATIVE_REPLIES
 from bot.utils.commands import get_command_suggestions
 from bot.utils.decorators import InChannelCheckFailure, InMonthCheckFailure
 from bot.utils.exceptions import APIError, MovedCommandError, UserNotPlayingError
@@ -17,6 +16,7 @@ from bot.utils.exceptions import APIError, MovedCommandError, UserNotPlayingErro
 log = logging.getLogger(__name__)
 
 
+DELETE_DELAY = 10
 QUESTION_MARK_ICON = "https://cdn.discordapp.com/emojis/512367613339369475.png"
 
 
@@ -35,7 +35,7 @@ class CommandErrorHandler(commands.Cog):
             logging.debug("Cooldown counter reverted as the command was not used correctly.")
 
     @staticmethod
-    def error_embed(message: str, title: Union[Iterable, str] = ERROR_REPLIES) -> Embed:
+    def error_embed(message: str, title: Iterable | str = ERROR_REPLIES) -> Embed:
         """Build a basic embed with red colour and either a random error title or a title provided."""
         embed = Embed(colour=Colours.soft_red)
         if isinstance(title, str):
@@ -71,7 +71,7 @@ class CommandErrorHandler(commands.Cog):
                 await self.send_command_suggestion(ctx, ctx.invoked_with)
             return
 
-        if isinstance(error, (InChannelCheckFailure, InMonthCheckFailure)):
+        if isinstance(error, InChannelCheckFailure | InMonthCheckFailure):
             await ctx.send(embed=self.error_embed(str(error), NEGATIVE_REPLIES), delete_after=7.5)
             return
 
@@ -185,7 +185,7 @@ class CommandErrorHandler(commands.Cog):
             e.description = "\n".join(
                 misspelled_content.replace(command_name, cmd, 1) for cmd in command_suggestions
             )
-            await ctx.send(embed=e, delete_after=RedirectOutput.delete_delay)
+            await ctx.send(embed=e, delete_after=DELETE_DELAY)
 
 
 async def setup(bot: Bot) -> None:

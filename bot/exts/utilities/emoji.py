@@ -2,8 +2,7 @@ import logging
 import random
 import textwrap
 from collections import defaultdict
-from datetime import datetime
-from typing import Optional
+from datetime import UTC, datetime
 
 from discord import Color, Embed, Emoji
 from discord.ext import commands
@@ -28,7 +27,7 @@ class Emojis(commands.Cog):
         embed = Embed(
             color=Colours.orange,
             title="Emoji Count",
-            timestamp=datetime.utcnow()
+            timestamp=datetime.now(tz=UTC)
         )
         msg = []
 
@@ -71,7 +70,7 @@ class Emojis(commands.Cog):
         return embed, msg
 
     @commands.group(name="emoji", invoke_without_command=True)
-    async def emoji_group(self, ctx: commands.Context, emoji: Optional[Emoji]) -> None:
+    async def emoji_group(self, ctx: commands.Context, emoji: Emoji | None) -> None:
         """A group of commands related to emojis."""
         if emoji is not None:
             await ctx.invoke(self.info_command, emoji)

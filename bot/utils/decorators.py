@@ -3,9 +3,8 @@ import functools
 import logging
 import random
 from asyncio import Lock
-from collections.abc import Container
+from collections.abc import Callable, Container
 from functools import wraps
-from typing import Callable, Optional, Union
 from weakref import WeakValueDictionary
 
 from discord import Colour, Embed
@@ -24,16 +23,12 @@ log = logging.getLogger(__name__)
 class InChannelCheckFailure(CheckFailure):
     """Check failure when the user runs a command in a non-whitelisted channel."""
 
-    pass
-
 
 class InMonthCheckFailure(CheckFailure):
     """Check failure for when a command is invoked outside of its allowed month."""
 
-    pass
 
-
-def seasonal_task(*allowed_months: Month, sleep_time: Union[float, int] = ONE_DAY) -> Callable:
+def seasonal_task(*allowed_months: Month, sleep_time: float | int = ONE_DAY) -> Callable:
     """
     Perform the decorated method periodically in `allowed_months`.
 
@@ -79,8 +74,8 @@ def in_month_listener(*allowed_months: Month) -> Callable:
             if current_month in allowed_months:
                 # Propagate return value although it should always be None
                 return await listener(*args, **kwargs)
-            else:
-                log.debug(f"Guarded {listener.__qualname__} from invoking in {current_month!s}")
+            log.debug(f"Guarded {listener.__qualname__} from invoking in {current_month!s}")
+            return None
         return guarded_listener
     return decorator
 
@@ -101,8 +96,7 @@ def in_month_command(*allowed_months: Month) -> Callable:
         )
         if can_run:
             return True
-        else:
-            raise InMonthCheckFailure(f"Command can only be used in {human_months(allowed_months)}")
+        raise InMonthCheckFailure(f"Command can only be used in {human_months(allowed_months)}")
 
     return commands.check(predicate)
 
@@ -201,13 +195,13 @@ def whitelist_check(**default_kwargs: Container[int]) -> Callable[[Context], boo
 
         # Determine which command's overrides we will use. Group commands will
         # inherit from their parents if they don't define their own overrides
-        overridden_command: Optional[commands.Command] = None
+        overridden_command: commands.Command | None = None
         for command in [ctx.command, *ctx.command.parents]:
             if hasattr(command.callback, "override"):
                 overridden_command = command
                 break
         if overridden_command is not None:
-            log.debug(f'Command {overridden_command} has overrides')
+            log.debug(f"Command {overridden_command} has overrides")
             if overridden_command is not ctx.command:
                 log.debug(
                     f"Command '{ctx.command.qualified_name}' inherited overrides "
@@ -319,7 +313,7 @@ def whitelist_override(bypass_defaults: bool = False, allow_dm: bool = False, **
     return inner
 
 
-def locked() -> Optional[Callable]:
+def locked() -> Callable | None:
     """
     Allows the user to only run one instance of the decorated command at a time.
 
@@ -327,11 +321,11 @@ def locked() -> Optional[Callable]:
 
     This decorator has to go before (below) the `command` decorator.
     """
-    def wrap(func: Callable) -> Optional[Callable]:
+    def wrap(func: Callable) -> Callable | None:
         func.__locks = WeakValueDictionary()
 
         @wraps(func)
-        async def inner(self: Callable, ctx: Context, *args, **kwargs) -> Optional[Callable]:
+        async def inner(self: Callable, ctx: Context, *args, **kwargs) -> Callable | None:
             lock = func.__locks.setdefault(ctx.author.id, Lock())
             if lock.locked():
                 embed = Embed()
@@ -344,7 +338,7 @@ def locked() -> Optional[Callable]:
                 )
                 embed.title = random.choice(ERROR_REPLIES)
                 await ctx.send(embed=embed)
-                return
+                return None
 
             async with func.__locks.setdefault(ctx.author.id, Lock()):
                 return await func(self, ctx, *args, **kwargs)

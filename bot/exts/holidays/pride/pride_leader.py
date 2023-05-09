@@ -2,7 +2,6 @@ import json
 import logging
 import random
 from pathlib import Path
-from typing import Optional
 
 import discord
 from discord.ext import commands
@@ -90,7 +89,7 @@ class PrideLeader(commands.Cog):
         return embed
 
     @commands.command(aliases=("pl", "prideleader"))
-    async def pride_leader(self, ctx: commands.Context, *, pride_leader_name: Optional[str]) -> None:
+    async def pride_leader(self, ctx: commands.Context, *, pride_leader_name: str | None) -> None:
         """
         Information about a Pride Leader.
 

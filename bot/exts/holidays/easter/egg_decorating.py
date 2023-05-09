@@ -4,7 +4,6 @@ import random
 from contextlib import suppress
 from io import BytesIO
 from pathlib import Path
-from typing import Optional, Union
 
 import discord
 from PIL import Image
@@ -33,7 +32,7 @@ class EggDecorating(commands.Cog):
     """Decorate some easter eggs!"""
 
     @staticmethod
-    def replace_invalid(colour: str) -> Optional[int]:
+    def replace_invalid(colour: str) -> int | None:
         """Attempts to match with HTML or XKCD colour names, returning the int value."""
         with suppress(KeyError):
             return int(HTML_COLOURS[colour], 16)
@@ -43,8 +42,8 @@ class EggDecorating(commands.Cog):
 
     @commands.command(aliases=("decorateegg",))
     async def eggdecorate(
-        self, ctx: commands.Context, *colours: Union[discord.Colour, str]
-    ) -> Optional[Image.Image]:
+        self, ctx: commands.Context, *colours: discord.Colour | str
+    ) -> Image.Image | None:
         """
         Picks a random egg design and decorates it using the given colours.
 
@@ -53,7 +52,7 @@ class EggDecorating(commands.Cog):
         """
         if len(colours) < 2:
             await ctx.send("You must include at least 2 colours!")
-            return
+            return None
 
         invalid = []
         colours = list(colours)
@@ -68,10 +67,10 @@ class EggDecorating(commands.Cog):
 
         if len(invalid) > 1:
             await ctx.send(f"Sorry, I don't know these colours: {' '.join(invalid)}")
-            return
-        elif len(invalid) == 1:
+            return None
+        if len(invalid) == 1:
             await ctx.send(f"Sorry, I don't know the colour {invalid[0]}!")
-            return
+            return None
 
         async with ctx.typing():
             # Expand list to 8 colours

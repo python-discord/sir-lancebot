@@ -6,10 +6,10 @@ import random
 import re
 import string
 from collections import defaultdict
+from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Callable, Optional
 
 import discord
 from discord.ext import commands, tasks
@@ -249,7 +249,7 @@ class TriviaQuiz(commands.Cog):
         wiki_questions = []
         # trivia_quiz.json follows a pattern, every new category starts with the next century.
         start_id = 501
-        yesterday = datetime.strftime(datetime.now() - timedelta(1), '%Y/%m/%d')
+        yesterday = datetime.strftime(datetime.now(tz=UTC) - timedelta(1), "%Y/%m/%d")
 
         while error_fetches < MAX_ERROR_FETCH_TRIES:
             async with self.bot.http_session.get(url=WIKI_FEED_API_URL.format(date=yesterday)) as r:
@@ -267,7 +267,7 @@ class TriviaQuiz(commands.Cog):
                     # Normalize the wikipedia article title to remove all punctuations from it
                     for word in re.split(r"[\s-]", title := article["normalizedtitle"]):
                         cleaned_title = re.sub(
-                            rf'\b{word.strip(string.punctuation)}\b', word, title, flags=re.IGNORECASE
+                            rf"\b{word.strip(string.punctuation)}\b", word, title, flags=re.IGNORECASE
                         )
 
                     # Since the extract contains the article name sometimes this would replace all the matching words
@@ -279,7 +279,7 @@ class TriviaQuiz(commands.Cog):
                     for word in re.split(r"[\s-]", cleaned_title):
                         word = word.strip(string.punctuation)
                         secret_word = r"\*" * len(word)
-                        question = re.sub(rf'\b{word}\b', f"**{secret_word}**", question, flags=re.IGNORECASE)
+                        question = re.sub(rf"\b{word}\b", f"**{secret_word}**", question, flags=re.IGNORECASE)
 
                     formatted_article_question = {
                         "id": start_id,
@@ -307,7 +307,7 @@ class TriviaQuiz(commands.Cog):
         return json.loads(p.read_text(encoding="utf-8"))
 
     @commands.group(name="quiz", aliases=("trivia", "triviaquiz"), invoke_without_command=True)
-    async def quiz_game(self, ctx: commands.Context, category: Optional[str], questions: Optional[int]) -> None:
+    async def quiz_game(self, ctx: commands.Context, category: str | None, questions: int | None) -> None:
         """
         Start a quiz!
 
@@ -550,7 +550,7 @@ class TriviaQuiz(commands.Cog):
             if self.game_status[ctx.channel.id]:
                 # Check if the author is the game starter or a moderator.
                 if ctx.author == self.game_owners[ctx.channel.id] or any(
-                    role.id in MODERATION_ROLES for role in getattr(ctx.author, 'roles', [])
+                    role.id in MODERATION_ROLES for role in getattr(ctx.author, "roles", [])
                 ):
                     self.game_status[ctx.channel.id] = False
                     del self.game_owners[ctx.channel.id]

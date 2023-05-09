@@ -72,9 +72,9 @@ HOLIDAYS_TO_REACT = [
     Valentines, Easter, EarthDay, Pride, Halloween, Hanukkah, Christmas
 ]
 # Type (or order) doesn't matter here - set is for de-duplication
-MONTHS_TO_REACT = set(
+MONTHS_TO_REACT = {
     month for holiday in HOLIDAYS_TO_REACT for month in holiday.months
-)
+}
 
 
 class HolidayReact(Cog):

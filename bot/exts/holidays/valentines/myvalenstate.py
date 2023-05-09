@@ -47,7 +47,7 @@ class MyValenstate(commands.Cog):
         else:
             author = name.lower().replace(" ", "")
 
-        for state in STATES.keys():
+        for state in STATES:
             lower_state = state.lower().replace(" ", "")
             eq_chars[state] = self.levenshtein(author, lower_state)
 
@@ -64,8 +64,7 @@ class MyValenstate(commands.Cog):
             embed_text = f"You have another match, this being {matches[0]}."
         else:
             embed_title = "You have a true match!"
-            embed_text = "This state is your true Valenstate! There are no states that would suit" \
-                         " you better"
+            embed_text = "This state is your true Valenstate! There are no states that would suit you better"
 
         embed = discord.Embed(
             title=f"Your Valenstate is {valenstate} \u2764",

@@ -42,7 +42,7 @@ CARD_HEIGHT = 97
 
 EMOJI_WRONG = "\u274C"
 
-ANSWER_REGEX = re.compile(r'^\D*(\d+)\D+(\d+)\D+(\d+)\D*$')
+ANSWER_REGEX = re.compile(r"^\D*(\d+)\D+(\d+)\D+(\d+)\D*$")
 
 HELP_TEXT = """
 **Each card has 4 features**
@@ -97,7 +97,7 @@ def get_card_image(card: tuple[int]) -> Image:
 
 def as_trinary(card: tuple[int]) -> int:
     """Find the card's unique index by interpreting its features as trinary."""
-    return int(''.join(str(x) for x in card), base=3)
+    return int("".join(str(x) for x in card), base=3)
 
 
 class DuckGame:
@@ -156,7 +156,7 @@ class DuckGame:
                     # which is prevented by the triangle iteration.
                     completion = tuple(
                         feat_a if feat_a == feat_b else 3-feat_a-feat_b
-                        for feat_a, feat_b in zip(card_a, card_b)
+                        for feat_a, feat_b in zip(card_a, card_b, strict=True)
                     )
                     try:
                         idx_c = self.board.index(completion)
@@ -178,8 +178,8 @@ class DuckGamesDirector(commands.Cog):
         self.current_games = {}
 
     @commands.group(
-        name='duckduckduckgoose',
-        aliases=['dddg', 'ddg', 'duckduckgoose', 'duckgoose'],
+        name="duckduckduckgoose",
+        aliases=["dddg", "ddg", "duckduckgoose", "duckgoose"],
         invoke_without_command=True
     )
     @commands.cooldown(rate=1, per=2, type=commands.BucketType.channel)
@@ -218,7 +218,7 @@ class DuckGamesDirector(commands.Cog):
             return
 
         game = self.current_games[channel.id]
-        if msg.content.strip().lower() == 'goose':
+        if msg.content.strip().lower() == "goose":
             # If all of the solutions have been claimed, i.e. the "goose" call is correct.
             if len(game.solutions) == len(game.claimed_answers):
                 try:

@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 
 from discord.ext import commands
 
@@ -9,25 +9,25 @@ log = logging.getLogger(__name__)
 
 
 class TimeLeft(commands.Cog):
-    """A Cog that tells you how long left until Hacktober is over!"""
+    """A Cog that tells users how long left until Hacktober is over!"""
 
     def in_hacktober(self) -> bool:
         """Return True if the current time is within Hacktoberfest."""
         _, end, start = self.load_date()
 
-        now = datetime.utcnow()
+        now = datetime.now(tz=UTC)
 
         return start <= now <= end
 
     @staticmethod
     def load_date() -> tuple[datetime, datetime, datetime]:
-        """Return of a tuple of the current time and the end and start times of the next October."""
-        now = datetime.utcnow()
+        """Return of a tuple of the current time and the end and start times of the next Hacktober."""
+        now = datetime.now(tz=UTC)
         year = now.year
         if now.month > 10:
             year += 1
-        end = datetime(year, 11, 1, 12)  # November 1st 12:00 (UTC-12:00)
-        start = datetime(year, 9, 30, 10)  # September 30th 10:00 (UTC+14:00)
+        end = datetime(year, 11, 1, 12, tzinfo=UTC)  # November 1st 12:00 (UTC-12:00)
+        start = datetime(year, 9, 30, 10, tzinfo=UTC)  # September 30th 10:00 (UTC+14:00)
         return now, end, start
 
     @commands.command()

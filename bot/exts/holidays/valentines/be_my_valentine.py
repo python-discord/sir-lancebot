@@ -126,15 +126,14 @@ class BeMyValentine(commands.Cog):
         if valentine_type is None:
             return self.random_valentine()
 
-        elif valentine_type.lower() in ["p", "poem"]:
+        if valentine_type.lower() in ["p", "poem"]:
             return self.valentine_poem(), "A poem dedicated to"
 
-        elif valentine_type.lower() in ["c", "compliment"]:
+        if valentine_type.lower() in ["c", "compliment"]:
             return self.valentine_compliment(), "A compliment for"
 
-        else:
-            # in this case, the user decides to type his own valentine.
-            return valentine_type, "A message for"
+        # in this case, the user decides to type his own valentine.
+        return valentine_type, "A message for"
 
     @staticmethod
     def random_emoji() -> tuple[str, str]:
@@ -148,10 +147,7 @@ class BeMyValentine(commands.Cog):
         valentine_poem = random.choice(self.valentines["valentine_poems"])
         valentine_compliment = random.choice(self.valentines["valentine_compliments"])
         random_valentine = random.choice([valentine_compliment, valentine_poem])
-        if random_valentine == valentine_poem:
-            title = "A poem dedicated to"
-        else:
-            title = "A compliment for "
+        title = "A poem dedicated to" if random_valentine == valentine_poem else "A compliment for "
         return random_valentine, title
 
     def valentine_poem(self) -> str:

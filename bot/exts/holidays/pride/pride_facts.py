@@ -1,9 +1,8 @@
 import json
 import logging
 import random
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Union
 
 import dateutil.parser
 import discord
@@ -29,11 +28,11 @@ class PrideFacts(commands.Cog):
     async def send_pride_fact_daily(self) -> None:
         """Background task to post the daily pride fact every day."""
         channel = self.bot.get_channel(Channels.sir_lancebot_playground)
-        await self.send_select_fact(channel, datetime.utcnow())
+        await self.send_select_fact(channel, datetime.now(tz=UTC))
 
     async def send_random_fact(self, ctx: commands.Context) -> None:
         """Provides a fact from any previous day, or today."""
-        now = datetime.utcnow()
+        now = datetime.now(tz=UTC)
         previous_years_facts = (y for x, y in FACTS.items() if int(x) < now.year)
         current_year_facts = FACTS.get(str(now.year), [])[:now.day]
         previous_facts = current_year_facts + [x for y in previous_years_facts for x in y]
@@ -42,9 +41,9 @@ class PrideFacts(commands.Cog):
         except IndexError:
             await ctx.send("No facts available")
 
-    async def send_select_fact(self, target: discord.abc.Messageable, _date: Union[str, datetime]) -> None:
+    async def send_select_fact(self, target: discord.abc.Messageable, _date: str | datetime) -> None:
         """Provides the fact for the specified day, if the day is today, or is in the past."""
-        now = datetime.utcnow()
+        now = datetime.now(tz=UTC)
         if isinstance(_date, str):
             try:
                 date = dateutil.parser.parse(_date, dayfirst=False, yearfirst=False, fuzzy=True)
@@ -76,7 +75,7 @@ class PrideFacts(commands.Cog):
         will be provided.
         """
         if not option:
-            await self.send_select_fact(ctx, datetime.utcnow())
+            await self.send_select_fact(ctx, datetime.now(tz=UTC))
         elif option.lower().startswith("rand"):
             await self.send_random_fact(ctx)
         else:

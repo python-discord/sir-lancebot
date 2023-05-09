@@ -1,7 +1,6 @@
 import logging
 from asyncio import to_thread
 from random import choice
-from typing import Union
 
 from bs4 import BeautifulSoup
 from discord import Embed, Interaction, SelectOption, ui
@@ -58,7 +57,7 @@ class InformationDropdown(ui.Select):
             SelectOption(
                 label="Other Information",
                 description="See how other people performed on this kata and more!",
-                emoji="ℹ"
+                emoji="🇮"
             )
         ]
 
@@ -101,7 +100,7 @@ class Challenges(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    async def kata_id(self, search_link: str, params: dict) -> Union[str, Embed]:
+    async def kata_id(self, search_link: str, params: dict) -> str | Embed:
         """
         Uses bs4 to get the HTML code for the page of katas, where the page is the link of the formatted `search_link`.
 
@@ -123,14 +122,13 @@ class Challenges(commands.Cog):
 
             if not first_kata_div:
                 raise commands.BadArgument("No katas could be found with the filters provided.")
-            else:
-                first_kata_div = choice(first_kata_div)
 
             # There are numerous divs before arriving at the id of the kata, which can be used for the link.
+            first_kata_div = choice(first_kata_div)
             first_kata_id = first_kata_div.a["href"].split("/")[-1]
             return first_kata_id
 
-    async def kata_information(self, kata_id: str) -> Union[dict, Embed]:
+    async def kata_information(self, kata_id: str) -> dict | Embed:
         """
         Returns the information about the Kata.
 
