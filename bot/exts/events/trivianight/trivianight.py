@@ -90,7 +90,7 @@ class TriviaNightCog(commands.Cog):
         try:
             serialized_json = loads(json_text)
         except JSONDecodeError as error:
-            raise commands.BadArgument(f"Looks like something went wrong:\n{str(error)}")
+            raise commands.BadArgument(f"Looks like something went wrong:\n{error!s}")
 
         self.game = TriviaNightGame(serialized_json)
         self.question_closed = asyncio.Event()

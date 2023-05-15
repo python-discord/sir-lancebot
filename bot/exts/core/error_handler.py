@@ -59,7 +59,7 @@ class CommandErrorHandler(commands.Cog):
 
         error = getattr(error, "original", error)
         logging.debug(
-            f"Error Encountered: {type(error).__name__} - {str(error)}, "
+            f"Error Encountered: {type(error).__name__} - {error!s}, "
             f"Command: {ctx.command}, "
             f"Author: {ctx.author}, "
             f"Channel: {ctx.channel}"
@@ -156,7 +156,7 @@ class CommandErrorHandler(commands.Cog):
             if ctx.guild is not None:
                 scope.set_extra("jump_to", ctx.message.jump_url)
 
-            log.exception(f"Unhandled command error: {str(error)}", exc_info=error)
+            log.exception(f"Unhandled command error: {error!s}", exc_info=error)
 
     async def send_command_suggestion(self, ctx: commands.Context, command_name: str) -> None:
         """Sends user similar commands if any can be found."""
