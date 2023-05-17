@@ -123,7 +123,6 @@ class Latex(commands.Cog):
             embed.description = "Couldn't upload logs."
             if logs_paste_url:
                 embed.description = f"[View Logs]({logs_paste_url})"
-        log.info(embed.title)
         return embed
 
     @commands.command()
