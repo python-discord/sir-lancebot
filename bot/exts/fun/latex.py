@@ -9,7 +9,7 @@ from typing import BinaryIO
 
 import discord
 from PIL import Image
-from aiohttp import web
+from aiohttp import client_exceptions, web
 from discord.ext import commands
 
 from bot.bot import Bot
@@ -72,6 +72,13 @@ class InvalidLatexError(Exception):
         self.logs = logs
 
 
+class LatexServerError(Exception):
+    """Represents an error raised from Latex rendering server."""
+
+    def __init__(self, logs: str | None):
+        super().__init__(logs)
+        self.logs = logs
+
 class Latex(commands.Cog):
     """Renders latex."""
 
@@ -81,8 +88,11 @@ class Latex(commands.Cog):
     async def _generate_image(self, query: str, out_file: BinaryIO) -> None:
         """Make an API request and save the generated image to cache."""
         payload = {"code": query, "format": "png"}
-        async with self.bot.http_session.post(LATEX_API_URL, data=payload, raise_for_status=True) as response:
-            response_json = await response.json()
+        try:
+            async with self.bot.http_session.post(LATEX_API_URL, data=payload, raise_for_status=True) as response:
+                response_json = await response.json()
+        except client_exceptions.ClientResponseError:
+            raise LatexServerError(None)
         if response_json["status"] != "success":
             raise InvalidLatexError(logs=response_json.get("log"))
         async with self.bot.http_session.get(
@@ -105,6 +115,17 @@ class Latex(commands.Cog):
         except web.HTTPClientError as e:
             log.info("Error when uploading latex output to pastebin. %s", e)
 
+    async def _prepare_error_embed(self, title: str, err: Exception | None) -> discord.Embed:
+        embed = discord.Embed(title=title)
+        embed.description = "No logs available."
+        if err is not None and err.logs is not None:
+            logs_paste_url = await self._upload_to_pastebin(err.logs)
+            embed.description = "Couldn't upload logs."
+            if logs_paste_url:
+                embed.description = f"[View Logs]({logs_paste_url})"
+        log.info(embed.title)
+        return embed
+
     @commands.command()
     @commands.max_concurrency(1, commands.BucketType.guild, wait=True)
     @whitelist_override(channels=LATEX_ALLOWED_CHANNNELS)
@@ -121,15 +142,12 @@ class Latex(commands.Cog):
                     with open(image_path, "wb") as out_file:
                         await self._generate_image(TEMPLATE.substitute(text=query), out_file)
                 except InvalidLatexError as err:
-                    embed = discord.Embed(title="Failed to render input.")
-                    if err.logs is None:
-                        embed.description = "No logs available."
-                    else:
-                        logs_paste_url = await self._upload_to_pastebin(err.logs)
-                        if logs_paste_url:
-                            embed.description = f"[View Logs]({logs_paste_url})"
-                        else:
-                            embed.description = "Couldn't upload logs."
+                    embed = await self._prepare_error_embed("Failed to render input.", err)
+                    await ctx.send(embed=embed)
+                    image_path.unlink()
+                    return
+                except LatexServerError as err:
+                    embed = await self._prepare_error_embed("Server encountered an issue, please retry later.", err)
                     await ctx.send(embed=embed)
                     image_path.unlink()
                     return
