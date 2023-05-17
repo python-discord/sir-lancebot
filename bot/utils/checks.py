@@ -1,7 +1,6 @@
 import datetime
 import logging
-from collections.abc import Container, Iterable
-from typing import Callable, Optional
+from collections.abc import Callable, Container, Iterable
 
 from discord.ext.commands import (
     BucketType, CheckFailure, Cog, Command, CommandOnCooldown, Context, Cooldown, CooldownMapping
@@ -10,12 +9,13 @@ from discord.ext.commands import (
 from bot import constants
 
 log = logging.getLogger(__name__)
+CODEJAM_CATEGORY_NAME = "Code Jam"
 
 
 class InWhitelistCheckFailure(CheckFailure):
     """Raised when the `in_whitelist` check fails."""
 
-    def __init__(self, redirect_channel: Optional[int]):
+    def __init__(self, redirect_channel: int | None):
         self.redirect_channel = redirect_channel
 
         if redirect_channel:
@@ -33,7 +33,7 @@ def in_whitelist_check(
     channels: Container[int] = (),
     categories: Container[int] = (),
     roles: Container[int] = (),
-    redirect: Optional[int] = constants.Channels.sir_lancebot_playground,
+    redirect: int | None = constants.Channels.sir_lancebot_playground,
     fail_silently: bool = False,
 ) -> bool:
     """
@@ -74,7 +74,7 @@ def in_whitelist_check(
         return True
 
     category = getattr(ctx_channel, "category", None)
-    if category and category.name == constants.codejam_categories_name:
+    if category and category.name == CODEJAM_CATEGORY_NAME:
         log.trace(f"{ctx.author} may use the `{ctx.command.name}` command as they are in a codejam team channel.")
         return True
 
@@ -153,7 +153,7 @@ def cooldown_with_role_bypass(rate: int, per: float, type: BucketType = BucketTy
             return
 
         # Cooldown logic, taken from discord.py internals.
-        current = ctx.message.created_at.replace(tzinfo=datetime.timezone.utc).timestamp()
+        current = ctx.message.created_at.replace(tzinfo=datetime.UTC).timestamp()
         bucket = buckets.get_bucket(ctx.message)
         retry_after = bucket.update_rate_limit(current)
         if retry_after:

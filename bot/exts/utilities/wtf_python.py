@@ -1,7 +1,6 @@
 import logging
 import random
 import re
-from typing import Optional
 
 import rapidfuzz
 from discord import Embed, File
@@ -67,7 +66,7 @@ class WTFPython(commands.Cog):
                 hyper_link = match[0].split("(")[1].replace(")", "")
                 self.headers[match[0]] = f"{BASE_URL}/{hyper_link}"
 
-    def fuzzy_match_header(self, query: str) -> Optional[str]:
+    def fuzzy_match_header(self, query: str) -> str | None:
         """
         Returns the fuzzy match of a query if its ratio is above "MINIMUM_CERTAINTY" else returns None.
 
@@ -79,7 +78,7 @@ class WTFPython(commands.Cog):
         return match if certainty > MINIMUM_CERTAINTY else None
 
     @commands.command(aliases=("wtf",))
-    async def wtf_python(self, ctx: commands.Context, *, query: Optional[str] = None) -> None:
+    async def wtf_python(self, ctx: commands.Context, *, query: str | None = None) -> None:
         """
         Search WTF Python repository.
 

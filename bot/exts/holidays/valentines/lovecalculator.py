@@ -3,8 +3,8 @@ import hashlib
 import json
 import logging
 import random
+from collections.abc import Coroutine
 from pathlib import Path
-from typing import Coroutine, Optional
 
 import discord
 from discord import Member
@@ -12,7 +12,7 @@ from discord.ext import commands
 from discord.ext.commands import BadArgument, Cog, clean_content
 
 from bot.bot import Bot
-from bot.constants import Channels, Lovefest, Month, PYTHON_PREFIX
+from bot.constants import Channels, Month, PYTHON_PREFIX, Roles
 from bot.utils.decorators import in_month
 
 log = logging.getLogger(__name__)
@@ -27,7 +27,7 @@ class LoveCalculator(Cog):
     @in_month(Month.FEBRUARY)
     @commands.command(aliases=("love_calculator", "love_calc"))
     @commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
-    async def love(self, ctx: commands.Context, who: Member, whom: Optional[Member] = None) -> None:
+    async def love(self, ctx: commands.Context, who: Member, whom: Member | None = None) -> None:
         """
         Tells you how much the two love each other.
 
@@ -45,8 +45,8 @@ class LoveCalculator(Cog):
           Running .love @chrisjl#2655 @joe#6000 will yield the same result as before.
         """
         if (
-            Lovefest.role_id not in [role.id for role in who.roles]
-            or (whom is not None and Lovefest.role_id not in [role.id for role in whom.roles])
+            Roles.lovefest not in [role.id for role in who.roles]
+            or (whom is not None and Roles.lovefest not in [role.id for role in whom.roles])
         ):
             raise BadArgument(
                 "This command can only be ran against members with the lovefest role! "

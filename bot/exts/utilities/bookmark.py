@@ -1,6 +1,5 @@
 import logging
 import random
-from typing import Optional
 
 import discord
 from discord.ext import commands
@@ -234,15 +233,15 @@ class Bookmark(commands.Cog):
         This command allows deleting any message sent by Sir-Lancebot in the user's DM channel with the bot.
         The command invocation must be a reply to the message that is to be deleted.
         """
-        target_message: Optional[discord.Message] = getattr(ctx.message.reference, "resolved", None)
+        target_message: discord.Message | None = getattr(ctx.message.reference, "resolved", None)
         if target_message is None:
             raise commands.UserInputError("You must reply to the message from Sir-Lancebot you wish to delete.")
 
         if not isinstance(ctx.channel, discord.DMChannel):
             raise commands.UserInputError("You can only run this command your own DMs!")
-        elif target_message.channel != ctx.channel:
+        if target_message.channel != ctx.channel:
             raise commands.UserInputError("You can only delete messages in your own DMs!")
-        elif target_message.author != self.bot.user:
+        if target_message.author != self.bot.user:
             raise commands.UserInputError("You can only delete messages sent by Sir Lancebot!")
 
         await target_message.delete()

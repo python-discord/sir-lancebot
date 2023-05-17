@@ -6,7 +6,6 @@ import math
 import random
 from itertools import product
 from pathlib import Path
-from typing import Union
 
 from PIL import Image
 from PIL.ImageDraw import ImageDraw
@@ -132,7 +131,7 @@ def lerp(t: float, a: float, b: float) -> float:
     return a + t * (b - a)
 
 
-class PerlinNoiseFactory(object):
+class PerlinNoiseFactory:
     """
     Callable that produces Perlin noise for an arbitrary point in an arbitrary number of dimensions.
 
@@ -396,7 +395,7 @@ class SnakeAndLaddersGame:
 
         Listen for reactions until players have joined, and the game has been started.
         """
-        def startup_event_check(reaction_: Reaction, user_: Union[User, Member]) -> bool:
+        def startup_event_check(reaction_: Reaction, user_: User | Member) -> bool:
             """Make sure that this reaction is what we want to operate on."""
             return (
                 all((
@@ -445,14 +444,12 @@ class SnakeAndLaddersGame:
                         # Allow game author or non-playing moderation staff to cancel a waiting game
                         await self.cancel_game()
                         return
-                    else:
-                        await self.player_leave(user)
-                elif reaction.emoji == START_EMOJI:
-                    if self.ctx.author == user:
-                        self.started = True
-                        await self.start_game(user)
-                        await startup.delete()
-                        break
+                    await self.player_leave(user)
+                elif reaction.emoji == START_EMOJI and self.ctx.author == user:
+                    self.started = True
+                    await self.start_game(user)
+                    await startup.delete()
+                    break
 
                 await startup.remove_reaction(reaction.emoji, user)
 
@@ -461,7 +458,7 @@ class SnakeAndLaddersGame:
                 await self.cancel_game()
                 return  # We're done, no reactions for the last 5 minutes
 
-    async def _add_player(self, user: Union[User, Member]) -> None:
+    async def _add_player(self, user: User | Member) -> None:
         """Add player to game."""
         self.players.append(user)
         self.player_tiles[user.id] = 1
@@ -470,7 +467,7 @@ class SnakeAndLaddersGame:
         im = Image.open(io.BytesIO(avatar_bytes)).resize((BOARD_PLAYER_SIZE, BOARD_PLAYER_SIZE))
         self.avatar_images[user.id] = im
 
-    async def player_join(self, user: Union[User, Member]) -> None:
+    async def player_join(self, user: User | Member) -> None:
         """
         Handle players joining the game.
 
@@ -492,11 +489,11 @@ class SnakeAndLaddersGame:
 
         await self.channel.send(
             f"**Snakes and Ladders**: {user.mention} has joined the game.\n"
-            f"There are now {str(len(self.players))} players in the game.",
+            f"There are now {len(self.players)!s} players in the game.",
             delete_after=10
         )
 
-    async def player_leave(self, user: Union[User, Member]) -> bool:
+    async def player_leave(self, user: User | Member) -> bool:
         """
         Handle players leaving the game.
 
@@ -531,17 +528,17 @@ class SnakeAndLaddersGame:
         await self.channel.send("**Snakes and Ladders**: Game has been canceled.")
         self._destruct()
 
-    async def start_game(self, user: Union[User, Member]) -> None:
+    async def start_game(self, user: User | Member) -> None:
         """
         Allow the game author to begin the game.
 
         The game cannot be started if the game is in a waiting state.
         """
-        if not user == self.author:
+        if user != self.author:
             await self.channel.send(user.mention + " Only the author of the game can start it.", delete_after=10)
             return
 
-        if not self.state == "waiting":
+        if self.state != "waiting":
             await self.channel.send(user.mention + " The game cannot be started at this time.", delete_after=10)
             return
 
@@ -552,7 +549,7 @@ class SnakeAndLaddersGame:
 
     async def start_round(self) -> None:
         """Begin the round."""
-        def game_event_check(reaction_: Reaction, user_: Union[User, Member]) -> bool:
+        def game_event_check(reaction_: Reaction, user_: User | Member) -> bool:
             """Make sure that this reaction is what we want to operate on."""
             return (
                 all((
@@ -626,8 +623,7 @@ class SnakeAndLaddersGame:
                         # Only allow non-playing moderation staff to cancel a running game
                         await self.cancel_game()
                         return
-                    else:
-                        is_surrendered = await self.player_leave(user)
+                    is_surrendered = await self.player_leave(user)
 
                 await self.positions.remove_reaction(reaction.emoji, user)
 
@@ -645,7 +641,7 @@ class SnakeAndLaddersGame:
         if not is_surrendered:
             await self._complete_round()
 
-    async def player_roll(self, user: Union[User, Member]) -> None:
+    async def player_roll(self, user: User | Member) -> None:
         """Handle the player's roll."""
         if user.id not in self.player_tiles:
             await self.channel.send(user.mention + " You are not in the match.", delete_after=10)
@@ -692,7 +688,7 @@ class SnakeAndLaddersGame:
         await self.channel.send("**Snakes and Ladders**: " + winner.mention + " has won the game! :tada:")
         self._destruct()
 
-    def _check_winner(self) -> Union[User, Member]:
+    def _check_winner(self) -> User | Member:
         """Return a winning member if we're in the post-round state and there's a winner."""
         if self.state != "post_round":
             return None
@@ -717,6 +713,6 @@ class SnakeAndLaddersGame:
         return x_level, y_level
 
     @staticmethod
-    def _is_moderator(user: Union[User, Member]) -> bool:
+    def _is_moderator(user: User | Member) -> bool:
         """Return True if the user is a Moderator."""
-        return any(role.id in MODERATION_ROLES for role in getattr(user, 'roles', []))
+        return any(role.id in MODERATION_ROLES for role in getattr(user, "roles", []))

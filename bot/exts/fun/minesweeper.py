@@ -2,7 +2,6 @@ import logging
 from collections.abc import Iterator
 from dataclasses import dataclass
 from random import randint, random
-from typing import Union
 
 import discord
 from discord.ext import commands
@@ -33,7 +32,7 @@ MESSAGE_MAPPING = {
 log = logging.getLogger(__name__)
 
 
-GameBoard = list[list[Union[str, int]]]
+GameBoard = list[list[str | int]]
 
 
 @dataclass
@@ -205,9 +204,9 @@ class Minesweeper(commands.Cog):
             for y in range(10)
         ):
             return False
-        else:
-            await self.won(ctx)
-            return True
+
+        await self.won(ctx)
+        return True
 
     async def reveal_one(
         self,
@@ -227,7 +226,7 @@ class Minesweeper(commands.Cog):
             await self.lost(ctx)
             revealed[y][x] = "x"  # mark bomb that made you lose with a x
             return True
-        elif board[y][x] == 0:
+        if board[y][x] == 0:
             self.reveal_zeros(revealed, board, x, y)
         return await self.check_if_won(ctx, revealed, board)
 

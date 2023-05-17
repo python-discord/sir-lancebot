@@ -2,8 +2,7 @@ import logging
 import random
 import re
 from collections import Counter
-from datetime import datetime, timedelta
-from typing import Optional, Union
+from datetime import UTC, datetime, timedelta
 from urllib.parse import quote_plus
 
 import discord
@@ -16,7 +15,7 @@ from bot.utils.decorators import in_month
 
 log = logging.getLogger(__name__)
 
-CURRENT_YEAR = datetime.now().year  # Used to construct GH API query
+CURRENT_YEAR = datetime.now(tz=UTC).year  # Used to construct GH API query
 PRS_FOR_SHIRT = 4  # Minimum number of PRs before a shirt is awarded
 REVIEW_DAYS = 14  # number of days needed after PR can be mature
 
@@ -24,8 +23,8 @@ REQUEST_HEADERS = {"User-Agent": "Python Discord Hacktoberbot"}
 # using repo topics API during preview period requires an accept header
 GITHUB_TOPICS_ACCEPT_HEADER = {"Accept": "application/vnd.github.mercy-preview+json"}
 if GITHUB_TOKEN := Tokens.github:
-    REQUEST_HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
-    GITHUB_TOPICS_ACCEPT_HEADER["Authorization"] = f"token {GITHUB_TOKEN}"
+    REQUEST_HEADERS["Authorization"] = f"token {GITHUB_TOKEN.get_secret_value()}"
+    GITHUB_TOPICS_ACCEPT_HEADER["Authorization"] = f"token {GITHUB_TOKEN.get_secret_value()}"
 
 GITHUB_NONEXISTENT_USER_MESSAGE = (
     "The listed users cannot be searched either because the users do not exist "
@@ -185,7 +184,7 @@ class HacktoberStats(commands.Cog):
         logging.info(f"Hacktoberfest PR built for GitHub user '{github_username}'")
         return stats_embed
 
-    async def get_october_prs(self, github_username: str) -> Optional[list[dict]]:
+    async def get_october_prs(self, github_username: str) -> list[dict] | None:
         """
         Query GitHub's API for PRs created during the month of October by github_username.
 
@@ -234,9 +233,8 @@ class HacktoberStats(commands.Cog):
             # Ignore logging non-existent users or users we do not have permission to see
             if api_message == GITHUB_NONEXISTENT_USER_MESSAGE:
                 log.debug(f"No GitHub user found named '{github_username}'")
-                return
-            else:
-                log.error(f"GitHub API request for '{github_username}' failed with message: {api_message}")
+                return None
+            log.error(f"GitHub API request for '{github_username}' failed with message: {api_message}")
             return []  # No October PRs were found due to error
 
         if jsonresp["total_count"] == 0:
@@ -246,7 +244,7 @@ class HacktoberStats(commands.Cog):
 
         logging.info(f"Found {len(jsonresp['items'])} Hacktoberfest PRs for GitHub user: '{github_username}'")
         outlist = []  # list of pr information dicts that will get returned
-        oct3 = datetime(int(CURRENT_YEAR), 10, 3, 23, 59, 59, tzinfo=None)
+        oct3 = datetime(int(CURRENT_YEAR), 10, 3, 23, 59, 59, tzinfo=UTC)
         hackto_topics = {}  # cache whether each repo has the appropriate topic (bool values)
         for item in jsonresp["items"]:
             shortname = self._get_shortname(item["repository_url"])
@@ -255,15 +253,14 @@ class HacktoberStats(commands.Cog):
                 "repo_shortname": shortname,
                 "created_at": datetime.strptime(
                     item["created_at"], "%Y-%m-%dT%H:%M:%SZ"
-                ),
+                ).replace(tzinfo=UTC),
                 "number": item["number"]
             }
 
             # If the PR has 'invalid' or 'spam' labels, the PR must be
             # either merged or approved for it to be included
-            if self._has_label(item, ["invalid", "spam"]):
-                if not await self._is_accepted(itemdict):
-                    continue
+            if self._has_label(item, ["invalid", "spam"]) and not await self._is_accepted(itemdict):
+                continue
 
             # PRs before oct 3 no need to check for topics
             # continue the loop if 'hacktoberfest-accepted' is labelled then
@@ -302,7 +299,7 @@ class HacktoberStats(commands.Cog):
             return await resp.json()
 
     @staticmethod
-    def _has_label(pr: dict, labels: Union[list[str], str]) -> bool:
+    def _has_label(pr: dict, labels: list[str] | str) -> bool:
         """
         Check if a PR has label 'labels'.
 
@@ -313,7 +310,7 @@ class HacktoberStats(commands.Cog):
             return False
         if isinstance(labels, str) and any(label["name"].casefold() == labels for label in pr["labels"]):
             return True
-        for item in labels:
+        for item in labels:  # noqa: SIM110
             if any(label["name"].casefold() == item for label in pr["labels"]):
                 return True
         return False
@@ -350,10 +347,7 @@ class HacktoberStats(commands.Cog):
             return False
 
         # loop through reviews and check for approval
-        for item in jsonresp2:
-            if item.get("status") == "APPROVED":
-                return True
-        return False
+        return any(item.get("status") == "APPROVED" for item in jsonresp2)
 
     @staticmethod
     def _get_shortname(in_url: str) -> str:
@@ -378,8 +372,8 @@ class HacktoberStats(commands.Cog):
         PRs that are accepted must either be merged, approved, or labelled
         'hacktoberfest-accepted.
         """
-        now = datetime.now()
-        oct3 = datetime(CURRENT_YEAR, 10, 3, 23, 59, 59, tzinfo=None)
+        now = datetime.now(tz=UTC)
+        oct3 = datetime(CURRENT_YEAR, 10, 3, 23, 59, 59, tzinfo=UTC)
         in_review = []
         accepted = []
         for pr in prs:
@@ -420,8 +414,7 @@ class HacktoberStats(commands.Cog):
         """Return "contribution" or "contributions" based on the value of n."""
         if n == 1:
             return "contribution"
-        else:
-            return "contributions"
+        return "contributions"
 
     @staticmethod
     def _author_mention_from_context(ctx: commands.Context) -> tuple[str, str]:
@@ -434,4 +427,6 @@ class HacktoberStats(commands.Cog):
 
 async def setup(bot: Bot) -> None:
     """Load the Hacktober Stats Cog."""
+    if not Tokens.github:
+        log.warning("No GitHub token was provided. The HacktoberStats Cog won't be fully functional.")
     await bot.add_cog(HacktoberStats(bot))

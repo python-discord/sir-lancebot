@@ -3,7 +3,6 @@ import logging
 import random
 from json import loads
 from pathlib import Path
-from typing import Union
 
 import discord
 from discord.ext import commands
@@ -29,7 +28,7 @@ TIMELIMIT = 30
 
 
 class EggheadQuiz(commands.Cog):
-    """This cog contains the command for the Easter quiz!"""
+    """The Egghead quiz cog."""
 
     def __init__(self):
         self.quiz_messages = {}
@@ -117,9 +116,10 @@ class EggheadQuiz(commands.Cog):
         )
 
         await ctx.send(content, embed=a_embed)
+        return None
 
     @staticmethod
-    async def already_reacted(new_reaction: discord.Reaction, user: Union[discord.Member, discord.User]) -> bool:
+    async def already_reacted(new_reaction: discord.Reaction, user: discord.Member | discord.User) -> bool:
         """Returns whether a given user has reacted more than once to a given message."""
         message = new_reaction.message
         for reaction in message.reactions:
@@ -131,16 +131,17 @@ class EggheadQuiz(commands.Cog):
         return False
 
     @commands.Cog.listener()
-    async def on_reaction_add(self, reaction: discord.Reaction, user: Union[discord.Member, discord.User]) -> None:
+    async def on_reaction_add(self, reaction: discord.Reaction, user: discord.Member | discord.User) -> None:
         """Listener to listen specifically for reactions of quiz messages."""
         if user.bot:
-            return
+            return None
         if reaction.message.id not in self.quiz_messages:
-            return
+            return None
         if str(reaction.emoji) not in self.quiz_messages[reaction.message.id]:
             return await reaction.message.remove_reaction(reaction, user)
         if await self.already_reacted(reaction, user):
             return await reaction.message.remove_reaction(reaction, user)
+        return None
 
 
 async def setup(bot: Bot) -> None:

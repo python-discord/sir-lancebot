@@ -1,9 +1,8 @@
 import logging
 import random
 import re
-import typing as t
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from urllib.parse import quote
 
 import discord
@@ -26,7 +25,7 @@ ISSUE_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/issues/{numbe
 PR_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/pulls/{number}"
 
 if Tokens.github:
-    REQUEST_HEADERS["Authorization"] = f"token {Tokens.github}"
+    REQUEST_HEADERS["Authorization"] = f"token {Tokens.github.get_secret_value()}"
 
 CODE_BLOCK_RE = re.compile(
     r"^`([^`\n]+)`"   # Inline codeblock
@@ -48,7 +47,7 @@ AUTOMATIC_REGEX = re.compile(
 class FoundIssue:
     """Dataclass representing an issue found by the regex."""
 
-    organisation: t.Optional[str]
+    organisation: str | None
     repository: str
     number: str
 
@@ -89,7 +88,7 @@ class GithubInfo(commands.Cog):
         number: int,
         repository: str,
         user: str
-    ) -> t.Union[IssueState, FetchError]:
+    ) -> IssueState | FetchError:
         """
         Retrieve an issue from a GitHub repository.
 
@@ -105,9 +104,9 @@ class GithubInfo(commands.Cog):
                 log.info(f"Ratelimit reached while fetching {url}")
                 return FetchError(403, "Ratelimit reached, please retry in a few minutes.")
             return FetchError(403, "Cannot access issue.")
-        elif r.status in (404, 410):
+        if r.status in (404, 410):
             return FetchError(r.status, "Issue not found.")
-        elif r.status != 200:
+        if r.status != 200:
             return FetchError(r.status, "Error while fetching issue.")
 
         # The initial API request is made to the issues API endpoint, which will return information
@@ -141,7 +140,7 @@ class GithubInfo(commands.Cog):
 
     @staticmethod
     def format_embed(
-        results: t.List[t.Union[IssueState, FetchError]]
+        results: list[IssueState | FetchError]
     ) -> discord.Embed:
         """Take a list of IssueState or FetchError and format a Discord embed for them."""
         description_list = []
@@ -261,7 +260,7 @@ class GithubInfo(commands.Cog):
                 description=f"```\n{user_data['bio']}\n```\n" if user_data["bio"] else "",
                 colour=discord.Colour.og_blurple(),
                 url=user_data["html_url"],
-                timestamp=datetime.strptime(user_data["created_at"], "%Y-%m-%dT%H:%M:%SZ")
+                timestamp=datetime.strptime(user_data["created_at"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=UTC)
             )
             embed.set_thumbnail(url=user_data["avatar_url"])
             embed.set_footer(text="Account created at")
@@ -293,7 +292,7 @@ class GithubInfo(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @github_group.command(name='repository', aliases=('repo',))
+    @github_group.command(name="repository", aliases=("repo",))
     async def github_repo_info(self, ctx: commands.Context, *repo: str) -> None:
         """
         Fetches a repositories' GitHub information.
@@ -347,8 +346,12 @@ class GithubInfo(commands.Cog):
             icon_url=repo_owner["avatar_url"]
         )
 
-        repo_created_at = datetime.strptime(repo_data["created_at"], "%Y-%m-%dT%H:%M:%SZ").strftime("%d/%m/%Y")
-        last_pushed = datetime.strptime(repo_data["pushed_at"], "%Y-%m-%dT%H:%M:%SZ").strftime("%d/%m/%Y at %H:%M")
+        repo_created_at = datetime.strptime(
+            repo_data["created_at"], "%Y-%m-%dT%H:%M:%SZ"
+        ).replace(tzinfo=UTC).strftime("%d/%m/%Y")
+        last_pushed = datetime.strptime(
+            repo_data["pushed_at"], "%Y-%m-%dT%H:%M:%SZ"
+        ).replace(tzinfo=UTC).strftime("%d/%m/%Y at %H:%M")
 
         embed.set_footer(
             text=(

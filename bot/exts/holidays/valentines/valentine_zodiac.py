@@ -2,9 +2,8 @@ import calendar
 import json
 import logging
 import random
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Union
 
 import discord
 from discord.ext import commands
@@ -78,6 +77,7 @@ class ValentineZodiac(commands.Cog):
             if zodiac_data["start_at"].date() <= query_date.date() <= zodiac_data["end_at"].date():
                 log.trace("Zodiac name sent.")
                 return zodiac_name
+        return None
 
     @commands.group(name="zodiac", invoke_without_command=True)
     async def zodiac(self, ctx: commands.Context, zodiac_sign: str) -> None:
@@ -87,7 +87,7 @@ class ValentineZodiac(commands.Cog):
         log.trace("Embed successfully sent.")
 
     @zodiac.command(name="date")
-    async def date_and_month(self, ctx: commands.Context, date: int, month: Union[int, str]) -> None:
+    async def date_and_month(self, ctx: commands.Context, date: int, month: int | str) -> None:
         """Provides information about zodiac sign by taking month and date as input."""
         if isinstance(month, str):
             month = month.capitalize()
@@ -103,7 +103,7 @@ class ValentineZodiac(commands.Cog):
             final_embed = self.zodiac_build_embed(zodiac)
         else:
             try:
-                zodiac_sign_based_on_date = self.zodiac_date_verifier(datetime(2020, month, date))
+                zodiac_sign_based_on_date = self.zodiac_date_verifier(datetime(2020, month, date, tzinfo=UTC))
                 log.trace("zodiac sign based on month and date received.")
             except ValueError as e:
                 final_embed = discord.Embed()

@@ -1,6 +1,6 @@
 try:
     from dotenv import load_dotenv
-    print("Found .env file, loading environment variables from it.")
+    print("Found .env file, loading environment variables from it.")  # noqa: T201
     load_dotenv(override=True)
 except ModuleNotFoundError:
     pass

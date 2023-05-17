@@ -7,7 +7,7 @@ from discord.ui import Button, View
 
 from bot.constants import Colours, NEGATIVE_REPLIES
 
-from ._game import AlreadyUpdated, Question, QuestionClosed
+from ._game import AlreadyUpdatedError, Question, QuestionClosedError
 from ._scoreboard import Scoreboard
 
 
@@ -29,7 +29,7 @@ class AnswerButton(Button):
         """
         try:
             guess = self.question.guess(interaction.user.id, self.label)
-        except AlreadyUpdated:
+        except AlreadyUpdatedError:
             await interaction.response.send_message(
                 embed=Embed(
                     title=choice(NEGATIVE_REPLIES),
@@ -39,7 +39,7 @@ class AnswerButton(Button):
                 ephemeral=True
             )
             return
-        except QuestionClosed:
+        except QuestionClosedError:
             await interaction.response.send_message(
                 embed=Embed(
                     title=choice(NEGATIVE_REPLIES),
@@ -91,7 +91,7 @@ class QuestionView(View):
             - text: A string that represents the question description to 'unicodeify'
         """
         return "".join(
-            f"{letter}\u200b" if letter not in ('\n', '\t', '`', 'p', 'y') else letter
+            f"{letter}\u200b" if letter not in ("\n", "\t", "`", "p", "y") else letter
             for idx, letter in enumerate(text)
         )
 
@@ -127,13 +127,13 @@ class QuestionView(View):
         if len(guesses) != 0:
             answers_chosen = {
                 answer_choice: len(
-                    tuple(filter(lambda x: x[0] == answer_choice, guesses.values()))  # noqa: B023
+                    tuple(filter(lambda x: x[0] == answer_choice, guesses.values()))
                 )
                 for answer_choice in labels
             }
 
             answers_chosen = dict(
-                sorted(list(answers_chosen.items()), key=lambda item: item[1], reverse=True)
+                sorted(answers_chosen.items(), key=lambda item: item[1], reverse=True)
             )
 
             for answer, people_answered in answers_chosen.items():

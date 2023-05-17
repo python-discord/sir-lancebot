@@ -1,7 +1,7 @@
 import logging
 import random
-from datetime import date, datetime
-from typing import Any, Optional
+from datetime import UTC, date, datetime
+from typing import Any
 from urllib.parse import urlencode
 
 from discord import Embed
@@ -53,7 +53,7 @@ class Space(Cog):
         await self.bot.invoke_help_command(ctx)
 
     @space.command(name="apod")
-    async def apod(self, ctx: Context, date: Optional[str]) -> None:
+    async def apod(self, ctx: Context, date: str | None) -> None:
         """
         Get Astronomy Picture of Day from NASA API. Date is optional parameter, what formatting is YYYY-MM-DD.
 
@@ -63,13 +63,13 @@ class Space(Cog):
         # Parse date to params, when provided. Show error message when invalid formatting
         if date:
             try:
-                apod_date = datetime.strptime(date, "%Y-%m-%d").date()
+                apod_date = datetime.strptime(date, "%Y-%m-%d").replace(tzinfo=UTC).date()
             except ValueError:
                 await ctx.send(f"Invalid date {date}. Please make sure your date is in format YYYY-MM-DD.")
                 return
 
-            now = datetime.now().date()
-            if APOD_MIN_DATE > apod_date or now < apod_date:
+            now = datetime.now(tz=UTC).date()
+            if apod_date < APOD_MIN_DATE or now < apod_date:
                 await ctx.send(f"Date must be between {APOD_MIN_DATE.isoformat()} and {now.isoformat()} (today).")
                 return
 
@@ -86,7 +86,7 @@ class Space(Cog):
         )
 
     @space.command(name="nasa")
-    async def nasa(self, ctx: Context, *, search_term: Optional[str]) -> None:
+    async def nasa(self, ctx: Context, *, search_term: str | None) -> None:
         """Get random NASA information/facts + image. Support `search_term` parameter for more specific search."""
         params = {
             "media_type": "image"
@@ -111,11 +111,11 @@ class Space(Cog):
         )
 
     @space.command(name="epic")
-    async def epic(self, ctx: Context, date: Optional[str]) -> None:
+    async def epic(self, ctx: Context, date: str | None) -> None:
         """Get a random image of the Earth from the NASA EPIC API. Support date parameter, format is YYYY-MM-DD."""
         if date:
             try:
-                show_date = datetime.strptime(date, "%Y-%m-%d").date().isoformat()
+                show_date = datetime.strptime(date, "%Y-%m-%d").replace(tzinfo=UTC).date().isoformat()
             except ValueError:
                 await ctx.send(f"Invalid date {date}. Please make sure your date is in format YYYY-MM-DD.")
                 return
@@ -147,7 +147,7 @@ class Space(Cog):
     async def mars(
         self,
         ctx: Context,
-        date: Optional[DateConverter],
+        date: DateConverter | None,
         rover: str = "curiosity"
     ) -> None:
         """
@@ -158,10 +158,8 @@ class Space(Cog):
         rover = rover.lower()
         if rover not in self.rovers:
             await ctx.send(
-                (
-                    f"Invalid rover `{rover}`.\n"
-                    f"**Rovers:** `{'`, `'.join(f'{r.capitalize()}' for r in self.rovers)}`"
-                )
+                f"Invalid rover `{rover}`.\n"
+                f"**Rovers:** `{'`, `'.join(f'{r.capitalize()}' for r in self.rovers)}`"
             )
             return
 
@@ -203,14 +201,14 @@ class Space(Cog):
     async def fetch_from_nasa(
         self,
         endpoint: str,
-        additional_params: Optional[dict[str, Any]] = None,
-        base: Optional[str] = NASA_BASE_URL,
+        additional_params: dict[str, Any] | None = None,
+        base: str | None = NASA_BASE_URL,
         use_api_key: bool = True
     ) -> dict[str, Any]:
         """Fetch information from NASA API, return result."""
         params = {}
         if use_api_key:
-            params["api_key"] = Tokens.nasa
+            params["api_key"] = Tokens.nasa.get_secret_value()
 
         # Add additional parameters to request parameters only when they provided by user
         if additional_params is not None:
@@ -219,7 +217,7 @@ class Space(Cog):
         async with self.http_session.get(url=f"{base}/{endpoint}?{urlencode(params)}") as resp:
             return await resp.json()
 
-    def create_nasa_embed(self, title: str, description: str, image: str, footer: Optional[str] = "") -> Embed:
+    def create_nasa_embed(self, title: str, description: str, image: str, footer: str | None = "") -> Embed:
         """Generate NASA commands embeds. Required: title, description and image URL, footer (addition) is optional."""
         return Embed(
             title=title,

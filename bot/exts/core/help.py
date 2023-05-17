@@ -3,7 +3,7 @@ import asyncio
 import itertools
 import logging
 from contextlib import suppress
-from typing import NamedTuple, Optional, Union
+from typing import NamedTuple
 
 from discord import Colour, Embed, HTTPException, Message, Reaction, User
 from discord.ext import commands
@@ -38,7 +38,7 @@ class Cog(NamedTuple):
 log = logging.getLogger(__name__)
 
 
-class HelpQueryNotFound(ValueError):
+class HelpQueryNotFoundError(ValueError):
     """
     Raised when a HelpSession Query doesn't match a command or cog.
 
@@ -49,7 +49,7 @@ class HelpQueryNotFound(ValueError):
     """
 
     def __init__(
-            self, arg: str, possible_matches: Optional[list[str]] = None, *, parent_command: Optional[Command] = None
+            self, arg: str, possible_matches: list[str] | None = None, *, parent_command: Command | None = None
     ) -> None:
         super().__init__(arg)
         self.possible_matches = possible_matches
@@ -117,7 +117,7 @@ class HelpSession:
         self._timeout_task = None
         self.reset_timeout()
 
-    def _get_query(self, query: str) -> Union[Command, Cog]:
+    def _get_query(self, query: str) -> Command | Cog | None:
         """Attempts to match the provided query with a valid command or cog."""
         command = self._bot.get_command(query)
         if command:
@@ -151,6 +151,7 @@ class HelpSession:
             )
 
         self._handle_not_found(query)
+        return None
 
     def _handle_not_found(self, query: str) -> None:
         """
@@ -164,11 +165,11 @@ class HelpSession:
             parent_command = self._bot.get_command(parent)
 
             if parent_command:
-                raise HelpQueryNotFound('Invalid Subcommand.', parent_command=parent_command)
+                raise HelpQueryNotFoundError("Invalid Subcommand.", parent_command=parent_command)
 
         similar_commands = get_command_suggestions(list(self._bot.all_commands.keys()), query)
 
-        raise HelpQueryNotFound(f'Query "{query}" not found.', similar_commands)
+        raise HelpQueryNotFoundError(f'Query "{query}" not found.', similar_commands)
 
     async def timeout(self, seconds: int = 30) -> None:
         """Waits for a set number of seconds, then stops the help session."""
@@ -178,9 +179,8 @@ class HelpSession:
     def reset_timeout(self) -> None:
         """Cancels the original timeout task and sets it again from the start."""
         # cancel original if it exists
-        if self._timeout_task:
-            if not self._timeout_task.cancelled():
-                self._timeout_task.cancel()
+        if self._timeout_task and not self._timeout_task.cancelled():
+            self._timeout_task.cancel()
 
         # recreate the timeout task
         self._timeout_task = self._bot.loop.create_task(self.timeout())
@@ -252,8 +252,7 @@ class HelpSession:
                 pass
 
             return f"**{cmd.cog_name}**"
-        else:
-            return "**\u200bNo Category:**"
+        return "**\u200bNo Category:**"
 
     def _get_command_params(self, cmd: Command) -> str:
         """
@@ -286,8 +285,7 @@ class HelpSession:
             # if required
             else:
                 results.append(f"<{name}>")
-
-        return f"{cmd.qualified_name} {' '.join(results)}"
+        return " ".join([cmd.qualified_name, *results])
 
     async def build_pages(self) -> None:
         """Builds the list of content pages to be paginated through in the help message, as a list of str."""
@@ -305,7 +303,7 @@ class HelpSession:
             paginator.add_line(f"*{self.description}*")
 
         # list all children commands of the queried object
-        if isinstance(self.query, (commands.GroupMixin, Cog)):
+        if isinstance(self.query, commands.GroupMixin | Cog):
             await self._list_child_commands(paginator)
 
         self._pages = paginator.pages
@@ -418,7 +416,7 @@ class HelpSession:
         """Returns an Embed with the requested page formatted within."""
         embed = Embed()
 
-        if isinstance(self.query, (commands.Command, Cog)) and page_number > 0:
+        if isinstance(self.query, commands.Command | Cog) and page_number > 0:
             title = f'Command Help | "{self.query.name}"'
         else:
             title = self.title
@@ -518,7 +516,7 @@ class Help(DiscordCog):
         """Shows Command Help."""
         try:
             await HelpSession.start(ctx, *commands)
-        except HelpQueryNotFound as error:
+        except HelpQueryNotFoundError as error:
 
             # Send help message of parent command if subcommand is invalid.
             if cmd := error.parent_command:
