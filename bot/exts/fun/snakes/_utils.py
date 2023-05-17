@@ -489,7 +489,7 @@ class SnakeAndLaddersGame:
 
         await self.channel.send(
             f"**Snakes and Ladders**: {user.mention} has joined the game.\n"
-            f"There are now {str(len(self.players))} players in the game.",
+            f"There are now {len(self.players)!s} players in the game.",
             delete_after=10
         )
 

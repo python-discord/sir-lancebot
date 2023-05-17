@@ -248,7 +248,7 @@ class DuckGamesDirector(commands.Cog):
         if answer in game.solutions:
             game.claimed_answers[answer] = msg.author
             game.scores[msg.author] += CORRECT_SOLN
-            await self.append_to_found_embed(game, f"{str(answer):12s}  -  {msg.author.display_name}")
+            await self.append_to_found_embed(game, f"{answer!s:12s}  -  {msg.author.display_name}")
         else:
             await msg.add_reaction(EMOJI_WRONG)
             game.scores[msg.author] += INCORRECT_SOLN
