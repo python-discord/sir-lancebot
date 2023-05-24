@@ -50,7 +50,7 @@ class SendBookmark(discord.ui.View):
     ):
         super().__init__()
 
-        self.clicked = [author.id]
+        self.clicked = []
         self.channel = channel
         self.target_message = target_message
         self.title = title
@@ -184,7 +184,7 @@ class Bookmark(commands.Cog):
     async def bookmark(
         self,
         ctx: commands.Context,
-        target_message: Optional[WrappedMessageConverter],
+        target_message: WrappedMessageConverter | None,
         *,
         title: str = "Bookmark",
     ) -> None:
@@ -195,7 +195,7 @@ class Bookmark(commands.Cog):
 
         Bookmarks can subsequently be deleted by using the `bookmark delete` command in DMs.
         """
-        target_message: Optional[discord.Message] = target_message or getattr(ctx.message.reference, "resolved", None)
+        target_message: discord.Message | None = target_message or getattr(ctx.message.reference, "resolved", None)
         if target_message is None:
             raise commands.UserInputError(MESSAGE_NOT_FOUND_ERROR)
 
@@ -206,6 +206,7 @@ class Bookmark(commands.Cog):
             await ctx.send(embed=embed)
             return
 
+        view = SendBookmark(ctx.author, ctx.channel, target_message, title)
         try:
             await dm_bookmark(ctx.author, target_message, title)
         except discord.Forbidden:
@@ -214,9 +215,9 @@ class Bookmark(commands.Cog):
             )
             await ctx.send(embed=error_embed)
         else:
+            view.clicked.append(ctx.author.id)
             log.info(f"{ctx.author.mention} bookmarked {target_message.jump_url} with title '{title}'")
 
-        view = SendBookmark(ctx.author, ctx.channel, target_message, title)
         embed = self.build_bookmark_embed(target_message)
 
         await ctx.send(embed=embed, view=view, delete_after=180)
