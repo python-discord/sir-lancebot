@@ -79,6 +79,7 @@ class LatexServerError(Exception):
         super().__init__(logs)
         self.logs = logs
 
+
 class Latex(commands.Cog):
     """Renders latex."""
 
@@ -118,7 +119,8 @@ class Latex(commands.Cog):
     async def _prepare_error_embed(self, title: str, err: Exception | None) -> discord.Embed:
         embed = discord.Embed(title=title)
         embed.description = "No logs available."
-        if err is not None and err.logs is not None:
+        logs = getattr(err, "logs", None)
+        if logs:
             logs_paste_url = await self._upload_to_pastebin(err.logs)
             embed.description = "Couldn't upload logs."
             if logs_paste_url:
