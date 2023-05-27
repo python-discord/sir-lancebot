@@ -75,9 +75,6 @@ class InvalidLatexError(Exception):
 class LatexServerError(Exception):
     """Represents an error raised from Latex rendering server."""
 
-    def __init__(self, logs: str | None):
-        super().__init__(logs)
-        self.logs = logs
 
 
 class Latex(commands.Cog):
@@ -93,7 +90,7 @@ class Latex(commands.Cog):
             async with self.bot.http_session.post(LATEX_API_URL, data=payload, raise_for_status=True) as response:
                 response_json = await response.json()
         except client_exceptions.ClientResponseError:
-            raise LatexServerError(None)
+            raise LatexServerError
         if response_json["status"] != "success":
             raise InvalidLatexError(logs=response_json.get("log"))
         async with self.bot.http_session.get(
@@ -116,12 +113,16 @@ class Latex(commands.Cog):
         except web.HTTPClientError as e:
             log.info("Error when uploading latex output to pastebin. %s", e)
 
-    async def _prepare_error_embed(self, title: str, err: Exception | None) -> discord.Embed:
+    async def _prepare_error_embed(self, err: Exception | None) -> discord.Embed:
+        title = "Server encountered an issue, please retry later."
+        if isinstance(err, InvalidLatexError):
+            title = "Failed to render input."
+
         embed = discord.Embed(title=title)
         embed.description = "No logs available."
         logs = getattr(err, "logs", None)
         if logs:
-            logs_paste_url = await self._upload_to_pastebin(err.logs)
+            logs_paste_url = await self._upload_to_pastebin(logs)
             embed.description = "Couldn't upload logs."
             if logs_paste_url:
                 embed.description = f"[View Logs]({logs_paste_url})"
@@ -142,13 +143,8 @@ class Latex(commands.Cog):
                 try:
                     with open(image_path, "wb") as out_file:
                         await self._generate_image(TEMPLATE.substitute(text=query), out_file)
-                except InvalidLatexError as err:
-                    embed = await self._prepare_error_embed("Failed to render input.", err)
-                    await ctx.send(embed=embed)
-                    image_path.unlink()
-                    return
-                except LatexServerError as err:
-                    embed = await self._prepare_error_embed("Server encountered an issue, please retry later.", err)
+                except (InvalidLatexError, LatexServerError) as err:
+                    embed = await self._prepare_error_embed(err)
                     await ctx.send(embed=embed)
                     image_path.unlink()
                     return
