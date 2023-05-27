@@ -113,7 +113,7 @@ class Latex(commands.Cog):
         except web.HTTPClientError as e:
             log.info("Error when uploading latex output to pastebin. %s", e)
 
-    async def _prepare_error_embed(self, err: Exception | None) -> discord.Embed:
+    async def _prepare_error_embed(self, err: InvalidLatexError | LatexServerError | None) -> discord.Embed:
         title = "Server encountered an issue, please retry later."
         if isinstance(err, InvalidLatexError):
             title = "Failed to render input."
