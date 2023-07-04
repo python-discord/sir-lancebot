@@ -4,7 +4,6 @@ import pathlib
 import random
 import string
 from io import BytesIO
-from typing import Callable
 
 import discord
 import rapidfuzz
