@@ -182,7 +182,7 @@ class Colour(commands.Cog):
         hex_tuple = ImageColor.getrgb(f"#{hex_colour}")
         await self.send_colour_response(ctx, hex_tuple)
 
-    def get_colour_conversions(self, rgb: tuple[int, int, int]) -> dict[str, str]:
+    def get_colour_conversions(self, rgb: tuple[int, int, int]) -> dict[str, tuple[int, ...] | str]:
         """Create a dictionary mapping of colour types and their values."""
         colour_name = self._rgb_to_name(rgb)
         if colour_name is None:
