@@ -989,21 +989,27 @@ class Snakes(Cog):
         """
         # Get the snake data we need
         if not name:
-            name_obj = await self._get_snake_name()
-            name = name_obj["scientific"]
-            content = await self._get_snek(name)
+            for _ in range(3):
+                name_obj = await self._get_snake_name()
+                name = name_obj["scientific"]
+                content = await self._get_snek(name)
 
+                if len(content["image_list"]) > 0:
+                    break
         elif isinstance(name, dict):
             content = name
-
         else:
             content = await self._get_snek(name)
 
+        try:
+            image_url = content["image_list"][0]
+        except IndexError:
+            await ctx.send("No images found for this snake.")
+            return
+
         # Make the card
         async with ctx.typing():
-
             stream = BytesIO()
-            image_url = content["image_list"][0]
             async with self.bot.http_session.get(image_url, timeout=ClientTimeout(total=10)) as response:
                 stream.write(await response.read())
 
