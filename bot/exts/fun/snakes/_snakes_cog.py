@@ -241,8 +241,11 @@ class Snakes(Cog):
         # Draw the text onto the final image
         draw = ImageDraw.Draw(full_image)
         for line in textwrap.wrap(description, 36):
-            draw.text([margin + 4, offset], line, font=CARD["font"])
-            offset += CARD["font"].getsize(line)[1]
+            draw.text((margin + 4, offset), line, font=CARD["font"])
+
+            _left, top, _right, bottom = CARD["font"].getbbox(line)
+            # Height of the text + 4px spacing
+            offset += bottom - top + 4
 
         # Get the image contents as a BufferIO object
         buffer = BytesIO()
