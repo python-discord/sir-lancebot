@@ -11,8 +11,8 @@ from functools import partial
 from io import BytesIO
 from typing import Any
 
-import async_timeout
 from PIL import Image, ImageDraw, ImageFont
+from aiohttp import ClientTimeout
 from discord import Colour, Embed, File, Member, Message, Reaction
 from discord.errors import HTTPException
 from discord.ext.commands import Cog, CommandError, Context, bot_has_permissions, group
@@ -279,8 +279,7 @@ class Snakes(Cog):
         if params is None:
             params = {}
 
-        async with async_timeout.timeout(10):
-            async with self.bot.http_session.get(url, params=params) as response:
+        async with self.bot.http_session.get(url, params=params, timeout=ClientTimeout(total=10)) as response:
                 return await response.json()
 
     def _get_random_long_message(self, messages: list[str], retries: int = 10) -> str:
@@ -1001,9 +1000,9 @@ class Snakes(Cog):
         async with ctx.typing():
 
             stream = BytesIO()
-            async with async_timeout.timeout(10):
-                async with self.bot.http_session.get(content["image_list"][0]) as response:
-                    stream.write(await response.read())
+            image_url = content["image_list"][0]
+            async with self.bot.http_session.get(image_url, timeout=ClientTimeout(total=10)) as response:
+                stream.write(await response.read())
 
             stream.seek(0)
 
