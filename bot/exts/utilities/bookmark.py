@@ -199,9 +199,9 @@ class Bookmark(commands.Cog):
         if target_message is None:
             raise commands.UserInputError(MESSAGE_NOT_FOUND_ERROR)
 
-        permissions = ctx.channel.permissions_for(ctx.author)
+        permissions = target_message.channel.permissions_for(ctx.author)
         if not permissions.read_messages:
-            log.info(f"{ctx.author} tried to bookmark a message in #{ctx.channel} but has no permissions.")
+            log.info(f"{ctx.author} tried to bookmark a message in #{target_message.channel} but has no permissions.")
             embed = self.build_error_embed("You don't have permission to view this channel.")
             await ctx.send(embed=embed)
             return
