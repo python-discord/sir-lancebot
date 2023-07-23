@@ -33,8 +33,8 @@ async def send_embed(
         ctx: Context,
         message_txt: str,
         colour: int = Colours.soft_red,
-        footer: str = None,
-        img_url: str = None,
+        footer: str | None = None,
+        img_url: str | None = None,
         f: discord.File = None
 ) -> None:
     """Generate & send a response embed with Wolfram as the author."""

@@ -172,7 +172,7 @@ class Reddit(Cog):
         else:
             log.warning(f"Unable to revoke access token: status {response.status}.")
 
-    async def fetch_posts(self, route: str, *, amount: int = 25, params: dict = None) -> list[dict]:
+    async def fetch_posts(self, route: str, *, amount: int = 25, params: dict | None = None) -> list[dict]:
         """A helper method to fetch a certain amount of Reddit posts at a given route."""
         # Reddit's JSON responses only provide 25 posts at most.
         if not 25 >= amount > 0:

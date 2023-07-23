@@ -39,7 +39,7 @@ class Bot(BotBase):
         else:
             await super().on_command_error(context, exception)
 
-    async def log_to_dev_log(self, title: str, details: str = None, *, icon: str = None) -> None:
+    async def log_to_dev_log(self, title: str, details: str | None = None, *, icon: str | None = None) -> None:
         """Send an embed message to the dev-log channel."""
         devlog = self.get_channel(constants.Channels.devlog)
 

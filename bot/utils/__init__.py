@@ -76,7 +76,7 @@ async def disambiguate(
         done, pending = await asyncio.wait(futures, return_when=asyncio.FIRST_COMPLETED, loop=ctx.bot.loop)
 
         # :yert:
-        result = list(done)[0].result()
+        result = next(iter(done)).result()
 
         # Pagination was canceled - result is None
         if result is None:
@@ -87,7 +87,7 @@ async def disambiguate(
         # Pagination was not initiated, only one page
         if result.author == ctx.bot.user:
             # Continue the wait_for
-            result = await list(pending)[0]
+            result = await next(iter(pending))
 
         # Love that duplicate code
         for coro in pending:

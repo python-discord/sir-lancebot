@@ -90,7 +90,7 @@ class MonsterSurvey(Cog):
     @monster_group.command(
         name="vote"
     )
-    async def monster_vote(self, ctx: Context, name: str = None) -> None:
+    async def monster_vote(self, ctx: Context, name: str | None = None) -> None:
         """
         Cast a vote for a particular monster.
 
@@ -141,7 +141,7 @@ class MonsterSurvey(Cog):
     @monster_group.command(
         name="show"
     )
-    async def monster_show(self, ctx: Context, name: str = None) -> None:
+    async def monster_show(self, ctx: Context, name: str | None = None) -> None:
         """Shows the named monster. If one is not named, it sends the default voting embed instead."""
         if name is None:
             await ctx.invoke(self.monster_leaderboard)

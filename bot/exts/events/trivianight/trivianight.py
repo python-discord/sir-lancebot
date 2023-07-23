@@ -107,7 +107,7 @@ class TriviaNightCog(commands.Cog):
 
     @trivianight.command(aliases=("next",))
     @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
-    async def question(self, ctx: commands.Context, question_number: str = None) -> None:
+    async def question(self, ctx: commands.Context, question_number: str | None = None) -> None:
         """
         Gets a random question from the unanswered question list and lets the user(s) choose the answer.
 

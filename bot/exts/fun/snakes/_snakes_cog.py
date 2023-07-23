@@ -279,9 +279,8 @@ class Snakes(Cog):
         if params is None:
             params = {}
 
-        async with async_timeout.timeout(10):
-            async with self.bot.http_session.get(url, params=params) as response:
-                return await response.json()
+        async with async_timeout.timeout(10), self.bot.http_session.get(url, params=params) as response:
+            return await response.json()
 
     def _get_random_long_message(self, messages: list[str], retries: int = 10) -> str:
         """
@@ -846,7 +845,7 @@ class Snakes(Cog):
         await self._validate_answer(ctx, quiz, answer, options)
 
     @snakes_group.command(name="name", aliases=("name_gen",))
-    async def name_command(self, ctx: Context, *, name: str = None) -> None:
+    async def name_command(self, ctx: Context, *, name: str | None = None) -> None:
         """
         Snakifies a username.
 
@@ -1001,9 +1000,8 @@ class Snakes(Cog):
         async with ctx.typing():
 
             stream = BytesIO()
-            async with async_timeout.timeout(10):
-                async with self.bot.http_session.get(content["image_list"][0]) as response:
-                    stream.write(await response.read())
+            async with async_timeout.timeout(10), self.bot.http_session.get(content["image_list"][0]) as response:
+                stream.write(await response.read())
 
             stream.seek(0)
 
@@ -1033,7 +1031,7 @@ class Snakes(Cog):
         await ctx.send(embed=embed)
 
     @snakes_group.command(name="snakify")
-    async def snakify_command(self, ctx: Context, *, message: str = None) -> None:
+    async def snakify_command(self, ctx: Context, *, message: str | None = None) -> None:
         """
         How would I talk if I were a snake?
 
@@ -1068,7 +1066,7 @@ class Snakes(Cog):
             await ctx.send(embed=embed)
 
     @snakes_group.command(name="video", aliases=("get_video",))
-    async def video_command(self, ctx: Context, *, search: str = None) -> None:
+    async def video_command(self, ctx: Context, *, search: str | None = None) -> None:
         """
         Gets a YouTube video about snakes.
 

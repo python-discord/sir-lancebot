@@ -155,7 +155,7 @@ class Scoreboard:
         self._points = {}
         self._speed = {}
 
-    def assign_points(self, user_id: int, *, points: int = None, speed: float = None) -> None:
+    def assign_points(self, user_id: int, *, points: int | None = None, speed: float | None = None) -> None:
         """
         Assign points or deduct points to/from a certain user.
 

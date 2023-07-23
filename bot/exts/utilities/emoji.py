@@ -78,7 +78,7 @@ class Emojis(commands.Cog):
             await self.bot.invoke_help_command(ctx)
 
     @emoji_group.command(name="count", aliases=("c",))
-    async def count_command(self, ctx: commands.Context, *, category_query: str = None) -> None:
+    async def count_command(self, ctx: commands.Context, *, category_query: str | None = None) -> None:
         """Returns embed with emoji category and info given by the user."""
         emoji_dict = defaultdict(list)
 

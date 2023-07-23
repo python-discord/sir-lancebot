@@ -38,7 +38,7 @@ class PrideFacts(commands.Cog):
             return
 
     @commands.command(name="pridefact", aliases=("pridefacts",))
-    async def pridefact(self, ctx: commands.Context, option: int | str = None) -> None:
+    async def pridefact(self, ctx: commands.Context, option: int | str | None = None) -> None:
         """
         Sends a message with a pride fact of the day.
 
