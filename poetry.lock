@@ -458,12 +458,12 @@ files = [
 
 [[package]]
 name = "emoji"
-version = "2.6.0"
+version = "2.7.0"
 description = "Emoji for Python"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 files = [
-    {file = "emoji-2.6.0.tar.gz", hash = "sha256:39ad95c9ba270cdfbd141d20c2ebcfc4e295d010b605de66908a098a3ba63a3c"},
+    {file = "emoji-2.7.0.tar.gz", hash = "sha256:375cc08589704266099846c553b6572ec5be591374b4d2cd1623b8343d5c9abb"},
 ]
 
 [package.extras]
@@ -1796,4 +1796,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "3.11.*"
-content-hash = "450939cc059c17d43268d17d1370a4342d9e914025379ca186d20a67d92dfe69"
+content-hash = "0beab5faeb75704d8d7d59063150af561663f65b165b992577cc847e2551829c"
