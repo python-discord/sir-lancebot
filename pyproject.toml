@@ -33,7 +33,7 @@ pip-licenses = "4.3.2"
 pre-commit = "3.3.3"
 python-dotenv = "1.0.0"
 ruff = "0.0.272"
-taskipy = "1.11.0"
+taskipy = "1.12.0"
 
 [tool.taskipy.tasks]
 start = "python -m bot"
