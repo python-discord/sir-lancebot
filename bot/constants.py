@@ -317,7 +317,7 @@ Redis = _Redis()
 class _Reddit(EnvConfig):
     EnvConfig.Config.env_prefix = "reddit_"
 
-    subreddits: tuple = ("r/Python",)
+    subreddits: tuple[str, ...] = ("r/Python",)
 
     client_id: SecretStr = ""
     secret: SecretStr = ""
