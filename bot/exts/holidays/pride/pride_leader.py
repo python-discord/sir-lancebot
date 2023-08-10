@@ -57,7 +57,7 @@ class PrideLeader(commands.Cog):
 
     def embed_builder(self, pride_leader: dict) -> discord.Embed:
         """Generate an Embed with information about a pride leader."""
-        name = [name for name, info in PRIDE_RESOURCE.items() if info == pride_leader][0]
+        name = next(name for name, info in PRIDE_RESOURCE.items() if info == pride_leader)
 
         embed = discord.Embed(
             title=name,
