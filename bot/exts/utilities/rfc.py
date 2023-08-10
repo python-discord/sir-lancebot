@@ -60,6 +60,6 @@ class Rfc(commands.Cog):
             await ctx.send(embed=embed)
 
 
-async def setup(bot: Bot):
+async def setup(bot: Bot) -> None:
     """Load the Rfc cog."""
     await bot.add_cog(Rfc(bot))
