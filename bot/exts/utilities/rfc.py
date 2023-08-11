@@ -77,6 +77,8 @@ class Rfc(commands.Cog):
 
             return
 
+        logger.info(f"Fetching RFC {rfc_id}")
+
         embed = Embed(
             title=f"RFC {rfc_id} - {document.title}",
             description=document.description,
