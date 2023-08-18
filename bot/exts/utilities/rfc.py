@@ -10,7 +10,8 @@ from bot.constants import Colours
 
 logger = logging.getLogger(__name__)
 
-BASE_URL = "https://datatracker.ietf.org/doc/rfc{rfc_id}/doc.json"
+API_URL = "https://datatracker.ietf.org/doc/rfc{rfc_id}/doc.json"
+DOCUMENT_URL = "https://datatracker.ietf.org/doc/rfc{rfc_id}"
 
 
 class RfcDocument(pydantic.BaseModel):
@@ -34,20 +35,22 @@ class Rfc(commands.Cog):
         if rfc_id in self.cache:
             return self.cache[rfc_id]
 
-        async with self.bot.http_session.get(BASE_URL.format(rfc_id=rfc_id)) as resp:
+        async with self.bot.http_session.get(API_URL.format(rfc_id=rfc_id)) as resp:
             if resp.status != 200:
                 return None
 
             data = await resp.json()
 
         description = (
-            data["abstract"] or f"[Link](https://datatracker.ietf.org/doc/rfc{rfc_id})"
+            data["abstract"]
+            or f"[Link]({DOCUMENT_URL.format(rfc_id=rfc_id)}"
         )
 
         revisions = data["rev"] or len(data["rev_history"])
 
         raw_date = data["rev_history"][0]["published"]
-        creation_date = datetime.datetime.strptime(raw_date, "%Y-%m-%dT%H:%M:%S%z")
+        creation_date = datetime.datetime.strptime(
+            raw_date, "%Y-%m-%dT%H:%M:%S%z")
 
         document = RfcDocument(
             title=data["title"],
@@ -83,6 +86,7 @@ class Rfc(commands.Cog):
             title=f"RFC {rfc_id} - {document.title}",
             description=document.description,
             colour=Colours.gold,
+            url=DOCUMENT_URL.format(rfc_id=rfc_id),
         )
 
         embed.add_field(
