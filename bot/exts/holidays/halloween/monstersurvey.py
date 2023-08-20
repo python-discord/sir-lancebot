@@ -109,7 +109,7 @@ class MonsterSurvey(Cog):
                 name = name.lower()
 
             vote_embed = Embed(
-                name="Monster Voting",
+                title="Monster Voting",
                 color=0xFF6800
             )
 
