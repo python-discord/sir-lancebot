@@ -7,6 +7,7 @@ from datetime import UTC, datetime
 
 import discord
 from discord.ext.commands import BadArgument, Context
+from pydis_core.utils.scheduling import create_task
 
 from bot.constants import Client, Month
 from bot.utils.pagination import LinePaginator
@@ -55,52 +56,30 @@ async def disambiguate(
     choices = (f"{index}: {entry}" for index, entry in enumerate(entries, start=1))
 
     def check(message: discord.Message) -> bool:
-        return (
-            message.content.isdecimal()
-            and message.author == ctx.author
-            and message.channel == ctx.channel
+        return message.author == ctx.author and message.channel == ctx.channel
+
+    if embed is None:
+        embed = discord.Embed()
+
+    # Run the paginator in the background, this means it will continue to work after the user has
+    # selected an option, and stopping it wont prevent the user from selecting an option, both
+    # of which are fine and make implementation simpler.
+    create_task(
+        LinePaginator.paginate(
+            choices, ctx, embed=embed, max_lines=entries_per_page,
+            empty=empty, max_size=6000, timeout=timeout
         )
+    )
 
     try:
-        if embed is None:
-            embed = discord.Embed()
-
-        coro1 = ctx.bot.wait_for("message", check=check, timeout=timeout)
-        coro2 = LinePaginator.paginate(
-            choices, ctx, embed=embed, max_lines=entries_per_page,
-            empty=empty, max_size=6000, timeout=9000
-        )
-
-        # wait_for timeout will go to except instead of the wait_for thing as I expected
-        futures = [asyncio.ensure_future(coro1), asyncio.ensure_future(coro2)]
-        done, pending = await asyncio.wait(futures, return_when=asyncio.FIRST_COMPLETED, loop=ctx.bot.loop)
-
-        # :yert:
-        result = next(iter(done)).result()
-
-        # Pagination was canceled - result is None
-        if result is None:
-            for coro in pending:
-                coro.cancel()
-            raise BadArgument("Canceled.")
-
-        # Pagination was not initiated, only one page
-        if result.author == ctx.bot.user:
-            # Continue the wait_for
-            result = await next(iter(pending))
-
-        # Love that duplicate code
-        for coro in pending:
-            coro.cancel()
+        message = await ctx.bot.wait_for("message", check=check, timeout=timeout)
     except asyncio.TimeoutError:
         raise BadArgument("Timed out.")
 
-    # Guaranteed to not error because of isdecimal() in check
-    index = int(result.content)
-
     try:
+        index = int(message.content)
         return entries[index - 1]
-    except IndexError:
+    except (ValueError, IndexError):
         raise BadArgument("Invalid choice.")
 
 

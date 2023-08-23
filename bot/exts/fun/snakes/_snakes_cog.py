@@ -11,8 +11,8 @@ from functools import partial
 from io import BytesIO
 from typing import Any
 
-import async_timeout
 from PIL import Image, ImageDraw, ImageFont
+from aiohttp import ClientTimeout
 from discord import Colour, Embed, File, Member, Message, Reaction
 from discord.errors import HTTPException
 from discord.ext.commands import Cog, CommandError, Context, bot_has_permissions, group
@@ -241,8 +241,11 @@ class Snakes(Cog):
         # Draw the text onto the final image
         draw = ImageDraw.Draw(full_image)
         for line in textwrap.wrap(description, 36):
-            draw.text([margin + 4, offset], line, font=CARD["font"])
-            offset += CARD["font"].getsize(line)[1]
+            draw.text((margin + 4, offset), line, font=CARD["font"])
+
+            _left, top, _right, bottom = CARD["font"].getbbox(line)
+            # Height of the text + 4px spacing
+            offset += bottom - top + 4
 
         # Get the image contents as a BufferIO object
         buffer = BytesIO()
@@ -279,8 +282,8 @@ class Snakes(Cog):
         if params is None:
             params = {}
 
-        async with async_timeout.timeout(10), self.bot.http_session.get(url, params=params) as response:
-            return await response.json()
+        async with self.bot.http_session.get(url, params=params, timeout=ClientTimeout(total=10)) as response:
+                return await response.json()
 
     def _get_random_long_message(self, messages: list[str], retries: int = 10) -> str:
         """
@@ -986,21 +989,28 @@ class Snakes(Cog):
         """
         # Get the snake data we need
         if not name:
-            name_obj = await self._get_snake_name()
-            name = name_obj["scientific"]
-            content = await self._get_snek(name)
+            for _ in range(3):
+                name_obj = await self._get_snake_name()
+                name = name_obj["scientific"]
+                content = await self._get_snek(name)
 
+                if len(content["image_list"]) > 0:
+                    break
         elif isinstance(name, dict):
             content = name
-
         else:
             content = await self._get_snek(name)
 
+        try:
+            image_url = content["image_list"][0]
+        except IndexError:
+            await ctx.send("No images found for this snake.")
+            return
+
         # Make the card
         async with ctx.typing():
-
             stream = BytesIO()
-            async with async_timeout.timeout(10), self.bot.http_session.get(content["image_list"][0]) as response:
+            async with self.bot.http_session.get(image_url, timeout=ClientTimeout(total=10)) as response:
                 stream.write(await response.read())
 
             stream.seek(0)
