@@ -40,6 +40,41 @@ WIKI_FEED_API_URL = "https://en.wikipedia.org/api/rest_v1/feed/featured/{date}"
 TRIVIA_QUIZ_ICON = (
     "https://raw.githubusercontent.com/python-discord/branding/main/icons/trivia_quiz/trivia-quiz-dist.png"
 )
+N_PREFIX_STARTS_AT = 5
+N_PREFIXES = [
+    "penta", "hexa", "hepta", "octa", "nona",
+    "deca", "hendeca", "dodeca", "trideca", "tetradeca",
+]
+
+PLANETS = [
+    ("1st", "Mercury"),
+    ("2nd", "Venus"),
+    ("3rd", "Earth"),
+    ("4th", "Mars"),
+    ("5th", "Jupiter"),
+    ("6th", "Saturn"),
+    ("7th", "Uranus"),
+    ("8th", "Neptune"),
+]
+
+TAXONOMIC_HIERARCHY = [
+    "species", "genus", "family", "order",
+    "class", "phylum", "kingdom", "domain",
+]
+
+UNITS_TO_BASE_UNITS = {
+    "hertz": ("(unit of frequency)", "s^-1"),
+    "newton": ("(unit of force)", "m*kg*s^-2"),
+    "pascal": ("(unit of pressure & stress)", "m^-1*kg*s^-2"),
+    "joule": ("(unit of energy & quantity of heat)", "m^2*kg*s^-2"),
+    "watt": ("(unit of power)", "m^2*kg*s^-3"),
+    "coulomb": ("(unit of electric charge & quantity of electricity)", "s*A"),
+    "volt": ("(unit of voltage & electromotive force)", "m^2*kg*s^-3*A^-1"),
+    "farad": ("(unit of capacitance)", "m^-2*kg^-1*s^4*A^2"),
+    "ohm": ("(unit of electric resistance)", "m^2*kg*s^-3*A^-2"),
+    "weber": ("(unit of magnetic flux)", "m^2*kg*s^-2*A^-1"),
+    "tesla": ("(unit of magnetic flux density)", "kg*s^-2*A^-1"),
+}
 
 
 @dataclass(frozen=True)
@@ -51,163 +86,117 @@ class QuizEntry:
     var_tol: int
 
 
-class DynamicQuestionGen:
-    """Class that contains functions to generate math/science questions for TriviaQuiz Cog."""
+def linear_system(q_format: str, a_format: str) -> QuizEntry:
+    """Generate a system of linear equations with two unknowns."""
+    x, y = random.randint(2, 5), random.randint(2, 5)
+    answer = a_format.format(x, y)
 
-    N_PREFIX_STARTS_AT = 5
-    N_PREFIXES = [
-        "penta", "hexa", "hepta", "octa", "nona",
-        "deca", "hendeca", "dodeca", "trideca", "tetradeca",
-    ]
+    coeffs = random.sample(range(1, 6), 4)
 
-    PLANETS = [
-        ("1st", "Mercury"),
-        ("2nd", "Venus"),
-        ("3rd", "Earth"),
-        ("4th", "Mars"),
-        ("5th", "Jupiter"),
-        ("6th", "Saturn"),
-        ("7th", "Uranus"),
-        ("8th", "Neptune"),
-    ]
+    question = q_format.format(
+        coeffs[0],
+        coeffs[1],
+        coeffs[0] * x + coeffs[1] * y,
+        coeffs[2],
+        coeffs[3],
+        coeffs[2] * x + coeffs[3] * y,
+    )
 
-    TAXONOMIC_HIERARCHY = [
-        "species", "genus", "family", "order",
-        "class", "phylum", "kingdom", "domain",
-    ]
+    return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
 
-    UNITS_TO_BASE_UNITS = {
-        "hertz": ("(unit of frequency)", "s^-1"),
-        "newton": ("(unit of force)", "m*kg*s^-2"),
-        "pascal": ("(unit of pressure & stress)", "m^-1*kg*s^-2"),
-        "joule": ("(unit of energy & quantity of heat)", "m^2*kg*s^-2"),
-        "watt": ("(unit of power)", "m^2*kg*s^-3"),
-        "coulomb": ("(unit of electric charge & quantity of electricity)", "s*A"),
-        "volt": ("(unit of voltage & electromotive force)", "m^2*kg*s^-3*A^-1"),
-        "farad": ("(unit of capacitance)", "m^-2*kg^-1*s^4*A^2"),
-        "ohm": ("(unit of electric resistance)", "m^2*kg*s^-3*A^-2"),
-        "weber": ("(unit of magnetic flux)", "m^2*kg*s^-2*A^-1"),
-        "tesla": ("(unit of magnetic flux density)", "kg*s^-2*A^-1"),
-    }
+def mod_arith(q_format: str, a_format: str) -> QuizEntry:
+    """Generate a basic modular arithmetic question."""
+    quotient, m, b = random.randint(30, 40), random.randint(10, 20), random.randint(200, 350)
+    ans = random.randint(0, 9)  # max remainder is 9, since the minimum modulus is 10
+    a = quotient * m + ans - b
 
-    @classmethod
-    def linear_system(cls, q_format: str, a_format: str) -> QuizEntry:
-        """Generate a system of linear equations with two unknowns."""
-        x, y = random.randint(2, 5), random.randint(2, 5)
-        answer = a_format.format(x, y)
+    question = q_format.format(a, b, m)
+    answer = a_format.format(ans)
 
-        coeffs = random.sample(range(1, 6), 4)
+    return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
 
-        question = q_format.format(
-            coeffs[0],
-            coeffs[1],
-            coeffs[0] * x + coeffs[1] * y,
-            coeffs[2],
-            coeffs[3],
-            coeffs[2] * x + coeffs[3] * y,
+def ngonal_prism(q_format: str, a_format: str) -> QuizEntry:
+    """Generate a question regarding vertices on n-gonal prisms."""
+    n = random.randint(0, len(N_PREFIXES) - 1)
+
+    question = q_format.format(N_PREFIXES[n])
+    answer = a_format.format((n + N_PREFIX_STARTS_AT) * 2)
+
+    return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
+
+def imag_sqrt(q_format: str, a_format: str) -> QuizEntry:
+    """Generate a negative square root question."""
+    ans_coeff = random.randint(3, 10)
+
+    question = q_format.format(ans_coeff ** 2)
+    answer = a_format.format(ans_coeff)
+
+    return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
+
+def binary_calc(q_format: str, a_format: str) -> QuizEntry:
+    """Generate a binary calculation question."""
+    a = random.randint(15, 20)
+    b = random.randint(10, a)
+    oper = random.choice(
+        (
+            ("+", operator.add),
+            ("-", operator.sub),
+            ("*", operator.mul),
         )
+    )
 
-        return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
+    # if the operator is multiplication, lower the values of the two operands to make it easier
+    if oper[0] == "*":
+        a -= 5
+        b -= 5
 
-    @classmethod
-    def mod_arith(cls, q_format: str, a_format: str) -> QuizEntry:
-        """Generate a basic modular arithmetic question."""
-        quotient, m, b = random.randint(30, 40), random.randint(10, 20), random.randint(200, 350)
-        ans = random.randint(0, 9)  # max remainder is 9, since the minimum modulus is 10
-        a = quotient * m + ans - b
+    question = q_format.format(a, oper[0], b)
+    answer = a_format.format(oper[1](a, b))
 
-        question = q_format.format(a, b, m)
-        answer = a_format.format(ans)
+    return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
 
-        return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
+def solar_system(q_format: str, a_format: str) -> QuizEntry:
+    """Generate a question on the planets of the Solar System."""
+    planet = random.choice(PLANETS)
 
-    @classmethod
-    def ngonal_prism(cls, q_format: str, a_format: str) -> QuizEntry:
-        """Generate a question regarding vertices on n-gonal prisms."""
-        n = random.randint(0, len(cls.N_PREFIXES) - 1)
+    question = q_format.format(planet[0])
+    answer = a_format.format(planet[1])
 
-        question = q_format.format(cls.N_PREFIXES[n])
-        answer = a_format.format((n + cls.N_PREFIX_STARTS_AT) * 2)
+    return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
 
-        return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
+def taxonomic_rank(q_format: str, a_format: str) -> QuizEntry:
+    """Generate a question on taxonomic classification."""
+    level = random.randint(0, len(TAXONOMIC_HIERARCHY) - 2)
 
-    @classmethod
-    def imag_sqrt(cls, q_format: str, a_format: str) -> QuizEntry:
-        """Generate a negative square root question."""
-        ans_coeff = random.randint(3, 10)
+    question = q_format.format(TAXONOMIC_HIERARCHY[level])
+    answer = a_format.format(TAXONOMIC_HIERARCHY[level + 1])
 
-        question = q_format.format(ans_coeff ** 2)
-        answer = a_format.format(ans_coeff)
+    return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
 
-        return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
 
-    @classmethod
-    def binary_calc(cls, q_format: str, a_format: str) -> QuizEntry:
-        """Generate a binary calculation question."""
-        a = random.randint(15, 20)
-        b = random.randint(10, a)
-        oper = random.choice(
-            (
-                ("+", operator.add),
-                ("-", operator.sub),
-                ("*", operator.mul),
-            )
-        )
+def base_units_convert(q_format: str, a_format: str) -> QuizEntry:
+    """Generate a SI base units conversion question."""
+    unit = random.choice(list(UNITS_TO_BASE_UNITS))
 
-        # if the operator is multiplication, lower the values of the two operands to make it easier
-        if oper[0] == "*":
-            a -= 5
-            b -= 5
+    question = q_format.format(
+        unit + " " + UNITS_TO_BASE_UNITS[unit][0]
+    )
+    answer = a_format.format(
+        UNITS_TO_BASE_UNITS[unit][1]
+    )
 
-        question = q_format.format(a, oper[0], b)
-        answer = a_format.format(oper[1](a, b))
-
-        return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
-
-    @classmethod
-    def solar_system(cls, q_format: str, a_format: str) -> QuizEntry:
-        """Generate a question on the planets of the Solar System."""
-        planet = random.choice(cls.PLANETS)
-
-        question = q_format.format(planet[0])
-        answer = a_format.format(planet[1])
-
-        return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
-
-    @classmethod
-    def taxonomic_rank(cls, q_format: str, a_format: str) -> QuizEntry:
-        """Generate a question on taxonomic classification."""
-        level = random.randint(0, len(cls.TAXONOMIC_HIERARCHY) - 2)
-
-        question = q_format.format(cls.TAXONOMIC_HIERARCHY[level])
-        answer = a_format.format(cls.TAXONOMIC_HIERARCHY[level + 1])
-
-        return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
-
-    @classmethod
-    def base_units_convert(cls, q_format: str, a_format: str) -> QuizEntry:
-        """Generate a SI base units conversion question."""
-        unit = random.choice(list(cls.UNITS_TO_BASE_UNITS))
-
-        question = q_format.format(
-            unit + " " + cls.UNITS_TO_BASE_UNITS[unit][0]
-        )
-        answer = a_format.format(
-            cls.UNITS_TO_BASE_UNITS[unit][1]
-        )
-
-        return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
+    return QuizEntry(question, [answer], DYNAMICALLY_GEN_VARIATION_TOLERANCE)
 
 
 DYNAMIC_QUESTIONS_FORMAT_FUNCS = {
-    201: DynamicQuestionGen.linear_system,
-    202: DynamicQuestionGen.mod_arith,
-    203: DynamicQuestionGen.ngonal_prism,
-    204: DynamicQuestionGen.imag_sqrt,
-    205: DynamicQuestionGen.binary_calc,
-    301: DynamicQuestionGen.solar_system,
-    302: DynamicQuestionGen.taxonomic_rank,
-    303: DynamicQuestionGen.base_units_convert,
+    201: linear_system,
+    202: mod_arith,
+    203: ngonal_prism,
+    204: imag_sqrt,
+    205: binary_calc,
+    301: solar_system,
+    302: taxonomic_rank,
+    303: base_units_convert,
 }
 
 
@@ -361,7 +350,7 @@ class TriviaQuiz(commands.Cog):
                 )
                 return
 
-            elif questions < 1:
+            if questions < 1:
                 await ctx.send(
                     embed=self.make_error_embed(
                         "You must choose to complete at least one question. "
@@ -370,8 +359,7 @@ class TriviaQuiz(commands.Cog):
                 )
                 return
 
-            else:
-                self.question_limit = questions
+            self.question_limit = questions
 
         # Start game if not running.
         if not self.game_status[ctx.channel.id]:

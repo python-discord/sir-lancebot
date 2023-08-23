@@ -43,7 +43,7 @@ class HacktoberStats(commands.Cog):
 
     @in_month(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)
     @commands.group(name="hacktoberstats", aliases=("hackstats",), invoke_without_command=True)
-    async def hacktoberstats_group(self, ctx: commands.Context, github_username: str = None) -> None:
+    async def hacktoberstats_group(self, ctx: commands.Context, github_username: str | None = None) -> None:
         """
         Display an embed for a user's Hacktoberfest contributions.
 
@@ -70,7 +70,7 @@ class HacktoberStats(commands.Cog):
 
     @in_month(Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)
     @hacktoberstats_group.command(name="link")
-    async def link_user(self, ctx: commands.Context, github_username: str = None) -> None:
+    async def link_user(self, ctx: commands.Context, github_username: str | None = None) -> None:
         """
         Link the invoking user's Github github_username to their Discord ID.
 

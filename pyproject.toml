@@ -9,20 +9,20 @@ license = "MIT"
 python = "3.11.*"
 
 # See https://bot-core.pythondiscord.com/ for docs.
-pydis_core = { version = "9.9.0", extras = ["async-rediscache"] }
+pydis_core = { version = "10.1.0", extras = ["async-rediscache"] }
 
 aiodns = "3.0.0"
-rapidfuzz = "3.1.1"
+rapidfuzz = "3.2.0"
 arrow = "1.2.3"
 beautifulsoup4 = "4.12.2"
 pillow = "10.0.0"
-sentry-sdk = "1.27.1"
-PyYAML = "6.0"
+sentry-sdk = "1.29.2"
+PyYAML = "6.0.1"
 emojis = "0.7.0"
 coloredlogs = "15.0.1"
 colorama = { version = "0.4.6", markers = "sys_platform == 'win32'" }
 lxml = "4.9.3"
-emoji = "2.6.0"
+emoji = "2.8.0"
 pyjokes = "0.6.0"
 pydantic = { version = "1.10.9", extras = ["dotenv"]}
 
@@ -32,8 +32,8 @@ isort = "5.12.0"
 pip-licenses = "4.3.2"
 pre-commit = "3.3.3"
 python-dotenv = "1.0.0"
-ruff = "0.0.272"
-taskipy = "1.11.0"
+ruff = "0.0.285"
+taskipy = "1.12.0"
 
 [tool.taskipy.tasks]
 start = "python -m bot"

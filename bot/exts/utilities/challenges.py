@@ -258,7 +258,7 @@ class Challenges(commands.Cog):
 
     @commands.command(aliases=["kata"])
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def challenge(self, ctx: commands.Context, language: str = "python", *, query: str = None) -> None:
+    async def challenge(self, ctx: commands.Context, language: str = "python", *, query: str | None = None) -> None:
         """
         The challenge command pulls a random kata (challenge) from codewars.com.
 

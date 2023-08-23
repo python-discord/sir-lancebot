@@ -1,6 +1,7 @@
 import enum
 import logging
 from os import environ
+from types import MappingProxyType
 
 from pydantic import BaseSettings, SecretStr
 
@@ -129,7 +130,7 @@ class Colours:
     grass_green = 0x66FF00
     gold = 0xE6C200
 
-    easter_like_colours = [
+    easter_like_colours = (
         (255, 247, 0),
         (255, 255, 224),
         (0, 255, 127),
@@ -143,7 +144,7 @@ class Colours:
         (135, 206, 235),
         (0, 204, 204),
         (64, 224, 208),
-    ]
+    )
 
 
 class Emojis:
@@ -177,17 +178,19 @@ class Emojis:
     pull_request_draft = "<:PRDraft:852596025045680218>"
     pull_request_merged = "<:PRMerged:852596100301193227>"
 
-    number_emojis = {
-        1: "\u0031\ufe0f\u20e3",
-        2: "\u0032\ufe0f\u20e3",
-        3: "\u0033\ufe0f\u20e3",
-        4: "\u0034\ufe0f\u20e3",
-        5: "\u0035\ufe0f\u20e3",
-        6: "\u0036\ufe0f\u20e3",
-        7: "\u0037\ufe0f\u20e3",
-        8: "\u0038\ufe0f\u20e3",
-        9: "\u0039\ufe0f\u20e3"
-    }
+    number_emojis = MappingProxyType(
+        {
+            1: "\u0031\ufe0f\u20e3",
+            2: "\u0032\ufe0f\u20e3",
+            3: "\u0033\ufe0f\u20e3",
+            4: "\u0034\ufe0f\u20e3",
+            5: "\u0035\ufe0f\u20e3",
+            6: "\u0036\ufe0f\u20e3",
+            7: "\u0037\ufe0f\u20e3",
+            8: "\u0038\ufe0f\u20e3",
+            9: "\u0039\ufe0f\u20e3"
+        }
+    )
 
     confirmation = "\u2705"
     decline = "\u274c"
@@ -314,11 +317,11 @@ Redis = _Redis()
 class _Reddit(EnvConfig):
     EnvConfig.Config.env_prefix = "reddit_"
 
-    subreddits = ["r/Python"]
+    subreddits: tuple[str, ...] = ("r/Python",)
 
     client_id: SecretStr = ""
     secret: SecretStr = ""
-    webhook = 635408384794951680
+    webhook: int = 635408384794951680
 
 
 Reddit = _Reddit()

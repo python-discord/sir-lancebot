@@ -90,8 +90,8 @@ class LinePaginator(Paginator):
         cls, lines: Iterable[str], ctx: Context,
         embed: Embed, prefix: str = "", suffix: str = "",
         max_lines: int | None = None, max_size: int = 500, empty: bool = True,
-        restrict_to_user: User = None, timeout: float = 300, footer_text: str = None,
-        url: str = None, exception_on_empty_embed: bool = False
+        restrict_to_user: User = None, timeout: float = 300, footer_text: str | None = None,
+        url: str | None = None, exception_on_empty_embed: bool = False
     ) -> None:
         """
         Use a paginator and set of reactions to provide pagination over a set of lines.
@@ -302,7 +302,7 @@ class ImagePaginator(Paginator):
         self._current_page.append(line)
         self.close_page()
 
-    def add_image(self, image: str = None) -> None:
+    def add_image(self, image: str | None = None) -> None:
         """Adds an image to a page given the url."""
         self.images.append(image)
 

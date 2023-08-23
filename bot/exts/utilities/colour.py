@@ -241,7 +241,7 @@ class Colour(commands.Cog):
                 choices=self.colour_mapping.values(),
                 score_cutoff=80
             )
-            colour_name = [name for name, hex_code in self.colour_mapping.items() if hex_code == match][0]
+            colour_name = next(name for name, hex_code in self.colour_mapping.items() if hex_code == match)
         except TypeError:
             colour_name = None
         return colour_name

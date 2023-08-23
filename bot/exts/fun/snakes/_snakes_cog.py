@@ -848,7 +848,7 @@ class Snakes(Cog):
         await self._validate_answer(ctx, quiz, answer, options)
 
     @snakes_group.command(name="name", aliases=("name_gen",))
-    async def name_command(self, ctx: Context, *, name: str = None) -> None:
+    async def name_command(self, ctx: Context, *, name: str | None = None) -> None:
         """
         Snakifies a username.
 
@@ -1041,7 +1041,7 @@ class Snakes(Cog):
         await ctx.send(embed=embed)
 
     @snakes_group.command(name="snakify")
-    async def snakify_command(self, ctx: Context, *, message: str = None) -> None:
+    async def snakify_command(self, ctx: Context, *, message: str | None = None) -> None:
         """
         How would I talk if I were a snake?
 
@@ -1076,7 +1076,7 @@ class Snakes(Cog):
             await ctx.send(embed=embed)
 
     @snakes_group.command(name="video", aliases=("get_video",))
-    async def video_command(self, ctx: Context, *, search: str = None) -> None:
+    async def video_command(self, ctx: Context, *, search: str | None = None) -> None:
         """
         Gets a YouTube video about snakes.
 
