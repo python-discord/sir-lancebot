@@ -29,7 +29,7 @@ class Holiday(NamedTuple):
 
 
 Valentines = Holiday([Month.FEBRUARY], {
-    "heart": Trigger(r"\b(love(s|lie|lies)?|wuv(s|lie|lies)?|heart)\b", ["\u2764\uFE0F"]),
+    "heart": Trigger(r"\b((l|w)(ove|uv)(s|lies?)?|hearts?)\b", ["\u2764\uFE0F"]),
     }
 )
 Easter = Holiday([Month.APRIL], {
