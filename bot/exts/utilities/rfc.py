@@ -41,16 +41,12 @@ class Rfc(commands.Cog):
 
             data = await resp.json()
 
-        description = (
-            data["abstract"]
-            or f"[Link]({DOCUMENT_URL.format(rfc_id=rfc_id)}"
-        )
+        description = data["abstract"]
 
         revisions = data["rev"] or len(data["rev_history"])
 
         raw_date = data["rev_history"][0]["published"]
-        creation_date = datetime.datetime.strptime(
-            raw_date, "%Y-%m-%dT%H:%M:%S%z")
+        creation_date = datetime.datetime.strptime(raw_date, "%Y-%m-%dT%H:%M:%S%z")
 
         document = RfcDocument(
             title=data["title"],
@@ -63,7 +59,7 @@ class Rfc(commands.Cog):
 
         return document
 
-    @commands.cooldown(1, 10, commands.BucketType.user)
+    @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.command()
     async def rfc(self, ctx: commands.Context, rfc_id: int) -> None:
         """Sends the corresponding RFC with the given ID."""
