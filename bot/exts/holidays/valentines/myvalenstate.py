@@ -39,7 +39,7 @@ class MyValenstate(commands.Cog):
         return pre_row[-1]
 
     @commands.command()
-    async def myvalenstate(self, ctx: commands.Context, *, name: str = None) -> None:
+    async def myvalenstate(self, ctx: commands.Context, *, name: str | None = None) -> None:
         """Find the vacation spot(s) with the most matching characters to the invoking user."""
         eq_chars = collections.defaultdict(int)
         if name is None:

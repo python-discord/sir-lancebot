@@ -32,7 +32,7 @@ class PrideAnthem(commands.Cog):
             log.info("No videos for that genre.")
 
     @commands.command(name="prideanthem", aliases=("anthem", "pridesong"))
-    async def prideanthem(self, ctx: commands.Context, genre: str = None) -> None:
+    async def prideanthem(self, ctx: commands.Context, genre: str | None = None) -> None:
         """
         Sends a message with a video of a random pride anthem.
 

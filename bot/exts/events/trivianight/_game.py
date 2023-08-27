@@ -134,7 +134,7 @@ class TriviaNightGame:
     def __iter__(self) -> Iterable[Question]:
         return iter(self._questions)
 
-    def next_question(self, number: str = None) -> Question:
+    def next_question(self, number: str | None = None) -> Question:
         """
         Consume one random question from the trivia night game.
 
@@ -145,7 +145,7 @@ class TriviaNightGame:
 
         if number is not None:
             try:
-                question = [q for q in self._all_questions if q.number == int(number)][0]
+                question = next(q for q in self._all_questions if q.number == int(number))
             except IndexError:
                 raise ValueError(f"Question number {number} does not exist.")
         elif len(self._questions) == 0:

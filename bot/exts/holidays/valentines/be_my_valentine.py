@@ -44,7 +44,7 @@ class BeMyValentine(commands.Cog):
     @commands.cooldown(1, 1800, commands.BucketType.user)
     @commands.group(name="bemyvalentine", invoke_without_command=True)
     async def send_valentine(
-        self, ctx: commands.Context, user: discord.Member, *, valentine_type: str = None
+        self, ctx: commands.Context, user: discord.Member, *, valentine_type: str | None = None
     ) -> None:
         """
         Send a valentine to a specified user with the lovefest role.
@@ -83,7 +83,7 @@ class BeMyValentine(commands.Cog):
     @commands.cooldown(1, 1800, commands.BucketType.user)
     @send_valentine.command(name="secret")
     async def anonymous(
-        self, ctx: commands.Context, user: discord.Member, *, valentine_type: str = None
+        self, ctx: commands.Context, user: discord.Member, *, valentine_type: str | None = None
     ) -> None:
         """
         Send an anonymous Valentine via DM to to a specified user with the lovefest role.

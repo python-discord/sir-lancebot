@@ -155,18 +155,18 @@ class Scoreboard:
         self._points = {}
         self._speed = {}
 
-    def assign_points(self, user_id: int, *, points: int = None, speed: float = None) -> None:
+    def assign_points(self, user_id: int, *, points: int | None = None, speed: float | None = None) -> None:
         """
         Assign points or deduct points to/from a certain user.
 
         This method should be called once the question has finished and all answers have been registered.
         """
-        if points is not None and user_id not in self._points.keys():
+        if points is not None and user_id not in self._points:
             self._points[user_id] = points
         elif points is not None:
             self._points[user_id] += points
 
-        if speed is not None and user_id not in self._speed.keys():
+        if speed is not None and user_id not in self._speed:
             self._speed[user_id] = [1, speed]
         elif speed is not None:
             self._speed[user_id] = [

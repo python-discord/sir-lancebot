@@ -227,7 +227,7 @@ class CaptureLastExpression(ast.NodeTransformer):
         log.trace("Found a trailing last expression in the evaluation code")
 
         log.trace("Creating assignment statement with trailing expression as the right-hand side")
-        right_hand_side = list(ast.iter_child_nodes(node))[0]
+        right_hand_side = next(iter(ast.iter_child_nodes(node)))
 
         assignment = ast.Assign(
             targets=[ast.Name(id="_value_last_expression", ctx=ast.Store())],
