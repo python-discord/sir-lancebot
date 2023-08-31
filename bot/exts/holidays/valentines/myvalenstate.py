@@ -27,7 +27,7 @@ class MyValenstate(commands.Cog):
         if len(goal) == 0:
             return len(source)
 
-        pre_row = list(range(0, len(source) + 1))
+        pre_row = list(range(len(source) + 1))
         for i, source_c in enumerate(source):
             cur_row = [i + 1]
             for j, goal_c in enumerate(goal):

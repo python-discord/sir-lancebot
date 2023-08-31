@@ -299,7 +299,7 @@ def create_snek_frame(
     start_y = random.randint(image_margins[Y], image_dimensions[Y] - image_margins[Y])
     points: list[tuple[float, float]] = [(start_x, start_y)]
 
-    for index in range(0, snake_length):
+    for index in range(snake_length):
         angle = perlin_factory.get_plain_noise(
             ((1 / (snake_length + 1)) * (index + 1)) + perlin_lookup_vertical_shift
         ) * ANGLE_RANGE

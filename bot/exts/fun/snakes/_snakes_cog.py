@@ -495,7 +495,7 @@ class Snakes(Cog):
         antidote_answer.pop()
 
         # Begin initial board building
-        for i in range(0, 10):
+        for i in range(10):
             page_guess_list.append(f"{HOLE_EMOJI} {HOLE_EMOJI} {HOLE_EMOJI} {HOLE_EMOJI}")
             page_result_list.append(f"{CROSS_EMOJI} {CROSS_EMOJI} {CROSS_EMOJI} {CROSS_EMOJI}")
             board.append(
@@ -530,7 +530,7 @@ class Snakes(Cog):
                     page_guess_list[antidote_tries] = " ".join(antidote_guess_list)
 
                     # Now check guess
-                    for i in range(0, len(antidote_answer)):
+                    for i in range(len(antidote_answer)):
                         if antidote_guess_list[i] == antidote_answer[i]:
                             guess_result.append(TICK_EMOJI)
                         elif antidote_guess_list[i] in antidote_answer:
@@ -542,7 +542,7 @@ class Snakes(Cog):
 
                     # Rebuild the board
                     board = []
-                    for i in range(0, 10):
+                    for i in range(10):
                         board.append(f"`{i+1:02d}` "
                                      f"{page_guess_list[i]} - "
                                      f"{page_result_list[i]}")
