@@ -6,7 +6,8 @@ from discord import Embed
 from discord.ext import commands
 
 from bot.bot import Bot
-from bot.constants import Colours
+from bot.constants import Colours, Roles
+from bot.utils.decorators import whitelist_override
 
 logger = logging.getLogger(__name__)
 
@@ -61,6 +62,8 @@ class Rfc(commands.Cog):
 
     @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.command()
+    @commands.guild_only()
+    @whitelist_override(roles=(Roles.everyone,))
     async def rfc(self, ctx: commands.Context, rfc_id: int) -> None:
         """Sends the corresponding RFC with the given ID."""
         document = await self.retrieve_data(rfc_id)
