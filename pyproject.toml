@@ -9,14 +9,14 @@ license = "MIT"
 python = "3.11.*"
 
 # See https://bot-core.pythondiscord.com/ for docs.
-pydis_core = { version = "10.1.0", extras = ["async-rediscache"] }
+pydis_core = { version = "10.2.0", extras = ["async-rediscache"] }
 
 aiodns = "3.0.0"
 rapidfuzz = "3.2.0"
 arrow = "1.2.3"
 beautifulsoup4 = "4.12.2"
 pillow = "10.0.0"
-sentry-sdk = "1.29.2"
+sentry-sdk = "1.30.0"
 PyYAML = "6.0.1"
 emojis = "0.7.0"
 coloredlogs = "15.0.1"
