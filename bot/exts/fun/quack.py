@@ -19,7 +19,7 @@ class Quackstack(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.command(aliases=("ducky",))
     async def quack(
         self,
         ctx: commands.Context,
