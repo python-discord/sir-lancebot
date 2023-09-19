@@ -53,13 +53,11 @@ jobs:
     environment: production
 
     steps:
-      # Check out the private "kubernetes" repository in the `kubernetes`
-      # subdirectory using a GitHub Personal Access Token
       - name: Checkout Kubernetes Repository
         uses: actions/checkout@v4
         with:
-          repository: python-discord/kubernetes
-          path: kubernetes
+          repository: python-discord/infra
+          path: infra
 
       - uses: azure/setup-kubectl@v3
 
@@ -73,5 +71,5 @@ jobs:
         uses: Azure/k8s-deploy@v4
         with:
           manifests: |
-              kubernetes/namespaces/default/sir-lancebot/deployment.yaml
+              infra/kubernetes/namespaces/default/sir-lancebot/deployment.yaml
           images: 'ghcr.io/python-discord/sir-lancebot:${{ inputs.sha-tag }}'
