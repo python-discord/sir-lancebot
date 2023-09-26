@@ -32,7 +32,7 @@ isort = "5.12.0"
 pip-licenses = "4.3.3"
 pre-commit = "3.4.0"
 python-dotenv = "1.0.0"
-ruff = "0.0.290"
+ruff = "0.0.291"
 taskipy = "1.12.0"
 
 [tool.taskipy.tasks]
