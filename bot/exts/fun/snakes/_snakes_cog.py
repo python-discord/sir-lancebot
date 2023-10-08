@@ -1059,10 +1059,9 @@ class Snakes(Cog):
 
                 # Get a random message from the users history
                 messages = []
-                async for message in ctx.history(limit=500).filter(
-                        lambda msg: msg.author == ctx.author  # Message was sent by author.
-                ):
-                    messages.append(message.content)
+                async for message in ctx.history(limit=500):
+                    if message.author == ctx.author:  # Message was sent by author.
+                        messages.append(message.content)
 
                 message = self._get_random_long_message(messages)
 
