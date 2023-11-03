@@ -71,3 +71,5 @@ ignore = [
 ]
 line-length = 120
 select = ["ANN", "B", "C4", "D", "DTZ", "E", "F", "ISC", "INT", "N", "PGH", "PIE", "Q", "RET", "RSE", "RUF", "S", "SIM", "T20", "TID", "UP", "W"]
+unsafe-fixes = true
+preview = true
