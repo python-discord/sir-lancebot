@@ -28,7 +28,6 @@ pydantic = { version = "1.10.9", extras = ["dotenv"]}
 
 
 [tool.poetry.dev-dependencies]
-isort = "5.12.0"
 pip-licenses = "4.3.3"
 pre-commit = "3.5.0"
 python-dotenv = "1.0.0"
@@ -39,7 +38,6 @@ taskipy = "1.12.0"
 start = "python -m bot"
 lint = "pre-commit run --all-files"
 precommit = "pre-commit install"
-isort = "isort ."
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -70,6 +68,12 @@ ignore = [
     "SIM102", "SIM108",
 ]
 line-length = 120
-select = ["ANN", "B", "C4", "D", "DTZ", "E", "F", "ISC", "INT", "N", "PGH", "PIE", "Q", "RET", "RSE", "RUF", "S", "SIM", "T20", "TID", "UP", "W"]
+select = ["ANN", "B", "C4", "D", "DTZ", "E", "F", "I", "ISC", "INT", "N", "PGH", "PIE", "Q", "RET", "RSE", "RUF", "S", "SIM", "T20", "TID", "UP", "W"]
 unsafe-fixes = true
 preview = true
+
+[tool.ruff.isort]
+known-first-party = ["bot"]
+order-by-type = false
+case-sensitive = true
+combine-as-imports = true
