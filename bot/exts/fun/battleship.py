@@ -1,4 +1,3 @@
-import asyncio
 import logging
 import random
 import re
@@ -244,7 +243,7 @@ class Game:
         while True:
             try:
                 await self.bot.wait_for("message", check=self.predicate, timeout=60.0)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 await self.turn.user.send("You took too long. Game over!")
                 await self.next.user.send(f"{self.turn.user} took too long. Game over!")
                 await self.public_channel.send(
@@ -400,7 +399,7 @@ class Battleship(commands.Cog):
                 check=partial(self.predicate, ctx, announcement),
                 timeout=60.0
             )
-        except asyncio.TimeoutError:
+        except TimeoutError:
             self.waiting.remove(ctx.author)
             await announcement.delete()
             await ctx.send(f"{ctx.author.mention} Seems like there's no one here to play...")

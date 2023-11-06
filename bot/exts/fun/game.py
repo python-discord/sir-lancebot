@@ -421,13 +421,13 @@ class Games(Cog):
             "url": data["url"],
             "description": f"{data['summary']}\n\n" if "summary" in data else "\n",
             "release_date": release_date,
-            "rating": round(data["total_rating"] if "total_rating" in data else 0, 2),
-            "rating_count": data["total_rating_count"] if "total_rating_count" in data else "?",
+            "rating": round(data.get("total_rating", 0), 2),
+            "rating_count": data.get("total_rating_count", "?"),
             "platforms": ", ".join(platform["name"] for platform in data["platforms"]) if "platforms" in data else "?",
             "status": GameStatus(data["status"]).name if "status" in data else "?",
             "age_ratings": rating,
             "made_by": ", ".join(companies),
-            "storyline": data["storyline"] if "storyline" in data else ""
+            "storyline": data.get("storyline", "")
         }
         page = GAME_PAGE.format(**formatting)
 
@@ -448,7 +448,7 @@ class Games(Cog):
             formatting = {
                 "name": game["name"],
                 "url": game["url"],
-                "rating": round(game["total_rating"] if "total_rating" in game else 0, 2),
+                "rating": round(game.get("total_rating", 0), 2),
                 "rating_count": game["total_rating_count"] if "total_rating" in game else "?"
             }
             line = GAME_SEARCH_LINE.format(**formatting)

@@ -1,4 +1,3 @@
-import asyncio
 import random
 from functools import partial
 
@@ -131,7 +130,7 @@ class Game:
         while True:
             try:
                 reaction, user = await self.bot.wait_for("reaction_add", check=self.predicate, timeout=30.0)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 await self.channel.send(f"{self.player_active.mention}, you took too long. Game over!")
                 return None
             else:
@@ -406,7 +405,7 @@ class ConnectFour(commands.Cog):
                 check=partial(self.get_player, ctx, announcement),
                 timeout=60.0
             )
-        except asyncio.TimeoutError:
+        except TimeoutError:
             self.waiting.remove(ctx.author)
             await announcement.delete()
             await ctx.send(

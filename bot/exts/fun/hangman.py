@@ -1,4 +1,3 @@
-from asyncio import TimeoutError
 from pathlib import Path
 from random import choice
 

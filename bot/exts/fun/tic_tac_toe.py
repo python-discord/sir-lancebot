@@ -1,4 +1,3 @@
-import asyncio
 import random
 from collections.abc import Callable
 
@@ -59,7 +58,7 @@ class Player:
 
         try:
             react, _ = await self.ctx.bot.wait_for("reaction_add", timeout=30.0, check=check_for_move)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             return True, None
         else:
             return False, list(Emojis.number_emojis.keys())[list(Emojis.number_emojis.values()).index(react.emoji)]
@@ -162,7 +161,7 @@ class Game:
                 timeout=60.0,
                 check=confirm_check
             )
-        except asyncio.TimeoutError:
+        except TimeoutError:
             self.over = True
             self.canceled = True
             await confirm_message.delete()
