@@ -283,7 +283,7 @@ class Snakes(Cog):
             params = {}
 
         async with self.bot.http_session.get(url, params=params, timeout=ClientTimeout(total=10)) as response:
-                return await response.json()
+            return await response.json()
 
     def _get_random_long_message(self, messages: list[str], retries: int = 10) -> str:
         """
@@ -422,7 +422,7 @@ class Snakes(Cog):
         # Validate the answer
         try:
             reaction, user = await ctx.bot.wait_for("reaction_add", timeout=45.0, check=predicate)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             await ctx.send(f"You took too long. The correct answer was **{options[answer]}**.")
             await message.clear_reactions()
             return
@@ -516,7 +516,7 @@ class Snakes(Cog):
             try:
                 reaction, user = await ctx.bot.wait_for(
                     "reaction_add", timeout=300, check=predicate)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 log.debug("Antidote timed out waiting for a reaction")
                 break  # We're done, no reactions for the last 5 minutes
 

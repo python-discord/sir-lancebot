@@ -1,4 +1,3 @@
-import asyncio
 from contextlib import suppress
 from functools import partial
 from pathlib import Path
@@ -94,7 +93,7 @@ class ConvoStarters(commands.Cog):
                     check=partial(self._predicate, command_invoker, message),
                     timeout=60.0
                 )
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 with suppress(discord.NotFound):
                     await message.clear_reaction("🔄")
                 break

@@ -73,7 +73,7 @@ async def disambiguate(
 
     try:
         message = await ctx.bot.wait_for("message", check=check, timeout=timeout)
-    except asyncio.TimeoutError:
+    except TimeoutError:
         raise BadArgument("Timed out.")
 
     try:

@@ -56,7 +56,7 @@ class PrideFacts(commands.Cog):
             await ctx.send(f"Could not parse option {option}")
 
     @staticmethod
-    def get_fact_embed(day_num: int | None=None) -> discord.Embed:
+    def get_fact_embed(day_num: int | None = None) -> discord.Embed:
         """
         Makes a embed for the fact on the given day_num to be sent.
 

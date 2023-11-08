@@ -1,4 +1,3 @@
-import asyncio
 import io
 import json
 import logging
@@ -453,7 +452,7 @@ class SnakeAndLaddersGame:
 
                 await startup.remove_reaction(reaction.emoji, user)
 
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 log.debug("Snakes and Ladders timed out waiting for a reaction")
                 await self.cancel_game()
                 return  # We're done, no reactions for the last 5 minutes
@@ -630,7 +629,7 @@ class SnakeAndLaddersGame:
                 if self._check_all_rolled():
                     break
 
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 log.debug("Snakes and Ladders timed out waiting for a reaction")
                 await self.cancel_game()
                 return  # We're done, no reactions for the last 5 minutes

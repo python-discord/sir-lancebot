@@ -11,14 +11,6 @@ repos:
 
   - repo: local
     hooks:
-      - id: isort
-        name: isort
-        description: This hook runs isort within our project's environment.
-        entry: poetry run isort
-        language: system
-        types: [python]
-        require_serial: true
-
       - id: ruff
         name: ruff
         description: Run ruff linting

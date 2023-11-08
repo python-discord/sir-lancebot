@@ -285,7 +285,7 @@ class GithubInfo(commands.Cog):
                 embed.add_field(name="Gists", value=f"[{gists}](https://gist.github.com/{quote(username, safe='')})")
 
                 embed.add_field(
-                    name=f"Organization{'s' if len(orgs)!=1 else ''}",
+                    name=f"Organization{'s' if len(orgs) != 1 else ''}",
                     value=orgs_to_add if orgs else "No organizations."
                 )
             embed.add_field(name="Website", value=blog)
