@@ -156,7 +156,7 @@ class Game:
             )
 
         try:
-            reaction, user = await self.ctx.bot.wait_for(
+            reaction, _ = await self.ctx.bot.wait_for(
                 "reaction_add",
                 timeout=60.0,
                 check=confirm_check

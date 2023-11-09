@@ -236,7 +236,7 @@ class Colour(commands.Cog):
         """Convert RGB values to a fuzzy matched name."""
         input_hex_colour = self._rgb_to_hex(rgb)
         try:
-            match, certainty, _ = rapidfuzz.process.extractOne(
+            match, _, _ = rapidfuzz.process.extractOne(
                 query=input_hex_colour,
                 choices=self.colour_mapping.values(),
                 score_cutoff=80
@@ -249,7 +249,7 @@ class Colour(commands.Cog):
     def match_colour_name(self, ctx: commands.Context, input_colour_name: str) -> str | None:
         """Convert a colour name to HEX code."""
         try:
-            match, certainty, _ = rapidfuzz.process.extractOne(
+            match, _, _ = rapidfuzz.process.extractOne(
                 query=input_colour_name,
                 choices=self.colour_mapping.keys(),
                 score_cutoff=80
