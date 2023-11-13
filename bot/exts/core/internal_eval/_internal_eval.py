@@ -165,7 +165,7 @@ class InternalEval(commands.Cog):
                 code = "\n".join(block.group("code") for block in blocks)
             else:
                 match = match[0] if len(blocks) == 0 else blocks[0]
-                code, block, lang, delim = match.group("code", "block", "lang", "delim")
+                code, _, _, _ = match.group("code", "block", "lang", "delim")
 
         else:
             code = RAW_CODE_REGEX.fullmatch(code).group("code")
