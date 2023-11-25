@@ -1,20 +1,21 @@
 import asyncio
-import logging
 
 import aiohttp
 import discord
 from async_rediscache import RedisSession
 from discord.ext import commands
 from pydis_core import StartupError
+from pydis_core.utils.logging import get_logger
 from redis import RedisError
 
 import bot
 from bot import constants
 from bot.bot import Bot
+from bot.log import setup_sentry
 from bot.utils.decorators import whitelist_check
 
-log = logging.getLogger(__name__)
-
+log = get_logger(__name__)
+setup_sentry()
 
 async def _create_redis_session() -> RedisSession:
     """Create and connect to a redis session."""
