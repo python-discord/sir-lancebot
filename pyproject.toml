@@ -23,7 +23,8 @@ colorama = { version = "0.4.6", markers = "sys_platform == 'win32'" }
 lxml = "4.9.3"
 emoji = "2.8.0"
 pyjokes = "0.6.0"
-pydantic = { version = "1.10.9", extras = ["dotenv"]}
+pydantic = { version = "2.5.2", extras = ["dotenv"]}
+pydantic-settings = "2.1.0"
 
 
 [tool.poetry.dev-dependencies]

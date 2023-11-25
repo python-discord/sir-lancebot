@@ -2,7 +2,8 @@ import enum
 from os import environ
 from types import MappingProxyType
 
-from pydantic import BaseSettings, SecretStr
+from pydantic import SecretStr
+from pydantic_settings import BaseSettings
 from pydis_core.utils.logging import get_logger
 
 __all__ = (
@@ -34,65 +35,59 @@ log = get_logger(__name__)
 PYTHON_PREFIX = "!"
 
 
-class EnvConfig(BaseSettings):
+class EnvConfig(
+    BaseSettings,
+    env_file=(".env.server", ".env"),
+    env_file_encoding="utf-8",
+    env_nested_delimiter="__",
+    extra="ignore",
+):
     """Our default configuration for models that should load from .env files."""
 
-    class Config:
-        """Specify what .env files to load, and how to load them."""
 
-        env_file = ".env",
-        env_file_encoding = "utf-8"
-
-
-class _Channels(EnvConfig):
-    EnvConfig.Config.env_prefix = "channels_"
-
-    algos_and_data_structs = 650401909852864553
-    bot_commands = 267659945086812160
-    community_meta = 267659945086812160
-    organisation = 551789653284356126
-    data_science_and_ai = 366673247892275221
-    devlog = 622895325144940554
-    dev_contrib = 635950537262759947
-    mod_meta = 775412552795947058
-    mod_tools = 775413915391098921
-    off_topic_0 = 291284109232308226
-    off_topic_1 = 463035241142026251
-    off_topic_2 = 463035268514185226
-    python_help = 1035199133436354600
-    sir_lancebot_playground = 607247579608121354
-    voice_chat_0 = 412357430186344448
-    voice_chat_1 = 799647045886541885
-    staff_voice = 541638762007101470
-    reddit = 458224812528238616
+class _Channels(EnvConfig, env_prefix="channels_"):
+    algos_and_data_structs: int = 650401909852864553
+    bot_commands: int = 267659945086812160
+    community_meta: int = 267659945086812160
+    organisation: int = 551789653284356126
+    data_science_and_ai: int = 366673247892275221
+    devlog: int = 622895325144940554
+    dev_contrib: int = 635950537262759947
+    mod_meta: int = 775412552795947058
+    mod_tools: int = 775413915391098921
+    off_topic_0: int = 291284109232308226
+    off_topic_1: int = 463035241142026251
+    off_topic_2: int = 463035268514185226
+    python_help: int = 1035199133436354600
+    sir_lancebot_playground: int = 607247579608121354
+    voice_chat_0: int = 412357430186344448
+    voice_chat_1: int = 799647045886541885
+    staff_voice: int = 541638762007101470
+    reddit: int = 458224812528238616
 
 
 Channels = _Channels()
 
 
-class _Categories(EnvConfig):
-    EnvConfig.Config.env_prefix = "categories_"
-
-    python_help_system = 691405807388196926
-    development = 411199786025484308
-    devprojects = 787641585624940544
-    media = 799054581991997460
-    staff = 364918151625965579
+class _Categories(EnvConfig, env_prefix="categories_"):
+    python_help_system: int = 691405807388196926
+    development: int = 411199786025484308
+    devprojects: int = 787641585624940544
+    media: int = 799054581991997460
+    staff: int = 364918151625965579
 
 
 Categories = _Categories()
 
 
-class _Client(EnvConfig):
-    EnvConfig.Config.env_prefix = "client_"
-
-    name = "Sir Lancebot"
-    guild = 267624335836053506
-    prefix = "."
+class _Client(EnvConfig, env_prefix="client_"):
+    name: str = "Sir Lancebot"
+    guild: int = 267624335836053506
+    prefix: str = "."
     token: SecretStr
-    debug = True
-    in_ci = False
-    github_repo = "https://github.com/python-discord/sir-lancebot"
+    debug: bool = True
+    in_ci: bool = False
+    github_repo: str = "https://github.com/python-discord/sir-lancebot"
     # Override seasonal locks: 1 (January) to 12 (December)
     month_override: int | None = None
 
@@ -100,12 +95,10 @@ class _Client(EnvConfig):
 Client = _Client()
 
 
-class _Logging(EnvConfig):
-    EnvConfig.Config.env_prefix = "logging_"
-
-    debug = Client.debug
-    file_logs = False
-    trace_loggers = ""
+class _Logging(EnvConfig, env_prefix="logging_"):
+    debug: bool = Client.debug
+    file_logs: bool = False
+    trace_loggers: str = ""
 
 
 Logging = _Logging()
@@ -259,26 +252,21 @@ if Client.month_override is not None:
     Month(Client.month_override)
 
 
-class _Roles(EnvConfig):
+class _Roles(EnvConfig, env_prefix="roles_"):
+    owners: int = 267627879762755584
+    admins: int = 267628507062992896
+    moderation_team: int = 267629731250176001
+    helpers: int = 267630620367257601
+    core_developers: int = 587606783669829632
+    everyone: int = Client.guild
 
-    EnvConfig.Config.env_prefix = "roles_"
-
-    owners = 267627879762755584
-    admins = 267628507062992896
-    moderation_team = 267629731250176001
-    helpers = 267630620367257601
-    core_developers = 587606783669829632
-    everyone = Client.guild
-
-    lovefest = 542431903886606399
+    lovefest: int = 542431903886606399
 
 
 Roles = _Roles()
 
 
-class _Tokens(EnvConfig):
-    EnvConfig.Config.env_prefix = "tokens_"
-
+class _Tokens(EnvConfig, env_prefix="tokens_"):
     giphy: SecretStr = ""
     youtube: SecretStr = ""
     tmdb: SecretStr = ""
@@ -292,31 +280,26 @@ class _Tokens(EnvConfig):
 Tokens = _Tokens()
 
 
-class _Wolfram(EnvConfig):
-    EnvConfig.Config.env_prefix = "wolfram_"
-    user_limit_day = 10
-    guild_limit_day = 67
+class _Wolfram(EnvConfig, env_prefix="wolfram_"):
+    user_limit_day: int = 10
+    guild_limit_day: int = 67
     key: SecretStr = ""
 
 
 Wolfram = _Wolfram()
 
 
-class _Redis(EnvConfig):
-    EnvConfig.Config.env_prefix = "redis_"
-
-    host = "redis.default.svc.cluster.local"
-    port = 6379
+class _Redis(EnvConfig, env_prefix="redis_"):
+    host: str = "redis.default.svc.cluster.local"
+    port: int = 6379
     password: SecretStr = ""
-    use_fakeredis = False
+    use_fakeredis: bool = False
 
 
 Redis = _Redis()
 
 
-class _Reddit(EnvConfig):
-    EnvConfig.Config.env_prefix = "reddit_"
-
+class _Reddit(EnvConfig, env_prefix="reddit_"):
     subreddits: tuple[str, ...] = ("r/Python",)
 
     client_id: SecretStr = ""
