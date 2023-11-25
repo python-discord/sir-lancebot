@@ -4,13 +4,14 @@ import contextlib
 import functools
 import inspect
 import io
-import logging
 import sys
 import traceback
 import types
 from typing import Any
 
-log = logging.getLogger(__name__)
+from pydis_core.utils.logging import get_logger
+
+log = get_logger(__name__)
 
 # A type alias to annotate the tuples returned from `sys.exc_info()`
 ExcInfo = tuple[type[Exception], Exception, types.TracebackType]

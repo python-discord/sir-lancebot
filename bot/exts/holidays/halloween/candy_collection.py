@@ -1,15 +1,15 @@
-import logging
 import random
 
 import discord
 from async_rediscache import RedisCache
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Channels, Month
 from bot.utils.decorators import in_month
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 # chance is 1 in x range, so 1 in 20 range would give 5% chance (for add candy)
 ADD_CANDY_REACTION_CHANCE = 20  # 5%

@@ -1,6 +1,5 @@
 import asyncio
 import colorsys
-import logging
 import os
 import random
 import re
@@ -16,6 +15,7 @@ from aiohttp import ClientTimeout
 from discord import Colour, Embed, File, Member, Message, Reaction
 from discord.errors import HTTPException
 from discord.ext.commands import Cog, CommandError, Context, bot_has_permissions, group
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import ERROR_REPLIES, Tokens
@@ -23,7 +23,7 @@ from bot.exts.fun.snakes import _utils as utils
 from bot.exts.fun.snakes._converter import Snake
 from bot.utils.decorators import locked
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 # region: Constants

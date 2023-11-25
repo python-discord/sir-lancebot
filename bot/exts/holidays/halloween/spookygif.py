@@ -1,12 +1,12 @@
-import logging
 
 import discord
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours, Tokens
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 API_URL = "http://api.giphy.com/v1/gifs/random"
 

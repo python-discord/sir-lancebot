@@ -1,13 +1,13 @@
 # Help command from Python bot. All commands that will be added to there in futures should be added to here too.
 import asyncio
 import itertools
-import logging
 from contextlib import suppress
 from typing import NamedTuple
 
 from discord import Colour, Embed, HTTPException, Message, Reaction, User
 from discord.ext import commands
 from discord.ext.commands import CheckFailure, Cog as DiscordCog, Command, Context
+from pydis_core.utils.logging import get_logger
 
 from bot import constants
 from bot.bot import Bot
@@ -35,7 +35,7 @@ class Cog(NamedTuple):
     commands: list[Command]
 
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 class HelpQueryNotFoundError(ValueError):

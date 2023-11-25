@@ -1,15 +1,15 @@
 import datetime
-import logging
 
 import pydantic
 from discord import Embed
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours, Roles
 from bot.utils.decorators import whitelist_override
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 API_URL = "https://datatracker.ietf.org/doc/rfc{rfc_id}/doc.json"
 DOCUMENT_URL = "https://datatracker.ietf.org/doc/rfc{rfc_id}"

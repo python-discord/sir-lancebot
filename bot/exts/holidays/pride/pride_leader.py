@@ -1,16 +1,16 @@
 import json
-import logging
 import random
 from pathlib import Path
 
 import discord
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 from rapidfuzz import fuzz
 
 from bot import constants
 from bot.bot import Bot
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 PRIDE_RESOURCE = json.loads(Path("bot/resources/holidays/pride/prideleader.json").read_text("utf8"))
 MINIMUM_FUZZ_RATIO = 40

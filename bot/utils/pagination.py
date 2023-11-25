@@ -1,9 +1,9 @@
-import logging
 from collections.abc import Iterable
 
 from discord import Embed, Member, Reaction
 from discord.abc import User
 from discord.ext.commands import Context, Paginator
+from pydis_core.utils.logging import get_logger
 
 from bot.constants import Emojis
 
@@ -15,7 +15,7 @@ DELETE_EMOJI = Emojis.trashcan  # [:trashcan:]
 
 PAGINATION_EMOJI = (FIRST_EMOJI, LEFT_EMOJI, RIGHT_EMOJI, LAST_EMOJI, DELETE_EMOJI)
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 class EmptyPaginatorEmbedError(Exception):

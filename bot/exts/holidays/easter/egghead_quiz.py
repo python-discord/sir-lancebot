@@ -1,16 +1,16 @@
 import asyncio
-import logging
 import random
 from json import loads
 from pathlib import Path
 
 import discord
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 EGGHEAD_QUESTIONS = loads(Path("bot/resources/holidays/easter/egghead_questions.json").read_text("utf8"))
 

@@ -1,6 +1,5 @@
 import asyncio
 import json
-import logging
 import operator
 import random
 import re
@@ -13,12 +12,13 @@ from pathlib import Path
 
 import discord
 from discord.ext import commands, tasks
+from pydis_core.utils.logging import get_logger
 from rapidfuzz import fuzz
 
 from bot.bot import Bot
 from bot.constants import Client, Colours, MODERATION_ROLES, NEGATIVE_REPLIES
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 DEFAULT_QUESTION_LIMIT = 7
 STANDARD_VARIATION_TOLERANCE = 88

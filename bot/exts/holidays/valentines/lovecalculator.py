@@ -1,7 +1,6 @@
 import bisect
 import hashlib
 import json
-import logging
 import random
 from collections.abc import Coroutine
 from pathlib import Path
@@ -10,12 +9,13 @@ import discord
 from discord import Member
 from discord.ext import commands
 from discord.ext.commands import BadArgument, Cog, clean_content
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Channels, Month, PYTHON_PREFIX, Roles
 from bot.utils.decorators import in_month
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 LOVE_DATA = json.loads(Path("bot/resources/holidays/valentines/love_matches.json").read_text("utf8"))
 LOVE_DATA = sorted((int(key), value) for key, value in LOVE_DATA.items())

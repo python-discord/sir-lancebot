@@ -1,15 +1,15 @@
-import logging
 import random
 from datetime import UTC, datetime
 
 import discord
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Month, Tokens
 from bot.utils.decorators import in_month
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 URL = "https://api.github.com/search/issues?per_page=100&q=is:issue+label:hacktoberfest+language:python+state:open"
 

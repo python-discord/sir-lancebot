@@ -1,15 +1,15 @@
-import logging
 from asyncio import to_thread
 from random import choice
 
 from bs4 import BeautifulSoup
 from discord import Embed, Interaction, SelectOption, ui
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours, Emojis, NEGATIVE_REPLIES
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 API_ROOT = "https://www.codewars.com/api/v1/code-challenges/{kata_id}"
 
 # Map difficulty for the kata to color we want to display in the embed.

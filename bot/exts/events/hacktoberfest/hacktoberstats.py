@@ -1,4 +1,3 @@
-import logging
 import random
 import re
 from collections import Counter
@@ -8,12 +7,13 @@ from urllib.parse import quote_plus
 import discord
 from async_rediscache import RedisCache
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours, Month, NEGATIVE_REPLIES, Tokens
 from bot.utils.decorators import in_month
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 CURRENT_YEAR = datetime.now(tz=UTC).year  # Used to construct GH API query
 PRS_FOR_SHIRT = 4  # Minimum number of PRs before a shirt is awarded
@@ -56,7 +56,7 @@ class HacktoberStats(commands.Cog):
 
             if await self.linked_accounts.contains(author_id):
                 github_username = await self.linked_accounts.get(author_id)
-                logging.info(f"Getting stats for {author_id} linked GitHub account '{github_username}'")
+                log.info(f"Getting stats for {author_id} linked GitHub account '{github_username}'")
             else:
                 msg = (
                     f"{author_mention}, you have not linked a GitHub account\n\n"
@@ -100,10 +100,10 @@ class HacktoberStats(commands.Cog):
         stored_user = await self.linked_accounts.pop(author_id, None)
         if stored_user:
             await ctx.send(f"{author_mention}, your GitHub profile has been unlinked")
-            logging.info(f"{author_id} has unlinked their GitHub account")
+            log.info(f"{author_id} has unlinked their GitHub account")
         else:
             await ctx.send(f"{author_mention}, you do not currently have a linked GitHub account")
-            logging.info(f"{author_id} tried to unlink their GitHub account but no account was linked")
+            log.info(f"{author_id} tried to unlink their GitHub account but no account was linked")
 
     async def get_stats(self, ctx: commands.Context, github_username: str) -> None:
         """
@@ -140,7 +140,7 @@ class HacktoberStats(commands.Cog):
 
     async def build_embed(self, github_username: str, prs: list[dict]) -> discord.Embed:
         """Return a stats embed built from github_username's PRs."""
-        logging.info(f"Building Hacktoberfest embed for GitHub user: '{github_username}'")
+        log.info(f"Building Hacktoberfest embed for GitHub user: '{github_username}'")
         in_review, accepted = await self._categorize_prs(prs)
 
         n = len(accepted) + len(in_review)  # Total number of PRs
@@ -181,7 +181,7 @@ class HacktoberStats(commands.Cog):
             value=accepted_str
         )
 
-        logging.info(f"Hacktoberfest PR built for GitHub user '{github_username}'")
+        log.info(f"Hacktoberfest PR built for GitHub user '{github_username}'")
         return stats_embed
 
     async def get_october_prs(self, github_username: str) -> list[dict] | None:
@@ -242,7 +242,7 @@ class HacktoberStats(commands.Cog):
             log.info(f"No October PRs found for GitHub user: '{github_username}'")
             return []
 
-        logging.info(f"Found {len(jsonresp['items'])} Hacktoberfest PRs for GitHub user: '{github_username}'")
+        log.info(f"Found {len(jsonresp['items'])} Hacktoberfest PRs for GitHub user: '{github_username}'")
         outlist = []  # list of pr information dicts that will get returned
         oct3 = datetime(int(CURRENT_YEAR), 10, 3, 23, 59, 59, tzinfo=UTC)
         hackto_topics = {}  # cache whether each repo has the appropriate topic (bool values)

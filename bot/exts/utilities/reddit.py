@@ -1,5 +1,4 @@
 import asyncio
-import logging
 import random
 import textwrap
 from collections import namedtuple
@@ -10,6 +9,7 @@ from discord import Colour, Embed, TextChannel
 from discord.ext.commands import Cog, Context, group, has_any_role
 from discord.ext.tasks import loop
 from discord.utils import escape_markdown, sleep_until
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Channels, ERROR_REPLIES, Emojis, Reddit as RedditConfig, STAFF_ROLES
@@ -17,7 +17,7 @@ from bot.utils.converters import Subreddit
 from bot.utils.messages import sub_clyde
 from bot.utils.pagination import ImagePaginator, LinePaginator
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 AccessToken = namedtuple("AccessToken", ["token", "expires_at"])
 HEADERS = {"User-Agent": "python3:python-discord/bot:1.0.0 (by /u/PythonDiscord)"}

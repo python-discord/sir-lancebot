@@ -1,16 +1,16 @@
-import logging
 import random
 from json import loads
 from pathlib import Path
 
 import discord
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Channels, Colours, Month
 from bot.utils.decorators import seasonal_task
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 EGG_FACTS = loads(Path("bot/resources/holidays/easter/easter_egg_facts.json").read_text("utf8"))
 

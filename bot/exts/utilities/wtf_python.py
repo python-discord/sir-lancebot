@@ -1,15 +1,15 @@
-import logging
 import random
 import re
 
 import rapidfuzz
 from discord import Embed, File
 from discord.ext import commands, tasks
+from pydis_core.utils.logging import get_logger
 
 from bot import constants
 from bot.bot import Bot
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 WTF_PYTHON_RAW_URL = "http://raw.githubusercontent.com/satwikkansal/wtfpython/master/"
 BASE_URL = "https://github.com/satwikkansal/wtfpython"

@@ -1,17 +1,17 @@
-import logging
 import random
 import re
 from typing import NamedTuple
 
 import discord
 from discord.ext.commands import Cog
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Month
 from bot.utils import resolve_current_month
 from bot.utils.decorators import in_month
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 class Trigger(NamedTuple):

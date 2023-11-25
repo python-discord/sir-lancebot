@@ -1,5 +1,4 @@
 import difflib
-import logging
 import random
 import re
 from datetime import UTC, datetime, timedelta
@@ -11,6 +10,7 @@ from discord import Embed
 from discord.ext import tasks
 from discord.ext.commands import Cog, Context, group
 from pydis_core.utils import scheduling
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import STAFF_ROLES, Tokens
@@ -40,7 +40,7 @@ BASE_HEADERS = {
     "Accept": "application/json"
 }
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 REGEX_NON_ALPHABET = re.compile(r"[^a-z0-9]", re.IGNORECASE)
 

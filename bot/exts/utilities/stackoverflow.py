@@ -1,14 +1,14 @@
-import logging
 from html import unescape
 from urllib.parse import quote_plus
 
 from discord import Embed, HTTPException
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours, Emojis
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 BASE_URL = "https://api.stackexchange.com/2.2/search/advanced"
 SO_PARAMS = {

@@ -1,13 +1,13 @@
-import logging
 import random
 
 from discord import Embed
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES, Tokens
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 class ScaryMovie(commands.Cog):

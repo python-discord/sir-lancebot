@@ -1,9 +1,9 @@
 import enum
-import logging
 from os import environ
 from types import MappingProxyType
 
 from pydantic import BaseSettings, SecretStr
+from pydis_core.utils.logging import get_logger
 
 __all__ = (
     "Channels",
@@ -28,7 +28,7 @@ __all__ = (
     "POSITIVE_REPLIES",
 )
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 PYTHON_PREFIX = "!"

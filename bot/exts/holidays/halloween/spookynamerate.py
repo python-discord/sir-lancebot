@@ -3,7 +3,6 @@ import json
 import random
 from collections import defaultdict
 from datetime import UTC, datetime, timedelta
-from logging import getLogger
 from os import getenv
 from pathlib import Path
 
@@ -12,12 +11,13 @@ from discord import Embed, Reaction, TextChannel, User
 from discord.colour import Colour
 from discord.ext import tasks
 from discord.ext.commands import Cog, Context, group
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Channels, Client, Colours, Month
 from bot.utils.decorators import InMonthCheckFailure
 
-logger = getLogger(__name__)
+logger = get_logger(__name__)
 
 EMOJIS_VAL = {
     "\N{Jack-O-Lantern}": 1,

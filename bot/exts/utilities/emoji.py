@@ -1,4 +1,3 @@
-import logging
 import random
 import textwrap
 from collections import defaultdict
@@ -6,13 +5,14 @@ from datetime import UTC, datetime
 
 from discord import Color, Embed, Emoji
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours, ERROR_REPLIES
 from bot.utils.pagination import LinePaginator
 from bot.utils.time import time_since
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 class Emojis(commands.Cog):

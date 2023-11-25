@@ -1,14 +1,14 @@
 import json
-import logging
 from pathlib import Path
 from random import shuffle
 
 import discord
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 game_recs = []
 
 # Populate the list `game_recs` with resource files

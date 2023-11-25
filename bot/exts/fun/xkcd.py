@@ -1,15 +1,15 @@
-import logging
 import re
 from random import randint
 
 from discord import Embed
 from discord.ext import tasks
 from discord.ext.commands import Cog, Context, command
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 COMIC_FORMAT = re.compile(r"latest|[0-9]+")
 BASE_URL = "https://xkcd.com"
@@ -74,7 +74,7 @@ class XKCD(Cog):
         if info["img"][-3:] in ("jpg", "png", "gif"):
             embed.set_image(url=info["img"])
             date = f"{info['year']}/{info['month']}/{info['day']}"
-            embed.set_footer(text=f"{date} - #{info['num']}, \'{info['safe_title']}\'")
+            embed.set_footer(text=f"{date} - #{info['num']}, '{info['safe_title']}'")
             embed.colour = Colours.soft_green
         else:
             embed.description = (

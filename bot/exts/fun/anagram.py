@@ -1,16 +1,16 @@
 import asyncio
 import json
-import logging
 import random
 from pathlib import Path
 
 import discord
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 TIME_LIMIT = 60
 

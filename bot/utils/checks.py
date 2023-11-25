@@ -1,5 +1,4 @@
 import datetime
-import logging
 from collections.abc import Callable, Container, Iterable
 
 from discord.ext.commands import (
@@ -12,10 +11,11 @@ from discord.ext.commands import (
     Cooldown,
     CooldownMapping,
 )
+from pydis_core.utils.logging import get_logger
 
 from bot import constants
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 CODEJAM_CATEGORY_NAME = "Code Jam"
 
 

@@ -1,4 +1,3 @@
-import logging
 import random
 import re
 from dataclasses import dataclass
@@ -8,11 +7,12 @@ from urllib.parse import quote
 import discord
 from aiohttp import ClientResponse
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours, ERROR_REPLIES, Emojis, NEGATIVE_REPLIES, Tokens
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 GITHUB_API_URL = "https://api.github.com"
 

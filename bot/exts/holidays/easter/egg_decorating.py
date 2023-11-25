@@ -1,5 +1,4 @@
 import json
-import logging
 import random
 from contextlib import suppress
 from io import BytesIO
@@ -8,11 +7,12 @@ from pathlib import Path
 import discord
 from PIL import Image
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.utils import helpers
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 HTML_COLOURS = json.loads(Path("bot/resources/fun/html_colours.json").read_text("utf8"))
 

@@ -1,14 +1,14 @@
-import logging
 from html import unescape
 from urllib.parse import quote_plus
 
 from discord import Embed
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 API_ROOT = "https://realpython.com/search/api/v1/"
 ARTICLE_URL = "https://realpython.com{article_url}"

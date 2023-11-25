@@ -1,16 +1,16 @@
-import logging
 import re
 from typing import Literal
 
 import discord
 from discord.ext import commands
 from emoji import EMOJI_DATA, is_emoji
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours, Roles
 from bot.utils.decorators import whitelist_override
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 BASE_URLS = {
     "png": "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/",
     "svg": "https://raw.githubusercontent.com/twitter/twemoji/master/assets/svg/",

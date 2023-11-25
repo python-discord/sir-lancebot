@@ -1,14 +1,13 @@
-import logging
-
 import discord
 from discord import DiscordException, Embed
 from discord.ext import commands
 from pydis_core import BotBase
 from pydis_core.utils import scheduling
+from pydis_core.utils.logging import get_logger
 
 from bot import constants, exts
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 __all__ = ("Bot", )
 

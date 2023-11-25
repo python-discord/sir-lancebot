@@ -1,4 +1,3 @@
-import logging
 import random
 from datetime import UTC, date, datetime
 from typing import Any
@@ -7,12 +6,13 @@ from urllib.parse import urlencode
 from discord import Embed
 from discord.ext import tasks
 from discord.ext.commands import Cog, Context, group
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Tokens
 from bot.utils.converters import DateConverter
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 NASA_BASE_URL = "https://api.nasa.gov"
 NASA_IMAGES_BASE_URL = "https://images-api.nasa.gov"

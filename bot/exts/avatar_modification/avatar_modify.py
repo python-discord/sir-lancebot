@@ -1,6 +1,5 @@
 import asyncio
 import json
-import logging
 import math
 import string
 import unicodedata
@@ -11,13 +10,14 @@ from typing import TypeVar
 
 import discord
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours, Emojis
 from bot.exts.avatar_modification._effects import PfpEffects
 from bot.utils.halloween import spookifications
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 _EXECUTOR = ThreadPoolExecutor(10)
 

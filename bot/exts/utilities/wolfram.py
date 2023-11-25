@@ -1,4 +1,3 @@
-import logging
 from collections.abc import Callable
 from io import BytesIO
 from urllib.parse import urlencode
@@ -8,12 +7,13 @@ import discord
 from discord import Embed
 from discord.ext import commands
 from discord.ext.commands import BucketType, Cog, Context, check, group
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours, STAFF_ROLES, Wolfram as WolframConfig
 from bot.utils.pagination import ImagePaginator
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 APPID = WolframConfig.key.get_secret_value()
 DEFAULT_OUTPUT_FORMAT = "JSON"

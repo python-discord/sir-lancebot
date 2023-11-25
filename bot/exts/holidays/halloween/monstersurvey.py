@@ -1,12 +1,12 @@
 import json
-import logging
 import pathlib
 
 from discord import Embed
 from discord.ext import commands
 from discord.ext.commands import Bot, Cog, Context
+from pydis_core.utils.logging import get_logger
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 EMOJIS = {
     "SUCCESS": "\u2705",

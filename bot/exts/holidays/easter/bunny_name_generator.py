@@ -1,14 +1,14 @@
 import json
-import logging
 import random
 import re
 from pathlib import Path
 
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 BUNNY_NAMES = json.loads(Path("bot/resources/holidays/easter/bunny_names.json").read_text("utf8"))
 

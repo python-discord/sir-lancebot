@@ -1,15 +1,15 @@
-import logging
 import random
 from os import environ
 
 import discord
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 
 TMDB_API_KEY = environ.get("TMDB_API_KEY")
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 class RomanceMovieFinder(commands.Cog):

@@ -1,10 +1,10 @@
-import logging
 import math
 import random
 from collections.abc import Iterable
 
 from discord import Embed, Message
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 from sentry_sdk import push_scope
 
 from bot.bot import Bot
@@ -13,7 +13,7 @@ from bot.utils.commands import get_command_suggestions
 from bot.utils.decorators import InChannelCheckFailure, InMonthCheckFailure
 from bot.utils.exceptions import APIError, MovedCommandError, UserNotPlayingError
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 DELETE_DELAY = 10
@@ -32,7 +32,7 @@ class CommandErrorHandler(commands.Cog):
         if command._buckets.valid:
             bucket = command._buckets.get_bucket(message)
             bucket._tokens = min(bucket.rate, bucket._tokens + 1)
-            logging.debug("Cooldown counter reverted as the command was not used correctly.")
+            log.debug("Cooldown counter reverted as the command was not used correctly.")
 
     @staticmethod
     def error_embed(message: str, title: Iterable | str = ERROR_REPLIES) -> Embed:
@@ -49,7 +49,7 @@ class CommandErrorHandler(commands.Cog):
     async def on_command_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
         """Activates when a command raises an error."""
         if getattr(error, "handled", False):
-            logging.debug(f"Command {ctx.command} had its error already handled locally; ignoring.")
+            log.debug(f"Command {ctx.command} had its error already handled locally; ignoring.")
             return
 
         parent_command = ""
@@ -58,7 +58,7 @@ class CommandErrorHandler(commands.Cog):
             ctx = subctx
 
         error = getattr(error, "original", error)
-        logging.debug(
+        log.debug(
             f"Error Encountered: {type(error).__name__} - {error!s}, "
             f"Command: {ctx.command}, "
             f"Author: {ctx.author}, "

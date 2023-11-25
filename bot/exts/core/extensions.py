@@ -1,5 +1,4 @@
 import functools
-import logging
 from collections.abc import Mapping
 from enum import Enum
 
@@ -7,6 +6,7 @@ from discord import Colour, Embed
 from discord.ext import commands
 from discord.ext.commands import Context, group
 from pydis_core.utils._extensions import unqualify
+from pydis_core.utils.logging import get_logger
 
 from bot import exts
 from bot.bot import Bot
@@ -14,7 +14,7 @@ from bot.constants import Client, Emojis, MODERATION_ROLES, Roles
 from bot.utils.checks import with_role_check
 from bot.utils.pagination import LinePaginator
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 UNLOAD_BLACKLIST = {f"{exts.__name__}.core.extensions"}

@@ -1,17 +1,17 @@
 import calendar
 import json
-import logging
 import random
 from datetime import UTC, datetime
 from pathlib import Path
 
 import discord
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 LETTER_EMOJI = ":love_letter:"
 HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_heart:", ":two_hearts:"]

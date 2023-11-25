@@ -1,6 +1,5 @@
 import asyncio
 import functools
-import logging
 import random
 from asyncio import Lock
 from collections.abc import Callable, Container
@@ -10,6 +9,7 @@ from weakref import WeakValueDictionary
 from discord import Colour, Embed
 from discord.ext import commands
 from discord.ext.commands import CheckFailure, Command, Context
+from pydis_core.utils.logging import get_logger
 
 from bot.constants import Channels, ERROR_REPLIES, Month, WHITELISTED_CHANNELS
 from bot.utils import human_months, resolve_current_month
@@ -17,7 +17,7 @@ from bot.utils.checks import in_whitelist_check
 
 ONE_DAY = 24 * 60 * 60
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 class InChannelCheckFailure(CheckFailure):
@@ -122,12 +122,12 @@ def in_month(*allowed_months: Month) -> Callable:
     def decorator(callable_: Callable) -> Callable:
         # Functions decorated as commands are turned into instances of `Command`
         if isinstance(callable_, Command):
-            logging.debug(f"Command {callable_.qualified_name} will be locked to {human_months(allowed_months)}")
+            log.debug(f"Command {callable_.qualified_name} will be locked to {human_months(allowed_months)}")
             actual_deco = in_month_command(*allowed_months)
 
         # D.py will assign this attribute when `callable_` is registered as a listener
         elif hasattr(callable_, "__cog_listener__"):
-            logging.debug(f"Listener {callable_.__qualname__} will be locked to {human_months(allowed_months)}")
+            log.debug(f"Listener {callable_.__qualname__} will be locked to {human_months(allowed_months)}")
             actual_deco = in_month_listener(*allowed_months)
 
         # Otherwise we're unsure exactly what has been decorated

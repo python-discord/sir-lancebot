@@ -1,10 +1,11 @@
-import logging
+
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Tokens
 from bot.exts.fun.snakes._snakes_cog import Snakes
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 async def setup(bot: Bot) -> None:

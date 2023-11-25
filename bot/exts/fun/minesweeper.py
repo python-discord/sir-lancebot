@@ -1,10 +1,10 @@
-import logging
 from collections.abc import Iterator
 from dataclasses import dataclass
 from random import randint, random
 
 import discord
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Client
@@ -29,7 +29,7 @@ MESSAGE_MAPPING = {
     "x": ":x:"
 }
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 GameBoard = list[list[str | int]]

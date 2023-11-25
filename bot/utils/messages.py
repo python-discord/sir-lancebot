@@ -1,13 +1,13 @@
 import contextlib
-import logging
 import re
 from collections.abc import Callable
 
 from discord import Embed, Message
 from discord.ext import commands
 from discord.ext.commands import Context, MessageConverter
+from pydis_core.utils.logging import get_logger
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 def sub_clyde(username: str | None) -> str | None:

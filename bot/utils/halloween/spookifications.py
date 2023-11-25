@@ -1,9 +1,9 @@
-import logging
 from random import choice, randint
 
 from PIL import Image, ImageOps
+from pydis_core.utils.logging import get_logger
 
-log = logging.getLogger()
+log = get_logger()
 
 
 def inversion(im: Image.Image) -> Image.Image:

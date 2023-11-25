@@ -1,4 +1,3 @@
-import logging
 import random
 from enum import Enum
 from typing import Any
@@ -6,13 +5,14 @@ from typing import Any
 from aiohttp import ClientSession
 from discord import Embed
 from discord.ext.commands import Cog, Context, group
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Tokens
 from bot.utils.exceptions import APIError
 from bot.utils.pagination import ImagePaginator
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 # Define base URL of TMDB
 BASE_URL = "https://api.themoviedb.org/3/"

@@ -1,5 +1,4 @@
 import hashlib
-import logging
 import os
 import re
 import string
@@ -11,12 +10,13 @@ import discord
 from PIL import Image
 from aiohttp import client_exceptions, web
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Channels, WHITELISTED_CHANNELS
 from bot.utils.decorators import whitelist_override
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 FORMATTED_CODE_REGEX = re.compile(
     r"(?P<delim>(?P<block>```)|``?)"        # code delimiter: 1-3 backticks; (?P=block) only matches if it's a block
     r"(?(block)(?:(?P<lang>[a-z]+)\n)?)"    # if we're in a block, match optional language (only letters plus newline)
