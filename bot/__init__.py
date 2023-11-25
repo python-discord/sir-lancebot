@@ -1,10 +1,3 @@
-try:
-    from dotenv import load_dotenv
-    print("Found .env file, loading environment variables from it.")  # noqa: T201
-    load_dotenv(override=True)
-except ModuleNotFoundError:
-    pass
-
 import asyncio
 import os
 from typing import TYPE_CHECKING

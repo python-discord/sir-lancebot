@@ -33,6 +33,7 @@ log = get_logger(__name__)
 
 
 PYTHON_PREFIX = "!"
+GIT_SHA = environ.get("GIT_SHA", "development")
 
 
 class EnvConfig(
@@ -90,6 +91,7 @@ class _Client(EnvConfig, env_prefix="client_"):
     github_repo: str = "https://github.com/python-discord/sir-lancebot"
     # Override seasonal locks: 1 (January) to 12 (December)
     month_override: int | None = None
+    sentry_dsn: str = ""
 
 
 Client = _Client()

@@ -10,7 +10,7 @@ from pydis_core.utils import logging as core_logging
 from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.redis import RedisIntegration
 
-from bot.constants import Logging
+from bot.constants import Client, GIT_SHA, Logging
 
 
 def setup() -> None:
@@ -59,12 +59,12 @@ def setup_sentry() -> None:
     )
 
     sentry_sdk.init(
-        dsn=os.environ.get("BOT_SENTRY_DSN"),
+        dsn=Client.sentry_dsn,
         integrations=[
             sentry_logging,
             RedisIntegration(),
         ],
-        release=f"bot@{os.environ.get('GIT_SHA')}",
+        release=f"bot@{GIT_SHA}",
         traces_sample_rate=0.5,
         _experiments={
             "profiles_sample_rate": 0.5,
