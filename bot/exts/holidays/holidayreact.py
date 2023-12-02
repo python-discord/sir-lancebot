@@ -61,7 +61,7 @@ Hanukkah = Holiday([Month.NOVEMBER, Month.DECEMBER], {
     }
 )
 Christmas = Holiday([Month.DECEMBER], {
-    "christmas tree": Trigger(r"\b((christ|x)mas tree)\b", ["\U0001F384"]),
+    "christmas tree": Trigger(r"\b((christ|x)mas| tree)\b", ["\U0001F384"]),
     "reindeer": Trigger(r"\b(reindeer|caribou|buck|stag)\b", ["\U0001F98C"]),
     "santa": Trigger(r"\bsanta\b", ["\U0001F385"]),
     "snowflake": Trigger(r"\b(snow ?)?flake(?! ?8)\b", ["\u2744\uFE0F"]),
