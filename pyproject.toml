@@ -29,7 +29,7 @@ pydantic-settings = "2.1.0"
 
 [tool.poetry.dev-dependencies]
 pip-licenses = "4.3.3"
-pre-commit = "3.5.0"
+pre-commit = "3.6.0"
 python-dotenv = "1.0.0"
 ruff = "0.1.7"
 taskipy = "1.12.2"
