@@ -20,7 +20,7 @@ PyYAML = "6.0.1"
 emojis = "0.7.0"
 coloredlogs = "15.0.1"
 colorama = { version = "0.4.6", markers = "sys_platform == 'win32'" }
-lxml = "4.9.3"
+lxml = "4.9.4"
 emoji = "2.9.0"
 pyjokes = "0.6.0"
 pydantic = { version = "2.5.2", extras = ["dotenv"]}
