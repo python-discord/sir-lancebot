@@ -28,7 +28,7 @@ pydantic-settings = "2.1.0"
 
 
 [tool.poetry.dev-dependencies]
-pip-licenses = "4.3.3"
+pip-licenses = "4.3.4"
 pre-commit = "3.6.0"
 python-dotenv = "1.0.0"
 ruff = "0.1.13"
