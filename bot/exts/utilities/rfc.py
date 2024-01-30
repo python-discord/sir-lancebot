@@ -20,7 +20,7 @@ class RfcDocument(pydantic.BaseModel):
 
     title: str
     description: str
-    revisions: str
+    revisions: int
     created: datetime.datetime
 
 
