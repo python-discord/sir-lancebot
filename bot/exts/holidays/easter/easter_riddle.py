@@ -66,11 +66,12 @@ class EasterRiddle(commands.Cog):
 
         await ctx.send(embed=riddle_embed)
         hint_number = 0
-        while not len(self.winners) or hint_number < 2:
+        while hint_number < 2:
             try:
                 response = await self.bot.wait_for(
                     "message",
-                    check=lambda m: m.channel == ctx.channel,
+                    check=lambda m: m.channel == ctx.channel
+                    and m.author != self.bot.user,
                     timeout=TIMELIMIT,
                 )
                 if response.content.lower() == self.correct.lower():
@@ -98,21 +99,8 @@ class EasterRiddle(commands.Cog):
         )
 
         await ctx.send(content, embed=answer_embed)
-
         self.winners.clear()
         self.current_channel = None
-
-    @commands.Cog.listener()
-    async def on_message(self, message: discord.Message) -> None:
-        """If a non-bot user enters a correct answer, their username gets added to self.winners."""
-        if self.current_channel != message.channel:
-            return
-
-        if self.bot.user == message.author:
-            return
-
-        if message.content.lower() == self.correct.lower():
-            self.winners.add(message.author.mention)
 
 
 async def setup(bot: Bot) -> None:
