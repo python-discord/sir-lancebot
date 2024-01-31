@@ -11,9 +11,7 @@ from bot.constants import Colours, NEGATIVE_REPLIES
 
 log = get_logger(__name__)
 
-RIDDLE_QUESTIONS = loads(
-    Path("bot/resources/holidays/easter/easter_riddle.json").read_text("utf8")
-)
+RIDDLE_QUESTIONS = loads(Path("bot/resources/holidays/easter/easter_riddle.json").read_text("utf8"))
 
 TIMELIMIT = 10
 
@@ -23,8 +21,6 @@ class EasterRiddle(commands.Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.winners = set()
-        self.correct = ""
         self.current_channel = None
 
     @commands.command(aliases=("riddlemethis", "riddleme"))
@@ -35,9 +31,7 @@ class EasterRiddle(commands.Cog):
         The duration of the hint interval can be configured by changing the TIMELIMIT constant in this file.
         """
         if self.current_channel:
-            await ctx.send(
-                f"A riddle is already being solved in {self.current_channel.mention}!"
-            )
+            await ctx.send(f"A riddle is already being solved in {self.current_channel.mention}!")
             return
 
         # Don't let users start in a DM
@@ -56,50 +50,48 @@ class EasterRiddle(commands.Cog):
         random_question = random.choice(RIDDLE_QUESTIONS)
         question = random_question["question"]
         hints = random_question["riddles"]
-        self.correct = random_question["correct_answer"]
+        correct = random_question["correct_answer"]
 
         description = f"You have {TIMELIMIT} seconds before the first hint."
 
-        riddle_embed = discord.Embed(
-            title=question, description=description, colour=Colours.pink
-        )
+        riddle_embed = discord.Embed(title=question, description=description, colour=Colours.pink)
 
         await ctx.send(embed=riddle_embed)
         hint_number = 0
-        while hint_number < 2:
+        winner = None
+        while hint_number < 3:
             try:
                 response = await self.bot.wait_for(
                     "message",
                     check=lambda m: m.channel == ctx.channel
-                    and m.author != self.bot.user,
+                    and m.author != self.bot.user
+                    and m.content.lower() == correct.lower(),
                     timeout=TIMELIMIT,
                 )
-                if response.content.lower() == self.correct.lower():
-                    self.winners.add(response.author.mention)
+                if response.content.lower() == correct.lower():
+                    winner = response.author.mention
                     break
             except TimeoutError:
+                hint_number += 1
+
                 try:
                     hint_embed = discord.Embed(
-                        title=f"Here's a hint: {hints[hint_number]}!",
+                        title=f"Here's a hint: {hints[hint_number-1]}!",
                         colour=Colours.pink,
                     )
                 except IndexError:
                     break
-                hint_number += 1
                 await ctx.send(embed=hint_embed)
 
-        if self.winners:
-            win_list = " ".join(self.winners)
-            content = f"Well done {win_list} for getting it right!"
+        if winner:
+            content = f"Well done {winner} for getting it right!"
         else:
             content = "Nobody got it right..."
 
-        answer_embed = discord.Embed(
-            title=f"The answer is: {self.correct}!", colour=Colours.pink
-        )
+        answer_embed = discord.Embed(title=f"The answer is: {correct}!", colour=Colours.pink)
 
         await ctx.send(content, embed=answer_embed)
-        self.winners.clear()
+        winner = None
         self.current_channel = None
 
 
