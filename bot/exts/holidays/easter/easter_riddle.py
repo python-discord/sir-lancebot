@@ -91,7 +91,6 @@ class EasterRiddle(commands.Cog):
         answer_embed = discord.Embed(title=f"The answer is: {correct}!", colour=Colours.pink)
 
         await ctx.send(content, embed=answer_embed)
-        winner = None
         self.current_channel = None
 
 
