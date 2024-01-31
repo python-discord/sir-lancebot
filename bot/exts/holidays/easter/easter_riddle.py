@@ -68,9 +68,8 @@ class EasterRiddle(commands.Cog):
                     and m.content.lower() == correct.lower(),
                     timeout=TIMELIMIT,
                 )
-                if response.content.lower() == correct.lower():
-                    winner = response.author.mention
-                    break
+                winner = response.author.mention
+                break
             except TimeoutError:
                 hint_number += 1
 
