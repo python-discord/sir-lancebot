@@ -21,7 +21,7 @@ emojis = "0.7.0"
 coloredlogs = "15.0.1"
 colorama = { version = "0.4.6", markers = "sys_platform == 'win32'" }
 lxml = "5.1.0"
-emoji = "2.10.0"
+emoji = "2.10.1"
 pyjokes = "0.6.0"
 pydantic = { version = "2.5.2", extras = ["dotenv"]}
 pydantic-settings = "2.1.0"
