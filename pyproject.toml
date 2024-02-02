@@ -55,6 +55,12 @@ known_first_party = ["bot"]
 [tool.ruff]
 target-version = "py311"
 extend-exclude = [".cache"]
+line-length = 120
+unsafe-fixes = true
+preview = true
+
+[tool.ruff.lint]
+select = ["ANN", "B", "C4", "D", "DTZ", "E", "F", "I", "ISC", "INT", "N", "PGH", "PIE", "Q", "RET", "RSE", "RUF", "S", "SIM", "T20", "TID", "UP", "W"]
 ignore = [
     "ANN002", "ANN003", "ANN101", "ANN102", "ANN204", "ANN206", "ANN401",
     "B904",
@@ -67,12 +73,8 @@ ignore = [
     "S311",
     "SIM102", "SIM108",
 ]
-line-length = 120
-select = ["ANN", "B", "C4", "D", "DTZ", "E", "F", "I", "ISC", "INT", "N", "PGH", "PIE", "Q", "RET", "RSE", "RUF", "S", "SIM", "T20", "TID", "UP", "W"]
-unsafe-fixes = true
-preview = true
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["bot"]
 order-by-type = false
 case-sensitive = true
