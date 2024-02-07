@@ -36,20 +36,20 @@ Valentines = Holiday(
             [
                 "\u2764\ufe0f",  # heart
                 "\u2665\ufe0f",  # hearts
-                "\U0001f49c",  # purple_heart
-                "\U0001f49f",  # heart_decoration
-                "\U0001f5a4",  # black_heart
-                "\U0001f499",  # blue_heart
-                "\U0001f90e",  # brown_heart
-                "\U0001f49d",  # gift_heart
-                "\U0001f49a",  # green_heart
-                "\U0001fa76",  # grey_heart
-                "\U0001fa75",  # light_blue_heart
-                "\U0001f9e1",  # orange_heart
-                "\U0001f49b",  # yellow_heart
-                "\U0001f49e",  # revolving_hearts
-                "\U0001f496",  # sparkling_heart
-                "\U0001f90d",  # white_heart
+                "\U0001f49c",    # purple_heart
+                "\U0001f49f",    # heart_decoration
+                "\U0001f5a4",    # black_heart
+                "\U0001f499",    # blue_heart
+                "\U0001f90e",    # brown_heart
+                "\U0001f49d",    # gift_heart
+                "\U0001f49a",    # green_heart
+                "\U0001fa76",    # grey_heart
+                "\U0001fa75",    # light_blue_heart
+                "\U0001f9e1",    # orange_heart
+                "\U0001f49b",    # yellow_heart
+                "\U0001f49e",    # revolving_hearts
+                "\U0001f496",    # sparkling_heart
+                "\U0001f90d",    # white_heart
             ],
         )
     }
