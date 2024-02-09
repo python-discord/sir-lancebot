@@ -31,7 +31,7 @@ pydantic-settings = "2.1.0"
 pip-licenses = "4.3.4"
 pre-commit = "3.6.0"
 python-dotenv = "1.0.1"
-ruff = "0.2.0"
+ruff = "0.2.1"
 taskipy = "1.12.2"
 
 [tool.taskipy.tasks]
