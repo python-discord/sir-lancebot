@@ -79,6 +79,90 @@ class Fun(Cog):
         if converted_text:
             converted_text = f">>> {converted_text.lstrip('> ')}"
         await ctx.send(content=converted_text, embed=embed)
+        
+    @commands.command(name="snakecase", aliases=("scase",))
+    async def snakecase_command(self, ctx: Context, *, text: str | None) -> None:
+        """Attempts to convert the provided string to snake_case."""
+        text = helpers.neutralise_string(text)
+        def conversion_func(text: str) -> str:
+            """Converts the provided string to snake_case."""
+            return "_".join(
+                text.split()
+            )
+        text = await clean_text_or_reply(ctx, text)
+        text, embed = await messages.get_text_and_embed(ctx, text)
+        # Convert embed if it exists
+        if embed is not None:
+            embed = messages.convert_embed(conversion_func, embed)
+        converted_text = conversion_func(text)
+        converted_text = helpers.suppress_links(converted_text)
+        # Don't put >>> if only embed present
+        if converted_text:
+            converted_text = f">>> {converted_text.lstrip('> ')}"
+        await ctx.send(content=converted_text, embed=embed)
+
+    @commands.command(name="pascalcase", aliases=("pcase", "pascal",))
+    async def pascalcase_command(self, ctx: Context, *, text: str | None) -> None:
+        """Attempts to convert the provided string to pascalCase."""
+        text = helpers.neutralise_string(text)
+        def conversion_func(text: str) -> str:
+            """Converts the provided string to pascalCase."""
+            return "".join(
+                word[0].upper()+word[1:] if i != 0 else word for i, word in enumerate(text.split())
+            )
+        text = await clean_text_or_reply(ctx, text)
+        text, embed = await messages.get_text_and_embed(ctx, text)
+        # Convert embed if it exists
+        if embed is not None:
+            embed = messages.convert_embed(conversion_func, embed)
+        converted_text = conversion_func(text)
+        converted_text = helpers.suppress_links(converted_text)
+        # Don't put >>> if only embed present
+        if converted_text:
+            converted_text = f">>> {converted_text.lstrip('> ')}"
+        await ctx.send(content=converted_text, embed=embed)
+
+    @commands.command(name="screamingsnakecase", aliases=("screamsnake", "ssnake","screamingsnake",))
+    async def screamingsnakecase_command(self, ctx: Context, *, text: str | None) -> None:
+        """Attempts to convert the provided string to SCREAMING_SNAKE_CASE."""
+        text = helpers.neutralise_string(text)
+        def conversion_func(text: str) -> str:
+            """Converts the provided string to SCREAMING_SNAKE_CASE."""
+            return "_".join(
+                word.upper() for word in text.split()
+            )
+        text = await clean_text_or_reply(ctx, text)
+        text, embed = await messages.get_text_and_embed(ctx, text)
+        # Convert embed if it exists
+        if embed is not None:
+            embed = messages.convert_embed(conversion_func, embed)
+        converted_text = conversion_func(text)
+        converted_text = helpers.suppress_links(converted_text)
+        # Don't put >>> if only embed present
+        if converted_text:
+            converted_text = f">>> {converted_text.lstrip('> ')}"
+        await ctx.send(content=converted_text, embed=embed)
+
+    @commands.command(name="camelcase", aliases=("ccase", "camel",))
+    async def camelcase_command(self, ctx: Context, *, text: str | None) -> None:
+        """Attempts to convert the provided string to CamelCase."""
+        text = helpers.neutralise_string(text)
+        def conversion_func(text: str) -> str:
+            """Converts the provided string to CamelCase."""
+            return "".join(
+                word[0].upper()+word[1:] for word in text.split()
+            )
+        text = await clean_text_or_reply(ctx, text)
+        text, embed = await messages.get_text_and_embed(ctx, text)
+        # Convert embed if it exists
+        if embed is not None:
+            embed = messages.convert_embed(conversion_func, embed)
+        converted_text = conversion_func(text)
+        converted_text = helpers.suppress_links(converted_text)
+        # Don't put >>> if only embed present
+        if converted_text:
+            converted_text = f">>> {converted_text.lstrip('> ')}"
+        await ctx.send(content=converted_text, embed=embed)
 
     @commands.group(name="caesarcipher", aliases=("caesar", "cc",))
     async def caesarcipher_group(self, ctx: Context) -> None:
