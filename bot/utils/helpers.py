@@ -1,7 +1,5 @@
 # imports
 import re
-from string import punctuation
-
 
 def suppress_links(message: str) -> str:
     """Accepts a message that may contain links, suppresses them, and returns them."""
@@ -12,26 +10,22 @@ def suppress_links(message: str) -> str:
 def neutralise_string(txt: str) -> str:
     """Attempts to neutralise all punctuation and cases and returns a string of lowercase words"""
     # take out punctuation
+    txt = re.sub(r'([^\w\s]|_)',' ',txt)
 
-    for c in punctuation:
-        words = txt.split(c)
-        txt = " ".join(words)
-
-    words = txt.split()
-    # full caps words
-    words = [word.lower() if word.isupper() else word for word in words]
+    # full caps words but leaves CamelCase / pascalCase
+    words = [word.lower() if word.isupper() else word for word in txt.split()]
     txt = " ".join(words)
 
+    # attempt to split pascalCase and CamelCase
     words = []
     old_i = 0
     for i, char in enumerate(txt):
-        if char.isupper():
+        # to avoid CamelCase getting leading empty append
+        if char.isupper() and i != 0:
             words.append(txt[old_i:i])
             old_i = i
     words.append(txt[old_i:])
-
-    # strip white spaces
-    words = [word.strip() for word in words]
-    txt = " ".join(words)
-    # return everything lower case
-    return " ".join(word.lower() for word in txt.split())
+    
+    # strip white spaces and make lowercase
+    words = [word.strip().lower() for word in words]
+    return " ".join(words)
