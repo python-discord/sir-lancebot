@@ -1,6 +1,6 @@
 import json
 import random
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from pathlib import Path
 from typing import Literal
 
@@ -51,6 +51,21 @@ class Fun(Cog):
         die_name = f"dice_{random.randint(1, 6)}"
         return getattr(Emojis, die_name)
 
+    @staticmethod
+    async def _clean_fun_cog_text(ctx: Context, text: str, conversion_func: Callable[[str], str]) -> None:
+        """This groups the clean and convert functions into one so we can reuse this without duplicated code."""
+        text = await clean_text_or_reply(ctx, text)
+        text, embed = await messages.get_text_and_embed(ctx, text)
+        # Convert embed if it exists
+        if embed is not None:
+            embed = messages.convert_embed(conversion_func, embed)
+        converted_text = conversion_func(text)
+        converted_text = helpers.suppress_links(converted_text)
+        # Don't put >>> if only embed present
+        if converted_text:
+            converted_text = f">>> {converted_text.lstrip('> ')}"
+        await ctx.send(content=converted_text, embed=embed)
+
     @commands.command()
     async def roll(self, ctx: Context, num_rolls: int = 1) -> None:
         """Outputs a number of random dice emotes (up to 6)."""
@@ -68,17 +83,7 @@ class Fun(Cog):
             return "".join(
                 char.upper() if round(random.random()) else char.lower() for char in text
             )
-        text = await clean_text_or_reply(ctx, text)
-        text, embed = await messages.get_text_and_embed(ctx, text)
-        # Convert embed if it exists
-        if embed is not None:
-            embed = messages.convert_embed(conversion_func, embed)
-        converted_text = conversion_func(text)
-        converted_text = helpers.suppress_links(converted_text)
-        # Don't put >>> if only embed present
-        if converted_text:
-            converted_text = f">>> {converted_text.lstrip('> ')}"
-        await ctx.send(content=converted_text, embed=embed)
+        await self._clean_fun_cog_text(ctx, text, conversion_func)
 
     @commands.command(name="snakecase", aliases=("scase",))
     async def snakecase_command(self, ctx: Context, *, text: str | None) -> None:
@@ -89,17 +94,7 @@ class Fun(Cog):
             return "_".join(
                 text.split()
             )
-        text = await clean_text_or_reply(ctx, text)
-        text, embed = await messages.get_text_and_embed(ctx, text)
-        # Convert embed if it exists
-        if embed is not None:
-            embed = messages.convert_embed(conversion_func, embed)
-        converted_text = conversion_func(text)
-        converted_text = helpers.suppress_links(converted_text)
-        # Don't put >>> if only embed present
-        if converted_text:
-            converted_text = f">>> {converted_text.lstrip('> ')}"
-        await ctx.send(content=converted_text, embed=embed)
+        await self._clean_fun_cog_text(ctx, text, conversion_func)
 
     @commands.command(name="pascalcase", aliases=("pcase", "pascal",))
     async def pascalcase_command(self, ctx: Context, *, text: str | None) -> None:
@@ -110,17 +105,7 @@ class Fun(Cog):
             return "".join(
                 word[0].upper()+word[1:] if i != 0 else word for i, word in enumerate(text.split())
             )
-        text = await clean_text_or_reply(ctx, text)
-        text, embed = await messages.get_text_and_embed(ctx, text)
-        # Convert embed if it exists
-        if embed is not None:
-            embed = messages.convert_embed(conversion_func, embed)
-        converted_text = conversion_func(text)
-        converted_text = helpers.suppress_links(converted_text)
-        # Don't put >>> if only embed present
-        if converted_text:
-            converted_text = f">>> {converted_text.lstrip('> ')}"
-        await ctx.send(content=converted_text, embed=embed)
+        await self._clean_fun_cog_text(ctx, text, conversion_func)
 
     @commands.command(name="screamingsnakecase", aliases=("screamsnake", "ssnake", "screamingsnake",))
     async def screamingsnakecase_command(self, ctx: Context, *, text: str | None) -> None:
@@ -131,17 +116,7 @@ class Fun(Cog):
             return "_".join(
                 word.upper() for word in text.split()
             )
-        text = await clean_text_or_reply(ctx, text)
-        text, embed = await messages.get_text_and_embed(ctx, text)
-        # Convert embed if it exists
-        if embed is not None:
-            embed = messages.convert_embed(conversion_func, embed)
-        converted_text = conversion_func(text)
-        converted_text = helpers.suppress_links(converted_text)
-        # Don't put >>> if only embed present
-        if converted_text:
-            converted_text = f">>> {converted_text.lstrip('> ')}"
-        await ctx.send(content=converted_text, embed=embed)
+        await self._clean_fun_cog_text(ctx, text, conversion_func)
 
     @commands.command(name="camelcase", aliases=("ccase", "camel",))
     async def camelcase_command(self, ctx: Context, *, text: str | None) -> None:
@@ -152,17 +127,7 @@ class Fun(Cog):
             return "".join(
                 word[0].upper()+word[1:] for word in text.split()
             )
-        text = await clean_text_or_reply(ctx, text)
-        text, embed = await messages.get_text_and_embed(ctx, text)
-        # Convert embed if it exists
-        if embed is not None:
-            embed = messages.convert_embed(conversion_func, embed)
-        converted_text = conversion_func(text)
-        converted_text = helpers.suppress_links(converted_text)
-        # Don't put >>> if only embed present
-        if converted_text:
-            converted_text = f">>> {converted_text.lstrip('> ')}"
-        await ctx.send(content=converted_text, embed=embed)
+        await self._clean_fun_cog_text(ctx, text, conversion_func)
 
     @commands.group(name="caesarcipher", aliases=("caesar", "cc",))
     async def caesarcipher_group(self, ctx: Context) -> None:
