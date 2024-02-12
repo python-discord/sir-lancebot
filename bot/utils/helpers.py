@@ -25,7 +25,7 @@ def neutralise_string(txt: str) -> str:
             words.append(txt[old_i:i])
             old_i = i
     words.append(txt[old_i:])
-    
+
     # strip white spaces and make lowercase
     words = [word.strip().lower() for word in words]
     return " ".join(words)

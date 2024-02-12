@@ -79,7 +79,7 @@ class Fun(Cog):
         if converted_text:
             converted_text = f">>> {converted_text.lstrip('> ')}"
         await ctx.send(content=converted_text, embed=embed)
-        
+
     @commands.command(name="snakecase", aliases=("scase",))
     async def snakecase_command(self, ctx: Context, *, text: str | None) -> None:
         """Attempts to convert the provided string to snake_case."""
