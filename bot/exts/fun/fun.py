@@ -122,7 +122,7 @@ class Fun(Cog):
             converted_text = f">>> {converted_text.lstrip('> ')}"
         await ctx.send(content=converted_text, embed=embed)
 
-    @commands.command(name="screamingsnakecase", aliases=("screamsnake", "ssnake","screamingsnake",))
+    @commands.command(name="screamingsnakecase", aliases=("screamsnake", "ssnake", "screamingsnake",))
     async def screamingsnakecase_command(self, ctx: Context, *, text: str | None) -> None:
         """Attempts to convert the provided string to SCREAMING_SNAKE_CASE."""
         text = helpers.neutralise_string(text)

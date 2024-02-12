@@ -1,5 +1,5 @@
-# imports
 import re
+
 
 def suppress_links(message: str) -> str:
     """Accepts a message that may contain links, suppresses them, and returns them."""
@@ -8,9 +8,9 @@ def suppress_links(message: str) -> str:
     return message
 
 def neutralise_string(txt: str) -> str:
-    """Attempts to neutralise all punctuation and cases and returns a string of lowercase words"""
+    """Attempts to neutralise all punctuation and cases and returns a string of lowercase words."""
     # take out punctuation
-    txt = re.sub(r'([^\w\s]|_)',' ',txt)
+    txt = re.sub(r"([^\w\s]|_)", " ", txt)
 
     # full caps words but leaves CamelCase / pascalCase
     words = [word.lower() if word.isupper() else word for word in txt.split()]
