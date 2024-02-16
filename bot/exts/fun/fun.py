@@ -100,12 +100,12 @@ class Fun(Cog):
 
     @commands.command(name="pascalcase", aliases=("pcase", "pascal",))
     async def pascalcase_command(self, ctx: Context, *, text: str | None) -> None:
-        """Attempts to convert the provided string to pascalCase."""
+        """Attempts to convert the provided string to PascalCase."""
         text = helpers.neutralise_string(text)
         def conversion_func(text: str) -> str:
-            """Converts the provided string to pascalCase."""
+            """Converts the provided string to PascalCase."""
             return "".join(
-                word[0].upper()+word[1:] if i != 0 else word for i, word in enumerate(text.split())
+                word.capitalize() for word in text.split()
             )
         converted_text, embed = await self._clean_text(ctx, text, conversion_func)
         await ctx.send(content=converted_text, embed=embed)
@@ -124,12 +124,12 @@ class Fun(Cog):
 
     @commands.command(name="camelcase", aliases=("ccase", "camel",))
     async def camelcase_command(self, ctx: Context, *, text: str | None) -> None:
-        """Attempts to convert the provided string to CamelCase."""
+        """Attempts to convert the provided string to camelCase."""
         text = helpers.neutralise_string(text)
         def conversion_func(text: str) -> str:
-            """Converts the provided string to CamelCase."""
+            """Converts the provided string to camelCase."""
             return "".join(
-                word[0].upper()+word[1:] for word in text.split()
+                word.capitalize() if i != 0 else word for i, word in enumerate(text.split())
             )
         converted_text, embed = await self._clean_text(ctx, text, conversion_func)
         await ctx.send(content=converted_text, embed=embed)

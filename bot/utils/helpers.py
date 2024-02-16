@@ -16,15 +16,15 @@ def neutralise_string(txt: str | None) -> str | None:
     # take out punctuation
     txt = re.sub(r"([^\w\s]|_)", " ", txt)
 
-    # full caps words but leaves CamelCase / pascalCase
+    # full caps words but leaves camelCase / PascalCase
     words = [word.lower() if word.isupper() else word for word in txt.split()]
     txt = " ".join(words)
 
-    # attempt to split pascalCase and CamelCase
+    # attempt to split PascalCase and camelCase
     words = []
     old_i = 0
     for i, char in enumerate(txt):
-        # to avoid CamelCase getting leading empty append
+        # to avoid PascalCase getting leading empty append
         if char.isupper() and i != 0:
             words.append(txt[old_i:i])
             old_i = i
