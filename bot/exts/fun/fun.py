@@ -83,8 +83,8 @@ class Fun(Cog):
             return "".join(
                 char.upper() if round(random.random()) else char.lower() for char in text
             )
-        converted_text, embed = await self._clean_text(ctx, text, conversion_func)
-        await ctx.send(content=converted_text, embed=embed)
+        cleaned_text, embed = await self._clean_text(ctx, text, conversion_func)
+        await ctx.send(content=cleaned_text, embed=embed)
 
     @commands.command(name="snakecase", aliases=("scase",))
     async def snakecase_command(self, ctx: Context, *, text: str | None) -> None:
@@ -95,8 +95,8 @@ class Fun(Cog):
             return "_".join(
                 text.split()
             )
-        converted_text, embed = await self._clean_text(ctx, text, conversion_func)
-        await ctx.send(content=converted_text, embed=embed)
+        cleaned_text, embed = await self._clean_text(ctx, text, conversion_func)
+        await ctx.send(content=cleaned_text, embed=embed)
 
     @commands.command(name="pascalcase", aliases=("pcase", "pascal",))
     async def pascalcase_command(self, ctx: Context, *, text: str | None) -> None:
@@ -107,8 +107,8 @@ class Fun(Cog):
             return "".join(
                 word.capitalize() for word in text.split()
             )
-        converted_text, embed = await self._clean_text(ctx, text, conversion_func)
-        await ctx.send(content=converted_text, embed=embed)
+        cleaned_text, embed = await self._clean_text(ctx, text, conversion_func)
+        await ctx.send(content=cleaned_text, embed=embed)
 
     @commands.command(name="screamingsnakecase", aliases=("screamsnake", "ssnake", "screamingsnake",))
     async def screamingsnakecase_command(self, ctx: Context, *, text: str | None) -> None:
@@ -119,8 +119,8 @@ class Fun(Cog):
             return "_".join(
                 word.upper() for word in text.split()
             )
-        converted_text, embed = await self._clean_text(ctx, text, conversion_func)
-        await ctx.send(content=converted_text, embed=embed)
+        cleaned_text, embed = await self._clean_text(ctx, text, conversion_func)
+        await ctx.send(content=cleaned_text, embed=embed)
 
     @commands.command(name="camelcase", aliases=("ccase", "camel",))
     async def camelcase_command(self, ctx: Context, *, text: str | None) -> None:
@@ -131,8 +131,8 @@ class Fun(Cog):
             return "".join(
                 word.capitalize() if i != 0 else word for i, word in enumerate(text.split())
             )
-        converted_text, embed = await self._clean_text(ctx, text, conversion_func)
-        await ctx.send(content=converted_text, embed=embed)
+        cleaned_text, embed = await self._clean_text(ctx, text, conversion_func)
+        await ctx.send(content=cleaned_text, embed=embed)
 
     @commands.group(name="caesarcipher", aliases=("caesar", "cc",))
     async def caesarcipher_group(self, ctx: Context) -> None:
