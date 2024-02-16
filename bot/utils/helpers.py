@@ -9,9 +9,11 @@ def suppress_links(message: str) -> str:
 
 def neutralise_string(txt: str | None) -> str | None:
     """Attempts to neutralise all punctuation and cases and returns a string of lowercase words."""
-    # take out punctuation
+    # return early if no text provided.
     if not txt:
         return None
+
+    # take out punctuation
     txt = re.sub(r"([^\w\s]|_)", " ", txt)
 
     # full caps words but leaves CamelCase / pascalCase
