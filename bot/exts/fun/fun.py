@@ -78,8 +78,6 @@ class Fun(Cog):
     @commands.command(name="randomcase", aliases=("rcase", "randomcaps", "rcaps",))
     async def randomcase_command(self, ctx: Context, *, text: str | None) -> None:
         """Randomly converts the casing of a given `text`, or the replied message."""
-        if not text:
-            raise BadArgument(f"`{Client.prefix}{ctx.invoked_with}` requires a text to attempt to convert.")
         def conversion_func(text: str) -> str:
             """Randomly converts the casing of a given string."""
             return "".join(
@@ -91,8 +89,6 @@ class Fun(Cog):
     @commands.command(name="snakecase", aliases=("scase",))
     async def snakecase_command(self, ctx: Context, *, text: str | None) -> None:
         """Attempts to convert the provided string to snake_case."""
-        if not text:
-            raise BadArgument(f"`{Client.prefix}{ctx.invoked_with}` requires a text to attempt to convert.")
         text = helpers.neutralise_string(text)
         def conversion_func(text: str) -> str:
             """Converts the provided string to snake_case."""
@@ -105,8 +101,6 @@ class Fun(Cog):
     @commands.command(name="pascalcase", aliases=("pcase", "pascal",))
     async def pascalcase_command(self, ctx: Context, *, text: str | None) -> None:
         """Attempts to convert the provided string to pascalCase."""
-        if not text:
-            raise BadArgument(f"`{Client.prefix}{ctx.invoked_with}` requires a text to attempt to convert.")
         text = helpers.neutralise_string(text)
         def conversion_func(text: str) -> str:
             """Converts the provided string to pascalCase."""
@@ -119,8 +113,6 @@ class Fun(Cog):
     @commands.command(name="screamingsnakecase", aliases=("screamsnake", "ssnake", "screamingsnake",))
     async def screamingsnakecase_command(self, ctx: Context, *, text: str | None) -> None:
         """Attempts to convert the provided string to SCREAMING_SNAKE_CASE."""
-        if not text:
-            raise BadArgument(f"`{Client.prefix}{ctx.invoked_with}` requires a text to attempt to convert.")
         text = helpers.neutralise_string(text)
         def conversion_func(text: str) -> str:
             """Converts the provided string to SCREAMING_SNAKE_CASE."""
@@ -133,8 +125,6 @@ class Fun(Cog):
     @commands.command(name="camelcase", aliases=("ccase", "camel",))
     async def camelcase_command(self, ctx: Context, *, text: str | None) -> None:
         """Attempts to convert the provided string to CamelCase."""
-        if not text:
-            raise BadArgument(f"`{Client.prefix}{ctx.invoked_with}` requires a text to attempt to convert.")
         text = helpers.neutralise_string(text)
         def conversion_func(text: str) -> str:
             """Converts the provided string to CamelCase."""
