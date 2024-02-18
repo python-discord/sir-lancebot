@@ -1,4 +1,3 @@
-import math
 import random
 from collections.abc import Iterable
 
@@ -65,15 +64,6 @@ class CommandErrorHandler(commands.Cog):
 
         if isinstance(error, InChannelCheckFailure | InMonthCheckFailure):
             await ctx.send(embed=self.error_embed(str(error), NEGATIVE_REPLIES), delete_after=7.5)
-            return
-
-        if isinstance(error, commands.CommandOnCooldown):
-            mins, secs = divmod(math.ceil(error.retry_after), 60)
-            embed = self.error_embed(
-                f"This command is on cooldown:\nPlease retry in {mins} minutes {secs} seconds.",
-                NEGATIVE_REPLIES
-            )
-            await ctx.send(embed=embed, delete_after=7.5)
             return
 
         if isinstance(error, commands.DisabledCommand):
