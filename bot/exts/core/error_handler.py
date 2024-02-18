@@ -6,7 +6,7 @@ from discord.ext import commands
 from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
-from bot.constants import Colours, ERROR_REPLIES, NEGATIVE_REPLIES
+from bot.constants import Colours, ERROR_REPLIES
 
 log = get_logger(__name__)
 
@@ -54,10 +54,6 @@ class CommandErrorHandler(commands.Cog):
             f"Author: {ctx.author}, "
             f"Channel: {ctx.channel}"
         )
-
-        if isinstance(error, commands.DisabledCommand):
-            await ctx.send(embed=self.error_embed("This command has been disabled.", NEGATIVE_REPLIES))
-            return
 
         await self.bot.command_error_manager.handle_error(error, ctx)
 
