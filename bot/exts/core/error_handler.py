@@ -6,8 +6,7 @@ from discord.ext import commands
 from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
-from bot.constants import Channels, Colours, ERROR_REPLIES, NEGATIVE_REPLIES
-from bot.utils.decorators import InChannelCheckFailure, InMonthCheckFailure
+from bot.constants import Colours, ERROR_REPLIES, NEGATIVE_REPLIES
 
 log = get_logger(__name__)
 
@@ -56,26 +55,8 @@ class CommandErrorHandler(commands.Cog):
             f"Channel: {ctx.channel}"
         )
 
-        if isinstance(error, InChannelCheckFailure | InMonthCheckFailure):
-            await ctx.send(embed=self.error_embed(str(error), NEGATIVE_REPLIES), delete_after=7.5)
-            return
-
         if isinstance(error, commands.DisabledCommand):
             await ctx.send(embed=self.error_embed("This command has been disabled.", NEGATIVE_REPLIES))
-            return
-
-        if isinstance(error, commands.NoPrivateMessage):
-            await ctx.send(
-                embed=self.error_embed(
-                    "This command can only be used in the server. "
-                    f"Go to <#{Channels.sir_lancebot_playground}> instead!",
-                    NEGATIVE_REPLIES
-                )
-            )
-            return
-
-        if isinstance(error, commands.CheckFailure):
-            await ctx.send(embed=self.error_embed("You are not authorized to use this command.", NEGATIVE_REPLIES))
             return
 
         await self.bot.command_error_manager.handle_error(error, ctx)
