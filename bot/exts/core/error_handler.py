@@ -48,11 +48,6 @@ class CommandErrorHandler(commands.Cog):
             log.debug(f"Command {ctx.command} had its error already handled locally; ignoring.")
             return
 
-        parent_command = ""
-        if subctx := getattr(ctx, "subcontext", None):
-            parent_command = f"{ctx.command} "
-            ctx = subctx
-
         error = getattr(error, "original", error)
         log.debug(
             f"Error Encountered: {type(error).__name__} - {error!s}, "
@@ -77,15 +72,6 @@ class CommandErrorHandler(commands.Cog):
                     NEGATIVE_REPLIES
                 )
             )
-            return
-
-        if isinstance(error, commands.BadArgument):
-            self.revert_cooldown_counter(ctx.command, ctx.message)
-            embed = self.error_embed(
-                "The argument you provided was invalid: "
-                f"{error}\n\nUsage:\n```\n{ctx.prefix}{parent_command}{ctx.command} {ctx.command.signature}\n```"
-            )
-            await ctx.send(embed=embed)
             return
 
         if isinstance(error, commands.CheckFailure):

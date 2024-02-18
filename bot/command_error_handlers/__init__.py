@@ -3,6 +3,7 @@ from pydis_core.utils.error_handling.commands import CommandErrorManager
 from bot.bot import Bot
 
 from .api_error import APIErrorHandler
+from .bad_argument import BadArgumentErrorHandler
 from .command_not_found import CommandNotFoundErrorHandler
 from .command_on_cooldown import CommandOnCooldownErrorHandler
 from .default import DefaultCommandErrorHandler
@@ -21,4 +22,5 @@ def bootstrap_command_error_manager(bot: Bot) -> CommandErrorManager:
     manager.register_handler(APIErrorHandler())
     manager.register_handler(CommandOnCooldownErrorHandler())
     manager.register_handler(UserNotPlayingErrorHandler())
+    manager.register_handler(BadArgumentErrorHandler())
     return manager
