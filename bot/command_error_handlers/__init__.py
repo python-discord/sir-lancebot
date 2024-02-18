@@ -4,6 +4,7 @@ from bot.bot import Bot
 
 from .command_not_found import CommandNotFoundErrorHandler
 from .default import DefaultCommandErrorHandler
+from .moved_command import MovedCommandErrorHandler
 
 
 def bootstrap_command_error_manager(bot: Bot) -> CommandErrorManager:
@@ -11,4 +12,5 @@ def bootstrap_command_error_manager(bot: Bot) -> CommandErrorManager:
     default_handler = DefaultCommandErrorHandler()
     manager = CommandErrorManager(default=default_handler)
     manager.register_handler(CommandNotFoundErrorHandler(bot))
+    manager.register_handler(MovedCommandErrorHandler())
     return manager

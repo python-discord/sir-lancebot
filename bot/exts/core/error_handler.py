@@ -9,7 +9,7 @@ from pydis_core.utils.logging import get_logger
 from bot.bot import Bot
 from bot.constants import Channels, Colours, ERROR_REPLIES, NEGATIVE_REPLIES
 from bot.utils.decorators import InChannelCheckFailure, InMonthCheckFailure
-from bot.utils.exceptions import APIError, MovedCommandError, UserNotPlayingError
+from bot.utils.exceptions import APIError, UserNotPlayingError
 
 log = get_logger(__name__)
 
@@ -123,14 +123,6 @@ class CommandErrorHandler(commands.Cog):
                     NEGATIVE_REPLIES
                 )
             )
-            return
-
-        if isinstance(error, MovedCommandError):
-            description = (
-                f"This command, `{ctx.prefix}{ctx.command.qualified_name}` has moved to `{error.new_command_name}`.\n"
-                f"Please use `{error.new_command_name}` instead."
-            )
-            await ctx.send(embed=self.error_embed(description, NEGATIVE_REPLIES))
             return
 
         await self.bot.command_error_manager.handle_error(error, ctx)
