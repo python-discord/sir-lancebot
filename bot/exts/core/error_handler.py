@@ -67,15 +67,6 @@ class CommandErrorHandler(commands.Cog):
             await ctx.send(embed=self.error_embed(str(error), NEGATIVE_REPLIES), delete_after=7.5)
             return
 
-        if isinstance(error, commands.UserInputError):
-            self.revert_cooldown_counter(ctx.command, ctx.message)
-            usage = f"```\n{ctx.prefix}{parent_command}{ctx.command} {ctx.command.signature}\n```"
-            embed = self.error_embed(
-                f"Your input was invalid: {error}\n\nUsage:{usage}"
-            )
-            await ctx.send(embed=embed)
-            return
-
         if isinstance(error, commands.CommandOnCooldown):
             mins, secs = divmod(math.ceil(error.retry_after), 60)
             embed = self.error_embed(
