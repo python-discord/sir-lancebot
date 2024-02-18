@@ -5,11 +5,9 @@ from collections.abc import Iterable
 from discord import Embed, Message
 from discord.ext import commands
 from pydis_core.utils.logging import get_logger
-from sentry_sdk import push_scope
 
 from bot.bot import Bot
 from bot.constants import Channels, Colours, ERROR_REPLIES, NEGATIVE_REPLIES
-from bot.utils.commands import get_command_suggestions
 from bot.utils.decorators import InChannelCheckFailure, InMonthCheckFailure
 from bot.utils.exceptions import APIError, MovedCommandError, UserNotPlayingError
 
@@ -64,12 +62,6 @@ class CommandErrorHandler(commands.Cog):
             f"Author: {ctx.author}, "
             f"Channel: {ctx.channel}"
         )
-
-        if isinstance(error, commands.CommandNotFound):
-            # Ignore messages that start with "..", as they were likely not meant to be commands
-            if not ctx.invoked_with.startswith("."):
-                await self.send_command_suggestion(ctx, ctx.invoked_with)
-            return
 
         if isinstance(error, InChannelCheckFailure | InMonthCheckFailure):
             await ctx.send(embed=self.error_embed(str(error), NEGATIVE_REPLIES), delete_after=7.5)
@@ -141,51 +133,7 @@ class CommandErrorHandler(commands.Cog):
             await ctx.send(embed=self.error_embed(description, NEGATIVE_REPLIES))
             return
 
-        with push_scope() as scope:
-            scope.user = {
-                "id": ctx.author.id,
-                "username": str(ctx.author)
-            }
-
-            scope.set_tag("command", ctx.command.qualified_name)
-            scope.set_tag("message_id", ctx.message.id)
-            scope.set_tag("channel_id", ctx.channel.id)
-
-            scope.set_extra("full_message", ctx.message.content)
-
-            if ctx.guild is not None:
-                scope.set_extra("jump_to", ctx.message.jump_url)
-
-            log.exception(f"Unhandled command error: {error!s}", exc_info=error)
-
-    async def send_command_suggestion(self, ctx: commands.Context, command_name: str) -> None:
-        """Sends user similar commands if any can be found."""
-        command_suggestions = []
-        if similar_command_names := get_command_suggestions(list(self.bot.all_commands.keys()), command_name):
-            for similar_command_name in similar_command_names:
-                similar_command = self.bot.get_command(similar_command_name)
-
-                if not similar_command:
-                    continue
-
-                log_msg = "Cancelling attempt to suggest a command due to failed checks."
-                try:
-                    if not await similar_command.can_run(ctx):
-                        log.debug(log_msg)
-                        continue
-                except commands.errors.CommandError:
-                    log.debug(log_msg)
-                    continue
-
-                command_suggestions.append(similar_command_name)
-
-            misspelled_content = ctx.message.content
-            e = Embed()
-            e.set_author(name="Did you mean:", icon_url=QUESTION_MARK_ICON)
-            e.description = "\n".join(
-                misspelled_content.replace(command_name, cmd, 1) for cmd in command_suggestions
-            )
-            await ctx.send(embed=e, delete_after=DELETE_DELAY)
+        await self.bot.command_error_manager.handle_error(error, ctx)
 
 
 async def setup(bot: Bot) -> None:
