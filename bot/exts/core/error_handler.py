@@ -8,7 +8,6 @@ from pydis_core.utils.logging import get_logger
 from bot.bot import Bot
 from bot.constants import Channels, Colours, ERROR_REPLIES, NEGATIVE_REPLIES
 from bot.utils.decorators import InChannelCheckFailure, InMonthCheckFailure
-from bot.utils.exceptions import APIError
 
 log = get_logger(__name__)
 
@@ -91,15 +90,6 @@ class CommandErrorHandler(commands.Cog):
 
         if isinstance(error, commands.CheckFailure):
             await ctx.send(embed=self.error_embed("You are not authorized to use this command.", NEGATIVE_REPLIES))
-            return
-
-        if isinstance(error, APIError):
-            await ctx.send(
-                embed=self.error_embed(
-                    f"There was an error when communicating with the {error.api}",
-                    NEGATIVE_REPLIES
-                )
-            )
             return
 
         await self.bot.command_error_manager.handle_error(error, ctx)
