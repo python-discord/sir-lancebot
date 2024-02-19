@@ -294,3 +294,26 @@ class PfpEffects:
         new_img = PfpEffects.join_images(img_squares)
 
         return new_img
+
+    @staticmethod
+    def christmasify_effect(image: Image.Image) -> Image.Image:
+        """Applies the christmas effect to the given image."""
+        christmas_effects = ["ice", "ornaments"]
+        overlay_type = random.choice(christmas_effects)
+        overlay = Image.open(Path(f"bot/resources/holidays/christmas/{overlay_type}_frame.png"))
+
+
+        if overlay_type == "ice":
+            overlay = overlay.resize((1024, 1024))
+
+            image = ImageOps.colorize(image.convert("L"), (0, 0, 0), (212, 235, 242))
+            image = image.convert("RGBA")
+            image.alpha_composite(overlay, (0, 0))
+
+
+        elif overlay_type == "ornaments":
+            overlay = overlay.resize((768, 768))
+            image.alpha_composite(overlay, (128, -250))
+            overlay = overlay.convert("RGBA")
+
+        return PfpEffects.crop_avatar_circle(image)
