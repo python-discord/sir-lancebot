@@ -1062,6 +1062,16 @@
       "id": 546,
       "question": "What is the max value of `hash(x)` if `x` is an `int` on 32-bit machines?",
       "answer": ["2^31 - 2", "2^31-2", "2**31 - 2", "2**31-2"]
+    },
+    {
+      "id": 547,
+      "question": "What common operation does this function implement?\n```py\nimport math\n\ndef mystery(x: float) -> float:\n    return math.copysign(abs(x) + 2**52 - 2**52, x)\n```",
+      "answer": "round"
+    },
+    {
+      "id": 548,
+      "question": "What common operation does this function implement?\n```py\ndef mystery(n: int) -> int:\n    return (n>>1<<1)^n\n```",
+      "answer": "is odd"
     }
   ]
 }
