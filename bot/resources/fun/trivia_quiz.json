@@ -764,7 +764,7 @@
     {
       "id": 431,
       "question": "Which Turing Award winner created a typesetting language based on Tex?",
-      "answer": ["Lamport" ,"Leslie Lamport"]
+      "answer": ["Lamport", "Leslie Lamport"]
     },
     {
       "id": 432,
@@ -1061,7 +1061,7 @@
     {
       "id": 546,
       "question": "What is the max value of `hash(x)` if `x` is an `int` on 32-bit machines?",
-      "answer": ["2^31 - 2", "2**31 - 2"]
+      "answer": ["2^31 - 2", "2^31-2", "2**31 - 2", "2**31-2"]
     }
   ]
 }
