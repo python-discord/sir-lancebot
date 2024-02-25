@@ -14,7 +14,7 @@ def neutralise_string(txt: str | None) -> list[str] | None:
         return None
 
     # Take out punctuation.
-    txt = re.sub(r"([^\w\s]|_)", " ", txt)
+    txt = re.sub(r"[\W_]", " ", txt)
 
     words = []
     for word in txt.split():
