@@ -89,9 +89,9 @@ class Fun(Cog):
     @commands.command(name="snakecase", aliases=("scase",))
     async def snakecase_command(self, ctx: Context, *, text: str | None) -> None:
         """Attempts to convert the provided string to snake_case."""
-        text = helpers.neutralise_string(text)
         def conversion_func(text: str) -> str:
             """Converts the provided string to snake_case."""
+            text = helpers.neutralise_string(text)
             return "_".join(
                 text
             )
@@ -101,9 +101,9 @@ class Fun(Cog):
     @commands.command(name="pascalcase", aliases=("pcase", "pascal",))
     async def pascalcase_command(self, ctx: Context, *, text: str | None) -> None:
         """Attempts to convert the provided string to PascalCase."""
-        text = helpers.neutralise_string(text)
         def conversion_func(text: str) -> str:
             """Converts the provided string to PascalCase."""
+            text = helpers.neutralise_string(text)
             return "".join(
                 word.capitalize() for word in text
             )
@@ -113,9 +113,9 @@ class Fun(Cog):
     @commands.command(name="screamingsnakecase", aliases=("screamsnake", "ssnake", "screamingsnake",))
     async def screamingsnakecase_command(self, ctx: Context, *, text: str | None) -> None:
         """Attempts to convert the provided string to SCREAMING_SNAKE_CASE."""
-        text = helpers.neutralise_string(text)
         def conversion_func(text: str) -> str:
             """Converts the provided string to SCREAMING_SNAKE_CASE."""
+            text = helpers.neutralise_string(text)
             return "_".join(
                 word.upper() for word in text
             )
@@ -125,9 +125,9 @@ class Fun(Cog):
     @commands.command(name="camelcase", aliases=("ccase", "camel",))
     async def camelcase_command(self, ctx: Context, *, text: str | None) -> None:
         """Attempts to convert the provided string to camelCase."""
-        text = helpers.neutralise_string(text)
         def conversion_func(text: str) -> str:
             """Converts the provided string to camelCase."""
+            text = helpers.neutralise_string(text)
             return "".join(
                 word.capitalize() if i != 0 else word for i, word in enumerate(text)
             )
