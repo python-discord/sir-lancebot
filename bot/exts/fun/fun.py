@@ -93,7 +93,7 @@ class Fun(Cog):
         def conversion_func(text: str) -> str:
             """Converts the provided string to snake_case."""
             return "_".join(
-                text.split()
+                text
             )
         cleaned_text, embed = await self._clean_text(ctx, text, conversion_func)
         await ctx.send(content=cleaned_text, embed=embed)
@@ -105,7 +105,7 @@ class Fun(Cog):
         def conversion_func(text: str) -> str:
             """Converts the provided string to PascalCase."""
             return "".join(
-                word.capitalize() for word in text.split()
+                word.capitalize() for word in text
             )
         cleaned_text, embed = await self._clean_text(ctx, text, conversion_func)
         await ctx.send(content=cleaned_text, embed=embed)
@@ -117,7 +117,7 @@ class Fun(Cog):
         def conversion_func(text: str) -> str:
             """Converts the provided string to SCREAMING_SNAKE_CASE."""
             return "_".join(
-                word.upper() for word in text.split()
+                word.upper() for word in text
             )
         cleaned_text, embed = await self._clean_text(ctx, text, conversion_func)
         await ctx.send(content=cleaned_text, embed=embed)
@@ -129,7 +129,7 @@ class Fun(Cog):
         def conversion_func(text: str) -> str:
             """Converts the provided string to camelCase."""
             return "".join(
-                word.capitalize() if i != 0 else word for i, word in enumerate(text.split())
+                word.capitalize() if i != 0 else word for i, word in enumerate(text)
             )
         cleaned_text, embed = await self._clean_text(ctx, text, conversion_func)
         await ctx.send(content=cleaned_text, embed=embed)
