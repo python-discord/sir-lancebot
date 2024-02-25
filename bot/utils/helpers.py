@@ -7,29 +7,25 @@ def suppress_links(message: str) -> str:
         message = message.replace(link, f"<{link}>")
     return message
 
-def neutralise_string(txt: str | None) -> str | None:
+def neutralise_string(txt: str | None) -> list[str] | None:
     """Attempts to neutralise all punctuation and cases and returns a string of lowercase words."""
-    # return early if no text provided.
+    # Return early if no text provided.
     if not txt:
         return None
 
-    # take out punctuation
+    # Take out punctuation.
     txt = re.sub(r"([^\w\s]|_)", " ", txt)
 
-    # full caps words but leaves camelCase / PascalCase
-    words = [word.lower() if word.isupper() else word for word in txt.split()]
-    txt = " ".join(words)
-
-    # attempt to split PascalCase and camelCase
     words = []
-    old_i = 0
-    for i, char in enumerate(txt):
-        # to avoid PascalCase getting leading empty append
-        if char.isupper() and i != 0:
-            words.append(txt[old_i:i])
-            old_i = i
-    words.append(txt[old_i:])
+    for word in txt.split():
+        if word.isupper():
+            words.append(word.lower())
+        else:
+            old_i = 0
+            for i, char in enumerate(word):
+                if char.isupper() and i != 0:
+                    words.append(word[old_i:i].lower())
+                    old_i = i
+            words.append(word[old_i:].lower())
 
-    # strip white spaces and make lowercase
-    words = [word.strip().lower() for word in words]
-    return " ".join(words)
+    return words
