@@ -32,7 +32,7 @@ ADDED_MESSAGES = [
     "If you got it, haunt it.",
     "TIME TO GET YOUR SPOOKY ON! :skull:",
 ]
-PING = "<@{id}>"  # noqa: RUF027
+PING = "<@{id}>"
 
 EMOJI_MESSAGE = "\n".join(f"- {emoji} {val}" for emoji, val in EMOJIS_VAL.items())
 HELP_MESSAGE_DICT = {

@@ -76,7 +76,6 @@ class LatexServerError(Exception):
     """Represents an error raised from Latex rendering server."""
 
 
-
 class Latex(commands.Cog):
     """Renders latex."""
 
