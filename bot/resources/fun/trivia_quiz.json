@@ -1010,12 +1010,12 @@
     },
     {
       "id": 536,
-      "question": "What is the default length limit for converting `strs` to `ints` in CPython 3.11+?",
+      "question": "What is the default length limit for converting `str`s to `int`s in CPython 3.11+?",
       "answer": "4300"
     },
     {
       "id": 537,
-      "question": "What is the minimum length limit for converting `strs` to `ints` in CPython 3.11+?",
+      "question": "What is the minimum length limit for converting `str`s to `int`s in CPython 3.11+?",
       "answer": "640"
     },
     {
