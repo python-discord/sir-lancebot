@@ -9,7 +9,7 @@ license = "MIT"
 python = "3.11.*"
 
 # See https://bot-core.pythondiscord.com/ for docs.
-pydis_core = { version = "10.7.0", extras = ["async-rediscache"] }
+pydis_core = { version = "11.0.0", extras = ["all"] }
 
 rapidfuzz = "3.6.2"
 arrow = "1.3.0"
@@ -23,7 +23,7 @@ colorama = { version = "0.4.6", markers = "sys_platform == 'win32'" }
 lxml = "5.1.0"
 emoji = "2.10.1"
 pyjokes = "0.6.0"
-pydantic = { version = "2.5.2", extras = ["dotenv"]}
+pydantic = { version = "2.6.4", extras = ["dotenv"]}
 pydantic-settings = "2.2.1"
 
 
