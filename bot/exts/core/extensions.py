@@ -207,7 +207,7 @@ class Extensions(commands.Cog):
             if error:
                 failures[extension] = error
 
-        emoji = ":x:" if failures else ":ok_hand:"
+        emoji = ":x:" if failures else Emojis.ok_hand
         msg = f"{emoji} {len(extensions) - len(failures)} / {len(extensions)} extensions {verb}ed."
 
         if failures:
@@ -241,7 +241,7 @@ class Extensions(commands.Cog):
             error_msg = f"{e.__class__.__name__}: {e}"
             msg = f":x: Failed to {verb} extension `{ext}`:\n```\n{error_msg}\n```"
         else:
-            msg = f":ok_hand: Extension successfully {verb}ed: `{ext}`."
+            msg = f"{Emojis.ok_hand} Extension successfully {verb}ed: `{ext}`."
             log.debug(msg[10:])
 
         return msg, error_msg
