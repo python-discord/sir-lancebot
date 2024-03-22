@@ -50,12 +50,9 @@ class _Channels(EnvConfig, env_prefix="channels_"):
     algos_and_data_structs: int = 650401909852864553
     bot_commands: int = 267659945086812160
     community_meta: int = 267659945086812160
-    organisation: int = 551789653284356126
     data_science_and_ai: int = 366673247892275221
     devlog: int = 622895325144940554
     dev_contrib: int = 635950537262759947
-    mod_meta: int = 775412552795947058
-    mod_tools: int = 775413915391098921
     off_topic_0: int = 291284109232308226
     off_topic_1: int = 463035241142026251
     off_topic_2: int = 463035268514185226
@@ -63,7 +60,6 @@ class _Channels(EnvConfig, env_prefix="channels_"):
     sir_lancebot_playground: int = 607247579608121354
     voice_chat_0: int = 412357430186344448
     voice_chat_1: int = 799647045886541885
-    staff_voice: int = 541638762007101470
     reddit: int = 458224812528238616
 
 
@@ -73,9 +69,7 @@ Channels = _Channels()
 class _Categories(EnvConfig, env_prefix="categories_"):
     python_help_system: int = 691405807388196926
     development: int = 411199786025484308
-    devprojects: int = 787641585624940544
     media: int = 799054581991997460
-    staff: int = 364918151625965579
 
 
 Categories = _Categories()
@@ -147,7 +141,6 @@ class Emojis:
 
     cross_mark = "\u274C"
     check = "\u2611"
-    envelope = "\U0001F4E8"
 
     trashcan = environ.get(
         "TRASHCAN_EMOJI",
