@@ -603,6 +603,11 @@
       "id": 330,
       "question": "When DNA is unzipped, two strands are formed. What are they called (separate both answers by the word \"and\")?",
       "answer": ["leading and lagging", "leading strand and lagging strand"]
+    },
+    {
+      "id": 331,
+      "question": "How much obsidian is required to craft an enchantment table?",
+      "answer": "4"
     }
   ],
   "cs": [
@@ -755,6 +760,76 @@
       "id": 430,
       "question": "Which of these languages is the youngest?\n(Lisp, Python, Java, Haskell, Prolog, Ruby, Perl)",
       "answer": "Java"
+    },
+    {
+      "id": 431,
+      "question": "Which Turing Award winner created a typesetting language based on Tex?",
+      "answer": ["Lamport", "Leslie Lamport"]
+    },
+    {
+      "id": 432,
+      "question": "What letter is used to separate date and time in ISO 8601?",
+      "answer": "T"
+    },
+    {
+      "id": 433,
+      "question": "HTTP/3 is built on which Transport Layer Protocol?",
+      "answer": "UDP"
+    },
+    {
+      "id": 434,
+      "question": "What algorithm yields accurate RTT measurements in TCP?",
+      "answer": ["Karn", "Karn-Partridge"]
+    },
+    {
+      "id": 435,
+      "question": "What standard provides the basis for Wi-Fi networks?",
+      "answer": ["802.11", "IEEE 802.11"]
+    },
+    {
+      "id": 436,
+      "question": "A database index that reorders the data to match the index is called a ________ index.",
+      "answer": "Clustered"
+    },
+    {
+      "id": 437,
+      "question": "What does the 'B' in 'B-Tree' stand for?",
+      "answer": ["Nothing", "B", "Unknown"]
+    },
+    {
+      "id": 438,
+      "question": "The name server with the original zone records for a domain is called the ________ name server.",
+      "answer": "Authoritative"
+    },
+    {
+      "id": 439,
+      "question": "What is the name of the memory cache that stores recent mappings from virtual memory to physical memory?",
+      "answer": ["TLB", "Translation lookaside buffer"]
+    },
+    {
+      "id": 440,
+      "question": "The process of moving unused page tables out of memory is called?",
+      "answer": "Swapping"
+    },
+    {
+      "id": 441,
+      "question": "A failing page table lookup is known as?",
+      "answer": "Page fault"
+    },
+    {
+      "id": 442,
+      "question": "What is the nickname for the textbook 'Compilers: Principles, Techniques, and Tools'?",
+      "answer": "Dragon Book"
+    },
+    {
+      "id": 443,
+      "question": "In functional programming, a function with identical return values for identical arguments and no side effects is called?",
+      "answer": "Pure function"
+    },
+    {
+      "id": 444,
+      "question": "On Linux systems, the `fork` system call returns what value in the parent process?",
+      "answer": ["PID", "child PID"]
     }
   ],
   "python": [
@@ -907,6 +982,101 @@
       "id": 530,
       "question": "What type is the attribute of a frame object that contains the current local variables?",
       "answer": "dict"
+    },
+    {
+      "id": 531,
+      "question": "What standard library module implements a topological sort function?",
+      "answer": "graphlib"
+    },
+    {
+      "id": 532,
+      "question": "Fstrings, `str.format`, and `%` style formatting are different methods of performing what operation?",
+      "answer": ["string interpolation", "interpolation"]
+    },
+    {
+      "id": 533,
+      "question": "What built-in function is the asynchronous version of a function that returns the next value of an iterator?",
+      "answer": "anext"
+    },
+    {
+      "id": 534,
+      "question": "What module should be used for extended precision floating point values?",
+      "answer": "decimal"
+    },
+    {
+      "id": 535,
+      "question": "What function can be used to increase the length limit for string to integer conversion (answer should be enclosed in backticks!)?",
+      "answer": "`sys.set_int_max_str_digits`"
+    },
+    {
+      "id": 536,
+      "question": "What is the default length limit for converting `str`s to `int`s in CPython 3.11+?",
+      "answer": "4300"
+    },
+    {
+      "id": 537,
+      "question": "What is the minimum length limit for converting `str`s to `int`s in CPython 3.11+?",
+      "answer": "640"
+    },
+    {
+      "id": 538,
+      "question": "What environment variable configures the length limit for converting `str`s to `int`s in CPython 3.11+ (answer should be enclosed in backticks!)?",
+      "answer": "`PYTHONINTMAXSTRDIGITS`"
+    },
+    {
+      "id": 539,
+      "question": "An instance of what type is returned when indexing into an instance of bytes?",
+      "answer": "int"
+    },
+    {
+      "id": 540,
+      "question": "What is `hash(float('iNf'))`?",
+      "answer": "314159"
+    },
+    {
+      "id": 541,
+      "question": "What kind of regex quantifiers were added in Python 3.11?",
+      "answer": "possessive"
+    },
+    {
+      "id": 542,
+      "question": "Who invented Tim Sort?",
+      "answer": "Tim Peters"
+    },
+    {
+      "id": 543,
+      "question": "How many unique compiled patterns can be stored in the `re` module's internal caches?",
+      "answer": "512"
+    },
+    {
+      "id": 544,
+      "question": "What is the minimum number of comparison methods a class must implement to support total ordering?",
+      "answer": "2"
+    },
+    {
+      "id": 545,
+      "question": "What is `pow(0, 0)`?",
+      "answer": "1"
+    },
+    {
+      "id": 546,
+      "question": "What is the max value of `hash(x)` if `x` is an `int` on 32-bit machines?",
+      "answer": ["2^31 - 2", "2^31-2", "2**31 - 2", "2**31-2"]
+    },
+    {
+      "id": 547,
+      "question": "What common operation does this function implement?\n```py\nimport math\n\ndef mystery(x: float) -> float:\n    return math.copysign(abs(x) + 2**52 - 2**52, x)\n```",
+      "answer": "round"
+    },
+    {
+      "id": 548,
+      "question": "What common operation does this function implement?\n```py\ndef mystery(n: int) -> int:\n    return (n>>1<<1)^n\n```",
+      "answer": "is odd"
+    },
+    {
+      "id": 549,
+      "question": "What cache replacement policy is used by the `re` module for up to 256 compiled patterns?",
+      "answer": "FIFO"
     }
   ]
 }
