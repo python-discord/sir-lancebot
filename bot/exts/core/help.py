@@ -11,19 +11,16 @@ from pydis_core.utils.logging import get_logger
 
 from bot import constants
 from bot.bot import Bot
-from bot.constants import Emojis
 from bot.utils.commands import get_command_suggestions
 from bot.utils.decorators import whitelist_override
-from bot.utils.pagination import FIRST_EMOJI, LAST_EMOJI, LEFT_EMOJI, LinePaginator, RIGHT_EMOJI
-
-DELETE_EMOJI = Emojis.trashcan
+from bot.utils.pagination import LinePaginator, PAGINATION_EMOJI
 
 REACTIONS = {
-    FIRST_EMOJI: "first",
-    LEFT_EMOJI: "back",
-    RIGHT_EMOJI: "next",
-    LAST_EMOJI: "end",
-    DELETE_EMOJI: "stop",
+    PAGINATION_EMOJI.first: "first",
+    PAGINATION_EMOJI.left: "back",
+    PAGINATION_EMOJI.right: "next",
+    PAGINATION_EMOJI.last: "end",
+    PAGINATION_EMOJI.delete: "stop",
 }
 
 
@@ -236,7 +233,7 @@ class HelpSession:
 
         # if single-page
         else:
-            self._bot.loop.create_task(self.message.add_reaction(DELETE_EMOJI))
+            self._bot.loop.create_task(self.message.add_reaction(PAGINATION_EMOJI.delete))
 
     def _category_key(self, cmd: Command) -> str:
         """

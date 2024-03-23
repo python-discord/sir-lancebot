@@ -17,6 +17,7 @@ from bot.utils.decorators import whitelist_check
 log = get_logger(__name__)
 setup_sentry()
 
+
 async def _create_redis_session() -> RedisSession:
     """Create and connect to a redis session."""
     redis_session = RedisSession(
