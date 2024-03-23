@@ -1,9 +1,0 @@
-# Extensions groups
-bot/exts/events/advent_of_code/**                   @ks129
-bot/exts/events/hacktoberfest/**                    @ks129
-bot/exts/holidays/halloween/**                      @ks129
-
-# CI & Docker
-.github/workflows/**                    @SebastiaanZ @Den4200
-Dockerfile                              @Den4200
-docker-compose.yml                      @Den4200
