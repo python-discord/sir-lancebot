@@ -1045,7 +1045,7 @@
     },
     {
       "id": 543,
-      "question": "What is the size of the `re` module's internal cache?",
+      "question": "How many unique compiled patterns can be stored in the `re` module's internal caches?",
       "answer": "512"
     },
     {
@@ -1072,6 +1072,11 @@
       "id": 548,
       "question": "What common operation does this function implement?\n```py\ndef mystery(n: int) -> int:\n    return (n>>1<<1)^n\n```",
       "answer": "is odd"
+    },
+    {
+      "id": 549,
+      "question": "What cache replacement policy is used by the `re` module for up to 256 compiled patterns?",
+      "answer": "FIFO"
     }
   ]
 }
