@@ -316,13 +316,11 @@ class ConnectFour(commands.Cog):
 
             return True
 
-        if (
+        return bool(
             user.id == ctx.author.id
             and str(reaction.emoji) == CROSS_EMOJI
             and reaction.message.id == announcement.id
-        ):
-            return True
-        return False
+        )
 
     def already_playing(self, player: discord.Member) -> bool:
         """Check if someone is already in a game."""
