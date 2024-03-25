@@ -166,7 +166,8 @@ class Emojis:
 
     # These icons are from Github's repo https://github.com/primer/octicons/
     issue_open = "<:IssueOpen:852596024777506817>"
-    issue_closed = "<:IssueClosed:927326162861039626>"
+    issue_completed = "<:IssueClosed:927326162861039626>"
+    issue_not_planned = "<:IssueNotPlanned:1221642127595929610>"
     issue_draft = "<:IssueDraft:852596025147523102>"  # Not currently used by Github, but here for future.
     pull_request_open = "<:PROpen:852596471505223781>"
     pull_request_closed = "<:PRClosed:852596024732286976>"

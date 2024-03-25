@@ -114,10 +114,11 @@ class GithubInfo(commands.Cog):
         # from issues: if the 'issues' key is present in the response then we can pull the data we
         # need from the initial API call.
         if "issues" in json_data["html_url"]:
-            if json_data.get("state") == "open":
-                emoji = Emojis.issue_open
-            else:
-                emoji = Emojis.issue_closed
+            emoji = Emojis.issue_open
+            if json_data.get("state") == "closed":
+                emoji = Emojis.issue_completed
+            if json_data.get("state_reason") == "not_planned":
+                emoji = Emojis.issue_not_planned
 
         # If the 'issues' key is not contained in the API response and there is no error code, then
         # we know that a PR has been requested and a call to the pulls API endpoint is necessary
