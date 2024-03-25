@@ -11,7 +11,7 @@ from discord import File, Member, Reaction, User
 from discord.ext.commands import Cog, Context
 from pydis_core.utils.logging import get_logger
 
-from bot.constants import MODERATION_ROLES
+from bot.constants import Emojis, MODERATION_ROLES
 
 SNAKE_RESOURCES = Path("bot/resources/fun/snakes").absolute()
 
@@ -355,7 +355,7 @@ def frame_to_png_bytes(image: Image) -> io.BytesIO:
 
 
 log = get_logger(__name__)
-START_EMOJI = "\u2611"     # :ballot_box_with_check: - Start the game
+START_EMOJI = Emojis.check     # :ballot_box_with_check: - Start the game
 CANCEL_EMOJI = "\u274C"    # :x: - Cancel or leave the game
 ROLL_EMOJI = "\U0001F3B2"  # :game_die: - Roll the die!
 JOIN_EMOJI = "\U0001F64B"  # :raising_hand: - Join the game.
