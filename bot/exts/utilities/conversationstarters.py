@@ -41,12 +41,14 @@ class ConvoStarters(commands.Cog):
         self.bot = bot
 
     @staticmethod
-    def _build_topic_embed(channel_id: int) -> discord.Embed:
+    def _build_topic_embed(channel_id: int, previous_topic: None | str) -> tuple[discord.Embed, bool]:
         """
         Build an embed containing a conversation topic.
 
         If in a Python channel, a python-related topic will be given.
         Otherwise, a random conversation topic will be received by the user.
+
+        Also returns a value that determines whether or not to remove the reaction afterwards
         """
         # No matter what, the form will be shown.
         embed = discord.Embed(
@@ -61,7 +63,23 @@ class ConvoStarters(commands.Cog):
             embed.title = f"**{next(TOPICS['default'])}**"
         else:
             embed.title = f"**{next(channel_topics)}**"
-        return embed
+
+        if previous_topic is None:
+            # This is the first topic being sent
+            return embed, False
+
+        total_topics = previous_topic.count("\n") + 1
+        # Add 1 before first topic
+        if total_topics == 1:
+            previous_topic = f"1. {previous_topic}"
+
+        embed.title = previous_topic + f"\n{total_topics + 1}. {embed.title}"
+
+        if len(embed.title) > 256:
+            embed.title = previous_topic
+            return embed, True
+
+        return embed, False
 
     @staticmethod
     def _predicate(
@@ -99,7 +117,12 @@ class ConvoStarters(commands.Cog):
                 break
 
             try:
-                await message.edit(embed=self._build_topic_embed(message.channel.id))
+                # The returned discord.Message object from discord.Message.edit is different from the current
+                # discord.Message object, so it must be reassigned to update properly
+                embed, remove_reactions = self._build_topic_embed(message.channel.id, message.embeds[0].title)
+                message = await message.edit(embed=embed)
+                if remove_reactions:
+                    await message.clear_reaction("🔄")
             except discord.NotFound:
                 break
 
@@ -115,7 +138,7 @@ class ConvoStarters(commands.Cog):
 
         Allows the refresh of a topic by pressing an emoji.
         """
-        message = await ctx.send(embed=self._build_topic_embed(ctx.channel.id))
+        message = await ctx.send(embed=self._build_topic_embed(ctx.channel.id, None)[0])
         self.bot.loop.create_task(self._listen_for_refresh(ctx.author, message))
 
 
