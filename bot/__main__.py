@@ -11,6 +11,7 @@ from redis import RedisError
 import bot
 from bot import constants
 from bot.bot import Bot
+from bot.command_error_handlers import bootstrap_command_error_manager
 from bot.log import setup_sentry
 from bot.utils.decorators import whitelist_check
 
@@ -74,6 +75,8 @@ async def main() -> None:
             intents=intents,
             allowed_roles=allowed_roles,
         )
+
+        bot.instance.register_command_error_manager(bootstrap_command_error_manager(bot.instance))
 
         async with bot.instance as _bot:
             _bot.add_check(whitelist_check(
