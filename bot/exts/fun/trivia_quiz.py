@@ -625,8 +625,7 @@ class TriviaQuiz(commands.Cog):
 
         for cat, description in self.categories.items():
             embed.description += (
-                f"**- {cat.capitalize()}**\n"
-                f"{description.capitalize()}\n"
+                f"- **{cat.capitalize()}**: {description.capitalize()}\n"
             )
 
         return embed
