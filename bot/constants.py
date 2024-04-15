@@ -293,7 +293,7 @@ Wolfram = _Wolfram()
 
 
 class _Redis(EnvConfig, env_prefix="redis_"):
-    host: str = "redis.default.svc.cluster.local"
+    host: str = "redis.databases.svc.cluster.local"
     port: int = 6379
     password: SecretStr = ""
     use_fakeredis: bool = False
