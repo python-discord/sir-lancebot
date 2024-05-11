@@ -1,6 +1,5 @@
-import logging
+from collections.abc import Callable
 from io import BytesIO
-from typing import Callable, Optional
 from urllib.parse import urlencode
 
 import arrow
@@ -8,14 +7,15 @@ import discord
 from discord import Embed
 from discord.ext import commands
 from discord.ext.commands import BucketType, Cog, Context, check, group
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
-from bot.constants import Colours, STAFF_ROLES, Wolfram
+from bot.constants import Colours, STAFF_ROLES, Wolfram as WolframConfig
 from bot.utils.pagination import ImagePaginator
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
-APPID = Wolfram.key
+APPID = WolframConfig.key.get_secret_value()
 DEFAULT_OUTPUT_FORMAT = "JSON"
 QUERY = "http://api.wolframalpha.com/v2/{request}"
 WOLF_IMAGE = "https://www.symbols.com/gi.php?type=1&id=2886&i=1"
@@ -23,18 +23,18 @@ WOLF_IMAGE = "https://www.symbols.com/gi.php?type=1&id=2886&i=1"
 MAX_PODS = 20
 
 # Allows for 10 wolfram calls pr user pr day
-usercd = commands.CooldownMapping.from_cooldown(Wolfram.user_limit_day, 60 * 60 * 24, BucketType.user)
+usercd = commands.CooldownMapping.from_cooldown(WolframConfig.user_limit_day, 60 * 60 * 24, BucketType.user)
 
 # Allows for max api requests / days in month per day for the entire guild (Temporary)
-guildcd = commands.CooldownMapping.from_cooldown(Wolfram.guild_limit_day, 60 * 60 * 24, BucketType.guild)
+guildcd = commands.CooldownMapping.from_cooldown(WolframConfig.guild_limit_day, 60 * 60 * 24, BucketType.guild)
 
 
 async def send_embed(
         ctx: Context,
         message_txt: str,
         colour: int = Colours.soft_red,
-        footer: str = None,
-        img_url: str = None,
+        footer: str | None = None,
+        img_url: str | None = None,
         f: discord.File = None
 ) -> None:
     """Generate & send a response embed with Wolfram as the author."""
@@ -64,10 +64,10 @@ def custom_cooldown(*ignore: int) -> Callable:
         if ctx.invoked_with == "help":
             # if the invoked command is help we don't want to increase the ratelimits since it's not actually
             # invoking the command/making a request, so instead just check if the user/guild are on cooldown.
-            guild_cooldown = not guildcd.get_bucket(ctx.message).get_tokens() == 0  # if guild is on cooldown
+            guild_cooldown = guildcd.get_bucket(ctx.message).get_tokens() != 0  # if guild is on cooldown
             # check the message is in a guild, and check user bucket if user is not ignored
             if ctx.guild and not any(r.id in ignore for r in ctx.author.roles):
-                return guild_cooldown and not usercd.get_bucket(ctx.message).get_tokens() == 0
+                return guild_cooldown and usercd.get_bucket(ctx.message).get_tokens() != 0
             return guild_cooldown
 
         user_bucket = usercd.get_bucket(ctx.message)
@@ -105,7 +105,7 @@ def custom_cooldown(*ignore: int) -> Callable:
     return check(predicate)
 
 
-async def get_pod_pages(ctx: Context, bot: Bot, query: str) -> Optional[list[tuple[str, str]]]:
+async def get_pod_pages(ctx: Context, bot: Bot, query: str) -> list[tuple[str, str]] | None:
     """Get the Wolfram API pod pages for the provided query."""
     async with ctx.typing():
         params = {
@@ -253,10 +253,7 @@ class Wolfram(Cog):
         if not pages:
             return
 
-        if len(pages) >= 2:
-            page = pages[1]
-        else:
-            page = pages[0]
+        page = pages[1] if len(pages) >= 2 else pages[0]
 
         await send_embed(ctx, page[0], colour=Colours.soft_orange, img_url=page[1])
 
@@ -303,4 +300,7 @@ class Wolfram(Cog):
 
 async def setup(bot: Bot) -> None:
     """Load the Wolfram cog."""
+    if not WolframConfig.key:
+        log.warning("No Wolfram API Key was provided. Not loading Wolfram Cog.")
+        return
     await bot.add_cog(Wolfram(bot))

@@ -1,19 +1,18 @@
-import logging
 import random
 import textwrap
 from collections import defaultdict
-from datetime import datetime
-from typing import Optional
+from datetime import UTC, datetime
 
 from discord import Color, Embed, Emoji
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours, ERROR_REPLIES
 from bot.utils.pagination import LinePaginator
 from bot.utils.time import time_since
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 class Emojis(commands.Cog):
@@ -28,7 +27,7 @@ class Emojis(commands.Cog):
         embed = Embed(
             color=Colours.orange,
             title="Emoji Count",
-            timestamp=datetime.utcnow()
+            timestamp=datetime.now(tz=UTC)
         )
         msg = []
 
@@ -71,7 +70,7 @@ class Emojis(commands.Cog):
         return embed, msg
 
     @commands.group(name="emoji", invoke_without_command=True)
-    async def emoji_group(self, ctx: commands.Context, emoji: Optional[Emoji]) -> None:
+    async def emoji_group(self, ctx: commands.Context, emoji: Emoji | None) -> None:
         """A group of commands related to emojis."""
         if emoji is not None:
             await ctx.invoke(self.info_command, emoji)
@@ -79,7 +78,7 @@ class Emojis(commands.Cog):
             await self.bot.invoke_help_command(ctx)
 
     @emoji_group.command(name="count", aliases=("c",))
-    async def count_command(self, ctx: commands.Context, *, category_query: str = None) -> None:
+    async def count_command(self, ctx: commands.Context, *, category_query: str | None = None) -> None:
         """Returns embed with emoji category and info given by the user."""
         emoji_dict = defaultdict(list)
 

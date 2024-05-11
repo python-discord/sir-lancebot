@@ -1,0 +1,76 @@
+name: Build & Deploy
+
+on:
+  workflow_call:
+    inputs:
+      sha-tag:
+        description: "A short-form SHA tag for the commit that triggered this flow"
+        required: true
+        type: string
+
+jobs:
+  build:
+    name: Build & Push
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # Check out the current repository in the `sir-lancebot` subdirectory
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Github Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN  }}
+
+      # Build and push the container to the GitHub Container
+      # Repository. The container will be tagged as "latest"
+      # and with the short SHA of the commit.
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          cache-from: type=registry,ref=ghcr.io/python-discord/sir-lancebot:latest
+          cache-to: type=inline
+          tags: |
+            ghcr.io/python-discord/sir-lancebot:latest
+            ghcr.io/python-discord/sir-lancebot:${{ inputs.sha-tag }}
+          build-args: |
+            git_sha=${{ github.sha }}
+
+  deploy:
+    needs: build
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout Kubernetes Repository
+        uses: actions/checkout@v4
+        with:
+          repository: python-discord/infra
+          path: infra
+
+      - uses: azure/setup-kubectl@v4
+
+      - name: Authenticate with Kubernetes
+        uses: azure/k8s-set-context@v4
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBECONFIG }}
+
+      - name: Deploy to Kubernetes
+        uses: Azure/k8s-deploy@v5
+        with:
+          namespace: bots
+          manifests: |
+              infra/kubernetes/namespaces/bots/sir-lancebot/deployment.yaml
+          images: 'ghcr.io/python-discord/sir-lancebot:${{ inputs.sha-tag }}'

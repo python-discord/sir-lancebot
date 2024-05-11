@@ -1,6 +1,5 @@
-import asyncio
 import random
-from typing import Callable, Optional, Union
+from collections.abc import Callable
 
 import discord
 from discord.ext.commands import Cog, Context, check, group
@@ -42,7 +41,7 @@ class Player:
         self.ctx = ctx
         self.symbol = symbol
 
-    async def get_move(self, board: dict[int, str], msg: discord.Message) -> tuple[bool, Optional[int]]:
+    async def get_move(self, board: dict[int, str], msg: discord.Message) -> tuple[bool, int | None]:
         """
         Get move from user.
 
@@ -59,7 +58,7 @@ class Player:
 
         try:
             react, _ = await self.ctx.bot.wait_for("reaction_add", timeout=30.0, check=check_for_move)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             return True, None
         else:
             return False, list(Emojis.number_emojis.keys())[list(Emojis.number_emojis.values()).index(react.emoji)]
@@ -106,7 +105,7 @@ class AI:
 class Game:
     """Class that contains information and functions about Tic Tac Toe game."""
 
-    def __init__(self, players: list[Union[Player, AI]], ctx: Context):
+    def __init__(self, players: list[Player | AI], ctx: Context):
         self.players = players
         self.ctx = ctx
         self.channel = ctx.channel
@@ -125,13 +124,13 @@ class Game:
         self.current = self.players[0]
         self.next = self.players[1]
 
-        self.winner: Optional[Union[Player, AI]] = None
-        self.loser: Optional[Union[Player, AI]] = None
+        self.winner: Player | AI | None = None
+        self.loser: Player | AI | None = None
         self.over = False
         self.canceled = False
         self.draw = False
 
-    async def get_confirmation(self) -> tuple[bool, Optional[str]]:
+    async def get_confirmation(self) -> tuple[bool, str | None]:
         """
         Ask does user want to play TicTacToe against requester. First player is always requester.
 
@@ -157,12 +156,12 @@ class Game:
             )
 
         try:
-            reaction, user = await self.ctx.bot.wait_for(
+            reaction, _ = await self.ctx.bot.wait_for(
                 "reaction_add",
                 timeout=60.0,
                 check=confirm_check
             )
-        except asyncio.TimeoutError:
+        except TimeoutError:
             self.over = True
             self.canceled = True
             await confirm_message.delete()
@@ -171,10 +170,10 @@ class Game:
         await confirm_message.delete()
         if reaction.emoji == Emojis.confirmation:
             return True, None
-        else:
-            self.over = True
-            self.canceled = True
-            return False, "User declined"
+
+        self.over = True
+        self.canceled = True
+        return False, "User declined"
 
     @staticmethod
     async def add_reactions(msg: discord.Message) -> None:
@@ -186,7 +185,8 @@ class Game:
         """Get formatted tic-tac-toe board for message."""
         board = list(self.board.values())
         return "\n".join(
-            (f"{board[line]} {board[line + 1]} {board[line + 2]}" for line in range(0, len(board), 3))
+            f"{board[line]} {board[line + 1]} {board[line + 2]}"
+            for line in range(0, len(board), 3)
         )
 
     async def play(self) -> None:
@@ -256,7 +256,7 @@ class TicTacToe(Cog):
     @is_channel_free()
     @is_requester_free()
     @group(name="tictactoe", aliases=("ttt", "tic"), invoke_without_command=True)
-    async def tic_tac_toe(self, ctx: Context, opponent: Optional[discord.User]) -> None:
+    async def tic_tac_toe(self, ctx: Context, opponent: discord.User | None) -> None:
         """Tic Tac Toe game. Play against friends or AI. Use reactions to add your mark to field."""
         if opponent == ctx.author:
             await ctx.send("You can't play against yourself.")

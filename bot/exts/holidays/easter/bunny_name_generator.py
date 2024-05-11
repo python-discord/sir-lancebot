@@ -1,15 +1,14 @@
 import json
-import logging
 import random
 import re
 from pathlib import Path
-from typing import Optional
 
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 BUNNY_NAMES = json.loads(Path("bot/resources/holidays/easter/bunny_names.json").read_text("utf8"))
 
@@ -18,7 +17,7 @@ class BunnyNameGenerator(commands.Cog):
     """Generate a random bunny name, or bunnify your Discord username!"""
 
     @staticmethod
-    def find_separators(displayname: str) -> Optional[list[str]]:
+    def find_separators(displayname: str) -> list[str] | None:
         """Check if Discord name contains spaces so we can bunnify an individual word in the name."""
         new_name = re.split(r"[_.\s]", displayname)
         if displayname not in new_name:
@@ -26,7 +25,7 @@ class BunnyNameGenerator(commands.Cog):
         return None
 
     @staticmethod
-    def find_vowels(displayname: str) -> Optional[str]:
+    def find_vowels(displayname: str) -> str | None:
         """
         Finds vowels in the user's display name.
 
@@ -46,6 +45,7 @@ class BunnyNameGenerator(commands.Cog):
             new_name = re.sub(exp, vowel_sub, displayname)
             if new_name != displayname:
                 return new_name
+        return None
 
     @staticmethod
     def append_name(displayname: str) -> str:
@@ -77,7 +77,7 @@ class BunnyNameGenerator(commands.Cog):
         unmatched_name = self.append_name(username)
 
         if spaces_in_name is not None:
-            replacements = ["Cotton", "Fluff", "Floof" "Bounce", "Snuffle", "Nibble", "Cuddle", "Velvetpaw", "Carrot"]
+            replacements = ["Cotton", "Fluff", "Floof", "Bounce", "Snuffle", "Nibble", "Cuddle", "Velvetpaw", "Carrot"]
             word_to_replace = random.choice(spaces_in_name)
             substitute = random.choice(replacements)
             bunnified_name = username.replace(word_to_replace, substitute)

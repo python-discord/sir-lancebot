@@ -1,4 +1,3 @@
-import logging
 from json import loads
 from pathlib import Path
 from random import choice
@@ -7,10 +6,11 @@ import discord
 from discord.errors import Forbidden
 from discord.ext import commands
 from discord.ext.commands import BucketType
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 HALLOWEENIFY_DATA = loads(Path("bot/resources/holidays/halloween/halloweenify.json").read_text("utf8"))
 

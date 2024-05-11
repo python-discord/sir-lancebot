@@ -1,16 +1,15 @@
-import logging
 import random
-from typing import Union
 
 import discord
 from async_rediscache import RedisCache
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Channels, Month
 from bot.utils.decorators import in_month
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 # chance is 1 in x range, so 1 in 20 range would give 5% chance (for add candy)
 ADD_CANDY_REACTION_CHANCE = 20  # 5%
@@ -18,17 +17,17 @@ ADD_CANDY_EXISTING_REACTION_CHANCE = 10  # 10%
 ADD_SKULL_REACTION_CHANCE = 50  # 2%
 ADD_SKULL_EXISTING_REACTION_CHANCE = 20  # 5%
 
-EMOJIS = dict(
-    CANDY="\N{CANDY}",
-    SKULL="\N{SKULL}",
-    MEDALS=(
+EMOJIS = {
+    "CANDY": "\N{CANDY}",
+    "SKULL": "\N{SKULL}",
+    "MEDALS": (
         "\N{FIRST PLACE MEDAL}",
         "\N{SECOND PLACE MEDAL}",
         "\N{THIRD PLACE MEDAL}",
         "\N{SPORTS MEDAL}",
         "\N{SPORTS MEDAL}",
     ),
-)
+}
 
 
 class CandyCollection(commands.Cog):
@@ -69,7 +68,7 @@ class CandyCollection(commands.Cog):
 
     @in_month(Month.OCTOBER)
     @commands.Cog.listener()
-    async def on_reaction_add(self, reaction: discord.Reaction, user: Union[discord.User, discord.Member]) -> None:
+    async def on_reaction_add(self, reaction: discord.Reaction, user: discord.User | discord.Member) -> None:
         """Add/remove candies from a person if the reaction satisfies criteria."""
         message = reaction.message
         # check to ensure the reactor is human
@@ -140,7 +139,7 @@ class CandyCollection(commands.Cog):
 
     @staticmethod
     async def send_spook_msg(
-        author: discord.Member, channel: discord.TextChannel, candies: Union[str, int]
+        author: discord.Member, channel: discord.TextChannel, candies: str | int
     ) -> None:
         """Send a spooky message."""
         e = discord.Embed(colour=author.colour)

@@ -1,6 +1,5 @@
 import asyncio
 import colorsys
-import logging
 import os
 import random
 import re
@@ -9,13 +8,14 @@ import textwrap
 import urllib
 from functools import partial
 from io import BytesIO
-from typing import Any, Optional
+from typing import Any
 
-import async_timeout
 from PIL import Image, ImageDraw, ImageFont
+from aiohttp import ClientTimeout
 from discord import Colour, Embed, File, Member, Message, Reaction
 from discord.errors import HTTPException
 from discord.ext.commands import Cog, CommandError, Context, bot_has_permissions, group
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import ERROR_REPLIES, Tokens
@@ -23,7 +23,7 @@ from bot.exts.fun.snakes import _utils as utils
 from bot.exts.fun.snakes._converter import Snake
 from bot.utils.decorators import locked
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 # region: Constants
@@ -241,8 +241,11 @@ class Snakes(Cog):
         # Draw the text onto the final image
         draw = ImageDraw.Draw(full_image)
         for line in textwrap.wrap(description, 36):
-            draw.text([margin + 4, offset], line, font=CARD["font"])
-            offset += CARD["font"].getsize(line)[1]
+            draw.text((margin + 4, offset), line, font=CARD["font"])
+
+            _left, top, _right, bottom = CARD["font"].getbbox(line)
+            # Height of the text + 4px spacing
+            offset += bottom - top + 4
 
         # Get the image contents as a BufferIO object
         buffer = BytesIO()
@@ -274,14 +277,13 @@ class Snakes(Cog):
 
         return message
 
-    async def _fetch(self, url: str, params: Optional[dict] = None) -> dict:
+    async def _fetch(self, url: str, params: dict | None = None) -> dict:
         """Asynchronous web request helper method."""
         if params is None:
             params = {}
 
-        async with async_timeout.timeout(10):
-            async with self.bot.http_session.get(url, params=params) as response:
-                return await response.json()
+        async with self.bot.http_session.get(url, params=params, timeout=ClientTimeout(total=10)) as response:
+            return await response.json()
 
     def _get_random_long_message(self, messages: list[str], retries: int = 10) -> str:
         """
@@ -373,7 +375,7 @@ class Snakes(Cog):
 
             for image in snake_info["images"]:
                 # Images come in the format of `File:filename.extension`
-                file, sep, filename = image["title"].partition(":")
+                _, _, filename = image["title"].partition(":")
                 filename = filename.replace(" ", "%20")  # Wikipedia returns good data!
 
                 if not filename.startswith("Map"):
@@ -419,8 +421,8 @@ class Snakes(Cog):
 
         # Validate the answer
         try:
-            reaction, user = await ctx.bot.wait_for("reaction_add", timeout=45.0, check=predicate)
-        except asyncio.TimeoutError:
+            reaction, _ = await ctx.bot.wait_for("reaction_add", timeout=45.0, check=predicate)
+        except TimeoutError:
             await ctx.send(f"You took too long. The correct answer was **{options[answer]}**.")
             await message.clear_reactions()
             return
@@ -493,7 +495,7 @@ class Snakes(Cog):
         antidote_answer.pop()
 
         # Begin initial board building
-        for i in range(0, 10):
+        for i in range(10):
             page_guess_list.append(f"{HOLE_EMOJI} {HOLE_EMOJI} {HOLE_EMOJI} {HOLE_EMOJI}")
             page_result_list.append(f"{CROSS_EMOJI} {CROSS_EMOJI} {CROSS_EMOJI} {CROSS_EMOJI}")
             board.append(
@@ -514,56 +516,55 @@ class Snakes(Cog):
             try:
                 reaction, user = await ctx.bot.wait_for(
                     "reaction_add", timeout=300, check=predicate)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 log.debug("Antidote timed out waiting for a reaction")
                 break  # We're done, no reactions for the last 5 minutes
 
-            if antidote_tries < 10:
-                if antidote_guess_count < 4:
-                    if reaction.emoji in ANTIDOTE_EMOJI:
-                        antidote_guess_list.append(reaction.emoji)
-                        antidote_guess_count += 1
+            if antidote_tries < 10 and antidote_guess_count < 4:
+                if reaction.emoji in ANTIDOTE_EMOJI:
+                    antidote_guess_list.append(reaction.emoji)
+                    antidote_guess_count += 1
 
-                    if antidote_guess_count == 4:  # Guesses complete
-                        antidote_guess_count = 0
-                        page_guess_list[antidote_tries] = " ".join(antidote_guess_list)
+                if antidote_guess_count == 4:  # Guesses complete
+                    antidote_guess_count = 0
+                    page_guess_list[antidote_tries] = " ".join(antidote_guess_list)
 
-                        # Now check guess
-                        for i in range(0, len(antidote_answer)):
-                            if antidote_guess_list[i] == antidote_answer[i]:
-                                guess_result.append(TICK_EMOJI)
-                            elif antidote_guess_list[i] in antidote_answer:
-                                guess_result.append(BLANK_EMOJI)
-                            else:
-                                guess_result.append(CROSS_EMOJI)
-                        guess_result.sort()
-                        page_result_list[antidote_tries] = " ".join(guess_result)
+                    # Now check guess
+                    for i in range(len(antidote_answer)):
+                        if antidote_guess_list[i] == antidote_answer[i]:
+                            guess_result.append(TICK_EMOJI)
+                        elif antidote_guess_list[i] in antidote_answer:
+                            guess_result.append(BLANK_EMOJI)
+                        else:
+                            guess_result.append(CROSS_EMOJI)
+                    guess_result.sort()
+                    page_result_list[antidote_tries] = " ".join(guess_result)
 
-                        # Rebuild the board
-                        board = []
-                        for i in range(0, 10):
-                            board.append(f"`{i+1:02d}` "
-                                         f"{page_guess_list[i]} - "
-                                         f"{page_result_list[i]}")
-                            board.append(EMPTY_UNICODE)
+                    # Rebuild the board
+                    board = []
+                    for i in range(10):
+                        board.append(f"`{i+1:02d}` "
+                                     f"{page_guess_list[i]} - "
+                                     f"{page_result_list[i]}")
+                        board.append(EMPTY_UNICODE)
 
-                        # Remove Reactions
-                        for emoji in antidote_guess_list:
-                            await board_id.remove_reaction(emoji, user)
+                    # Remove Reactions
+                    for emoji in antidote_guess_list:
+                        await board_id.remove_reaction(emoji, user)
 
-                        if antidote_guess_list == antidote_answer:
-                            win = True
+                    if antidote_guess_list == antidote_answer:
+                        win = True
 
-                        antidote_tries += 1
-                        guess_result = []
-                        antidote_guess_list = []
+                    antidote_tries += 1
+                    guess_result = []
+                    antidote_guess_list = []
 
-                        antidote_embed.clear_fields()
-                        antidote_embed.add_field(name=f"{10 - antidote_tries} "
-                                                      f"guesses remaining",
-                                                 value="\n".join(board))
-                        # Redisplay the board
-                        await board_id.edit(embed=antidote_embed)
+                    antidote_embed.clear_fields()
+                    antidote_embed.add_field(name=f"{10 - antidote_tries} "
+                                                  f"guesses remaining",
+                                             value="\n".join(board))
+                    # Redisplay the board
+                    await board_id.edit(embed=antidote_embed)
 
         # Winning / Ending Screen
         if win is True:
@@ -598,7 +599,7 @@ class Snakes(Cog):
         Written by Momo and kel.
         Modified by juan and lemon.
         """
-        with ctx.typing():
+        async with ctx.typing():
 
             # Generate random snake attributes
             width = random.randint(6, 10)
@@ -637,7 +638,7 @@ class Snakes(Cog):
 
         Created by Ava and eivl.
         """
-        with ctx.typing():
+        async with ctx.typing():
             if name is None:
                 name = await Snake.random()
 
@@ -693,7 +694,7 @@ class Snakes(Cog):
         Made by Ava and eivl.
         Modified by lemon.
         """
-        with ctx.typing():
+        async with ctx.typing():
 
             image = None
 
@@ -746,10 +747,10 @@ class Snakes(Cog):
         await message.delete()
 
         # Build and send the embed.
-        my_snake_embed = Embed(description=":tada: Congrats! You hatched: **{0}**".format(snake_name))
+        my_snake_embed = Embed(description=f":tada: Congrats! You hatched: **{snake_name}**")
         my_snake_embed.set_thumbnail(url=snake_image)
         my_snake_embed.set_footer(
-            text=" Owner: {0}#{1}".format(ctx.author.name, ctx.author.discriminator)
+            text=f" Owner: {ctx.author.name}#{ctx.author.discriminator}"
         )
 
         await ctx.send(embed=my_snake_embed)
@@ -773,7 +774,7 @@ class Snakes(Cog):
                     "query": "snake",
                     "page": page,
                     "language": "en-US",
-                    "api_key": Tokens.tmdb,
+                    "api_key": Tokens.tmdb.get_secret_value(),
                 }
             )
             data = await response.json()
@@ -785,7 +786,7 @@ class Snakes(Cog):
                 f"https://api.themoviedb.org/3/movie/{movie}",
                 params={
                     "language": "en-US",
-                    "api_key": Tokens.tmdb,
+                    "api_key": Tokens.tmdb.get_secret_value(),
                 }
             )
             data = await response.json()
@@ -832,7 +833,7 @@ class Snakes(Cog):
         # Prepare a question.
         question = random.choice(self.snake_quizzes)
         answer = question["answerkey"]
-        options = {key: question["options"][key] for key in ANSWERS_EMOJI.keys()}
+        options = {key: question["options"][key] for key in ANSWERS_EMOJI}
 
         # Build and send the embed.
         embed = Embed(
@@ -847,7 +848,7 @@ class Snakes(Cog):
         await self._validate_answer(ctx, quiz, answer, options)
 
     @snakes_group.command(name="name", aliases=("name_gen",))
-    async def name_command(self, ctx: Context, *, name: str = None) -> None:
+    async def name_command(self, ctx: Context, *, name: str | None = None) -> None:
         """
         Snakifies a username.
 
@@ -879,10 +880,7 @@ class Snakes(Cog):
             snake_name = snake_name.split()[-1]
 
         # If no name is provided, use whoever called the command.
-        if name:
-            user_name = name
-        else:
-            user_name = ctx.author.display_name
+        user_name = name if name else ctx.author.display_name
 
         # Get the index of the vowel to slice the username at
         user_slice_index = len(user_name)
@@ -991,23 +989,29 @@ class Snakes(Cog):
         """
         # Get the snake data we need
         if not name:
-            name_obj = await self._get_snake_name()
-            name = name_obj["scientific"]
-            content = await self._get_snek(name)
+            for _ in range(3):
+                name_obj = await self._get_snake_name()
+                name = name_obj["scientific"]
+                content = await self._get_snek(name)
 
+                if len(content["image_list"]) > 0:
+                    break
         elif isinstance(name, dict):
             content = name
-
         else:
             content = await self._get_snek(name)
 
+        try:
+            image_url = content["image_list"][0]
+        except IndexError:
+            await ctx.send("No images found for this snake.")
+            return
+
         # Make the card
         async with ctx.typing():
-
             stream = BytesIO()
-            async with async_timeout.timeout(10):
-                async with self.bot.http_session.get(content["image_list"][0]) as response:
-                    stream.write(await response.read())
+            async with self.bot.http_session.get(image_url, timeout=ClientTimeout(total=10)) as response:
+                stream.write(await response.read())
 
             stream.seek(0)
 
@@ -1037,7 +1041,7 @@ class Snakes(Cog):
         await ctx.send(embed=embed)
 
     @snakes_group.command(name="snakify")
-    async def snakify_command(self, ctx: Context, *, message: str = None) -> None:
+    async def snakify_command(self, ctx: Context, *, message: str | None = None) -> None:
         """
         How would I talk if I were a snake?
 
@@ -1047,19 +1051,18 @@ class Snakes(Cog):
         Written by Momo and kel.
         Modified by lemon.
         """
-        with ctx.typing():
+        async with ctx.typing():
             embed = Embed()
             user = ctx.author
 
             if not message:
 
                 # Get a random message from the users history
-                messages = []
-                async for message in ctx.history(limit=500).filter(
-                        lambda msg: msg.author == ctx.author  # Message was sent by author.
-                ):
-                    messages.append(message.content)
-
+                messages = [
+                    message.content
+                    async for message in ctx.history(limit=500)
+                    if message.author == ctx.author
+                ]
                 message = self._get_random_long_message(messages)
 
             # Build and send the embed
@@ -1072,7 +1075,7 @@ class Snakes(Cog):
             await ctx.send(embed=embed)
 
     @snakes_group.command(name="video", aliases=("get_video",))
-    async def video_command(self, ctx: Context, *, search: str = None) -> None:
+    async def video_command(self, ctx: Context, *, search: str | None = None) -> None:
         """
         Gets a YouTube video about snakes.
 
@@ -1095,7 +1098,7 @@ class Snakes(Cog):
                 "part": "snippet",
                 "q": urllib.parse.quote_plus(query),
                 "type": "video",
-                "key": Tokens.youtube
+                "key": Tokens.youtube.get_secret_value()
             }
         )
         response = await response.json()
@@ -1148,3 +1151,4 @@ class Snakes(Cog):
             embed.description = "Could not generate the snake card! Please try again."
             embed.title = random.choice(ERROR_REPLIES)
             await ctx.send(embed=embed)
+    # endregion

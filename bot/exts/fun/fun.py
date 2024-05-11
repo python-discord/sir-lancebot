@@ -1,5 +1,4 @@
 import json
-import logging
 import random
 from collections.abc import Iterable
 from pathlib import Path
@@ -10,12 +9,13 @@ from discord import Embed
 from discord.ext import commands
 from discord.ext.commands import BadArgument, Cog, Context
 from pydis_core.utils.commands import clean_text_or_reply
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Client, Colours, Emojis
 from bot.utils import helpers, messages
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 def caesar_cipher(text: str, offset: int) -> Iterable[str]:

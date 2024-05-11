@@ -1,5 +1,5 @@
 tasks:
   - name: "Python Environment"
-    before: "pyenv install 3.9.6 && pyenv global 3.9.6"
-    init: "pip install poetry && export PIP_USER=false"
-    command: "poetry install && poetry run pre-commit install"
+    before: "pyenv install 3.12 && pyenv global 3.12"
+    init: "pip install poetry"
+    command: "export PIP_USER=false && poetry install && poetry run pre-commit install"

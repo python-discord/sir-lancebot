@@ -1,4 +1,3 @@
-import logging
 import random
 from enum import Enum
 from typing import Any
@@ -6,13 +5,14 @@ from typing import Any
 from aiohttp import ClientSession
 from discord import Embed
 from discord.ext.commands import Cog, Context, group
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Tokens
 from bot.utils.exceptions import APIError
 from bot.utils.pagination import ImagePaginator
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 # Define base URL of TMDB
 BASE_URL = "https://api.themoviedb.org/3/"
@@ -22,7 +22,7 @@ THUMBNAIL_URL = "https://i.imgur.com/LtFtC8H.png"
 
 # Define movie params, that will be used for every movie request
 MOVIE_PARAMS = {
-    "api_key": Tokens.tmdb,
+    "api_key": Tokens.tmdb.get_secret_value(),
     "language": "en-US"
 }
 
@@ -63,17 +63,17 @@ class Movie(Cog):
     @group(name="movies", aliases=("movie",), invoke_without_command=True)
     async def movies(self, ctx: Context, genre: str = "", amount: int = 5) -> None:
         """
-        Get random movies by specifying genre. Also support amount parameter,\
-        that define how much movies will be shown.
+        Get random movies by specifying genre.
 
-        Default 5. Use .movies genres to get all available genres.
+        The amount parameter, that defines how many movies will be shown, defaults to 5.
+        Use `.movies genres` to get all available genres.
         """
         # Check is there more than 20 movies specified, due TMDB return 20 movies
         # per page, so this is max. Also you can't get less movies than 1, just logic
         if amount > 20:
             await ctx.send("You can't get more than 20 movies at once. (TMDB limits)")
             return
-        elif amount < 1:
+        if amount < 1:
             await ctx.send("You can't get less than 1 movie.")
             return
 
@@ -106,7 +106,7 @@ class Movie(Cog):
         """Return JSON of TMDB discover request."""
         # Define params of request
         params = {
-            "api_key": Tokens.tmdb,
+            "api_key": Tokens.tmdb.get_secret_value(),
             "language": "en-US",
             "sort_by": "popularity.desc",
             "include_adult": "false",
@@ -179,8 +179,8 @@ class Movie(Cog):
 
         text += "__**Some Numbers**__\n"
 
-        budget = f"{movie['budget']:,d}" if movie['budget'] else "?"
-        revenue = f"{movie['revenue']:,d}" if movie['revenue'] else "?"
+        budget = f"{movie['budget']:,d}" if movie["budget"] else "?"
+        revenue = f"{movie['revenue']:,d}" if movie["revenue"] else "?"
 
         if movie["runtime"] is not None:
             duration = divmod(movie["runtime"], 60)
@@ -208,4 +208,7 @@ class Movie(Cog):
 
 async def setup(bot: Bot) -> None:
     """Load the Movie Cog."""
+    if not Tokens.tmdb:
+        logger.warning("No TMDB token. Not loading Movie Cog.")
+        return
     await bot.add_cog(Movie(bot))

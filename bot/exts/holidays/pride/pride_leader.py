@@ -1,17 +1,16 @@
 import json
-import logging
 import random
 from pathlib import Path
-from typing import Optional
 
 import discord
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 from rapidfuzz import fuzz
 
 from bot import constants
 from bot.bot import Bot
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 PRIDE_RESOURCE = json.loads(Path("bot/resources/holidays/pride/prideleader.json").read_text("utf8"))
 MINIMUM_FUZZ_RATIO = 40
@@ -58,7 +57,7 @@ class PrideLeader(commands.Cog):
 
     def embed_builder(self, pride_leader: dict) -> discord.Embed:
         """Generate an Embed with information about a pride leader."""
-        name = [name for name, info in PRIDE_RESOURCE.items() if info == pride_leader][0]
+        name = next(name for name, info in PRIDE_RESOURCE.items() if info == pride_leader)
 
         embed = discord.Embed(
             title=name,
@@ -90,7 +89,7 @@ class PrideLeader(commands.Cog):
         return embed
 
     @commands.command(aliases=("pl", "prideleader"))
-    async def pride_leader(self, ctx: commands.Context, *, pride_leader_name: Optional[str]) -> None:
+    async def pride_leader(self, ctx: commands.Context, *, pride_leader_name: str | None) -> None:
         """
         Information about a Pride Leader.
 

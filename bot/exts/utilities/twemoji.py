@@ -1,16 +1,16 @@
-import logging
 import re
-from typing import Literal, Optional
+from typing import Literal
 
 import discord
 from discord.ext import commands
 from emoji import EMOJI_DATA, is_emoji
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours, Roles
 from bot.utils.decorators import whitelist_override
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 BASE_URLS = {
     "png": "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/",
     "svg": "https://raw.githubusercontent.com/twitter/twemoji/master/assets/svg/",
@@ -57,7 +57,7 @@ class Twemoji(commands.Cog):
         return embed
 
     @staticmethod
-    def emoji(codepoint: Optional[str]) -> Optional[str]:
+    def emoji(codepoint: str | None) -> str | None:
         """
         Returns the emoji corresponding to a given `codepoint`, or `None` if no emoji was found.
 
@@ -66,9 +66,10 @@ class Twemoji(commands.Cog):
         """
         if code := Twemoji.trim_code(codepoint):
             return chr(int(code, 16))
+        return None
 
     @staticmethod
-    def codepoint(emoji: Optional[str]) -> Optional[str]:
+    def codepoint(emoji: str | None) -> str | None:
         """
         Returns the codepoint, in a trimmed format, of a single emoji.
 
@@ -82,7 +83,7 @@ class Twemoji(commands.Cog):
         return hex(ord(emoji)).removeprefix("0x")
 
     @staticmethod
-    def trim_code(codepoint: Optional[str]) -> Optional[str]:
+    def trim_code(codepoint: str | None) -> str | None:
         """
         Returns the meaningful information from the given `codepoint`.
 
@@ -98,6 +99,7 @@ class Twemoji(commands.Cog):
         """
         if code := CODEPOINT_REGEX.search(codepoint or ""):
             return code.group()
+        return None
 
     @staticmethod
     def codepoint_from_input(raw_emoji: tuple[str, ...]) -> str:

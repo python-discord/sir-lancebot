@@ -1,12 +1,12 @@
-import logging
 from random import choice, randint
 
 from PIL import Image, ImageOps
+from pydis_core.utils.logging import get_logger
 
-log = logging.getLogger()
+log = get_logger()
 
 
-def inversion(im: Image) -> Image:
+def inversion(im: Image.Image) -> Image.Image:
     """
     Inverts the image.
 
@@ -17,7 +17,7 @@ def inversion(im: Image) -> Image:
     return inv
 
 
-def pentagram(im: Image) -> Image:
+def pentagram(im: Image.Image) -> Image.Image:
     """Adds pentagram to the image."""
     im = im.convert("RGB")
     wt, ht = im.size
@@ -27,15 +27,15 @@ def pentagram(im: Image) -> Image:
     return im
 
 
-def bat(im: Image) -> Image:
+def bat(im: Image.Image) -> Image.Image:
     """
-    Adds a bat silhoutte to the image.
+    Adds a bat silhouette to the image.
 
-    The bat silhoutte is of a size at least one-fifths that of the original image and may be rotated
+    The bat silhouette is of a size at least one-fifths that of the original image and may be rotated
     up to 90 degrees anti-clockwise.
     """
     im = im.convert("RGB")
-    wt, ht = im.size
+    wt, _ = im.size
     bat = Image.open("bot/resources/holidays/halloween/bat-clipart.png")
     bat_size = randint(wt//10, wt//7)
     rot = randint(0, 90)
@@ -49,7 +49,7 @@ def bat(im: Image) -> Image:
     return im
 
 
-def get_random_effect(im: Image) -> Image:
+def get_random_effect(im: Image.Image) -> Image.Image:
     """Randomly selects and applies an effect."""
     effects = [inversion, pentagram, bat]
     effect = choice(effects)

@@ -1,9 +1,9 @@
-FROM --platform=linux/amd64 ghcr.io/chrislovering/python-poetry-base:3.10-slim
+FROM --platform=linux/amd64 ghcr.io/owl-corp/python-poetry-base:3.12-slim
 
 # Install dependencies
 WORKDIR /bot
 COPY pyproject.toml poetry.lock ./
-RUN poetry install --without dev
+RUN poetry install --only main
 
 # Set SHA build argument
 ARG git_sha="development"

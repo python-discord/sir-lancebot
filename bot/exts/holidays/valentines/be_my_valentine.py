@@ -1,17 +1,17 @@
-import logging
 import random
 from json import loads
 from pathlib import Path
 
 import discord
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
-from bot.constants import Channels, Colours, Lovefest, Month, PYTHON_PREFIX
+from bot.constants import Channels, Colours, Month, PYTHON_PREFIX, Roles
 from bot.utils.decorators import in_month
 from bot.utils.exceptions import MovedCommandError
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 HEART_EMOJIS = [":heart:", ":gift_heart:", ":revolving_hearts:", ":sparkling_heart:", ":two_hearts:"]
 
@@ -44,7 +44,7 @@ class BeMyValentine(commands.Cog):
     @commands.cooldown(1, 1800, commands.BucketType.user)
     @commands.group(name="bemyvalentine", invoke_without_command=True)
     async def send_valentine(
-        self, ctx: commands.Context, user: discord.Member, *, valentine_type: str = None
+        self, ctx: commands.Context, user: discord.Member, *, valentine_type: str | None = None
     ) -> None:
         """
         Send a valentine to a specified user with the lovefest role.
@@ -60,7 +60,7 @@ class BeMyValentine(commands.Cog):
             # This command should only be used in the server
             raise commands.UserInputError("You are supposed to use this command in the server.")
 
-        if Lovefest.role_id not in [role.id for role in user.roles]:
+        if Roles.lovefest not in [role.id for role in user.roles]:
             raise commands.UserInputError(
                 f"You cannot send a valentine to {user} as they do not have the lovefest role!"
             )
@@ -83,7 +83,7 @@ class BeMyValentine(commands.Cog):
     @commands.cooldown(1, 1800, commands.BucketType.user)
     @send_valentine.command(name="secret")
     async def anonymous(
-        self, ctx: commands.Context, user: discord.Member, *, valentine_type: str = None
+        self, ctx: commands.Context, user: discord.Member, *, valentine_type: str | None = None
     ) -> None:
         """
         Send an anonymous Valentine via DM to to a specified user with the lovefest role.
@@ -95,7 +95,7 @@ class BeMyValentine(commands.Cog):
         example : .bemyvalentine secret Iceman#6508 Hey I love you, wanna hang around ? (sends the custom message to
         Iceman in DM making you anonymous)
         """
-        if Lovefest.role_id not in [role.id for role in user.roles]:
+        if Roles.lovefest not in [role.id for role in user.roles]:
             await ctx.message.delete()
             raise commands.UserInputError(
                 f"You cannot send a valentine to {user} as they do not have the lovefest role!"
@@ -126,15 +126,14 @@ class BeMyValentine(commands.Cog):
         if valentine_type is None:
             return self.random_valentine()
 
-        elif valentine_type.lower() in ["p", "poem"]:
+        if valentine_type.lower() in ["p", "poem"]:
             return self.valentine_poem(), "A poem dedicated to"
 
-        elif valentine_type.lower() in ["c", "compliment"]:
+        if valentine_type.lower() in ["c", "compliment"]:
             return self.valentine_compliment(), "A compliment for"
 
-        else:
-            # in this case, the user decides to type his own valentine.
-            return valentine_type, "A message for"
+        # in this case, the user decides to type his own valentine.
+        return valentine_type, "A message for"
 
     @staticmethod
     def random_emoji() -> tuple[str, str]:
@@ -148,10 +147,7 @@ class BeMyValentine(commands.Cog):
         valentine_poem = random.choice(self.valentines["valentine_poems"])
         valentine_compliment = random.choice(self.valentines["valentine_compliments"])
         random_valentine = random.choice([valentine_compliment, valentine_poem])
-        if random_valentine == valentine_poem:
-            title = "A poem dedicated to"
-        else:
-            title = "A compliment for "
+        title = "A poem dedicated to" if random_valentine == valentine_poem else "A compliment for "
         return random_valentine, title
 
     def valentine_poem(self) -> str:

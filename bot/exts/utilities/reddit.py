@@ -1,16 +1,15 @@
 import asyncio
-import logging
 import random
 import textwrap
 from collections import namedtuple
-from datetime import datetime, timedelta
-from typing import Union
+from datetime import UTC, datetime, timedelta
 
 from aiohttp import BasicAuth, ClientError
 from discord import Colour, Embed, TextChannel
 from discord.ext.commands import Cog, Context, group, has_any_role
 from discord.ext.tasks import loop
 from discord.utils import escape_markdown, sleep_until
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Channels, ERROR_REPLIES, Emojis, Reddit as RedditConfig, STAFF_ROLES
@@ -18,33 +17,32 @@ from bot.utils.converters import Subreddit
 from bot.utils.messages import sub_clyde
 from bot.utils.pagination import ImagePaginator, LinePaginator
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 AccessToken = namedtuple("AccessToken", ["token", "expires_at"])
+HEADERS = {"User-Agent": "python3:python-discord/bot:1.0.0 (by /u/PythonDiscord)"}
+URL = "https://www.reddit.com"
+OAUTH_URL = "https://oauth.reddit.com"
+MAX_RETRIES = 3
 
 
 class Reddit(Cog):
     """Track subreddit posts and show detailed statistics about them."""
-
-    HEADERS = {"User-Agent": "python3:python-discord/bot:1.0.0 (by /u/PythonDiscord)"}
-    URL = "https://www.reddit.com"
-    OAUTH_URL = "https://oauth.reddit.com"
-    MAX_RETRIES = 3
 
     def __init__(self, bot: Bot):
         self.bot = bot
 
         self.webhook = None
         self.access_token = None
-        self.client_auth = BasicAuth(RedditConfig.client_id, RedditConfig.secret)
+        self.client_auth = BasicAuth(RedditConfig.client_id.get_secret_value(), RedditConfig.secret.get_secret_value())
 
         self.auto_poster_loop.start()
 
     async def cog_unload(self) -> None:
         """Stop the loop task and revoke the access token when the cog is unloaded."""
         self.auto_poster_loop.cancel()
-        if self.access_token and self.access_token.expires_at > datetime.utcnow():
-            asyncio.create_task(self.revoke_access_token())
+        if self.access_token and self.access_token.expires_at > datetime.now(tz=UTC):
+            await self.revoke_access_token()
 
     async def cog_load(self) -> None:
         """Sets the reddit webhook when the cog is loaded."""
@@ -55,7 +53,7 @@ class Reddit(Cog):
         """Get the #reddit channel object from the bot's cache."""
         return self.bot.get_channel(Channels.reddit)
 
-    def build_pagination_pages(self, posts: list[dict], paginate: bool) -> Union[list[tuple], str]:
+    def build_pagination_pages(self, posts: list[dict], paginate: bool) -> list[tuple] | str:
         """Build embed pages required for Paginator."""
         pages = []
         first_page = ""
@@ -69,7 +67,7 @@ class Reddit(Cog):
 
             # Normal brackets interfere with Markdown.
             title = escape_markdown(title).replace("[", "⦋").replace("]", "⦌")
-            link = self.URL + data["permalink"]
+            link = URL + data["permalink"]
 
             first_page += f"**[{title.replace('*', '')}]({link})**\n"
 
@@ -122,10 +120,10 @@ class Reddit(Cog):
         A token is valid for 1 hour. There will be MAX_RETRIES to get a token, after which the cog
         will be unloaded and a ClientError raised if retrieval was still unsuccessful.
         """
-        for i in range(1, self.MAX_RETRIES + 1):
+        for i in range(1, MAX_RETRIES + 1):
             response = await self.bot.http_session.post(
-                url=f"{self.URL}/api/v1/access_token",
-                headers=self.HEADERS,
+                url=f"{URL}/api/v1/access_token",
+                headers=HEADERS,
                 auth=self.client_auth,
                 data={
                     "grant_type": "client_credentials",
@@ -138,17 +136,15 @@ class Reddit(Cog):
                 expiration = int(content["expires_in"]) - 60  # Subtract 1 minute for leeway.
                 self.access_token = AccessToken(
                     token=content["access_token"],
-                    expires_at=datetime.utcnow() + timedelta(seconds=expiration)
+                    expires_at=datetime.now(tz=UTC) + timedelta(seconds=expiration)
                 )
 
                 log.debug(f"New token acquired; expires on UTC {self.access_token.expires_at}")
                 return
-            else:
-                log.debug(
-                    f"Failed to get an access token: "
-                    f"status {response.status} & content type {response.content_type}; "
-                    f"retrying ({i}/{self.MAX_RETRIES})"
-                )
+            log.debug(
+                f"Failed to get an access token: status {response.status} & content type {response.content_type}; "
+                f"retrying ({i}/{MAX_RETRIES})"
+            )
 
             await asyncio.sleep(3)
 
@@ -162,8 +158,8 @@ class Reddit(Cog):
         For security reasons, it's good practice to revoke the token when it's no longer being used.
         """
         response = await self.bot.http_session.post(
-            url=f"{self.URL}/api/v1/revoke_token",
-            headers=self.HEADERS,
+            url=f"{URL}/api/v1/revoke_token",
+            headers=HEADERS,
             auth=self.client_auth,
             data={
                 "token": self.access_token.token,
@@ -176,24 +172,24 @@ class Reddit(Cog):
         else:
             log.warning(f"Unable to revoke access token: status {response.status}.")
 
-    async def fetch_posts(self, route: str, *, amount: int = 25, params: dict = None) -> list[dict]:
+    async def fetch_posts(self, route: str, *, amount: int = 25, params: dict | None = None) -> list[dict]:
         """A helper method to fetch a certain amount of Reddit posts at a given route."""
         # Reddit's JSON responses only provide 25 posts at most.
         if not 25 >= amount > 0:
             raise ValueError("Invalid amount of subreddit posts requested.")
 
         # Renew the token if necessary.
-        if not self.access_token or self.access_token.expires_at < datetime.utcnow():
+        if not self.access_token or self.access_token.expires_at < datetime.now(tz=UTC):
             await self.get_access_token()
 
-        url = f"{self.OAUTH_URL}/{route}"
-        for _ in range(self.MAX_RETRIES):
+        url = f"{OAUTH_URL}/{route}"
+        for _ in range(MAX_RETRIES):
             response = await self.bot.http_session.get(
                 url=url,
-                headers={**self.HEADERS, "Authorization": f"bearer {self.access_token.token}"},
+                headers=HEADERS | {"Authorization": f"bearer {self.access_token.token}"},
                 params=params
             )
-            if response.status == 200 and response.content_type == 'application/json':
+            if response.status == 200 and response.content_type == "application/json":
                 # Got appropriate response - process and return.
                 content = await response.json()
                 posts = content["data"]["children"]
@@ -205,11 +201,11 @@ class Reddit(Cog):
             await asyncio.sleep(3)
 
         log.debug(f"Invalid response from: {url} - status code {response.status}, mimetype {response.content_type}")
-        return list()  # Failed to get appropriate response within allowed number of retries.
+        return []  # Failed to get appropriate response within allowed number of retries.
 
     async def get_top_posts(
             self, subreddit: Subreddit, time: str = "all", amount: int = 5, paginate: bool = False
-    ) -> Union[Embed, list[tuple]]:
+    ) -> Embed | list[tuple]:
         """
         Get the top amount of posts for a given subreddit within a specified timeframe.
 
@@ -248,7 +244,7 @@ class Reddit(Cog):
         """Post the top 5 posts daily, and the top 5 posts weekly."""
         # once d.py get support for `time` parameter in loop decorator,
         # this can be removed and the loop can use the `time=datetime.time.min` parameter
-        now = datetime.utcnow()
+        now = datetime.now(tz=UTC)
         tomorrow = now + timedelta(days=1)
         midnight_tomorrow = tomorrow.replace(hour=0, minute=0, second=0)
 
@@ -257,7 +253,7 @@ class Reddit(Cog):
         if not self.webhook:
             await self.bot.fetch_webhook(RedditConfig.webhook)
 
-        if datetime.utcnow().weekday() == 0:
+        if datetime.now(tz=UTC).weekday() == 0:
             await self.top_weekly_posts()
             # if it's a monday send the top weekly posts
 
@@ -358,6 +354,6 @@ class Reddit(Cog):
 async def setup(bot: Bot) -> None:
     """Load the Reddit cog."""
     if not RedditConfig.secret or not RedditConfig.client_id:
-        log.error("Credentials not provided, cog not loaded.")
+        log.warning("Credentials not provided, cog not loaded.")
         return
     await bot.add_cog(Reddit(bot))

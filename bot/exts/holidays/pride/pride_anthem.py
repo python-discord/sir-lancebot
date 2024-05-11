@@ -1,14 +1,13 @@
 import json
-import logging
 import random
 from pathlib import Path
-from typing import Optional
 
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 VIDEOS = json.loads(Path("bot/resources/holidays/pride/anthems.json").read_text("utf8"))
 
@@ -16,7 +15,7 @@ VIDEOS = json.loads(Path("bot/resources/holidays/pride/anthems.json").read_text(
 class PrideAnthem(commands.Cog):
     """Embed a random youtube video for a gay anthem!"""
 
-    def get_video(self, genre: Optional[str] = None) -> dict:
+    def get_video(self, genre: str | None = None) -> dict:
         """
         Picks a random anthem from the list.
 
@@ -25,15 +24,15 @@ class PrideAnthem(commands.Cog):
         """
         if not genre:
             return random.choice(VIDEOS)
-        else:
-            songs = [song for song in VIDEOS if genre.casefold() in song["genre"]]
-            try:
-                return random.choice(songs)
-            except IndexError:
-                log.info("No videos for that genre.")
+
+        songs = [song for song in VIDEOS if genre.casefold() in song["genre"]]
+        try:
+            return random.choice(songs)
+        except IndexError:
+            log.info("No videos for that genre.")
 
     @commands.command(name="prideanthem", aliases=("anthem", "pridesong"))
-    async def prideanthem(self, ctx: commands.Context, genre: str = None) -> None:
+    async def prideanthem(self, ctx: commands.Context, genre: str | None = None) -> None:
         """
         Sends a message with a video of a random pride anthem.
 

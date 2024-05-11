@@ -1,15 +1,14 @@
-import logging
 from html import unescape
-from typing import Optional
 from urllib.parse import quote_plus
 
 from discord import Embed
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 API_ROOT = "https://realpython.com/search/api/v1/"
 ARTICLE_URL = "https://realpython.com{article_url}"
@@ -31,8 +30,13 @@ class RealPython(commands.Cog):
 
     @commands.command(aliases=["rp"])
     @commands.cooldown(1, 10, commands.cooldowns.BucketType.user)
-    async def realpython(self, ctx: commands.Context, amount: Optional[int] = 5, *,
-                         user_search: Optional[str] = None) -> None:
+    async def realpython(
+        self,
+        ctx: commands.Context,
+        amount: int | None = 5,
+        *,
+        user_search: str | None = None
+    ) -> None:
         """
         Send some articles from RealPython that match the search terms.
 

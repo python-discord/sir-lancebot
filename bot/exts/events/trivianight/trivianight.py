@@ -1,7 +1,6 @@
 import asyncio
 from json import JSONDecodeError, loads
 from random import choice
-from typing import Optional
 
 from discord import Embed
 from discord.ext import commands
@@ -10,7 +9,7 @@ from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES, POSITIVE_REPLIES, Roles
 from bot.utils.pagination import LinePaginator
 
-from ._game import AllQuestionsVisited, TriviaNightGame
+from ._game import AllQuestionsVisitedError, TriviaNightGame
 from ._questions import QuestionView
 from ._scoreboard import Scoreboard
 
@@ -23,8 +22,8 @@ class TriviaNightCog(commands.Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.game: Optional[TriviaNightGame] = None
-        self.scoreboard: Optional[Scoreboard] = None
+        self.game: TriviaNightGame | None = None
+        self.scoreboard: Scoreboard | None = None
         self.question_closed: asyncio.Event = None
 
     @commands.group(aliases=["tn"], invoke_without_command=True)
@@ -46,7 +45,7 @@ class TriviaNightCog(commands.Cog):
 
     @trivianight.command()
     @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
-    async def load(self, ctx: commands.Context, *, to_load: Optional[str]) -> None:
+    async def load(self, ctx: commands.Context, *, to_load: str | None) -> None:
         """
         Loads a JSON file from the provided attachment or argument.
 
@@ -76,8 +75,7 @@ class TriviaNightCog(commands.Cog):
         elif not to_load:
             raise commands.BadArgument("You didn't attach an attachment nor link a message!")
         elif (
-            to_load.startswith("https://discord.com/channels")
-            or to_load.startswith("https://discordapp.com/channels")
+            to_load.startswith(("https://discord.com/channels", "https://discordapp.com/channels"))
         ):
             channel_id, message_id = to_load.split("/")[-2:]
             channel = await ctx.guild.fetch_channel(int(channel_id))
@@ -92,7 +90,7 @@ class TriviaNightCog(commands.Cog):
         try:
             serialized_json = loads(json_text)
         except JSONDecodeError as error:
-            raise commands.BadArgument(f"Looks like something went wrong:\n{str(error)}")
+            raise commands.BadArgument(f"Looks like something went wrong:\n{error!s}")
 
         self.game = TriviaNightGame(serialized_json)
         self.question_closed = asyncio.Event()
@@ -107,9 +105,9 @@ class TriviaNightCog(commands.Cog):
 
         await ctx.send(embed=success_embed)
 
-    @trivianight.command(aliases=('next',))
+    @trivianight.command(aliases=("next",))
     @commands.has_any_role(*TRIVIA_NIGHT_ROLES)
-    async def question(self, ctx: commands.Context, question_number: str = None) -> None:
+    async def question(self, ctx: commands.Context, question_number: str | None = None) -> None:
         """
         Gets a random question from the unanswered question list and lets the user(s) choose the answer.
 
@@ -135,7 +133,7 @@ class TriviaNightCog(commands.Cog):
 
         try:
             next_question = self.game.next_question(question_number)
-        except AllQuestionsVisited:
+        except AllQuestionsVisitedError:
             error_embed = Embed(
                 title=choice(NEGATIVE_REPLIES),
                 description="All of the questions have been used.",

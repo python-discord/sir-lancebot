@@ -1,13 +1,12 @@
 import functools
-import logging
 from collections.abc import Mapping
 from enum import Enum
-from typing import Optional
 
 from discord import Colour, Embed
 from discord.ext import commands
 from discord.ext.commands import Context, group
 from pydis_core.utils._extensions import unqualify
+from pydis_core.utils.logging import get_logger
 
 from bot import exts
 from bot.bot import Bot
@@ -15,7 +14,7 @@ from bot.constants import Client, Emojis, MODERATION_ROLES, Roles
 from bot.utils.checks import with_role_check
 from bot.utils.pagination import LinePaginator
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 UNLOAD_BLACKLIST = {f"{exts.__name__}.core.extensions"}
@@ -48,7 +47,7 @@ class Extension(commands.Converter):
 
         if argument in ctx.bot.all_extensions:
             return argument
-        elif (qualified_arg := f"{exts.__name__}.{argument}") in ctx.bot.all_extensions:
+        if (qualified_arg := f"{exts.__name__}.{argument}") in ctx.bot.all_extensions:
             return qualified_arg
 
         matches = []
@@ -63,10 +62,9 @@ class Extension(commands.Converter):
                 f":x: `{argument}` is an ambiguous extension name. "
                 f"Please use one of the following fully-qualified names.```\n{names}\n```"
             )
-        elif matches:
+        if matches:
             return matches[0]
-        else:
-            raise commands.BadArgument(f":x: Could not find the extension `{argument}`.")
+        raise commands.BadArgument(f":x: Could not find the extension `{argument}`.")
 
 
 class Extensions(commands.Cog):
@@ -86,7 +84,7 @@ class Extensions(commands.Cog):
         Load extensions given their fully qualified or unqualified names.
 
         If '\*' or '\*\*' is given as the name, all unloaded extensions will be loaded.
-        """  # noqa: W605
+        """
         if not extensions:
             await self.bot.invoke_help_command(ctx)
             return
@@ -103,7 +101,7 @@ class Extensions(commands.Cog):
         Unload currently loaded extensions given their fully qualified or unqualified names.
 
         If '\*' or '\*\*' is given as the name, all loaded extensions will be unloaded.
-        """  # noqa: W605
+        """
         if not extensions:
             await self.bot.invoke_help_command(ctx)
             return
@@ -129,7 +127,7 @@ class Extensions(commands.Cog):
 
         If '\*' is given as the name, all currently loaded extensions will be reloaded.
         If '\*\*' is given as the name, all extensions, including unloaded ones, will be reloaded.
-        """  # noqa: W605
+        """
         if not extensions:
             await self.bot.invoke_help_command(ctx)
             return
@@ -155,7 +153,7 @@ class Extensions(commands.Cog):
         embed = Embed(colour=Colour.og_blurple())
         embed.set_author(
             name="Extensions List",
-            url=Client.github_bot_repo,
+            url=Client.github_repo,
             icon_url=str(self.bot.user.display_avatar.url)
         )
 
@@ -220,7 +218,7 @@ class Extensions(commands.Cog):
 
         return msg
 
-    async def manage(self, action: Action, ext: str) -> tuple[str, Optional[str]]:
+    async def manage(self, action: Action, ext: str) -> tuple[str, str | None]:
         """Apply an action to an extension and return the status message and any error message."""
         verb = action.name.lower()
         error_msg = None

@@ -1,20 +1,13 @@
 name: Create Sentry release
 
-on:
-  push:
-    branches:
-      - main
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+on: workflow_call
 
 jobs:
   create_sentry_release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@main
+        uses: actions/checkout@v4
 
       - name: Create a Sentry.io release
         uses: tclindner/sentry-releases-action@v1.2.0

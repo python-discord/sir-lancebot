@@ -1,13 +1,13 @@
 import json
-import logging
 from pathlib import Path
 from random import choice
 
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 LINKS = json.loads(Path("bot/resources/fun/speedrun_links.json").read_text("utf8"))
 

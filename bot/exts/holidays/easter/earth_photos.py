@@ -1,18 +1,18 @@
-import logging
 
 import discord
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours, Tokens
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 API_URL = "https://api.unsplash.com/photos/random"
 
 
 class EarthPhotos(commands.Cog):
-    """This cog contains the command for earth photos."""
+    """The earth photos cog."""
 
     def __init__(self, bot: Bot):
         self.bot = bot
@@ -23,7 +23,7 @@ class EarthPhotos(commands.Cog):
         async with ctx.typing():
             async with self.bot.http_session.get(
                     API_URL,
-                    params={"query": "planet_earth", "client_id": Tokens.unsplash_access_key}
+                    params={"query": "planet_earth", "client_id": Tokens.unsplash.get_secret_value()}
             ) as r:
                 jsondata = await r.json()
                 linksdata = jsondata.get("urls")
@@ -37,7 +37,7 @@ class EarthPhotos(commands.Cog):
                 rf = "?utm_source=Sir%20Lancebot&utm_medium=referral"
             async with self.bot.http_session.get(
                 downloadlinksdata.get("download_location"),
-                    params={"client_id": Tokens.unsplash_access_key}
+                    params={"client_id": Tokens.unsplash.get_secret_value()}
             ) as _:
                 pass
 
@@ -59,7 +59,7 @@ class EarthPhotos(commands.Cog):
 
 async def setup(bot: Bot) -> None:
     """Load the Earth Photos cog."""
-    if not Tokens.unsplash_access_key:
+    if not Tokens.unsplash:
         log.warning("No Unsplash access key found. Cog not loading.")
         return
     await bot.add_cog(EarthPhotos(bot))

@@ -1,16 +1,16 @@
-import logging
 import re
-from datetime import datetime
+from datetime import UTC, datetime
 from html import unescape
 
 from discord import Color, Embed, TextChannel
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.utils import LinePaginator
 from bot.utils.exceptions import APIError
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 SEARCH_API = (
     "https://en.wikipedia.org/w/api.php"
@@ -85,7 +85,7 @@ class WikipediaSearch(commands.Cog):
                 colour=Color.og_blurple()
             )
             embed.set_thumbnail(url=WIKI_THUMBNAIL)
-            embed.timestamp = datetime.utcnow()
+            embed.timestamp = datetime.now(tz=UTC)
             await LinePaginator.paginate(contents, ctx, embed, restrict_to_user=ctx.author)
         else:
             await ctx.send(

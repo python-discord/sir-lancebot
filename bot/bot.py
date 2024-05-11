@@ -1,15 +1,13 @@
-import logging
-from typing import Optional
-
 import discord
 from discord import DiscordException, Embed
 from discord.ext import commands
 from pydis_core import BotBase
 from pydis_core.utils import scheduling
+from pydis_core.utils.logging import get_logger
 
 from bot import constants, exts
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 __all__ = ("Bot", )
 
@@ -26,7 +24,7 @@ class Bot(BotBase):
     name = constants.Client.name
 
     @property
-    def member(self) -> Optional[discord.Member]:
+    def member(self) -> discord.Member | None:
         """Retrieves the guild member object for the bot."""
         guild = self.get_guild(constants.Client.guild)
         if not guild:
@@ -40,7 +38,7 @@ class Bot(BotBase):
         else:
             await super().on_command_error(context, exception)
 
-    async def log_to_dev_log(self, title: str, details: str = None, *, icon: str = None) -> None:
+    async def log_to_dev_log(self, title: str, details: str | None = None, *, icon: str | None = None) -> None:
         """Send an embed message to the dev-log channel."""
         devlog = self.get_channel(constants.Channels.devlog)
 

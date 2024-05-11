@@ -1,8 +1,8 @@
 import math
 import random
+from collections.abc import Callable
 from io import BytesIO
 from pathlib import Path
-from typing import Callable, Optional
 
 import discord
 from PIL import Image, ImageDraw, ImageOps
@@ -55,7 +55,7 @@ class PfpEffects:
 
     @staticmethod
     def crop_avatar_circle(avatar: Image.Image) -> Image.Image:
-        """This crops the avatar given into a circle."""
+        """Crop the avatar given into a circle."""
         mask = Image.new("L", avatar.size, 0)
         draw = ImageDraw.Draw(mask)
         draw.ellipse((0, 0) + avatar.size, fill=255)
@@ -64,7 +64,7 @@ class PfpEffects:
 
     @staticmethod
     def crop_ring(ring: Image.Image, px: int) -> Image.Image:
-        """This crops the given ring into a circle."""
+        """Crop the given ring into a circle."""
         mask = Image.new("L", ring.size, 0)
         draw = ImageDraw.Draw(mask)
         draw.ellipse((0, 0) + ring.size, fill=255)
@@ -108,7 +108,7 @@ class PfpEffects:
         return image
 
     @staticmethod
-    def easterify_effect(image: Image.Image, overlay_image: Optional[Image.Image] = None) -> Image.Image:
+    def easterify_effect(image: Image.Image, overlay_image: Image.Image | None = None) -> Image.Image:
         """
         Applies the easter effect to the given image.
 

@@ -1,14 +1,6 @@
 name: Lint
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+on: workflow_call
 
 jobs:
   lint:
@@ -29,13 +21,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Install Python Dependencies
-        uses: HassanAbouelela/actions/setup-python@setup-python_v1.3.1
+        uses: HassanAbouelela/actions/setup-python@setup-python_v1.5.0
         with:
-          dev: true
-          python_version: "3.10"
+          python_version: "3.12"
 
       # Check all of our dev dependencies are compatible with the MIT license.
       # If you added a new dependencies that is being rejected,
@@ -51,25 +42,16 @@ jobs:
       - name: Attempt bot setup
         run: "python -m bot"
         env:
-          USE_FAKEREDIS: true
-          IN_CI: true
+          REDIS_USE_FAKEREDIS: true
+          CLIENT_IN_CI: true
+          CLIENT_TOKEN: ""
 
-      # We will not run `flake8` here, as we will use a separate flake8
-      # action.
       - name: Run pre-commit hooks
-        run: SKIP=flake8 pre-commit run --all-files
+        run: SKIP=ruff pre-commit run --all-files
 
-      # Run flake8 and have it format the linting errors in the format of
-      # the GitHub Workflow command to register error annotations. This
-      # means that our flake8 output is automatically added as an error
-      # annotation to both the run result and in the "Files" tab of a
-      # pull request.
-      #
-      # Format used:
-      # ::error file={filename},line={line},col={col}::{message}
-      - name: Run flake8
-        run: "flake8 \
-        --format='::error file=%(path)s,line=%(row)d,col=%(col)d::[flake8] %(code)s: %(text)s'"
+      # Run `ruff` using github formatting to enable automatic inline annotations.
+      - name: Run ruff
+        run: "ruff check --output-format=github ."
 
       # Prepare the Pull Request Payload artifact. If this fails, we
       # we fail silently using the `continue-on-error` option. It's
@@ -88,7 +70,7 @@ jobs:
       - name: Upload a Build Artifact
         if: always() && steps.prepare-artifact.outcome == 'success'
         continue-on-error: true
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: pull-request-payload
           path: pull_request_payload.json

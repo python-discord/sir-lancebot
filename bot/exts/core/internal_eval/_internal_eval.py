@@ -1,10 +1,9 @@
-import logging
 import re
 import textwrap
-from typing import Optional
 
 import discord
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Client, Roles
@@ -14,7 +13,7 @@ from ._helpers import EvalContext
 
 __all__ = ["InternalEval"]
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 FORMATTED_CODE_REGEX = re.compile(
     r"(?P<delim>(?P<block>```)|``?)"        # code delimiter: 1-3 backticks; (?P=block) only matches if it's a block
@@ -84,7 +83,7 @@ class InternalEval(commands.Cog):
 
         return shortened_output
 
-    async def _upload_output(self, output: str) -> Optional[str]:
+    async def _upload_output(self, output: str) -> str | None:
         """Upload `internal eval` output to our pastebin and return the url."""
         data = self.shorten_output(output, max_length=MAX_LENGTH)
         try:
@@ -166,7 +165,7 @@ class InternalEval(commands.Cog):
                 code = "\n".join(block.group("code") for block in blocks)
             else:
                 match = match[0] if len(blocks) == 0 else blocks[0]
-                code, block, lang, delim = match.group("code", "block", "lang", "delim")
+                code, _, _, _ = match.group("code", "block", "lang", "delim")
 
         else:
             code = RAW_CODE_REGEX.fullmatch(code).group("code")

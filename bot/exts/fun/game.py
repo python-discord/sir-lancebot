@@ -1,16 +1,16 @@
 import difflib
-import logging
 import random
 import re
-from datetime import datetime as dt, timedelta
+from datetime import UTC, datetime, timedelta
 from enum import IntEnum
-from typing import Any, Optional
+from typing import Any
 
 from aiohttp import ClientSession
 from discord import Embed
 from discord.ext import tasks
 from discord.ext.commands import Cog, Context, group
 from pydis_core.utils import scheduling
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import STAFF_ROLES, Tokens
@@ -20,8 +20,8 @@ from bot.utils.pagination import ImagePaginator, LinePaginator
 # Base URL of IGDB API
 BASE_URL = "https://api.igdb.com/v4"
 
-CLIENT_ID = Tokens.igdb_client_id
-CLIENT_SECRET = Tokens.igdb_client_secret
+CLIENT_ID = Tokens.igdb_client_id.get_secret_value()
+CLIENT_SECRET = Tokens.igdb_client_secret.get_secret_value()
 
 # The number of seconds before expiry that we attempt to re-fetch a new access token
 ACCESS_TOKEN_RENEWAL_WINDOW = 60*60*24*2
@@ -40,7 +40,7 @@ BASE_HEADERS = {
     "Accept": "application/json"
 }
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 REGEX_NON_ALPHABET = re.compile(r"[^a-z0-9]", re.IGNORECASE)
 
@@ -255,7 +255,7 @@ class Games(Cog):
                 self.genres[genre_name] = genre
 
     @group(name="games", aliases=("game",), invoke_without_command=True)
-    async def games(self, ctx: Context, amount: Optional[int] = 5, *, genre: Optional[str]) -> None:
+    async def games(self, ctx: Context, amount: int | None = 5, *, genre: str | None) -> None:
         """
         Get random game(s) by genre from IGDB. Use .games genres command to get all available genres.
 
@@ -293,7 +293,8 @@ class Games(Cog):
                     f"{f'Maybe you meant `{display_possibilities}`?' if display_possibilities else ''}"
                 )
                 return
-            elif len(possibilities) == 1:
+
+            if len(possibilities) == 1:
                 games = await self.get_games_list(
                     amount, self.genres[possibilities[0][1]], offset=random.randint(0, 150)
                 )
@@ -368,8 +369,8 @@ class Games(Cog):
     async def get_games_list(
         self,
         amount: int,
-        genre: Optional[str] = None,
-        sort: Optional[str] = None,
+        genre: str | None = None,
+        sort: str | None = None,
         additional_body: str = "",
         offset: int = 0
     ) -> list[dict[str, Any]]:
@@ -398,10 +399,13 @@ class Games(Cog):
     async def create_page(self, data: dict[str, Any]) -> tuple[str, str]:
         """Create content of Game Page."""
         # Create cover image URL from template
-        url = COVER_URL.format(**{"image_id": data["cover"]["image_id"] if "cover" in data else ""})
+        url = COVER_URL.format(image_id=data.get("cover", {}).get("image_id", ""))
 
         # Get release date separately with checking
-        release_date = dt.utcfromtimestamp(data["first_release_date"]).date() if "first_release_date" in data else "?"
+        if "first_release_date" in data:
+            release_date = datetime.fromtimestamp(data["first_release_date"], tz=UTC).date()
+        else:
+            release_date = "?"
 
         # Create Age Ratings value
         rating = ", ".join(
@@ -417,13 +421,13 @@ class Games(Cog):
             "url": data["url"],
             "description": f"{data['summary']}\n\n" if "summary" in data else "\n",
             "release_date": release_date,
-            "rating": round(data["total_rating"] if "total_rating" in data else 0, 2),
-            "rating_count": data["total_rating_count"] if "total_rating_count" in data else "?",
+            "rating": round(data.get("total_rating", 0), 2),
+            "rating_count": data.get("total_rating_count", "?"),
             "platforms": ", ".join(platform["name"] for platform in data["platforms"]) if "platforms" in data else "?",
             "status": GameStatus(data["status"]).name if "status" in data else "?",
             "age_ratings": rating,
             "made_by": ", ".join(companies),
-            "storyline": data["storyline"] if "storyline" in data else ""
+            "storyline": data.get("storyline", "")
         }
         page = GAME_PAGE.format(**formatting)
 
@@ -434,7 +438,7 @@ class Games(Cog):
         lines = []
 
         # Define request body of IGDB API request and do request
-        body = SEARCH_BODY.format(**{"term": search_term})
+        body = SEARCH_BODY.format(term=search_term)
 
         async with self.http_session.post(url=f"{BASE_URL}/games", data=body, headers=self.headers) as resp:
             data = await resp.json()
@@ -444,7 +448,7 @@ class Games(Cog):
             formatting = {
                 "name": game["name"],
                 "url": game["url"],
-                "rating": round(game["total_rating"] if "total_rating" in game else 0, 2),
+                "rating": round(game.get("total_rating", 0), 2),
                 "rating_count": game["total_rating_count"] if "total_rating" in game else "?"
             }
             line = GAME_SEARCH_LINE.format(**formatting)
@@ -460,10 +464,10 @@ class Games(Cog):
         returning results.
         """
         # Create request body from template
-        body = COMPANIES_LIST_BODY.format(**{
-            "limit": limit,
-            "offset": offset
-        })
+        body = COMPANIES_LIST_BODY.format(
+            limit=limit,
+            offset=offset,
+        )
 
         async with self.http_session.post(url=f"{BASE_URL}/companies", data=body, headers=self.headers) as resp:
             return await resp.json()
@@ -471,10 +475,10 @@ class Games(Cog):
     async def create_company_page(self, data: dict[str, Any]) -> tuple[str, str]:
         """Create good formatted Game Company page."""
         # Generate URL of company logo
-        url = LOGO_URL.format(**{"image_id": data["logo"]["image_id"] if "logo" in data else ""})
+        url = LOGO_URL.format(image_id=data.get("logo", {}).get("image_id", ""))
 
         # Try to get found date of company
-        founded = dt.utcfromtimestamp(data["start_date"]).date() if "start_date" in data else "?"
+        founded = datetime.fromtimestamp(data["start_date"], tz=UTC).date() if "start_date" in data else "?"
 
         # Generate list of games, that company have developed or published
         developed = ", ".join(game["name"] for game in data["developed"]) if "developed" in data else "?"

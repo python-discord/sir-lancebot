@@ -1,16 +1,15 @@
-import logging
 from asyncio import to_thread
 from random import choice
-from typing import Union
 
 from bs4 import BeautifulSoup
 from discord import Embed, Interaction, SelectOption, ui
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours, Emojis, NEGATIVE_REPLIES
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 API_ROOT = "https://www.codewars.com/api/v1/code-challenges/{kata_id}"
 
 # Map difficulty for the kata to color we want to display in the embed.
@@ -58,7 +57,7 @@ class InformationDropdown(ui.Select):
             SelectOption(
                 label="Other Information",
                 description="See how other people performed on this kata and more!",
-                emoji="ℹ"
+                emoji="🇮"
             )
         ]
 
@@ -84,6 +83,7 @@ class InformationDropdown(ui.Select):
         # The attribute is not set during initialization.
         result_embed = self.mapping_of_embeds[self.values[0]]
         await self.original_message.edit(embed=result_embed)
+        await interaction.response.defer()
 
 
 class Challenges(commands.Cog):
@@ -100,7 +100,7 @@ class Challenges(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    async def kata_id(self, search_link: str, params: dict) -> Union[str, Embed]:
+    async def kata_id(self, search_link: str, params: dict) -> str | Embed:
         """
         Uses bs4 to get the HTML code for the page of katas, where the page is the link of the formatted `search_link`.
 
@@ -122,18 +122,13 @@ class Challenges(commands.Cog):
 
             if not first_kata_div:
                 raise commands.BadArgument("No katas could be found with the filters provided.")
-            elif len(first_kata_div) >= 3:
-                first_kata_div = choice(first_kata_div[:3])
-            elif "q=" not in search_link:
-                first_kata_div = choice(first_kata_div)
-            else:
-                first_kata_div = first_kata_div[0]
 
             # There are numerous divs before arriving at the id of the kata, which can be used for the link.
+            first_kata_div = choice(first_kata_div)
             first_kata_id = first_kata_div.a["href"].split("/")[-1]
             return first_kata_id
 
-    async def kata_information(self, kata_id: str) -> Union[dict, Embed]:
+    async def kata_information(self, kata_id: str) -> dict | Embed:
         """
         Returns the information about the Kata.
 
@@ -263,7 +258,7 @@ class Challenges(commands.Cog):
 
     @commands.command(aliases=["kata"])
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def challenge(self, ctx: commands.Context, language: str = "python", *, query: str = None) -> None:
+    async def challenge(self, ctx: commands.Context, language: str = "python", *, query: str | None = None) -> None:
         """
         The challenge command pulls a random kata (challenge) from codewars.com.
 

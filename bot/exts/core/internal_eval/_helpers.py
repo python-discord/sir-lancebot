@@ -4,13 +4,14 @@ import contextlib
 import functools
 import inspect
 import io
-import logging
 import sys
 import traceback
 import types
-from typing import Any, Optional, Union
+from typing import Any
 
-log = logging.getLogger(__name__)
+from pydis_core.utils.logging import get_logger
+
+log = get_logger(__name__)
 
 # A type alias to annotate the tuples returned from `sys.exc_info()`
 ExcInfo = tuple[type[Exception], Exception, types.TracebackType]
@@ -120,7 +121,7 @@ class EvalContext:
         log.trace(f"Updating {self._locals} with {locals_}")
         self._locals.update(locals_)
 
-    def prepare_eval(self, code: str) -> Optional[str]:
+    def prepare_eval(self, code: str) -> str | None:
         """Prepare an evaluation by processing the code and setting up the context."""
         self.code = code
 
@@ -149,7 +150,7 @@ class EvalContext:
         compiled_code = compile(self.eval_tree, filename=INTERNAL_EVAL_FRAMENAME, mode="exec")
 
         log.trace("Executing the compiled code with the desired namespace environment")
-        exec(compiled_code, self.locals)  # noqa: B102,S102
+        exec(compiled_code, self.locals)  # noqa: S102
 
         log.trace("Awaiting the created evaluation wrapper coroutine.")
         await self.function()
@@ -212,7 +213,7 @@ class CaptureLastExpression(ast.NodeTransformer):
         self.tree = tree
         self.last_node = list(ast.iter_child_nodes(tree))[-1]
 
-    def visit_Expr(self, node: ast.Expr) -> Union[ast.Expr, ast.Assign]:  # noqa: N802
+    def visit_Expr(self, node: ast.Expr) -> ast.Expr | ast.Assign:  # noqa: N802
         """
         Replace the Expr node that is last child node of Module with an assignment.
 
@@ -227,10 +228,10 @@ class CaptureLastExpression(ast.NodeTransformer):
         log.trace("Found a trailing last expression in the evaluation code")
 
         log.trace("Creating assignment statement with trailing expression as the right-hand side")
-        right_hand_side = list(ast.iter_child_nodes(node))[0]
+        right_hand_side = next(iter(ast.iter_child_nodes(node)))
 
         assignment = ast.Assign(
-            targets=[ast.Name(id='_value_last_expression', ctx=ast.Store())],
+            targets=[ast.Name(id="_value_last_expression", ctx=ast.Store())],
             value=right_hand_side,
             lineno=node.lineno,
             col_offset=0,

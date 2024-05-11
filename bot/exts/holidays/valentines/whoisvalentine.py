@@ -1,15 +1,15 @@
 import json
-import logging
 from pathlib import Path
 from random import choice
 
 import discord
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 FACTS = json.loads(Path("bot/resources/holidays/valentines/valentine_facts.json").read_text("utf8"))
 

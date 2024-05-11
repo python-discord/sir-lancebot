@@ -1,14 +1,14 @@
-import datetime
-import logging
+from datetime import UTC, date, datetime
 
 from discord import Embed
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours, Month
 from bot.utils.decorators import in_month
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 HEBCAL_URL = (
     "https://www.hebcal.com/hebcal/?v=1&cfg=json&maj=on&min=on&mod=on&nx=on&"
@@ -21,18 +21,18 @@ class HanukkahEmbed(commands.Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.hanukkah_dates: list[datetime.date] = []
+        self.hanukkah_dates: list[date] = []
 
-    def _parse_time_to_datetime(self, date: list[str]) -> datetime.datetime:
+    def _parse_time_to_datetime(self, date: list[str]) -> datetime:
         """Format the times provided by the api to datetime forms."""
         try:
-            return datetime.datetime.strptime(date, "%Y-%m-%dT%H:%M:%S%z")
+            return datetime.strptime(date, "%Y-%m-%dT%H:%M:%S%z")
         except ValueError:
             # there is a possibility of an event not having a time, just a day
             # to catch this, we try again without time information
-            return datetime.datetime.strptime(date, "%Y-%m-%d")
+            return datetime.strptime(date, "%Y-%m-%d").replace(tzinfo=UTC)
 
-    async def fetch_hanukkah_dates(self) -> list[datetime.date]:
+    async def fetch_hanukkah_dates(self) -> list[date]:
         """Gets the dates for hanukkah festival."""
         # clear the datetime objects to prevent a memory link
         self.hanukkah_dates = []
@@ -52,11 +52,11 @@ class HanukkahEmbed(commands.Cog):
         hanukkah_dates = await self.fetch_hanukkah_dates()
         start_day = hanukkah_dates[0]
         end_day = hanukkah_dates[-1]
-        today = datetime.date.today()
+        today = datetime.now(tz=UTC).date()
         embed = Embed(title="Hanukkah", colour=Colours.blue)
         if start_day <= today <= end_day:
             if start_day == today:
-                now = datetime.datetime.utcnow()
+                now = datetime.now(tz=UTC)
                 hours = now.hour + 4  # using only hours
                 hanukkah_start_hour = 18
                 if hours < hanukkah_start_hour:
@@ -66,7 +66,8 @@ class HanukkahEmbed(commands.Cog):
                     )
                     await ctx.send(embed=embed)
                     return
-                elif hours > hanukkah_start_hour:
+
+                if hours > hanukkah_start_hour:
                     embed.description = (
                         "It is the starting day of Hanukkah! "
                         f"Its been {hours - hanukkah_start_hour} hours hanukkah started!"

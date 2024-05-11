@@ -1,16 +1,16 @@
 import json
-import logging
 import pathlib
 
 from discord import Embed
 from discord.ext import commands
 from discord.ext.commands import Bot, Cog, Context
+from pydis_core.utils.logging import get_logger
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 EMOJIS = {
-    "SUCCESS": u"\u2705",
-    "ERROR": u"\u274C"
+    "SUCCESS": "\u2705",
+    "ERROR": "\u274C"
 }
 
 
@@ -90,7 +90,7 @@ class MonsterSurvey(Cog):
     @monster_group.command(
         name="vote"
     )
-    async def monster_vote(self, ctx: Context, name: str = None) -> None:
+    async def monster_vote(self, ctx: Context, name: str | None = None) -> None:
         """
         Cast a vote for a particular monster.
 
@@ -109,7 +109,7 @@ class MonsterSurvey(Cog):
                 name = name.lower()
 
             vote_embed = Embed(
-                name="Monster Voting",
+                title="Monster Voting",
                 color=0xFF6800
             )
 
@@ -141,7 +141,7 @@ class MonsterSurvey(Cog):
     @monster_group.command(
         name="show"
     )
-    async def monster_show(self, ctx: Context, name: str = None) -> None:
+    async def monster_show(self, ctx: Context, name: str | None = None) -> None:
         """Shows the named monster. If one is not named, it sends the default voting embed instead."""
         if name is None:
             await ctx.invoke(self.monster_leaderboard)

@@ -74,7 +74,7 @@ class Emoji:
         return bot.get_emoji(self.uid) is not None
 
     @classmethod
-    def from_match(cls, match: tuple[str, str, str]) -> t.Optional['Emoji']:
+    def from_match(cls, match: tuple[str, str, str]) -> t.Optional["Emoji"]:
         """Creates an Emoji from a regex match tuple."""
         if not match or len(match) != 3 or not match[2].isdecimal():
             return None
@@ -155,7 +155,7 @@ class Uwu(Cog):
         return input_string
 
     @commands.command(name="uwu", aliases=("uwuwize", "uwuify",))
-    async def uwu_command(self, ctx: Context, *, text: t.Optional[str] = None) -> None:
+    async def uwu_command(self, ctx: Context, *, text: str | None = None) -> None:
         """
         Echo an uwuified version the passed text.
 

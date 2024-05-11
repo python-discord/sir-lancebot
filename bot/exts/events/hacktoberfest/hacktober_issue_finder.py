@@ -1,16 +1,15 @@
-import datetime
-import logging
 import random
-from typing import Optional
+from datetime import UTC, datetime
 
 import discord
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Month, Tokens
 from bot.utils.decorators import in_month
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 URL = "https://api.github.com/search/issues?per_page=100&q=is:issue+label:hacktoberfest+language:python+state:open"
 
@@ -18,7 +17,7 @@ REQUEST_HEADERS = {
     "User-Agent": "Python Discord Hacktoberbot",
     "Accept": "application / vnd.github.v3 + json"
 }
-if GITHUB_TOKEN := Tokens.github:
+if GITHUB_TOKEN := Tokens.github.get_secret_value():
     REQUEST_HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
 
 
@@ -28,9 +27,9 @@ class HacktoberIssues(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.cache_normal = None
-        self.cache_timer_normal = datetime.datetime(1, 1, 1)
+        self.cache_timer_normal = datetime(1, 1, 1, tzinfo=UTC)
         self.cache_beginner = None
-        self.cache_timer_beginner = datetime.datetime(1, 1, 1)
+        self.cache_timer_beginner = datetime(1, 1, 1, tzinfo=UTC)
 
     @in_month(Month.OCTOBER)
     @commands.command()
@@ -49,7 +48,7 @@ class HacktoberIssues(commands.Cog):
             embed = self.format_embed(issue)
         await ctx.send(embed=embed)
 
-    async def get_issues(self, ctx: commands.Context, option: str) -> Optional[dict]:
+    async def get_issues(self, ctx: commands.Context, option: str) -> dict | None:
         """Get a list of the python issues with the label 'hacktoberfest' from the Github api."""
         if option == "beginner":
             if (ctx.message.created_at.replace(tzinfo=None) - self.cache_timer_beginner).seconds <= 60:

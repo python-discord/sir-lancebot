@@ -1,13 +1,13 @@
-import logging
 import random
 
 from discord import Embed
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
-from bot.constants import Tokens
+from bot.constants import Colours, NEGATIVE_REPLIES, Tokens
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 class ScaryMovie(commands.Cog):
@@ -21,6 +21,13 @@ class ScaryMovie(commands.Cog):
         """Randomly select a scary movie and display information about it."""
         async with ctx.typing():
             selection = await self.select_movie()
+            if not selection:
+                await ctx.send(embed=Embed(
+                    title=random.choice(NEGATIVE_REPLIES),
+                    description=":warning: Failed to select a movie from the API",
+                    color=Colours.soft_red
+                ))
+                return
             movie_details = await self.format_metadata(selection)
 
         await ctx.send(embed=movie_details)
@@ -29,7 +36,7 @@ class ScaryMovie(commands.Cog):
         """Selects a random movie and returns a JSON of movie details from TMDb."""
         url = "https://api.themoviedb.org/3/discover/movie"
         params = {
-            "api_key": Tokens.tmdb,
+            "api_key": Tokens.tmdb.get_secret_value(),
             "with_genres": "27",
             "vote_count.gte": "5",
             "include_adult": "false"
@@ -44,15 +51,21 @@ class ScaryMovie(commands.Cog):
             total_pages = data.get("total_pages")
 
         # Get movie details from one random result on a random page
-        params["page"] = random.randint(1, total_pages)
+        params["page"] = random.randint(1, min(total_pages, 500))
         async with self.bot.http_session.get(url=url, params=params, headers=headers) as response:
             data = await response.json()
-            selection_id = random.choice(data.get("results")).get("id")
+            if (results := data.get("results")) is None:
+                log.warning("Failed to select a movie - data returned from API has no 'results' key")
+                return {}
+            selection_id = random.choice(results).get("id")
+            if selection_id is None:
+                log.warning("Failed to select a movie - selected film didn't have an id")
+                return {}
 
         # Get full details and credits
         async with self.bot.http_session.get(
             url=f"https://api.themoviedb.org/3/movie/{selection_id}",
-            params={"api_key": Tokens.tmdb, "append_to_response": "credits"}
+            params={"api_key": Tokens.tmdb.get_secret_value(), "append_to_response": "credits"}
         ) as selection:
 
             return await selection.json()
@@ -122,4 +135,7 @@ class ScaryMovie(commands.Cog):
 
 async def setup(bot: Bot) -> None:
     """Load the Scary Movie Cog."""
+    if not Tokens.tmdb:
+        log.warning("No TMDB Token. Not loading ScaryMovie Cog.")
+        return
     await bot.add_cog(ScaryMovie(bot))

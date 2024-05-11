@@ -1,17 +1,15 @@
-import asyncio
 import io
 import json
-import logging
 import math
 import random
 from itertools import product
 from pathlib import Path
-from typing import Union
 
 from PIL import Image
 from PIL.ImageDraw import ImageDraw
 from discord import File, Member, Reaction, User
 from discord.ext.commands import Cog, Context
+from pydis_core.utils.logging import get_logger
 
 from bot.constants import MODERATION_ROLES
 
@@ -132,7 +130,7 @@ def lerp(t: float, a: float, b: float) -> float:
     return a + t * (b - a)
 
 
-class PerlinNoiseFactory(object):
+class PerlinNoiseFactory:
     """
     Callable that produces Perlin noise for an arbitrary point in an arbitrary number of dimensions.
 
@@ -300,7 +298,7 @@ def create_snek_frame(
     start_y = random.randint(image_margins[Y], image_dimensions[Y] - image_margins[Y])
     points: list[tuple[float, float]] = [(start_x, start_y)]
 
-    for index in range(0, snake_length):
+    for index in range(snake_length):
         angle = perlin_factory.get_plain_noise(
             ((1 / (snake_length + 1)) * (index + 1)) + perlin_lookup_vertical_shift
         ) * ANGLE_RANGE
@@ -356,7 +354,7 @@ def frame_to_png_bytes(image: Image) -> io.BytesIO:
     return stream
 
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 START_EMOJI = "\u2611"     # :ballot_box_with_check: - Start the game
 CANCEL_EMOJI = "\u274C"    # :x: - Cancel or leave the game
 ROLL_EMOJI = "\U0001F3B2"  # :game_die: - Roll the die!
@@ -396,7 +394,7 @@ class SnakeAndLaddersGame:
 
         Listen for reactions until players have joined, and the game has been started.
         """
-        def startup_event_check(reaction_: Reaction, user_: Union[User, Member]) -> bool:
+        def startup_event_check(reaction_: Reaction, user_: User | Member) -> bool:
             """Make sure that this reaction is what we want to operate on."""
             return (
                 all((
@@ -445,23 +443,21 @@ class SnakeAndLaddersGame:
                         # Allow game author or non-playing moderation staff to cancel a waiting game
                         await self.cancel_game()
                         return
-                    else:
-                        await self.player_leave(user)
-                elif reaction.emoji == START_EMOJI:
-                    if self.ctx.author == user:
-                        self.started = True
-                        await self.start_game(user)
-                        await startup.delete()
-                        break
+                    await self.player_leave(user)
+                elif reaction.emoji == START_EMOJI and self.ctx.author == user:
+                    self.started = True
+                    await self.start_game(user)
+                    await startup.delete()
+                    break
 
                 await startup.remove_reaction(reaction.emoji, user)
 
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 log.debug("Snakes and Ladders timed out waiting for a reaction")
                 await self.cancel_game()
                 return  # We're done, no reactions for the last 5 minutes
 
-    async def _add_player(self, user: Union[User, Member]) -> None:
+    async def _add_player(self, user: User | Member) -> None:
         """Add player to game."""
         self.players.append(user)
         self.player_tiles[user.id] = 1
@@ -470,7 +466,7 @@ class SnakeAndLaddersGame:
         im = Image.open(io.BytesIO(avatar_bytes)).resize((BOARD_PLAYER_SIZE, BOARD_PLAYER_SIZE))
         self.avatar_images[user.id] = im
 
-    async def player_join(self, user: Union[User, Member]) -> None:
+    async def player_join(self, user: User | Member) -> None:
         """
         Handle players joining the game.
 
@@ -492,11 +488,11 @@ class SnakeAndLaddersGame:
 
         await self.channel.send(
             f"**Snakes and Ladders**: {user.mention} has joined the game.\n"
-            f"There are now {str(len(self.players))} players in the game.",
+            f"There are now {len(self.players)!s} players in the game.",
             delete_after=10
         )
 
-    async def player_leave(self, user: Union[User, Member]) -> bool:
+    async def player_leave(self, user: User | Member) -> bool:
         """
         Handle players leaving the game.
 
@@ -531,17 +527,17 @@ class SnakeAndLaddersGame:
         await self.channel.send("**Snakes and Ladders**: Game has been canceled.")
         self._destruct()
 
-    async def start_game(self, user: Union[User, Member]) -> None:
+    async def start_game(self, user: User | Member) -> None:
         """
         Allow the game author to begin the game.
 
         The game cannot be started if the game is in a waiting state.
         """
-        if not user == self.author:
+        if user != self.author:
             await self.channel.send(user.mention + " Only the author of the game can start it.", delete_after=10)
             return
 
-        if not self.state == "waiting":
+        if self.state != "waiting":
             await self.channel.send(user.mention + " The game cannot be started at this time.", delete_after=10)
             return
 
@@ -552,7 +548,7 @@ class SnakeAndLaddersGame:
 
     async def start_round(self) -> None:
         """Begin the round."""
-        def game_event_check(reaction_: Reaction, user_: Union[User, Member]) -> bool:
+        def game_event_check(reaction_: Reaction, user_: User | Member) -> bool:
             """Make sure that this reaction is what we want to operate on."""
             return (
                 all((
@@ -626,15 +622,14 @@ class SnakeAndLaddersGame:
                         # Only allow non-playing moderation staff to cancel a running game
                         await self.cancel_game()
                         return
-                    else:
-                        is_surrendered = await self.player_leave(user)
+                    is_surrendered = await self.player_leave(user)
 
                 await self.positions.remove_reaction(reaction.emoji, user)
 
                 if self._check_all_rolled():
                     break
 
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 log.debug("Snakes and Ladders timed out waiting for a reaction")
                 await self.cancel_game()
                 return  # We're done, no reactions for the last 5 minutes
@@ -645,7 +640,7 @@ class SnakeAndLaddersGame:
         if not is_surrendered:
             await self._complete_round()
 
-    async def player_roll(self, user: Union[User, Member]) -> None:
+    async def player_roll(self, user: User | Member) -> None:
         """Handle the player's roll."""
         if user.id not in self.player_tiles:
             await self.channel.send(user.mention + " You are not in the match.", delete_after=10)
@@ -692,7 +687,7 @@ class SnakeAndLaddersGame:
         await self.channel.send("**Snakes and Ladders**: " + winner.mention + " has won the game! :tada:")
         self._destruct()
 
-    def _check_winner(self) -> Union[User, Member]:
+    def _check_winner(self) -> User | Member:
         """Return a winning member if we're in the post-round state and there's a winner."""
         if self.state != "post_round":
             return None
@@ -717,6 +712,6 @@ class SnakeAndLaddersGame:
         return x_level, y_level
 
     @staticmethod
-    def _is_moderator(user: Union[User, Member]) -> bool:
+    def _is_moderator(user: User | Member) -> bool:
         """Return True if the user is a Moderator."""
-        return any(role.id in MODERATION_ROLES for role in getattr(user, 'roles', []))
+        return any(role.id in MODERATION_ROLES for role in getattr(user, "roles", []))

@@ -1,17 +1,17 @@
-import logging
 import random
 import re
 from typing import NamedTuple
 
 import discord
 from discord.ext.commands import Cog
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Month
 from bot.utils import resolve_current_month
 from bot.utils.decorators import in_month
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 class Trigger(NamedTuple):
@@ -28,8 +28,30 @@ class Holiday(NamedTuple):
     triggers: dict[str, Trigger]
 
 
-Valentines = Holiday([Month.FEBRUARY], {
-    "heart": Trigger(r"\b(love|heart)\b", ["\u2764\uFE0F"]),
+Valentines = Holiday(
+    [Month.FEBRUARY],
+    {
+        "heart": Trigger(
+            r"\b((l|w)(ove|uv)(s|lies?)?|hearts?)\b",
+            [
+                "\u2764\ufe0f",  # heart
+                "\u2665\ufe0f",  # hearts
+                "\U0001f49c",    # purple_heart
+                "\U0001f49f",    # heart_decoration
+                "\U0001f5a4",    # black_heart
+                "\U0001f499",    # blue_heart
+                "\U0001f90e",    # brown_heart
+                "\U0001f49d",    # gift_heart
+                "\U0001f49a",    # green_heart
+                "\U0001fa76",    # grey_heart
+                "\U0001fa75",    # light_blue_heart
+                "\U0001f9e1",    # orange_heart
+                "\U0001f49b",    # yellow_heart
+                "\U0001f49e",    # revolving_hearts
+                "\U0001f496",    # sparkling_heart
+                "\U0001f90d",    # white_heart
+            ],
+        )
     }
 )
 Easter = Holiday([Month.APRIL], {
@@ -72,9 +94,9 @@ HOLIDAYS_TO_REACT = [
     Valentines, Easter, EarthDay, Pride, Halloween, Hanukkah, Christmas
 ]
 # Type (or order) doesn't matter here - set is for de-duplication
-MONTHS_TO_REACT = set(
+MONTHS_TO_REACT = {
     month for holiday in HOLIDAYS_TO_REACT for month in holiday.months
-)
+}
 
 
 class HolidayReact(Cog):

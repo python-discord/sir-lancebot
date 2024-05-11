@@ -1,19 +1,17 @@
 import json
-import logging
 import random
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Union
 
-import dateutil.parser
 import discord
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Channels, Colours, Month
 from bot.utils.decorators import seasonal_task
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 FACTS = json.loads(Path("bot/resources/holidays/pride/facts.json").read_text("utf8"))
 
@@ -29,65 +27,45 @@ class PrideFacts(commands.Cog):
     async def send_pride_fact_daily(self) -> None:
         """Background task to post the daily pride fact every day."""
         channel = self.bot.get_channel(Channels.sir_lancebot_playground)
-        await self.send_select_fact(channel, datetime.utcnow())
+        await self.send_select_fact(channel, datetime.now(tz=UTC).day)
 
-    async def send_random_fact(self, ctx: commands.Context) -> None:
-        """Provides a fact from any previous day, or today."""
-        now = datetime.utcnow()
-        previous_years_facts = (y for x, y in FACTS.items() if int(x) < now.year)
-        current_year_facts = FACTS.get(str(now.year), [])[:now.day]
-        previous_facts = current_year_facts + [x for y in previous_years_facts for x in y]
+    async def send_select_fact(self, target: discord.abc.Messageable, day_num: int) -> None:
+        """Provides the fact for the specified day."""
         try:
-            await ctx.send(embed=self.make_embed(random.choice(previous_facts)))
+            await target.send(embed=self.get_fact_embed(day_num))
         except IndexError:
-            await ctx.send("No facts available")
-
-    async def send_select_fact(self, target: discord.abc.Messageable, _date: Union[str, datetime]) -> None:
-        """Provides the fact for the specified day, if the day is today, or is in the past."""
-        now = datetime.utcnow()
-        if isinstance(_date, str):
-            try:
-                date = dateutil.parser.parse(_date, dayfirst=False, yearfirst=False, fuzzy=True)
-            except (ValueError, OverflowError) as err:
-                await target.send(f"Error parsing date: {err}")
-                return
-        else:
-            date = _date
-        if date.year < now.year or (date.year == now.year and date.day <= now.day):
-            try:
-                await target.send(embed=self.make_embed(FACTS[str(date.year)][date.day - 1]))
-            except KeyError:
-                await target.send(f"The year {date.year} is not yet supported")
-                return
-            except IndexError:
-                await target.send(f"Day {date.day} of {date.year} is not yet support")
-                return
-        else:
-            await target.send("The fact for the selected day is not yet available.")
+            await target.send(f"Day {day_num} is not supported")
+            return
 
     @commands.command(name="pridefact", aliases=("pridefacts",))
-    async def pridefact(self, ctx: commands.Context, option: str = None) -> None:
+    async def pridefact(self, ctx: commands.Context, option: int | str | None = None) -> None:
         """
         Sends a message with a pride fact of the day.
 
-        If "random" is given as an argument, a random previous fact will be provided.
-
-        If a date is given as an argument, and the date is in the past, the fact from that day
-        will be provided.
+        "option" is an optional setting, which has two has two accepted values:
+          - "random": a random previous fact will be provided.
+          - If a option is a number (1-30), the fact for that given day of June is returned.
         """
         if not option:
-            await self.send_select_fact(ctx, datetime.utcnow())
-        elif option.lower().startswith("rand"):
-            await self.send_random_fact(ctx)
-        else:
+            await self.send_select_fact(ctx, datetime.now(tz=UTC).day)
+        elif isinstance(option, int):
             await self.send_select_fact(ctx, option)
+        elif option.lower().startswith("rand"):
+            await ctx.send(embed=self.get_fact_embed())
+        else:
+            await ctx.send(f"Could not parse option {option}")
 
     @staticmethod
-    def make_embed(fact: str) -> discord.Embed:
-        """Makes a nice embed for the fact to be sent."""
+    def get_fact_embed(day_num: int | None = None) -> discord.Embed:
+        """
+        Makes a embed for the fact on the given day_num to be sent.
+
+        if day_num is not set, a random fact is selected.
+        """
+        fact = FACTS[day_num-1] if day_num else random.choice(FACTS)
         return discord.Embed(
             colour=Colours.pink,
-            title="Pride Fact!",
+            title=f"Day {day_num}'s pride fact!" if day_num else "Random pride fact!",
             description=fact
         )
 

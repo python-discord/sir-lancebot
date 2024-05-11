@@ -1,16 +1,16 @@
 import json
-import logging
 import random
 from collections.abc import Iterable
 
 import discord
 from discord.ext.commands import Context, Converter
+from pydis_core.utils.logging import get_logger
 from rapidfuzz import fuzz
 
 from bot.exts.fun.snakes._utils import SNAKE_RESOURCES
 from bot.utils import disambiguate
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 class Snake(Converter):
