@@ -50,22 +50,27 @@ class ConvoStarters(commands.Cog):
 
         Also returns a value that determines whether or not to remove the reaction afterwards
         """
-        # No matter what, the form will be shown.
+        footer = f"Suggest more topics [here]({SUGGESTION_FORM})!"
+        max_topics = 3
+
         embed = discord.Embed(
-            description=f"Suggest more topics [here]({SUGGESTION_FORM})!",
+            title="Conversation Starter",
             color=discord.Colour.og_blurple()
         )
 
+        embed.set_footer(text=footer)
+
         try:
-            channel_topics = TOPICS[channel_id]
+            channel_topics = TOPICS[str(channel_id)]
         except KeyError:
             # Channel doesn't have any topics.
-            embed.title = f"**{next(TOPICS['default'])}**"
+            new_topic = next(TOPICS["default"])
         else:
-            embed.title = f"**{next(channel_topics)}**"
+            new_topic = next(channel_topics)
 
         if previous_topic is None:
             # This is the first topic being sent
+            embed.description = new_topic
             return embed, False
 
         total_topics = previous_topic.count("\n") + 1
@@ -73,12 +78,14 @@ class ConvoStarters(commands.Cog):
         if total_topics == 1:
             previous_topic = f"1. {previous_topic}"
 
-        embed.title = previous_topic + f"\n{total_topics + 1}. {embed.title}"
+        embed.description = previous_topic + f"\n{total_topics + 1}. {new_topic}"
 
-        if len(embed.title) > 256:
-            embed.title = previous_topic
+        if total_topics == max_topics - 1:
             return embed, True
 
+        # If there are 3 topics, return embed, True
+        if total_topics >= max_topics:
+            return embed, True
         return embed, False
 
     @staticmethod
@@ -119,7 +126,7 @@ class ConvoStarters(commands.Cog):
             try:
                 # The returned discord.Message object from discord.Message.edit is different from the current
                 # discord.Message object, so it must be reassigned to update properly
-                embed, remove_reactions = self._build_topic_embed(message.channel.id, message.embeds[0].title)
+                embed, remove_reactions = self._build_topic_embed(message.channel.id, message.embeds[0].description)
                 message = await message.edit(embed=embed)
                 if remove_reactions:
                     await message.clear_reaction("🔄")
@@ -130,7 +137,7 @@ class ConvoStarters(commands.Cog):
                 await message.remove_reaction(reaction, user)
 
     @commands.command()
-    @commands.cooldown(1, 60*2, commands.BucketType.channel)
+    @commands.cooldown(1, 60 * 2, commands.BucketType.channel)
     @whitelist_override(channels=ALL_ALLOWED_CHANNELS)
     async def topic(self, ctx: commands.Context) -> None:
         """
