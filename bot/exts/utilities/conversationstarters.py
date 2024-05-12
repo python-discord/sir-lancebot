@@ -57,7 +57,6 @@ class ConvoStarters(commands.Cog):
         previous_topic = None
         if previous_description:
             previous_topic = previous_description.split("\n\n")[0]
-            print(previous_topic)
 
         embed = discord.Embed(
             title="Conversation Starter",
@@ -84,7 +83,7 @@ class ConvoStarters(commands.Cog):
 
         # Handle forced reactions after clear
         if total_topics >= max_topics:
-            add_description(new_topic)
+            embed.description = previous_description
             return embed, True
 
         # Add 1 before first topic
