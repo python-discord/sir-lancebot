@@ -41,7 +41,7 @@ class ConvoStarters(commands.Cog):
         self.bot = bot
 
     @staticmethod
-    def _build_topic_embed(channel_id: int, previous_topic: None | str) -> tuple[discord.Embed, bool]:
+    def _build_topic_embed(channel_id: int, previous_description: None | str) -> tuple[discord.Embed, bool]:
         """
         Build an embed containing a conversation topic.
 
@@ -53,12 +53,16 @@ class ConvoStarters(commands.Cog):
         footer = f"Suggest more topics [here]({SUGGESTION_FORM})!"
         max_topics = 3
 
+        # Remove footer from previous description
+        previous_topic = None
+        if previous_description:
+            previous_topic = previous_description.split("\n\n")[0]
+            print(previous_topic)
+
         embed = discord.Embed(
             title="Conversation Starter",
             color=discord.Colour.og_blurple()
         )
-
-        embed.set_footer(text=footer)
 
         try:
             channel_topics = TOPICS[str(channel_id)]
@@ -68,23 +72,26 @@ class ConvoStarters(commands.Cog):
         else:
             new_topic = next(channel_topics)
 
+        def add_description(text: str) -> None:
+            embed.description = f"{text}\n\n{footer}"
+
         if previous_topic is None:
             # This is the first topic being sent
-            embed.description = new_topic
+            add_description(new_topic)
             return embed, False
 
         total_topics = previous_topic.count("\n") + 1
 
         # Handle forced reactions after clear
         if total_topics >= max_topics:
-            embed.description = previous_topic
+            add_description(new_topic)
             return embed, True
 
         # Add 1 before first topic
         if total_topics == 1:
             previous_topic = f"1. {previous_topic}"
 
-        embed.description = previous_topic + f"\n{total_topics + 1}. {new_topic}"
+        add_description(f"{previous_topic}\n{total_topics + 1}. {new_topic}")
 
         # If this is the last topic, remove the reaction
         if total_topics == max_topics - 1:
