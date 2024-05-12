@@ -48,7 +48,7 @@ class ConvoStarters(commands.Cog):
         If in a Python channel, a python-related topic will be given.
         Otherwise, a random conversation topic will be received by the user.
 
-        Also returns a value that determines whether or not to remove the reaction afterwards
+        Also returns a value that determines whether to remove the reaction afterwards
         """
         footer = f"Suggest more topics [here]({SUGGESTION_FORM})!"
         max_topics = 3
@@ -74,17 +74,20 @@ class ConvoStarters(commands.Cog):
             return embed, False
 
         total_topics = previous_topic.count("\n") + 1
+
+        # Handle forced reactions after clear
+        if total_topics >= max_topics:
+            embed.description = previous_topic
+            return embed, True
+
         # Add 1 before first topic
         if total_topics == 1:
             previous_topic = f"1. {previous_topic}"
 
         embed.description = previous_topic + f"\n{total_topics + 1}. {new_topic}"
 
+        # If this is the last topic, remove the reaction
         if total_topics == max_topics - 1:
-            return embed, True
-
-        # If there are 3 topics, return embed, True
-        if total_topics >= max_topics:
             return embed, True
         return embed, False
 
