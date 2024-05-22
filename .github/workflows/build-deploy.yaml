@@ -70,6 +70,7 @@ jobs:
       - name: Deploy to Kubernetes
         uses: Azure/k8s-deploy@v5
         with:
+          namespace: bots
           manifests: |
-              infra/kubernetes/namespaces/default/sir-lancebot/deployment.yaml
+              infra/kubernetes/namespaces/bots/sir-lancebot/deployment.yaml
           images: 'ghcr.io/python-discord/sir-lancebot:${{ inputs.sha-tag }}'
