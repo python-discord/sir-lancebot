@@ -2,6 +2,7 @@ import arrow
 from dateutil.relativedelta import relativedelta
 from discord import Embed
 from discord.ext import commands
+from discord.utils import format_dt
 
 from bot import start_time
 from bot.bot import Bot
@@ -29,16 +30,7 @@ class Ping(commands.Cog):
     @commands.command(name="uptime")
     async def uptime(self, ctx: commands.Context) -> None:
         """Get the current uptime of the bot."""
-        difference = relativedelta(start_time - arrow.utcnow())
-        uptime_string = start_time.shift(
-            seconds=-difference.seconds,
-            minutes=-difference.minutes,
-            hours=-difference.hours,
-            days=-difference.days
-        ).humanize()
-
-        await ctx.send(f"I started up {uptime_string}.")
-
+        await ctx.reply(f"I started up {format_dt(start_time.datetime, 'R')}.")
 
 async def setup(bot: Bot) -> None:
     """Load the Ping cog."""
