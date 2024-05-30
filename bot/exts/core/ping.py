@@ -21,7 +21,7 @@ class Ping(commands.Cog):
         embed = Embed(
             title=":ping_pong: Pong!",
             colour=Colours.bright_green,
-            description=f"Gateway Latency: {round(self.bot.latency * 1000)}ms",
+            description=f"Gateway Latency: `{round(self.bot.latency * 1000)}`ms",
         )
 
         await ctx.send(embed=embed)
