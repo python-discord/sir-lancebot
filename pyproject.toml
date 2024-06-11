@@ -11,7 +11,7 @@ python = "3.12.*"
 # See https://bot-core.pythondiscord.com/ for docs.
 pydis_core = { version = "11.1.0", extras = ["all"] }
 
-rapidfuzz = "3.9.2"
+rapidfuzz = "3.9.3"
 arrow = "1.3.0"
 beautifulsoup4 = "4.12.3"
 pillow = "10.3.0"
