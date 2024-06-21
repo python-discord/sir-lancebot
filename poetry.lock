@@ -1707,13 +1707,13 @@ files = [
 
 [[package]]
 name = "taskipy"
-version = "1.12.2"
+version = "1.13.0"
 description = "tasks runner for python projects"
 optional = false
-python-versions = ">=3.6,<4.0"
+python-versions = "<4.0,>=3.6"
 files = [
-    {file = "taskipy-1.12.2-py3-none-any.whl", hash = "sha256:ffdbb0bb0db54c0ec5c424610a3a087eea22706d4d1f6e3e8b4f12ebba05f98f"},
-    {file = "taskipy-1.12.2.tar.gz", hash = "sha256:eadfdc20d6bb94d8018eda32f1dbf584cf4aa6cffb71ba5cc2de20d344f8c4fb"},
+    {file = "taskipy-1.13.0-py3-none-any.whl", hash = "sha256:56f42b7e508d9aed2c7b6365f8d3dab62dbd0c768c1ab606c819da4fc38421f7"},
+    {file = "taskipy-1.13.0.tar.gz", hash = "sha256:2b52f0257958fed151f1340f7de93fcf0848f7a358ad62ba05c31c2ca04f89fe"},
 ]
 
 [package.dependencies]
@@ -1909,4 +1909,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "3.12.*"
-content-hash = "6ed7644ee9218db4550a410150bd5305f04e34969f91e2c0eb8d48da1f7fe23b"
+content-hash = "0ae50316df6738736ab08e9c0f1dd1518f0e2abd57ad3c40cb838422e125b72c"
