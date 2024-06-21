@@ -32,7 +32,7 @@ pip-licenses = "4.4.0"
 pre-commit = "3.7.1"
 python-dotenv = "1.0.1"
 ruff = "0.4.8"
-taskipy = "1.12.2"
+taskipy = "1.13.0"
 
 [tool.taskipy.tasks]
 start = "python -m bot"
