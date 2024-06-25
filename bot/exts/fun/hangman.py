@@ -119,7 +119,7 @@ class Hangman(commands.Cog):
                     description=f"Time's up! The correct word was `{word}`.",
                     color=Colours.soft_red,
                 )
-                await original_message.edit(embed=timeout_embed)
+                await ctx.send(embed=timeout_embed)
                 return
 
             # If the user enters a capital letter as their guess, it is automatically converted to a lowercase letter
