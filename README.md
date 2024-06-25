@@ -1,8 +1,7 @@
 # Sir Lancebot
 
-[![Discord][5]][6]
-[![Lint Badge][1]][2]
-[![Build Badge][3]][4]
+[![Discord][3]][4]
+[![CI Badge][1]][2]
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Open in Gitpod](https://img.shields.io/badge/Gitpod-ready--to--code-908a85?logo=gitpod)](https://gitpod.io/#/github.com/python-discord/sir-lancebot)
 
@@ -23,9 +22,7 @@ Before you start, please take some time to read through our [contributing guidel
 
 See [Sir Lancebot's Wiki](https://pythondiscord.com/pages/contributing/sir-lancebot/) for in-depth guides on getting started with the project!
 
-[1]:https://github.com/python-discord/sir-lancebot/workflows/Lint/badge.svg?branch=main
-[2]:https://github.com/python-discord/sir-lancebot/actions?query=workflow%3ALint+branch%3Amain
-[3]:https://github.com/python-discord/sir-lancebot/workflows/Build/badge.svg?branch=main
-[4]:https://github.com/python-discord/sir-lancebot/actions?query=workflow%3ABuild+branch%3Amain
-[5]: https://raw.githubusercontent.com/python-discord/branding/main/logos/badge/badge_github.svg
-[6]: https://discord.gg/python
+[1]:https://github.com/python-discord/sir-lancebot/workflows/CI/badge.svg?branch=main
+[2]:https://github.com/python-discord/sir-lancebot/actions?query=workflow%3ACI+branch%3Amain
+[3]: https://raw.githubusercontent.com/python-discord/branding/main/logos/badge/badge_github.svg
+[4]: https://discord.gg/python
