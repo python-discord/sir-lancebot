@@ -8,9 +8,10 @@ from typing import BinaryIO
 
 import discord
 from PIL import Image
-from aiohttp import client_exceptions, web
+from aiohttp import client_exceptions
 from discord.ext import commands
 from pydis_core.utils.logging import get_logger
+from pydis_core.utils.paste_service import PasteFile, PasteTooLongError, PasteUploadError, send_to_paste_service
 
 from bot.bot import Bot
 from bot.constants import Channels, WHITELISTED_CHANNELS
@@ -100,17 +101,16 @@ class Latex(commands.Cog):
 
     async def _upload_to_pastebin(self, text: str) -> str | None:
         """Uploads `text` to the paste service, returning the url if successful."""
+        file = PasteFile(content=text, lexer="text")
         try:
-            async with self.bot.http_session.post(
-                PASTEBIN_URL + "/documents",
-                data=text,
-                raise_for_status=True
-            ) as response:
-                response_json = await response.json()
-            if "key" in response_json:
-                return f"{PASTEBIN_URL}/{response_json['key']}.txt?noredirect"
-        except web.HTTPClientError as e:
+            resp = await send_to_paste_service(
+                files=[file],
+                http_session=self.bot.http_session,
+            )
+            return resp.link
+        except (PasteTooLongError, PasteUploadError) as e:
             log.info("Error when uploading latex output to pastebin. %s", e)
+            return None
 
     async def _prepare_error_embed(self, err: InvalidLatexError | LatexServerError | None) -> discord.Embed:
         title = "Server encountered an issue, please retry later."
