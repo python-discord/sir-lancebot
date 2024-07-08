@@ -115,11 +115,11 @@ class Hangman(commands.Cog):
                 )
             except TimeoutError:
                 timeout_embed = Embed(
-                    title=choice(NEGATIVE_REPLIES),
-                    description="Looks like the bot timed out! You must send a letter within 60 seconds.",
+                    title="You lost",
+                    description=f"Time's up! The correct word was `{word}`.",
                     color=Colours.soft_red,
                 )
-                await original_message.edit(embed=timeout_embed)
+                await ctx.send(embed=timeout_embed)
                 return
 
             # If the user enters a capital letter as their guess, it is automatically converted to a lowercase letter
