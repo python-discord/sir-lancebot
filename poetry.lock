@@ -1348,18 +1348,14 @@ fakeredis = ["fakeredis[lua] (>=2.0,<3.0)"]
 
 [[package]]
 name = "pyjokes"
-version = "0.6.0"
+version = "0.7.2"
 description = "One line jokes for programmers (jokes as a service)"
 optional = false
-python-versions = "*"
+python-versions = "<4.0,>=3.9"
 files = [
-    {file = "pyjokes-0.6.0-py2.py3-none-any.whl", hash = "sha256:70b6125186dee5845038505cd16b5e09250da46c730e36b44ffd870e3c81aaaa"},
-    {file = "pyjokes-0.6.0.tar.gz", hash = "sha256:08860eedb78cbfa4618243c8db088f21c39823ece1fdaf0133e52d9c56e981a5"},
+    {file = "pyjokes-0.7.2-py3-none-any.whl", hash = "sha256:fabf2b298718549efe9323e61a286516f4104aa645c23d48e9150a4683d24e7e"},
+    {file = "pyjokes-0.7.2.tar.gz", hash = "sha256:1a0dab5bfd30deee547055ebf26b2073b4dd10b708311b4c9bdf6ccb743d5821"},
 ]
-
-[package.extras]
-doc = ["mkdocs"]
-test = ["coverage", "pytest", "tox"]
 
 [[package]]
 name = "pyreadline3"
@@ -1920,4 +1916,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "3.12.*"
-content-hash = "4966a9104e95490a55fb79a5c45ee2189b78dd43c6fa617249e523499f5da7b7"
+content-hash = "8d081e4ead22663cc00455d3d7f499c523475ab78dc75ecf614b874b4f28286f"
