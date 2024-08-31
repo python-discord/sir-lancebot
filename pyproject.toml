@@ -22,7 +22,7 @@ coloredlogs = "15.0.1"
 colorama = { version = "0.4.6", markers = "sys_platform == 'win32'" }
 lxml = "5.2.2"
 emoji = "2.12.1"
-pyjokes = "0.7.2"
+pyjokes = "0.8.3"
 pydantic = { version = "2.6.4", extras = ["dotenv"]}
 pydantic-settings = "2.2.1"
 

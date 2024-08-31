@@ -1361,13 +1361,13 @@ fakeredis = ["fakeredis[lua] (>=2.0,<3.0)"]
 
 [[package]]
 name = "pyjokes"
-version = "0.7.2"
+version = "0.8.3"
 description = "One line jokes for programmers (jokes as a service)"
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "pyjokes-0.7.2-py3-none-any.whl", hash = "sha256:fabf2b298718549efe9323e61a286516f4104aa645c23d48e9150a4683d24e7e"},
-    {file = "pyjokes-0.7.2.tar.gz", hash = "sha256:1a0dab5bfd30deee547055ebf26b2073b4dd10b708311b4c9bdf6ccb743d5821"},
+    {file = "pyjokes-0.8.3-py3-none-any.whl", hash = "sha256:12836e61bc7a2c1ff302604a040f0f63ac36c5c947c20319fcb5d1ab37bac46e"},
+    {file = "pyjokes-0.8.3.tar.gz", hash = "sha256:5735d31e973d5b6934b46b89431505733c3110f9b66eac0ff0be86f7f3646423"},
 ]
 
 [[package]]
@@ -1947,4 +1947,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "3.12.*"
-content-hash = "9eb45108c19e458bf5cf72b129609050bbdca074c59d700ce16e9148ff5313b7"
+content-hash = "a5f51ff4617256b6a4872be3738aa17cd258dfdb06b1071ce16e171c7127957f"
