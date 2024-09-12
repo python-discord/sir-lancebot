@@ -1333,13 +1333,13 @@ yaml = ["pyyaml (>=6.0.1)"]
 
 [[package]]
 name = "pydis-core"
-version = "11.3.1"
+version = "11.4.0"
 description = "PyDis core provides core functionality and utility to the bots of the Python Discord community."
 optional = false
 python-versions = "<4.0,>=3.11"
 files = [
-    {file = "pydis_core-11.3.1-py3-none-any.whl", hash = "sha256:a7344a65710593214711efc5f8daf14b601c7bb83f90efa2a148a6f41a5d7c92"},
-    {file = "pydis_core-11.3.1.tar.gz", hash = "sha256:52a6e687b3700c077e49bd1e719aa868497524e7086f44cc219d66170155230b"},
+    {file = "pydis_core-11.4.0-py3-none-any.whl", hash = "sha256:cd2a4a5c929548400423ec5e544b67696c978df92d00ee4bd337e60ea4f24728"},
+    {file = "pydis_core-11.4.0.tar.gz", hash = "sha256:3a3a213add4e0a221bc4f4a09776b77d2d7aa1978b0958872a1db030992d0b97"},
 ]
 
 [package.dependencies]
@@ -1943,4 +1943,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "3.12.*"
-content-hash = "56ecbd30a95a09c65cef191fda4846952082ca086eca97a46cb2547e8ec4a7de"
+content-hash = "998db7fd2adb7039d74bcd15ca6289685c7b163410a97d78830da5103d16189f"
