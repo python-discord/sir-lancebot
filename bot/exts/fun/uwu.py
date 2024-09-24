@@ -44,6 +44,19 @@ EMOJIS = [
     "^^;;",
 ]
 
+EMOJI_REPLACE = {
+    ":neutral_face:": ":cat:",
+    ":cry:": ":crying_cat_face:",
+    ":heart_eyes:": ":heart_eyes_cat:",
+    ":joy:": ":joy_cat:",
+    ":kissing:": ":kissing_cat:",
+    ":angry:": ":pouting_cat:",
+    ":scream:": ":scream_cat:",
+    ":laughing:": ":smile_cat:",
+    ":grinning:": ":smiley_cat:",
+    ":smirk:": ":smirk_cat:",
+    ":pleading_face:": ":pleading_face::point_right::point_left:"
+}
 REGEX_WORD_REPLACE = re.compile(r"(?<!w)[lr](?!w)")
 
 REGEX_PUNCTUATION = re.compile(r"[.!?\r\n\t]")
@@ -143,6 +156,12 @@ class Uwu(Cog):
         # Return original if no replacement
         return input_string
 
+    def _uwu_emojis(self, input_string: str) -> str:
+        """Replaces certain emojis with better emojis."""
+        for old, new in EMOJI_REPLACE.items():
+            input_string = input_string.replace(old, new)
+        return input_string
+
     def _uwuify(self, input_string: str, *, stutter_strength: float = 0.2, emoji_strength: float = 0.1) -> str:
         """Takes a string and returns an uwuified version of it."""
         input_string = input_string.lower()
@@ -152,6 +171,7 @@ class Uwu(Cog):
         input_string = self._stutter(stutter_strength, input_string)
         input_string = self._emoji(emoji_strength, input_string)
         input_string = self._ext_emoji_replace(input_string)
+        input_string = self._emoji_replace(input_string)
         return input_string
 
     @commands.command(name="uwu", aliases=("uwuwize", "uwuify",))
