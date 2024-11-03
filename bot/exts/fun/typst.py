@@ -6,6 +6,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import discord
+from PIL import Image
 from discord.ext import commands
 from pydis_core.utils.logging import get_logger
 from pydis_core.utils.paste_service import PasteFile, PasteTooLongError, PasteUploadError, send_to_paste_service
@@ -14,6 +15,7 @@ from bot.bot import Bot
 from bot.constants import Channels, WHITELISTED_CHANNELS
 from bot.utils.codeblocks import prepare_input
 from bot.utils.decorators import whitelist_override
+from bot.utils.images import crop_background
 from bot.utils.typst import render_typst_worker
 
 log = get_logger(__name__)
@@ -27,6 +29,8 @@ CACHE_DIRECTORY = THIS_DIR / "_typst_cache"
 CACHE_DIRECTORY.mkdir(exist_ok=True)
 TEMPLATE = string.Template(Path("bot/resources/fun/typst_template.typ").read_text())
 
+# how many pixels to leave on each side when cropping the image to only the contents. Set to None to disable cropping.
+CROP_PADDING: int | None = 10
 MAX_CONCURRENCY = 2
 
 TYPST_ALLOWED_CHANNNELS = WHITELISTED_CHANNELS + (
@@ -44,6 +48,10 @@ class InvalidTypstError(Exception):
     def __init__(self, logs: str | None):
         super().__init__(logs)
         self.logs = logs
+
+
+class EmptyImageError(Exception):
+    """Represents an error caused by the output image being empty."""
 
 
 class Typst(commands.Cog):
@@ -72,9 +80,14 @@ class Typst(commands.Cog):
                     await ctx.send(embed=embed)
                     image_path.unlink()
                     return
+                except EmptyImageError:
+                    await ctx.send("The output image was empty.")
+                    return
             await ctx.send(file=discord.File(image_path, "typst.png"))
 
-    async def render_typst(self, query: str, tempdir_name: str, image_path: Path) -> None:
+    async def render_typst(
+        self, query: str, tempdir_name: str, image_path: Path
+    ) -> None:
         """
         Renders the query as Typst.
 
@@ -82,14 +95,29 @@ class Typst(commands.Cog):
         image_path shouldn't be in that directory or else it will be immediately deleted.
         """
         with TemporaryDirectory(prefix=tempdir_name, dir=CACHE_DIRECTORY) as tempdir:
+            raw_img_path = Path(tempdir) / image_path.with_stem("raw_out").name
             source_path = Path(tempdir) / "inp.typ"
             source_path.write_text(TEMPLATE.substitute(text=query), encoding="utf-8")
             try:
                 await asyncio.get_event_loop().run_in_executor(
-                    _EXECUTOR, render_typst_worker, source_path, image_path
+                    _EXECUTOR, render_typst_worker, source_path, raw_img_path
                 )
             except RuntimeError as e:
-                raise InvalidTypstError(e.args[0] if e.args else "<no error message emitted>")
+                raise InvalidTypstError(
+                    e.args[0] if e.args else "<no error message emitted>"
+                )
+
+            if CROP_PADDING is None:
+                raw_img_path.rename(image_path)
+            else:
+                res = crop_background(
+                    Image.open(raw_img_path).convert("RGB"),
+                    (255, 255, 255),
+                    pad=CROP_PADDING,
+                )
+                if res is None:
+                    raise EmptyImageError
+                res.save(image_path)
 
     async def _prepare_error_embed(
         self, err: InvalidTypstError | None
