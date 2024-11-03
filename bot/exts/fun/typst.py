@@ -6,10 +6,16 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import discord
+import platformdirs
 from PIL import Image
 from discord.ext import commands
 from pydis_core.utils.logging import get_logger
-from pydis_core.utils.paste_service import PasteFile, PasteTooLongError, PasteUploadError, send_to_paste_service
+from pydis_core.utils.paste_service import (
+    PasteFile,
+    PasteTooLongError,
+    PasteUploadError,
+    send_to_paste_service,
+)
 
 from bot.bot import Bot
 from bot.constants import Channels, WHITELISTED_CHANNELS
@@ -28,6 +34,40 @@ THIS_DIR = Path(__file__).parent
 CACHE_DIRECTORY = THIS_DIR / "_typst_cache"
 CACHE_DIRECTORY.mkdir(exist_ok=True)
 TEMPLATE = string.Template(Path("bot/resources/fun/typst_template.typ").read_text())
+PACKAGES_INSTALL_STRING = Path("bot/resources/fun/typst_packages.typ").read_text()
+
+TYPST_PACKAGES_DIR = platformdirs.user_cache_path("typst") / "packages"
+if not TYPST_PACKAGES_DIR.exists():
+    log.info(
+        f"The Typst package directory '{TYPST_PACKAGES_DIR}' doesn't currently exist; populating allowed packages."
+    )
+    with TemporaryDirectory(prefix="packageinstall", dir=CACHE_DIRECTORY) as tempdir:
+        source_path = Path(tempdir) / "inp.typ"
+        output_path = Path(tempdir) / "discard.png"
+        source_path.write_text(PACKAGES_INSTALL_STRING, encoding="utf-8")
+        render_typst_worker(source_path, output_path)
+    if not TYPST_PACKAGES_DIR.exists():
+        raise ValueError(
+            f"'{TYPST_PACKAGES_DIR}' still doesn't exist after installing packages - "
+            "this suggests the packages path is incorrect or no packages were installed."
+        )
+    num_packages = 0
+    for universe in TYPST_PACKAGES_DIR.iterdir():
+        num_packages += sum(1 for _ in universe.iterdir())
+    log.info(
+        f"Installed {num_packages} packages. Locking the packages directory against writes."
+    )
+    # for security, remove the write permissions from typst packages
+    mode = 0o555  # read, execute, not write
+    for (
+        dirpath,
+        dirnames,
+        filenames,
+    ) in TYPST_PACKAGES_DIR.walk():
+        for d in dirnames + filenames:
+            (dirpath / d).chmod(mode)
+    TYPST_PACKAGES_DIR.chmod(mode)
+
 
 # how many pixels to leave on each side when cropping the image to only the contents. Set to None to disable cropping.
 CROP_PADDING: int | None = 10
@@ -78,7 +118,7 @@ class Typst(commands.Cog):
                 except InvalidTypstError as err:
                     embed = await self._prepare_error_embed(err)
                     await ctx.send(embed=embed)
-                    image_path.unlink()
+                    image_path.unlink(missing_ok=True)
                     return
                 except EmptyImageError:
                     await ctx.send("The output image was empty.")
