@@ -25,6 +25,7 @@ emoji = "2.12.1"
 pyjokes = "0.8.3"
 pydantic = { version = "2.6.4", extras = ["dotenv"]}
 pydantic-settings = "2.2.1"
+typst = "^0.11.1"
 
 
 [tool.poetry.dev-dependencies]

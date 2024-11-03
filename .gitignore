@@ -2,6 +2,7 @@
 log/*
 data/*
 bot/exts/fun/_latex_cache/*
+bot/exts/fun/_typst_cache/*
 
 
 
