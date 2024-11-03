@@ -36,11 +36,6 @@ LATEX_ALLOWED_CHANNNELS = WHITELISTED_CHANNELS + (
 )
 
 
-def _process_image(data: bytes, out_file: BinaryIO) -> None:
-    """Read `data` as an image file, and paste it on a white background."""
-    return process_image(data, out_file, PAD)
-
-
 class InvalidLatexError(Exception):
     """Represents an error caused by invalid latex."""
 
@@ -73,7 +68,7 @@ class Latex(commands.Cog):
             f"{LATEX_API_URL}/{response_json['filename']}",
             raise_for_status=True
         ) as response:
-            _process_image(await response.read(), out_file)
+            process_image(await response.read(), out_file, PAD)
 
     async def _upload_to_pastebin(self, text: str) -> str | None:
         """Uploads `text` to the paste service, returning the url if successful."""
