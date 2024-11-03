@@ -1,21 +1,16 @@
 import asyncio
 import hashlib
 import string
-from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import discord
 import platformdirs
 from PIL import Image
+from anyio.to_process import run_sync
 from discord.ext import commands
 from pydis_core.utils.logging import get_logger
-from pydis_core.utils.paste_service import (
-    PasteFile,
-    PasteTooLongError,
-    PasteUploadError,
-    send_to_paste_service,
-)
+from pydis_core.utils.paste_service import PasteFile, PasteTooLongError, PasteUploadError, send_to_paste_service
 
 from bot.bot import Bot
 from bot.constants import Channels, WHITELISTED_CHANNELS
@@ -37,49 +32,20 @@ TEMPLATE = string.Template(Path("bot/resources/fun/typst_template.typ").read_tex
 PACKAGES_INSTALL_STRING = Path("bot/resources/fun/typst_packages.typ").read_text()
 
 TYPST_PACKAGES_DIR = platformdirs.user_cache_path("typst") / "packages"
-if not TYPST_PACKAGES_DIR.exists():
-    log.info(
-        f"The Typst package directory '{TYPST_PACKAGES_DIR}' doesn't currently exist; populating allowed packages."
-    )
-    with TemporaryDirectory(prefix="packageinstall", dir=CACHE_DIRECTORY) as tempdir:
-        source_path = Path(tempdir) / "inp.typ"
-        output_path = Path(tempdir) / "discard.png"
-        source_path.write_text(PACKAGES_INSTALL_STRING, encoding="utf-8")
-        render_typst_worker(source_path, output_path)
-    if not TYPST_PACKAGES_DIR.exists():
-        raise ValueError(
-            f"'{TYPST_PACKAGES_DIR}' still doesn't exist after installing packages - "
-            "this suggests the packages path is incorrect or no packages were installed."
-        )
-    num_packages = 0
-    for universe in TYPST_PACKAGES_DIR.iterdir():
-        num_packages += sum(1 for _ in universe.iterdir())
-    log.info(
-        f"Installed {num_packages} packages. Locking the packages directory against writes."
-    )
-    # for security, remove the write permissions from typst packages
-    mode = 0o555  # read, execute, not write
-    for (
-        dirpath,
-        dirnames,
-        filenames,
-    ) in TYPST_PACKAGES_DIR.walk():
-        for d in dirnames + filenames:
-            (dirpath / d).chmod(mode)
-    TYPST_PACKAGES_DIR.chmod(mode)
-
 
 # how many pixels to leave on each side when cropping the image to only the contents. Set to None to disable cropping.
 CROP_PADDING: int | None = 10
 MAX_CONCURRENCY = 2
+# max time in seconds to allow the typst process to run
+TYPST_TIMEOUT: float = 1.0
+# max size of the typst (raw) output image to allow rather than emitting an error
+MAX_RAW_SIZE = 2 * 1024**2  # 2MB
 
 TYPST_ALLOWED_CHANNNELS = WHITELISTED_CHANNELS + (
     Channels.data_science_and_ai,
     Channels.algos_and_data_structs,
     Channels.python_help,
 )
-
-_EXECUTOR = ProcessPoolExecutor(MAX_CONCURRENCY)
 
 
 class InvalidTypstError(Exception):
@@ -88,6 +54,14 @@ class InvalidTypstError(Exception):
     def __init__(self, logs: str | None):
         super().__init__(logs)
         self.logs = logs
+
+
+class TypstTimeoutError(Exception):
+    """Represents an error caused by the Typst rendering taking too long."""
+
+
+class OutputTooBigError(Exception):
+    """Represents an error caused by the Typst output image being too big."""
 
 
 class EmptyImageError(Exception):
@@ -99,6 +73,42 @@ class Typst(commands.Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
+        self._setup_packages()
+
+    def _setup_packages(self) -> None:
+        if TYPST_PACKAGES_DIR.exists():
+            return
+        log.info(
+            f"The Typst package directory '{TYPST_PACKAGES_DIR}' doesn't currently exist; populating allowed packages."
+        )
+        with TemporaryDirectory(
+            prefix="packageinstall", dir=CACHE_DIRECTORY
+        ) as tempdir:
+            source_path = Path(tempdir) / "inp.typ"
+            output_path = Path(tempdir) / "discard.png"
+            source_path.write_text(PACKAGES_INSTALL_STRING, encoding="utf-8")
+            render_typst_worker(source_path, output_path)
+        if not TYPST_PACKAGES_DIR.exists():
+            raise ValueError(
+                f"'{TYPST_PACKAGES_DIR}' still doesn't exist after installing packages - "
+                "this suggests the packages path is incorrect or no packages were installed."
+            )
+        num_packages = 0
+        for universe in TYPST_PACKAGES_DIR.iterdir():
+            num_packages += sum(1 for _ in universe.iterdir())
+        log.info(
+            f"Installed {num_packages} packages. Locking the packages directory against writes."
+        )
+        # for security, remove the write permissions from typst packages
+        mode = 0o555  # read, execute, not write
+        for (
+            dirpath,
+            dirnames,
+            filenames,
+        ) in TYPST_PACKAGES_DIR.walk():
+            for d in dirnames + filenames:
+                (dirpath / d).chmod(mode)
+        TYPST_PACKAGES_DIR.chmod(mode)
 
     @commands.command()
     @commands.max_concurrency(MAX_CONCURRENCY, commands.BucketType.guild, wait=True)
@@ -123,6 +133,17 @@ class Typst(commands.Cog):
                 except EmptyImageError:
                     await ctx.send("The output image was empty.")
                     return
+                except TypstTimeoutError:
+                    await ctx.send(
+                        f"Typst rendering took too long (current timeout is {TYPST_TIMEOUT}s)."
+                    )
+                    image_path.unlink(missing_ok=True)
+                    return
+                except OutputTooBigError:
+                    await ctx.send(
+                        f"Typst output was too big (current limit is {MAX_RAW_SIZE/1024**2:.1f}MB.)"
+                    )
+                    return
             await ctx.send(file=discord.File(image_path, "typst.png"))
 
     async def render_typst(
@@ -139,13 +160,22 @@ class Typst(commands.Cog):
             source_path = Path(tempdir) / "inp.typ"
             source_path.write_text(TEMPLATE.substitute(text=query), encoding="utf-8")
             try:
-                await asyncio.get_event_loop().run_in_executor(
-                    _EXECUTOR, render_typst_worker, source_path, raw_img_path
-                )
+                async with asyncio.timeout(TYPST_TIMEOUT):
+                    await run_sync(
+                        render_typst_worker,
+                        source_path,
+                        raw_img_path,
+                        cancellable=True,
+                    )
             except RuntimeError as e:
                 raise InvalidTypstError(
                     e.args[0] if e.args else "<no error message emitted>"
                 )
+            except TimeoutError:
+                raise TypstTimeoutError
+
+            if raw_img_path.stat().st_size > MAX_RAW_SIZE:
+                raise OutputTooBigError
 
             if CROP_PADDING is None:
                 raw_img_path.rename(image_path)
