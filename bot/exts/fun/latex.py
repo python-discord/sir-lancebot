@@ -1,13 +1,10 @@
 import hashlib
 import os
-import re
 import string
-from io import BytesIO
 from pathlib import Path
 from typing import BinaryIO
 
 import discord
-from PIL import Image
 from aiohttp import client_exceptions
 from discord.ext import commands
 from pydis_core.utils.logging import get_logger
@@ -15,18 +12,12 @@ from pydis_core.utils.paste_service import PasteFile, PasteTooLongError, PasteUp
 
 from bot.bot import Bot
 from bot.constants import Channels, WHITELISTED_CHANNELS
+from bot.utils.codeblocks import prepare_input
 from bot.utils.decorators import whitelist_override
+from bot.utils.images import process_image
 
 log = get_logger(__name__)
-FORMATTED_CODE_REGEX = re.compile(
-    r"(?P<delim>(?P<block>```)|``?)"        # code delimiter: 1-3 backticks; (?P=block) only matches if it's a block
-    r"(?(block)(?:(?P<lang>[a-z]+)\n)?)"    # if we're in a block, match optional language (only letters plus newline)
-    r"(?:[ \t]*\n)*"                        # any blank (empty or tabs/spaces only) lines before the code
-    r"(?P<code>.*?)"                        # extract all code inside the markup
-    r"\s*"                                  # any more whitespace before the end of the code markup
-    r"(?P=delim)",                          # match the exact same delimiter from the start again
-    re.DOTALL | re.IGNORECASE,              # "." also matches newlines, case insensitive
-)
+
 
 LATEX_API_URL = os.getenv("LATEX_API_URL", "https://rtex.probablyaweb.site/api/v2")
 PASTEBIN_URL = "https://paste.pythondiscord.com"
@@ -45,24 +36,9 @@ LATEX_ALLOWED_CHANNNELS = WHITELISTED_CHANNELS + (
 )
 
 
-def _prepare_input(text: str) -> str:
-    """Extract latex from a codeblock, if it is in one."""
-    if match := FORMATTED_CODE_REGEX.match(text):
-        return match.group("code")
-    return text
-
-
 def _process_image(data: bytes, out_file: BinaryIO) -> None:
     """Read `data` as an image file, and paste it on a white background."""
-    image = Image.open(BytesIO(data)).convert("RGBA")
-    width, height = image.size
-    background = Image.new("RGBA", (width + 2 * PAD, height + 2 * PAD), "WHITE")
-
-    # paste the image on the background, using the same image as the mask
-    # when an RGBA image is passed as the mask, its alpha band is used.
-    # this has the effect of skipping pasting the pixels where the image is transparent.
-    background.paste(image, (PAD, PAD), image)
-    background.save(out_file)
+    return process_image(data, out_file, PAD)
 
 
 class InvalidLatexError(Exception):
@@ -132,7 +108,7 @@ class Latex(commands.Cog):
     @whitelist_override(channels=LATEX_ALLOWED_CHANNNELS)
     async def latex(self, ctx: commands.Context, *, query: str) -> None:
         """Renders the text in latex and sends the image."""
-        query = _prepare_input(query)
+        query = prepare_input(query)
 
         # the hash of the query is used as the filename in the cache.
         query_hash = hashlib.md5(query.encode()).hexdigest()  # noqa: S324
