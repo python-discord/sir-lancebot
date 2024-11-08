@@ -1,16 +1,25 @@
 import asyncio
 import hashlib
 import string
+from functools import partial
+from io import BytesIO
 from pathlib import Path
+from pickle import PicklingError  # noqa: S403
 from tempfile import TemporaryDirectory
 
 import discord
 import platformdirs
 from PIL import Image
+from anyio import BrokenWorkerProcess
 from anyio.to_process import run_sync
 from discord.ext import commands
 from pydis_core.utils.logging import get_logger
-from pydis_core.utils.paste_service import PasteFile, PasteTooLongError, PasteUploadError, send_to_paste_service
+from pydis_core.utils.paste_service import (
+    PasteFile,
+    PasteTooLongError,
+    PasteUploadError,
+    send_to_paste_service,
+)
 
 from bot.bot import Bot
 from bot.constants import Channels, WHITELISTED_CHANNELS
@@ -38,6 +47,9 @@ CROP_PADDING: int | None = 10
 MAX_CONCURRENCY = 2
 # max time in seconds to allow the typst process to run
 TYPST_TIMEOUT: float = 1.0
+# memory limit (in bytes) to set via RLIMIT_AS for the child process.
+# Typst uses a lot of RAM when compiling, so this seems to need to be >500MB.
+TYPST_MEMORY_LIMIT: int = 1000 * 1024**2  # 1GB, which is pretty generous
 # max size of the typst (raw) output image to allow rather than emitting an error
 MAX_RAW_SIZE = 2 * 1024**2  # 2MB
 
@@ -68,6 +80,10 @@ class EmptyImageError(Exception):
     """Represents an error caused by the output image being empty."""
 
 
+class TypstWorkerCrashedError(Exception):
+    """Represents an error caused by Typst rendering process crashing. This can mean the memory limit was exceeded."""
+
+
 class Typst(commands.Cog):
     """Renders typst."""
 
@@ -85,9 +101,8 @@ class Typst(commands.Cog):
             prefix="packageinstall", dir=CACHE_DIRECTORY
         ) as tempdir:
             source_path = Path(tempdir) / "inp.typ"
-            output_path = Path(tempdir) / "discard.png"
             source_path.write_text(PACKAGES_INSTALL_STRING, encoding="utf-8")
-            render_typst_worker(source_path, output_path)
+            render_typst_worker(source_path)
         if not TYPST_PACKAGES_DIR.exists():
             raise ValueError(
                 f"'{TYPST_PACKAGES_DIR}' still doesn't exist after installing packages - "
@@ -144,6 +159,12 @@ class Typst(commands.Cog):
                         f"Typst output was too big (current limit is {MAX_RAW_SIZE/1024**2:.1f}MB.)"
                     )
                     return
+                except TypstWorkerCrashedError:
+                    await ctx.send(
+                        "Worker process crashed. "
+                        f"Perhaps the memory limit of {TYPST_MEMORY_LIMIT/1024**2:.1f}MB was exceeded?"
+                    )
+                    return
             await ctx.send(file=discord.File(image_path, "typst.png"))
 
     async def render_typst(
@@ -156,15 +177,16 @@ class Typst(commands.Cog):
         image_path shouldn't be in that directory or else it will be immediately deleted.
         """
         with TemporaryDirectory(prefix=tempdir_name, dir=CACHE_DIRECTORY) as tempdir:
-            raw_img_path = Path(tempdir) / image_path.with_stem("raw_out").name
             source_path = Path(tempdir) / "inp.typ"
             source_path.write_text(TEMPLATE.substitute(text=query), encoding="utf-8")
             try:
                 async with asyncio.timeout(TYPST_TIMEOUT):
-                    await run_sync(
-                        render_typst_worker,
-                        source_path,
-                        raw_img_path,
+                    raw_img = await run_sync(
+                        partial(
+                            render_typst_worker,
+                            source_path,
+                            mem_rlimit=TYPST_MEMORY_LIMIT,
+                        ),
                         cancellable=True,
                     )
             except RuntimeError as e:
@@ -173,15 +195,24 @@ class Typst(commands.Cog):
                 )
             except TimeoutError:
                 raise TypstTimeoutError
+            except BrokenWorkerProcess:
+                raise TypstWorkerCrashedError
+            except PicklingError as e:
+                # if the child process runs out of memory hard enough, it can fail to even send back an exception,
+                # which results in this error
+                if "PanicException" in str(e):
+                    raise TypstWorkerCrashedError
+                raise
 
-            if raw_img_path.stat().st_size > MAX_RAW_SIZE:
+            if len(raw_img) > MAX_RAW_SIZE:
+                log.debug(len(raw_img))
                 raise OutputTooBigError
 
             if CROP_PADDING is None:
-                raw_img_path.rename(image_path)
+                image_path.write_bytes(raw_img)
             else:
                 res = crop_background(
-                    Image.open(raw_img_path).convert("RGB"),
+                    Image.open(BytesIO(raw_img)).convert("RGB"),
                     (255, 255, 255),
                     pad=CROP_PADDING,
                 )
