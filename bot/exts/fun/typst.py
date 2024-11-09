@@ -120,10 +120,18 @@ class Typst(commands.Cog):
     async def _download_typst_executable(self) -> None:
         if not Config.typst_archive_url:
             raise ValueError("Trying to download Typst but the archive URL isn't set")
+        if not Config.typst_archive_sha256:
+            raise ValueError("Trying to download Typst but the archive hash isn't set")
         async with self.bot.http_session.get(
             Config.typst_archive_url, raise_for_status=True
         ) as response:
             arc_data = await response.read()
+        digest = hashlib.sha256(arc_data).hexdigest()
+        if digest != Config.typst_archive_sha256:
+            raise ValueError(
+                f"Retrieved archive doesn't match hash {Config.typst_archive_sha256}; "
+                f"instead got file with size {len(arc_data)} and hash {digest}"
+            )
         log.info("Retrieved Typst archive, unpacking")
         typst_executable = archive_retrieve_file(
             arc_data,
