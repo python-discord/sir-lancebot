@@ -147,26 +147,6 @@ files = [
 ]
 
 [[package]]
-name = "anyio"
-version = "4.6.2.post1"
-description = "High level compatibility layer for multiple asynchronous event loop implementations"
-optional = false
-python-versions = ">=3.9"
-files = [
-    {file = "anyio-4.6.2.post1-py3-none-any.whl", hash = "sha256:6d170c36fba3bdd840c73d3868c1e777e33676a69c3a72cf0a0d5d6d8009b61d"},
-    {file = "anyio-4.6.2.post1.tar.gz", hash = "sha256:4c8bc31ccdb51c7f7bd251f51c609e038d63e34219b44aa86e47576389880b4c"},
-]
-
-[package.dependencies]
-idna = ">=2.8"
-sniffio = ">=1.1"
-
-[package.extras]
-doc = ["Sphinx (>=7.4,<8.0)", "packaging", "sphinx-autodoc-typehints (>=1.2.0)", "sphinx-rtd-theme"]
-test = ["anyio[trio]", "coverage[toml] (>=7)", "exceptiongroup (>=1.2.0)", "hypothesis (>=4.0)", "psutil (>=5.9)", "pytest (>=7.0)", "pytest-mock (>=3.6.1)", "trustme", "truststore (>=0.9.1)", "uvloop (>=0.21.0b1)"]
-trio = ["trio (>=0.26.1)"]
-
-[[package]]
 name = "arrow"
 version = "1.3.0"
 description = "Better dates & times for Python"
@@ -1727,17 +1707,6 @@ files = [
 ]
 
 [[package]]
-name = "sniffio"
-version = "1.3.1"
-description = "Sniff out which async library your code is running under"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "sniffio-1.3.1-py3-none-any.whl", hash = "sha256:2f6da418d1f1e0fddd844478f41680e794e6051915791a034ff65e5f100525a2"},
-    {file = "sniffio-1.3.1.tar.gz", hash = "sha256:f4324edc670a0f49750a81b895f35c3adb843cca46f0530f79fc1babb23789dc"},
-]
-
-[[package]]
 name = "sortedcontainers"
 version = "2.4.0"
 description = "Sorted Containers -- Sorted List, Sorted Dict, Sorted Set"
@@ -1818,26 +1787,6 @@ python-versions = ">=3.8"
 files = [
     {file = "typing_extensions-4.10.0-py3-none-any.whl", hash = "sha256:69b1a937c3a517342112fb4c6df7e72fc39a38e7891a5730ed4985b5214b5475"},
     {file = "typing_extensions-4.10.0.tar.gz", hash = "sha256:b0abd7c89e8fb96f98db18d86106ff1d90ab692004eb746cf6eda2682f91b3cb"},
-]
-
-[[package]]
-name = "typst"
-version = "0.12.0"
-description = "Python binding to typst"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "typst-0.12.0-cp37-abi3-macosx_10_12_x86_64.whl", hash = "sha256:a464184f6d8c327fbb28c51ab9dd1d5ee1b49ffa3b252977df7f8b2346bd3d3f"},
-    {file = "typst-0.12.0-cp37-abi3-macosx_11_0_arm64.whl", hash = "sha256:f9b28aaae36637661421216cec81b7f7c55eafc80343266dd7fa67201f7c4c7e"},
-    {file = "typst-0.12.0-cp37-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:8537f151d339304576173a4ce48d7f8e1806729a32c09393b3800b89653b88f4"},
-    {file = "typst-0.12.0-cp37-abi3-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:714c716300d073eb51f87e5c6ef743e4319d08fb693d5ad53f17d1cdbdaa986c"},
-    {file = "typst-0.12.0-cp37-abi3-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:bb2c2899fd85ab5e2a708811e94a2411bc3143152b328482f0b23d96006e18c1"},
-    {file = "typst-0.12.0-cp37-abi3-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:571b01f8fb4c161288143628528596ce6573e7dce867241f1451e4c250862576"},
-    {file = "typst-0.12.0-cp37-abi3-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:f0442734f24b5abeb66db4690016a65a933617141ed26f43af95281b0b0e27a7"},
-    {file = "typst-0.12.0-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:28e53c2a123c3ea825a95ab7101202ae548a61cb773c80b0db5793570893f26a"},
-    {file = "typst-0.12.0-cp37-abi3-win32.whl", hash = "sha256:69a8ef18fbcb6bb10376d111597e464a1d80b63586a5a5324f6b4a3e1bb6f6a5"},
-    {file = "typst-0.12.0-cp37-abi3-win_amd64.whl", hash = "sha256:f8d12ba034ce3d2579bc4284a99e6bab5dd83440cd643a25546997b6b58041f8"},
-    {file = "typst-0.12.0.tar.gz", hash = "sha256:e3575e0a0a6e323b6e9fb367e838a4caa947112e38ee32911cdaaa9c85176ac5"},
 ]
 
 [[package]]
@@ -1994,4 +1943,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "3.12.*"
-content-hash = "212ca55d9f279d0c28568ed456d56c80cd758273cae56006b1c473b06f38d61d"
+content-hash = "56ecbd30a95a09c65cef191fda4846952082ca086eca97a46cb2547e8ec4a7de"

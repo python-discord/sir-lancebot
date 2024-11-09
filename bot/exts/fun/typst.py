@@ -1,17 +1,14 @@
 import asyncio
 import hashlib
 import string
-from functools import partial
+import sys
 from io import BytesIO
 from pathlib import Path
-from pickle import PicklingError  # noqa: S403
 from tempfile import TemporaryDirectory
 
 import discord
 import platformdirs
 from PIL import Image
-from anyio import BrokenWorkerProcess
-from anyio.to_process import run_sync
 from discord.ext import commands
 from pydis_core.utils.logging import get_logger
 from pydis_core.utils.paste_service import (
@@ -22,11 +19,12 @@ from pydis_core.utils.paste_service import (
 )
 
 from bot.bot import Bot
-from bot.constants import Channels, WHITELISTED_CHANNELS
+from bot.constants import Channels, Typst as Config, WHITELISTED_CHANNELS
+from bot.utils.archives import archive_retrieve_file
 from bot.utils.codeblocks import prepare_input
 from bot.utils.decorators import whitelist_override
 from bot.utils.images import crop_background
-from bot.utils.typst import render_typst_worker
+from bot.utils.typst import compile_typst
 
 log = get_logger(__name__)
 
@@ -40,18 +38,22 @@ CACHE_DIRECTORY.mkdir(exist_ok=True)
 TEMPLATE = string.Template(Path("bot/resources/fun/typst_template.typ").read_text())
 PACKAGES_INSTALL_STRING = Path("bot/resources/fun/typst_packages.typ").read_text()
 
+# the default typst packages directory.
 TYPST_PACKAGES_DIR = platformdirs.user_cache_path("typst") / "packages"
 
 # how many pixels to leave on each side when cropping the image to only the contents. Set to None to disable cropping.
 CROP_PADDING: int | None = 10
-MAX_CONCURRENCY = 2
+# commands.max_concurrency limit for .typst
+MAX_CONCURRENCY: int = 2
 # max time in seconds to allow the typst process to run
 TYPST_TIMEOUT: float = 1.0
 # memory limit (in bytes) to set via RLIMIT_AS for the child process.
-# Typst uses a lot of RAM when compiling, so this seems to need to be >500MB.
-TYPST_MEMORY_LIMIT: int = 1000 * 1024**2  # 1GB, which is pretty generous
-# max size of the typst (raw) output image to allow rather than emitting an error
+TYPST_MEMORY_LIMIT: int = 200 * 1024**2  # 200MB, which is pretty generous
+# max size of the typst output image (before cropping) to allow rather than emitting an error
 MAX_RAW_SIZE = 2 * 1024**2  # 2MB
+# if set, limits the internal parallelism of the typst subprocess (--jobs argument).
+WORKER_JOBS: int | None = None
+
 
 TYPST_ALLOWED_CHANNNELS = WHITELISTED_CHANNELS + (
     Channels.data_science_and_ai,
@@ -89,9 +91,48 @@ class Typst(commands.Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
-        self._setup_packages()
 
-    def _setup_packages(self) -> None:
+    async def _setup_typst(self) -> None:
+        await self._ensure_typst_executable()
+        await self._setup_packages()
+
+    async def _ensure_typst_executable(self) -> None:
+        path = Path(Config.typst_path).resolve()
+        if path.exists():
+            if not path.is_file():
+                raise ValueError("Typst path exists but doesn't point to a file:", path)
+        else:
+            log.info("Typst executable not found at '%s', downloading", path)
+            await self._download_typst_executable()
+        proc = await asyncio.subprocess.create_subprocess_exec(
+            path,
+            "--version",
+            stdin=asyncio.subprocess.DEVNULL,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        stdout, _ = await proc.communicate()
+        log.info(f"Typst executable reports itself as {stdout.decode('utf-8').strip()!r}.")
+
+    async def _download_typst_executable(self) -> None:
+        if not Config.typst_archive_url:
+            raise ValueError("Trying to download Typst but the archive URL isn't set")
+        async with self.bot.http_session.get(
+            Config.typst_archive_url, raise_for_status=True
+        ) as response:
+            arc_data = await response.read()
+        log.info("Retrieved Typst archive, unpacking")
+        typst_executable = archive_retrieve_file(
+            arc_data,
+            filename="typst.exe" if sys.platform == "win32" else "typst",
+        )
+        log.info("Storing the typst executable on disk")
+        exe_path = Path(Config.typst_path)
+        exe_path.parent.mkdir(exist_ok=True)
+        exe_path.write_bytes(typst_executable)
+        exe_path.chmod(0o555)  # read, execute, not write
+
+    async def _setup_packages(self) -> None:
         if TYPST_PACKAGES_DIR.exists():
             return
         log.info(
@@ -100,9 +141,8 @@ class Typst(commands.Cog):
         with TemporaryDirectory(
             prefix="packageinstall", dir=CACHE_DIRECTORY
         ) as tempdir:
-            source_path = Path(tempdir) / "inp.typ"
-            source_path.write_text(PACKAGES_INSTALL_STRING, encoding="utf-8")
-            render_typst_worker(source_path)
+            await compile_typst(PACKAGES_INSTALL_STRING, root_path=Path(tempdir))
+
         if not TYPST_PACKAGES_DIR.exists():
             raise ValueError(
                 f"'{TYPST_PACKAGES_DIR}' still doesn't exist after installing packages - "
@@ -160,6 +200,7 @@ class Typst(commands.Cog):
                     )
                     return
                 except TypstWorkerCrashedError:
+                    log.exception("typst worker crashed")
                     await ctx.send(
                         "Worker process crashed. "
                         f"Perhaps the memory limit of {TYPST_MEMORY_LIMIT/1024**2:.1f}MB was exceeded?"
@@ -171,23 +212,21 @@ class Typst(commands.Cog):
         self, query: str, tempdir_name: str, image_path: Path
     ) -> None:
         """
-        Renders the query as Typst.
+        Renders the query as Typst to PNG.
 
-        Does so by writing it into a file in a temporary directory, storing the output in image_path.
-        image_path shouldn't be in that directory or else it will be immediately deleted.
+        If successful, the processed output is stored in `image_path`.
+        `tempdir_name` under cache will be the temporary root directory to be used.
         """
+        source = TEMPLATE.substitute(text=query)
         with TemporaryDirectory(prefix=tempdir_name, dir=CACHE_DIRECTORY) as tempdir:
-            source_path = Path(tempdir) / "inp.typ"
-            source_path.write_text(TEMPLATE.substitute(text=query), encoding="utf-8")
             try:
                 async with asyncio.timeout(TYPST_TIMEOUT):
-                    raw_img = await run_sync(
-                        partial(
-                            render_typst_worker,
-                            source_path,
-                            mem_rlimit=TYPST_MEMORY_LIMIT,
-                        ),
-                        cancellable=True,
+                    res = await compile_typst(
+                        source,
+                        root_path=Path(tempdir),
+                        format="png",
+                        mem_rlimit=TYPST_MEMORY_LIMIT,
+                        jobs=WORKER_JOBS,
                     )
             except RuntimeError as e:
                 raise InvalidTypstError(
@@ -195,30 +234,25 @@ class Typst(commands.Cog):
                 )
             except TimeoutError:
                 raise TypstTimeoutError
-            except BrokenWorkerProcess:
-                raise TypstWorkerCrashedError
-            except PicklingError as e:
-                # if the child process runs out of memory hard enough, it can fail to even send back an exception,
-                # which results in this error
-                if "PanicException" in str(e):
-                    raise TypstWorkerCrashedError
-                raise
 
-            if len(raw_img) > MAX_RAW_SIZE:
-                log.debug(len(raw_img))
-                raise OutputTooBigError
+        raw_img = res.output
+        if len(raw_img) > MAX_RAW_SIZE:
+            log.debug(
+                "Raw image rejected for having size %.1f MB", len(raw_img) / 1024**2
+            )
+            raise OutputTooBigError
 
-            if CROP_PADDING is None:
-                image_path.write_bytes(raw_img)
-            else:
-                res = crop_background(
-                    Image.open(BytesIO(raw_img)).convert("RGB"),
-                    (255, 255, 255),
-                    pad=CROP_PADDING,
-                )
-                if res is None:
-                    raise EmptyImageError
-                res.save(image_path)
+        if CROP_PADDING is None:
+            image_path.write_bytes(raw_img)
+        else:
+            res = crop_background(
+                Image.open(BytesIO(raw_img)).convert("RGB"),
+                (255, 255, 255),
+                pad=CROP_PADDING,
+            )
+            if res is None:
+                raise EmptyImageError
+            res.save(image_path)
 
     async def _prepare_error_embed(
         self, err: InvalidTypstError | None
@@ -253,4 +287,6 @@ class Typst(commands.Cog):
 
 async def setup(bot: Bot) -> None:
     """Load the Typst Cog."""
-    await bot.add_cog(Typst(bot))
+    cog = Typst(bot)
+    await cog._setup_typst()
+    await bot.add_cog(cog)
