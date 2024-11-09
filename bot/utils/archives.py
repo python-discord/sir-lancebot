@@ -15,7 +15,7 @@ def _tar_retrieve_file(archive_data: typing.BinaryIO, filename: str) -> bytes:
                         "Member has the right name but couldn't extract:", el
                     )
                 return fo.read()
-    raise FileNotFoundError("No member with this name was found in archive:", filename)
+    raise ValueError("No member with this name was found in archive:", filename)
 
 
 def _zip_retrieve_file(archive_data: typing.BinaryIO, filename: str) -> bytes:
@@ -23,7 +23,7 @@ def _zip_retrieve_file(archive_data: typing.BinaryIO, filename: str) -> bytes:
         for el in arc.filelist:
             if PurePath(el.filename).name == filename:
                 return arc.read(el)
-    raise FileNotFoundError("No member with this name was found in archive:", filename)
+    raise ValueError("No member with this name was found in archive:", filename)
 
 
 def archive_retrieve_file(
