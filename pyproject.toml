@@ -74,6 +74,7 @@ ignore = [
     "RUF029",
     "S311",
     "SIM102", "SIM108",
+    "S404", # S404 is bugged and doesn't respect noqa
 ]
 
 [tool.ruff.lint.isort]

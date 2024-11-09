@@ -4,6 +4,7 @@ import resource
 from dataclasses import dataclass
 from functools import partial
 from pathlib import Path
+from subprocess import CalledProcessError
 from typing import Literal
 
 from bot.constants import Typst as Config
@@ -41,7 +42,7 @@ async def compile_typst(
     """
     typst_path = Path(Config.typst_path).resolve()
     if not typst_path.exists():
-        raise FileNotFoundError("Typst executable was not found at path", typst_path)
+        raise ValueError("Typst executable was not found at path", typst_path)
     if not root_path.is_dir():
         raise ValueError("Root directory was not a directory", root_path)
 
@@ -70,9 +71,16 @@ async def compile_typst(
         )
 
         stdout, stderr = await proc.communicate(input=source.encode("utf-8"))
-    # if the task is cancelled or any other problem happens, make sure to kill the worker
+        if proc.returncode is None:
+            # shouldn't be possible
+            raise RuntimeError("Process didn't terminate after communicate")
+        if proc.returncode != 0:
+            raise CalledProcessError(
+                proc.returncode, [typst_path, *args], stdout, stderr
+            )
+    # if the task is cancelled or any other problem happens, make sure to kill the worker if it still exists
     except BaseException:
-        with contextlib.suppress(UnboundLocalError):
+        with contextlib.suppress(UnboundLocalError, ProcessLookupError):
             proc.kill()
         raise
     return TypstCompileResult(output=stdout, stderr=stderr)

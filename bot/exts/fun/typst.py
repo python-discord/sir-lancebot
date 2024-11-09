@@ -4,6 +4,7 @@ import string
 import sys
 from io import BytesIO
 from pathlib import Path
+from subprocess import CalledProcessError
 from tempfile import TemporaryDirectory
 
 import discord
@@ -112,7 +113,9 @@ class Typst(commands.Cog):
             stderr=asyncio.subprocess.PIPE,
         )
         stdout, _ = await proc.communicate()
-        log.info(f"Typst executable reports itself as {stdout.decode('utf-8').strip()!r}.")
+        log.info(
+            f"Typst executable reports itself as {stdout.decode('utf-8').strip()!r}."
+        )
 
     async def _download_typst_executable(self) -> None:
         if not Config.typst_archive_url:
@@ -200,7 +203,6 @@ class Typst(commands.Cog):
                     )
                     return
                 except TypstWorkerCrashedError:
-                    log.exception("typst worker crashed")
                     await ctx.send(
                         "Worker process crashed. "
                         f"Perhaps the memory limit of {TYPST_MEMORY_LIMIT/1024**2:.1f}MB was exceeded?"
@@ -228,12 +230,19 @@ class Typst(commands.Cog):
                         mem_rlimit=TYPST_MEMORY_LIMIT,
                         jobs=WORKER_JOBS,
                     )
-            except RuntimeError as e:
-                raise InvalidTypstError(
-                    e.args[0] if e.args else "<no error message emitted>"
-                )
             except TimeoutError:
                 raise TypstTimeoutError
+            except CalledProcessError as e:
+                err = e.stderr.decode("utf-8")
+                # when the memory limit is reached this usually shows up as signal 6 (SIGABRT), but it can vary
+                if e.returncode < 0:
+                    log.debug(
+                        "Typst subprocess died due to a signal %s",
+                        str(e).split("died with")[-1].strip(),
+                    )
+                    raise TypstWorkerCrashedError
+                # if in doubt we assume it's a normal error and return the logs
+                raise InvalidTypstError(err)
 
         raw_img = res.output
         if len(raw_img) > MAX_RAW_SIZE:
