@@ -58,7 +58,6 @@ extend-exclude = [".cache"]
 output-format = "concise"
 line-length = 120
 unsafe-fixes = true
-preview = true
 
 [tool.ruff.lint]
 select = ["ANN", "B", "C4", "D", "DTZ", "E", "F", "I", "ISC", "INT", "N", "PGH", "PIE", "Q", "RET", "RSE", "RUF", "S", "SIM", "T20", "TID", "UP", "W"]
