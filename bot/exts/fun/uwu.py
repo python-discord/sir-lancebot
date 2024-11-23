@@ -45,17 +45,18 @@ EMOJIS = [
 ]
 
 EMOJI_REPLACE = {
-    ":neutral_face:": ":cat:",
-    ":cry:": ":crying_cat_face:",
-    ":heart_eyes:": ":heart_eyes_cat:",
-    ":joy:": ":joy_cat:",
-    ":kissing:": ":kissing_cat:",
-    ":angry:": ":pouting_cat:",
-    ":scream:": ":scream_cat:",
-    ":laughing:": ":smile_cat:",
-    ":grinning:": ":smiley_cat:",
-    ":smirk:": ":smirk_cat:",
-    ":pleading_face:": ":pleading_face::point_right::point_left:"
+    "😐": ":cat:",
+    "😢": ":crying_cat_face:",
+    "😍": ":heart_eyes_cat:",
+    "😂": ":joy_cat:",
+    "😗": ":kissing_cat:",
+    "😠": ":pouting_cat:",
+    "😱": ":scream_cat:",
+    "😆": ":smile_cat:",
+    "🙂": ":smiley_cat:",
+    "😀": ":smiley_cat:",
+    "😏": ":smirk_cat:",
+    "🥺": ":pleading_face::point_right::point_left:"
 }
 REGEX_WORD_REPLACE = re.compile(r"(?<!w)[lr](?!w)")
 
