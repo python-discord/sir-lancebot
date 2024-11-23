@@ -305,6 +305,23 @@ class _Reddit(EnvConfig, env_prefix="reddit_"):
 
 Reddit = _Reddit()
 
+
+# "typst_" is the prefix for Typst's own envvars, so "typstext_"
+class _Typst(EnvConfig, env_prefix="typstext_"):
+    # the path to the typst binary that will be used.
+    # the Typst cog can download it to this path automatically
+    typst_path: str = "bot/exts/fun/_typst_cache/typst"
+
+    # fetching configuration. note that the defaults assume Linux on x86_64
+
+    # the direct url to fetch a typst release archive from. It will be unpacked and the executable from it used.
+    typst_archive_url: str = "https://github.com/typst/typst/releases/download/v0.12.0/typst-x86_64-unknown-linux-musl.tar.xz"
+    # SHA256 hex digest the archive at typst_archive_url will be checked against. can be obtained by sha256sum
+    typst_archive_sha256: str = "605130a770ebd59a4a579673079cb913a13e75985231657a71d6239a57539ec3"
+
+
+Typst = _Typst()
+
 # Default role combinations
 MODERATION_ROLES = {Roles.moderation_team, Roles.admins, Roles.owners}
 STAFF_ROLES = {Roles.helpers, Roles.moderation_team, Roles.admins, Roles.owners}
