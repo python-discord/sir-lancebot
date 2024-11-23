@@ -171,7 +171,7 @@ class Uwu(Cog):
         input_string = self._stutter(stutter_strength, input_string)
         input_string = self._emoji(emoji_strength, input_string)
         input_string = self._ext_emoji_replace(input_string)
-        input_string = self._emoji_replace(input_string)
+        input_string = self._uwu_emojis(input_string)
         return input_string
 
     @commands.command(name="uwu", aliases=("uwuwize", "uwuify",))
