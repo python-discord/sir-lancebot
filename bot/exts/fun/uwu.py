@@ -195,7 +195,7 @@ class Uwu(Cog):
             # If we weren't able to get the content of a replied message
             raise commands.UserInputError("Your message must have content or you must reply to a message.")
 
-        await clean_content(fix_channel_mentions=True).convert(ctx, text)
+        text = await clean_content(fix_channel_mentions=True).convert(ctx, text)
 
         # Grabs the text from the embed for uwuification
         if embeds:
