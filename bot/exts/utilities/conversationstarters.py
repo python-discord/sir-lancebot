@@ -41,27 +41,61 @@ class ConvoStarters(commands.Cog):
         self.bot = bot
 
     @staticmethod
-    def _build_topic_embed(channel_id: int) -> discord.Embed:
+    def _build_topic_embed(channel_id: int, previous_description: None | str) -> tuple[discord.Embed, bool]:
         """
         Build an embed containing a conversation topic.
 
         If in a Python channel, a python-related topic will be given.
         Otherwise, a random conversation topic will be received by the user.
+
+        Also returns a value that determines whether to remove the reaction afterwards
         """
-        # No matter what, the form will be shown.
+        footer = f"Suggest more topics [here]({SUGGESTION_FORM})!"
+        max_topics = 3
+
+        # Remove footer from previous description
+        previous_topic = None
+        if previous_description:
+            previous_topic = previous_description.split("\n\n")[0]
+
         embed = discord.Embed(
-            description=f"Suggest more topics [here]({SUGGESTION_FORM})!",
+            title="Conversation Starter",
             color=discord.Colour.og_blurple()
         )
 
         try:
-            channel_topics = TOPICS[channel_id]
+            channel_topics = TOPICS[str(channel_id)]
         except KeyError:
             # Channel doesn't have any topics.
-            embed.title = f"**{next(TOPICS['default'])}**"
+            new_topic = next(TOPICS["default"])
         else:
-            embed.title = f"**{next(channel_topics)}**"
-        return embed
+            new_topic = next(channel_topics)
+
+        def add_description(text: str) -> None:
+            embed.description = f"{text}\n\n{footer}"
+
+        if previous_topic is None:
+            # This is the first topic being sent
+            add_description(new_topic)
+            return embed, False
+
+        total_topics = previous_topic.count("\n") + 1
+
+        # Handle forced reactions after clear
+        if total_topics >= max_topics:
+            embed.description = previous_description
+            return embed, True
+
+        # Add 1 before first topic
+        if total_topics == 1:
+            previous_topic = f"1. {previous_topic}"
+
+        add_description(f"{previous_topic}\n{total_topics + 1}. {new_topic}")
+
+        # If this is the last topic, remove the reaction
+        if total_topics == max_topics - 1:
+            return embed, True
+        return embed, False
 
     @staticmethod
     def _predicate(
@@ -99,7 +133,12 @@ class ConvoStarters(commands.Cog):
                 break
 
             try:
-                await message.edit(embed=self._build_topic_embed(message.channel.id))
+                # The returned discord.Message object from discord.Message.edit is different from the current
+                # discord.Message object, so it must be reassigned to update properly
+                embed, remove_reactions = self._build_topic_embed(message.channel.id, message.embeds[0].description)
+                message = await message.edit(embed=embed)
+                if remove_reactions:
+                    await message.clear_reaction("🔄")
             except discord.NotFound:
                 break
 
@@ -107,7 +146,7 @@ class ConvoStarters(commands.Cog):
                 await message.remove_reaction(reaction, user)
 
     @commands.command()
-    @commands.cooldown(1, 60*2, commands.BucketType.channel)
+    @commands.cooldown(1, 60 * 2, commands.BucketType.channel)
     @whitelist_override(channels=ALL_ALLOWED_CHANNELS)
     async def topic(self, ctx: commands.Context) -> None:
         """
@@ -115,7 +154,7 @@ class ConvoStarters(commands.Cog):
 
         Allows the refresh of a topic by pressing an emoji.
         """
-        message = await ctx.send(embed=self._build_topic_embed(ctx.channel.id))
+        message = await ctx.send(embed=self._build_topic_embed(ctx.channel.id, None)[0])
         self.bot.loop.create_task(self._listen_for_refresh(ctx.author, message))
 
 
