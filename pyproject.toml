@@ -25,7 +25,7 @@ pydantic-settings = "2.6.1"
 pyjokes = "0.8.3"
 PyYAML = "6.0.2"
 rapidfuzz = "3.10.1"
-sentry-sdk = "2.19.0"
+sentry-sdk = "2.19.2"
 
 [tool.poetry.dev-dependencies]
 pip-licenses = "5.0.0"
