@@ -201,6 +201,13 @@ class Reddit(Cog):
             await asyncio.sleep(3)
 
         log.debug(f"Invalid response from: {url} - status code {response.status}, mimetype {response.content_type}")
+        if response.status == 429:
+            log.warning(
+                "Hit reddit ratelimit. Used: %s Remaining: %s Reset: %s",
+                response.headers.get("X-Ratelimit-Used", "Missing"),
+                response.headers.get("X-Ratelimit-Remaining", "Missing"),
+                response.headers.get("X-Ratelimit-Approximate ", "Missing"),
+            )
         return []  # Failed to get appropriate response within allowed number of retries.
 
     async def get_top_posts(
