@@ -36,7 +36,8 @@ class Reddit(Cog):
         self.access_token = None
         self.client_auth = BasicAuth(RedditConfig.client_id.get_secret_value(), RedditConfig.secret.get_secret_value())
 
-        self.auto_poster_loop.start()
+        if RedditConfig.send_top_daily_posts:
+            self.auto_poster_loop.start()
 
     async def cog_unload(self) -> None:
         """Stop the loop task and revoke the access token when the cog is unloaded."""
