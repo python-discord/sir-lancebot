@@ -301,6 +301,11 @@ class Reddit(Cog):
         async with ctx.typing():
             pages = await self.get_top_posts(subreddit=subreddit, time="all", paginate=True)
 
+        if isinstance(pages, Embed):
+            # If get_top_posts hits an error, then an error embed is returned, not actual posts.
+            await ctx.send(embed=pages)
+            return
+
         await ctx.send(f"Here are the top {subreddit} posts of all time!")
         embed = Embed(
             color=Colour.og_blurple()
