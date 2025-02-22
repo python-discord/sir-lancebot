@@ -163,7 +163,7 @@ class Colour(commands.Cog):
     @colour.command()
     async def name(self, ctx: commands.Context, *, user_colour_name: str) -> None:
         """Create an embed from a name input."""
-        hex_colour = self.match_colour_name(ctx, user_colour_name)
+        hex_colour = self.match_colour_name(ctx, user_colour_name.title())
         if hex_colour is None:
             name_error_embed = discord.Embed(
                 title="No colour match found.",
