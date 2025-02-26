@@ -127,16 +127,26 @@ class GameSession:
 
         # session settings
         self.timeout_message = (
-            "Time is running out! You must make a choice within 60 seconds. ⏳"
+            "⏳ Hint: time is running out! You must make a choice within 60 seconds."
         )
         self._timeout_task = None
         self.reset_timeout()
 
     def _get_game_data(self, game_code: str) -> AdventureData | None:
         """Returns the game data for the given game code."""
+        # sanitize the game code to prevent directory traversal attacks.
+        game_code = Path(game_code).name
+
+        # Convert index to game code if it's a number
         try:
-            # sanitize the game code to prevent directory traversal attacks.
-            game_code = Path(game_code).name
+            index = int(game_code)
+            game_code = AVAILABLE_GAMES[index - 1]["id"]
+            self.game_code = game_code
+        except (ValueError, IndexError):
+            pass
+            
+        # load the game data from the JSON file
+        try:
             game_data = json.loads(
                 Path(f"{BASE_PATH}/{game_code}.json").read_text("utf8")
             )
@@ -168,15 +178,18 @@ class GameSession:
 
     async def send_available_game_codes(self) -> None:
         """Sends a list of all available game codes."""
-        available_game_codes = "\n".join(
-            f"{game['id']} - {game['name']}" for game in AVAILABLE_GAMES
+        available_game_codes = "\n\n".join(
+            f"{index}. **{game['name']}** (`{game['id']}`)\n*{game['description']}*"
+            for index, game in enumerate(AVAILABLE_GAMES, start=1) 
         )
 
         embed = Embed(
-            title="Available games",
+            title="📋 Available Games",
             description=available_game_codes,
             colour=constants.Colours.soft_red,
         )
+
+        embed.set_footer(text="💡 Hint: use `.adventure [game_code]` or `.adventure [index]` to start a game.")
 
         await self.destination.send(embed=embed)
         
@@ -250,14 +263,15 @@ class GameSession:
     def embed_message(self, room_data: RoomData | EndRoomData) -> Embed:
         """Returns an Embed with the requested room data formatted within."""
         embed = Embed()
+        embed.color = constants.Colours.soft_orange
 
         current_game_name = AVAILABLE_GAMES_DICT[self.game_code]["name"]
 
         if self.is_in_ending_room:
             embed.description = room_data["text"]
             emoji = room_data["emoji"]
-            embed.set_author(name=f"Game over! {emoji}")
-            embed.set_footer(text=f"Thanks for playing - {current_game_name}")
+            embed.set_author(name=f"Game ended! {emoji}")
+            embed.set_footer(text=f"✨ Thanks for playing {current_game_name}!")
         else:
             embed.description = self._format_room_data(room_data)
             embed.set_author(name=current_game_name)
@@ -326,7 +340,11 @@ class Adventure(DiscordCog):
             await GameSession.start(ctx, game_code)
         except GameCodeNotFoundError as error:
             await ctx.send(str(error))
-            return
+        
+    @commands.command(name="adventures")
+    async def list_adventures(self, ctx: Context) -> None:
+        """List all available adventure games."""
+        await GameSession.start(ctx, None)
 
 
 async def setup(bot: Bot) -> None:
