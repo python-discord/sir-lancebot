@@ -1,0 +1,12 @@
+[
+  {
+    "id": "three_little_pigs",
+    "name": "Three Little Pigs",
+    "description": "A wolf is on the prowl! You are one of the three little pigs. Try to survive by building a house."
+  },
+  {
+    "id": "dragon_slayer",
+    "name": "Dragon Slayer",
+    "description": "A dragon is terrorizing the kingdom! You are a brave knight, tasked with rescuing the princess and defeating the dragon."
+  }
+]

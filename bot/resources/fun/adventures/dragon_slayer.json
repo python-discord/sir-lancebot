@@ -1,0 +1,192 @@
+{
+  "start": {
+    "text": "The wind whips at your cloak as you stand at the foot of Mount Cinder, its peak shrouded in smoke. Princess Elara, known for her wisdom and kindness, has been snatched away by the fearsome dragon, Ignis, who makes his lair atop this treacherous mountain. The King has promised a handsome reward and the Princess's hand in marriage to the hero who returns her safely.  Two paths lie before you:",
+    "options": [
+      {
+        "text": "The Direct Assault",
+        "leads_to": "assault_gatekeepers",
+        "emoji": "⚔️"
+      },
+      {
+        "text": "The Stealthy Infiltration",
+        "leads_to": "woods_fork",
+        "emoji": "🌲"
+      }
+    ]
+  },
+  "assault_gatekeepers": {
+    "text": "A narrow, rocky path winds upwards, but it's blocked by two hulking ogres wielding crude clubs. They snarl menacingly, demanding passage.",
+    "options": [
+      {
+        "text": "Bribe them with promises of gold",
+        "leads_to": "assault_bridge",
+        "emoji": "💰"
+      },
+      {
+        "text": "Engage them in combat",
+        "leads_to": "assault_death",
+        "emoji": "💥"
+      }
+    ]
+  },
+  "woods_fork": {
+    "text": "The Whispering Woods loom before you, a dense tangle of ancient trees and shadowed paths. The air is thick with the smell of damp earth and decaying leaves. You come to a fork in the trail.",
+    "options": [
+      {
+        "text": "Follow the well-worn trail",
+        "leads_to": "woods_bridge",
+        "emoji": "👣"
+      },
+      {
+        "text": "Venture off-trail, seeking a shortcut",
+        "leads_to": "woods_hermit",
+        "emoji": "🧭"
+      }
+    ]
+  },
+  "assault_bridge": {
+    "text": "The path leads to a rickety rope bridge spanning a deep chasm.  Closer inspection reveals that several ropes are frayed, and pressure plates glint ominously. It's clearly trapped.",
+    "options": [
+      {
+        "text": "Carefully disarm the trap before crossing",
+        "leads_to": "lair_entrance",
+        "emoji": "🛠️"
+      },
+      {
+        "text": "Take the risk and sprint across quickly",
+        "leads_to": "assault_death",
+        "emoji": "🏃"
+      }
+    ]
+  },
+  "woods_bridge": {
+    "text": "The trail leads to a narrow wooden bridge swaying precariously over a deep ravine.  The wood creaks ominously under your weight, and you notice several planks are rotten. It's clearly trapped.",
+    "options": [
+      {
+        "text": "Carefully disarm the trap before crossing",
+        "leads_to": "lair_entrance",
+        "emoji": "🛠️"
+      },
+      {
+        "text": "Take the risk and sprint across quickly",
+        "leads_to": "woods_death",
+        "emoji": "🏃"
+      }
+    ]
+  },
+  "woods_hermit": {
+    "text": "Deep within the woods, you stumble upon a small, moss-covered hut. A wizened hermit emerges, his eyes twinkling with ancient knowledge. He offers cryptic advice: 'The dragon's weakness lies not in strength, but in sorrow.'",
+    "options": [
+      {
+        "text": "Heed the hermit's words and remember his wisdom",
+        "leads_to": "lair_inner",
+        "emoji": "👂"
+      },
+      {
+        "text": "Dismiss the hermit as a rambling madman",
+        "leads_to": "woods_death",
+        "emoji": "🤷"
+      }
+    ]
+  },
+  "lair_entrance": {
+    "text": "You finally reach the mouth of Ignis's lair, a gaping maw in the mountainside. A shimmering magical barrier seals the entrance, pulsating with arcane energy.",
+    "options": [
+      {
+        "text": "Search the surrounding area for a way to disable the barrier",
+        "leads_to": "lair_weakness",
+        "emoji": "🔍"
+      },
+      {
+        "text": "Attempt to force your way through with brute strength",
+        "leads_to": "lair_inner",
+        "emoji": "💥"
+      }
+    ]
+  },
+  "lair_inner": {
+    "text": "You've bypassed the outer defenses, but the inner chamber is guarded by a swirling fire elemental, crackling with intense heat. It hisses and lunges, eager to incinerate you.",
+    "options": [
+      {
+        "text": "Use water magic, if you possess it, to exploit the elemental's weakness",
+        "leads_to": "lair_weakness",
+        "emoji": "💧"
+      },
+      {
+        "text": "Engage in direct combat, a battle of fire against fire",
+        "leads_to": "lair_final_battle",
+        "emoji": "🔥"
+      }
+    ]
+  },
+  "lair_weakness": {
+    "text": "You find Princess Elara chained to a rock, looking pale but unharmed.  Ignis, a magnificent beast wreathed in smoke and flame, descends before you. He is powerful, but you remember the hermit's words.",
+    "options": [
+      {
+        "text": "Appeal to the dragon's sorrow, referencing a past loss you learned about during your exploration",
+        "leads_to": "rescue",
+        "emoji": "🥺"
+      },
+      {
+        "text": "Prepare for combat, drawing your weapon",
+        "leads_to": "lair_final_battle",
+        "emoji": "⚔️"
+      }
+    ]
+  },
+  "lair_final_battle": {
+    "text": "Ignis is enraged! He unleashes a torrent of fire, bathing the chamber in searing heat.",
+    "options": [
+      {
+        "text": "Dodge and weave through the flames, seeking an opening to attack",
+        "leads_to": "rescue",
+        "emoji": "➡️"
+      },
+      {
+        "text": "Stand your ground and attempt to counter-attack with your shield and weapon",
+        "leads_to": "final_battle_death",
+        "emoji": "🛡️"
+      }
+    ]
+  },
+  "rescue": {
+    "text": "Ignis is defeated (or swayed by your understanding). Princess Elara is safe.",
+    "options": [
+      {
+        "text": "Take the princess and escape the lair immediately, prioritizing her safety",
+        "leads_to": "ending_diplomat",
+        "emoji": "🏃‍♀️"
+      },
+      {
+        "text": "Loot the dragon's hoard before leaving, thinking of the reward",
+        "leads_to": "ending_greedy",
+        "emoji": "💎"
+      }
+    ]
+  },
+  "assault_death": {
+    "text": "The ogres prove too strong, their clubs crushing your bones.  Or perhaps you misjudged the bridge trap, falling into the chasm below. Your journey ends here, a grim tale whispered among adventurers.",
+    "type": "end",
+    "emoji": "💀"
+  },
+  "woods_death": {
+    "text": "You become hopelessly lost in the labyrinthine woods, succumbing to starvation and exposure. Or perhaps you underestimated the dangers lurking in the shadows, falling prey to a wild beast. Your journey ends here, a cautionary tale for those who stray from the path.",
+    "type": "end",
+    "emoji": "💀"
+  },
+  "final_battle_death": {
+    "text": "Ignis's fiery breath engulfs you, leaving nothing but ashes. Your journey ends here, a testament to the dragon's terrible power.",
+    "type": "end",
+    "emoji": "💀"
+  },
+  "ending_diplomat": {
+    "text": "You return to the kingdom a hero, not only for rescuing the princess, but also for your wisdom and compassion in understanding the dragon's sorrow. You are celebrated as a true leader and hero.",
+    "type": "end",
+    "emoji": "🕊️"
+  },
+  "ending_greedy": {
+    "text": "You return to the kingdom with the princess and a vast hoard of treasure. You are hailed as a hero, but whispers follow you about your greed and whether you truly deserved the reward. The princess, though grateful for her rescue, looks at you with a hint of disappointment.  You have saved her, but at the cost of some of your honor. The kingdom will remember your name, but not all the stories told will be flattering.",
+    "type": "end",
+    "emoji": "😈"
+  }
+}
