@@ -1,9 +1,9 @@
-# Adventure command from Python bot. 
+# Adventure command from Python bot.
 import asyncio
-from contextlib import suppress
 import json
+from contextlib import suppress
 from pathlib import Path
-from typing import Literal, NamedTuple, TypedDict, Union
+from typing import Literal, NamedTuple, TypedDict
 
 from discord import Embed, HTTPException, Message, Reaction, User
 from discord.ext import commands
@@ -26,9 +26,7 @@ log = get_logger(__name__)
 
 
 class GameInfo(TypedDict):
-    """
-    A dictionary containing the game information. Used in `available_games.json`.
-    """
+    """A dictionary containing the game information. Used in `available_games.json`."""
 
     id: str
     name: str
@@ -75,19 +73,18 @@ class AdventureData(TypedDict):
     """
     A dictionary containing the game data, serialized from a JSON file in `resources/fun/adventures`.
 
-    The keys are the room names, and the values are dictionaries containing the room data, which can be either a RoomData or an EndRoomData.
+    The keys are the room names, and the values are dictionaries containing the room data,
+    which can be either a RoomData or an EndRoomData.
 
     There must exist only one "start" key in the dictionary. However, there can be multiple endings, i.e., EndRoomData.
     """
 
     start: RoomData
-    __annotations__: dict[str, Union[RoomData, EndRoomData]]
+    __annotations__: dict[str, RoomData | EndRoomData]
 
 
 class GameCodeNotFoundError(ValueError):
-    """
-    Raised when a GameSession code doesn't exist.
-    """
+    """Raised when a GameSession code doesn't exist."""
 
     def __init__(
         self,
@@ -97,9 +94,7 @@ class GameCodeNotFoundError(ValueError):
 
 
 class GameSession:
-    """
-    An interactive session for the Adventure RPG game.
-    """
+    """An interactive session for the Adventure RPG game."""
 
     def __init__(
         self,
@@ -144,7 +139,7 @@ class GameSession:
             self.game_code = game_code
         except (ValueError, IndexError):
             pass
-            
+
         # load the game data from the JSON file
         try:
             game_data = json.loads(
@@ -172,7 +167,7 @@ class GameSession:
     def reset_timeout(self) -> None:
         """Cancels the original timeout task and sets it again from the start."""
         self.cancel_timeout()
-        
+
         # recreate the timeout task
         self._timeout_task = self._bot.loop.create_task(self.timeout())
 
@@ -180,7 +175,7 @@ class GameSession:
         """Sends a list of all available game codes."""
         available_game_codes = "\n\n".join(
             f"{index}. **{game['name']}** (`{game['id']}`)\n*{game['description']}*"
-            for index, game in enumerate(AVAILABLE_GAMES, start=1) 
+            for index, game in enumerate(AVAILABLE_GAMES, start=1)
         )
 
         embed = Embed(
@@ -192,7 +187,7 @@ class GameSession:
         embed.set_footer(text="💡 Hint: use `.adventure [game_code]` or `.adventure [index]` to start a game.")
 
         await self.destination.send(embed=embed)
-        
+
     async def on_reaction_add(self, reaction: Reaction, user: User) -> None:
         """Event handler for when reactions are added on the game message."""
         # ensure it was the relevant session message
@@ -235,13 +230,13 @@ class GameSession:
             self._bot.add_listener(self.on_message_delete)
         else:
             await self.send_available_game_codes()
-            
+
 
     def add_reactions(self) -> None:
         """Adds the relevant reactions to the message based on if options are available in the current room."""
         if self.is_in_ending_room:
             return
-        
+
         current_room = self._current_room
         available_options = self.game_data[current_room]["options"]
         reactions = [option["emoji"] for option in available_options]
@@ -259,7 +254,7 @@ class GameSession:
         )
 
         return f"{text}\n\n{formatted_options}"
-    
+
     def embed_message(self, room_data: RoomData | EndRoomData) -> Embed:
         """Returns an Embed with the requested room data formatted within."""
         embed = Embed()
@@ -296,9 +291,7 @@ class GameSession:
 
     @classmethod
     async def start(cls, ctx: Context, game_code: str | None = None) -> "GameSession":
-        """
-        Create and begin a game session based on the given game code.
-        """
+        """Create and begin a game session based on the given game code."""
         session = cls(ctx, game_code)
         await session.prepare()
 
@@ -340,7 +333,7 @@ class Adventure(DiscordCog):
             await GameSession.start(ctx, game_code)
         except GameCodeNotFoundError as error:
             await ctx.send(str(error))
-        
+
     @commands.command(name="adventures")
     async def list_adventures(self, ctx: Context) -> None:
         """List all available adventure games."""
@@ -348,4 +341,5 @@ class Adventure(DiscordCog):
 
 
 async def setup(bot: Bot) -> None:
+    """Load the Adventure cog."""
     await bot.add_cog(Adventure(bot))
