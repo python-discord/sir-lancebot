@@ -275,7 +275,10 @@ class GameSession:
         text = room_data["text"]
 
         formatted_options = "\n".join(
-            f"{option["emoji"]} {option["text"]}" for option in self.available_options
+            f"{option["emoji"]} {option["text"]}"
+            if option in self.available_options
+            else "🔒 ***This option is locked***"
+            for option in self.all_options
         )
 
         return f"{text}\n\n{formatted_options}"
