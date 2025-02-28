@@ -3,7 +3,7 @@ import asyncio
 import json
 from contextlib import suppress
 from pathlib import Path
-from typing import Literal, NamedTuple, TypedDict
+from typing import Literal, NamedTuple, NotRequired, TypedDict
 
 from discord import Embed, HTTPException, Message, Reaction, User
 from discord.ext import commands
@@ -48,6 +48,9 @@ class OptionData(TypedDict):
     text: str
     leads_to: str
     emoji: str
+    requires_effect: NotRequired[str]
+    effect_restricts: NotRequired[str]
+    effect: NotRequired[str]
 
 
 class RoomData(TypedDict):
@@ -117,8 +120,9 @@ class GameSession:
         self.message = None
 
         # init session states
-        self._current_room = "start"
-        self._path = [self._current_room]
+        self._current_room: str = "start"
+        self._path: list[str] = [self._current_room]
+        self._effects: list[str] = []
 
         # session settings
         self.timeout_message = (
@@ -201,9 +205,7 @@ class GameSession:
         emoji = str(reaction.emoji)
 
         # check if valid action
-        current_room = self._current_room
-        available_options = self.game_data[current_room]["options"]
-        acceptable_emojis = [option["emoji"] for option in available_options]
+        acceptable_emojis = [option["emoji"] for option in self.available_options]
         if emoji not in acceptable_emojis:
             return
 
@@ -214,7 +216,9 @@ class GameSession:
             await self.message.clear_reactions()
 
         # Run relevant action method
-        await self.pick_option(acceptable_emojis.index(emoji))
+        all_emojis = [option["emoji"] for option in self.all_options]
+
+        await self.pick_option(all_emojis.index(emoji))
 
 
     async def on_message_delete(self, message: Message) -> None:
@@ -237,20 +241,17 @@ class GameSession:
         if self.is_in_ending_room:
             return
 
-        current_room = self._current_room
-        available_options = self.game_data[current_room]["options"]
-        reactions = [option["emoji"] for option in available_options]
+        pickable_emojis = [option["emoji"] for option in self.available_options]
 
-        for reaction in reactions:
+        for reaction in pickable_emojis:
             self._bot.loop.create_task(self.message.add_reaction(reaction))
 
     def _format_room_data(self, room_data: RoomData) -> str:
         """Formats the room data into a string for the embed description."""
         text = room_data["text"]
-        options = room_data["options"]
 
         formatted_options = "\n".join(
-            f"{option["emoji"]} {option["text"]}" for option in options
+            f"{option["emoji"]} {option["text"]}" for option in self.available_options
         )
 
         return f"{text}\n\n{formatted_options}"
@@ -310,12 +311,39 @@ class GameSession:
 
         return self.game_data[current_room].get("type") == "end"
 
+    @property
+    def all_options(self) -> list[OptionData]:
+        """Get all options in the current room."""
+        return self.game_data[self._current_room]["options"]
+
+    @property
+    def available_options(self) -> bool:
+        """
+        Get "available" options in the current room.
+
+        This filters out options that require an effect that the user doesn't have or options that restrict an effect.
+        """
+        filtered_options = filter(
+            lambda option: (
+                "requires_effect" not in option or option.get("requires_effect") in self._effects
+            ) and (
+                "effect_restricts" not in option or option.get("effect_restricts") not in self._effects
+            ),
+            self.all_options
+        )
+
+        return filtered_options
+
     async def pick_option(self, index: int) -> None:
         """Event that is called when the user picks an option."""
-        current_room = self._current_room
-        next_room = self.game_data[current_room]["options"][index]["leads_to"]
+        chosen_option = self.all_options[index]
 
-        # update the path and current room
+        next_room = chosen_option["leads_to"]
+        new_effect = chosen_option.get("effect")
+
+        # update all the game states
+        if new_effect:
+            self._effects.append(new_effect)
         self._path.append(next_room)
         self._current_room = next_room
 
