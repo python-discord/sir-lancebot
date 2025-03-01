@@ -41,19 +41,19 @@ class BeMyValentine(commands.Cog):
         """
         raise MovedCommandError(MOVED_COMMAND)
 
-    @commands.cooldown(1, 1800, commands.BucketType.user)
+    # @commands.cooldown(1, 1800, commands.BucketType.user)
     @commands.group(name="bemyvalentine", invoke_without_command=True)
     async def send_valentine(
-        self, ctx: commands.Context, user: discord.Member, *, valentine_type: str | None = None
+        self, ctx: commands.Context, user: discord.Member, privacy_type: str | None = None, valentine_type: str | None = None
     ) -> None:
         """
         Send a valentine to a specified user with the lovefest role.
 
-        syntax: .bemyvalentine [user] [p/poem/c/compliment/or you can type your own valentine message]
+        syntax: .bemyvalentine [user] [public/private] [p/poem/c/compliment/or you can type your own valentine message]
         (optional)
 
-        example: .bemyvalentine Iceman#6508 p (sends a poem to Iceman)
-        example: .bemyvalentine Iceman Hey I love you, wanna hang around ? (sends the custom message to Iceman)
+        example: .bemyvalentine private Iceman#6508 p (sends a private poem to Iceman)
+        example: .bemyvalentine public Iceman Hey I love you, wanna hang around ? (sends the custom message publicly to Iceman)
         NOTE : AVOID TAGGING THE USER MOST OF THE TIMES.JUST TRIM THE '@' when using this command.
         """
         if ctx.guild is None:
@@ -64,10 +64,18 @@ class BeMyValentine(commands.Cog):
             raise commands.UserInputError(
                 f"You cannot send a valentine to {user} as they do not have the lovefest role!"
             )
+        
+        if privacy_type not in ["public", "private"]:
+            # Privacy type wrongfully specified.
+            raise commands.UserInputError(
+                f"Specify if you want the message to be sent privately or publicly!"
+            )
+        
+        # COMMENTED FOR TESTING PURPOSES
 
-        if user == ctx.author:
-            # Well a user can't valentine himself/herself.
-            raise commands.UserInputError("Come on, you can't send a valentine to yourself :expressionless:")
+        # if user == ctx.author:
+        #     # Well a user can't valentine himself/herself.
+        #     raise commands.UserInputError("Come on, you can't send a valentine to yourself :expressionless:")
 
         emoji_1, emoji_2 = self.random_emoji()
         channel = self.bot.get_channel(Channels.sir_lancebot_playground)
@@ -78,7 +86,20 @@ class BeMyValentine(commands.Cog):
             description=f"{valentine} \n **{emoji_2}From {ctx.author}{emoji_1}**",
             color=Colours.pink
         )
-        await channel.send(user.mention, embed=embed)
+    
+        if privacy_type.lower() == "private":
+            # Send the message privately if "private" was speicified
+            try:
+                await user.send(embed=embed)
+                await user.send(f"Your valentine has been **privately** delivered to {user.display_name}!")
+            except discord.Forbidden:
+                await ctx.send(f"I couldn't send a private message to {user.display_name}. They may have DMs disabled.")
+        else:
+            # Send the message publicly if "public" was speicified
+            try:
+                await ctx.send(user.mention, embed=embed)
+            except discord.Forbidden:
+                await ctx.send(f"I couldn't send a private message to {user.display_name}. They may have DMs disabled.")
 
     @commands.cooldown(1, 1800, commands.BucketType.user)
     @send_valentine.command(name="secret")
