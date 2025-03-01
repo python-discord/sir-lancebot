@@ -47,6 +47,7 @@ class EnvConfig(
 
 
 class _Channels(EnvConfig, env_prefix="channels_"):
+    general: int = 123123123123
     algos_and_data_structs: int = 650401909852864553
     bot_commands: int = 267659945086812160
     community_meta: int = 267659945086812160
@@ -312,6 +313,7 @@ STAFF_ROLES = {Roles.helpers, Roles.moderation_team, Roles.admins, Roles.owners}
 
 # Whitelisted channels
 WHITELISTED_CHANNELS = (
+    Channels.general,
     Channels.bot_commands,
     Channels.sir_lancebot_playground,
     Channels.off_topic_0,
