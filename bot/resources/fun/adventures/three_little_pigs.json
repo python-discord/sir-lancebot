@@ -19,79 +19,81 @@
       }
     ]
   },
-  "straw_house_branch": {
-    "text": "You've chosen to build a straw house. What do you do?",
-    "options": [
-      {
-        "text": "Hurry and finish!",
-        "leads_to": "ending_1",
-        "emoji": "💨"
-      },
-      {
-        "text": "Invite a friend (the duck) for help.",
-        "leads_to": "ending_2",
-        "emoji": "🦆"
-      }
-    ]
-  },
-  "stick_house_branch": {
-    "text": "You've chosen to build a stick house. What do you do?",
-    "options": [
-      {
-        "text": "Focus on speed.",
-        "leads_to": "ending_3",
-        "emoji": "🏃"
-      },
-      {
-        "text": "Reinforce the frame with extra sticks.",
-        "leads_to": "ending_4",
-        "emoji": "💪"
-      }
-    ]
-  },
-  "brick_house_branch": {
-    "text": "You've chosen to build a brick house. What do you do?",
-    "options": [
-      {
-        "text": "Finish quickly, no time for extras!",
-        "leads_to": "ending_5",
-        "emoji": "⏱️"
-      },
-      {
-        "text": "Fortify the door with a steel lock and hire a boar as a guard.",
-        "leads_to": "ending_6",
-        "emoji": "🔒"
-      }
-    ]
-  },
-  "ending_1": {
-    "text": "The wolf huffs and puffs and blows your house down! You're captured!",
-    "type": "end",
-    "emoji": "🐺"
-  },
-  "ending_2": {
-    "text": "The wolf still blows the house down, but you and the duck escape through the chimney!",
-    "type": "end",
-    "emoji": "💨"
-  },
-  "ending_3": {
-    "text": "The wolf huffs and puffs and *mostly* blows your house down. You narrowly escape, but your friend, the rabbit, gets caught!",
-    "type": "end",
-    "emoji": "🐇"
-  },
-  "ending_4": {
-    "text": "The wolf huffs and puffs, but the house holds! He tries to climb the roof, but you've prepared a trapdoor and he falls into a boiling pot of soup! You have wolf stew for dinner.",
-    "type": "end",
-    "emoji": "🍲"
-  },
-  "ending_5": {
-    "text": "The wolf can't blow down the house. He tries the chimney, but you've blocked it! He gives up and goes hungry.",
-    "type": "end",
-    "emoji": "😔"
-  },
-  "ending_6": {
-    "text": "The wolf tries everything, but the house is impenetrable. The boar chases him away. You live happily ever after, with excellent security.",
-    "type": "end",
-    "emoji": "🎉"
+  "other_rooms": {
+    "straw_house_branch": {
+      "text": "You've chosen to build a straw house. What do you do?",
+      "options": [
+        {
+          "text": "Hurry and finish!",
+          "leads_to": "ending_1",
+          "emoji": "💨"
+        },
+        {
+          "text": "Invite a friend (the duck) for help.",
+          "leads_to": "ending_2",
+          "emoji": "🦆"
+        }
+      ]
+    },
+    "stick_house_branch": {
+      "text": "You've chosen to build a stick house. What do you do?",
+      "options": [
+        {
+          "text": "Focus on speed.",
+          "leads_to": "ending_3",
+          "emoji": "🏃"
+        },
+        {
+          "text": "Reinforce the frame with extra sticks.",
+          "leads_to": "ending_4",
+          "emoji": "💪"
+        }
+      ]
+    },
+    "brick_house_branch": {
+      "text": "You've chosen to build a brick house. What do you do?",
+      "options": [
+        {
+          "text": "Finish quickly, no time for extras!",
+          "leads_to": "ending_5",
+          "emoji": "⏱️"
+        },
+        {
+          "text": "Fortify the door with a steel lock and hire a boar as a guard.",
+          "leads_to": "ending_6",
+          "emoji": "🔒"
+        }
+      ]
+    },
+    "ending_1": {
+      "text": "The wolf huffs and puffs and blows your house down! You're captured!",
+      "type": "end",
+      "emoji": "🐺"
+    },
+    "ending_2": {
+      "text": "The wolf still blows the house down, but you and the duck escape through the chimney!",
+      "type": "end",
+      "emoji": "💨"
+    },
+    "ending_3": {
+      "text": "The wolf huffs and puffs and *mostly* blows your house down. You narrowly escape, but your friend, the rabbit, gets caught!",
+      "type": "end",
+      "emoji": "🐇"
+    },
+    "ending_4": {
+      "text": "The wolf huffs and puffs, but the house holds! He tries to climb the roof, but you've prepared a trapdoor and he falls into a boiling pot of soup! You have wolf stew for dinner.",
+      "type": "end",
+      "emoji": "🍲"
+    },
+    "ending_5": {
+      "text": "The wolf can't blow down the house. He tries the chimney, but you've blocked it! He gives up and goes hungry.",
+      "type": "end",
+      "emoji": "😔"
+    },
+    "ending_6": {
+      "text": "The wolf tries everything, but the house is impenetrable. The boar chases him away. You live happily ever after, with excellent security.",
+      "type": "end",
+      "emoji": "🎉"
+    }
   }
 }

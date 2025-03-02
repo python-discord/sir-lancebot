@@ -76,7 +76,7 @@ class GameData(TypedDict):
     """
 
     start: RoomData
-    __annotations__: dict[str, RoomData | EndRoomData]
+    other_rooms: dict[str, RoomData | EndRoomData]
 
 
 class GameCodeNotFoundError(ValueError):
@@ -248,7 +248,7 @@ class GameSession:
     async def prepare(self) -> None:
         """Sets up the game events, message and reactions."""
         if self.game_data:
-            await self.update_message("start")
+            await self.update_message()
             self._bot.add_listener(self.on_reaction_add)
             self._bot.add_listener(self.on_message_delete)
         else:
@@ -297,10 +297,9 @@ class GameSession:
 
         return embed
 
-    async def update_message(self, room_id: str) -> None:
+    async def update_message(self) -> None:
         """Sends the initial message, or changes the existing one to the given room ID."""
-        target_room_data = self.game_data[room_id]
-        embed_message = self.embed_message(target_room_data)
+        embed_message = self.embed_message(self.current_room_data)
 
         if not self.message:
             self.message = await self.destination.send(embed=embed_message)
@@ -329,14 +328,12 @@ class GameSession:
     @property
     def is_in_ending_room(self) -> bool:
         """Check if the game has ended."""
-        current_room = self._current_room
-
-        return self.game_data[current_room].get("type") == "end"
+        return self.current_room_data.get("type") == "end"
 
     @property
     def all_options(self) -> list[OptionData]:
         """Get all options in the current room."""
-        return self.game_data[self._current_room]["options"]
+        return self.current_room_data.get("options", [])
 
     @property
     def available_options(self) -> bool:
@@ -356,6 +353,16 @@ class GameSession:
 
         return filtered_options
 
+    @property
+    def current_room_data(self) -> RoomData | EndRoomData:
+        """Get the current room data."""
+        current_room = self._current_room
+
+        if current_room == "start":
+            return self.game_data[current_room]
+
+        return self.game_data["other_rooms"][current_room]
+
     async def pick_option(self, index: int) -> None:
         """Event that is called when the user picks an option."""
         chosen_option = self.all_options[index]
@@ -370,7 +377,7 @@ class GameSession:
         self._current_room = next_room
 
         # update the message with the new room
-        await self.update_message(next_room)
+        await self.update_message()
 
 
 class Adventure(DiscordCog):
