@@ -7,7 +7,7 @@ from typing import Literal, NotRequired, TypedDict
 
 from discord import Embed, HTTPException, Message, Reaction, User
 from discord.ext import commands
-from discord.ext.commands import Cog as DiscordCog, Context
+from discord.ext.commands import Cog as DiscordCog, Context, clean_content
 from pydis_core.utils.logging import get_logger
 
 from bot import constants
@@ -379,7 +379,14 @@ class Adventure(DiscordCog):
     async def new_adventure(self, ctx: Context, game_code_or_index: str | None = None) -> None:
         """Wanted to slay a dragon? Embark on an exciting journey through text-based RPG adventure."""
         try:
-            await GameSession.start(ctx, game_code_or_index)
+            # prevent malicious pings and mentions
+            santiser = clean_content(fix_channel_mentions=True)
+            sanitised_game_code_or_index = await santiser.convert(ctx, game_code_or_index)
+
+            # quality of life: if the user accidentally wraps the game code in backticks, process it anyway
+            sanitised_game_code_or_index = sanitised_game_code_or_index.strip("`")
+
+            await GameSession.start(ctx, sanitised_game_code_or_index)
         except GameCodeNotFoundError as error:
             await ctx.send(str(error))
 
