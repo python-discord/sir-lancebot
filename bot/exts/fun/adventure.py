@@ -9,6 +9,7 @@ from discord import Embed, HTTPException, Message, Reaction, User
 from discord.ext import commands
 from discord.ext.commands import Cog as DiscordCog, Context, clean_content
 from pydis_core.utils.logging import get_logger
+from pydis_core.utils.scheduling import create_task
 
 from bot import constants
 from bot.bot import Bot
@@ -191,7 +192,7 @@ class GameSession:
         self.cancel_timeout()
 
         # recreate the timeout task
-        self._timeout_task = self._bot.loop.create_task(self.timeout())
+        self._timeout_task = create_task(self.timeout())
 
     async def send_available_game_codes(self) -> None:
         """Sends a list of all available game codes."""
