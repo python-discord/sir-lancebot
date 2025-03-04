@@ -49,11 +49,11 @@ class BeMyValentine(commands.Cog):
         """
         Send a valentine to a specified user with the lovefest role.
 
-        syntax: .bemyvalentine [user] [public/private] [p/poem/c/compliment/or you can type your own valentine message]
+        syntax: .bemyvalentine [user] [public/private] [anon/signed] [p/poem/c/compliment/or you can type your own valentine message]
         (optional)
 
-        example: .bemyvalentine private Iceman#6508 p (sends a private poem to Iceman)
-        example: .bemyvalentine public Iceman Hey I love you, wanna hang around ? (sends the custom message publicly to Iceman)
+        example: .bemyvalentine Iceman#6508 private anon p (sends an anonymous private poem through DM to Iceman)
+        example: .bemyvalentine Iceman public signed Hey I love you, wanna hang around ? (sends the custom message publicly and signed to Iceman in the current channel)
         NOTE : AVOID TAGGING THE USER MOST OF THE TIMES.JUST TRIM THE '@' when using this command.
         """
 
