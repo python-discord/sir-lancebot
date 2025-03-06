@@ -386,15 +386,15 @@ class Adventure(DiscordCog):
     @commands.command(name="adventure")
     async def new_adventure(self, ctx: Context, game_code_or_index: str | None = None) -> None:
         """Wanted to slay a dragon? Embark on an exciting journey through text-based RPG adventure."""
-        try:
+        if isinstance(game_code_or_index, str):
             # prevent malicious pings and mentions
-            santiser = clean_content(fix_channel_mentions=True)
-            sanitised_game_code_or_index = await santiser.convert(ctx, game_code_or_index)
+            sanitiser = clean_content(fix_channel_mentions=True)
+            game_code_or_index = await sanitiser.convert(ctx, game_code_or_index)
 
             # quality of life: if the user accidentally wraps the game code in backticks, process it anyway
-            sanitised_game_code_or_index = sanitised_game_code_or_index.strip("`")
-
-            await GameSession.start(ctx, sanitised_game_code_or_index)
+            game_code_or_index = game_code_or_index.strip("`")
+        try:
+            await GameSession.start(ctx, game_code_or_index)
         except GameCodeNotFoundError as error:
             await ctx.send(str(error))
 
