@@ -89,10 +89,9 @@ class BeMyValentine(commands.Cog):
                 f"Specify if you want the message to be sent privately or publicly!"
             )
         
-        # COMMENTED FOR TESTING PURPOSES
 
         if user == ctx.author:
-        # Well a user can't valentine himself/herself.
+            # Well a user can't valentine himself/herself.
             raise commands.UserInputError("Come on, you can't send a valentine to yourself :expressionless:")
 
         emoji_1, emoji_2 = self.random_emoji()
