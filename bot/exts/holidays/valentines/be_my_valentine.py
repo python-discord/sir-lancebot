@@ -92,7 +92,7 @@ class BeMyValentine(commands.Cog):
         # COMMENTED FOR TESTING PURPOSES
 
         if user == ctx.author:
-        #     # Well a user can't valentine himself/herself.
+        # Well a user can't valentine himself/herself.
             raise commands.UserInputError("Come on, you can't send a valentine to yourself :expressionless:")
 
         emoji_1, emoji_2 = self.random_emoji()
