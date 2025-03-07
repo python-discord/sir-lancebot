@@ -7,7 +7,7 @@ from discord.ext import commands
 from bot.constants import Roles
 
 # Import the BeMyValentine cog (the part of the bot that handles sending valentines) to be tested
-from .be_my_valentine import BeMyValentine
+from bot.exts.holidays.valentines.be_my_valentine import BeMyValentine
 
 
 
