@@ -7,8 +7,7 @@ from bot.exts.fun.yodaify import Yodaify
 @patch("bot.exts.fun.yodaify.Yodaify.yodaify", new_callable=AsyncMock)
 async def test_yodaify_command_is_called(mock_yodaify):
     """
-    Requirement 1: Bot-command
-    When a user writes .yoda <text> it runs the function.
+    Requirement 1 Bot-command: When a user writes .yoda <text> it runs the function.
     """
     ctx = AsyncMock()
 
@@ -44,7 +43,6 @@ async def yodaify_conversion_helper(text, converted_text):
 
 @pytest.mark.asyncio
 async def test_yodaify_conversion_1():
-
     await yodaify_conversion_helper("I like trains.", ">>> " + "Trains, I like.")
 
 
@@ -74,7 +72,7 @@ async def test_yodaify_invalid_sentecne():
 @pytest.mark.asyncio
 async def test_yodaify_multiple_sentances():
     """
-    Requirement 9 Multiple sentences:
+    Requirement 9 Multiple sentences: If there are multiple sentences in the input, they should be converted separately.
     """
     await yodaify_conversion_helper("I like trains. I am driving a car. She likes my new van.", ">>> " + "Trains, I like. Driving a car, I am. My new van, she likes.")
 
