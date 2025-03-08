@@ -10,7 +10,7 @@ package-mode = false
 python = "3.12.*"
 
 # See https://bot-core.pythondiscord.com/ for docs.
-pydis_core = { version = "11.5.0", extras = ["all"] }
+pydis_core = { version = "11.6.0", extras = ["all"] }
 
 arrow = "1.3.0"
 beautifulsoup4 = "4.12.3"
