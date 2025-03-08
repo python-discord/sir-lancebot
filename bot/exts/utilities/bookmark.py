@@ -120,7 +120,12 @@ class Bookmark(commands.Cog):
             name="Bookmark",
             callback=self._bookmark_context_menu_callback,
         )
+        self.delete_bookmark_context_menu = discord.app_commands.ContextMenu(
+            name="Delete bookmark",
+            callback=self._delete_bookmark_context_menu_callback,
+        )
         self.bot.tree.add_command(self.book_mark_context_menu, guild=discord.Object(bot.guild_id))
+        self.bot.tree.add_command(self.delete_bookmark_context_menu)
 
     @staticmethod
     def build_success_reply_embed(target_message: discord.Message) -> discord.Embed:
@@ -176,6 +181,18 @@ class Bookmark(commands.Cog):
 
         bookmark_title_form = BookmarkForm(message=message)
         await interaction.response.send_modal(bookmark_title_form)
+
+    async def _delete_bookmark_context_menu_callback(
+        self,
+        interaction: discord.Interaction,
+        message: discord.Message
+    ) -> None:
+        """The callback that will handle deleting a bookmark from a context menu command."""
+        await self._delete_bookmark(message, interaction.channel)
+        await interaction.response.send_message(
+            embed=self._build_success_embed("Bookmark successfully deleted."),
+            ephemeral=True,
+        )
 
     @commands.group(name="bookmark", aliases=("bm", "pin"), invoke_without_command=True)
     @commands.guild_only()
@@ -235,12 +252,23 @@ class Bookmark(commands.Cog):
         The command invocation must be a reply to the message that is to be deleted.
         """
         target_message: discord.Message | None = getattr(ctx.message.reference, "resolved", None)
+        await self._delete_bookmark(target_message, ctx.channel)
+        await ctx.send(embed=self._build_success_embed("Bookmark successfully deleted."), delete_after=10)
+
+    @staticmethod
+    def _build_success_embed(message: str) -> discord.Embed:
+        return discord.Embed(
+            description=message,
+            colour=Colours.soft_green
+        )
+
+    async def _delete_bookmark(self, target_message: discord.Message | None, channel: discord.abc.Messageable) -> None:
+        """Delete a bookmark."""
         if target_message is None:
             raise commands.UserInputError("You must reply to the message from Sir-Lancebot you wish to delete.")
-
-        if not isinstance(ctx.channel, discord.DMChannel):
+        if not isinstance(channel, discord.DMChannel):
             raise commands.UserInputError("You can only run this command your own DMs!")
-        if target_message.channel != ctx.channel:
+        if target_message.channel.id != channel.id:
             raise commands.UserInputError("You can only delete messages in your own DMs!")
         if target_message.author != self.bot.user:
             raise commands.UserInputError("You can only delete messages sent by Sir Lancebot!")
