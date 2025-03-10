@@ -29,7 +29,7 @@ sentry-sdk = "2.19.2"
 
 [tool.poetry.dev-dependencies]
 pip-licenses = "5.0.0"
-pre-commit = "4.0.1"
+pre-commit = "4.1.0"
 python-dotenv = "1.0.1"
 ruff = "0.8.4"
 taskipy = "1.14.1"
