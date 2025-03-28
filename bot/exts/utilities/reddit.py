@@ -36,7 +36,8 @@ class Reddit(Cog):
         self.access_token = None
         self.client_auth = BasicAuth(RedditConfig.client_id.get_secret_value(), RedditConfig.secret.get_secret_value())
 
-        self.auto_poster_loop.start()
+        if RedditConfig.send_top_daily_posts:
+            self.auto_poster_loop.start()
 
     async def cog_unload(self) -> None:
         """Stop the loop task and revoke the access token when the cog is unloaded."""
@@ -201,6 +202,13 @@ class Reddit(Cog):
             await asyncio.sleep(3)
 
         log.debug(f"Invalid response from: {url} - status code {response.status}, mimetype {response.content_type}")
+        if response.status == 429:
+            log.warning(
+                "Hit reddit ratelimit. Used: %s Remaining: %s Reset: %s",
+                response.headers.get("X-Ratelimit-Used", "Missing"),
+                response.headers.get("X-Ratelimit-Remaining", "Missing"),
+                response.headers.get("X-Ratelimit-Approximate ", "Missing"),
+            )
         return []  # Failed to get appropriate response within allowed number of retries.
 
     async def get_top_posts(
@@ -300,6 +308,11 @@ class Reddit(Cog):
         """Send the top posts of all time from a given subreddit."""
         async with ctx.typing():
             pages = await self.get_top_posts(subreddit=subreddit, time="all", paginate=True)
+
+        if isinstance(pages, Embed):
+            # If get_top_posts hits an error, then an error embed is returned, not actual posts.
+            await ctx.send(embed=pages)
+            return
 
         await ctx.send(f"Here are the top {subreddit} posts of all time!")
         embed = Embed(

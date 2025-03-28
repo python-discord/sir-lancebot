@@ -301,6 +301,7 @@ class _Reddit(EnvConfig, env_prefix="reddit_"):
     client_id: SecretStr = ""
     secret: SecretStr = ""
     webhook: int = 635408384794951680
+    send_top_daily_posts: bool = True
 
 
 Reddit = _Reddit()
