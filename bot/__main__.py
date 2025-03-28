@@ -86,4 +86,6 @@ async def main() -> None:
                 await _bot.start(constants.Client.token.get_secret_value())
 
 
-asyncio.run(main())
+# the main-guard is needed for launching subprocesses, e.g. via anyio.to_process
+if __name__ == "__main__":
+    asyncio.run(main())
