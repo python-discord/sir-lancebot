@@ -173,6 +173,8 @@ class GameSession:
 
     async def notify_timeout(self) -> None:
         """Notifies the user that the session has timed out."""
+        if self.message is None:
+            return
         await self.message.edit(content="⏰ You took too long to make a choice! The game has ended. :(")
 
     async def timeout(self) -> None:
@@ -236,6 +238,10 @@ class GameSession:
 
         # Run relevant action method
         all_emojis = [option["emoji"] for option in self.all_options]
+
+        # We technically don't need this, but it's here to mitigate race conditions.
+        if emoji not in all_emojis:
+            return
 
         await self.pick_option(all_emojis.index(emoji))
 
