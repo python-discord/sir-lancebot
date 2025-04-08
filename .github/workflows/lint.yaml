@@ -26,7 +26,7 @@ jobs:
       - name: Install Python Dependencies
         uses: HassanAbouelela/actions/setup-python@setup-python_v1.6.0
         with:
-          python_version: "3.12"
+          python_version: "3.13"
 
       # Check all of our dev dependencies are compatible with the MIT license.
       # If you added a new dependencies that is being rejected,
