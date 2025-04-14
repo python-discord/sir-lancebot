@@ -19,7 +19,7 @@ coloredlogs = "15.0.1"
 emoji = "2.14.0"
 emojis = "0.7.0"
 lxml = "5.3.0"
-pillow = "11.0.0"
+pillow = "11.2.1"
 pydantic = { version = "2.10.1", extras = ["dotenv"]}
 pydantic-settings = "2.8.1"
 pyjokes = "0.8.3"
