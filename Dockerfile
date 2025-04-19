@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 ghcr.io/owl-corp/python-poetry-base:3.12-slim
+FROM --platform=linux/amd64 ghcr.io/owl-corp/python-poetry-base:3.13-slim
 
 # Install dependencies
 WORKDIR /bot

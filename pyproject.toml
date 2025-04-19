@@ -7,7 +7,7 @@ license = "MIT"
 package-mode = false
 
 [tool.poetry.dependencies]
-python = "3.12.*"
+python = "3.13.*"
 
 # See https://bot-core.pythondiscord.com/ for docs.
 pydis_core = { version = "11.6.0", extras = ["all"] }
@@ -53,7 +53,7 @@ atomic = true
 known_first_party = ["bot"]
 
 [tool.ruff]
-target-version = "py312"
+target-version = "py313"
 extend-exclude = [".cache"]
 output-format = "concise"
 line-length = 120
