@@ -41,21 +41,39 @@ class BeMyValentine(commands.Cog):
         """
         raise MovedCommandError(MOVED_COMMAND)
 
-    @commands.cooldown(1, 1800, commands.BucketType.user)
+    # @commands.cooldown(1, 1800, commands.BucketType.user)
     @commands.group(name="bemyvalentine", invoke_without_command=True)
     async def send_valentine(
-        self, ctx: commands.Context, user: discord.Member, *, valentine_type: str | None = None
+        self, ctx: commands.Context, user: discord.Member, privacy_type: str | None = None, anon: str | None = None, valentine_type: str | None = None
     ) -> None:
         """
         Send a valentine to a specified user with the lovefest role.
 
-        syntax: .bemyvalentine [user] [p/poem/c/compliment/or you can type your own valentine message]
+        syntax: .bemyvalentine [user] [public/private] [anon/signed] [p/poem/c/compliment/or you can type your own valentine message]
         (optional)
 
-        example: .bemyvalentine Iceman#6508 p (sends a poem to Iceman)
-        example: .bemyvalentine Iceman Hey I love you, wanna hang around ? (sends the custom message to Iceman)
+        example: .bemyvalentine Iceman#6508 private anon p (sends an anonymous private poem through DM to Iceman)
+        example: .bemyvalentine Iceman public signed Hey I love you, wanna hang around ? (sends the custom message publicly and signed to Iceman in the current channel)
         NOTE : AVOID TAGGING THE USER MOST OF THE TIMES.JUST TRIM THE '@' when using this command.
         """
+
+
+        if anon.lower() == "anon":
+            # Delete the message containing the command right after it was sent to enforce anonymity.
+            try:
+                await ctx.message.delete()
+            except discord.Forbidden:
+                await ctx.send("I can't delete your message! Please check my permissions.")
+            
+
+        if anon not in ["anon", "signed"]:
+            # Anonymity type wrongfully specified.
+            raise commands.UserInputError(
+                f"Specify if you want the message to be anonymous or not!"
+            )
+
+
+
         if ctx.guild is None:
             # This command should only be used in the server
             raise commands.UserInputError("You are supposed to use this command in the server.")
@@ -64,6 +82,13 @@ class BeMyValentine(commands.Cog):
             raise commands.UserInputError(
                 f"You cannot send a valentine to {user} as they do not have the lovefest role!"
             )
+        
+        if privacy_type not in ["public", "private"]:
+            # Privacy type wrongfully specified.
+            raise commands.UserInputError(
+                f"Specify if you want the message to be sent privately or publicly!"
+            )
+        
 
         if user == ctx.author:
             # Well a user can't valentine himself/herself.
@@ -73,12 +98,33 @@ class BeMyValentine(commands.Cog):
         channel = self.bot.get_channel(Channels.sir_lancebot_playground)
         valentine, title = self.valentine_check(valentine_type)
 
-        embed = discord.Embed(
-            title=f"{emoji_1} {title} {user.display_name} {emoji_2}",
-            description=f"{valentine} \n **{emoji_2}From {ctx.author}{emoji_1}**",
-            color=Colours.pink
-        )
-        await channel.send(user.mention, embed=embed)
+        if anon.lower() == "anon":
+            embed = discord.Embed(
+                title=f"{emoji_1} {title} {user.display_name} {emoji_2}",
+                description=f"{valentine} \n **{emoji_2}From an anonymous admirer{emoji_1}**",
+                color=Colours.pink
+            )
+        
+        else:
+            embed = discord.Embed(
+                title=f"{emoji_1} {title} {user.display_name} {emoji_2}",
+                description=f"{valentine} \n **{emoji_2}From {ctx.author}{emoji_1}**",
+                color=Colours.pink
+            )
+
+        if privacy_type.lower() == "private":
+            # Send the message privately if "private" was speicified
+            try:
+                await user.send(embed=embed)
+                await ctx.author.send(f"Your valentine has been **privately** delivered to {user.display_name}!")
+            except discord.Forbidden:
+                await ctx.send(f"I couldn't send a private message to {user.display_name}. They may have DMs disabled.")
+        else:
+            # Send the message publicly if "public" was speicified
+            try:
+                await ctx.send(user.mention, embed=embed)
+            except discord.Forbidden:
+                await ctx.send(f"I couldn't send a private message to {user.display_name}. They may have DMs disabled.")
 
     @commands.cooldown(1, 1800, commands.BucketType.user)
     @send_valentine.command(name="secret")
