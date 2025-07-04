@@ -6,7 +6,6 @@ import unicodedata
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import TypeVar
 
 import discord
 from discord.ext import commands
@@ -25,12 +24,10 @@ FILENAME_STRING = "{effect}_{author}.png"
 
 MAX_SQUARES = 10_000
 
-T = TypeVar("T")
-
 GENDER_OPTIONS = json.loads(Path("bot/resources/holidays/pride/gender_options.json").read_text("utf8"))
 
 
-async def in_executor(func: Callable[..., T], *args) -> T:
+async def in_executor[T](func: Callable[..., T], *args) -> T:
     """
     Runs the given synchronous function `func` in an executor.
 
