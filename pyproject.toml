@@ -31,7 +31,7 @@ sentry-sdk = "2.19.2"
 pip-licenses = "5.0.0"
 pre-commit = "4.0.1"
 python-dotenv = "1.0.1"
-ruff = "0.8.4"
+ruff = "0.12.2"
 taskipy = "1.14.1"
 
 [tool.taskipy.tasks]
