@@ -4,5 +4,5 @@
 # Make exceptions for what's needed
 !bot
 !pyproject.toml
-!poetry.lock
+!uv.lock
 !LICENSE
