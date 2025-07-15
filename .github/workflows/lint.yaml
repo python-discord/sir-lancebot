@@ -6,37 +6,20 @@ jobs:
   lint:
     name: Run linting & tests
     runs-on: ubuntu-latest
-    env:
-      # List of licenses that are compatible with the MIT License and
-      # can be used in our project
-      ALLOWED_LICENSES: Apache Software License;
-        BSD;  BSD License;
-        GNU Library or Lesser General Public License (LGPL);
-        Historical Permission Notice and Disclaimer (HPND);
-        ISC License (ISCL);
-        MIT License;
-        Mozilla Public License 2.0 (MPL 2.0);
-        Public Domain;
-        Python Software Foundation License
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Python Dependencies
-        uses: HassanAbouelela/actions/setup-python@setup-python_v1.6.0
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
         with:
-          python_version: "3.13"
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+          activate-environment: true
 
-      # Check all of our dev dependencies are compatible with the MIT license.
-      # If you added a new dependencies that is being rejected,
-      # please make sure it is compatible with the license for this project,
-      # and add it to the ALLOWED_LICENSE variable
-      - name: Check Dependencies License
-        run: |
-          poetry self add poetry-plugin-export
-          pip-licenses --allow-only="$ALLOWED_LICENSE" \
-            --package $(poetry export -f requirements.txt --without-hashes | sed "s/==.*//g" | tr "\n" " ")
+      - name: Install dependencies
+        run: uv sync --frozen
 
       # Attempt to run the bot. Setting `IN_CI` to true, so bot.run() is never called.
       # This is to catch import and cog setup errors that may appear in PRs, to avoid crash loops if merged.
