@@ -267,7 +267,7 @@ class Bookmark(commands.Cog):
         if target_message is None:
             raise commands.UserInputError("You must reply to the message from Sir-Lancebot you wish to delete.")
         if not isinstance(channel, discord.DMChannel):
-            raise commands.UserInputError("You can only run this command your own DMs!")
+            raise commands.UserInputError("You can only run this command in your own DMs!")
         if target_message.channel.id != channel.id:
             raise commands.UserInputError("You can only delete messages in your own DMs!")
         if target_message.author != self.bot.user:
