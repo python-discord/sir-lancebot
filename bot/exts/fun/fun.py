@@ -4,6 +4,7 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import Literal
 
+import aiohttp
 import pyjokes
 from discord import Embed
 from discord.ext import commands
@@ -153,10 +154,26 @@ class Fun(Cog):
         await self._caesar_cipher(ctx, offset, msg, left_shift=True)
 
     @commands.command()
-    async def joke(self, ctx: commands.Context, category: Literal["neutral", "chuck", "all"] = "all") -> None:
-        """Retrieves a joke of the specified `category` from the pyjokes api."""
-        joke = pyjokes.get_joke(category=category)
-        await ctx.send(joke)
+    async def joke(self, ctx: commands.Context, category: Literal["dad", "neutral", "chuck", "all"] = "all") -> None:
+        """
+        Retrieves a joke of the specified `category` from the pyjokes api.
+
+        - dad uses icanhazdadjoke.
+        - others use pyjokes.
+        """
+        if category == "dad":
+            async with aiohttp.ClientSession() as session, session.get(
+                "https://icanhazdadjoke.com",
+                headers={"Accept":"application/json"
+            }) as res:
+                if res.status == 200:
+                    data = await res.json()
+                    await ctx.send(data["joke"])
+                else:
+                    await ctx.send("There is no dad joke now")
+        else:
+            joke = pyjokes.get_joke(category=category)
+            await ctx.send(joke)
 
 
 async def setup(bot: Bot) -> None:
