@@ -164,8 +164,10 @@ class Fun(Cog):
         if category == "dad":
             async with aiohttp.ClientSession() as session, session.get(
                 "https://icanhazdadjoke.com",
-                headers={"Accept":"application/json"
-            }) as res:
+                headers={
+                    "Accept":"application/json",
+                    "User-Agent": "Sir-lancebot"
+                }) as res:
                 if res.status == 200:
                     data = await res.json()
                     await ctx.send(data["joke"])
