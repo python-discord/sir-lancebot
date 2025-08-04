@@ -25,7 +25,8 @@ class GenerateSudokuPuzzle:
             print(row)
         return
 
-    def valid_location(self, grid, row, col, number):
+    @staticmethod
+    def valid_location(grid, row, col, number):
         """Returns a bool which determines whether the
         number can be placed in the square given by the player."""
         # Checks the row
@@ -46,7 +47,8 @@ class GenerateSudokuPuzzle:
         else:
             return True
 
-    def find_empty_square(self, grid):
+    @staticmethod
+    def find_empty_square(grid):
         """Return the next empty square coordinates in the grid."""
         for i in range(6):
             for j in range(6):
@@ -54,7 +56,8 @@ class GenerateSudokuPuzzle:
                     return [i, j]
         return
 
-    def yield_coords(self):
+    @staticmethod
+    def yield_coords():
         for i in range(0, 36):
             yield i // 6, i % 6
 
@@ -85,7 +88,8 @@ class GenerateSudokuPuzzle:
 
         return False
 
-    def get_non_empty_squares(self, grid):
+    @staticmethod
+    def get_non_empty_squares(grid):
         """Returns a shuffled list of non-empty squares in the puzzle."""
         non_empty_squares = []
         for i in range(len(grid)):
@@ -98,8 +102,8 @@ class GenerateSudokuPuzzle:
     def remove_numbers_from_grid(self):
         """Remove numbers from the grid to create the puzzle."""
         # Get all non-empty squares from the grid
-        # non_empty_squares = self.get_non_empty_squares(self.grid)
-        # non_empty_squares_count = len(non_empty_squares)
+        non_empty_squares = self.get_non_empty_squares(self.grid)
+        non_empty_squares_count = len(non_empty_squares)
         rounds = 3
         while rounds > 0 and len(self.get_non_empty_squares(self.grid)) >= 11:
             # There should be at least 11 clues for easy puzzles,
@@ -107,13 +111,14 @@ class GenerateSudokuPuzzle:
             row, col = non_empty_squares.pop()
             non_empty_squares_count -= 1
             # Might need to put the square value back if there is more than one solution
-            removed_square = self.grid[row][col]
+            # removed_square = self.grid[row][col]
             self.grid[row][col] = 0
             # Make a copy of the grid to solve
-            grid_copy = copy.deepcopy(self.grid)
+            # grid_copy = copy.deepcopy(self.grid)
             # Initialize solutions counter to zero
             self.counter = 0
             # self.solve_puzzle(grid_copy)
         return
+
 
 GenerateSudokuPuzzle()
