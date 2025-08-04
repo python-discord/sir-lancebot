@@ -90,7 +90,7 @@ class SudokuGame:
         info_embed.add_field(name="Hints Used", value=len(self.hints))
         return info_embed
 
-    async def sudoku_embed(self, digit=None, coord=None):
+    async def update_board(self, digit=None, coord=None):
         sudoku_embed = discord.Embed(title="Sudoku", color=Colours.soft_orange)
         if digit and coord:
             self.draw_num(digit, coord)
