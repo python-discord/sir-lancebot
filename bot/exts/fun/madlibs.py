@@ -116,7 +116,7 @@ class Madlibs(commands.Cog):
         self.checks.remove(author_check)
 
         story = []
-        for value, blank in zip(random_template["value"], blanks, strict=True):
+        for value, blank in zip(random_template["value"], blanks, strict=False):
             story.append(f"{value}__{blank}__")
 
         # In each story template, there is always one more "value"
