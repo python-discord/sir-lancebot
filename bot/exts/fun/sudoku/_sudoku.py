@@ -10,6 +10,8 @@ from discord.ext import commands
 from bot.bot import Bot
 from bot.constants import Colours
 
+from ._board_generation import GenerateSudokuPuzzle
+
 BACKGROUND = (242, 243, 244)
 BLACK = 0
 SUDOKU_TEMPLATE_PATH = "bot/resources/fun/sudoku_template.png"
@@ -64,9 +66,9 @@ class SudokuGame:
         return position[0] * 83 + 100, (position[1]) * 83 + 11
 
     @staticmethod
-    def generate_board() -> list[list[int]]:
-        """Generate a valid Sudoku solution board."""
-        pass
+    def generate_board() -> tuple[list[list[int]], list[list[int]]]:
+        """Generate a valid Sudoku puzzle."""
+        return GenerateSudokuPuzzle().generate_puzzle()
 
     def generate_puzzle(self) -> list[list[int]]:
         """Remove numbers from a valid Sudoku solution based on the difficulty. Returns a Sudoku puzzle."""
@@ -108,7 +110,7 @@ class Sudoku(commands.Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.games: dict[int:SudokuGame] = {}
+        self.games: dict[int, SudokuGame] = {}
 
     @commands.group(aliases=["s"], invoke_without_command=True)
     async def sudoku(self, ctx: commands.Context, coord: Optional[CoordinateConverter] = None,
@@ -126,10 +128,10 @@ class Sudoku(commands.Cog):
         if not game:
             await ctx.send("Welcome to Sudoku! Type your guesses like so: `A1 1`")
             await self.start(ctx)
-            await self.bot.wait_for(event="message")
+            await self.bot.wait_for("message")
             if coord and digit.isnumeric() and -1 < int(digit) < 10 or digit in "xX":
                 # print(f"{coord=}, {digit=}")
-                await game.sudoku_embed(digit, coord)
+                await game.update_board(digit, coord)
             else:
                 raise commands.BadArgument
 
@@ -140,7 +142,7 @@ class Sudoku(commands.Cog):
             await ctx.send("You are already playing a game!")
             return
         game = self.games[ctx.author.id] = SudokuGame(ctx, difficulty)
-        await game.sudoku_embed()
+        await game.update_board()
 
     @sudoku.command(aliases=["end", "stop"])
     async def finish(self, ctx: commands.Context) -> None:

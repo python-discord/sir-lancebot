@@ -39,8 +39,11 @@ class GenerateSudokuPuzzle:
                 return False
 
         # Checks the subgrid
-        for i in range(row, (row + 2)): 
-            for j in range(col, (col + 2)): 
+        start_row = row - row % 2
+        start_col = col - col % 3
+
+        for i in range(start_row, (start_row + 2)):
+            for j in range(start_col, (start_col + 2)):
                 if grid[i][j] == number: 
                     return False
 
@@ -62,29 +65,24 @@ class GenerateSudokuPuzzle:
             yield i // 6, i % 6
 
     def generate_solution(self, grid):
-        """Generates a full solution with backtracking."""
         number_list = [1, 2, 3, 4, 5, 6]
-        for row, col in self.yield_coords():
-            # Find next empty cell
-            if not grid[row][col] == 0:
-                continue
 
-            random.shuffle(number_list)
-            for number in number_list:
-                if not self.valid_location(grid, row, col, number):
-                    continue
+        empty = self.find_empty_square(grid)
+        if not empty:
+            return True  # board is complete
 
-                self.path.append((number, row, col))
+        row, col = empty
+        random.shuffle(number_list)
+
+        for number in number_list:
+            if self.valid_location(grid, row, col, number):
                 grid[row][col] = number
-                if not self.find_empty_square(grid):
-                    return True
-                else:
-                    continue
+                self.path.append((number, row, col))
 
-            # If the grid is full
-            if self.generate_solution(grid):
-                return True
-            break
+                if self.generate_solution(grid):
+                    return True
+
+                grid[row][col] = 0
 
         return False
 
@@ -119,6 +117,3 @@ class GenerateSudokuPuzzle:
             self.counter = 0
             # self.solve_puzzle(grid_copy)
         return
-
-
-GenerateSudokuPuzzle()
