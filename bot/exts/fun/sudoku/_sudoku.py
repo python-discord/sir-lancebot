@@ -38,10 +38,11 @@ class CoordinateConverter(commands.Converter):
 
 
 class SudokuGame:
-    """Class that contains information and regarding Sudoku game."""
+    """Class that contains helper methods for a Sudoku game."""
 
-    def __init__(self, ctx: commands.Context, difficulty: str):
+    def __init__(self, ctx: commands.Context, difficulty: str, cog: "Sudoku"):
         self.ctx = ctx
+        self.cog = cog
         self.image = Image.open(SUDOKU_TEMPLATE_PATH)
         self.solution = self.generate_board()
         self.puzzle = self.generate_puzzle()
@@ -101,7 +102,7 @@ class SudokuGame:
         sudoku_embed.set_image(url="attachment://sudoku.png")
         if self.message:
             await self.message.delete()
-        self.message = await self.ctx.send(file=board_image, embed=sudoku_embed, view=SudokuView(self.ctx))
+        self.message = await self.ctx.send(file=board_image, embed=sudoku_embed, view=SudokuView(self.ctx, self.cog))
         os.remove("sudoku.png")
 
 
@@ -111,6 +112,10 @@ class Sudoku(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.games: dict[int, SudokuGame] = {}
+
+    @staticmethod
+    def is_valid(msg):
+        return msg.author == ctx.author and msg.channel == ctx.channel
 
     @commands.group(aliases=["s"], invoke_without_command=True)
     async def sudoku(self, ctx: commands.Context, coord: Optional[CoordinateConverter] = None,
@@ -126,10 +131,10 @@ class Sudoku(commands.Cog):
         """
         game = self.games.get(ctx.author.id)
         if not game:
-            await ctx.send("Welcome to Sudoku! Type your guesses like so: `A1 1`")
+            await ctx.send("Welcome to Sudoku! Type your guesses like so: `.sudoku A1 1`")
             await self.start(ctx)
-            await self.bot.wait_for("message")
-            if coord and digit.isnumeric() and -1 < int(digit) < 10 or digit in "xX":
+            await self.bot.wait_for("message", check=is_valid)
+            if coord and isinstance(digit, str) and (digit.isnumeric() and 0 <= int(digit) <= 9 or digit in "xX"):
                 # print(f"{coord=}, {digit=}")
                 await game.update_board(digit, coord)
             else:
@@ -141,35 +146,24 @@ class Sudoku(commands.Cog):
         if self.games.get(ctx.author.id):
             await ctx.send("You are already playing a game!")
             return
-        game = self.games[ctx.author.id] = SudokuGame(ctx, difficulty)
+        game = self.games[ctx.author.id] = SudokuGame(ctx, difficulty, self)
         await game.update_board()
 
-    @sudoku.command(aliases=["end", "stop"])
-    async def finish(self, ctx: commands.Context) -> None:
-        """End a Sudoku game."""
-        game = self.games.get(ctx.author.id)
-        if game:
-            if ctx.author == game.invoker:
-                del self.games[ctx.author.id]
-                await ctx.send("Ended the current game.")
-            else:
-                await ctx.send("Only the owner of the game can end it!")
-        else:
-            await ctx.send("You are not playing a Sudoku game! Type `.sudoku start` to begin.")
 
-    @sudoku.command(aliases=["who", "information", "score"])
-    async def info(self, ctx: commands.Context) -> None:
-        """Send info about a currently running Sudoku game."""
-        game = self.games.get(ctx.author.id)
-        if game:
-            await ctx.send(embed=game.info_embed())
-        else:
-            await ctx.send("You are not playing a game!")
+class SudokuView(discord.ui.View):
+    """A set of buttons to control a Sudoku game."""
 
-    @sudoku.command()
-    async def hint(self, ctx: commands.Context) -> None:
-        """Fill in one empty square on the Sudoku board."""
-        game = self.games.get(ctx.author.id)
+    def __init__(self, ctx: commands.Context, cog: Sudoku):
+        super().__init__(timeout=120)
+        self.disabled = None
+        self.ctx = ctx
+        # self.games: dict[int, SudokuGame] = {}
+        self.cog = cog
+
+    @discord.ui.button(style=discord.ButtonStyle.green, label="Hint")
+    async def hint_button(self, interaction: discord.Interaction, *_) -> None:
+        """Button that fills in one empty square on the Sudoku board."""
+        game = self.cog.games.get(interaction.user.id)
         if game:
             game.hints.append(time.time())
             while True:
@@ -178,30 +172,29 @@ class Sudoku(commands.Cog):
                     await game.update_board(digit=random.randint(0, 5), coord=(x, y))
                     break
 
-
-class SudokuView(discord.ui.View):
-    """A set of buttons to control a Sudoku game."""
-
-    def __init__(self, ctx: commands.Context):
-        super(SudokuView, self).__init__()
-        self.disabled = None
-        self.ctx = ctx
-        # self.children[0]
-
-    @discord.ui.button(style=discord.ButtonStyle.green, label="Hint")
-    async def hint_button(self, *_) -> None:
-        """Button that fills in one empty square on the Sudoku board."""
-        await self.ctx.invoke(self.ctx.bot.get_command("sudoku hint"))
-
     @discord.ui.button(style=discord.ButtonStyle.primary, label="Game Info")
-    async def info_button(self, *_) -> None:
+    async def info_button(self, interaction: discord.Interaction, *_) -> None:
         """Button that displays information about the current game."""
-        await self.ctx.invoke(self.ctx.bot.get_command("sudoku info"))
+        game = self.cog.games.get(interaction.user.id)
+        if game:
+            await interaction.response.send_message(embed=game.info_embed(), ephemeral=False)
+        else:
+            await interaction.response.send_message("You are not playing a Sudoku game! Type `.sudoku` to "
+                                                    "begin.", ephemeral=True)
 
     @discord.ui.button(style=discord.ButtonStyle.red, label="End Game")
-    async def end_button(self, *_) -> None:
+    async def end_button(self, interaction: discord.Interaction, *_) -> None:
         """Button that ends the current game."""
-        await self.ctx.invoke(self.ctx.bot.get_command("sudoku finish"))
+        game = self.cog.games.get(interaction.user.id)
+        if game:
+            if interaction.user == game.invoker:
+                del self.cog.games[interaction.user.id]
+                await interaction.response.send_message("Ended the current game.", ephemeral=True)
+            else:
+                await interaction.response.send_message("Only the owner of the game can end it!", ephemeral=True)
+        else:
+            await interaction.response.send_message("You are not playing a Sudoku game! Type `.sudoku` to "
+                                                    "begin.", ephemeral=True)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         """Check to ensure that the interacting user is the user who invoked the command."""
