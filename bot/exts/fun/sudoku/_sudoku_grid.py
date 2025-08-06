@@ -2,11 +2,20 @@ from collections import Counter
 import random
 import copy
 
+from PIL import Image, ImageDraw, ImageFont
+
 
 NUM_GIVEN_DIGITS = 12
 
+BACKGROUND = (242, 243, 244)
+BLACK = (0, 0, 0)
+SUDOKU_TEMPLATE_PATH = "bot/resources/fun/sudoku_template.png"
+NUMBER_FONT = ImageFont.truetype("bot/resources/fun/Roboto-Medium.ttf", 99)
+
 
 class SudokuGrid:
+    """A sudoku puzzle."""
+
     def __init__(self):
         # Correct solution to the puzzle
         self.solution: list[list[int]] = self.generate_solution()
@@ -42,8 +51,18 @@ class SudokuGrid:
             if puzzle_digits.total() <= NUM_GIVEN_DIGITS:
                 break
 
+        # Initialize image
+        self.image: Image.Image = Image.open(SUDOKU_TEMPLATE_PATH)
+        for x, row in enumerate(self.puzzle):
+            for y, digit in enumerate(row):
+                if digit == 0:
+                    continue
+                self.draw_digit((x, y), digit)
+
     @staticmethod
-    def generate_solution():
+    def generate_solution() -> list[list[int]]:
+        """Generate a random complete 6x6 sudoku grid."""
+
         # Offset added to each row/column, arranged into subgrids
         row_boxes = [[0, 1, 2], [3, 4, 5]]
         col_boxes = [[0, 3], [1, 4], [2, 5]]
@@ -71,7 +90,20 @@ class SudokuGrid:
 
         return grid
 
+    def draw_digit(self, position: tuple[int, int], digit: int):
+        pos_x = position[0] * 83 + 95
+        pos_y = position[1] * 83 + 6
+        ImageDraw.Draw(self.image).text(
+            (pos_x, pos_y),
+            str(digit),
+            fill=BLACK,
+            font=NUMBER_FONT,
+            align="center",
+        )
+
     def has_unique_solution(self) -> bool:
+        """Brute force search the empty squares to see if an alternate solution exists."""
+
         # Base case (grid complete)
         if not self.empty_squares:
             # Return False (i.e. non-unique) if a different solution is found
@@ -102,3 +134,21 @@ class SudokuGrid:
         self.empty_squares.add((r, c))
 
         return is_unique
+
+    def is_empty(self, position: tuple[int, int]) -> bool:
+        """Checks if a given square is empty."""
+        return position in self.empty_squares
+
+    def guess(self, position: tuple[int, int], digit: int) -> bool:
+        """Guess the digit of a given square, and update the board if correct."""
+        if not self.is_empty(position):
+            return False
+
+        row, col = position
+        if self.solution[row][col] == digit:
+            self.puzzle[row][col] = digit
+            self.empty_squares.remove(position)
+            self.draw_digit(position, digit)
+            return True
+        else:
+            return False
