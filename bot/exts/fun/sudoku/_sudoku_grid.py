@@ -1,11 +1,12 @@
 from collections import Counter
+import io
 import random
 import copy
+from typing import Literal
 
 from PIL import Image, ImageDraw, ImageFont
+import discord
 
-
-NUM_GIVEN_DIGITS = 12
 
 BACKGROUND = (242, 243, 244)
 BLACK = (0, 0, 0)
@@ -13,15 +14,28 @@ SUDOKU_TEMPLATE_PATH = "bot/resources/fun/sudoku_template.png"
 NUMBER_FONT = ImageFont.truetype("bot/resources/fun/Roboto-Medium.ttf", 99)
 
 
+type SudokuDifficulty = Literal["easy", "medium", "hard"]
+
+
+GIVEN_DIGITS: dict[SudokuDifficulty, int] = {
+    "easy": 13,
+    "medium": 11,
+    "hard": 9,
+}
+
+
 class SudokuGrid:
     """A sudoku puzzle."""
 
-    def __init__(self):
+    def __init__(self, difficulty: SudokuDifficulty):
+        self.difficulty: SudokuDifficulty = difficulty
+
         # Correct solution to the puzzle
         self.solution: list[list[int]] = self.generate_solution()
 
         # Digits shown to the user
         self.puzzle: list[list[int]] = copy.deepcopy(self.solution)
+
         # Track of empty squares used to speed up processing
         self.empty_squares: set[tuple[int, int]] = set()
         puzzle_digits: Counter[int] = Counter({i: 6 for i in range(1, 7)})
@@ -48,7 +62,7 @@ class SudokuGrid:
                 puzzle_digits += {digit: 1}
 
             # Stop when there are 12 given digits
-            if puzzle_digits.total() <= NUM_GIVEN_DIGITS:
+            if puzzle_digits.total() <= GIVEN_DIGITS[difficulty]:
                 break
 
         # Initialize image
@@ -146,9 +160,22 @@ class SudokuGrid:
 
         row, col = position
         if self.solution[row][col] == digit:
+            # Correct, perform necessary updates
             self.puzzle[row][col] = digit
             self.empty_squares.remove(position)
             self.draw_digit(position, digit)
             return True
         else:
+            # Incorrect
             return False
+
+    def is_solved(self) -> bool:
+        """Returns whether the sudoku puzzle is complete."""
+        return self.puzzle == self.solution
+
+    def image_file(self) -> discord.File:
+        """Returns the current board image as a discord.File object."""
+        buf = io.BytesIO()
+        self.image.save(buf, "jpg")
+        buf.seek(0)
+        return discord.File(buf, "sudoku.jpg")
