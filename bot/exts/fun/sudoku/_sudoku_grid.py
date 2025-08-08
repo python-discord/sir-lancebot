@@ -1,34 +1,29 @@
-from collections import Counter
-import io
-import random
 import copy
+import random
+from collections import Counter
 from typing import Literal
 
 from PIL import Image, ImageDraw, ImageFont
-import discord
 
+type SudokuDifficulty = Literal["easy", "normal", "hard"]
 
-BACKGROUND = (242, 243, 244)
+GIVEN_DIGITS: dict[SudokuDifficulty, int] = {
+    "easy": 13,
+    "normal": 11,
+    "hard": 9,
+}
+
 BLACK = (0, 0, 0)
 SUDOKU_TEMPLATE_PATH = "bot/resources/fun/sudoku_template.png"
 NUMBER_FONT = ImageFont.truetype("bot/resources/fun/Roboto-Medium.ttf", 99)
 
 
-type SudokuDifficulty = Literal["easy", "medium", "hard"]
-
-
-GIVEN_DIGITS: dict[SudokuDifficulty, int] = {
-    "easy": 13,
-    "medium": 11,
-    "hard": 9,
-}
-
-
 class SudokuGrid:
-    """A sudoku puzzle."""
+    """Generates and solves Sudoku puzzles."""
 
-    def __init__(self, difficulty: SudokuDifficulty):
+    def __init__(self, difficulty: SudokuDifficulty = "normal"):
         self.difficulty: SudokuDifficulty = difficulty
+        self.given_digits = GIVEN_DIGITS[difficulty]
 
         # Correct solution to the puzzle
         self.solution: list[list[int]] = self.generate_solution()
@@ -61,8 +56,8 @@ class SudokuGrid:
                 self.empty_squares.remove((r, c))
                 puzzle_digits += {digit: 1}
 
-            # Stop when there are 12 given digits
-            if puzzle_digits.total() <= GIVEN_DIGITS[difficulty]:
+            # Stop when all the given digits have been set based on the difficulty
+            if puzzle_digits.total() <= self.given_digits:
                 break
 
         # Initialize image
@@ -76,7 +71,6 @@ class SudokuGrid:
     @staticmethod
     def generate_solution() -> list[list[int]]:
         """Generate a random complete 6x6 sudoku grid."""
-
         # Offset added to each row/column, arranged into subgrids
         row_boxes = [[0, 1, 2], [3, 4, 5]]
         col_boxes = [[0, 3], [1, 4], [2, 5]]
@@ -85,6 +79,7 @@ class SudokuGrid:
         for box in row_boxes:
             random.shuffle(box)
         random.shuffle(row_boxes)
+
         # Column permutation
         for box in col_boxes:
             random.shuffle(box)
@@ -104,20 +99,20 @@ class SudokuGrid:
 
         return grid
 
-    def draw_digit(self, position: tuple[int, int], digit: int):
-        pos_x = position[0] * 83 + 95
-        pos_y = position[1] * 83 + 6
+    def draw_digit(self, position: tuple[int, int], digit: int, fill: tuple[int, int, int] = BLACK) -> None:
+        """Draws a digit in the given position on the Sudoku board."""
+        pos_x = int(position[1]) * 83 + 95
+        pos_y = int(position[0]) * 83 + 6
         ImageDraw.Draw(self.image).text(
             (pos_x, pos_y),
             str(digit),
-            fill=BLACK,
+            fill=fill,
             font=NUMBER_FONT,
             align="center",
         )
 
     def has_unique_solution(self) -> bool:
         """Brute force search the empty squares to see if an alternate solution exists."""
-
         # Base case (grid complete)
         if not self.empty_squares:
             # Return False (i.e. non-unique) if a different solution is found
@@ -128,8 +123,10 @@ class SudokuGrid:
 
         # Check row
         possible_digits -= set(self.puzzle[r])
+
         # Check column
         possible_digits -= set(self.puzzle[i][c] for i in range(6))
+
         # Check subgrid
         sub_r = r - r % 2
         sub_c = c - c % 3
@@ -153,6 +150,10 @@ class SudokuGrid:
         """Checks if a given square is empty."""
         return position in self.empty_squares
 
+    def is_solved(self) -> bool:
+        """Returns whether the sudoku puzzle is complete."""
+        return self.puzzle == self.solution
+
     def guess(self, position: tuple[int, int], digit: int) -> bool:
         """Guess the digit of a given square, and update the board if correct."""
         if not self.is_empty(position):
@@ -160,22 +161,8 @@ class SudokuGrid:
 
         row, col = position
         if self.solution[row][col] == digit:
-            # Correct, perform necessary updates
             self.puzzle[row][col] = digit
             self.empty_squares.remove(position)
             self.draw_digit(position, digit)
             return True
-        else:
-            # Incorrect
-            return False
-
-    def is_solved(self) -> bool:
-        """Returns whether the sudoku puzzle is complete."""
-        return self.puzzle == self.solution
-
-    def image_file(self) -> discord.File:
-        """Returns the current board image as a discord.File object."""
-        buf = io.BytesIO()
-        self.image.save(buf, "jpg")
-        buf.seek(0)
-        return discord.File(buf, "sudoku.jpg")
+        return False
