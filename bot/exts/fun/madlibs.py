@@ -101,10 +101,15 @@ class Madlibs(commands.Cog):
         for i, part_of_speech in enumerate(random_template["blanks"]):
             inputs_left = len(random_template["blanks"]) - i
 
-            self.view = MadlibsView(ctx, self, part_of_speech, i)
+            if self.view and getattr(self.view, "cooldown_task", None) and not self.view.cooldown_task.done():
+                self.view.cooldown_task.cancel()
+
+            self.view = MadlibsView(ctx, self, 60, part_of_speech, i)
 
             madlibs_embed = self.madlibs_embed(part_of_speech, inputs_left)
             await original_message.edit(embed=madlibs_embed, view=self.view)
+
+            self.view.cooldown_task = asyncio.create_task(self.view.enable_random_button_after(original_message))
 
             self.wait_task = asyncio.create_task(
                 self.bot.wait_for("message", timeout=TIMEOUT, check=author_check)
@@ -115,21 +120,24 @@ class Madlibs(commands.Cog):
             except asyncio.CancelledError:
                 if self.end_game:
                     if self.view:
-                        # clean up and exit early
                         self.view.stop()
-
-                        for child in view.children:
+                        for child in self.view.children:
                             if isinstance(child, discord.ui.Button):
                                 child.disabled = True
+
+                        # cancel cooldown cleanly
+                        task = getattr(self.view, "cooldown_task", None)
+                        if task and not task.done():
+                            task.cancel()
 
                         await original_message.edit(view=self.view)
                         self.checks.remove(author_check)
 
-                        return
+                    return
                 # else: "Choose for me" set self.submitted_words[i]; just continue
             except asyncio.TimeoutError:
+                # If we ended the game around the same time, don't show timeout
                 if self.end_game:
-                    # If we ended the game around the same time, don't show timeout
                     self.checks.remove(author_check)
                     return
 
@@ -142,7 +150,7 @@ class Madlibs(commands.Cog):
                 await ctx.send(ctx.author.mention, embed=timeout_embed)
 
                 self.view.stop()
-                for child in view.children:
+                for child in self.view.children:
                     if isinstance(child, discord.ui.Button):
                         child.disabled = True
 
@@ -181,14 +189,19 @@ class Madlibs(commands.Cog):
 
         await ctx.send(embed=story_embed)
 
+        # After sending the story, disable the view and cancel all wait tasks
+        if self.view:
+            task = getattr(self.view, "cooldown_task", None)
+            if task and not task.done():
+                task.cancel()
+            self.view.stop()
+            for child in self.view.children:
+                if isinstance(child, discord.ui.Button):
+                    child.disabled = True
+            await original_message.edit(view=self.view)
+
         if self.wait_task and not self.wait_task.done():
             self.wait_task.cancel()
-
-        for child in self.view.children:
-            if isinstance(child, discord.ui.Button):
-                child.disabled = True
-
-        await original_message.edit(view=self.view)
 
     @madlibs.error
     async def handle_madlibs_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
@@ -200,7 +213,8 @@ class Madlibs(commands.Cog):
 
 class MadlibsView(discord.ui.View):
 
-    def __init__(self, ctx: commands.Context, cog: "Madlibs", part_of_speech: str, index: int):
+    def __init__(self, ctx: commands.Context, cog: "Madlibs", cooldown: float = 0,
+                 part_of_speech: str = "", index: int = 0):
         super().__init__(timeout=120)
         self.disabled = None
         self.ctx = ctx
@@ -208,6 +222,25 @@ class MadlibsView(discord.ui.View):
         self.word_bank = self._load_word_bank()
         self.part_of_speech = part_of_speech
         self.index = index
+        self._cooldown = cooldown
+
+        # Reference to the async task that will re-enable the button
+        self.cooldown_task: asyncio.Task | None = None
+
+        if cooldown > 0:
+            self.random_word_button.disabled = True
+
+    async def enable_random_button_after(self, message: discord.Message):
+        if self._cooldown <= 0:
+            return
+        await asyncio.sleep(self._cooldown)
+
+        # Game ended or this view is no longer the active one
+        if self.is_finished() or self is not self.cog.view:
+            return
+
+        self.random_word_button.disabled = False
+        await message.edit(view=self)
 
     @staticmethod
     def _load_word_bank() -> dict[str, list[str]]:
@@ -227,7 +260,14 @@ class MadlibsView(discord.ui.View):
             if wait_task and not wait_task.done():
                 wait_task.cancel()
 
+            if self.cooldown_task and not self.cooldown_task.done():
+                self.cooldown_task.cancel()
+
             await interaction.response.send_message(f"Randomly chosen word: {random_word}", ephemeral=True)
+
+            # Re-disable the button and restart the cooldown (so it can't be clicked again immediately)
+            self.random_word_button.disabled = True
+            await interaction.followup.edit_message(view=self)
         else:
             await interaction.response.send_message("Only the owner of the game can end it!", ephemeral=True)
 
