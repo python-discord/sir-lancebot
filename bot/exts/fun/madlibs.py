@@ -1,14 +1,15 @@
-import json
 import asyncio
-import discord
-
+import json
 from pathlib import Path
 from random import choice
 from typing import TypedDict
+
+import discord
 from discord.ext import commands
 
 from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES
+
 
 TIMEOUT = 120
 
@@ -86,10 +87,7 @@ class Madlibs(commands.Cog):
 
             # Ignore commands while a game is running
             prefix = ctx.prefix or ""
-            if prefix and message.content.startswith(prefix):
-                return False
-
-            return True
+            return not (prefix and message.content.startswith(prefix))
 
         self.checks.add(author_check)
 
@@ -135,7 +133,7 @@ class Madlibs(commands.Cog):
 
                     return
                 # else: "Choose for me" set self.submitted_words[i]; just continue
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 # If we ended the game around the same time, don't show timeout
                 if self.end_game:
                     self.checks.remove(author_check)
@@ -212,6 +210,7 @@ class Madlibs(commands.Cog):
 
 
 class MadlibsView(discord.ui.View):
+    """A set of buttons to control a Madlibs game."""
 
     def __init__(self, ctx: commands.Context, cog: "Madlibs", cooldown: float = 0,
                  part_of_speech: str = "", index: int = 0):
@@ -230,7 +229,8 @@ class MadlibsView(discord.ui.View):
         if cooldown > 0:
             self.random_word_button.disabled = True
 
-    async def enable_random_button_after(self, message: discord.Message):
+    async def enable_random_button_after(self, message: discord.Message) -> None:
+        """Function that controls the cooldown of the "Choose for me" button to prevent spam."""
         if self._cooldown <= 0:
             return
         await asyncio.sleep(self._cooldown)
