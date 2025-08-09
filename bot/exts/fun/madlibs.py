@@ -5,11 +5,9 @@ from random import choice
 from typing import TypedDict
 
 import discord
-from discord.ext import commands
-
 from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES
-
+from discord.ext import commands
 
 TIMEOUT = 120
 
