@@ -1,11 +1,11 @@
 import asyncio
-import io
 import random
 from random import choice
+import re
 
 import discord
-from PIL import Image
 from discord.ext import commands
+from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES
@@ -13,18 +13,85 @@ from bot.constants import Colours, NEGATIVE_REPLIES
 from ._sudoku_grid import SudokuDifficulty, SudokuGrid
 
 
+log = get_logger(__name__)
+
+
 class SudokuGame:
     """Class that contains helper constants for a Sudoku game."""
 
     def __init__(self, ctx: commands.Context, difficulty: SudokuDifficulty, cog: "Sudoku"):
-        self.ctx = ctx
-        self.cog = cog
         self.grid = SudokuGrid(difficulty)
-        self.hints: int = 0
-        self.image = self.grid.image
-        self.board = [row[:] for row in self.grid.puzzle]
+
+        self.cog: Sudoku = cog
         self.invoker: discord.Member = ctx.author
+        self.channel = ctx.channel
         self.message: discord.Message | None = None
+        self.view: SudokuView | None = None
+
+        self.hints: int = 0
+        self.correct: int = 0
+        self.incorrect: int = 0
+        self.wait_task: asyncio.Task | None = None
+
+    async def send_or_update_message(self):
+        # Create embed
+        embed_description = (
+            f"Hints used: {self.hints}/5\n"
+            f"Correct / incorrect guesses: {self.correct} / {self.incorrect}"
+        )
+        embed = discord.Embed(title="Sudoku", color=Colours.soft_orange, description=embed_description)
+        embed.set_image(url="attachment://sudoku.png")
+        file = self.grid.image_as_discord_file()
+
+        if self.message is None:
+            self.view = SudokuView(self)
+            self.message = await self.channel.send(embed=embed, file=file, view=self.view)
+        else:
+            await self.message.edit(embed=embed, attachments=[file], view=self.view)
+
+    async def guess(self, coord: tuple[int, int], digit: int, message: discord.Message):
+        result = self.grid.guess(coord, digit)
+        if not result:
+            self.incorrect += 1
+            await message.add_reaction("❌")
+            return
+
+        self.correct += 1
+        await message.add_reaction("✅")
+
+        await self.check_solved()
+        await self.send_or_update_message()
+
+    def get_hint(self) -> tuple[int, int]:
+        self.hints += 1
+
+        # Update internal board
+        x, y = random.choice(list(self.grid.empty_squares))
+        self.grid.guess((x, y), self.grid.solution[x][y], (0, 0, 255))
+
+        if self.hints >= 5:
+            self.view.hint_button.disabled = True
+
+        return x, y
+
+    async def check_solved(self):
+        if self.grid.is_solved():
+            self.view.stop()
+            self.view = None
+
+            await self.channel.send("Congratulations! You solved the puzzle!")
+            self.end_game()
+
+    def end_game(self):
+        # Cancel the wait task if it's running
+        if self.wait_task is not None and not self.wait_task.done():
+            self.wait_task.cancel()
+        # Fill in empty squares (if game was aborted)
+        for x, row in enumerate(self.grid.solution):
+            for y, digit in enumerate(row):
+                self.grid.guess((x, y), digit, (0, 255, 0))
+        # Remove game from registry
+        self.cog.games.pop(self.invoker.id)
 
 
 class Sudoku(commands.Cog):
@@ -34,25 +101,8 @@ class Sudoku(commands.Cog):
         self.bot = bot
         self.games: dict[int, SudokuGame] = {}
 
-    @staticmethod
-    def is_valid_guess_format(content: str) -> bool:
-        parts = content.strip().upper().split()
-        if len(parts) != 2:
-            return False
-        coord, digit = parts
-        if len(coord) != 2 or coord[0] not in "ABCDEF" or not coord[1].isdigit():
-            return False
-        return (digit.isdigit() and 1 <= int(digit) <= 6) or digit in "Xx"
-
-    @staticmethod
-    def pil_to_discord_file(image: Image.Image, filename: str = "sudoku.png") -> discord.File:
-        buffer = io.BytesIO()
-        image.save(buffer, format="PNG")
-        buffer.seek(0)
-        return discord.File(buffer, filename=filename)
-
     @commands.command()
-    async def sudoku(self, ctx: commands.Context, difficulty: SudokuDifficulty = "normal") -> None:
+    async def sudoku(self, ctx: commands.Context, difficulty: str | None = None) -> None:
         """
         Play Sudoku with the bot!
 
@@ -62,33 +112,29 @@ class Sudoku(commands.Cog):
         column, or any of the smaller 3x3 grids. In this version of the game, it would be 2x3 smaller grids
         instead of 3x3 and numbers 1-6 will be used on the grid.
         """
-        diff = difficulty.lower()
-
-        valid_difficulties: tuple[SudokuDifficulty, ...] = ("easy", "normal", "hard")
-        if diff not in valid_difficulties:
-            await ctx.send("Invalid difficulty! Choose from: easy, normal, hard.")
+        if difficulty is None:
+            await ctx.send("Welcome to sudoku! Start the game by running `.sudoku easy/normal/hard`")
             return
 
-        game = self.games.get(ctx.author.id)
-        if game:
+        if ctx.author.id in self.games:
             await ctx.send("You are already playing a game!")
             return
 
+        difficulty = difficulty.lower()
+        valid_difficulties: list[SudokuDifficulty] = ["easy", "normal", "hard"]
+        if difficulty not in valid_difficulties:
+            await ctx.send("Invalid difficulty! Choose from: easy, normal, hard.")
+            return
+
+        await ctx.send("Welcome to Sudoku! Type your guesses like so: `A1 1`\n"
+                       "Note: Hints are marked in blue, guesses are marked in red.")
+
         game = SudokuGame(ctx, difficulty, self)
+        await game.send_or_update_message()
         self.games[ctx.author.id] = game
 
         def is_valid(msg: ctx.message) -> bool:
             return msg.author == ctx.author and msg.channel == ctx.channel
-
-        view = SudokuView(ctx, self)
-        game = self.games.get(ctx.author.id)
-        await ctx.send("Welcome to Sudoku! Type your guesses like so: `A1 1`\n"
-                       "Note: Hints are marked in blue, guesses are marked in red.\n"
-                       "Hints allowed: Easy: 6; Normal: 4; Hard: 2")
-        sudoku_embed = discord.Embed(title="Sudoku", color=Colours.soft_orange)
-        file = self.pil_to_discord_file(game.image)
-        sudoku_embed.set_image(url="attachment://sudoku.png")
-        game.message = await ctx.send(embed=sudoku_embed, file=file, view=view)
 
         game.wait_task = asyncio.create_task(
             self.bot.wait_for("message", timeout=120, check=is_valid)
@@ -99,140 +145,65 @@ class Sudoku(commands.Cog):
             timeout_embed = discord.Embed(
                 title=choice(NEGATIVE_REPLIES),
                 description="Uh oh! You took too long to respond!",
-                color=Colours.soft_red
+                color=Colours.soft_red,
             )
-
             await ctx.send(ctx.author.mention, embed=timeout_embed)
-
-            view.stop()
-            for child in view.children:
-                if isinstance(child, discord.ui.Button):
-                    child.disabled = True
-
-            await game.message.edit(view=view)
+            game.end_game()
+            game.send_or_update_message()
             return
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message) -> None:
         if message.author.bot:
             return
-
-        game = self.games.get(message.author.id)
-        if not game or not game.message:
+        if (game := self.games.get(message.author.id)) is None:
+            return
+        if (match := re.match(r"^([a-z])([1-6]) ([1-6])$", message.content.lower())) is None:
             return
 
-        content = message.content.strip().upper()
-        if not self.is_valid_guess_format(content):
-            return  # ignore invalid formats
-
-        coord_str, digit_str = message.content.strip().split()
-        col_letter, row_number = coord_str[0], coord_str[1:]
-        row = int(row_number) - 1  # e.g. "2" → 1 (0-indexed)
-        col = ord(col_letter.upper()) - ord("A")  # "D" → 3
-
-        coord = (row, col)
+        col_str, row_str, digit_str = match.groups()
+        col = ord(col_str) - ord("a")
+        row = int(row_str) - 1
         digit = int(digit_str)
 
-        if game.grid.guess(coord, digit):
-            game.grid.draw_digit(coord, digit, (255, 0, 0))
-
-            # Convert image to discord.File
-            file = self.pil_to_discord_file(game.grid.image)
-
-            # Create updated embed
-            embed = discord.Embed(title="Sudoku", color=Colours.soft_orange)
-            embed.set_image(url="attachment://sudoku.png")
-
-            # Edit the original message
-            await game.message.edit(embed=embed, attachments=[file], view=SudokuView(game.ctx, self))
-
-            if game.grid.is_solved():
-                await game.ctx.send("Congratulations! You solved the puzzle!")
-        else:
-            await message.add_reaction("❌")
+        await game.guess((row, col), digit, message)
 
 
 class SudokuView(discord.ui.View):
     """A set of buttons to control a Sudoku game."""
 
-    def __init__(self, ctx: commands.Context, cog: Sudoku):
+    def __init__(self, game: SudokuGame):
         super().__init__(timeout=120)
-        self.disabled = None
-        self.ctx = ctx
-        self.cog = cog
+        self.game = game
 
     @discord.ui.button(style=discord.ButtonStyle.green, label="Hint")
     async def hint_button(self, interaction: discord.Interaction, *_) -> None:
         """Button that fills in one empty square on the Sudoku board."""
-        game = self.cog.games.get(interaction.user.id)
-        if not game:
-            await interaction.response.send_message("You're not playing a game!", ephemeral=True)
-            return
-        game.hints += 1
-        # Find an empty cell and fill it with the correct value
-        empty_cells = [(i, j) for i in range(6) for j in range(6) if game.grid.puzzle[i][j] == 0]
-        if not empty_cells:
-            await interaction.response.send_message("No empty cells left to hint.", ephemeral=True)
+        if self.game.hints >= 5:
+            await interaction.response.send_message("You ran out of hints!", ephemeral=True)
             return
 
-        # Update internal board
-        x, y = random.choice(empty_cells)
-        game.grid.puzzle[x][y] = game.grid.solution[x][y]
-        game.grid.empty_squares.discard((x, y))
+        row, col = self.game.get_hint()
 
-        # Draw the digit
-        game.grid.draw_digit((x, y), game.grid.solution[x][y], (0, 0, 255))
-        await interaction.response.send_message(f"Hint placed at {chr(65 + y)}{x+1}.", ephemeral=True)
+        rows = "123456"
+        cols = "ABCDEF"
+        await interaction.response.send_message(f"Hint placed on {rows[row]}{cols[col]}", ephemeral=True)
 
-        file = self.cog.pil_to_discord_file(game.grid.image)
-
-        embed = discord.Embed(title="Sudoku", color=Colours.soft_orange)
-        embed.set_image(url="attachment://sudoku.png")
-
-        if ((game.hints >= 6 and game.grid.difficulty == "easy") or
-                (game.hints >= 4 and game.grid.difficulty == "normal") or
-                (game.hints >= 2 and game.grid.difficulty == "hard")):
-            # await interaction.response.send_message("You ran out of hints!", ephemeral=True)
-            for child in self.children:
-                if isinstance(child, discord.ui.Button) and child.label == "Hint":
-                    child.disabled = True
-
-        await interaction.followup.edit_message(
-            message_id=interaction.message.id,
-            attachments=[file],
-            embed=embed,
-            view=self
-        )
+        await self.game.check_solved()
+        await self.game.send_or_update_message()
 
     @discord.ui.button(style=discord.ButtonStyle.red, label="End Game")
     async def end_button(self, interaction: discord.Interaction, *_) -> None:
         """Button that ends the current game."""
-        game = self.cog.games.get(interaction.user.id)
-        if game:
-            if interaction.user == game.invoker:
-                del self.cog.games[interaction.user.id]
-
-                # Cancel the wait task if it's running
-                wait_task = game.wait_task if hasattr(game, "wait_task") else None
-                if wait_task and not wait_task.done():
-                    wait_task.cancel()
-
-                # Disable all buttons in the view
-                for child in self.children:
-                    if isinstance(child, discord.ui.Button):
-                        child.disabled = True
-
-                await interaction.response.send_message("Ended the current game.", ephemeral=True)
-                await interaction.followup.edit_message(message_id=interaction.message.id, view=self)
-            else:
-                await interaction.response.send_message("Only the owner of the game can end it!", ephemeral=True)
+        if interaction.user == self.game.invoker:
+            self.game.end_game()
+            await interaction.response.send_message("Ended the current game.", ephemeral=True)
         else:
-            await interaction.response.send_message("You are not playing a Sudoku game! Type `.sudoku` to "
-                                                    "begin.", ephemeral=True)
+            await interaction.response.send_message("Only the owner of the game can end it!", ephemeral=True)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         """Check to ensure that the interacting user is the user who invoked the command."""
-        if interaction.user != self.ctx.author:
+        if interaction.user != self.game.invoker:
             await interaction.response.send_message(
                 "Sorry, but this button can only be used by the original author.", ephemeral=True)
             return False

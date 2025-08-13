@@ -1,9 +1,11 @@
 import copy
+import io
 import random
 from collections import Counter
 from typing import Literal
 
 from PIL import Image, ImageDraw, ImageFont
+import discord
 
 type SudokuDifficulty = Literal["easy", "normal", "hard"]
 
@@ -72,8 +74,8 @@ class SudokuGrid:
     def generate_solution() -> list[list[int]]:
         """Generate a random complete 6x6 sudoku grid."""
         # Offset added to each row/column, arranged into subgrids
-        row_boxes = [[0, 1, 2], [3, 4, 5]]
-        col_boxes = [[0, 3], [1, 4], [2, 5]]
+        row_boxes = [[0, 3], [1, 4], [2, 5]]
+        col_boxes = [[0, 1, 2], [3, 4, 5]]
 
         # Row permutation
         for box in row_boxes:
@@ -85,8 +87,8 @@ class SudokuGrid:
             random.shuffle(box)
         random.shuffle(col_boxes)
 
-        rows = row_boxes[0] + row_boxes[1]
-        cols = col_boxes[0] + col_boxes[1] + col_boxes[2]
+        rows = row_boxes[0] + row_boxes[1] + row_boxes[2]
+        cols = col_boxes[0] + col_boxes[1]
 
         number_mapping = list(range(1, 7))
         random.shuffle(number_mapping)
@@ -154,7 +156,7 @@ class SudokuGrid:
         """Returns whether the sudoku puzzle is complete."""
         return self.puzzle == self.solution
 
-    def guess(self, position: tuple[int, int], digit: int) -> bool:
+    def guess(self, position: tuple[int, int], digit: int, color: tuple[int, int, int] = (255, 0, 0)) -> bool:
         """Guess the digit of a given square, and update the board if correct."""
         if not self.is_empty(position):
             return False
@@ -163,6 +165,12 @@ class SudokuGrid:
         if self.solution[row][col] == digit:
             self.puzzle[row][col] = digit
             self.empty_squares.remove(position)
-            self.draw_digit(position, digit)
+            self.draw_digit(position, digit, color)
             return True
         return False
+
+    def image_as_discord_file(self, filename: str = "sudoku.png") -> discord.File:
+        buffer = io.BytesIO()
+        self.image.save(buffer, format="PNG")
+        buffer.seek(0)
+        return discord.File(buffer, filename=filename)
