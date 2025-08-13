@@ -4,8 +4,8 @@ import random
 from collections import Counter
 from typing import Literal
 
-from PIL import Image, ImageDraw, ImageFont
 import discord
+from PIL import Image, ImageDraw, ImageFont
 
 type SudokuDifficulty = Literal["easy", "normal", "hard"]
 
@@ -16,6 +16,7 @@ GIVEN_DIGITS: dict[SudokuDifficulty, int] = {
 }
 
 BLACK = (0, 0, 0)
+GREEN = (9, 150, 21)
 SUDOKU_TEMPLATE_PATH = "bot/resources/fun/sudoku_template.png"
 NUMBER_FONT = ImageFont.truetype("bot/resources/fun/Roboto-Medium.ttf", 99)
 
@@ -23,7 +24,7 @@ NUMBER_FONT = ImageFont.truetype("bot/resources/fun/Roboto-Medium.ttf", 99)
 class SudokuGrid:
     """Generates and solves Sudoku puzzles."""
 
-    def __init__(self, difficulty: SudokuDifficulty = "normal"):
+    def __init__(self, difficulty: SudokuDifficulty):
         self.difficulty: SudokuDifficulty = difficulty
         self.given_digits = GIVEN_DIGITS[difficulty]
 
@@ -156,7 +157,7 @@ class SudokuGrid:
         """Returns whether the sudoku puzzle is complete."""
         return self.puzzle == self.solution
 
-    def guess(self, position: tuple[int, int], digit: int, color: tuple[int, int, int] = (255, 0, 0)) -> bool:
+    def guess(self, position: tuple[int, int], digit: int, color: tuple[int, int, int] = GREEN) -> bool:
         """Guess the digit of a given square, and update the board if correct."""
         if not self.is_empty(position):
             return False
