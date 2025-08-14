@@ -1,6 +1,7 @@
 import logging
 
 from bot.bot import Bot
+
 from ._sudoku import Sudoku
 
 log = logging.getLogger(__name__)
