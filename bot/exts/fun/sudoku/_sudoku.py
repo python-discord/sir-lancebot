@@ -16,7 +16,7 @@ RED = (255, 0, 0)
 
 
 class SudokuGame:
-    """Class that contains helper constants for a Sudoku game."""
+    """Class that contains helper methods for a Sudoku game."""
 
     def __init__(self, ctx: commands.Context, difficulty: SudokuDifficulty, cog: "Sudoku"):
         self.grid = SudokuGrid(difficulty)
