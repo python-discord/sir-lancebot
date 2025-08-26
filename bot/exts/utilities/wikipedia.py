@@ -35,6 +35,10 @@ WIKI_SEARCH_RESULT = (
     "{description}\n"
 )
 
+WIKI_HEADERS = {
+    "User-Agent": "SirLancebot/0.0 (https://github.com/python-discord; ops@pydis.wtf) aiohttp/0.0"
+}
+
 
 class WikipediaSearch(commands.Cog):
     """Get info from wikipedia."""
@@ -45,7 +49,7 @@ class WikipediaSearch(commands.Cog):
     async def wiki_request(self, channel: TextChannel, search: str) -> list[str]:
         """Search wikipedia search string and return formatted first 10 pages found."""
         params = WIKI_PARAMS | {"srlimit": 10, "srsearch": search}
-        async with self.bot.http_session.get(url=SEARCH_API, params=params) as resp:
+        async with self.bot.http_session.get(url=SEARCH_API, params=params, headers=WIKI_HEADERS) as resp:
             if resp.status != 200:
                 log.info(f"Unexpected response `{resp.status}` while searching wikipedia for `{search}`")
                 raise APIError("Wikipedia API", resp.status)
