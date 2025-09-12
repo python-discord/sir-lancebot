@@ -15,4 +15,8 @@ There is a module named `turtledemo` that animates and creates things with the `
 When you do `hash(float('inf'))` or `hash(math.inf)`, you'll get the first few digits of pi but as an int: `314159`.
 Did you know the GOAT of python, [Ned Batchelder](<https://nedbatchelder.com>), commonly hangs around and helps users in python discord!!
 Apparently, pythons are known to have eaten goats.
-Python is 
+The Python logo itself spells 'py'!
+Small integers (from -5 to 256) are cached and reused, so they will always compare identically (`a is b` will be `True` if two variables are the same number and that number is in this range).
+Dictionaries are guaranteed to preserve insertion order since Python 3.7.
+The canonical implementation of Python is written in C, known as CPython (available from [python.org](<https://python.org/>)!
+The assignment expression operator (`:=`), introduced in Python 3.8, is known as the "walrus operator" due to its shape!
