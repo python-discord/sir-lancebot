@@ -13,7 +13,6 @@ There are many implementations of Python; like Jython, which runs on the Java Vi
 There is an unofficial port of python for the PS2.
 There is a module named `turtledemo` that animates and creates things with the `turtle` module. An example animation is `turtledemo.sorting_animate`, which can be tested using `from turtledemo.sorting_animate import main; main()`.
 When you do `hash(float('inf'))` or `hash(math.inf)`, you'll get the first few digits of pi but as an int: `314159`.
-Did you know the GOAT of python, [Ned Batchelder](<https://nedbatchelder.com>), commonly hangs around and helps users in python discord!!
 Apparently, pythons are known to have eaten goats.
 The python logo is based on a Mayan representation of a snake!
 Small integers (from -5 to 256) are cached and reused, so they will always compare identically (`a is b` will be `True` if two variables are the same number and that number is in this range).
