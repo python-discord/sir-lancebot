@@ -21,4 +21,3 @@ The canonical implementation of Python is written in C, known as CPython (availa
 The assignment expression operator (`:=`), introduced in Python 3.8, is known as the "walrus operator" due to its shape!
 In Python, `bool` is actually a subclass of `int` (and you can perform math with `True` and `False` just as though they were `1` and `0`)!
 Unlike many other languages, Python has no primitive types: every value really *is* an object!
-
