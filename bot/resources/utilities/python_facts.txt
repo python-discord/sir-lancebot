@@ -1,23 +1,17 @@
 Python was named after Monty Python, a British Comedy Troupe, which Guido van Rossum likes.
 If you type `import this` in the Python REPL, you'll get a poem about the philosophies about Python. (check it out by doing !zen in <#267659945086812160>)
 If you type `import antigravity` in the Python REPL, you'll be directed to an [xkcd comic](https://xkcd.com/353/) about how easy Python is.
-Python was first released in 1991, even a few years before Java!
-Python was invented by Guido Van Rossum, affectionately known as the 'Benevolent Dictator For Life' of Python (BDFL) until he stepped down in 2018.
+Python's first public release was in 1991, making it a few years older than Java!
+Python was invented by Guido van Rossum, affectionately known as the 'Benevolent Dictator For Life' (BDFL) of Python until he stepped down in 2018.
 If you type `from __future__ import braces` in the REPL, you’ll get an interesting `SyntaxError` about whether it will be implemented.
 Not only did Guido van Rossum name Python after Monty Python, the Python docs are riddled with Monty Python skit references.
 Python is a multi-paradigm programming language providing support for procedural, object-oriented, and even functional paradigms.
-A blank Python file has some built-in hidden variables by default. These are: `__doc__, __name__, __cached__, __spec__, __loader__, __package__, __annotations__, __file__`, and `__builtins__`
-Python Libraries and Packages are a set of useful modules and functions that minimize the use of code in our day-to-day life.
-There are more than 137k libraries and 198k packages in Python.
 There are many implementations of Python; like Jython, which runs on the Java Virtual Machine; IronPython, which runs on  .NET; and pypy, which uses a just-in-time compiler.
-There is an unofficial port of python for the PS2.
 There is a module named `turtledemo` that animates and creates things with the `turtle` module. An example animation is `turtledemo.sorting_animate`, which can be tested using `from turtledemo.sorting_animate import main; main()`.
 When you do `hash(float('inf'))` or `hash(math.inf)`, you'll get the first few digits of pi but as an int: `314159`.
-Apparently, pythons are known to have eaten goats.
-The python logo is based on a Mayan representation of a snake!
-Small integers (from -5 to 256) are cached and reused, so they will always compare identically (`a is b` will be `True` if two variables are the same number and that number is in this range).
+The Python logo is based on Mayan representations of snakes!
+At the time of writing, small integers in Python (from -5 to 256) are cached and reused, so they will always compare identically (`a is b` will be `True` if `a` and `b` are the same number and in this range).
 Dictionaries are guaranteed to preserve insertion order since Python 3.7.
 The canonical implementation of Python is written in C, known as CPython (available from [python.org](<https://python.org/>)!
 The assignment expression operator (`:=`), introduced in Python 3.8, is known as the "walrus operator" due to its shape!
 In Python, `bool` is actually a subclass of `int` (and you can perform math with `True` and `False` just as though they were `1` and `0`)!
-Unlike many other languages, Python has no primitive types: every value really *is* an object!
