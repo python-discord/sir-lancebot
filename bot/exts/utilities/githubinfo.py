@@ -2,6 +2,7 @@ import random
 import re
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from typing import Any
 from urllib.parse import quote
 
 import discord
@@ -22,7 +23,6 @@ REQUEST_HEADERS = {
 
 REPOSITORY_ENDPOINT = "https://api.github.com/orgs/{org}/repos?per_page=100&type=public"
 ISSUE_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/issues/{number}"
-PR_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/pulls/{number}"
 
 if Tokens.github:
     REQUEST_HEADERS["Authorization"] = f"token {Tokens.github.get_secret_value()}"
@@ -83,19 +83,13 @@ class GithubInfo(commands.Cog):
         """Remove any codeblock in a message."""
         return CODE_BLOCK_RE.sub("", message)
 
-    async def fetch_issue(
-        self,
-        number: int,
-        repository: str,
-        user: str
-    ) -> IssueState | FetchError:
+    async def fetch_issue(self, number: int, repository: str, user: str) -> IssueState | FetchError:
         """
         Retrieve an issue from a GitHub repository.
 
         Returns IssueState on success, FetchError on failure.
         """
         url = ISSUE_ENDPOINT.format(user=user, repository=repository, number=number)
-        pulls_url = PR_ENDPOINT.format(user=user, repository=repository, number=number)
 
         json_data, r = await self.fetch_data(url)
 
@@ -109,35 +103,44 @@ class GithubInfo(commands.Cog):
         if r.status != 200:
             return FetchError(r.status, "Error while fetching issue.")
 
-        # The initial API request is made to the issues API endpoint, which will return information
-        # if the issue or PR is present. However, the scope of information returned for PRs differs
-        # from issues: if the 'issues' key is present in the response then we can pull the data we
-        # need from the initial API call.
-        if "issues" in json_data["html_url"]:
-            emoji = Emojis.issue_open
-            if json_data.get("state") == "closed":
-                emoji = Emojis.issue_completed
-            if json_data.get("state_reason") == "not_planned":
-                emoji = Emojis.issue_not_planned
-
-        # If the 'issues' key is not contained in the API response and there is no error code, then
-        # we know that a PR has been requested and a call to the pulls API endpoint is necessary
-        # to get the desired information for the PR.
-        else:
-            pull_data, _ = await self.fetch_data(pulls_url)
-            if pull_data["draft"]:
-                emoji = Emojis.pull_request_draft
-            elif pull_data["state"] == "open":
-                emoji = Emojis.pull_request_open
-            # When 'merged_at' is not None, this means that the state of the PR is merged
-            elif pull_data["merged_at"] is not None:
+        # its important to note that the issues endpoint only provides issues and pull requests
+        # discussions are not supported, but may still be provided
+        # this method doesn't check for discussions, it just silently ignores them
+        log.trace("Fetched issue/PR data: %r", json_data)
+        if pull_data := json_data.get("pull_request"):
+            if pull_data.get("merged_at"):
                 emoji = Emojis.pull_request_merged
-            else:
+            elif json_data.get("draft") is True:
+                emoji = Emojis.pull_request_draft
+            elif json_data.get("state") == "open":
+                emoji = Emojis.pull_request_open
+            elif json_data.get("state") == "closed":
                 emoji = Emojis.pull_request_closed
+            else:
+                # unknown state, GitHub added a new state and the emoji should be added
+                log.error("Unknown PR state: %s for %s", json_data.get("state"), url)
+                # fall the emoji back to a state
+                emoji = Emojis.pull_request_open
+        else:
+            if json_data.get("state") == "closed":
+                if json_data.get("state_reason") == "not_planned":
+                    emoji = Emojis.issue_not_planned
+                else:
+                    emoji = Emojis.issue_completed
+            elif json_data.get("draft") is True:
+                # not currently used by GitHub, but future planning
+                emoji = Emojis.issue_draft
+            elif json_data.get("state") == "open":
+                emoji = Emojis.issue_open
+            else:
+                # unknown state, GitHub added a new state and the emoji should be added
+                log.error("Unknown issue state: %s for %s", json_data.get("state"), url)
+                # fall the emoji back to a state
+                emoji = Emojis.issue_open
 
-        issue_url = json_data.get("html_url")
+        html_url = json_data["html_url"]
 
-        return IssueState(repository, number, issue_url, json_data.get("title", ""), emoji)
+        return IssueState(repository, number, html_url, json_data.get("title", ""), emoji)
 
     @staticmethod
     def format_embed(
@@ -217,7 +220,7 @@ class GithubInfo(commands.Cog):
         resp = self.format_embed(links)
         await message.channel.send(embed=resp)
 
-    async def fetch_data(self, url: str) -> tuple[dict[str], ClientResponse]:
+    async def fetch_data(self, url: str) -> tuple[dict[str, Any], ClientResponse]:
         """Retrieve data as a dictionary and the response in a tuple."""
         log.trace(f"Querying GH issues API: {url}")
         async with self.bot.http_session.get(url, headers=REQUEST_HEADERS) as r:
