@@ -176,42 +176,40 @@ class GithubInfo(commands.Cog):
 
         Listener to retrieve issue(s) from a GitHub repository using automatic linking if matching <org>/<repo>#<issue>.
         """
-        # Ignore bots
-        if message.author.bot:
+        # Ignore bots and DMs
+        if message.author.bot or not message.guild:
             return
 
         issues = [
             FoundIssue(*match.group("org", "repo", "number"))
             for match in AUTOMATIC_REGEX.finditer(self.remove_codeblocks(message.content))
         ]
-        links = []
 
-        if issues:
-            # Block this from working in DMs
-            if not message.guild:
-                return
+        if not issues:
+            return
 
-            log.trace(f"Found {issues = }")
-            # Remove duplicates
-            issues = list(dict.fromkeys(issues))
+        links = list[IssueState]()
+        log.trace(f"Found {issues = }")
+        # Remove duplicates
+        issues = list(dict.fromkeys(issues))
 
-            if len(issues) > MAXIMUM_ISSUES:
-                embed = discord.Embed(
-                    title=random.choice(ERROR_REPLIES),
-                    color=Colours.soft_red,
-                    description=f"Too many issues/PRs! (maximum of {MAXIMUM_ISSUES})"
-                )
-                await message.channel.send(embed=embed, delete_after=5)
-                return
+        if len(issues) > MAXIMUM_ISSUES:
+            embed = discord.Embed(
+                title=random.choice(ERROR_REPLIES),
+                color=Colours.soft_red,
+                description=f"Too many issues/PRs! (maximum of {MAXIMUM_ISSUES})"
+            )
+            await message.channel.send(embed=embed, delete_after=5)
+            return
 
-            for repo_issue in issues:
-                result = await self.fetch_issue(
-                    int(repo_issue.number),
-                    repo_issue.repository,
-                    repo_issue.organisation or "python-discord"
-                )
-                if isinstance(result, IssueState):
-                    links.append(result)
+        for repo_issue in issues:
+            result = await self.fetch_issue(
+                int(repo_issue.number),
+                repo_issue.repository,
+                repo_issue.organisation or "python-discord"
+            )
+            if isinstance(result, IssueState):
+                links.append(result)
 
         if not links:
             return
