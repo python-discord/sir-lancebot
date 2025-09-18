@@ -4,7 +4,6 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import Literal
 
-import aiohttp
 import pyjokes
 from discord import Embed
 from discord.ext import commands
@@ -162,17 +161,15 @@ class Fun(Cog):
         - others use pyjokes.
         """
         if category == "dad":
-            async with aiohttp.ClientSession() as session, session.get(
+            async with self.bot.http_session.get(
                 "https://icanhazdadjoke.com",
                 headers={
                     "Accept":"application/json",
-                    "User-Agent": "Sir-lancebot"
+                    "User-Agent": "Sir-lancebot (https://github.com/python-discord/sir-lancebot)"
                 }) as res:
-                if res.status == 200:
-                    data = await res.json()
-                    await ctx.send(data["joke"])
-                else:
-                    await ctx.send("There is no dad joke now")
+                res.raise_for_status()
+                data = await res.json()
+                await ctx.send(data["joke"])
         else:
             joke = pyjokes.get_joke(category=category)
             await ctx.send(joke)
