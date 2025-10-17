@@ -9,7 +9,7 @@ name = "sir-lancebot"
 version = "0.1.0"
 description = "A Discord bot designed as a fun and beginner-friendly learning environment for writing bot features and learning open-source."
 dependencies = [
-    "pydis-core[all]==11.6.0",
+    "pydis-core[all]==11.8.0",
     "arrow==1.3.0",
     "beautifulsoup4==4.12.3",
     "colorama==0.4.6; sys_platform == \"win32\"",
