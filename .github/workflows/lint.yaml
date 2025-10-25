@@ -19,7 +19,7 @@ jobs:
           activate-environment: true
 
       - name: Install dependencies
-        run: uv sync --frozen
+        run: uv sync --locked
 
       # Attempt to run the bot. Setting `IN_CI` to true, so bot.run() is never called.
       # This is to catch import and cog setup errors that may appear in PRs, to avoid crash loops if merged.
