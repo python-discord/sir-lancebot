@@ -75,7 +75,7 @@ Halloween = Holiday([Month.OCTOBER], {
     "jack-o-lantern": Trigger(r"\bjack-o-lantern\b", ["\U0001F383"]),
     "pumpkin": Trigger(r"\bpumpkin\b", ["\U0001F383"]),
     "skeleton": Trigger(r"\bskeleton\b", ["\U0001F480"]),
-    "spooky": Trigger(r"\bspo{2,}[k|p][i|y](er|est)?\b", ["\U0001F47B"]),
+    "spooky": Trigger(r"\bspo{2,}[kp][iy](er|est)?\b", ["\U0001F47B"]),
     }
 )
 Hanukkah = Holiday([Month.NOVEMBER, Month.DECEMBER], {
