@@ -14,6 +14,7 @@ from pydis_core.utils.logging import get_logger
 from bot.bot import Bot
 from bot.constants import Client, Colours, Emojis
 from bot.utils import helpers, messages
+from bot.utils.quote import daily_quote, random_quote
 
 log = get_logger(__name__)
 
@@ -157,6 +158,22 @@ class Fun(Cog):
         """Retrieves a joke of the specified `category` from the pyjokes api."""
         joke = pyjokes.get_joke(category=category)
         await ctx.send(joke)
+
+    @commands.command(name="quote", aliases=("rquote", "randomquote", "random_quote",))
+    async def quote(self, ctx: commands.Context) -> None:
+        """Retrieves a random quote from the zenquotes.io api."""
+        quote =  await random_quote()
+        if quote.startswith("Error:"):
+            log.warning("Failed to fetch random quote.")
+        await ctx.send(quote if not quote.startswith("Error:") else "Couldn't fetch a quote 😢")
+
+    @commands.command(name="daily_quote", aliases=("dquote", "dailyquote"))
+    async def daily_quote(self, ctx: commands.Context) -> None:
+        """Retrieves the daily quote from zenquotes.io api."""
+        quote = await daily_quote()
+        if quote.startswith("Error:"):
+            log.warning("Failed to fetch random quote.")
+        await ctx.send(quote if not quote.startswith("Error:") else "Couldn't fetch a quote 😢")
 
 
 async def setup(bot: Bot) -> None:
