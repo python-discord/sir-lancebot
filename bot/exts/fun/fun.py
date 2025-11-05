@@ -177,10 +177,9 @@ class Fun(Cog):
             quote = await daily_quote(self.bot)
             embed = Embed(
                 title="Daily Quote",
-                description=quote
+                description=f"{quote}\n\nPowered by [zenquotes.io](https://zenquotes.io)"
             )
             embed.set_author(name=self.bot.user.display_name, icon_url=self.bot.user.display_avatar.url)
-            embed.set_footer(text="Powered by zenquotes.io")
             await ctx.send(embed=embed)
         except ClientResponseError as e:
             log.warning(f"ZenQuotes API error: {e.status} {e.message}")
@@ -199,10 +198,9 @@ class Fun(Cog):
             quote = await random_quote(self.bot)
             embed = Embed(
                 title="Daily Quote",
-                description=quote
+                description=f"{quote}\n\nPowered by [zenquotes.io](https://zenquotes.io)"
             )
             embed.set_author(name=self.bot.user.display_name, icon_url=self.bot.user.display_avatar.url)
-            embed.set_footer(text="Powered by zenquotes.io")
             await ctx.send(embed=embed)
         except ClientResponseError as e:
             log.warning(f"ZenQuotes API error: {e.status} {e.message}")
