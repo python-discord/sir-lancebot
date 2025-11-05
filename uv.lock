@@ -838,7 +838,6 @@ name = "sir-lancebot"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
-    { name = "aiohttp" },
     { name = "arrow" },
     { name = "beautifulsoup4" },
     { name = "colorama", marker = "sys_platform == 'win32'" },
@@ -867,7 +866,6 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "aiohttp", specifier = "==3.10.10" },
     { name = "arrow", specifier = "==1.3.0" },
     { name = "beautifulsoup4", specifier = "==4.12.3" },
     { name = "colorama", marker = "sys_platform == 'win32'", specifier = "==0.4.6" },

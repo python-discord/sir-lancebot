@@ -24,7 +24,6 @@ dependencies = [
     "PyYAML==6.0.2",
     "rapidfuzz==3.12.2",
     "sentry-sdk==2.19.2",
-    "aiohttp==3.10.10",
 ]
 
 [dependency-groups]
