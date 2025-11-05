@@ -5,11 +5,10 @@ from pathlib import Path
 from typing import Literal
 
 import pyjokes
+from aiohttp import ClientError, ClientResponseError
 from discord import Embed
 from discord.ext import commands
 from discord.ext.commands import BadArgument, Cog, Context
-from aiohttp import ClientResponseError, ClientError
-from asyncio import TimeoutError
 from pydis_core.utils.commands import clean_text_or_reply
 from pydis_core.utils.logging import get_logger
 
@@ -163,14 +162,15 @@ class Fun(Cog):
 
     @commands.group(name="quote")
     async def quote(self, ctx: Context) -> None:
-        """Retrieve a quote from zenquotes.io api
-        
-           see `random`, `daily` subcommands.
+        """
+        Retrieve a quote from zenquotes.io api.
+
+        see `random`, `daily` subcommands.
         """
         if ctx.invoked_subcommand is None:
             await ctx.invoke(self.bot.get_command("help"), "quote")
 
-    @quote.command(name='daily')
+    @quote.command(name="daily")
     async def quote_daily(self, ctx: Context) -> None:
         """Retrieve the daily quote from zenquotes.io api."""
         try:
@@ -188,11 +188,11 @@ class Fun(Cog):
         except (ClientError, TimeoutError) as e:
             log.error(f"Network error fetching quote: {e}")
             await ctx.send("Could not connect to the quote service.")
-        except Exception as e:
+        except Exception:
             log.exception("Unexpected error fetching quote.")
             await ctx.send("Something unexpected happened. Try again later.")
 
-    @quote.command(name='random')
+    @quote.command(name="random")
     async def quote_random(self, ctx: Context) -> None:
         """Retrieve a random quote from zenquotes.io api."""
         try:
@@ -210,7 +210,7 @@ class Fun(Cog):
         except (ClientError, TimeoutError) as e:
             log.error(f"Network error fetching quote: {e}")
             await ctx.send("Could not connect to the quote service.")
-        except Exception as e:
+        except Exception:
             log.exception("Unexpected error fetching quote.")
             await ctx.send("Something unexpected happened. Try again later.")
 
