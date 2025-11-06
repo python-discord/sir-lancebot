@@ -197,7 +197,7 @@ class Fun(Cog):
         try:
             quote = await random_quote(self.bot)
             embed = Embed(
-                title="Daily Quote",
+                title="Random Quote",
                 description=f"{quote}\n\nPowered by [zenquotes.io](https://zenquotes.io)"
             )
             embed.set_author(name=self.bot.user.display_name, icon_url=self.bot.user.display_avatar.url)
