@@ -38,7 +38,7 @@ async def daily_quote(bot: Bot) -> str:
         return cached_quote
 
     log.debug("No cached quote found.")
-    async with bot.http_session.get("https://zenquotes.io/api/today") as resp:
+    async with bot.http_session.get(DAILY_QUOTE_URL) as resp:
         resp.raise_for_status()
         data = await resp.json()
         quote = f"{data[0]['q']}\n— {data[0]['a']}"
