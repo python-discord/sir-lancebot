@@ -165,7 +165,7 @@ class Fun(Cog):
         """
         Retrieve a quote from zenquotes.io api.
 
-        see `random`, `daily` subcommands.
+        See `random`, `daily` subcommands.
         """
         if ctx.invoked_subcommand is None:
             await ctx.invoke(self.bot.get_command("help"), "quote")
@@ -177,19 +177,19 @@ class Fun(Cog):
             quote = await daily_quote(self.bot)
             embed = Embed(
                 title="Daily Quote",
-                description=f"{quote}\n\nPowered by [zenquotes.io](https://zenquotes.io)"
+                description=f"> {quote}\n\n-# Powered by [zenquotes.io](https://zenquotes.io)",
+                colour=Colours.blue
             )
-            embed.set_author(name=self.bot.user.display_name, icon_url=self.bot.user.display_avatar.url)
             await ctx.send(embed=embed)
         except ClientResponseError as e:
             log.warning(f"ZenQuotes API error: {e.status} {e.message}")
-            await ctx.send("Could not retrieve quote from API.")
+            await ctx.send(":x: Could not retrieve quote from API.")
         except (ClientError, TimeoutError) as e:
             log.error(f"Network error fetching quote: {e}")
-            await ctx.send("Could not connect to the quote service.")
+            await ctx.send(":x: Could not connect to the quote service.")
         except Exception:
             log.exception("Unexpected error fetching quote.")
-            await ctx.send("Something unexpected happened. Try again later.")
+            await ctx.send(":x: Something unexpected happened. Try again later.")
 
     @quote.command(name="random")
     async def quote_random(self, ctx: Context) -> None:
@@ -198,19 +198,19 @@ class Fun(Cog):
             quote = await random_quote(self.bot)
             embed = Embed(
                 title="Random Quote",
-                description=f"{quote}\n\nPowered by [zenquotes.io](https://zenquotes.io)"
+                description=f"> {quote}\n\n-# Powered by [zenquotes.io](https://zenquotes.io)",
+                colour=Colours.blue
             )
-            embed.set_author(name=self.bot.user.display_name, icon_url=self.bot.user.display_avatar.url)
             await ctx.send(embed=embed)
         except ClientResponseError as e:
             log.warning(f"ZenQuotes API error: {e.status} {e.message}")
-            await ctx.send("Could not retrieve quote from API.")
+            await ctx.send(":x: Could not retrieve quote from API.")
         except (ClientError, TimeoutError) as e:
             log.error(f"Network error fetching quote: {e}")
-            await ctx.send("Could not connect to the quote service.")
+            await ctx.send(":x: Could not connect to the quote service.")
         except Exception:
             log.exception("Unexpected error fetching quote.")
-            await ctx.send("Something unexpected happened. Try again later.")
+            await ctx.send(":x: Something unexpected happened. Try again later.")
 
 async def setup(bot: Bot) -> None:
     """Load the Fun cog."""

@@ -15,8 +15,10 @@ log = get_logger(__name__)
 def seconds_until_midnight_utc() -> int:
     """Calculate the number of seconds remaining until midnight UTC for Redis cache TTL."""
     now = datetime.now(UTC)
-    tomorrow = (now + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
-    return int((tomorrow - now).total_seconds())
+    tomorrow = now + timedelta(days=1)
+    midnight = tomorrow.replace(hour=0, minute=0, second=0, microsecond=0)
+    time_to_midnight = (midnight - now)
+    return int(time_to_midnight.total_seconds())
 
 
 async def random_quote(bot: Bot) -> str:
