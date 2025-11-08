@@ -26,7 +26,7 @@ async def random_quote(bot: Bot) -> str:
     async with bot.http_session.get(RANDOM_QUOTE_URL) as response:
         response.raise_for_status()
         data = await response.json()
-        quote = f"{data[0]['q']}\n*\\— {data[0]['a']}*"
+        quote = f"{data[0]['q']}\n*— {data[0]['a']}*"
         return quote
 
 
@@ -43,7 +43,7 @@ async def daily_quote(bot: Bot) -> str:
     async with bot.http_session.get(DAILY_QUOTE_URL) as resp:
         resp.raise_for_status()
         data = await resp.json()
-        quote = f"{data[0]['q']}\n*\\— {data[0]['a']}*"
+        quote = f"{data[0]['q']}\n*— {data[0]['a']}*"
 
     ttl = seconds_until_midnight_utc()
 
