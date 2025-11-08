@@ -27,8 +27,8 @@ class HTTPStatusCodes(commands.Cog):
         self.bot = bot
 
     @commands.group(
-        name="http_status",
-        aliases=("status", "httpstatus"),
+        name="http",
+        aliases=("http_status", "httpstatus", "status"),
         invoke_without_command=True,
     )
     async def http_status_group(self, ctx: commands.Context, code: int) -> None:
