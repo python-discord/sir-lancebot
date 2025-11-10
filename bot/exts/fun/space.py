@@ -1,3 +1,5 @@
+# XXX: Disabled due to issues with NASA API, see https://github.com/python-discord/sir-lancebot/issues/1709
+
 import random
 from datetime import UTC, date, datetime
 from typing import Any
@@ -231,4 +233,7 @@ async def setup(bot: Bot) -> None:
         logger.warning("Can't find NASA API key. Not loading Space Cog.")
         return
 
-    await bot.add_cog(Space(bot))
+    # XXX: Disabled due to issues with NASA API, see https://github.com/python-discord/sir-lancebot/issues/1709
+
+    # await bot.add_cog(Space(bot))
+    return
