@@ -1,10 +1,10 @@
+import json
 import random
 import re
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from urllib.parse import quote
 from pathlib import Path
-import json
+from urllib.parse import quote
 
 import discord
 from aiohttp import ClientResponse
@@ -81,12 +81,13 @@ class GithubInfo(commands.Cog):
         self.bot = bot
         self.repos = []
 
-    async def cog_load(self):
+    async def cog_load(self) -> None:
+        """Function to be run at cog load."""
         self.refresh_repos.start()
 
         self.stored_repos_json = Path(__file__).parent.parent.parent / "resources" / "utilities" / "stored_repos.json"
 
-        with open(self.stored_repos_json, "r") as f:
+        with open(self.stored_repos_json) as f:
             self.stored_repos = json.load(f)
             log.info("Loaded stored repos in memory.")
 
@@ -307,7 +308,8 @@ class GithubInfo(commands.Cog):
         await ctx.send(embed=embed)
 
     @tasks.loop(hours=24)
-    async def refresh_repos(self):
+    async def refresh_repos(self) -> None:
+        """Refresh self.repos with latest PyDis repos."""
         self.repos, _ = await self.fetch_data(REPOSITORY_ENDPOINT.format(org="python-discord"))
         log.info(f"Loaded {len(self.repos)} repos from Python Discord org into memory.")
 
@@ -330,8 +332,8 @@ class GithubInfo(commands.Cog):
                 repo_query = self.stored_repos[repo_query]
             else:
                 for each in self.repos:
-                    if repo_query == each['name']:
-                        repo_query = each['full_name']
+                    if repo_query == each["name"]:
+                        repo_query = each["full_name"]
                         is_pydis = True
                         break
                 else:
@@ -341,7 +343,7 @@ class GithubInfo(commands.Cog):
             # Case 1: PyDis repo
             if is_pydis:
                 for each in self.repos:
-                    if repo_query == each['full_name']:
+                    if repo_query == each["full_name"]:
                         repo_data = each
                         break
 
@@ -349,7 +351,7 @@ class GithubInfo(commands.Cog):
             elif fetch_most_starred:
                 repo_data, _ = await self.fetch_data(FETCH_MOST_STARRED_ENDPOINT.format(name=quote(repo_query)))
 
-                if not repo_data['items']:
+                if not repo_data["items"]:
                     embed = discord.Embed(
                         title=random.choice(NEGATIVE_REPLIES),
                         description=f"No repositories found matching `{repo_query}`.",
@@ -358,7 +360,7 @@ class GithubInfo(commands.Cog):
                     await ctx.send(embed=embed)
                     return
 
-                repo_item = repo_data['items'][0]  # Top result
+                repo_item = repo_data["items"][0]  # Top result
                 embed = discord.Embed(
                     title=repo_item["name"],
                     description=repo_item["description"] or "No description provided.",
