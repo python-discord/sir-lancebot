@@ -3,10 +3,12 @@ import re
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from urllib.parse import quote
+from pathlib import Path
+import json
 
 import discord
 from aiohttp import ClientResponse
-from discord.ext import commands
+from discord.ext import commands, tasks
 from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
@@ -21,6 +23,7 @@ REQUEST_HEADERS = {
 }
 
 REPOSITORY_ENDPOINT = "https://api.github.com/orgs/{org}/repos?per_page=100&type=public"
+FETCH_MOST_STARRED_ENDPOINT = "https://api.github.com/search/repositories?q={name}&sort=stars&order=desc&per_page=1"
 ISSUE_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/issues/{number}"
 PR_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/pulls/{number}"
 
@@ -77,6 +80,16 @@ class GithubInfo(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.repos = []
+
+    async def cog_load(self):
+        self.refresh_repos.start()
+
+        self.stored_repos_json = Path(__file__).parent.parent.parent / "resources" / "utilities" / "stored_repos.json"
+
+        with open(self.stored_repos_json, "r") as f:
+            self.stored_repos = json.load(f)
+            log.info("Loaded stored repos in memory.")
+
 
     @staticmethod
     def remove_codeblocks(message: str) -> str:
@@ -293,78 +306,144 @@ class GithubInfo(commands.Cog):
 
         await ctx.send(embed=embed)
 
+    @tasks.loop(hours=24)
+    async def refresh_repos(self):
+        self.repos, _ = await self.fetch_data(REPOSITORY_ENDPOINT.format(org="python-discord"))
+        log.info(f"Loaded {len(self.repos)} repos from Python Discord org into memory.")
+
     @github_group.command(name="repository", aliases=("repo",))
     async def github_repo_info(self, ctx: commands.Context, *repo: str) -> None:
         """
-        Fetches a repositories' GitHub information.
+        Fetches a repository's GitHub information.
 
         The repository should look like `user/reponame` or `user reponame`.
+        If it's not a stored repo or PyDis repo, it will fetch the most-starred repo
+        matching the search query from GitHub.
         """
-        repo = "/".join(repo)
-        if repo.count("/") != 1:
-            embed = discord.Embed(
-                title=random.choice(NEGATIVE_REPLIES),
-                description="The repository should look like `user/reponame` or `user reponame`.",
-                colour=Colours.soft_red
-            )
+        is_pydis = False
+        fetch_most_starred = False
+        repo_query = "/".join(repo)
 
-            await ctx.send(embed=embed)
-            return
+        # Determine type of repo
+        if repo_query.count("/") != 1:
+            if repo_query in self.stored_repos:
+                repo_query = self.stored_repos[repo_query]
+            else:
+                for each in self.repos:
+                    if repo_query == each['name']:
+                        repo_query = each['full_name']
+                        is_pydis = True
+                        break
+                else:
+                    fetch_most_starred = True
 
         async with ctx.typing():
-            repo_data, _ = await self.fetch_data(f"{GITHUB_API_URL}/repos/{quote(repo)}")
+            # Case 1: PyDis repo
+            if is_pydis:
+                for each in self.repos:
+                    if repo_query == each['full_name']:
+                        repo_data = each
+                        break
 
-            # There won't be a message key if this repo exists
-            if "message" in repo_data:
+            # Case 2: Not stored or PyDis, fetch most-starred matching repo
+            elif fetch_most_starred:
+                repo_data, _ = await self.fetch_data(FETCH_MOST_STARRED_ENDPOINT.format(name=quote(repo_query)))
+
+                if not repo_data['items']:
+                    embed = discord.Embed(
+                        title=random.choice(NEGATIVE_REPLIES),
+                        description=f"No repositories found matching `{repo_query}`.",
+                        colour=Colours.soft_red
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
+                repo_item = repo_data['items'][0]  # Top result
                 embed = discord.Embed(
-                    title=random.choice(NEGATIVE_REPLIES),
-                    description="The requested repository was not found.",
-                    colour=Colours.soft_red
+                    title=repo_item["name"],
+                    description=repo_item["description"] or "No description provided.",
+                    colour=discord.Colour.og_blurple(),
+                    url=repo_item["html_url"]
+                )
+
+                repo_owner = repo_item["owner"]
+                embed.set_author(
+                    name=repo_owner["login"],
+                    url=repo_owner["html_url"],
+                    icon_url=repo_owner["avatar_url"]
+                )
+
+                repo_created_at = datetime.strptime(
+                    repo_item["created_at"], "%Y-%m-%dT%H:%M:%SZ"
+                ).replace(tzinfo=UTC).strftime("%d/%m/%Y")
+                last_pushed = datetime.strptime(
+                    repo_item["pushed_at"], "%Y-%m-%dT%H:%M:%SZ"
+                ).replace(tzinfo=UTC).strftime("%d/%m/%Y at %H:%M")
+
+                embed.set_footer(
+                    text=(
+                        f"{repo_item['forks_count']} ⑂ "
+                        f"• {repo_item['stargazers_count']} ⭐ "
+                        f"• Created At {repo_created_at} "
+                        f"• Last Commit {last_pushed}"
+                    )
                 )
 
                 await ctx.send(embed=embed)
                 return
 
-        embed = discord.Embed(
-            title=repo_data["name"],
-            description=repo_data["description"],
-            colour=discord.Colour.og_blurple(),
-            url=repo_data["html_url"]
-        )
+            # Case 3: Regular GitHub repo
+            else:
+                repo_data, _ = await self.fetch_data(f"{GITHUB_API_URL}/repos/{quote(repo_query)}")
 
-        # If it's a fork, then it will have a parent key
-        try:
-            parent = repo_data["parent"]
-            embed.description += f"\n\nForked from [{parent['full_name']}]({parent['html_url']})"
-        except KeyError:
-            log.debug("Repository is not a fork.")
+                if "message" in repo_data:
+                    embed = discord.Embed(
+                        title=random.choice(NEGATIVE_REPLIES),
+                        description="The requested repository was not found.",
+                        colour=Colours.soft_red
+                    )
+                    await ctx.send(embed=embed)
+                    return
 
-        repo_owner = repo_data["owner"]
-
-        embed.set_author(
-            name=repo_owner["login"],
-            url=repo_owner["html_url"],
-            icon_url=repo_owner["avatar_url"]
-        )
-
-        repo_created_at = datetime.strptime(
-            repo_data["created_at"], "%Y-%m-%dT%H:%M:%SZ"
-        ).replace(tzinfo=UTC).strftime("%d/%m/%Y")
-        last_pushed = datetime.strptime(
-            repo_data["pushed_at"], "%Y-%m-%dT%H:%M:%SZ"
-        ).replace(tzinfo=UTC).strftime("%d/%m/%Y at %H:%M")
-
-        embed.set_footer(
-            text=(
-                f"{repo_data['forks_count']} ⑂ "
-                f"• {repo_data['stargazers_count']} ⭐ "
-                f"• Created At {repo_created_at} "
-                f"• Last Commit {last_pushed}"
+            # Embed creation for PyDis or regular GitHub repo
+            embed = discord.Embed(
+                title=repo_data["name"],
+                description=repo_data["description"] or "No description provided.",
+                colour=discord.Colour.og_blurple(),
+                url=repo_data["html_url"]
             )
-        )
 
-        await ctx.send(embed=embed)
+            # Fork info
+            try:
+                parent = repo_data["parent"]
+                embed.description += f"\n\nForked from [{parent['full_name']}]({parent['html_url']})"
+            except KeyError:
+                log.debug("Repository is not a fork.")
 
+            repo_owner = repo_data["owner"]
+            embed.set_author(
+                name=repo_owner["login"],
+                url=repo_owner["html_url"],
+                icon_url=repo_owner["avatar_url"]
+            )
+
+            repo_created_at = datetime.strptime(
+                repo_data["created_at"], "%Y-%m-%dT%H:%M:%SZ"
+            ).replace(tzinfo=UTC).strftime("%d/%m/%Y")
+            last_pushed = datetime.strptime(
+                repo_data["pushed_at"], "%Y-%m-%dT%H:%M:%SZ"
+            ).replace(tzinfo=UTC).strftime("%d/%m/%Y at %H:%M")
+
+            embed.set_footer(
+                text=(
+                    f"{repo_data['forks_count']} ⑂ "
+                    f"• {repo_data['stargazers_count']} ⭐ "
+                    f"• Created At {repo_created_at} "
+                    f"• Last Commit {last_pushed}"
+                )
+            )
+
+            await ctx.send(embed=embed)
 
 async def setup(bot: Bot) -> None:
     """Load the GithubInfo cog."""
