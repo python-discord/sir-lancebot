@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Literal
 
 import pyjokes
+from aiohttp import ClientError, ClientResponseError
 from discord import Embed
 from discord.ext import commands
 from discord.ext.commands import BadArgument, Cog, Context
@@ -14,6 +15,7 @@ from pydis_core.utils.logging import get_logger
 from bot.bot import Bot
 from bot.constants import Client, Colours, Emojis
 from bot.utils import helpers, messages
+from bot.utils.quote import daily_quote, random_quote
 
 log = get_logger(__name__)
 
@@ -158,6 +160,57 @@ class Fun(Cog):
         joke = pyjokes.get_joke(category=category)
         await ctx.send(joke)
 
+    @commands.group(name="quote")
+    async def quote(self, ctx: Context) -> None:
+        """
+        Retrieve a quote from zenquotes.io api.
+
+        See `random`, `daily` subcommands.
+        """
+        if ctx.invoked_subcommand is None:
+            await ctx.invoke(self.bot.get_command("help"), "quote")
+
+    @quote.command(name="daily")
+    async def quote_daily(self, ctx: Context) -> None:
+        """Retrieve the daily quote from zenquotes.io api."""
+        try:
+            quote = await daily_quote(self.bot)
+            embed = Embed(
+                title="Daily Quote",
+                description=f"> {quote}\n\n-# Powered by [zenquotes.io](https://zenquotes.io)",
+                colour=Colours.blue
+            )
+            await ctx.send(embed=embed)
+        except ClientResponseError as e:
+            log.warning(f"ZenQuotes API error: {e.status} {e.message}")
+            await ctx.send(":x: Could not retrieve quote from API.")
+        except (ClientError, TimeoutError) as e:
+            log.error(f"Network error fetching quote: {e}")
+            await ctx.send(":x: Could not connect to the quote service.")
+        except Exception:
+            log.exception("Unexpected error fetching quote.")
+            await ctx.send(":x: Something unexpected happened. Try again later.")
+
+    @quote.command(name="random")
+    async def quote_random(self, ctx: Context) -> None:
+        """Retrieve a random quote from zenquotes.io api."""
+        try:
+            quote = await random_quote(self.bot)
+            embed = Embed(
+                title="Random Quote",
+                description=f"> {quote}\n\n-# Powered by [zenquotes.io](https://zenquotes.io)",
+                colour=Colours.blue
+            )
+            await ctx.send(embed=embed)
+        except ClientResponseError as e:
+            log.warning(f"ZenQuotes API error: {e.status} {e.message}")
+            await ctx.send(":x: Could not retrieve quote from API.")
+        except (ClientError, TimeoutError) as e:
+            log.error(f"Network error fetching quote: {e}")
+            await ctx.send(":x: Could not connect to the quote service.")
+        except Exception:
+            log.exception("Unexpected error fetching quote.")
+            await ctx.send(":x: Something unexpected happened. Try again later.")
 
 async def setup(bot: Bot) -> None:
     """Load the Fun cog."""
