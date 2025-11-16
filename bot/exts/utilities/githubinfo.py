@@ -91,6 +91,10 @@ class GithubInfo(commands.Cog):
             self.stored_repos = json.load(f)
             log.info("Loaded stored repos in memory.")
 
+    async def cog_unload(self) -> None:
+        """Function to be run at cog unload."""
+        self.refresh_repos.cancel()
+
 
     @staticmethod
     def remove_codeblocks(message: str) -> str:
