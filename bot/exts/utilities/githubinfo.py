@@ -333,7 +333,7 @@ class GithubInfo(commands.Cog):
             else:
                 for each in self.repos:
                     if repo_query == each["name"]:
-                        repo_query = each["full_name"]
+                        repo_query = each
                         is_pydis = True
                         break
                 else:
@@ -342,10 +342,7 @@ class GithubInfo(commands.Cog):
         async with ctx.typing():
             # Case 1: PyDis repo
             if is_pydis:
-                for each in self.repos:
-                    if repo_query == each["full_name"]:
-                        repo_data = each
-                        break
+                repo_data = repo_query # repo_query already contains the matched repo
 
             # Case 2: Not stored or PyDis, fetch most-starred matching repo
             elif fetch_most_starred:
