@@ -325,7 +325,7 @@ class GithubInfo(commands.Cog):
                     colour=discord.Colour.og_blurple(),
                     url=repo_data["html_url"]
                 )
-
+        # if its a fork it will have a parent key
         try:
             parent = repo_data["parent"]
             embed.description += f"\n\nForked from [{parent['full_name']}]({parent['html_url']})"
