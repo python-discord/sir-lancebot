@@ -402,10 +402,6 @@ class GithubInfo(commands.Cog):
                     return
 
                 repo_data = repos["items"][0]  # Top result
-                embed = self.build_embed(repo_data)
-
-                await ctx.send(embed=embed)
-                return
 
             # Case 3: Regular GitHub repo
             else:
