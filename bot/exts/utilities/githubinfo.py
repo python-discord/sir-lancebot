@@ -317,6 +317,46 @@ class GithubInfo(commands.Cog):
         self.repos, _ = await self.fetch_data(REPOSITORY_ENDPOINT.format(org="python-discord"))
         log.info(f"Loaded {len(self.repos)} repos from Python Discord org into memory.")
 
+    def build_embed(self, repo_data: dict) -> discord.Embed:
+        """Create a clean discord embed to show repo data."""
+        embed = discord.Embed(
+                    title=repo_data["name"],
+                    description=repo_data["description"] or "No description provided.",
+                    colour=discord.Colour.og_blurple(),
+                    url=repo_data["html_url"]
+                )
+
+        try:
+            parent = repo_data["parent"]
+            embed.description += f"\n\nForked from [{parent['full_name']}]({parent['html_url']})"
+        except KeyError:
+            log.debug("Repository is not a fork.")
+
+        repo_owner = repo_data["owner"]
+        embed.set_author(
+            name=repo_owner["login"],
+            url=repo_owner["html_url"],
+            icon_url=repo_owner["avatar_url"]
+        )
+
+        repo_created_at = datetime.strptime(
+            repo_data["created_at"], "%Y-%m-%dT%H:%M:%SZ"
+        ).replace(tzinfo=UTC).strftime("%d/%m/%Y")
+        last_pushed = datetime.strptime(
+            repo_data["pushed_at"], "%Y-%m-%dT%H:%M:%SZ"
+        ).replace(tzinfo=UTC).strftime("%d/%m/%Y at %H:%M")
+
+        embed.set_footer(
+            text=(
+                f"{repo_data['forks_count']} ⑂ "
+                f"• {repo_data['stargazers_count']} ⭐ "
+                f"• Created At {repo_created_at} "
+                f"• Last Commit {last_pushed}"
+            )
+        )
+        return embed
+
+
     @github_group.command(name="repository", aliases=("repo",))
     async def github_repo_info(self, ctx: commands.Context, *repo: str) -> None:
         """
@@ -350,9 +390,9 @@ class GithubInfo(commands.Cog):
 
             # Case 2: Not stored or PyDis, fetch most-starred matching repo
             elif fetch_most_starred:
-                repo_data, _ = await self.fetch_data(FETCH_MOST_STARRED_ENDPOINT.format(name=quote(repo_query)))
+                repos, _ = await self.fetch_data(FETCH_MOST_STARRED_ENDPOINT.format(name=quote(repo_query)))
 
-                if not repo_data["items"]:
+                if not repos["items"]:
                     embed = discord.Embed(
                         title=random.choice(NEGATIVE_REPLIES),
                         description=f"No repositories found matching `{repo_query}`.",
@@ -361,36 +401,8 @@ class GithubInfo(commands.Cog):
                     await ctx.send(embed=embed)
                     return
 
-                repo_item = repo_data["items"][0]  # Top result
-                embed = discord.Embed(
-                    title=repo_item["name"],
-                    description=repo_item["description"] or "No description provided.",
-                    colour=discord.Colour.og_blurple(),
-                    url=repo_item["html_url"]
-                )
-
-                repo_owner = repo_item["owner"]
-                embed.set_author(
-                    name=repo_owner["login"],
-                    url=repo_owner["html_url"],
-                    icon_url=repo_owner["avatar_url"]
-                )
-
-                repo_created_at = datetime.strptime(
-                    repo_item["created_at"], "%Y-%m-%dT%H:%M:%SZ"
-                ).replace(tzinfo=UTC).strftime("%d/%m/%Y")
-                last_pushed = datetime.strptime(
-                    repo_item["pushed_at"], "%Y-%m-%dT%H:%M:%SZ"
-                ).replace(tzinfo=UTC).strftime("%d/%m/%Y at %H:%M")
-
-                embed.set_footer(
-                    text=(
-                        f"{repo_item['forks_count']} ⑂ "
-                        f"• {repo_item['stargazers_count']} ⭐ "
-                        f"• Created At {repo_created_at} "
-                        f"• Last Commit {last_pushed}"
-                    )
-                )
+                repo_data = repos["items"][0]  # Top result
+                embed = self.build_embed(repo_data)
 
                 await ctx.send(embed=embed)
                 return
@@ -408,44 +420,7 @@ class GithubInfo(commands.Cog):
                     await ctx.send(embed=embed)
                     return
 
-            # Embed creation for PyDis or regular GitHub repo
-            embed = discord.Embed(
-                title=repo_data["name"],
-                description=repo_data["description"] or "No description provided.",
-                colour=discord.Colour.og_blurple(),
-                url=repo_data["html_url"]
-            )
-
-            # Fork info
-            try:
-                parent = repo_data["parent"]
-                embed.description += f"\n\nForked from [{parent['full_name']}]({parent['html_url']})"
-            except KeyError:
-                log.debug("Repository is not a fork.")
-
-            repo_owner = repo_data["owner"]
-            embed.set_author(
-                name=repo_owner["login"],
-                url=repo_owner["html_url"],
-                icon_url=repo_owner["avatar_url"]
-            )
-
-            repo_created_at = datetime.strptime(
-                repo_data["created_at"], "%Y-%m-%dT%H:%M:%SZ"
-            ).replace(tzinfo=UTC).strftime("%d/%m/%Y")
-            last_pushed = datetime.strptime(
-                repo_data["pushed_at"], "%Y-%m-%dT%H:%M:%SZ"
-            ).replace(tzinfo=UTC).strftime("%d/%m/%Y at %H:%M")
-
-            embed.set_footer(
-                text=(
-                    f"{repo_data['forks_count']} ⑂ "
-                    f"• {repo_data['stargazers_count']} ⭐ "
-                    f"• Created At {repo_created_at} "
-                    f"• Last Commit {last_pushed}"
-                )
-            )
-
+            embed = self.build_embed(repo_data)
             await ctx.send(embed=embed)
 
 async def setup(bot: Bot) -> None:
