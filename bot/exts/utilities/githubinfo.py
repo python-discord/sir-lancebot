@@ -406,7 +406,7 @@ class GithubInfo(commands.Cog):
             # Case 3: Regular GitHub repo
             else:
                 repo_data, _ = await self.fetch_data(f"{GITHUB_API_URL}/repos/{quote(repo_query)}")
-
+                # There won't be a message key if this repo exists
                 if "message" in repo_data:
                     embed = discord.Embed(
                         title=random.choice(NEGATIVE_REPLIES),
