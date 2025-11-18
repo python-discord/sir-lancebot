@@ -391,7 +391,7 @@ class GithubInfo(commands.Cog):
             # Case 2: Not stored or PyDis, fetch most-starred matching repo
             elif fetch_most_starred:
                 repos, _ = await self.fetch_data(MOST_STARRED_ENDPOINT.format(name=quote(repo_query)))
-
+                # 'items' is a list of repos, if it is empty, no repos were found
                 if not repos["items"]:
                     embed = discord.Embed(
                         title=random.choice(NEGATIVE_REPLIES),
