@@ -1,4 +1,6 @@
 {
     "kubernetes": "kubernetes/kubernetes",
-    "discord.py": "Rapptz/discord.py"
+    "discord.py": "Rapptz/discord.py",
+    "peps": "python/peps",
+    "cpython": "python/cpython"
 }
