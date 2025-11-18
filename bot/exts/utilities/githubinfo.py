@@ -316,7 +316,7 @@ class GithubInfo(commands.Cog):
         """Refresh self.pydis_repos with latest PyDis repos."""
         fetched_repos, _ = await self.fetch_data(REPOSITORY_ENDPOINT.format(org="python-discord"))
         for each in fetched_repos:
-            self.pydis_repos.update({each['name']: each})
+            self.pydis_repos.update({each["name"]: each})
         log.info(f"Loaded {len(self.pydis_repos)} repos from Python Discord org into memory.")
 
     def build_embed(self, repo_data: dict) -> discord.Embed:
