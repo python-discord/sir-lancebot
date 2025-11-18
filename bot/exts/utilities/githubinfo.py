@@ -23,7 +23,7 @@ REQUEST_HEADERS = {
 }
 
 REPOSITORY_ENDPOINT = "https://api.github.com/orgs/{org}/repos?per_page=100&type=public"
-FETCH_MOST_STARRED_ENDPOINT = "https://api.github.com/search/repositories?q={name}&sort=stars&order=desc&per_page=1"
+MOST_STARRED_ENDPOINT = "https://api.github.com/search/repositories?q={name}&sort=stars&order=desc&per_page=1"
 ISSUE_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/issues/{number}"
 PR_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/pulls/{number}"
 
@@ -79,7 +79,7 @@ class GithubInfo(commands.Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.repos = []
+        self.pydis_repos: dict = {}
 
     async def cog_load(self) -> None:
         """Function to be run at cog load."""
@@ -313,9 +313,11 @@ class GithubInfo(commands.Cog):
 
     @tasks.loop(hours=24)
     async def refresh_repos(self) -> None:
-        """Refresh self.repos with latest PyDis repos."""
-        self.repos, _ = await self.fetch_data(REPOSITORY_ENDPOINT.format(org="python-discord"))
-        log.info(f"Loaded {len(self.repos)} repos from Python Discord org into memory.")
+        """Refresh self.pydis_repos with latest PyDis repos."""
+        fetched_repos, _ = await self.fetch_data(REPOSITORY_ENDPOINT.format(org="python-discord"))
+        for each in fetched_repos:
+            self.pydis_repos.update({each['name']: each})
+        log.info(f"Loaded {len(self.pydis_repos)} repos from Python Discord org into memory.")
 
     def build_embed(self, repo_data: dict) -> discord.Embed:
         """Create a clean discord embed to show repo data."""
@@ -375,11 +377,9 @@ class GithubInfo(commands.Cog):
             if repo_query in self.stored_repos:
                 repo_query = self.stored_repos[repo_query]
             else:
-                for each in self.repos:
-                    if repo_query == each["name"]:
-                        repo_query = each
-                        is_pydis = True
-                        break
+                if repo_query in self.pydis_repos:
+                    repo_query = self.pydis_repos[repo_query]
+                    is_pydis = True
                 else:
                     fetch_most_starred = True
 
@@ -390,7 +390,7 @@ class GithubInfo(commands.Cog):
 
             # Case 2: Not stored or PyDis, fetch most-starred matching repo
             elif fetch_most_starred:
-                repos, _ = await self.fetch_data(FETCH_MOST_STARRED_ENDPOINT.format(name=quote(repo_query)))
+                repos, _ = await self.fetch_data(MOST_STARRED_ENDPOINT.format(name=quote(repo_query)))
 
                 if not repos["items"]:
                     embed = discord.Embed(
