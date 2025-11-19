@@ -380,7 +380,7 @@ class GithubInfo(commands.Cog):
             )
             await ctx.send(embed=embed)
             return
-        
+
         # Determine type of repo
         if repo_query.count("/") == 0:
             if repo_query.casefold() in self.stored_repos:
