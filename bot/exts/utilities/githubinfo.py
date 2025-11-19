@@ -375,9 +375,9 @@ class GithubInfo(commands.Cog):
 
         if repo_query.count("/") > 1:
             embed = discord.Embed(
-                colour=Colours.soft_red,
                 title=random.choice(NEGATIVE_REPLIES),
-                description="There cannot be more than one `/` in the repository."
+                description="There cannot be more than one `/` in the repository.",
+                colour=Colours.soft_red
             )
             await ctx.send(embed=embed)
             return
