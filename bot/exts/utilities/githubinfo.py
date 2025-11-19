@@ -364,9 +364,10 @@ class GithubInfo(commands.Cog):
         """
         Fetches a repository's GitHub information.
 
-        The repository should look like `user/reponame` or `user reponame`.
-        If it's not a stored repo or PyDis repo, it will fetch the most-starred repo
-        matching the search query from GitHub.
+        If the repository looks like `user/reponame` or `user reponame` then it will fetch it from github.
+        Otherwise, if it's a stored repo or PyDis repo, it will fetch the stored repo or use the PyDis repo
+        stored inside self.pydis_repos.
+        Otherwise it will fetch the most starred repo matching the search query from GitHub.
         """
         is_pydis = False
         fetch_most_starred = False
@@ -383,13 +384,14 @@ class GithubInfo(commands.Cog):
 
         # Determine type of repo
         if repo_query.count("/") == 0:
-            if repo_query.casefold() in self.stored_repos:
-                repo_query = self.stored_repos[repo_query.casefold()]
-            elif repo_query.casefold() in self.pydis_repos:
-                    repo_query = self.pydis_repos[repo_query.casefold()]
-                    is_pydis = True
+            repo_query_casefold = repo_query.casefold()
+            if repo_query_casefold in self.stored_repos:
+                repo_query = self.stored_repos[repo_query_casefold]
+            elif repo_query_casefold in self.pydis_repos:
+                repo_query = self.pydis_repos[repo_query_casefold]
+                is_pydis = True
             else:
-                    fetch_most_starred = True
+                fetch_most_starred = True
 
         async with ctx.typing():
             # Case 1: PyDis repo
