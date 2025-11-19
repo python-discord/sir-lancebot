@@ -27,6 +27,9 @@ MOST_STARRED_ENDPOINT = "https://api.github.com/search/repositories?q={name}&sor
 ISSUE_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/issues/{number}"
 PR_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/pulls/{number}"
 
+STORED_REPOS_FILE = Path(__file__).parent.parent.parent / "resources" / "utilities" / "stored_repos.json"
+
+
 if Tokens.github:
     REQUEST_HEADERS["Authorization"] = f"token {Tokens.github.get_secret_value()}"
 
@@ -85,9 +88,7 @@ class GithubInfo(commands.Cog):
         """Function to be run at cog load."""
         self.refresh_repos.start()
 
-        self.stored_repos_json = Path(__file__).parent.parent.parent / "resources" / "utilities" / "stored_repos.json"
-
-        with open(self.stored_repos_json) as f:
+        with open(STORED_REPOS_FILE) as f:
             self.stored_repos = json.load(f)
             log.info("Loaded stored repos in memory.")
 
@@ -315,18 +316,17 @@ class GithubInfo(commands.Cog):
     async def refresh_repos(self) -> None:
         """Refresh self.pydis_repos with latest PyDis repos."""
         fetched_repos, _ = await self.fetch_data(REPOSITORY_ENDPOINT.format(org="python-discord"))
-        for each in fetched_repos:
-            self.pydis_repos.update({each["name"]: each})
+        self.pydis_repos = {repo["name"].casefold(): repo for repo in fetched_repos}
         log.info(f"Loaded {len(self.pydis_repos)} repos from Python Discord org into memory.")
 
     def build_embed(self, repo_data: dict) -> discord.Embed:
         """Create a clean discord embed to show repo data."""
         embed = discord.Embed(
-                    title=repo_data["name"],
-                    description=repo_data["description"] or "No description provided.",
-                    colour=discord.Colour.og_blurple(),
-                    url=repo_data["html_url"]
-                )
+            title=repo_data["name"],
+            description=repo_data["description"] or "No description provided.",
+            colour=discord.Colour.og_blurple(),
+            url=repo_data["html_url"]
+        )
         # if its a fork it will have a parent key
         try:
             parent = repo_data["parent"]
@@ -374,10 +374,10 @@ class GithubInfo(commands.Cog):
 
         # Determine type of repo
         if repo_query.count("/") != 1:
-            if repo_query in self.stored_repos:
+            if repo_query.casefold() in self.stored_repos:
                 repo_query = self.stored_repos[repo_query]
             else:
-                if repo_query in self.pydis_repos:
+                if repo_query.casefold() in self.pydis_repos:
                     repo_query = self.pydis_repos[repo_query]
                     is_pydis = True
                 else:
@@ -391,7 +391,7 @@ class GithubInfo(commands.Cog):
             # Case 2: Not stored or PyDis, fetch most-starred matching repo
             elif fetch_most_starred:
                 repos, _ = await self.fetch_data(MOST_STARRED_ENDPOINT.format(name=quote(repo_query)))
-                # 'items' is a list of repos, if it is empty, no repos were found
+
                 if not repos["items"]:
                     embed = discord.Embed(
                         title=random.choice(NEGATIVE_REPLIES),
