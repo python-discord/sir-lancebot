@@ -372,15 +372,23 @@ class GithubInfo(commands.Cog):
         fetch_most_starred = False
         repo_query = "/".join(repo)
 
+        if repo_query.count("/") > 1:
+            embed = discord.Embed(
+                colour=Colours.soft_red,
+                title=random.choice(NEGATIVE_REPLIES),
+                description="There cannot be more than one `/` in the repository."
+            )
+            await ctx.send(embed=embed)
+            return
+        
         # Determine type of repo
-        if repo_query.count("/") != 1:
+        if repo_query.count("/") == 0:
             if repo_query.casefold() in self.stored_repos:
-                repo_query = self.stored_repos[repo_query]
-            else:
-                if repo_query.casefold() in self.pydis_repos:
-                    repo_query = self.pydis_repos[repo_query]
+                repo_query = self.stored_repos[repo_query.casefold()]
+            elif repo_query.casefold() in self.pydis_repos:
+                    repo_query = self.pydis_repos[repo_query.casefold()]
                     is_pydis = True
-                else:
+            else:
                     fetch_most_starred = True
 
         async with ctx.typing():
