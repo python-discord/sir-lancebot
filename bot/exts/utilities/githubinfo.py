@@ -85,7 +85,11 @@ class GithubInfo(commands.Cog):
         self.pydis_repos: dict = {}
 
     async def cog_load(self) -> None:
-        """Function to be run at cog load."""
+        """
+        Function to be run at cog load.
+
+        Starts the refresh_repos tasks.loop that runs every 24 hours.
+        """
         self.refresh_repos.start()
 
         with open(STORED_REPOS_FILE) as f:
@@ -93,7 +97,11 @@ class GithubInfo(commands.Cog):
             log.info("Loaded stored repos in memory.")
 
     async def cog_unload(self) -> None:
-        """Function to be run at cog unload."""
+        """
+        Function to be run at cog unload.
+
+        Cancels the execution of refresh_repos tasks.loop.
+        """
         self.refresh_repos.cancel()
 
 
