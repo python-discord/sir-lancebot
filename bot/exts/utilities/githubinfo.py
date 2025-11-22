@@ -1,12 +1,14 @@
+import json
 import random
 import re
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from pathlib import Path
 from urllib.parse import quote
 
 import discord
 from aiohttp import ClientResponse
-from discord.ext import commands
+from discord.ext import commands, tasks
 from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
@@ -21,8 +23,12 @@ REQUEST_HEADERS = {
 }
 
 REPOSITORY_ENDPOINT = "https://api.github.com/orgs/{org}/repos?per_page=100&type=public"
+MOST_STARRED_ENDPOINT = "https://api.github.com/search/repositories?q={name}&sort=stars&order=desc&per_page=100"
 ISSUE_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/issues/{number}"
 PR_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/pulls/{number}"
+
+STORED_REPOS_FILE = Path(__file__).parent.parent.parent / "resources" / "utilities" / "stored_repos.json"
+
 
 if Tokens.github:
     REQUEST_HEADERS["Authorization"] = f"token {Tokens.github.get_secret_value()}"
@@ -76,7 +82,28 @@ class GithubInfo(commands.Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.repos = []
+        self.pydis_repos: dict = {}
+
+    async def cog_load(self) -> None:
+        """
+        Function to be run at cog load.
+
+        Starts the refresh_repos tasks.loop that runs every 24 hours.
+        """
+        self.refresh_repos.start()
+
+        with open(STORED_REPOS_FILE) as f:
+            self.stored_repos = json.load(f)
+            log.info("Loaded stored repos in memory.")
+
+    async def cog_unload(self) -> None:
+        """
+        Function to be run at cog unload.
+
+        Cancels the execution of refresh_repos tasks.loop.
+        """
+        self.refresh_repos.cancel()
+
 
     @staticmethod
     def remove_codeblocks(message: str) -> str:
@@ -293,46 +320,22 @@ class GithubInfo(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @github_group.command(name="repository", aliases=("repo",))
-    async def github_repo_info(self, ctx: commands.Context, *repo: str) -> None:
-        """
-        Fetches a repositories' GitHub information.
+    @tasks.loop(hours=24)
+    async def refresh_repos(self) -> None:
+        """Refresh self.pydis_repos with latest PyDis repos."""
+        fetched_repos, _ = await self.fetch_data(REPOSITORY_ENDPOINT.format(org="python-discord"))
+        self.pydis_repos = {repo["name"].casefold(): repo for repo in fetched_repos}
+        log.info(f"Loaded {len(self.pydis_repos)} repos from Python Discord org into memory.")
 
-        The repository should look like `user/reponame` or `user reponame`.
-        """
-        repo = "/".join(repo)
-        if repo.count("/") != 1:
-            embed = discord.Embed(
-                title=random.choice(NEGATIVE_REPLIES),
-                description="The repository should look like `user/reponame` or `user reponame`.",
-                colour=Colours.soft_red
-            )
-
-            await ctx.send(embed=embed)
-            return
-
-        async with ctx.typing():
-            repo_data, _ = await self.fetch_data(f"{GITHUB_API_URL}/repos/{quote(repo)}")
-
-            # There won't be a message key if this repo exists
-            if "message" in repo_data:
-                embed = discord.Embed(
-                    title=random.choice(NEGATIVE_REPLIES),
-                    description="The requested repository was not found.",
-                    colour=Colours.soft_red
-                )
-
-                await ctx.send(embed=embed)
-                return
-
+    def build_embed(self, repo_data: dict) -> discord.Embed:
+        """Create a clean discord embed to show repo data."""
         embed = discord.Embed(
             title=repo_data["name"],
             description=repo_data["description"],
             colour=discord.Colour.og_blurple(),
             url=repo_data["html_url"]
         )
-
-        # If it's a fork, then it will have a parent key
+        # if its a fork it will have a parent key
         try:
             parent = repo_data["parent"]
             embed.description += f"\n\nForked from [{parent['full_name']}]({parent['html_url']})"
@@ -340,7 +343,6 @@ class GithubInfo(commands.Cog):
             log.debug("Repository is not a fork.")
 
         repo_owner = repo_data["owner"]
-
         embed.set_author(
             name=repo_owner["login"],
             url=repo_owner["html_url"],
@@ -362,9 +364,91 @@ class GithubInfo(commands.Cog):
                 f"• Last Commit {last_pushed}"
             )
         )
+        return embed
 
-        await ctx.send(embed=embed)
 
+    @github_group.command(name="repository", aliases=("repo",))
+    async def github_repo_info(self, ctx: commands.Context, *repo: str) -> None:
+        """
+        Fetches a repository's GitHub information.
+
+        If the repository looks like `user/reponame` or `user reponame` then it will fetch it from github.
+        Otherwise, if it's a stored repo or PyDis repo, it will fetch the stored repo or use the PyDis repo
+        stored inside self.pydis_repos.
+        Otherwise it will fetch the most starred repo matching the search query from GitHub.
+        """
+        is_pydis = False
+        fetch_most_starred = False
+        repo_query = "/".join(repo)
+        repo_query_casefold = repo_query.casefold()
+
+
+        if repo_query.count("/") > 1:
+            embed = discord.Embed(
+                title=random.choice(NEGATIVE_REPLIES),
+                description="There cannot be more than one `/` in the repository.",
+                colour=Colours.soft_red
+            )
+            await ctx.send(embed=embed)
+            return
+
+        # Determine type of repo
+        if repo_query.count("/") == 0:
+            if repo_query_casefold in self.stored_repos:
+                repo_query = self.stored_repos[repo_query_casefold]
+            elif repo_query_casefold in self.pydis_repos:
+                repo_query = self.pydis_repos[repo_query_casefold]
+                is_pydis = True
+            else:
+                fetch_most_starred = True
+
+        async with ctx.typing():
+            # Case 1: PyDis repo
+            if is_pydis:
+                repo_data = repo_query # repo_query already contains the matched repo
+
+            # Case 2: Not stored or PyDis, fetch most-starred matching repo
+            elif fetch_most_starred:
+                repos, _ = await self.fetch_data(MOST_STARRED_ENDPOINT.format(name=quote(repo_query)))
+
+                if not repos["items"]:
+                    embed = discord.Embed(
+                        title=random.choice(NEGATIVE_REPLIES),
+                        description=f"No repositories found matching `{repo_query}`.",
+                        colour=Colours.soft_red
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
+                for repo in repos["items"]:
+                    if repo["name"] == repo_query_casefold:
+                        repo_data = repo
+                        break
+                else:
+                    embed = discord.Embed(
+                        title=random.choice(NEGATIVE_REPLIES),
+                        description=f"No repositories found matching `{repo_query}`.",
+                        colour=Colours.soft_red
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
+
+            # Case 3: Regular GitHub repo
+            else:
+                repo_data, _ = await self.fetch_data(f"{GITHUB_API_URL}/repos/{quote(repo_query)}")
+                # There won't be a message key if this repo exists
+                if "message" in repo_data:
+                    embed = discord.Embed(
+                        title=random.choice(NEGATIVE_REPLIES),
+                        description="The requested repository was not found.",
+                        colour=Colours.soft_red
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
+            embed = self.build_embed(repo_data)
+            await ctx.send(embed=embed)
 
 async def setup(bot: Bot) -> None:
     """Load the GithubInfo cog."""
