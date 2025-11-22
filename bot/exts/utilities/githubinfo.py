@@ -379,8 +379,9 @@ class GithubInfo(commands.Cog):
         """
         is_pydis = False
         fetch_most_starred = False
-        repo_query_casefold = repo_query.casefold()
         repo_query = "/".join(repo)
+        repo_query_casefold = repo_query.casefold()
+
 
         if repo_query.count("/") > 1:
             embed = discord.Embed(
