@@ -379,6 +379,7 @@ class GithubInfo(commands.Cog):
         """
         is_pydis = False
         fetch_most_starred = False
+        repo_query_casefold = repo_query.casefold()
         repo_query = "/".join(repo)
 
         if repo_query.count("/") > 1:
@@ -392,7 +393,6 @@ class GithubInfo(commands.Cog):
 
         # Determine type of repo
         if repo_query.count("/") == 0:
-            repo_query_casefold = repo_query.casefold()
             if repo_query_casefold in self.stored_repos:
                 repo_query = self.stored_repos[repo_query_casefold]
             elif repo_query_casefold in self.pydis_repos:
@@ -420,7 +420,7 @@ class GithubInfo(commands.Cog):
                     return
 
                 for repo in repos["items"]:
-                    if repo["name"] == repo_query:
+                    if repo["name"] == repo_query_casefold:
                         repo_data = repo
                         break
                 else:
