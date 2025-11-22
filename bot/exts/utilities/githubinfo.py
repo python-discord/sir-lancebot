@@ -331,7 +331,7 @@ class GithubInfo(commands.Cog):
         """Create a clean discord embed to show repo data."""
         embed = discord.Embed(
             title=repo_data["name"],
-            description=repo_data["description"] or "No description provided.",
+            description=repo_data["description"],
             colour=discord.Colour.og_blurple(),
             url=repo_data["html_url"]
         )
