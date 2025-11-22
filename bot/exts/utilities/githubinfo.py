@@ -23,7 +23,7 @@ REQUEST_HEADERS = {
 }
 
 REPOSITORY_ENDPOINT = "https://api.github.com/orgs/{org}/repos?per_page=100&type=public"
-MOST_STARRED_ENDPOINT = "https://api.github.com/search/repositories?q={name}&sort=stars&order=desc&per_page=1"
+MOST_STARRED_ENDPOINT = "https://api.github.com/search/repositories?q={name}&sort=stars&order=desc&per_page=100"
 ISSUE_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/issues/{number}"
 PR_ENDPOINT = "https://api.github.com/repos/{user}/{repository}/pulls/{number}"
 
@@ -419,7 +419,19 @@ class GithubInfo(commands.Cog):
                     await ctx.send(embed=embed)
                     return
 
-                repo_data = repos["items"][0]  # Top result
+                for repo in repos["items"]:
+                    if repo["name"] == repo_query:
+                        repo_data = repo
+                        break
+                else:
+                    embed = discord.Embed(
+                        title=random.choice(NEGATIVE_REPLIES),
+                        description=f"No repositories found matching `{repo_query}`.",
+                        colour=Colours.soft_red
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
 
             # Case 3: Regular GitHub repo
             else:
