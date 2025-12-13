@@ -4,7 +4,7 @@ import itertools
 from contextlib import suppress
 from typing import NamedTuple
 
-from discord import Colour, Embed, HTTPException, Message, Reaction, User, RawReactionActionEvent, NotFound
+from discord import Colour, Embed, HTTPException, Message, NotFound, RawReactionActionEvent, Reaction, User
 from discord.ext import commands
 from discord.ext.commands import CheckFailure, Cog as DiscordCog, Command, Context
 from pydis_core.utils.logging import get_logger
