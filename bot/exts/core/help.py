@@ -4,7 +4,7 @@ import itertools
 from contextlib import suppress
 from typing import NamedTuple
 
-from discord import Colour, Embed, HTTPException, Message, NotFound, RawReactionActionEvent, Reaction, User
+from discord import Colour, Embed, HTTPException, Message, RawReactionActionEvent, Reaction, User
 from discord.ext import commands
 from discord.ext.commands import CheckFailure, Cog as DiscordCog, Command, Context
 from pydis_core.utils.logging import get_logger
@@ -233,19 +233,6 @@ class HelpSession:
         action = getattr(self, f"do_{REACTIONS[emoji]}", None)
         if action:
             await action()
-
-        # Remove the reaction to prep for re-use
-        try:
-            # We need to get the actual message and user objects for remove_reaction
-            channel = self._bot.get_channel(payload.channel_id)
-            if channel:
-                message = await channel.fetch_message(payload.message_id)
-                user = self._bot.get_user(payload.user_id)
-                if user and message:
-                    await message.remove_reaction(payload.emoji, user)
-        except (HTTPException, NotFound):
-            # Ignore errors when removing reactions
-            pass
 
     async def on_message_delete(self, message: Message) -> None:
         """Closes the help session when the help message is deleted."""
