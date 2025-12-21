@@ -4,7 +4,7 @@ import itertools
 from contextlib import suppress
 from typing import NamedTuple
 
-from discord import Colour, Embed, HTTPException, Message, NotFound, Object, RawReactionActionEvent, DMChannel
+from discord import Colour, DMChannel, Embed, HTTPException, Message, NotFound, Object, RawReactionActionEvent
 from discord.ext import commands
 from discord.ext.commands import CheckFailure, Cog as DiscordCog, Command, Context
 from pydis_core.utils.logging import get_logger
@@ -206,7 +206,8 @@ class HelpSession:
         try:
             # We need to get the actual message and user objects for remove_reaction
             channel = self._bot.get_channel(payload.channel_id)
-            if channel and not isinstance(channel, DMChannel): # channel will be None in DMs so this line skips reaction removal in DMs to prevent exceptions.
+            if channel and not isinstance(channel, DMChannel):
+                # channel is None in DMs, this condition skips reaction removal in DMs to prevent exceptions
                 message = channel.get_partial_message(payload.message_id)
                 await message.remove_reaction(payload.emoji, Object(id=payload.user_id))
         except (HTTPException, NotFound):
