@@ -27,6 +27,7 @@ APOD_MIN_DATE = date(1995, 6, 16)
 
 @dataclass
 class NasaResult:
+    """Structured result object returned by NASA API requests."""
     ok: bool
     status: int | None
     data: Any | None
