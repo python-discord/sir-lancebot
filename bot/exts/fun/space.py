@@ -127,14 +127,14 @@ class Space(Cog):
 
                 if 200 <= status < 300:
                     return NasaResult(ok=True, status=status, data=data)
-                else:
-                    logger.warning("NASA API returned non-success status %s for %s", status, url)
-                    return NasaResult(
-                        ok=False,
-                        status=status,
-                        data=data,
-                        error=f"NASA API returned status {status}.",
-                    )
+                    
+                logger.warning("NASA API returned non-success status %s for %s", status, url)
+                return NasaResult(
+                    ok=False,
+                    status=status,
+                    data=data,
+                    error=f"NASA API returned status {status}.",
+                )
 
         except TimeoutError:
             logger.warning("NASA API request timed out for %s", url)
