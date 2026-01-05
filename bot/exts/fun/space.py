@@ -137,7 +137,7 @@ class Space(Cog):
                         error=f"NASA API returned status {status}.",
                     )
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             logger.warning("NASA API request timed out for %s", url)
             return NasaResult(ok=False, status=None, data=None, error="NASA API request timed out.")
         except aiohttp.ClientError as e:
