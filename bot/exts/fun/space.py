@@ -391,6 +391,7 @@ class Space(Cog):
         await ctx.send(
             "The NASA Mars Rover Photos API used by this command has been archived by NASA and is no longer "
             "reliably available. As a result, `.space mars` is temporarily disabled."
+            "> For more details on this issue see [GitHub issue #1709](https://github.com/python-discord/sir-lancebot/issues/1709)"
         )
 
     @mars.command(name="dates", aliases=("d", "date", "rover", "rovers", "r"))
@@ -399,6 +400,7 @@ class Space(Cog):
         if not self.rovers:
             await ctx.send(
                 "Rover metadata could not be loaded because the Mars Rover Photos API has been archived by NASA."
+                "> For more details on this issue see [GitHub issue #1709](https://github.com/python-discord/sir-lancebot/issues/1709)"
             )
             return
 
