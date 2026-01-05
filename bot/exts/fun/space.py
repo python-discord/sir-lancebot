@@ -156,6 +156,21 @@ class Space(Cog):
             .set_image(url=image)
             .set_footer(text="Powered by NASA API" + (footer or ""))
         )
+    
+    async def fetch_perseverance_images(self, sol: int | None = None, earth_date: str | None = None):
+        """Fetch Perseverance raw images from the Mars 2020 API."""
+        params = {
+            "feed": "raw_images",
+            "category": "mars2020",
+            "feedtype": "json",
+        }
+        if sol is not None:
+            params["sol"] = sol
+        if earth_date is not None:
+            params["earth_date"] = earth_date
+
+        url = "https://mars.nasa.gov/rss/api/"
+        return await self.fetch_from_nasa("", params, base=url, use_api_key=False)
 
     # ===========================
     # BACKGROUND TASKS
@@ -163,43 +178,14 @@ class Space(Cog):
 
     @tasks.loop(hours=24)
     async def get_rovers(self) -> None:
-        """
-        Get listing of rovers from NASA API and info about their start and end dates.
-
-        NOTE: The Mars Rover Photos API has been archived by NASA.
-        This task is kept for compatibility but will not populate rover data reliably.
-        """
-        logger.info("Refreshing Mars rover metadata from NASA (archived API).")
-        result = await self.fetch_from_nasa("mars-photos/api/v1/rovers")
-
-        if not result.ok:
-            logger.warning(
-                "Failed to refresh rover metadata from NASA (archived API). Status: %s, Error: %s",
-                result.status,
-                result.error,
-            )
-            self.rovers.clear()
-            return
-
-        data = result.data
-        if not isinstance(data, dict) or "rovers" not in data:
-            logger.warning("Unexpected rover metadata format from NASA: %r", data)
-            self.rovers.clear()
-            return
-
-        self.rovers.clear()
-        for rover in data.get("rovers", []):
-            try:
-                name = rover["name"].lower()
-                self.rovers[name] = {
-                    "min_date": rover.get("landing_date"),
-                    "max_date": rover.get("max_date"),
-                    "max_sol": rover.get("max_sol"),
-                }
-            except KeyError:
-                logger.warning("Skipping malformed rover entry: %r", rover)
-
-        logger.info("Loaded rover metadata for rovers: %s", ", ".join(self.rovers.keys()) or "none")
+        """Load Perseverance rover metadata (Mars 2020)."""
+        self.rovers = {
+            "perseverance": {
+                "min_date": "2021-02-18",
+                "max_date": None,  # Updated dynamically
+                "max_sol": None,
+            }
+        }
 
     # ===========================
     # COMMAND GROUP
@@ -372,7 +358,7 @@ class Space(Cog):
         )
 
     # ===========================
-    # MARS COMMANDS (ARCHIVED API)
+    # MARS COMMANDS
     # ===========================
 
     @space.group(name="mars", invoke_without_command=True)
@@ -380,37 +366,55 @@ class Space(Cog):
         self,
         ctx: Context,
         date: DateConverter | None,
-        rover: str = "curiosity",
+        rover: str = "perseverance",
     ) -> None:
-        """
-        Get random Mars image by date. Supports both SOL (martian solar day) and Earth date and rovers.
+        """Get a random Perseverance rover image by sol or Earth date."""
+        if rover.lower() != "perseverance":
+            await ctx.send("Only the Perseverance rover is supported with the new NASA API.")
+            return
 
-        NOTE: The Mars Rover Photos API used by this command has been archived by NASA and is no longer
-        reliable. This command is kept for compatibility but will currently respond with a notice.
-        """
-        await ctx.send(
-            "The NASA Mars Rover Photos API used by this command has been archived by NASA and is no longer "
-            "reliably available. As a result, `.space mars` is temporarily disabled."
-            "> For more details on this issue see [GitHub issue #1709](https://github.com/python-discord/sir-lancebot/issues/1709)"
+        sol = None
+        earth_date = None
+
+        if isinstance(date, int):
+            sol = date
+        elif isinstance(date, datetime):
+            earth_date = date.date().isoformat()
+
+        result = await self.fetch_perseverance_images(sol=sol, earth_date=earth_date)
+
+        if not result.ok or "images" not in result.data:
+            await ctx.send("NASA did not return any images for that date.")
+            return
+
+        images = result.data["images"]
+        if not images:
+            await ctx.send("No images found for that date.")
+            return
+
+        image = random.choice(images)
+        img_url = image.get("image_files", [{}])[0].get("file_url")
+        caption = image.get("caption", "No caption available.")
+        sol_value = image.get("sol", "Unknown")
+
+        embed = self.create_nasa_embed(
+            f"Perseverance Rover — Sol {sol_value}",
+            caption,
+            img_url,
         )
+        await ctx.send(embed=embed)
 
     @mars.command(name="dates", aliases=("d", "date", "rover", "rovers", "r"))
     async def dates(self, ctx: Context) -> None:
         """Get current available rover photo date ranges (informational only; API is archived)."""
-        if not self.rovers:
-            await ctx.send(
-                "Rover metadata could not be loaded because the Mars Rover Photos API has been archived by NASA."
-                "> For more details on this issue see [GitHub issue #1709](https://github.com/python-discord/sir-lancebot/issues/1709)"
-            )
+        if "perseverance" not in self.rovers:
+            await ctx.send("Rover metadata unavailable.")
             return
 
+        info = self.rovers["perseverance"]
         await ctx.send(
-            "\n".join(
-                f"**{r.capitalize()}:** {i['min_date']} **-** {i['max_date']}"
-                for r, i in self.rovers.items()
-            )
+            f"**Perseverance:** {info['min_date']} — Present (sol increases daily)"
         )
-
 
 async def setup(bot: Bot) -> None:
     """Load the Space cog."""
