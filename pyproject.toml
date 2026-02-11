@@ -17,7 +17,7 @@ dependencies = [
     "emoji==2.14.0",
     "emojis==0.7.0",
     "lxml==6.0.0",
-    "pillow==11.0.0",
+    "pillow==12.1.1",
     "pydantic==2.10.1",
     "pydantic-settings==2.8.1",
     "pyjokes==0.8.3",
