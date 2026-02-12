@@ -1,0 +1,23 @@
+[
+  {
+    "id": "three_little_pigs",
+    "name": "Three Little Pigs",
+    "description": "A wolf is on the prowl! You are one of the three little pigs. Try to survive by building a house.",
+    "color": "0x1DA1F2",
+    "time": 30
+  },
+  {
+    "id": "dragon_slayer",
+    "name": "Dragon Slayer",
+    "description": "A dragon is terrorizing the kingdom! You are a brave knight, tasked with rescuing the princess and defeating the dragon.",
+    "color": "0x1F8B4C",
+    "time": 60
+  },
+  {
+    "id": "Gurfelts_haunted_mansion",
+    "name": "Gurfelt's Haunted Mansion",
+    "description": "Explore a haunted mansion and uncover its secrets!",
+    "color": "0xB734EB",
+    "time": 60
+  }
+]
