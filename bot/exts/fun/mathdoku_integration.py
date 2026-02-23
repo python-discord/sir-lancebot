@@ -11,17 +11,17 @@ from bot.constants import Client
 from bot.utils.converters import CoordinateConverter
 from bot.utils.exceptions import UserNotPlayingError
 
-class Kenken(commands.Cog):
-    """Play a game of Kenken."""
+class Mathdoku(commands.Cog):
+    """Play a game of Mathdoku."""
 
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @commands.group(name="Kenken", invoke_without_command=True)
-    async def kenken_group(self, ctx: commands.Context) -> None:
-        """Commands for Playing Kenken."""
-        await ctx.send("The Kenken API is working!")
+    @commands.group(name="Mathdoku", invoke_without_command=True)
+    async def Mathdoku_group(self, ctx: commands.Context) -> None:
+        """Commands for Playing Mathdoku."""
+        await ctx.send("The Mathdoku API is working!")
 
 async def setup(bot: Bot) -> None:
-    """Load the Kenken cog."""
-    await bot.add_cog(Kenken(bot))
+    """Load the Mathdoku cog."""
+    await bot.add_cog(Mathdoku(bot))
