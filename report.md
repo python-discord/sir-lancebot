@@ -1,8 +1,24 @@
-# Report for assignment 4 This is a template for your report. You are free to modify it as needed. It is not required to use markdown for your report either, but the report has to be delivered in a standard, cross-platform format.
+# Lab 4 Report: **Issue Resolution**
 
-## Project Name: URL: One or two sentences describing it
+## Project Description
 
-## Onboarding experience Did you choose a new project or continue on the previous one? If you changed the project, how did your experience differ from before?
+### Project Name: **Sir Lancebot**
+
+### URL: https://github.com/python-discordsir-lancebot
+
+### One or two sentences describing it:
+
+Sir Lancebot is an open-source Discord bot written in Python and maintained by the Python Discord community. . On the project, contributors can implement new commands and features, or fix issues.
+
+## Onboarding experience
+
+### Did you choose a new project or continue on the previous one? If you changed the project, how did your experience differ from before?
+
+We decided to select a new project because the remaining open issues in the mockito project were very complex to resolve. Therefore, we chose to siwtch to `Sir Lancebot`.
+
+The experience of selecting an issue in this new project was more satisfactory and straightforward. We chose one that the whole team found particularly interesting. The issue was clearly described, and provide to us more flexibility in terms of implementation and decision-making.
+
+
 
 ## Effort spent For each team member, how much time was spent in
 1. plenary discussions/meetings;
