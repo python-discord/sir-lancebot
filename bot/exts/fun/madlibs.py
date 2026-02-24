@@ -155,8 +155,8 @@ class Madlibs(commands.Cog):
 
                 await original_message.edit(view=self.view)
 
-                for j in self.submitted_words:
-                    self.edited_content.pop(j, self.submitted_words[j])
+                for word in self.submitted_words:
+                    self.edited_content.pop(word, self.submitted_words[word])
 
                 self.checks.remove(author_check)
 
