@@ -83,7 +83,7 @@ def _create_cells_and_blocks(expected_size: int, created_grid: Grid, grid_str: s
                 cell.block = None
                 continue
             if col not in seen_blocks:
-                block = Block(col, None, None, cell, (255, 255, 255))
+                block = Block(col, None, None, cell)
                 seen_blocks[col] = block
                 created_grid.blocks.append(block)
             else:
