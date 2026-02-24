@@ -11,11 +11,16 @@ from bot.constants import Client
 from bot.utils.converters import CoordinateConverter
 from bot.utils.exceptions import UserNotPlayingError
 
+import re
+
 
 # These 2 commands make the API not work for some reason if uncommented
 # from .mathdoku_parser import create_grids
 # grids = create_grids()
 
+
+
+CROSS_EMOJI = "\u274e"
 
 class Mathdoku(commands.Cog):
     """Play a game of Mathdoku."""
@@ -30,17 +35,6 @@ class Mathdoku(commands.Cog):
         await ctx.send("The Mathdoku API is working!")
         await self.bot.invoke_help_command(ctx)
 
-    # def predicate(self, message: discord.Message) -> bool:
-    #     """Predicate checking the message typed for each turn."""
-    #     if message.author == self.turn.user and message.channel == self.turn.user.dm_channel:
-    #         if message.content.lower() == "surrender":
-    #             self.surrender = True
-    #             return True
-    #         self.match = re.fullmatch("([A-J]|[a-j]) ?((10)|[1-9])", message.content.strip())
-    #         if not self.match:
-    #             self.bot.loop.create_task(message.add_reaction(CROSS_EMOJI))
-    #         return bool(self.match)
-    #     return None
 
     @mathdoku_group.command(name="start")
     async def start_command(self, ctx: commands.Context, size: int = 5) -> None:
@@ -49,38 +43,45 @@ class Mathdoku(commands.Cog):
 
         self.playing = True
         while self.playing == True:
-            self.input_number_on_board()
+            await self.input_number_on_board(ctx)
 
         await ctx.send("Game of Mathdoku is over!")
- 
-    async def input_number_on_board(self) -> None: #None might need to be changed later
-        # """Lets the player choose a square and input a number if it exists."""
-        # input_message = await self.send(
-        #     "Type the square and what number you want to input. Format it like this: A1 3\n"
-        #     "Type `end` to end game."
-        # )
-    # while True:
-    #     try:
-    #         await self.bot.wait_for("message", check=self.predicate, timeout=30.0)
-    #     except TimeoutError:
-    #         await self.send("You took too long. Game over!")
-    #         self.gameover = True
-    #         break
-    #     else:
-    #         if self.surrender:
-    #             await self.next.user.send(f"{self.turn.user} surrendered. Game over!")
-    #             await self.public_channel.send(
-    #                 f"Game over! {self.turn.user.mention} surrendered to {self.next.user.mention}!"
-    #             )
-    #             self.gameover = True
-    #             break
-    #         square = self.get_square(self.next.grid, self.match.string)
-    #         if square.aimed:
-    #             await self.turn.user.send("You've already aimed at this square!", delete_after=3.0)
-    #         else:
-    #             break
-    # await turn_message.delete()
-    # return square
+
+    async def input_number_on_board(self, ctx: commands.Context,) -> None: #None might need to be changed later
+        """Lets the player choose a square and input a number if it is valid."""
+        turn_message = await ctx.send(
+            "Type the square and what number you want to input. Format it like this: A1 3\n"
+            "Type `end` to end game."
+        )
+        while True:
+            try:
+                await self.bot.wait_for("message", check=self.predicate, timeout=60.0)
+            except TimeoutError:
+                await ctx.send("You took too long. Game over!")
+                self.playing = False
+                break
+            else:
+                if not self.playing:
+                    await ctx.send("The game has been ended")
+                    break
+                else:
+                    break
+        await turn_message.delete()
+
+    def predicate(self, message: discord.Message) -> bool:
+        """Predicate checking the message typed for each turn."""
+        input_text = message.content.strip()
+
+        if input_text.lower() == "end":
+            self.playing = False
+            return True
+        match = re.fullmatch(r"[A-Ja-j](10|[1-9])\s+[1-9]", input_text)
+
+        #might wanna change to another format
+        if not match:
+            self.bot.loop.create_task(message.add_reaction(CROSS_EMOJI))
+
+        return bool(match)
 
 
 async def setup(bot: Bot) -> None:
