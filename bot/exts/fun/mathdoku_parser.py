@@ -80,7 +80,7 @@ def _create_cells_and_blocks(expected_size: int, created_grid: Grid, grid_str: s
         for j, col in enumerate(row):
             cell = created_grid[i][j]
             if col.isdigit():  # has no block
-                cell.block = None
+                cell.block = Block("0", "", col, cell)
                 continue
             if col not in seen_blocks:
                 block = Block(col, None, None, cell)

@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from bot.exts.fun.mathdoku import Block
 from bot.exts.fun.mathdoku_parser import create_grids
 
 
@@ -43,7 +44,8 @@ G 3-
     assert grid.cells[0][0].block.number == 30
 
     assert grid.cells[4][4].correct == 5
-    assert grid.cells[4][4].block is None
+    assert type(grid.cells[4][4].block) is Block
+    assert grid.cells[4][4].block.id == "0"
 
 
 def test_load_invalid_5x5_grid(tmp_path: Path) -> None:
