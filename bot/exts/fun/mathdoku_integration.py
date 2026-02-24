@@ -1,15 +1,11 @@
-from collections.abc import Iterator
-from dataclasses import dataclass
-from random import randint, random
 
-import discord
 from discord.ext import commands
-from pydis_core.utils.logging import get_logger
+from mathdoku_parser import create_grids
 
 from bot.bot import Bot
-from bot.constants import Client
-from bot.utils.converters import CoordinateConverter
-from bot.utils.exceptions import UserNotPlayingError
+
+grids = create_grids()
+
 
 class Mathdoku(commands.Cog):
     """Play a game of Mathdoku."""
@@ -21,6 +17,7 @@ class Mathdoku(commands.Cog):
     async def Mathdoku_group(self, ctx: commands.Context) -> None:
         """Commands for Playing Mathdoku."""
         await ctx.send("The Mathdoku API is working!")
+
 
 async def setup(bot: Bot) -> None:
     """Load the Mathdoku cog."""
