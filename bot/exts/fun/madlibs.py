@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 import json
 from pathlib import Path
 from random import choice
@@ -113,57 +114,72 @@ class Madlibs(commands.Cog):
             self.wait_task = asyncio.create_task(
                 self.bot.wait_for("message", timeout=TIMEOUT, check=author_check)
             )
-            try:
-                message = await self.wait_task
-                self.submitted_words[i] = message.content
-            except asyncio.CancelledError:
+
+            # Clear any previous value for this index
+            self.submitted_words.pop(i, None)
+
+            start = discord.utils.utcnow()
+
+            while True:
+                # If user clicked End Game
                 if self.end_game:
                     if self.view:
                         self.view.stop()
                         for child in self.view.children:
                             if isinstance(child, discord.ui.Button):
                                 child.disabled = True
-
-                        # cancel cooldown cleanly
                         task = getattr(self.view, "cooldown_task", None)
                         if task and not task.done():
                             task.cancel()
-
                         await original_message.edit(view=self.view)
-                        self.checks.remove(author_check)
 
-                    return
-                # else: "Choose for me" set self.submitted_words[i]; just continue
-            except TimeoutError:
-                # If we ended the game around the same time, don't show timeout
-                if self.end_game:
                     self.checks.remove(author_check)
                     return
 
-                timeout_embed = discord.Embed(
-                    title=choice(NEGATIVE_REPLIES),
-                    description="Uh oh! You took too long to respond!",
-                    color=Colours.soft_red
-                )
+                # If user submitted a word manually, via on_message / wait_for
+                message = None
+                with contextlib.suppress(asyncio.TimeoutError):
+                    message = await self.bot.wait_for(
+                        "message",
+                        timeout=1.0,
+                        check=author_check,
+                    )
 
-                await ctx.send(ctx.author.mention, embed=timeout_embed)
+                if message is not None:
+                    # manual input
+                    self.submitted_words[i] = message.content
+                    break
 
-                self.view.stop()
-                for child in self.view.children:
-                    if isinstance(child, discord.ui.Button):
-                        child.disabled = True
+                # If "Choose for me" was pressed, that handler sets submitted_words[i]
+                if i in self.submitted_words:
+                    break
 
-                await original_message.edit(view=self.view)
+                # Global timeout
+                elapsed = (discord.utils.utcnow() - start).total_seconds()
+                if elapsed >= TIMEOUT:
+                    if self.end_game:
+                        self.checks.remove(author_check)
+                        return
 
-                for word in self.submitted_words:
-                    self.edited_content.pop(word, self.submitted_words[word])
+                    timeout_embed = discord.Embed(
+                        title=choice(NEGATIVE_REPLIES),
+                        description="Uh oh! You took too long to respond!",
+                        color=Colours.soft_red,
+                    )
+                    await ctx.send(ctx.author.mention, embed=timeout_embed)
 
-                self.checks.remove(author_check)
+                    if self.view:
+                        self.view.stop()
+                        for child in self.view.children:
+                            if isinstance(child, discord.ui.Button):
+                                child.disabled = True
+                        await original_message.edit(view=self.view)
 
-                return
-            finally:
-                # Clean up so the next iteration doesn't see an old task
-                self.wait_task = None
+                    for word in self.submitted_words:
+                        self.edited_content.pop(word, self.submitted_words[word])
+
+                    self.checks.remove(author_check)
+                    return
 
         blanks = [self.submitted_words[j] for j in range(len(random_template["blanks"]))]
 
@@ -257,20 +273,20 @@ class MadlibsView(discord.ui.View):
             random_word = choice(self.word_bank[self.part_of_speech])
             self.cog.submitted_words[self.index] = random_word
 
-            wait_task = self.cog.wait_task
-            if wait_task is not None and not wait_task.done():
-                wait_task.cancel()
-
             if self.cooldown_task and not self.cooldown_task.done():
                 self.cooldown_task.cancel()
 
-            await interaction.response.send_message(f"Randomly chosen word: {random_word}", ephemeral=True)
+            await interaction.response.send_message(
+                f"Randomly chosen word: {random_word}", ephemeral=True
+            )
 
             # Re-disable the button and restart the cooldown (so it can't be clicked again immediately)
             self.random_word_button.disabled = True
             await interaction.followup.edit_message(view=self)
         else:
-            await interaction.response.send_message("Only the owner of the game can end it!", ephemeral=True)
+            await interaction.response.send_message(
+                "Only the owner of the game can end it!", ephemeral=True
+            )
 
     @discord.ui.button(style=discord.ButtonStyle.red, label="End Game")
     async def end_button(self, interaction: discord.Interaction, *_) -> None:
@@ -279,20 +295,21 @@ class MadlibsView(discord.ui.View):
             # Mark the game as ended
             self.cog.end_game = True
 
-            # Cancel the wait task if it's running
-            wait_task = self.cog.wait_task
-            if wait_task is not None and not wait_task.done():
-                wait_task.cancel()
-
             # Disable all buttons in the view
             for child in self.children:
                 if isinstance(child, discord.ui.Button):
                     child.disabled = True
 
-            await interaction.response.send_message("Ended the current game.", ephemeral=True)
-            await interaction.followup.edit_message(message_id=interaction.message.id, view=self)
+            await interaction.response.send_message(
+                "Ended the current game.", ephemeral=True
+            )
+            await interaction.followup.edit_message(
+                message_id=interaction.message.id, view=self
+            )
         else:
-            await interaction.response.send_message("Only the owner of the game can end it!", ephemeral=True)
+            await interaction.response.send_message(
+                "Only the owner of the game can end it!", ephemeral=True
+            )
 
 
 async def setup(bot: Bot) -> None:
