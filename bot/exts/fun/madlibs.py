@@ -257,8 +257,8 @@ class MadlibsView(discord.ui.View):
             random_word = choice(self.word_bank[self.part_of_speech])
             self.cog.submitted_words[self.index] = random_word
 
-            wait_task = getattr(self.cog, "wait_task", None)
-            if wait_task and not wait_task.done():
+            wait_task = self.cog.wait_task
+            if wait_task is not None and not wait_task.done():
                 wait_task.cancel()
 
             if self.cooldown_task and not self.cooldown_task.done():
@@ -276,10 +276,12 @@ class MadlibsView(discord.ui.View):
     async def end_button(self, interaction: discord.Interaction, *_) -> None:
         """Button that ends the current game."""
         if interaction.user == self.ctx.author:
-            # Cancel the wait task if it's running
+            # Mark the game as ended
             self.cog.end_game = True
-            wait_task = getattr(self.cog, "wait_task", None)
-            if wait_task and not wait_task.done():
+
+            # Cancel the wait task if it's running
+            wait_task = self.cog.wait_task
+            if wait_task is not None and not wait_task.done():
                 wait_task.cancel()
 
             # Disable all buttons in the view
