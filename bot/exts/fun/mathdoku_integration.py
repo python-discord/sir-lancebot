@@ -31,6 +31,7 @@ class Mathdoku(commands.Cog):
         self.bot = bot
         self.grids = grids
         self.playing = False
+        self.player_id = None
 
     @commands.group(name="Mathdoku", aliases=("md",), invoke_without_command=True)
     async def mathdoku_group(self, ctx: commands.Context) -> None:
@@ -41,6 +42,7 @@ class Mathdoku(commands.Cog):
     @mathdoku_group.command(name="start")
     async def start_command(self, ctx: commands.Context, size: int = 5) -> None:
         """Start a game of Mathdoku."""
+        self.player_id = ctx.author.id
         await ctx.send("Game of Mathdoku has been started!")
 
         self.playing = True
@@ -74,18 +76,20 @@ class Mathdoku(commands.Cog):
 
     def predicate(self, message: discord.Message) -> bool:
         """Predicate checking the message typed for each turn."""
-        input_text = message.content.strip()
+        if self.player_id == message.author.id:
+            input_text = message.content.strip()
 
-        if input_text.lower() == "end":
-            self.playing = False
-            return True
-        match = re.fullmatch(r"[A-Ja-j](10|[1-9])\s+[1-9]", input_text)
+            if input_text.lower() == "end":
+                self.playing = False
+                return True
+            match = re.fullmatch(r"[A-Ja-j](10|[1-9])\s+[1-9]", input_text)
 
-        # might wanna change to another format
-        if not match:
-            self.bot.loop.create_task(message.add_reaction(CROSS_EMOJI))
-
-        return bool(match)
+            # might wanna change to another format
+            if not match:
+                self.bot.loop.create_task(message.add_reaction(CROSS_EMOJI))
+            return bool(match)
+        else: 
+            return None
 
 
 async def setup(bot: Bot) -> None:
