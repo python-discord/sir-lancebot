@@ -95,6 +95,10 @@ class Mathdoku(commands.Cog):
         self.grids = testingGrid
         file = discord.File(self.grids._generate_image(), filename="mathdoku.png")
         self.board = await ctx.send(file=file)
+
+        await ctx.send(
+            "Type the square and what number you want to input. Format it like this: A1 3\n" "Type `end` to end game."
+        )
         
 
         self.playing = True
@@ -108,9 +112,6 @@ class Mathdoku(commands.Cog):
         ctx: commands.Context,
     ) -> None:  # None might need to be changed later
         """Lets the player choose a square and input a number if it is valid."""
-        turn_message = await ctx.send(
-            "Type the square and what number you want to input. Format it like this: A1 3\n" "Type `end` to end game."
-        )
         while True:
             try:
                 await self.bot.wait_for("message", check=self.predicate, timeout=60.0)
@@ -126,7 +127,6 @@ class Mathdoku(commands.Cog):
                     file = discord.File(self.grids._generate_image(), filename="mathdoku.png")
                     await self.board.edit(content=None, attachments=[file])
                     break
-        await turn_message.delete()
 
     def predicate(self, message: discord.Message) -> bool:
         """Predicate checking the message typed for each turn."""

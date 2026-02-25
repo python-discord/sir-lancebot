@@ -59,4 +59,4 @@ I 2-
     assert grid._blocks_fufilled_check()[0].id == "F"
     assert grid._blocks_fufilled_check()[1].id == "H"
 
-    grid._generate_image(outfile=filepath, saveToFile=True)
+    grid._generate_image(outfile=filepath, saveToFile=False)
