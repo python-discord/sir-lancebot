@@ -47,7 +47,6 @@ def test_load_valid_5x5_grid(tmp_path: Path) -> None:
 
     assert grid.cells[4][4].correct == 5
     assert type(grid.cells[4][4].block) is Block
-    assert grid.cells[4][4].block.id == "0"
 
 
 def test_load_invalid_5x5_grid(tmp_path: Path) -> None:

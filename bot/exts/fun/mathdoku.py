@@ -114,15 +114,12 @@ class Block:
         self.operation = operation
         self.number = number
         self.label_cell = label_cell
+        self.color = self.compute_color()
 
-    @property
-    def color(self) -> tuple[int, int, int]:
-        """Returns the block's color."""
-        c_a = ord(self.id[0]) - ord("A")
-        if c_a > 0 and c_a < len(COLORS):
-            return COLORS[c_a]
-
-        return COLORS[-1]
+    def compute_color(self) -> tuple[int, int, int]:
+        """Computes the block's color."""
+        c_a = ord(self.id[0])**2 - ord("A")
+        return COLORS[c_a % len(COLORS)]
 
 
 class Grid:
@@ -222,7 +219,26 @@ class Grid:
             return True
         return False
         
-                
+
+    def board_filled_handler(self) -> bool:
+        """
+        Handler for when board is filled.\n
+        The method calls the victory check and colors in the blocks that are not fufilled if any,\n
+        and returns True or False if the board is solved.
+        """     
+        if self.check_victory():
+            return True
+        
+        wrong_blocks = self._blocks_fufilled_check()
+        for block in self.blocks:
+            if block in wrong_blocks:
+                block.color = (255, 0, 0)
+            else:
+                block.color = (100, 255, 100)
+
+        return False
+        
+              
 
     def __getitem__(self, i: int) -> list[Cell]:
         """
