@@ -1,9 +1,16 @@
 import re
 from pathlib import Path
 
+from bot.bot import Bot
+
 from .mathdoku import Block, Grid
 
 FILE_PATH = Path("bot/resources/fun/mathdoku_boards.txt")
+
+
+async def setup(bot: Bot) -> None:
+    """Missing setup function was causing issues."""
+    return
 
 
 def create_grids(file_path: Path = FILE_PATH) -> list[Grid]:
