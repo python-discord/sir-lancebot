@@ -136,6 +136,8 @@ class Grid:
             tuple(Cell(col, row) for col in range(size))
             for row in range(size)
         )   # 2D tupple for cells [row][col]
+        
+        self._last_hint_timestamp = None
 
     @property
     def cells(self):
