@@ -79,3 +79,37 @@ G 3-
     grids = create_grids(file_path=grids_file)
 
     assert len(grids) == 0
+
+
+def test_load_valid_5x5_grid_and_check_singletons_have_blocks(tmp_path: Path) -> None:
+    """Loads a grid and checks that singleton cells have blocks that have correct numbers."""
+    content = """\
+5x5:d5
+.KK "1:(d=5)"
+EAACC
+EB3CG
+EBF5G
+E1FDD
+FFFD5
+
+A 1-
+B 6+
+C 12x
+D 8+
+E 30x
+F 15+
+G 3-
+
+1 5 4 3 2
+5 4 3 2 1
+3 2 1 5 4
+2 1 5 4 3
+4 3 2 1 5
+"""
+    grids_file = tmp_path / "grids.txt"
+    grids_file.write_text(content, encoding="utf-8")
+
+    grids = create_grids(file_path=grids_file)
+    grid = grids[0]
+    assert type(grid[2][3].block) is Block
+    assert type(grid[2][3].block.number) is int
