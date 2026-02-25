@@ -22,9 +22,9 @@ def test_image_generation():
     cell_seven = testingGrid.cells[2][0]
     cell_eight = testingGrid.cells[2][1]
     cell_nine = testingGrid.cells[2][2]
-    testBlock_1 = Block("1", "+", 3, cell_one)
-    testBlock_2 = Block("2", "/", 30, cell_four)
-    testBlock_3 = Block("3", "-", 300, cell_five)
+    testBlock_1 = Block("A", "+", 3, cell_one)
+    testBlock_2 = Block("B", "/", 30, cell_four)
+    testBlock_3 = Block("C", "-", 300, cell_five)
     testingGrid.blocks.append(testBlock_1)
     testingGrid.blocks.append(testBlock_2)
     testingGrid.blocks.append(testBlock_3)
@@ -54,7 +54,7 @@ def test_image_generation():
     cell_five.block = testBlock_3
     cell_six.block = testBlock_3
 
-    testingGrid._generate_image(outfile=filepath)
+    testingGrid._generate_image(outfile=filepath, saveToFile=True)
     assert os.path.exists(filepath)
     if (os.path.exists(filepath)): 
         os.remove(filepath)

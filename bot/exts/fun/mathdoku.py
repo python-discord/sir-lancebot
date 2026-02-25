@@ -1,3 +1,4 @@
+from io import BytesIO
 from PIL import Image, ImageDraw, ImageFont
 from datetime import datetime
 
@@ -231,7 +232,7 @@ class Grid:
         """
         return self.cells[i]
 
-    def _generate_image(self, cellSize = 80, margin = 30, outfile = "mathdoku.png") -> None:
+    def _generate_image(self, cellSize = 80, margin = 30, outfile = "mathdoku.png", saveToFile = False) -> None:
         """Print the Grid to """
         fontLable = ImageFont.load_default(15)
         fontGuess = ImageFont.load_default(30)
@@ -282,9 +283,14 @@ class Grid:
             draw.text((13, margin + 22 + j * cellSize + margin//2), str(text), 
                             fill="black", font=fontGuess)
 
-        img.save(outfile)
-        print("Saved " + outfile)
-        return
+        if (saveToFile):
+            img.save(outfile)
+ 
+        buffer = BytesIO()
+        img.save(buffer, "PNG")
+        buffer.seek(0)
+        return buffer
+    
     def _find_first_empty_cell(self):
         """Return the first empty cell (`guess == 0`) in row-major order, or `None` if all cells are filled."""
         for row in self.cells:
