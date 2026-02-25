@@ -89,6 +89,7 @@ def _create_cells_and_blocks(expected_size: int, created_grid: Grid, grid_str: s
             if col.isdigit():  # has no block
                 block = Block("0", "", int(col), cell)
                 cell.block = block
+                block.cells.append(cell)
                 created_grid.blocks.append(block)
                 continue
             if col not in seen_blocks:
