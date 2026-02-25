@@ -1,4 +1,5 @@
 from PIL import Image, ImageDraw, ImageFont
+from datetime import datetime
 
 COLORS = [
     (235, 59, 59),
@@ -84,6 +85,7 @@ COLORS = [
     (235, 59, 72),
 ]
 
+
 class Cell:
     """Represents a single cell in the grid."""
 
@@ -124,6 +126,8 @@ class Block:
 
 class Grid:
     """Represents the full game board, with all blocks and player guesses."""
+
+    HINT_COOLDOWN_SECONDS = 180 # 3 minutes of hint cooldown.
 
     def __init__(self, size: int) -> None:
         self.size = size
@@ -279,3 +283,37 @@ class Grid:
         img.save(outfile)
         print("Saved " + outfile)
         return
+    def _find_first_empty_cell(self):
+        """Return the first empty cell (`guess == 0`) in row-major order, or `None` if all cells are filled."""
+        for row in self.cells:
+            for cell in row:
+                if cell.guess == 0:
+                    return cell, "empty"
+
+        return None
+
+    def hint(self, now: datetime | None = None):
+        """Return a hint for the first empty cell, or cooldown/all-filled info if a hint cannot be given."""
+        current_time = datetime.now() if now is None else now
+
+        if self._last_hint_timestamp is not None:
+            elapsed = (current_time - self._last_hint_timestamp).total_seconds()
+            if elapsed < self.HINT_COOLDOWN_SECONDS:
+                return {
+                    "type": "cooldown",
+                    "remaining_seconds": int(self.HINT_COOLDOWN_SECONDS - elapsed),
+                }
+
+        found = self._find_first_empty_cell()
+        if found is None:
+            return {"type": "all filled cells"}
+
+        cell, _reason = found
+
+        self._last_hint_timestamp = current_time
+        return {
+            "type": "hint",
+            "row": cell.row,
+            "column": cell.column,
+            "value": cell.correct,
+        }
