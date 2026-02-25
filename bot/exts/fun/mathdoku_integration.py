@@ -65,7 +65,7 @@ cell_five.block = testBlock_3
 cell_six.block = testBlock_3 
 
 
-CROSS_EMOJI = "\u274e"
+CROSS_EMOJI = '\u274C' #"\u274e"
 log = get_logger(__name__)
 
 
@@ -92,8 +92,8 @@ class Mathdoku(commands.Cog):
         await ctx.send("Game of Mathdoku has been started!")
 
         # TODO Create an actual Grid:
-        self.grid = testingGrid
-        file = discord.File(self.grid._generate_image(), filename="mathdoku.png")
+        self.grids = testingGrid
+        file = discord.File(self.grids._generate_image(), filename="mathdoku.png")
         self.board = await ctx.send(file=file)
         
 
@@ -123,6 +123,8 @@ class Mathdoku(commands.Cog):
                     await ctx.send("The game has been ended")
                     break
                 else:
+                    file = discord.File(self.grids._generate_image(), filename="mathdoku.png")
+                    await self.board.edit(content=None, attachments=[file])
                     break
         await turn_message.delete()
 
@@ -135,11 +137,15 @@ class Mathdoku(commands.Cog):
                 self.playing = False
                 return True
             match = re.fullmatch(r"[A-Ja-j](10|[1-9])\s+[1-9]", input_text)
-
-            # might wanna change to another format
             if not match:
                 self.bot.loop.create_task(message.add_reaction(CROSS_EMOJI))
-            return bool(match)
+                return bool(match)
+            
+            valid_match = self.grids.add_guess(input_text) # checks if its a valid guess and applies
+            # might wanna change to another format
+            if not valid_match:
+                self.bot.loop.create_task(message.add_reaction(CROSS_EMOJI))
+            return valid_match
         else: 
             return None
 

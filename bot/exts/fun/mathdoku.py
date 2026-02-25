@@ -369,3 +369,20 @@ class Grid:
             "column": cell.column,
             "value": cell.correct,
         }
+    
+    def add_guess(self, guess):
+        """Takes the user guess and checks if its valid, if it is -> add to cell
+            A guess is in format A5 4, where A = column, 5 = row and 4 = guessed value"""
+        guess = guess.split()
+        column = ord(guess[0][0].lower()) - 97
+        row = int(guess[0][1]) - 1
+        value = int(guess[1])
+
+        if (column < 0 or row < 0 or value < 1):
+            return False
+        
+        if (column >= self.size or row >= self.size or value > self.size):
+            return False
+        
+        self.cells[row][column].guess = value
+        return True
