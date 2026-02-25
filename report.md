@@ -32,7 +32,12 @@ The experience of selecting an issue in this new project was more satisfactory a
 
 For setting up tools and libraries (step 4), enumerate all dependencies you took care of and where you spent your time, if that time exceeds 30 minutes.
 
-## Overview of issue(s) and work done. Title: URL: Summary in one or two sentences Scope (functionality and code affected).
+## Overview of issue(s) and work done. 
+
+### Title: Kenken command #989 
+### URL: https://github.com/python-discord/sir-lancebot/issues/989 (link to the original issue, should it be the issue to the pullrequest or the fork instead?)
+### Summary in one or two sentences Scope (functionality and code affected).
+We created a Mathdoku game command for the Sir Lancebot Discord bot. We only created new files in the sir-lancebot repository and did not change any existing files. 
 
 ## Requirements for the new feature or requirements affected by functionality being refactored
 
