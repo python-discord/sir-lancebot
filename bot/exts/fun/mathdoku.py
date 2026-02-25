@@ -1,3 +1,5 @@
+from PIL import Image, ImageDraw, ImageFont
+
 COLORS = [
     (235, 59, 59),
     (199, 61, 50),
@@ -81,7 +83,6 @@ COLORS = [
     (199, 50, 72),
     (235, 59, 72),
 ]
-
 
 class Cell:
     """Represents a single cell in the grid."""
@@ -223,3 +224,58 @@ class Grid:
         Grid[i] will return the i:th row.
         """
         return self.cells[i]
+
+    def _generate_image(self, cellSize = 80, margin = 30, outfile = "mathdoku.png") -> None:
+        """Print the Grid to """
+        fontLable = ImageFont.load_default(15)
+        fontGuess = ImageFont.load_default(30)
+        img = Image.new("RGB", (cellSize * len(self.cells) + 2*margin, cellSize * len(self.cells) + 2*margin), "white")
+        draw = ImageDraw.Draw(img)
+
+        for row in self.cells:
+            for cell in row:
+                # 1) The block color
+                x_start = (cell.column) * cellSize + margin + margin//2
+                y_start = (cell.row) * cellSize + margin + margin//2
+                x_end = (cell.column) * cellSize + cellSize + margin + margin//2
+                y_end = (cell.row) * cellSize + cellSize + margin + margin//2
+                color = cell.block.color
+                draw.rectangle((x_start, y_start, x_end, y_end),fill=color)
+                
+                # 2) the guess
+                guess = cell.guess
+                if (guess != 0):
+                    draw.text((x_start+30, y_start+22), str(guess), 
+                            fill="black", font=fontGuess)
+                    
+                # 3) the lines between the cells
+                draw.line((x_start, y_start, x_start + cellSize, y_start), fill="black", width=2)
+                draw.line((x_end, y_start, x_end, y_end), fill="black", width=2)
+                draw.line((x_start, y_start, x_start, y_start + cellSize), fill="black", width=2)
+                draw.line((x_start, y_end, x_end, y_end), fill="black", width=2)
+
+        for block in self.blocks:
+            # 4) the lable of the block - in the top left corner of the lable cell
+            label_cell = block.label_cell
+            label = str(block.number) + " " + str(block.operation)
+            x_start = (label_cell.column) * cellSize + margin + margin//2
+            y_start = (label_cell.row) * cellSize + margin + margin//2
+            print("Label:" + label )
+            draw.text((x_start+4, y_start+2), str(label), 
+                            fill="black", font=fontLable)
+
+        # 5) the x axis description A-...
+        for i in range(self.size):
+            text = chr(ord("A") + i)
+            draw.text((margin + 30 + i * cellSize + margin//2, 4), str(text), 
+                            fill="black", font=fontGuess)
+            
+        # 6) the y axis description 1-...
+        for j in range(self.size):
+            text = str(j+1)
+            draw.text((13, margin + 22 + j * cellSize + margin//2), str(text), 
+                            fill="black", font=fontGuess)
+
+        img.save(outfile)
+        print("Saved " + outfile)
+        return
