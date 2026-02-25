@@ -28,12 +28,12 @@ class Madlibs(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.templates = self._load_templates()
-        self.edited_content = {}
         self.submitted_words = {}
         self.view = None
         self.wait_task: asyncio.Task | None = None
         self.end_game = False
         self.checks = set()
+        self.message_ids: dict[int, int] = {}
 
     @staticmethod
     def _load_templates() -> list[MadlibsTemplate]:
@@ -67,7 +67,11 @@ class Madlibs(commands.Cog):
         else:
             return
 
-        self.edited_content[after.id] = after.content
+        index = self.message_ids.get(after.id)
+        if index is None:
+            return
+
+        self.submitted_words[index] = after.content
 
     @commands.command()
     @commands.max_concurrency(1, per=commands.BucketType.user)
@@ -148,6 +152,7 @@ class Madlibs(commands.Cog):
                 if message is not None:
                     # manual input
                     self.submitted_words[i] = message.content
+                    self.message_ids[message.id] = i
                     break
 
                 # If "Choose for me" was pressed, that handler sets submitted_words[i]
@@ -174,9 +179,6 @@ class Madlibs(commands.Cog):
                             if isinstance(child, discord.ui.Button):
                                 child.disabled = True
                         await original_message.edit(view=self.view)
-
-                    for word in self.submitted_words:
-                        self.edited_content.pop(word, self.submitted_words[word])
 
                     self.checks.remove(author_check)
                     return
