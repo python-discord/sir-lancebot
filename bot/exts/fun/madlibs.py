@@ -141,7 +141,6 @@ class Madlibs(commands.Cog):
                     return
 
                 # If user submitted a word manually, via on_message / wait_for
-                message = None
                 with contextlib.suppress(asyncio.TimeoutError):
                     message = await self.bot.wait_for(
                         "message",
@@ -150,7 +149,6 @@ class Madlibs(commands.Cog):
                     )
 
                 if message is not None:
-                    # manual input
                     self.submitted_words[i] = message.content
                     self.message_ids[message.id] = i
                     break
