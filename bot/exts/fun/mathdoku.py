@@ -237,8 +237,14 @@ class Grid:
                 block.color = (100, 255, 100)
 
         return False
-        
-              
+    
+    def check_full_grid(self) -> bool:
+        "Helper that checks if a grid is completely filled"
+        for i in range(self.size):
+            for cell in self.cells[i]:
+                if cell.guess <= 0:
+                    return False
+        return True
 
     def __getitem__(self, i: int) -> list[Cell]:
         """
