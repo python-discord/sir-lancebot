@@ -239,12 +239,12 @@ class Grid:
         img = Image.new("RGB", (cellSize * len(self.cells) + 2*margin, cellSize * len(self.cells) + 2*margin), "white")
         draw = ImageDraw.Draw(img)
 
-        for row in self.cells:
-            for cell in row:
+        for i, row in enumerate(self.cells):
+            for j, cell in enumerate(row):
                 # 1) The block color
-                x_start = (cell.column) * cellSize + margin + margin//2
+                x_start = (cell.column) * cellSize + margin + margin//2 
                 y_start = (cell.row) * cellSize + margin + margin//2
-                x_end = (cell.column) * cellSize + cellSize + margin + margin//2
+                x_end = (cell.column) * cellSize + cellSize + margin + margin//2 
                 y_end = (cell.row) * cellSize + cellSize + margin + margin//2
                 color = cell.block.color
                 draw.rectangle((x_start, y_start, x_end, y_end),fill=color)
@@ -256,10 +256,38 @@ class Grid:
                             fill="black", font=fontGuess)
                     
                 # 3) the lines between the cells
-                draw.line((x_start, y_start, x_start + cellSize, y_start), fill="black", width=2)
-                draw.line((x_end, y_start, x_end, y_end), fill="black", width=2)
-                draw.line((x_start, y_start, x_start, y_start + cellSize), fill="black", width=2)
-                draw.line((x_start, y_end, x_end, y_end), fill="black", width=2)
+                thin_line_width = 2
+                draw.line((x_start, y_start, x_start + cellSize, y_start), fill="black", width=thin_line_width)
+                draw.line((x_end, y_start, x_end, y_end), fill="black", width=thin_line_width)
+                draw.line((x_start, y_start, x_start, y_start + cellSize), fill="black", width=thin_line_width)
+                draw.line((x_start, y_end, x_end, y_end), fill="black", width=thin_line_width)
+
+                n_over = 1
+                n_under = 1
+                n_right = 1
+                n_left = 1
+
+                if i == 0:
+                    n_over = 0
+                if i == len(self.cells) - 1:
+                    n_under = 0
+                if j == 0:
+                    n_left = 0
+                if j == len(row) - 1:
+                    n_right = 0
+
+                thick_line_width = 5
+                offset = 2
+
+                if self.cells[i - n_over][j].block.id != cell.block.id or self.cells[i - n_over][j] is cell:
+                    draw.line((x_start - offset, y_start, x_end + offset, y_start), fill="black", width=thick_line_width)
+                if self.cells[i + n_under][j].block.id != cell.block.id or self.cells[i + n_under][j] is cell:
+                    draw.line((x_start - offset, y_end, x_end + offset, y_end), fill="black", width=thick_line_width)
+                if self.cells[i][j - n_left].block.id != cell.block.id or self.cells[i][j - n_left] is cell:
+                    draw.line((x_start, y_start, x_start, y_end), fill="black", width=thick_line_width)
+                if self.cells[i][j + n_right].block.id != cell.block.id or self.cells[i][j + n_right] is cell:
+                    draw.line((x_end, y_start, x_end, y_end), fill="black", width=thick_line_width)
+
 
         for block in self.blocks:
             # 4) the lable of the block - in the top left corner of the lable cell
