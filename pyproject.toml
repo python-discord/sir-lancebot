@@ -33,7 +33,12 @@ dev = [
     "python-dotenv==1.0.1",
     "ruff==0.8.4",
     "taskipy==1.14.1",
+    "pytest==8.4.2",
+    "pytest-cov==7.0.0",
+    "pytest-subtests==0.14.1",
+    "pytest-xdist==3.8.0",
 ]
+
 
 [tool.uv]
 prerelease = "allow"
@@ -42,6 +47,16 @@ prerelease = "allow"
 start = "python -m bot"
 lint = "pre-commit run --all-files"
 precommit = "pre-commit install"
+test = "pytest -n auto --ff"
+retest = "pytest -n auto --lf"
+test-cov = "pytest -n auto --cov-report= --cov"
+html = "coverage html"
+report = "coverage report"
+
+[tool.coverage.run]
+branch = true
+source_pkgs = ["bot"]
+source = ["tests"]
 
 [tool.isort]
 multi_line_output = 6
@@ -80,3 +95,12 @@ known-first-party = ["bot"]
 order-by-type = false
 case-sensitive = true
 combine-as-imports = true
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["ANN", "D"]
+
+[tool.pytest.ini_options]
+# We don't use nose style tests so disable them in pytest.
+# This stops pytest from running functions named `setup` in test files.
+# See https://github.com/python-discord/bot/pull/2229#issuecomment-1204436420
+addopts = "-p no:nose"
