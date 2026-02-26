@@ -69,6 +69,7 @@ CROSS_EMOJI = '\u274C' #"\u274e"
 MAGNIFYING_EMOJI = '🔍'
 PARTY_EMOJI = "🎉"
 log = get_logger(__name__)
+has_filled_board_prev = False
 
 
 class Mathdoku(commands.Cog):
@@ -138,6 +139,7 @@ class Mathdoku(commands.Cog):
 
     def predicate(self, message: discord.Message) -> bool:
         """Predicate checking the message typed for each turn."""
+        global has_filled_board_prev
         if self.player_id == message.author.id:
             input_text = message.content.strip()
 
@@ -150,6 +152,10 @@ class Mathdoku(commands.Cog):
                 self.bot.loop.create_task(message.add_reaction(CROSS_EMOJI))
                 return bool(match)
             
+            if has_filled_board_prev:
+                self.grids.recolor_blocks()
+                has_filled_board_prev = False
+
             valid_match = self.grids.add_guess(input_text) # checks if its a valid guess and applies
             full_grid = self.grids.check_full_grid()
             if (full_grid):
@@ -165,6 +171,7 @@ class Mathdoku(commands.Cog):
 
     def reaction_predicate(self, reaction: discord.Reaction, user: discord.User) -> bool:
         """Predicate checking the reaction"""
+        global has_filled_board_prev
         if self.player_id == user.id and self.board.id == reaction.message.id:
             emoji = str(reaction.emoji)
             if emoji == MAGNIFYING_EMOJI:
@@ -173,6 +180,7 @@ class Mathdoku(commands.Cog):
                     self.bot.loop.create_task(self.board.remove_reaction(MAGNIFYING_EMOJI, user))
                     file = discord.File(self.grids._generate_image(), filename="mathdoku.png")
                     self.bot.loop.create_task(self.board.edit(content=None, attachments=[file]))
+                    has_filled_board_prev = True
                     if result:
                         self.bot.loop.create_task(self.board.add_reaction(PARTY_EMOJI))
                     return result

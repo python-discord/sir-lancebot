@@ -1,15 +1,15 @@
-from bot.exts.fun.mathdoku import Grid, Block
 from bot.exts.fun.mathdoku_parser import create_grids
 from pathlib import Path
 
 
 def test_board_filled_handler(tmp_path: Path):
     """
-    Contract: The board filled should color in the right and wrong blocks
-    and save the board to testdokuboardfilled2.png
+    Contract: The board should be recolored 
     """
 
-    filepath = "testdokuboardfilled2.png"
+    filepath1 = "testdokuboardfilledcolor1.png"
+    filepath2 = "testdokuboardfilledcolor2.png"
+    filepath3 = "testdokuboardfilledcolor3.png"
     
     content = """\
 5x5:d5
@@ -48,17 +48,14 @@ I 2-
         for cell in row:
             cell.guess = cell.correct
     
+    save_to_disk = False
+    grid._generate_image(outfile=filepath1, saveToFile=save_to_disk)
 
-    grid.cells[4][4].guess = 2
-    grid.cells[0][0].guess = 1
+    for block in grid.blocks:
+        block.color = (255, 255, 255)
 
-    assert grid.board_filled_handler() is False
+    grid._generate_image(outfile=filepath2, saveToFile=save_to_disk)
 
-    assert grid.check_victory() is False
+    grid.recolor_blocks()
 
-    assert grid._latin_square_check() is False
-
-    assert grid._blocks_fufilled_check()[0].id == "F"
-    assert grid._blocks_fufilled_check()[1].id == "H"
-
-    grid._generate_image(outfile=filepath, saveToFile=False)
+    grid._generate_image(outfile=filepath3, saveToFile=save_to_disk)

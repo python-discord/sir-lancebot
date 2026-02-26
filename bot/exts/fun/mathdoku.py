@@ -226,25 +226,32 @@ class Grid:
         The method calls the victory check and colors in the blocks that are not fufilled if any,\n
         and returns True or False if the board is solved.
         """     
-        if self.check_victory():
-            return True
-        
         wrong_blocks = self._blocks_fufilled_check()
+        if isinstance(wrong_blocks, bool):
+            wrong_blocks = []
+
         for block in self.blocks:
             if block in wrong_blocks:
                 block.color = (255, 0, 0)
             else:
                 block.color = (100, 255, 100)
 
-        return False
+        return self.check_victory()
     
     def check_full_grid(self) -> bool:
-        "Helper that checks if a grid is completely filled"
+        """Helper that checks if a grid is completely filled"""
         for i in range(self.size):
             for cell in self.cells[i]:
                 if cell.guess <= 0:
                     return False
         return True
+    
+    def recolor_blocks(self) -> None:
+        """
+        Method to recolor all blocks in their original color
+        """
+        for block in self.blocks:
+            block.color = block.compute_color()
 
     def __getitem__(self, i: int) -> list[Cell]:
         """
@@ -317,7 +324,7 @@ class Grid:
             label = str(block.number) + " " + str(block.operation)
             x_start = (label_cell.column) * cellSize + margin + margin//2
             y_start = (label_cell.row) * cellSize + margin + margin//2
-            print("Label:" + label )
+            #print("Label:" + label )
             draw.text((x_start+4, y_start+2), str(label), 
                             fill="black", font=fontLable)
 
