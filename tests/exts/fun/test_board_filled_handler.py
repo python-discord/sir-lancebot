@@ -52,6 +52,7 @@ I 2-
     grid.cells[4][4].guess = 2
     grid.cells[0][0].guess = 1
 
+    # Comment out the line below to see different colors for singletons
     assert grid.board_filled_handler() is False
 
     assert grid.check_victory() is False
