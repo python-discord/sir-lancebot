@@ -32,14 +32,77 @@ The experience of selecting an issue in this new project was more satisfactory a
 
 For setting up tools and libraries (step 4), enumerate all dependencies you took care of and where you spent your time, if that time exceeds 30 minutes.
 
-## Overview of issue(s) and work done. 
+## Overview of issue(s) and work done.
 
-### Title: Kenken command #989 
+### Title: Kenken command #989
 ### URL: https://github.com/python-discord/sir-lancebot/issues/989 (link to the original issue, should it be the issue to the pullrequest or the fork instead?)
 ### Summary in one or two sentences Scope (functionality and code affected).
-We created a Mathdoku game command for the Sir Lancebot Discord bot. We only created new files in the sir-lancebot repository and did not change any existing files. 
+We created a Mathdoku game command for the Sir Lancebot Discord bot. We only created new files in the sir-lancebot repository and did not change any existing files.
 
 ## Requirements for the new feature or requirements affected by functionality being refactored
+
+- **FR-01 - Help Command Exposure:**
+The bot shall expose a `help` entry under the command group `.Mathdoku` for running **mathdoku**.
+
+- **FR-02 - Start Game Command:**
+The command `.md start`shall start a new valid **mathdoku** game session.
+
+- **FR-03 - Grid Size:**
+The `.md start` command shall accept an optional grid size parameter.
+
+- **FR-04 - Independent Game Sessions:**
+Each game session shall maintain an independent board state.
+
+- **FR-05 - Hint Message Publication:**
+After starting a game, the bot publish a hint message and automatically attach a lightbulb emoji reaction to that message.
+
+- **FR-06 - Hint Cooldown Mechanism:**
+There shall be a cooldown period of 180 seconds between consecutive hint requests.
+
+- **FR-07 - Board Representation:**
+The board shall be internally represented as an indexable matrix structure, accessible by row and column coordinates.
+
+- **FR-08 - Cell Data Model:**
+Each cell in the board shall store its row and column coordinates, associated block, current guessed value, and correct solution value.
+
+- **FR-09 - Board Parsing Validation:**
+The board parser shall ignore any invalid configuration that violates the mathdoku rules.
+
+- **FR-10 - Block Data Model:**
+Each block shall store a unique id, a mathematical operation, and a target result number.
+
+- **FR-11 - Input Request Handling:**
+The game shall prompt the player to provide input moves during gameplay. The bot must clearly indicate when user input is expected.
+
+- **FR-12 - Leave command:**
+The game shall provide a command allowing users to leave an active game session.
+
+- **FR-13 - Invalid Input Notification:**
+The bot shall notify the user whenever an invalid input is detected.
+
+- **FR-14 - Inactivity Timeout:**
+The game session shall automatically terminate after a defined period of user inactivity.
+
+- **FR-15 - Win Condition Validation:**
+The game shall validate winning conditions by checking both the Latin square properly and correct block constraint satisfaction.
+
+- **FR-16 - Error Identification:**
+The game shall identify incorrect cells or blocks.
+
+- **FR-17 - Visual Board Representation:**
+The board shall be visually represented as an image showing grid structure and blocking coloring.
+
+- **FR-18 - Hint Reaction Trigger:**
+The bot shall trigger the hint logic when a user reacts with the lightbulb emoji on the hint message.
+
+- **FR-19 - Hint Contect Logic:**
+A hint shall return the first empty cell in teh board and reveal its correct value.
+
+- **FR-20 - Cooldown Feedback:**
+The bot shall notify the user of the remaining cooldown time in seconds.
+
+- **FR-21 - No Available Hint Notification:**
+The bot shall notify the user that no hints are available if all cells in the board are filled.
 
 Optional (point 3): trace tests to requirements.
 
