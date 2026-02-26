@@ -1,7 +1,7 @@
 import asyncio
-from collections.abc import Iterator
-from dataclasses import dataclass
-from random import randint, random
+import re
+from copy import deepcopy
+from random import randint
 
 import discord
 from discord.ext import commands
@@ -68,6 +68,7 @@ cell_six.block = testBlock_3
 CROSS_EMOJI = '\u274C' #"\u274e"
 MAGNIFYING_EMOJI = '🔍'
 PARTY_EMOJI = "🎉"
+HINT_EMOJI = "💡"
 log = get_logger(__name__)
 has_filled_board_prev = False
 
@@ -102,13 +103,13 @@ class Mathdoku(commands.Cog):
         await ctx.send(
             "Type the square and what number you want to input. Format it like this: A1 3\n" "Type `end` to end game."
         )
+
+        await self.board.add_reaction(HINT_EMOJI)
+
         self.playing = True
-        while self.playing == True:
+        while self.playing is True:
             await self.input_number_on_board(ctx)
-
         await ctx.send("Game of Mathdoku is over!")
-
-
 
     async def input_number_on_board(self, ctx: commands.Context,) -> None:  # None might need to be changed later
         """Lets the player choose a square and input a number if it is valid."""
@@ -141,8 +142,8 @@ class Mathdoku(commands.Cog):
                 await self.board.remove_reaction(emoji, user)
             if emoji == MAGNIFYING_EMOJI:
                 await self.magnifying_handler(ctx=ctx, user=user)
-            elif emoji == "hint":
-                pass
+            elif emoji == HINT_EMOJI:
+                await self.hint_handler(ctx=ctx, user=user)
             elif emoji == "rules":
                 pass
             else:  # any other emoji
@@ -201,8 +202,21 @@ class Mathdoku(commands.Cog):
                 return
         else:
             self.bot.loop.create_task(self.board.remove_reaction(MAGNIFYING_EMOJI, user))
-            return
 
+    async def hint_handler(self, ctx, user) -> None:
+        """Handle hint request via 💡 reaction."""
+
+        await self.board.remove_reaction(HINT_EMOJI, user)
+        result = self.grids.hint()
+
+        if result["type"] == "cooldown":
+            await ctx.send(f"Hint on cooldown. Try again in {result['remaining_seconds']}s.")
+        elif result["type"] == "all filled cells":
+            await ctx.send("No empty cells left.")
+        else:
+            await ctx.send(f"Hint: row {result['row'] + 1}, column {result['column'] + 1} should be {result['value']}.")
+        
+    
 async def setup(bot: Bot) -> None:
     """Load the Mathdoku cog."""
     from .mathdoku_parser import create_grids
