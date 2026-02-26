@@ -102,13 +102,13 @@ class Mathdoku(commands.Cog):
         await ctx.send(
             "Type the square and what number you want to input. Format it like this: A1 3\n" "Type `end` to end game."
         )
-        
-
         self.playing = True
         while self.playing == True:
             await self.input_number_on_board(ctx)
 
         await ctx.send("Game of Mathdoku is over!")
+
+
 
     async def input_number_on_board(self, ctx: commands.Context,) -> None:  # None might need to be changed later
         """Lets the player choose a square and input a number if it is valid."""
@@ -116,30 +116,56 @@ class Mathdoku(commands.Cog):
         msg_task = asyncio.create_task(self.bot.wait_for("message", check=self.predicate, timeout=60.0))
         react_task = asyncio.create_task(self.bot.wait_for("reaction_add", check=self.reaction_predicate, timeout=60.0))
         
-        _, pending = await asyncio.wait({msg_task, react_task}, timeout=60.0, return_when = asyncio.FIRST_COMPLETED)
+        done, pending = await asyncio.wait({msg_task, react_task}, timeout=60.0, return_when = asyncio.FIRST_COMPLETED)
         
         for task in pending:
             task.cancel()
 
         try:
-            pass    
+            finished = done.pop()
+            result = await finished
             
-        except TimeoutError:
+        except TimeoutError:  # Timeout 
             await ctx.send("You took too long. Game over!")
             self.playing = False
             return
 
-        if not self.playing:
+        if not self.playing:  # takes care of the end message
             await ctx.send("The game has been ended")
             return
-        else:
+        
+        if finished is react_task:  # A Reaction was posted
+            reaction, user = result
+            emoji = str(reaction.emoji)
+            if self.player_id != user.id:  # reaction by wrong player
+                await self.board.remove_reaction(emoji, user)
+            if emoji == MAGNIFYING_EMOJI:
+                await self.magnifying_handler(ctx=ctx, user=user)
+            elif emoji == "hint":
+                pass
+            elif emoji == "rules":
+                pass
+            else:  # any other emoji
+                await self.board.remove_reaction(emoji, user)
+
+        else:  # A message was posted
+            input_text = result.content.strip()
+            valid_match = self.grids.add_guess(input_text) # checks if its a valid guess and applies
+            if not valid_match:
+                await result.add_reaction(CROSS_EMOJI)
+                return
+            
+            full_grid = self.grids.check_full_grid()
+            if (full_grid):
+                await self.board.add_reaction(MAGNIFYING_EMOJI)
+            
+            self.grids.recolor_blocks()
             file = discord.File(self.grids._generate_image(), filename="mathdoku.png")
             await self.board.edit(content=None, attachments=[file])
             return
 
     def predicate(self, message: discord.Message) -> bool:
-        """Predicate checking the message typed for each turn."""
-        global has_filled_board_prev
+        """Predicate checking if the message matches a guess or the word end"""
         if self.player_id == message.author.id:
             input_text = message.content.strip()
 
@@ -150,50 +176,32 @@ class Mathdoku(commands.Cog):
             match = re.fullmatch(r"[A-Ja-j](10|[1-9])\s+[1-9]", input_text)
             if not match:
                 self.bot.loop.create_task(message.add_reaction(CROSS_EMOJI))
-                return bool(match)
-            
-            if has_filled_board_prev:
-                self.grids.recolor_blocks()
-                has_filled_board_prev = False
-
-            valid_match = self.grids.add_guess(input_text) # checks if its a valid guess and applies
-            full_grid = self.grids.check_full_grid()
-            if (full_grid):
-                self.bot.loop.create_task(self.board.add_reaction(MAGNIFYING_EMOJI))
-            # might wanna change to another format
-            if not valid_match:
-                self.bot.loop.create_task(message.add_reaction(CROSS_EMOJI))
-            return valid_match
+                return False
+            return True
         else: 
             return False
-        
-
 
     def reaction_predicate(self, reaction: discord.Reaction, user: discord.User) -> bool:
-        """Predicate checking the reaction"""
-        global has_filled_board_prev
-        if self.player_id == user.id and self.board.id == reaction.message.id:
-            emoji = str(reaction.emoji)
-            if emoji == MAGNIFYING_EMOJI:
-                if self.grids.check_full_grid():
-                    result = self.grids.board_filled_handler()
-                    self.bot.loop.create_task(self.board.remove_reaction(MAGNIFYING_EMOJI, user))
-                    file = discord.File(self.grids._generate_image(), filename="mathdoku.png")
-                    self.bot.loop.create_task(self.board.edit(content=None, attachments=[file]))
-                    has_filled_board_prev = True
-                    if result:
-                        self.bot.loop.create_task(self.board.add_reaction(PARTY_EMOJI))
-                    return result
-                else:
-                    self.bot.loop.create_task(self.board.remove_reaction(MAGNIFYING_EMOJI, user))
-                return False
-                
-            else:
-                self.bot.loop.create_task(self.board.remove_reaction(emoji, user))
-                return False
+        """Predicate checking if the reaction was on the correct message"""
+        if self.board.id == reaction.message.id:
+            return True
         
-            
-
+    async def magnifying_handler(self, ctx, user):
+        if self.grids.check_full_grid():
+                await self.board.remove_reaction(MAGNIFYING_EMOJI, user)
+                
+                result = self.grids.board_filled_handler() # check win and update img
+                file = discord.File(self.grids._generate_image(), filename="mathdoku.png")
+                await self.board.edit(content=None, attachments=[file])
+                
+                if result: # WIN
+                    await self.board.add_reaction(PARTY_EMOJI)
+                    await ctx.send(PARTY_EMOJI + " Congrats! You WON " + PARTY_EMOJI)
+                    self.playing = False
+                return
+        else:
+            self.bot.loop.create_task(self.board.remove_reaction(MAGNIFYING_EMOJI, user))
+            return
 
 async def setup(bot: Bot) -> None:
     """Load the Mathdoku cog."""
