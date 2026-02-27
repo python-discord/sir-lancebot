@@ -98,6 +98,7 @@ class Cell:
         self.block = None
         self._guess = 0
         self.correct = 0
+        self.color = None
 
     @property
     def guess(self):
@@ -106,6 +107,9 @@ class Cell:
     @guess.setter
     def guess(self, new_guess) -> None:
         self._guess = new_guess
+
+    def reset_color(self):
+        self.color = self.block.color
 
 
 class Block:
@@ -256,6 +260,14 @@ class Grid:
             else:
                 block.color = (100, 255, 100)
 
+        # TODO this currently would overwrite any color changes in the roman lines checker
+        # We should first recolor the blocks based on if they match the block sum criteria, and then overwrite their
+        # color with the colors from the roman lines check - where only rows/column that break the grid are colored
+        # -- maybe in another red so its easy to tell apart?
+        for row in range(self.size):
+            for cell in self.cells[row]:
+                cell.reset_color()
+
         return self.check_victory()
 
     def check_full_grid(self) -> bool:
@@ -270,6 +282,10 @@ class Grid:
         """Method to recolor all blocks in their original color."""
         for block in self.blocks:
             block.color = block.compute_color()
+
+        for row in range(self.size):
+            for cell in self.cells[row]:
+                cell.reset_color()
 
     def __getitem__(self, i: int) -> list[Cell]:
         """
@@ -295,7 +311,7 @@ class Grid:
                 y_start = (cell.row) * cellSize + margin + margin // 2
                 x_end = (cell.column) * cellSize + cellSize + margin + margin // 2
                 y_end = (cell.row) * cellSize + cellSize + margin + margin // 2
-                color = cell.block.color
+                color = cell.color
                 draw.rectangle((x_start, y_start, x_end, y_end), fill=color)
 
                 # 2) the guess

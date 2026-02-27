@@ -100,6 +100,7 @@ def _create_cells_and_blocks(expected_size: int, created_grid: Grid, grid_str: s
             else:
                 block = seen_blocks[col]
             cell.block = block
+            cell.color = cell.block.color
             block.cells.append(cell)
     return seen_blocks
 
