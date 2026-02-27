@@ -55,6 +55,8 @@ class Mathdoku(commands.Cog):
         self.player_id = None
         self.board = None  # The message that the board is posten on
         self.guess_count = 0
+        self.rules_msg_exists = False
+        self.rules_msg = None
 
     @commands.group(name="Mathdoku", aliases=("md",), invoke_without_command=True)
     async def mathdoku_group(self, ctx: commands.Context) -> None:
@@ -142,6 +144,10 @@ class Mathdoku(commands.Cog):
             emoji = str(reaction.emoji)
             if self.player_id != user.id:  # reaction by wrong player
                 await self.board.remove_reaction(emoji, user)
+            if self.rules_msg_exists:
+                await self.rules_msg.delete()
+                self.rules_msg_exists = False
+                self.rules_msg = None
             if emoji == MAGNIFYING_EMOJI:
                 await self.magnifying_handler(ctx=ctx, user=user)
             elif emoji == HINT_EMOJI:
@@ -157,7 +163,10 @@ class Mathdoku(commands.Cog):
             if not valid_match:
                 await result.add_reaction(CROSS_EMOJI)
                 return
-
+            if self.rules_msg_exists:
+                await self.rules_msg.delete()
+                self.rules_msg_exists = False
+                self.rules_msg = None
             try:
                 await result.delete()
             except Exception:
@@ -229,7 +238,8 @@ class Mathdoku(commands.Cog):
     async def rules_handler(self, ctx, user) -> None:
         """Handle rules request via 📕 reaction."""
         await self.board.remove_reaction(RULE_EMOJI, user)
-        await ctx.send(mathdoku_rules)
+        self.rules_msg = await ctx.send(mathdoku_rules)
+        self.rules_msg_exists = True
 
     async def resent_message(self, ctx):
         await self.board.delete()
