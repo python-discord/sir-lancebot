@@ -92,6 +92,12 @@ class Mathdoku(commands.Cog):
     @mathdoku_group.command(name="start")
     async def start_command(self, ctx: commands.Context, size: int = 5) -> None:
         """Start a game of Mathdoku."""
+        
+        if self.playing:
+            await ctx.send("Someone else is playing right now. Please wait your turn.")
+            return
+        self.playing = True
+
         self.player_id = ctx.author.id
         await ctx.send("Game of Mathdoku has been started!")
 
@@ -106,7 +112,6 @@ class Mathdoku(commands.Cog):
 
         await self.board.add_reaction(HINT_EMOJI)
 
-        self.playing = True
         while self.playing is True:
             await self.input_number_on_board(ctx)
         await ctx.send("Game of Mathdoku is over!")
