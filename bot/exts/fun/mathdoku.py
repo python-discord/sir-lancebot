@@ -85,7 +85,7 @@ COLORS = [
     (255, 50, 111),
     (255, 50, 96),
     (255, 50, 81),
-    (255, 50, 66)
+    (255, 50, 66),
 ]
 
 
@@ -107,8 +107,10 @@ class Cell:
     def guess(self, new_guess) -> None:
         self._guess = new_guess
 
+
 class Block:
     """Represents a block in the puzzle, with its cells, operation and colour."""
+
     color_id = 0
     color_offset = randint(0, 80)
 
@@ -120,28 +122,29 @@ class Block:
         self.label_cell = label_cell
         self.color_id = Block.color_id
         self.color = self.compute_color()
-        
+
         Block.color_id += 1
 
     def compute_color(self) -> tuple[int, int, int]:
         """Computes the block's color."""
-        return COLORS[(self.color_id * (len(COLORS) // (Block.color_id + 1)) + Block.color_offset) % len(COLORS)]
+        c_a = ord(self.id[0]) ** 2 - ord("A")
+        return COLORS[c_a % len(COLORS)]
 
 
 class Grid:
     """Represents the full game board, with all blocks and player guesses."""
 
-    HINT_COOLDOWN_SECONDS = 180 # 3 minutes of hint cooldown.
+    HINT_COOLDOWN_SECONDS = 180  # 3 minutes of hint cooldown.
 
-    def __init__(self, size: int) -> None:
+    def __init__(self, size: int, difficulty: str | None = None) -> None:
         self.size = size
         self.blocks = []
         self._cells = tuple(
-            tuple(Cell(col, row) for col in range(size))
-            for row in range(size)
-        )   # 2D tupple for cells [row][col]
+            tuple(Cell(col, row) for col in range(size)) for row in range(size)
+        )  # 2D tupple for cells [row][col]
 
         self._last_hint_timestamp = None
+        self.difficulty = difficulty
 
     @property
     def cells(self):
@@ -179,6 +182,7 @@ class Grid:
         Checks if all the blocks are filled correctly and meets the requirements. \n
         Returns the blocks that are wrong or True if all blocks meet the requirements. \n
         Will return False if the input is invalid.
+        Will return False if the input is invalid.
         """
         wrong_blocks = []
         for block in self.blocks:
@@ -215,14 +219,16 @@ class Grid:
             return True
         return wrong_blocks
 
-
     def check_victory(self) -> bool:
         """
         Checks if the board is in a state where the player has won and will
         return True or False.
         """
-        return bool(self._latin_square_check() and isinstance(self._blocks_fufilled_check(), bool) and self._blocks_fufilled_check())
-
+        return bool(
+            self._latin_square_check()
+            and isinstance(self._blocks_fufilled_check(), bool)
+            and self._blocks_fufilled_check()
+        )
 
     def board_filled_handler(self) -> bool:
         """
@@ -263,28 +269,29 @@ class Grid:
         """
         return self.cells[i]
 
-    def _generate_image(self, cellSize = 80, margin = 30, outfile = "mathdoku.png", saveToFile = False) -> None:
+    def _generate_image(self, cellSize=80, margin=30, outfile="mathdoku.png", saveToFile=False) -> None:
         """Print the Grid to."""
         fontLable = ImageFont.load_default(15)
         fontGuess = ImageFont.load_default(30)
-        img = Image.new("RGB", (cellSize * len(self.cells) + 2*margin, cellSize * len(self.cells) + 2*margin), "white")
+        img = Image.new(
+            "RGB", (cellSize * len(self.cells) + 2 * margin, cellSize * len(self.cells) + 2 * margin), "white"
+        )
         draw = ImageDraw.Draw(img)
 
         for i, row in enumerate(self.cells):
             for j, cell in enumerate(row):
                 # 1) The block color
-                x_start = (cell.column) * cellSize + margin + margin//2
-                y_start = (cell.row) * cellSize + margin + margin//2
-                x_end = (cell.column) * cellSize + cellSize + margin + margin//2
-                y_end = (cell.row) * cellSize + cellSize + margin + margin//2
+                x_start = (cell.column) * cellSize + margin + margin // 2
+                y_start = (cell.row) * cellSize + margin + margin // 2
+                x_end = (cell.column) * cellSize + cellSize + margin + margin // 2
+                y_end = (cell.row) * cellSize + cellSize + margin + margin // 2
                 color = cell.block.color
-                draw.rectangle((x_start, y_start, x_end, y_end),fill=color)
+                draw.rectangle((x_start, y_start, x_end, y_end), fill=color)
 
                 # 2) the guess
                 guess = cell.guess
-                if (guess != 0):
-                    draw.text((x_start+30, y_start+22), str(guess),
-                            fill="black", font=fontGuess)
+                if guess != 0:
+                    draw.text((x_start + 30, y_start + 22), str(guess), fill="black", font=fontGuess)
 
                 # 3) the lines between the cells
                 thin_line_width = 2
@@ -311,7 +318,9 @@ class Grid:
                 offset = 2
 
                 if self.cells[i - n_over][j].block.id != cell.block.id or self.cells[i - n_over][j] is cell:
-                    draw.line((x_start - offset, y_start, x_end + offset, y_start), fill="black", width=thick_line_width)
+                    draw.line(
+                        (x_start - offset, y_start, x_end + offset, y_start), fill="black", width=thick_line_width
+                    )
                 if self.cells[i + n_under][j].block.id != cell.block.id or self.cells[i + n_under][j] is cell:
                     draw.line((x_start - offset, y_end, x_end + offset, y_end), fill="black", width=thick_line_width)
                 if self.cells[i][j - n_left].block.id != cell.block.id or self.cells[i][j - n_left] is cell:
@@ -319,30 +328,26 @@ class Grid:
                 if self.cells[i][j + n_right].block.id != cell.block.id or self.cells[i][j + n_right] is cell:
                     draw.line((x_end, y_start, x_end, y_end), fill="black", width=thick_line_width)
 
-
         for block in self.blocks:
             # 4) the lable of the block - in the top left corner of the lable cell
             label_cell = block.label_cell
             label = str(block.number) + " " + str(block.operation)
-            x_start = (label_cell.column) * cellSize + margin + margin//2
-            y_start = (label_cell.row) * cellSize + margin + margin//2
-            #print("Label:" + label )
-            draw.text((x_start+4, y_start+2), str(label),
-                            fill="black", font=fontLable)
+            x_start = (label_cell.column) * cellSize + margin + margin // 2
+            y_start = (label_cell.row) * cellSize + margin + margin // 2
+            # print("Label:" + label )
+            draw.text((x_start + 4, y_start + 2), str(label), fill="black", font=fontLable)
 
         # 5) the x axis description A-...
         for i in range(self.size):
             text = chr(ord("A") + i)
-            draw.text((margin + 30 + i * cellSize + margin//2, 4), str(text),
-                            fill="black", font=fontGuess)
+            draw.text((margin + 30 + i * cellSize + margin // 2, 4), str(text), fill="black", font=fontGuess)
 
         # 6) the y axis description 1-...
         for j in range(self.size):
-            text = str(j+1)
-            draw.text((13, margin + 22 + j * cellSize + margin//2), str(text),
-                            fill="black", font=fontGuess)
+            text = str(j + 1)
+            draw.text((13, margin + 22 + j * cellSize + margin // 2), str(text), fill="black", font=fontGuess)
 
-        if (saveToFile):
+        if saveToFile:
             img.save(outfile)
 
         buffer = BytesIO()
@@ -395,10 +400,10 @@ class Grid:
         row = int(guess[0][1]) - 1
         value = int(guess[1])
 
-        if (column < 0 or row < 0 or value < 1):
+        if column < 0 or row < 0 or value < 1:
             return False
 
-        if (column >= self.size or row >= self.size or value > self.size):
+        if column >= self.size or row >= self.size or value > self.size:
             return False
 
         self.cells[row][column].guess = value

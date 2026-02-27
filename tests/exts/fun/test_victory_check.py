@@ -2,11 +2,11 @@ from pathlib import Path
 
 from bot.exts.fun.mathdoku_parser import create_grids
 
+
 def test_victory_check_won(tmp_path: Path) -> None:
     """Creates a temp file with a valid grid in it and attempts to load a valid grid from that file."""
     content = """\
-5x5:d5
-.KK "1:(d=5)"
+5x5:d5 (easy)
 EAACC
 EB3CG
 EBF5G
@@ -32,20 +32,20 @@ G 3-
 
     grids = create_grids(file_path=grids_file)
 
-    grid = grids[0]
+    grid = grids[5]["easy"][0]
 
     # Set guess to possible solution
     for row in grid.cells:
         for cell in row:
             cell.guess = cell.correct
-    
+
     assert grid.check_victory()
+
 
 def test_victory_check_lost(tmp_path: Path) -> None:
     """Creates a temp file with a valid grid in it and attempts to load a valid grid from that file."""
     content = """\
-5x5:d5
-.KK "1:(d=5)"
+5x5:d5 (easy)
 EAACC
 EB3CG
 EBF5G
@@ -71,13 +71,13 @@ G 3-
 
     grids = create_grids(file_path=grids_file)
 
-    grid = grids[0]
+    grid = grids[5]["easy"][0]
 
     # Set guess to possible solution
     for row in grid.cells:
         for cell in row:
             cell.guess = cell.correct
-    
+
     grid.cells[0][1].guess = 4
 
     assert grid.check_victory() is False
@@ -90,8 +90,7 @@ G 3-
 def test_victory_check_won_with_division(tmp_path: Path) -> None:
     """Creates a temp file with a valid grid in it and attempts to load a valid grid from that file."""
     content = """\
-5x5:d5
-.KK "8:(d=5)"
+5x5:d5 (easy)
 FFFF5
 AAE1B
 CCEGB
@@ -119,20 +118,20 @@ I 2-
 
     grids = create_grids(file_path=grids_file)
 
-    grid = grids[0]
+    grid = grids[5]["easy"][0]
 
     # Set guess to possible solution
     for row in grid.cells:
         for cell in row:
             cell.guess = cell.correct
-    
+
     assert grid.check_victory()
+
 
 def test_victory_check_lost_with_division(tmp_path: Path) -> None:
     """Creates a temp file with a valid grid in it and attempts to load a valid grid from that file."""
     content = """\
-5x5:d5
-.KK "8:(d=5)"
+5x5:d5 (easy)
 FFFF5
 AAE1B
 CCEGB
@@ -160,13 +159,12 @@ I 2-
 
     grids = create_grids(file_path=grids_file)
 
-    grid = grids[0]
+    grid = grids[5]["easy"][0]
 
     # Set guess to possible solution
     for row in grid.cells:
         for cell in row:
             cell.guess = cell.correct
-    
 
     grid.cells[4][4].guess = 2
 

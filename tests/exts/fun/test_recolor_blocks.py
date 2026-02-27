@@ -1,19 +1,16 @@
-from bot.exts.fun.mathdoku_parser import create_grids
 from pathlib import Path
 
+from bot.exts.fun.mathdoku_parser import create_grids
 
-def test_board_filled_handler(tmp_path: Path):
-    """
-    Contract: The board should be recolored 
-    """
 
+def test_board_filled_handler(tmp_path: Path) -> None:
+    """Contract: The board should be recolored."""
     filepath1 = "testdokuboardfilledcolor1.png"
     filepath2 = "testdokuboardfilledcolor2.png"
     filepath3 = "testdokuboardfilledcolor3.png"
-    
+
     content = """\
-5x5:d5
-.KK "8:(d=5)"
+5x5:d5 (easy)
 FFFF5
 AAE1B
 CCEGB
@@ -41,13 +38,13 @@ I 2-
 
     grids = create_grids(file_path=grids_file)
 
-    grid = grids[0]
+    grid = grids[5]["easy"][0]
 
     # Set guess to possible solution
     for row in grid.cells:
         for cell in row:
             cell.guess = cell.correct
-    
+
     save_to_disk = False
     grid._generate_image(outfile=filepath1, saveToFile=save_to_disk)
 

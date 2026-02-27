@@ -28,13 +28,14 @@ def create_grids(file_path: Path = FILE_PATH) -> list[Grid]:
     Returns a list of succesfully parsed boards.
     """
     matched_grid_strs = _search_for_grids_in_file(file_path)
-    grids = []
+    grids = {}
     for m_board in matched_grid_strs:
         expected_size = int(m_board[0][0])
-        grid = Grid(expected_size)
-        grid_str = m_board[1]
-        operation_str = m_board[2]
-        solution_str = m_board[3]
+        difficulty = m_board[1]
+        grid = Grid(expected_size, difficulty=difficulty)
+        grid_str = m_board[2]
+        operation_str = m_board[3]
+        solution_str = m_board[4]
         try:
             created_blocks = _create_cells_and_blocks(expected_size, grid, grid_str)
             _read_block_operations(created_blocks, operation_str)
@@ -42,7 +43,7 @@ def create_grids(file_path: Path = FILE_PATH) -> list[Grid]:
         except IndexError:
             continue
         grid.recolor_blocks()
-        grids.append(grid)
+        grids.setdefault(expected_size, {}).setdefault(difficulty, []).append(grid)
 
     return grids
 
@@ -58,8 +59,7 @@ def _search_for_grids_in_file(file_path: Path = FILE_PATH) -> list[tuple[str, st
     4) proposed solution, e.g. 1 5 4 3 2.
     """
     matched_boards = re.findall(
-        r"""(\d+x\d+:d\d)\r?\n
-                       \.KK\ "\d+:\(d=\d+\)"\r?\n
+        r"""(\d+x\d+:d\d+)\ \((\w+)\)\r?\n
                        ((?:[\d\w]+\r?\n)+)
                        \r?\n
                        ((?:\w\ \d+[\+\-x\/]\r?\n)+)

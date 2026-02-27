@@ -1,19 +1,17 @@
-from bot.exts.fun.mathdoku import Grid, Block
-from bot.exts.fun.mathdoku_parser import create_grids
 from pathlib import Path
 
+from bot.exts.fun.mathdoku_parser import create_grids
 
-def test_board_filled_handler(tmp_path: Path):
+
+def test_board_filled_handler(tmp_path: Path) -> None:
     """
     Contract: The board filled should color in the right and wrong blocks
-    and save the board to testdokuboardfilled2.png
+    and save the board to testdokuboardfilled2.png.
     """
-
     filepath = "testdokuboardfilled2.png"
-    
+
     content = """\
-5x5:d5
-.KK "8:(d=5)"
+5x5:d5 (easy)
 FFFF5
 AAE1B
 CCEGB
@@ -41,13 +39,12 @@ I 2-
 
     grids = create_grids(file_path=grids_file)
 
-    grid = grids[0]
+    grid = grids[5]["easy"][0]
 
     # Set guess to possible solution
     for row in grid.cells:
         for cell in row:
             cell.guess = cell.correct
-    
 
     grid.cells[4][4].guess = 2
     grid.cells[0][0].guess = 1

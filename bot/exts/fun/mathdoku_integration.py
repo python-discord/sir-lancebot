@@ -68,7 +68,7 @@ cell_five.block = testBlock_3
 cell_six.block = testBlock_3
 
 
-CROSS_EMOJI = "\u274C" #"\u274e"
+CROSS_EMOJI = "\u274c"  # "\u274e"
 MAGNIFYING_EMOJI = "🔍"
 PARTY_EMOJI = "🎉"
 HINT_EMOJI = "💡"
@@ -79,12 +79,12 @@ has_filled_board_prev = False
 class Mathdoku(commands.Cog):
     """Play a game of Mathdoku."""
 
-    def __init__(self, bot: Bot, grids: list):
+    def __init__(self, bot: Bot, grids: dict):
         self.bot = bot
-        self.grids = grids # The game Grid
+        self.grids = grids  # The game Grid
         self.playing = False
         self.player_id = None
-        self.board = None # The message that the board is posten on
+        self.board = None  # The message that the board is posten on
         self.guess_count = 0
 
     @commands.group(name="Mathdoku", aliases=("md",), invoke_without_command=True)
@@ -96,7 +96,7 @@ class Mathdoku(commands.Cog):
     @mathdoku_group.command(name="start")
     async def start_command(self, ctx: commands.Context, size: int = 5) -> None:
         """Start a game of Mathdoku."""
-        
+
         if self.playing:
             await ctx.send("Someone else is playing right now. Please wait your turn.")
             return
@@ -120,12 +120,15 @@ class Mathdoku(commands.Cog):
             await self.input_number_on_board(ctx)
         await ctx.send("Game of Mathdoku is over!")
 
-    async def input_number_on_board(self, ctx: commands.Context,) -> None:  # None might need to be changed later
+    async def input_number_on_board(
+        self,
+        ctx: commands.Context,
+    ) -> None:  # None might need to be changed later
         """Lets the player choose a square and input a number if it is valid."""
         msg_task = asyncio.create_task(self.bot.wait_for("message", check=self.predicate, timeout=60.0))
         react_task = asyncio.create_task(self.bot.wait_for("reaction_add", check=self.reaction_predicate, timeout=60.0))
 
-        done, pending = await asyncio.wait({msg_task, react_task}, timeout=60.0, return_when = asyncio.FIRST_COMPLETED)
+        done, pending = await asyncio.wait({msg_task, react_task}, timeout=60.0, return_when=asyncio.FIRST_COMPLETED)
 
         for task in pending:
             task.cancel()
@@ -159,24 +162,25 @@ class Mathdoku(commands.Cog):
 
         else:  # A message was posted
             input_text = result.content.strip()
-            valid_match = self.grids.add_guess(input_text) # checks if its a valid guess and applies
+            valid_match = self.grids.add_guess(input_text)  # checks if its a valid guess and applies
             if not valid_match:
                 await result.add_reaction(CROSS_EMOJI)
                 return
-         
+
             self.guess_count += 1
-            if self.guess_count % 10 == 0: # re-send the grid after 10 guesses so the user doesn't need to scroll
+            if self.guess_count % 10 == 0:  # re-send the grid after 10 guesses so the user doesn't need to scroll
                 await self.board.delete()
                 self.grids.recolor_blocks()
                 file = discord.File(self.grids._generate_image(), filename="mathdoku.png")
                 self.board = await ctx.send(file=file)
                 await self.board.add_reaction(HINT_EMOJI)
                 await ctx.send(
-                    "Type the square and what number you want to input. Format it like this: A1 3\n" "Type `end` to end game."
+                    "Type the square and what number you want to input. Format it like this: A1 3\n"
+                    "Type `end` to end game."
                 )
 
             full_grid = self.grids.check_full_grid()
-            if (full_grid):
+            if full_grid:
                 await self.board.add_reaction(MAGNIFYING_EMOJI)
 
             self.grids.recolor_blocks()
@@ -208,17 +212,17 @@ class Mathdoku(commands.Cog):
 
     async def magnifying_handler(self, ctx, user) -> None:
         if self.grids.check_full_grid():
-                await self.board.remove_reaction(MAGNIFYING_EMOJI, user)
+            await self.board.remove_reaction(MAGNIFYING_EMOJI, user)
 
-                result = self.grids.board_filled_handler() # check win and update img
-                file = discord.File(self.grids._generate_image(), filename="mathdoku.png")
-                await self.board.edit(content=None, attachments=[file])
+            result = self.grids.board_filled_handler()  # check win and update img
+            file = discord.File(self.grids._generate_image(), filename="mathdoku.png")
+            await self.board.edit(content=None, attachments=[file])
 
-                if result: # WIN
-                    await self.board.add_reaction(PARTY_EMOJI)
-                    await ctx.send(PARTY_EMOJI + " Congrats! You WON " + PARTY_EMOJI)
-                    self.playing = False
-                return
+            if result:  # WIN
+                await self.board.add_reaction(PARTY_EMOJI)
+                await ctx.send(PARTY_EMOJI + " Congrats! You WON " + PARTY_EMOJI)
+                self.playing = False
+            return
         self.bot.loop.create_task(self.board.remove_reaction(MAGNIFYING_EMOJI, user))
 
     async def hint_handler(self, ctx, user) -> None:

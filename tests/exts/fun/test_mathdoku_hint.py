@@ -7,8 +7,7 @@ from bot.exts.fun.mathdoku_parser import create_grids
 def _load_5x5_grid(tmp_path: Path) -> None:
     """Creates a temp file with a valid grid in it and attempts to load a valid grid from that file."""
     content = """\
-5x5:d5
-.KK "8:(d=5)"
+5x5:d5 (easy)
 FFFF5
 AAE1B
 CCEGB
@@ -35,9 +34,10 @@ I 2-
     grids_file.write_text(content, encoding="utf-8")
     grids = create_grids(file_path=grids_file)
 
-    grid = grids[0]
+    grid = grids[5]["easy"][0]
 
     return grid
+
 
 def test_hint_find_first_empty_cell(tmp_path: Path) -> None:
     grid = _load_5x5_grid(tmp_path)
@@ -48,6 +48,7 @@ def test_hint_find_first_empty_cell(tmp_path: Path) -> None:
     assert result["row"] == 0
     assert result["column"] == 0
     assert result["value"] == 4
+
 
 def test_hint_find_empty_cell_after_some_filled(tmp_path: Path) -> None:
     grid = _load_5x5_grid(tmp_path)
@@ -63,6 +64,7 @@ def test_hint_find_empty_cell_after_some_filled(tmp_path: Path) -> None:
     assert result["column"] == 3
     assert result["value"] == 3
 
+
 def test_hint_cooldown(tmp_path: Path) -> None:
     grid = _load_5x5_grid(tmp_path)
     t0 = datetime(2026, 2, 25, 14, 0, 0)
@@ -73,6 +75,7 @@ def test_hint_cooldown(tmp_path: Path) -> None:
     assert result["type"] == "cooldown"
     assert result["remaining_seconds"] == 150
 
+
 def test_hint_available_again_at_180_seconds(tmp_path: Path) -> None:
     grid = _load_5x5_grid(tmp_path)
     t0 = datetime(2026, 2, 25, 14, 0, 0)
@@ -82,6 +85,7 @@ def test_hint_available_again_at_180_seconds(tmp_path: Path) -> None:
 
     assert first_hint["type"] == "hint"
     assert second_hint["type"] == "hint"
+
 
 def test_hint_all_cells_filled(tmp_path: Path) -> None:
     grid = _load_5x5_grid(tmp_path)
