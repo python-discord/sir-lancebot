@@ -1,6 +1,7 @@
-from discord.ext.commands import Cog, command, Context
-from bot.constants import Tokens
+from discord.ext.commands import Cog, Context, command
+
 from bot.bot import Bot
+from bot.constants import Tokens
 
 GITHUB_API_URL = "https://api.github.com"
 
@@ -13,17 +14,26 @@ class GitHubStats(Cog):
     async def github_stats(self, ctx: Context, start: str, end: str, repo: str = "python-discord/sir-lancebot") -> None:
         """
         Fetches stats for a GitHub repo.
-        Usage: !github_stats 2023-01-01 2023-12-31 python-discord/bot
+        Usage: !github_stats 2023-01-01 2023-12-31 python-discord/bot.
         """
         if not await self.repo_exists(repo):
-            await ctx.send(f"❌ Could not find repository: `{repo}`")
+            await ctx.send(f"Could not find repository: `{repo}`")
             return
 
         open = await self.get_issue_count(repo, start, end, state="created")
         closed = await self.get_issue_count(repo, start, end, state="closed")
 
+        prs_opened = await self.get_pr_count(repo, start, end, "opened")
+        prs_closed = await self.get_pr_count(repo, start, end, "closed")
+        prs_merged = await self.get_pr_count(repo, start, end, "merged")
+
         stats_message = (
-            f"Stats for **{repo}** ({start} to {end}):\n" f"Issues opened: {open}\n" f"Issues closed: {closed}"
+            f"Stats for **{repo}** ({start} to {end}):\n"
+            f"Issues opened: {open}\n"
+            f"Issues closed: {closed} \n"
+            f"Pull Requests opened: {prs_opened} \n"
+            f"Pull Requests closed: {prs_closed} \n"
+            f"Pull Requests merged: {prs_merged} \n"
         )
         await ctx.send(stats_message)
 
@@ -56,6 +66,30 @@ class GitHubStats(Cog):
         # The query string uses GitHub's advanced search syntax
         # e.g., repo:python-discord/bot is:issue created:2023-01-01..2023-12-31
         query = f"repo:{repo} is:issue {state}:{start}..{end}"
+        params = {"q": query}
+
+        async with self.bot.http_session.get(url, headers=headers, params=params) as response:
+            if response.status != 200:
+                return -1
+
+            data = await response.json()
+            return data.get("total_count", 0)
+
+    async def get_pr_count(self, repo: str, start: str, end: str, action: str) -> int:
+        """Gets the number of PRs opened, closed or merged in a given timeframe."""
+        url = f"{GITHUB_API_URL}/search/issues"
+        headers = {"Authorization": f"token {Tokens.github.get_secret_value()}"}
+
+        if action == "opened":
+            state_query = f"created:{start}..{end}"
+        elif action == "merged":
+            state_query = f"is:merged merged:{start}..{end}"
+        elif action == "closed":
+            state_query = f"is:unmerged closed:{start}..{end}"
+        else:
+            return 0
+
+        query = f"repo:{repo} is:pr {state_query}"
         params = {"q": query}
 
         async with self.bot.http_session.get(url, headers=headers, params=params) as response:
