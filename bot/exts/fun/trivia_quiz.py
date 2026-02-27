@@ -17,6 +17,7 @@ from rapidfuzz import fuzz
 
 from bot.bot import Bot
 from bot.constants import Client, Colours, MODERATION_ROLES, NEGATIVE_REPLIES
+from bot.utils.leaderboard import add_points
 
 logger = get_logger(__name__)
 
@@ -479,6 +480,7 @@ class TriviaQuiz(commands.Cog):
                     break
 
                 points = 100 - 25 * hint_no
+                leaderboard_points = max(1, 3 - hint_no)
                 if msg.author in self.game_player_scores[ctx.channel.id]:
                     self.game_player_scores[ctx.channel.id][msg.author] += points
                 else:
@@ -491,8 +493,8 @@ class TriviaQuiz(commands.Cog):
                     self.player_scores[msg.author] = points
 
                 hint_no = 0
-
-                await ctx.send(f"{msg.author.mention} got the correct answer :tada: {points} points!")
+                await add_points(self.bot, msg.author.id, leaderboard_points, "quiz")
+                await ctx.send(f"{msg.author.mention} got the correct answer :tada: {leaderboard_points} points!")
 
                 await self.send_answer(
                     ctx.channel,

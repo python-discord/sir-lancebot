@@ -9,6 +9,10 @@ from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours, Emojis
+from bot.utils.leaderboard import add_points
+
+BATTLESHIP_WIN_POINTS = 6
+
 
 log = get_logger(__name__)
 
@@ -150,7 +154,7 @@ class Game:
         loser: discord.Member
     ) -> None:
         """Removes games from list of current games and announces to public chat."""
-        await self.public_channel.send(f"Game Over! {winner.mention} won against {loser.mention}")
+        await self.public_channel.send(f"Game Over! {winner.mention} won against {loser.mention} (+{BATTLESHIP_WIN_POINTS} pts)")
 
         for player in (self.p1, self.p2):
             grid = self.format_grid(player, SHIP_EMOJIS)
@@ -247,7 +251,9 @@ class Game:
                 await self.next.user.send(f"{self.turn.user} took too long. Game over!")
                 await self.public_channel.send(
                     f"Game over! {self.turn.user.mention} timed out so {self.next.user.mention} wins!"
+                    f"(+{BATTLESHIP_WIN_POINTS} pts)"
                 )
+                await add_points(self.bot, self.next.user.id, BATTLESHIP_WIN_POINTS, "battleship")
                 self.gameover = True
                 break
             else:
@@ -255,7 +261,9 @@ class Game:
                     await self.next.user.send(f"{self.turn.user} surrendered. Game over!")
                     await self.public_channel.send(
                         f"Game over! {self.turn.user.mention} surrendered to {self.next.user.mention}!"
+                        f"(+{BATTLESHIP_WIN_POINTS} pts)"
                     )
+                    await add_points(self.bot, self.next.user.id, BATTLESHIP_WIN_POINTS, "battleship")
                     self.gameover = True
                     break
                 square = self.get_square(self.next.grid, self.match.string)
@@ -274,10 +282,12 @@ class Game:
             await self.turn.user.send(f"You've sunk their {square.boat} ship!", delete_after=3.0)
             alert_messages.append(await self.next.user.send(f"Oh no! Your {square.boat} ship sunk!"))
             if self.check_gameover(self.next.grid):
-                await self.turn.user.send("You win!")
+                await self.turn.user.send(f"You win! (+{BATTLESHIP_WIN_POINTS} pts)")
                 await self.next.user.send("You lose!")
                 self.gameover = True
+                await add_points(self.bot, self.turn.user.id, BATTLESHIP_WIN_POINTS, "battleship")
                 await self.game_over(winner=self.turn.user, loser=self.next.user)
+                
 
     async def start_game(self) -> None:
         """Begins the game."""

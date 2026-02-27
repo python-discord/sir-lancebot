@@ -12,6 +12,9 @@ from discord.ext.commands import Cog, Context
 from pydis_core.utils.logging import get_logger
 
 from bot.constants import Emojis, MODERATION_ROLES
+from bot.utils.leaderboard import add_points
+
+SNAKES_AND_LADDERS_WIN_POINTS = 8
 
 SNAKE_RESOURCES = Path("bot/resources/fun/snakes").absolute()
 
@@ -684,7 +687,11 @@ class SnakeAndLaddersGame:
             return
 
         # announce winner and exit
-        await self.channel.send("**Snakes and Ladders**: " + winner.mention + " has won the game! :tada:")
+        await add_points(self.ctx.bot, winner.id, SNAKES_AND_LADDERS_WIN_POINTS, "snakes_and_ladders")
+        await self.channel.send(
+            f"**Snakes and Ladders**: {winner.mention} has won the game! :tada: "
+            f"(+{SNAKES_AND_LADDERS_WIN_POINTS} pts)"
+        )
         self._destruct()
 
     def _check_winner(self) -> User | Member:

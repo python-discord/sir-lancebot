@@ -9,7 +9,9 @@ from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours
+from bot.utils.leaderboard import add_points
 
+EGGQUIZ_WIN_POINTS = 3
 log = get_logger(__name__)
 
 EGGHEAD_QUESTIONS = loads(Path("bot/resources/holidays/easter/egghead_questions.json").read_text("utf8"))
@@ -103,11 +105,18 @@ class EggheadQuiz(commands.Cog):
             # with the correct answer, so stop looping over reactions.
             break
 
-        mentions = " ".join([
-            u.mention for u in users if not u.bot
-        ])
+        winners = [u for u in users if not u.bot]
 
-        content = f"Well done {mentions} for getting it correct!" if mentions else "Nobody got it right..."
+        for u in winners:
+            await add_points(ctx.bot, u.id, EGGQUIZ_WIN_POINTS, "eggquiz")
+
+        mentions = " ".join(u.mention for u in winners)
+
+        content = (
+            f"Well done {mentions} for getting it correct! (+{EGGQUIZ_WIN_POINTS} pts)"
+            if mentions
+            else "Nobody got it right..."
+        )
 
         a_embed = discord.Embed(
             title=f"The correct answer was {correct}!",

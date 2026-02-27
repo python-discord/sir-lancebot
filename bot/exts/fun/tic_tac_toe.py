@@ -7,6 +7,9 @@ from discord.ext.commands import Cog, Context, check, group
 from bot.bot import Bot
 from bot.constants import Emojis
 from bot.utils.pagination import LinePaginator
+from bot.utils.leaderboard import add_points
+
+TIC_TAC_TOE_WIN_POINTS = 3
 
 CONFIRMATION_MESSAGE = (
     "{opponent}, {requester} wants to play Tic-Tac-Toe against you."
@@ -219,9 +222,15 @@ class Game:
             if check_win(self.board):
                 self.winner = self.current
                 self.loser = self.next
-                await self.ctx.send(
-                    f":tada: {self.current} won this game! :tada:"
-                )
+
+                # Only award points to real users (not the AI/bot)
+                if isinstance(self.current, Player):
+                    await add_points(self.ctx.bot, self.current.user.id, TIC_TAC_TOE_WIN_POINTS, "tic_tac_toe")
+                    await self.ctx.send(f":tada: {self.current} won this game! :tada: (+{TIC_TAC_TOE_WIN_POINTS} pts)")
+                else:
+                    await self.ctx.send(
+                        f":tada: {self.current} won this game! :tada:"
+                    )
                 await board.clear_reactions()
                 break
             self.current, self.next = self.next, self.current

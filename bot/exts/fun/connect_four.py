@@ -8,6 +8,9 @@ from discord.ext import commands
 
 from bot.bot import Bot
 from bot.constants import Emojis
+from bot.utils.leaderboard import add_points
+
+CONNECT_FOUR_WIN_POINTS = 5
 
 NUMBERS = list(Emojis.number_emojis.values())
 CROSS_EMOJI = Emojis.incident_unactioned
@@ -75,11 +78,15 @@ class Game:
     ) -> None:
         """Announces to public chat."""
         if action == "win":
-            await self.channel.send(f"Game Over! {player1.mention} won against {player2.mention}")
+            await self.channel.send(f"Game Over! {player1.mention} won against {player2.mention}"f"(+{CONNECT_FOUR_WIN_POINTS} pts)")
+            if isinstance(player1, Member):
+                await add_points(self.bot, player1.id, CONNECT_FOUR_WIN_POINTS, "connect_four")
         elif action == "draw":
             await self.channel.send(f"Game Over! {player1.mention} {player2.mention} It's A Draw :tada:")
         elif action == "quit":
-            await self.channel.send(f"{self.player1.mention} surrendered. Game over!")
+            await self.channel.send(f"{player1.mention} surrendered. {player2.mention} wins! Game over!"f"(+{CONNECT_FOUR_WIN_POINTS} pts)")
+            if isinstance(player2, Member):
+                await add_points(self.bot, player2.id, CONNECT_FOUR_WIN_POINTS, "connect_four")
         await self.print_grid()
 
     async def start_game(self) -> None:
@@ -131,7 +138,10 @@ class Game:
             try:
                 reaction, user = await self.bot.wait_for("reaction_add", check=self.predicate, timeout=30.0)
             except TimeoutError:
-                await self.channel.send(f"{self.player_active.mention}, you took too long. Game over!")
+                await self.channel.send(f"{self.player_active.mention}, you took too long. Game over!"
+                f"{self.player_inactive.mention} wins! (+{CONNECT_FOUR_WIN_POINTS} pts)")
+                if isinstance(self.player_inactive, Member):
+                    await add_points(self.bot, self.player_inactive.id, CONNECT_FOUR_WIN_POINTS, "connect_four")
                 return None
             else:
                 await message.delete()
