@@ -162,16 +162,28 @@ class Grid:
         Checks if the grid is filled correctly in terms of a latin square.\n
         I.e all numbers in the range per colum and row exist.
         """
-        check_structure = [[False for col in range(self.size)] for row in range(self.size)]
+        check_row_structure = [[False for col in range(self.size)] for row in range(self.size)]
+        check_col_structure = [[False for col in range(self.size)] for row in range(self.size)]
 
+        # Fills the check structure
         for row in range(self.size):
             for col in range(self.size):
                 guess = self.cells[row][col].guess
                 if guess == 0:
                     return False
-                check_structure[row][guess - 1] = True
-            if all(check_structure[row]) is False:
-                return False
+                check_row_structure[row][guess - 1] = True
+                check_col_structure[guess - 1][col] = True
+
+        #print("\n------------------")
+        #print(check_row_structure)
+        #print(check_col_structure)
+        #print("------------------\n")
+
+        # Checks that the entire structure is True
+        for row in range(self.size):
+            for col in range(self.size):
+                if check_row_structure[row][col] is False or check_col_structure[row][col] is False:
+                    return False
 
         return True
 
