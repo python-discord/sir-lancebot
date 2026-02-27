@@ -85,6 +85,7 @@ class Mathdoku(commands.Cog):
         self.playing = False
         self.player_id = None
         self.board = None # The message that the board is posten on
+        self.guess_count = 0
 
     @commands.group(name="Mathdoku", aliases=("md",), invoke_without_command=True)
     async def mathdoku_group(self, ctx: commands.Context) -> None:
@@ -162,6 +163,17 @@ class Mathdoku(commands.Cog):
             if not valid_match:
                 await result.add_reaction(CROSS_EMOJI)
                 return
+         
+            self.guess_count += 1
+            if self.guess_count % 10 == 0: # re-send the grid after 10 guesses so the user doesn't need to scroll
+                await self.board.delete()
+                self.grids.recolor_blocks()
+                file = discord.File(self.grids._generate_image(), filename="mathdoku.png")
+                self.board = await ctx.send(file=file)
+                await self.board.add_reaction(HINT_EMOJI)
+                await ctx.send(
+                    "Type the square and what number you want to input. Format it like this: A1 3\n" "Type `end` to end game."
+                )
 
             full_grid = self.grids.check_full_grid()
             if (full_grid):
