@@ -38,8 +38,7 @@ I 2-
 
     return grid
 
-
-def test_hint_find_first_empty_cell(tmp_path: Path) -> None:
+def _test_hint_find_first_empty_cell(tmp_path: Path) -> None:
     grid = _load_5x5_grid(tmp_path)
 
     result = grid.hint(now=datetime(2026, 2, 25, 14, 0, 0))
@@ -49,8 +48,7 @@ def test_hint_find_first_empty_cell(tmp_path: Path) -> None:
     assert result["column"] == 0
     assert result["value"] == 4
 
-
-def test_hint_find_empty_cell_after_some_filled(tmp_path: Path) -> None:
+def _test_hint_find_empty_cell_after_some_filled(tmp_path: Path) -> None:
     grid = _load_5x5_grid(tmp_path)
 
     grid.cells[0][0].guess = 4

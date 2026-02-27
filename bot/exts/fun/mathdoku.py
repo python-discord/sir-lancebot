@@ -110,25 +110,21 @@ class Cell:
 
 class Block:
     """Represents a block in the puzzle, with its cells, operation and colour."""
-
-    color_id = 0
-    color_offset = randint(0, 80)
-
-    def __init__(self, id: str, operation: str, number: int, label_cell: Cell) -> None:
+    def __init__(self, id: str, operation: str, number: int, label_cell: Cell, grid: "Grid") -> None:
         self.id = id
         self.cells = []
         self.operation = operation
         self.number = number
         self.label_cell = label_cell
-        self.color_id = Block.color_id
+        self.grid = grid
+        self.color_id = grid.current_color_id
+        grid.current_color_id += 1
         self.color = self.compute_color()
-
-        Block.color_id += 1
+        
 
     def compute_color(self) -> tuple[int, int, int]:
         """Computes the block's color."""
-        c_a = ord(self.id[0]) ** 2 - ord("A")
-        return COLORS[c_a % len(COLORS)]
+        return COLORS[(self.color_id * (len(COLORS) // (self.grid.current_color_id)) + self.grid.color_offset) % len(COLORS)]
 
 
 class Grid:
@@ -145,6 +141,8 @@ class Grid:
 
         self._last_hint_timestamp = None
         self.difficulty = difficulty
+        self.color_offset = randint(0, 80)
+        self.current_color_id = 0
 
     @property
     def cells(self):

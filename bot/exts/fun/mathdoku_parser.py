@@ -88,13 +88,13 @@ def _create_cells_and_blocks(expected_size: int, created_grid: Grid, grid_str: s
         for j, col in enumerate(row):
             cell = created_grid[i][j]
             if col.isdigit():  # has no block
-                block = Block(str(i) + str(j), "", int(col), cell)
+                block = Block(str(i) + str(j), "", int(col), cell, created_grid)
                 cell.block = block
                 block.cells.append(cell)
                 created_grid.blocks.append(block)
                 continue
             if col not in seen_blocks:
-                block = Block(col, None, None, cell)
+                block = Block(col, None, None, cell, created_grid)
                 seen_blocks[col] = block
                 created_grid.blocks.append(block)
             else:
