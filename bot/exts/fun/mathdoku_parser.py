@@ -41,6 +41,7 @@ def create_grids(file_path: Path = FILE_PATH) -> list[Grid]:
             _read_solution(grid, solution_str)
         except IndexError:
             continue
+        grid.recolor_blocks()
         grids.append(grid)
 
     return grids
