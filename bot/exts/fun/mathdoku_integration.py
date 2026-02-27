@@ -85,7 +85,7 @@ class Mathdoku(commands.Cog):
         self.playing = False
         self.player_id = None
         self.board = None  # The message that the board is posten on
-        self.guess_count = 0
+        self.guess_count = 1
 
     @commands.group(name="Mathdoku", aliases=("md",), invoke_without_command=True)
     async def mathdoku_group(self, ctx: commands.Context) -> None:
@@ -167,7 +167,11 @@ class Mathdoku(commands.Cog):
                 await result.add_reaction(CROSS_EMOJI)
                 return
 
-            self.guess_count += 1
+            try:
+                await result.delete()
+            except Exception:
+                self.guess_count += 1
+
             if self.guess_count % 10 == 0:  # re-send the grid after 10 guesses so the user doesn't need to scroll
                 await self.board.delete()
                 self.grids.recolor_blocks()
