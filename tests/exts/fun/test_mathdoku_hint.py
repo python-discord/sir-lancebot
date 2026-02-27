@@ -38,17 +38,15 @@ I 2-
 
     return grid
 
-def _test_hint_find_first_empty_cell(tmp_path: Path) -> None:
+def test_hint_find_first_empty_cell(tmp_path: Path) -> None:
     grid = _load_5x5_grid(tmp_path)
 
     result = grid.hint(now=datetime(2026, 2, 25, 14, 0, 0))
 
     assert result["type"] == "hint"
-    assert result["row"] == 0
-    assert result["column"] == 0
-    assert result["value"] == 4
+    assert result["guess"] == "A1 4"
 
-def _test_hint_find_empty_cell_after_some_filled(tmp_path: Path) -> None:
+def test_hint_find_empty_cell_after_some_filled(tmp_path: Path) -> None:
     grid = _load_5x5_grid(tmp_path)
 
     grid.cells[0][0].guess = 4
@@ -58,9 +56,7 @@ def _test_hint_find_empty_cell_after_some_filled(tmp_path: Path) -> None:
     result = grid.hint(now=datetime(2026, 2, 25, 14, 0, 0))
 
     assert result["type"] == "hint"
-    assert result["row"] == 0
-    assert result["column"] == 3
-    assert result["value"] == 3
+    assert result["guess"] == "D1 3"
 
 
 def test_hint_cooldown(tmp_path: Path) -> None:
