@@ -1,6 +1,7 @@
-from io import BytesIO
-from PIL import Image, ImageDraw, ImageFont
 from datetime import datetime
+from io import BytesIO
+
+from PIL import Image, ImageDraw, ImageFont
 
 COLORS = [
     (235, 59, 59),
@@ -102,7 +103,7 @@ class Cell:
         return self._guess
 
     @guess.setter
-    def guess(self, new_guess):
+    def guess(self, new_guess) -> None:
         self._guess = new_guess
 
 class Block:
@@ -134,7 +135,7 @@ class Grid:
             tuple(Cell(col, row) for col in range(size))
             for row in range(size)
         )   # 2D tupple for cells [row][col]
-        
+
         self._last_hint_timestamp = None
 
     @property
@@ -149,7 +150,7 @@ class Grid:
                 print_str += str(self.cells[row][col].guess) + " "
             print_str += str(self.cells[row][col + 1].guess) + "]\n"
         return print_str
-    
+
     def _latin_square_check(self) -> bool:
         """
         Checks if the grid is filled correctly in terms of a latin square.\n
@@ -167,12 +168,12 @@ class Grid:
                 return False
 
         return True
-    
+
     def _blocks_fufilled_check(self) -> list[Block] | bool:
         """
         Checks if all the blocks are filled correctly and meets the requirements. \n
         Returns the blocks that are wrong or True if all blocks meet the requirements. \n
-        Will return False if the input is invalid. 
+        Will return False if the input is invalid.
         """
         wrong_blocks = []
         for block in self.blocks:
@@ -201,10 +202,10 @@ class Grid:
                         else:
                             result = block.number
                         break
-            
+
             if abs(result) != block.number:
                 wrong_blocks.append(block)
-        
+
         if len(wrong_blocks) == 0:
             return True
         return wrong_blocks
@@ -212,20 +213,18 @@ class Grid:
 
     def check_victory(self) -> bool:
         """
-        Checks if the board is in a state where the player has won and will 
-        return True or False
+        Checks if the board is in a state where the player has won and will
+        return True or False.
         """
-        if self._latin_square_check() and isinstance(self._blocks_fufilled_check(), bool) and self._blocks_fufilled_check():
-            return True
-        return False
-        
+        return bool(self._latin_square_check() and isinstance(self._blocks_fufilled_check(), bool) and self._blocks_fufilled_check())
+
 
     def board_filled_handler(self) -> bool:
         """
         Handler for when board is filled.\n
         The method calls the victory check and colors in the blocks that are not fufilled if any,\n
         and returns True or False if the board is solved.
-        """     
+        """
         wrong_blocks = self._blocks_fufilled_check()
         if isinstance(wrong_blocks, bool):
             wrong_blocks = []
@@ -237,19 +236,17 @@ class Grid:
                 block.color = (100, 255, 100)
 
         return self.check_victory()
-    
+
     def check_full_grid(self) -> bool:
-        """Helper that checks if a grid is completely filled"""
+        """Helper that checks if a grid is completely filled."""
         for i in range(self.size):
             for cell in self.cells[i]:
                 if cell.guess <= 0:
                     return False
         return True
-    
+
     def recolor_blocks(self) -> None:
-        """
-        Method to recolor all blocks in their original color
-        """
+        """Method to recolor all blocks in their original color."""
         for block in self.blocks:
             block.color = block.compute_color()
 
@@ -262,7 +259,7 @@ class Grid:
         return self.cells[i]
 
     def _generate_image(self, cellSize = 80, margin = 30, outfile = "mathdoku.png", saveToFile = False) -> None:
-        """Print the Grid to """
+        """Print the Grid to."""
         fontLable = ImageFont.load_default(15)
         fontGuess = ImageFont.load_default(30)
         img = Image.new("RGB", (cellSize * len(self.cells) + 2*margin, cellSize * len(self.cells) + 2*margin), "white")
@@ -271,19 +268,19 @@ class Grid:
         for i, row in enumerate(self.cells):
             for j, cell in enumerate(row):
                 # 1) The block color
-                x_start = (cell.column) * cellSize + margin + margin//2 
+                x_start = (cell.column) * cellSize + margin + margin//2
                 y_start = (cell.row) * cellSize + margin + margin//2
-                x_end = (cell.column) * cellSize + cellSize + margin + margin//2 
+                x_end = (cell.column) * cellSize + cellSize + margin + margin//2
                 y_end = (cell.row) * cellSize + cellSize + margin + margin//2
                 color = cell.block.color
                 draw.rectangle((x_start, y_start, x_end, y_end),fill=color)
-                
+
                 # 2) the guess
                 guess = cell.guess
                 if (guess != 0):
-                    draw.text((x_start+30, y_start+22), str(guess), 
+                    draw.text((x_start+30, y_start+22), str(guess),
                             fill="black", font=fontGuess)
-                    
+
                 # 3) the lines between the cells
                 thin_line_width = 2
                 draw.line((x_start, y_start, x_start + cellSize, y_start), fill="black", width=thin_line_width)
@@ -325,29 +322,29 @@ class Grid:
             x_start = (label_cell.column) * cellSize + margin + margin//2
             y_start = (label_cell.row) * cellSize + margin + margin//2
             #print("Label:" + label )
-            draw.text((x_start+4, y_start+2), str(label), 
+            draw.text((x_start+4, y_start+2), str(label),
                             fill="black", font=fontLable)
 
         # 5) the x axis description A-...
         for i in range(self.size):
             text = chr(ord("A") + i)
-            draw.text((margin + 30 + i * cellSize + margin//2, 4), str(text), 
+            draw.text((margin + 30 + i * cellSize + margin//2, 4), str(text),
                             fill="black", font=fontGuess)
-            
+
         # 6) the y axis description 1-...
         for j in range(self.size):
             text = str(j+1)
-            draw.text((13, margin + 22 + j * cellSize + margin//2), str(text), 
+            draw.text((13, margin + 22 + j * cellSize + margin//2), str(text),
                             fill="black", font=fontGuess)
 
         if (saveToFile):
             img.save(outfile)
- 
+
         buffer = BytesIO()
         img.save(buffer, "PNG")
         buffer.seek(0)
         return buffer
-    
+
     def _find_first_empty_cell(self):
         """Return the first empty cell (`guess == 0`) in row-major order, or `None` if all cells are filled."""
         for row in self.cells:
@@ -376,16 +373,18 @@ class Grid:
         cell, _reason = found
 
         self._last_hint_timestamp = current_time
+
+        coord = f"{chr(ord('A') + cell.column)}{cell.row + 1}"
         return {
             "type": "hint",
-            "row": cell.row,
-            "column": cell.column,
-            "value": cell.correct,
+            "guess": f"{coord} {cell.correct}",
         }
-    
-    def add_guess(self, guess):
-        """Takes the user guess and checks if its valid, if it is -> add to cell
-            A guess is in format A5 4, where A = column, 5 = row and 4 = guessed value"""
+
+    def add_guess(self, guess) -> bool:
+        """
+        Takes the user guess and checks if its valid, if it is -> add to cell
+        A guess is in format A5 4, where A = column, 5 = row and 4 = guessed value.
+        """
         guess = guess.split()
         column = ord(guess[0][0].lower()) - 97
         row = int(guess[0][1]) - 1
@@ -393,9 +392,9 @@ class Grid:
 
         if (column < 0 or row < 0 or value < 1):
             return False
-        
+
         if (column >= self.size or row >= self.size or value > self.size):
             return False
-        
+
         self.cells[row][column].guess = value
         return True
