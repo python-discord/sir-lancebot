@@ -1,80 +1,21 @@
 import asyncio
 import re
+from random import choice
+
 
 import discord
 from discord.ext import commands
 from pydis_core.utils.logging import get_logger
 
+from copy import deepcopy
+
 from bot.bot import Bot
-
-# TODO remove this import when merging files
-from bot.exts.fun.mathdoku import Block, Grid
-
-# These 2 commands make the API not work for some reason if uncommented
-# from .mathdoku_parser import create_grids
-# grids = create_grids()
-
-# TODO remove this testing Grid
-testingGrid = Grid(3)
-cell_one = testingGrid.cells[0][0]
-cell_two = testingGrid.cells[0][1]
-cell_three = testingGrid.cells[0][2]
-cell_four = testingGrid.cells[1][0]
-cell_five = testingGrid.cells[1][1]
-cell_six = testingGrid.cells[1][2]
-cell_seven = testingGrid.cells[2][0]
-cell_eight = testingGrid.cells[2][1]
-cell_nine = testingGrid.cells[2][2]
-testBlock_1 = Block("A", "+", 6, cell_one, testingGrid)
-testBlock_2 = Block("B", "+", 9, cell_four, testingGrid)
-testBlock_3 = Block("C", "+", 3, cell_five, testingGrid)
-testingGrid.blocks.append(testBlock_1)
-testingGrid.blocks.append(testBlock_2)
-testingGrid.blocks.append(testBlock_3)
-
-cell_one.guess = 1
-cell_three.guess = 3
-cell_seven.guess = 2
-
-cell_one.correct = 1
-cell_two.correct = 2
-cell_three.correct = 3
-cell_four.correct = 3
-cell_five.correct = 1
-cell_six.correct = 2
-cell_seven.correct = 2
-cell_eight.correct = 3
-cell_nine.correct = 1
-
-testBlock_1.cells.append(cell_one)
-testBlock_1.cells.append(cell_two)
-testBlock_1.cells.append(cell_three)
-cell_one.block = testBlock_1
-cell_two.block = testBlock_1
-cell_three.block = testBlock_1
-
-testBlock_2.cells.append(cell_four)
-testBlock_2.cells.append(cell_seven)
-testBlock_2.cells.append(cell_eight)
-testBlock_2.cells.append(cell_nine)
-cell_four.block = testBlock_2
-cell_seven.block = testBlock_2
-cell_eight.block = testBlock_2
-cell_nine.block = testBlock_2
-
-testBlock_3.cells.append(cell_five)
-testBlock_3.cells.append(cell_six)
-cell_five.block = testBlock_3
-cell_six.block = testBlock_3
-
-testingGrid.recolor_blocks()
 
 CROSS_EMOJI = "\u274c"  # "\u274e"
 MAGNIFYING_EMOJI = "🔍"
 PARTY_EMOJI = "🎉"
 HINT_EMOJI = "💡"
 log = get_logger(__name__)
-has_filled_board_prev = False
 
 
 class Mathdoku(commands.Cog):
@@ -82,11 +23,12 @@ class Mathdoku(commands.Cog):
 
     def __init__(self, bot: Bot, grids: dict):
         self.bot = bot
-        self.grids = grids  # The game Grid
+        self.grids = grids  # All possible game grids
+        self.grid = None  # the currently active game grid
         self.playing = False
         self.player_id = None
         self.board = None  # The message that the board is posten on
-        self.guess_count = 1
+        self.guess_count = 0
 
     @commands.group(name="Mathdoku", aliases=("md",), invoke_without_command=True)
     async def mathdoku_group(self, ctx: commands.Context) -> None:
@@ -95,20 +37,38 @@ class Mathdoku(commands.Cog):
         await self.bot.invoke_help_command(ctx)
 
     @mathdoku_group.command(name="start")
-    async def start_command(self, ctx: commands.Context, size: int = 5) -> None:
-        """Start a game of Mathdoku."""
+    async def start_command(self, ctx: commands.Context, size: int = 5, difficulty = "medium") -> None:
+        """Start a game of Mathdoku
+        size = the board size. Pick from 3-9
+        difficulty = easy, medium or hard
+        """
+
+        size = int(size)
+        difficulty = str(difficulty).lower()
 
         if self.playing:
             await ctx.send("Someone else is playing right now. Please wait your turn.")
             return
-        self.playing = True
 
+        if size not in [3,4,5,6,7,8,9]:
+            await ctx.send("Please give a valid size between 3 and 9")
+            return
+        
+        if difficulty not in ["easy", "medium", "hard"]:
+            await ctx.send("Please give a valid difficulty: easy, medium or hard")
+            return
+    
+        grids_available = self.grids[size][difficulty]
+        if len(grids_available) < 1:
+            await ctx.send("Couldn't find any boards for size: " + size + " and difficulty: " + difficulty  + ". Sorry :/")
+            return
+        
+        self.playing = True
         self.player_id = ctx.author.id
+        self.grid = deepcopy(choice(grids_available))  # get a random grid from the available ones for this size / difficulty
         await ctx.send("Game of Mathdoku has been started!")
 
-        # TODO Create an actual Grid:
-        self.grids = testingGrid
-        file = discord.File(self.grids._generate_image(), filename="mathdoku.png")
+        file = discord.File(self.grid._generate_image(), filename="mathdoku.png")
         self.board = await ctx.send(file=file)
 
         await ctx.send(
@@ -142,6 +102,9 @@ class Mathdoku(commands.Cog):
             await ctx.send("You took too long. Game over!")
             self.playing = False
             return
+        
+        except Exception:
+            return
 
         if not self.playing:  # takes care of the end message
             await ctx.send("The game has been ended")
@@ -163,7 +126,7 @@ class Mathdoku(commands.Cog):
 
         else:  # A message was posted
             input_text = result.content.strip()
-            valid_match = self.grids.add_guess(input_text)  # checks if its a valid guess and applies
+            valid_match = self.grid.add_guess(input_text)  # checks if its a valid guess and applies
             if not valid_match:
                 await result.add_reaction(CROSS_EMOJI)
                 return
@@ -173,23 +136,16 @@ class Mathdoku(commands.Cog):
             except Exception:
                 self.guess_count += 1
 
-            if self.guess_count % 10 == 0:  # re-send the grid after 10 guesses so the user doesn't need to scroll
-                await self.board.delete()
-                self.grids.recolor_blocks()
-                file = discord.File(self.grids._generate_image(), filename="mathdoku.png")
-                self.board = await ctx.send(file=file)
-                await self.board.add_reaction(HINT_EMOJI)
-                await ctx.send(
-                    "Type the square and what number you want to input. Format it like this: A1 3\n"
-                    "Type `end` to end game."
-                )
+            if self.guess_count > 10:  # re-send the grid after 10 guesses so the user doesn't need to scroll
+                await self.resent_message(ctx=ctx)
+                self.guess_count = 0
 
-            full_grid = self.grids.check_full_grid()
+            full_grid = self.grid.check_full_grid()
             if full_grid:
                 await self.board.add_reaction(MAGNIFYING_EMOJI)
 
-            self.grids.recolor_blocks()
-            file = discord.File(self.grids._generate_image(), filename="mathdoku.png")
+            self.grid.recolor_blocks()
+            file = discord.File(self.grid._generate_image(), filename="mathdoku.png")
             await self.board.edit(content=None, attachments=[file])
             return
 
@@ -204,6 +160,7 @@ class Mathdoku(commands.Cog):
 
             match = re.fullmatch(r"[A-Ja-j](10|[1-9])\s+[1-9]", input_text)
             if not match:
+                self.guess_count += 1
                 self.bot.loop.create_task(message.add_reaction(CROSS_EMOJI))
                 return False
             return True
@@ -216,13 +173,12 @@ class Mathdoku(commands.Cog):
         return None
 
     async def magnifying_handler(self, ctx, user) -> None:
-        if self.grids.check_full_grid():
+        if self.grid.check_full_grid():
             await self.board.remove_reaction(MAGNIFYING_EMOJI, user)
 
-            result = self.grids.board_filled_handler()  # check win and update img
-            file = discord.File(self.grids._generate_image(), filename="mathdoku.png")
+            result = self.grid.board_filled_handler()  # check win and update img
+            file = discord.File(self.grid._generate_image(), filename="mathdoku.png")
             await self.board.edit(content=None, attachments=[file])
-
             if result:  # WIN
                 await self.board.add_reaction(PARTY_EMOJI)
                 await ctx.send(PARTY_EMOJI + " Congrats! You WON " + PARTY_EMOJI)
@@ -233,7 +189,7 @@ class Mathdoku(commands.Cog):
     async def hint_handler(self, ctx, user) -> None:
         """Handle hint request via 💡 reaction."""
         await self.board.remove_reaction(HINT_EMOJI, user)
-        result = self.grids.hint()
+        result = self.grid.hint()
 
         if result["type"] == "cooldown":
             await ctx.send(f"Hint on cooldown. Try again in {result['remaining_seconds']}s.")
@@ -242,6 +198,17 @@ class Mathdoku(commands.Cog):
         else:
             await ctx.send(f"Hint: {result['guess']}")
 
+
+    async def resent_message(self, ctx):
+        await self.board.delete()
+        self.grid.recolor_blocks()
+        file = discord.File(self.grid._generate_image(), filename="mathdoku.png")
+        self.board = await ctx.send(file=file)
+        await self.board.add_reaction(HINT_EMOJI)
+        await ctx.send(
+            "Type the square and what number you want to input. Format it like this: A1 3\n"
+            "Type `end` to end game."
+        )
 
 async def setup(bot: Bot) -> None:
     """Load the Mathdoku cog."""
