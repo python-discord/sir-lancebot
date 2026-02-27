@@ -95,6 +95,10 @@ class Mathdoku(commands.Cog):
         self.player_id = ctx.author.id
         self.grid = deepcopy(choice(grids_available))  # get a random grid from the available ones for this size / difficulty
         await ctx.send("Game of Mathdoku has been started!")
+        await ctx.send(
+            "Press 🔍 to check if the board's conditions are met (only appears when the board is full)\n" 
+            "Press 💡 to get a helpful hint on how to solve the puzzle\n"
+            "Press 📕 to get the rules of the Mathdoku game")
 
         file = discord.File(self.grid._generate_image(), filename="mathdoku.png")
         self.board = await ctx.send(file=file)
