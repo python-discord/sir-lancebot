@@ -17,7 +17,7 @@ jobs:
 
       # Check out the current repository in the `sir-lancebot` subdirectory
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -54,7 +54,7 @@ jobs:
 
     steps:
       - name: Checkout Kubernetes Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: python-discord/infra
           path: infra
