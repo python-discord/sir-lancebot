@@ -8,7 +8,7 @@
 
 ### One or two sentences describing it:
 
-Sir Lancebot is an open-source Discord bot written in Python and maintained by the Python Discord community. . On the project, contributors can implement new commands and features, or fix issues.
+Sir Lancebot is an open-source Discord bot written in Python and maintained by the Python Discord community. On the project, contributors can implement new commands and features, or fix issues.
 
 ## Onboarding experience
 
@@ -119,6 +119,52 @@ Optional (point 5): considered for acceptance (passes all automated checks).
 ## UML class diagram and its description ### Key changes/classes affected
 
 Optional (point 1): Architectural overview.
+
+## Architectural Overview
+
+### System Purpose.
+
+**Sir Lancebot** is an open-source `Discord bot` developed and maintained by the Python Discord community. Its primary purpose is to serve a beginner-friendly project for developers who want to learn and contribute to open source. The bot  provides a variety of features for Discord servers (fun games, utilities, seasonal commands, event tools).
+
+In practice, the system combines a bot core with multiple independent features modules (cogs), so new functionality can be added with minimal impact on existing commands.
+
+Our `Mathdoku` implementation follows the same philosophy: board logic is separated from Discord interaction and from the board-file parsing, which keeps each concern testable and replaceable.
+
+### System Architecture
+
+### Component Diagram
+
+![alt text]()
+
+The system architecture is organized in layers around a modular bot core.
+`Users` interact through Discord, and the `Discord API` sends events and commands to the `Sir Lancebot Core`, which is responsible for runtime setup and dispatching functionality to the corresponding extension. Each `extension (Cog)` is independent, so features can be added, removed or modified independently without modifying the core logic. Our `Mathdoku` game implementation is included inside the `fun` feature group, but there are other fun features groups as `utilites`, `holidays`, `events`.
+
+### Mathdoku Architecture in the system.
+
+The `Mathdoku` feature is implemented as a subsystem across three modules with clear separation of responsibilities.
+
+#### 1. Game Logic (`mathdoku.py`)
+This module contains the core game model:
+- **Cell:** stores coordinates (row, column), block, player guess, and correct value.
+- **Block:** stores block metadata (id, operation, number, assigned cells, color).
+- **Grid:** stores board state and game rules (latin-square rules, full-board checks, check block constraints, evaluates win condition, hint cooldown handling...).
+
+This module is independent from Discord commands, so game correctness can be verified independently from the bot's event handling.
+
+#### 2. Board Parsing (`mathdoku_parser.py`)
+This module reads `mathdoku_boards.txt`, extract board definitions, builds `Grid` objects, assign blocks and operations, and loads the correct solution values.
+
+This module acts as the entry point for board data, transforming raw text into structured game objects ready to be used by the game logic.
+
+#### 3. Discord Integration (`mathdoku_integration.py`)
+This module connects the game to Discord and manages the full interaction flow with the player:
+- Starts a game session.
+- Wait for player input messages with a 10 minutes inactivity timeout.
+- Handles guesses from user inputs.
+- Handles emoji reactions for hints and block validation.
+
+This module contains no game rules. It receives player input messages,
+delegates to the game logic, and sends the result back to Discord.
 
 Optional (point 2): relation to design pattern(s).
 
