@@ -494,7 +494,10 @@ class TriviaQuiz(commands.Cog):
 
                 hint_no = 0
                 await add_points(self.bot, msg.author.id, leaderboard_points, "quiz")
-                await ctx.send(f"{msg.author.mention} got the correct answer :tada: {points} points! (+{leaderboard_points} global pts)")
+                await ctx.send(
+                    f"{msg.author.mention} got the correct answer :tada: "
+                    f"{points} points! (+{leaderboard_points} global pts)"
+                )
 
                 await self.send_answer(
                     ctx.channel,

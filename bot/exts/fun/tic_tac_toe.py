@@ -6,8 +6,8 @@ from discord.ext.commands import Cog, Context, check, group
 
 from bot.bot import Bot
 from bot.constants import Emojis
-from bot.utils.pagination import LinePaginator
 from bot.utils.leaderboard import add_points
+from bot.utils.pagination import LinePaginator
 
 TIC_TAC_TOE_WIN_POINTS = 10
 

@@ -154,7 +154,9 @@ class Game:
         loser: discord.Member
     ) -> None:
         """Removes games from list of current games and announces to public chat."""
-        await self.public_channel.send(f"Game Over! {winner.mention} won against {loser.mention} (+{BATTLESHIP_WIN_POINTS} pts)")
+        await self.public_channel.send(
+            f"Game Over! {winner.mention} won against {loser.mention} (+{BATTLESHIP_WIN_POINTS} pts)"
+        )
 
         for player in (self.p1, self.p2):
             grid = self.format_grid(player, SHIP_EMOJIS)
