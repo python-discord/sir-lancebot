@@ -12,7 +12,7 @@ from bot.utils.converters import CoordinateConverter
 from bot.utils.exceptions import UserNotPlayingError
 from bot.utils.leaderboard import add_points
 
-MINESWEEPER_WIN_POINTS = 6
+MINESWEEPER_WIN_POINTS = 15
 
 MESSAGE_MAPPING = {
     0: ":stop_button:",
@@ -61,12 +61,12 @@ class Minesweeper(commands.Cog):
     def points_for_bomb_chance(bomb_chance: float) -> int:
         """Calculate points awarded based on the bomb density of the board."""
         if bomb_chance <= 0.15:
-            return 4  
+            return 15
         if bomb_chance <= 0.20:
-            return 6   
+            return 17
         if bomb_chance <= 0.25:
-            return 8   
-        return 10      
+            return 20
+        return 15     
 
     @commands.group(name="minesweeper", aliases=("ms",), invoke_without_command=True)
     async def minesweeper_group(self, ctx: commands.Context) -> None:

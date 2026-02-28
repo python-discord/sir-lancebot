@@ -24,7 +24,7 @@ from bot.exts.fun.snakes._converter import Snake
 from bot.utils.decorators import locked
 from bot.utils.leaderboard import add_points
 
-SNAKE_QUIZ_WIN_POINTS = 2
+SNAKE_QUIZ_WIN_POINTS = 10
 
 log = get_logger(__name__)
 

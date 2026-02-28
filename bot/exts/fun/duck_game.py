@@ -15,9 +15,9 @@ from bot.constants import MODERATION_ROLES
 from bot.utils.decorators import with_role
 from bot.utils.leaderboard import add_points
 
-DUCK_GAME_FIRST_PLACE_POINTS = 10
-DUCK_GAME_SECOND_PLACE_POINTS = 6
-DUCK_GAME_THIRD_PLACE_POINTS = 3
+DUCK_GAME_FIRST_PLACE_POINTS = 30
+DUCK_GAME_SECOND_PLACE_POINTS = 20
+DUCK_GAME_THIRD_PLACE_POINTS = 10
 
 DECK = list(product(*[(0, 1, 2)]*4))
 

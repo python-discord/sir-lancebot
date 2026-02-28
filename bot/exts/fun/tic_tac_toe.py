@@ -9,7 +9,7 @@ from bot.constants import Emojis
 from bot.utils.pagination import LinePaginator
 from bot.utils.leaderboard import add_points
 
-TIC_TAC_TOE_WIN_POINTS = 3
+TIC_TAC_TOE_WIN_POINTS = 10
 
 CONFIRMATION_MESSAGE = (
     "{opponent}, {requester} wants to play Tic-Tac-Toe against you."

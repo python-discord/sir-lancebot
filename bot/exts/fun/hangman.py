@@ -8,7 +8,7 @@ from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES
 from bot.utils.leaderboard import add_points
 
-HANGMAN_WIN_POINTS = 4
+HANGMAN_WIN_POINTS = 15
 
 # Defining all words in the list of words as a global variable
 ALL_WORDS = Path("bot/resources/fun/hangman_words.txt").read_text().splitlines()

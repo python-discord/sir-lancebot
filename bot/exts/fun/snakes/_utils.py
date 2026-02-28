@@ -14,7 +14,7 @@ from pydis_core.utils.logging import get_logger
 from bot.constants import Emojis, MODERATION_ROLES
 from bot.utils.leaderboard import add_points
 
-SNAKES_AND_LADDERS_WIN_POINTS = 8
+SNAKES_AND_LADDERS_WIN_POINTS = 15
 
 SNAKE_RESOURCES = Path("bot/resources/fun/snakes").absolute()
 

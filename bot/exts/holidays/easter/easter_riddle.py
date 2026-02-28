@@ -10,7 +10,7 @@ from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES
 from bot.utils.leaderboard import add_points
 
-EASTER_RIDDLE_WIN_POINTS = 3
+EASTER_RIDDLE_WIN_POINTS = 10
 
 log = get_logger(__name__)
 

@@ -10,7 +10,7 @@ from bot.bot import Bot
 from bot.constants import Emojis
 from bot.utils.leaderboard import add_points
 
-CONNECT_FOUR_WIN_POINTS = 5
+CONNECT_FOUR_WIN_POINTS = 15
 
 NUMBERS = list(Emojis.number_emojis.values())
 CROSS_EMOJI = Emojis.incident_unactioned

@@ -11,7 +11,7 @@ from bot.bot import Bot
 from bot.constants import Colours, Emojis
 from bot.utils.leaderboard import add_points
 
-BATTLESHIP_WIN_POINTS = 6
+BATTLESHIP_WIN_POINTS = 30
 
 
 log = get_logger(__name__)

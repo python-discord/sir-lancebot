@@ -480,7 +480,7 @@ class TriviaQuiz(commands.Cog):
                     break
 
                 points = 100 - 25 * hint_no
-                leaderboard_points = max(1, 3 - hint_no)
+                leaderboard_points = max(10, 12 - hint_no)
                 if msg.author in self.game_player_scores[ctx.channel.id]:
                     self.game_player_scores[ctx.channel.id][msg.author] += points
                 else:

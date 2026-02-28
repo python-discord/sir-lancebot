@@ -11,7 +11,7 @@ from bot.bot import Bot
 from bot.constants import Colours
 from bot.utils.leaderboard import add_points
 
-EGGQUIZ_WIN_POINTS = 3
+EGGQUIZ_WIN_POINTS = 10
 log = get_logger(__name__)
 
 EGGHEAD_QUESTIONS = loads(Path("bot/resources/holidays/easter/egghead_questions.json").read_text("utf8"))

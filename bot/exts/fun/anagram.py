@@ -11,7 +11,7 @@ from bot.bot import Bot
 from bot.constants import Colours
 from bot.utils.leaderboard import add_points
 
-ANAGRAM_WIN_POINTS = 3
+ANAGRAM_WIN_POINTS = 10
 
 log = get_logger(__name__)
 
