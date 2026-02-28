@@ -6,6 +6,9 @@ from discord.ext import commands
 
 from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES
+from bot.utils.leaderboard import add_points
+
+HANGMAN_WIN_POINTS = 4
 
 # Defining all words in the list of words as a global variable
 ALL_WORDS = Path("bot/resources/fun/hangman_words.txt").read_text().splitlines()
@@ -167,9 +170,10 @@ class Hangman(commands.Cog):
 
         # The loop exited meaning that the user has guessed the word
         await original_message.edit(embed=self.create_embed(tries, user_guess))
+        await add_points(self.bot, ctx.author.id, HANGMAN_WIN_POINTS, "hangman")
         win_embed = Embed(
             title="You won!",
-            description=f"The word was `{word}`.",
+            description=f"The word was `{word}`. (+{HANGMAN_WIN_POINTS} pts)",
             color=Colours.grass_green
         )
         await ctx.send(embed=win_embed)

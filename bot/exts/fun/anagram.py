@@ -9,6 +9,9 @@ from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours
+from bot.utils.leaderboard import add_points
+
+ANAGRAM_WIN_POINTS = 3
 
 log = get_logger(__name__)
 
@@ -32,11 +35,13 @@ class AnagramGame:
         self.correct = set(correct)
 
         self.winners = set()
+        self.winner_ids = set()
 
     async def message_creation(self, message: discord.Message) -> None:
         """Check if the message is a correct answer and remove it from the list of answers."""
         if message.content.lower() in self.correct:
             self.winners.add(message.author.mention)
+            self.winner_ids.add(message.author.id)
             self.correct.remove(message.content.lower())
 
 
@@ -77,7 +82,9 @@ class Anagram(commands.Cog):
 
         if game.winners:
             win_list = ", ".join(game.winners)
-            content = f"Well done {win_list} for getting it right!"
+            for winner_id in game.winner_ids:
+                await add_points(self.bot, winner_id, ANAGRAM_WIN_POINTS, "anagram")
+            content = f"Well done {win_list} for getting it right! (+{ANAGRAM_WIN_POINTS} pts)"
         else:
             content = "Nobody got it right."
 
