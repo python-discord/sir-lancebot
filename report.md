@@ -168,6 +168,33 @@ delegates to the game logic, and sends the result back to Discord.
 
 Optional (point 2): relation to design pattern(s).
 
+## Refactoring Patterns
+We have implemented two refactoring patterns from Martin Fowler's catalogue that align with the overall architecture of `Sir Lancebot`.
+
+#### Extract Class
+
+Instead of implememting the entire `Mathdoku` feature in a single file, we decided to separate the different responsibilities into three independent files.
+
+- `mathdoku.py` owns the game model and rules.
+- `mathdoku_parser.py` owns the board file loading.
+- `mathdoku_integration.py` owns the Discord interaction.
+
+This reflects the **Extract Class** pattern: when a class or module
+takes on too many responsibilities, each concern is extracted into its
+own unit.
+
+#### Extract Method
+Within `mathdoku_parser.py`, we decided to divide the parsing logic into smaller functions rather than a single large function.
+
+- `_search_for_grids_in_file()` reads the board file and applies a regex to locate and extract all board definitions.
+- `_create_cells_and_blocks()` iterates over the board layout,
+  creates `Block` objects, and assigns each cell to its corresponding block.
+- `_read_block_operations()` assigns the arithmetic operator and target number to the corresponding block.
+- `_read_solution()` sets the correct value on each cell.
+
+This reflects the **Extract Method** pattern: when complex logic is divided
+into well-named methods, each with a single, clear purpose.
+
 ## Overall experience What are your main take-aways from this project? What did you learn? How did you grow as a team, using the Essence standard to evaluate yourself?
 
 Optional (point 6): How would you put your work in context with best software engineering practice?
