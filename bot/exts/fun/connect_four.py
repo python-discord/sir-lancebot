@@ -78,13 +78,13 @@ class Game:
     ) -> None:
         """Announces to public chat."""
         if action == "win":
-            await self.channel.send(f"Game Over! {player1.mention} won against {player2.mention}"f"(+{CONNECT_FOUR_WIN_POINTS} pts)")
+            await self.channel.send(f"Game Over! {player1.mention} won against {player2.mention} (+{CONNECT_FOUR_WIN_POINTS} pts)")
             if isinstance(player1, Member):
                 await add_points(self.bot, player1.id, CONNECT_FOUR_WIN_POINTS, "connect_four")
         elif action == "draw":
             await self.channel.send(f"Game Over! {player1.mention} {player2.mention} It's A Draw :tada:")
         elif action == "quit":
-            await self.channel.send(f"{player1.mention} surrendered. {player2.mention} wins! Game over!"f"(+{CONNECT_FOUR_WIN_POINTS} pts)")
+            await self.channel.send(f"{player1.mention} surrendered. {player2.mention} wins! Game over! (+{CONNECT_FOUR_WIN_POINTS} pts)")
             if isinstance(player2, Member):
                 await add_points(self.bot, player2.id, CONNECT_FOUR_WIN_POINTS, "connect_four")
         await self.print_grid()

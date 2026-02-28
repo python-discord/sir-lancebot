@@ -59,6 +59,7 @@ class Minesweeper(commands.Cog):
 
     @staticmethod
     def points_for_bomb_chance(bomb_chance: float) -> int:
+        """Calculate points awarded based on the bomb density of the board."""
         if bomb_chance <= 0.15:
             return 4  
         if bomb_chance <= 0.20:
@@ -197,11 +198,12 @@ class Minesweeper(commands.Cog):
     async def won(self, ctx: commands.Context) -> None:
         """The player won the game."""
         game = self.games[ctx.author.id]
-        points = self.points_by_user.get(ctx.author.id, 6) 
+        points = self.points_by_user.get(ctx.author.id, 6)
         await add_points(self.bot, ctx.author.id, points, "minesweeper")
         await ctx.author.send(f":tada: You won! :tada: (+{points} pts)")
         if game.activated_on_server:
-            await game.chat_msg.channel.send(f":tada: {ctx.author.mention} just won Minesweeper! :tada: (+{points} pts)"
+            await game.chat_msg.channel.send(
+                f":tada: {ctx.author.mention} just won Minesweeper! :tada: (+{points} pts)"
             )
     def reveal_zeros(self, revealed: GameBoard, board: GameBoard, x: int, y: int) -> None:
         """Recursively reveal adjacent cells when a 0 cell is encountered."""

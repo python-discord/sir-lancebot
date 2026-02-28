@@ -250,7 +250,7 @@ class Game:
                 await self.turn.user.send("You took too long. Game over!")
                 await self.next.user.send(f"{self.turn.user} took too long. Game over!")
                 await self.public_channel.send(
-                    f"Game over! {self.turn.user.mention} timed out so {self.next.user.mention} wins!"
+                    f"Game over! {self.turn.user.mention} timed out so {self.next.user.mention} wins! "
                     f"(+{BATTLESHIP_WIN_POINTS} pts)"
                 )
                 await add_points(self.bot, self.next.user.id, BATTLESHIP_WIN_POINTS, "battleship")
@@ -260,7 +260,7 @@ class Game:
                 if self.surrender:
                     await self.next.user.send(f"{self.turn.user} surrendered. Game over!")
                     await self.public_channel.send(
-                        f"Game over! {self.turn.user.mention} surrendered to {self.next.user.mention}!"
+                        f"Game over! {self.turn.user.mention} surrendered to {self.next.user.mention}! "
                         f"(+{BATTLESHIP_WIN_POINTS} pts)"
                     )
                     await add_points(self.bot, self.next.user.id, BATTLESHIP_WIN_POINTS, "battleship")
