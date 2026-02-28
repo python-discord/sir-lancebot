@@ -10,9 +10,7 @@ from bot.utils.leaderboard import get_daily_leaderboard, get_leaderboard, get_us
 from bot.utils.pagination import LinePaginator
 
 DUCK_COIN_THUMBNAIL = (
-    "https://media.discordapp.net/attachments/1137013167340404912/1475115932224585922/"
-    "duck-coin.png?ex=699c5044&is=699afec4&hm=fecd34c81739c468e380a292dec6db3edb01bb9b5eea37752c67656987554655"
-    "&=&format=webp&quality=lossless&width=1518&height=1646"
+    "https://raw.githubusercontent.com/python-discord/sir-lancebot/main/bot/resources/fun/duck-coin.png"
 )
 
 MEDALS = (
