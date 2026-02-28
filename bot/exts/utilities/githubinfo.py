@@ -18,9 +18,7 @@ log = get_logger(__name__)
 
 GITHUB_API_URL = "https://api.github.com"
 
-REQUEST_HEADERS = {
-    "Accept": "application/vnd.github.v3+json"
-}
+REQUEST_HEADERS = {"Accept": "application/vnd.github.v3+json"}
 
 REPOSITORY_ENDPOINT = "https://api.github.com/orgs/{org}/repos?per_page=100&type=public"
 MOST_STARRED_ENDPOINT = "https://api.github.com/search/repositories?q={name}&sort=stars&order=desc&per_page=100"
@@ -34,9 +32,9 @@ if Tokens.github:
     REQUEST_HEADERS["Authorization"] = f"token {Tokens.github.get_secret_value()}"
 
 CODE_BLOCK_RE = re.compile(
-    r"^`([^`\n]+)`"   # Inline codeblock
+    r"`([^`\n]+)`"  # Inline codeblock
     r"|```(.+?)```",  # Multiline codeblock
-    re.DOTALL | re.MULTILINE
+    re.DOTALL | re.MULTILINE,
 )
 
 # Maximum number of issues in one message
@@ -104,18 +102,12 @@ class GithubInfo(commands.Cog):
         """
         self.refresh_repos.cancel()
 
-
     @staticmethod
     def remove_codeblocks(message: str) -> str:
         """Remove any codeblock in a message."""
         return CODE_BLOCK_RE.sub("", message)
 
-    async def fetch_issue(
-        self,
-        number: int,
-        repository: str,
-        user: str
-    ) -> IssueState | FetchError:
+    async def fetch_issue(self, number: int, repository: str, user: str) -> IssueState | FetchError:
         """
         Retrieve an issue from a GitHub repository.
 
@@ -167,9 +159,7 @@ class GithubInfo(commands.Cog):
         return IssueState(repository, number, issue_url, json_data.get("title", ""), emoji)
 
     @staticmethod
-    def format_embed(
-        results: list[IssueState | FetchError]
-    ) -> discord.Embed:
+    def format_embed(results: list[IssueState | FetchError]) -> discord.Embed:
         """Take a list of IssueState or FetchError and format a Discord embed for them."""
         description_list = []
 
@@ -181,10 +171,7 @@ class GithubInfo(commands.Cog):
             elif isinstance(result, FetchError):
                 description_list.append(f":x: [{result.return_code}] {result.message}")
 
-        resp = discord.Embed(
-            colour=Colours.bright_green,
-            description="\n".join(description_list)
-        )
+        resp = discord.Embed(colour=Colours.bright_green, description="\n".join(description_list))
 
         resp.set_author(name="GitHub")
         return resp
@@ -226,16 +213,14 @@ class GithubInfo(commands.Cog):
                 embed = discord.Embed(
                     title=random.choice(ERROR_REPLIES),
                     color=Colours.soft_red,
-                    description=f"Too many issues/PRs! (maximum of {MAXIMUM_ISSUES})"
+                    description=f"Too many issues/PRs! (maximum of {MAXIMUM_ISSUES})",
                 )
                 await message.channel.send(embed=embed, delete_after=5)
                 return
 
             for repo_issue in issues:
                 result = await self.fetch_issue(
-                    int(repo_issue.number),
-                    repo_issue.repository,
-                    repo_issue.organisation or "python-discord"
+                    int(repo_issue.number), repo_issue.repository, repo_issue.organisation or "python-discord"
                 )
                 if isinstance(result, IssueState):
                     links.append(result)
@@ -263,7 +248,7 @@ class GithubInfo(commands.Cog):
                 embed = discord.Embed(
                     title=random.choice(NEGATIVE_REPLIES),
                     description=f"The profile for `{username}` was not found.",
-                    colour=Colours.soft_red
+                    colour=Colours.soft_red,
                 )
 
                 await ctx.send(embed=embed)
@@ -288,25 +273,21 @@ class GithubInfo(commands.Cog):
                 description=f"```\n{user_data['bio']}\n```\n" if user_data["bio"] else "",
                 colour=discord.Colour.og_blurple(),
                 url=user_data["html_url"],
-                timestamp=datetime.strptime(user_data["created_at"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=UTC)
+                timestamp=datetime.strptime(user_data["created_at"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=UTC),
             )
             embed.set_thumbnail(url=user_data["avatar_url"])
             embed.set_footer(text="Account created at")
 
             if user_data["type"] == "User":
-
                 embed.add_field(
-                    name="Followers",
-                    value=f"[{user_data['followers']}]({user_data['html_url']}?tab=followers)"
+                    name="Followers", value=f"[{user_data['followers']}]({user_data['html_url']}?tab=followers)"
                 )
                 embed.add_field(
-                    name="Following",
-                    value=f"[{user_data['following']}]({user_data['html_url']}?tab=following)"
+                    name="Following", value=f"[{user_data['following']}]({user_data['html_url']}?tab=following)"
                 )
 
             embed.add_field(
-                name="Public repos",
-                value=f"[{user_data['public_repos']}]({user_data['html_url']}?tab=repositories)"
+                name="Public repos", value=f"[{user_data['public_repos']}]({user_data['html_url']}?tab=repositories)"
             )
 
             if user_data["type"] == "User":
@@ -314,7 +295,7 @@ class GithubInfo(commands.Cog):
 
                 embed.add_field(
                     name=f"Organization{'s' if len(orgs) != 1 else ''}",
-                    value=orgs_to_add if orgs else "No organizations."
+                    value=orgs_to_add if orgs else "No organizations.",
                 )
             embed.add_field(name="Website", value=blog)
 
@@ -333,7 +314,7 @@ class GithubInfo(commands.Cog):
             title=repo_data["name"],
             description=repo_data["description"],
             colour=discord.Colour.og_blurple(),
-            url=repo_data["html_url"]
+            url=repo_data["html_url"],
         )
         # if its a fork it will have a parent key
         try:
@@ -343,18 +324,16 @@ class GithubInfo(commands.Cog):
             log.debug("Repository is not a fork.")
 
         repo_owner = repo_data["owner"]
-        embed.set_author(
-            name=repo_owner["login"],
-            url=repo_owner["html_url"],
-            icon_url=repo_owner["avatar_url"]
-        )
+        embed.set_author(name=repo_owner["login"], url=repo_owner["html_url"], icon_url=repo_owner["avatar_url"])
 
-        repo_created_at = datetime.strptime(
-            repo_data["created_at"], "%Y-%m-%dT%H:%M:%SZ"
-        ).replace(tzinfo=UTC).strftime("%d/%m/%Y")
-        last_pushed = datetime.strptime(
-            repo_data["pushed_at"], "%Y-%m-%dT%H:%M:%SZ"
-        ).replace(tzinfo=UTC).strftime("%d/%m/%Y at %H:%M")
+        repo_created_at = (
+            datetime.strptime(repo_data["created_at"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=UTC).strftime("%d/%m/%Y")
+        )
+        last_pushed = (
+            datetime.strptime(repo_data["pushed_at"], "%Y-%m-%dT%H:%M:%SZ")
+            .replace(tzinfo=UTC)
+            .strftime("%d/%m/%Y at %H:%M")
+        )
 
         embed.set_footer(
             text=(
@@ -366,6 +345,199 @@ class GithubInfo(commands.Cog):
         )
         return embed
 
+    async def get_issue_count(self, repo: str, start: str, end: str, state: str) -> int:
+        """Gets the number of issues opened or closed (based on state) in a given timeframe."""
+        url = f"{GITHUB_API_URL}/search/issues"
+        query = f"repo:{repo} is:issue {state}:{start}..{end}"
+        params = {"q": query}
+
+        async with self.bot.http_session.get(url, headers=REQUEST_HEADERS, params=params) as response:
+            if response.status != 200:
+                return -1
+            data = await response.json()
+            return data.get("total_count", 0)
+
+    async def get_pr_count(self, repo: str, start: str, end: str, action: str) -> int:
+        """Gets the number of PRs opened, closed, or merged in a given timeframe."""
+        url = f"{GITHUB_API_URL}/search/issues"
+
+        if action == "opened":
+            state_query = f"created:{start}..{end}"
+        elif action == "merged":
+            state_query = f"is:merged merged:{start}..{end}"
+        elif action == "closed":
+            state_query = f"is:unmerged closed:{start}..{end}"
+        else:
+            return 0
+
+        query = f"repo:{repo} is:pr {state_query}"
+        params = {"q": query}
+
+        async with self.bot.http_session.get(url, headers=REQUEST_HEADERS, params=params) as response:
+            if response.status != 200:
+                return -1
+
+            data = await response.json()
+            return data.get("total_count", 0)
+
+    async def get_commit_count(self, repo_str: str, start_str: str, end_str: str) -> int:
+        """Returns the number of commits done to the given repo between the start and end date."""
+        start_iso = f"{start_str}T00:00:00Z"
+        end_iso = f"{end_str}T23:59:59Z"
+
+        url = f"https://api.github.com/repos/{repo_str}/commits"
+        params = {"since": start_iso, "until": end_iso, "per_page": 1, "page": 1}
+
+        async with self.bot.http_session.get(url, headers=REQUEST_HEADERS, params=params) as response:
+            if response.status != 200:
+                return -1
+
+            commits_json = await response.json()
+            # No commits
+            if not commits_json:
+                return 0
+
+            link_header = response.headers.get("Link")
+            # No link header means only one page
+            if not link_header:
+                return 1
+
+            # Grabbing the number of pages from the Link header
+            match = re.search(r'page=(\d+)>; rel="last"', link_header)
+
+            if match:
+                return int(match.group(1))
+
+            return 1
+
+    async def _fetch_page(self, url: str, headers: dict, page: int, cache: dict) -> list:
+        """Fetch a page of stargazers, using cache to avoid duplicate requests."""
+        if page not in cache:
+            params = {"per_page": 100, "page": page}
+            async with self.bot.http_session.get(url, headers=headers, params=params) as response:
+                if response.status != 200:
+                    return []
+                cache[page] = await response.json()
+        return cache[page]
+
+    async def _get_date_at(self, url: str, headers: dict, i: int, cache: dict) -> str:
+        """Get the starred_at date (YYYY-MM-DD) of the star at global index i (0-based)."""
+        page = (i // 100) + 1
+        pos = i % 100
+        page_data = await self._fetch_page(url, headers, page, cache)
+
+        # FIX: Prevent IndexError if GitHub's cached count is higher than the actual list
+        if page_data and pos < len(page_data):
+            return page_data[pos].get("starred_at", "")[:10]
+        return ""
+
+    async def get_stars_gained(self, repo: str, start: str, end: str) -> int:
+        """Gets the number of stars gained for a given repository in a timeframe."""
+        url = f"{GITHUB_API_URL}/repos/{repo}/stargazers"
+
+        # Copy the global headers but update the Accept header specifically for Stargazers
+        star_headers = REQUEST_HEADERS.copy()
+        star_headers["Accept"] = "application/vnd.github.star+json"
+
+        repo_data, response = await self.fetch_data(f"{GITHUB_API_URL}/repos/{repo}")
+        if response.status != 200:
+            return -1
+
+        max_stars = repo_data.get("stargazers_count", 0)
+
+        if max_stars == 0:
+            return 0
+
+        # GitHub API limits stargazers pagination to 40 000 entries (page 400 max)
+        # Because of this the output is not consistent for projects with more than 40 000 stars so we default to -2
+        github_stargazer_limit = 40000
+        if max_stars > github_stargazer_limit:
+            return -2
+        searchable_stars = max_stars
+
+        # We use a cache and binary search to limit the number of requests to the GitHub API
+        cache = {}
+        low, high = 0, searchable_stars - 1
+        while low < high:
+            mid = (low + high) // 2
+            lowdate = await self._get_date_at(url, star_headers, mid, cache)
+            if lowdate == "":
+                return -1
+            if lowdate < start:
+                low = mid + 1
+            else:
+                high = mid
+        left = low
+
+        date_left = await self._get_date_at(url, star_headers, left, cache)
+        if date_left < start or date_left > end:
+            return 0
+
+        low, high = left, searchable_stars - 1
+        while low < high:
+            mid = (low + high + 1) // 2
+            highdate = await self._get_date_at(url, star_headers, mid, cache)
+            if highdate == "":
+                return -1
+            if highdate > end:
+                high = mid - 1
+            else:
+                low = mid
+        right = low
+
+        return right - left + 1
+
+    @github_group.command(name="stats")
+    async def github_stats(self, ctx: commands.Context, start: str, end: str, repo: str) -> None:
+        """
+        Fetches stats for a GitHub repo.
+
+        Usage: !github_stats 2023-01-01 2023-12-31 python-discord/bot.
+        """
+        async with ctx.typing():
+            url = f"{GITHUB_API_URL}/repos/{repo}"
+            repo_data, response = await self.fetch_data(url)
+
+            if "message" in repo_data:
+                embed = discord.Embed(
+                    title=random.choice(NEGATIVE_REPLIES),
+                    description=f"Could not find repository: `{repo}`",
+                    colour=Colours.soft_red,
+                )
+                await ctx.send(embed=embed)
+                return
+
+            open_issues = await self.get_issue_count(repo, start, end, state="created")
+            closed_issues = await self.get_issue_count(repo, start, end, state="closed")
+            prs_opened = await self.get_pr_count(repo, start, end, "opened")
+            prs_closed = await self.get_pr_count(repo, start, end, "closed")
+            prs_merged = await self.get_pr_count(repo, start, end, "merged")
+            commits = await self.get_commit_count(repo, start, end)
+            stars_gained = await self.get_stars_gained(repo, start, end)
+
+            if stars_gained == -2:
+                stars = "N/A (repo exceeds API limit)"
+            elif stars_gained > 0:
+                stars = f"+{stars_gained}"
+            elif stars_gained == 0:
+                stars = "0"
+            else:
+                stars = "unavailable"
+
+            stats_text = (
+                f"Issues opened: {open_issues}\n"
+                f"Issues closed: {closed_issues}\n"
+                f"Pull Requests opened: {prs_opened}\n"
+                f"Pull Requests closed: {prs_closed}\n"
+                f"Pull Requests merged: {prs_merged}\n"
+                f"Stars gained: {stars}\n"
+                f"Commits: {commits}"
+            )
+
+            stats_embed = discord.Embed(
+                title=f"Stats for {repo}", description=stats_text, colour=discord.Colour.og_blurple()
+            )
+            await ctx.send(embed=stats_embed)
 
     @github_group.command(name="repository", aliases=("repo",))
     async def github_repo_info(self, ctx: commands.Context, *repo: str) -> None:
@@ -382,12 +554,11 @@ class GithubInfo(commands.Cog):
         repo_query = "/".join(repo)
         repo_query_casefold = repo_query.casefold()
 
-
         if repo_query.count("/") > 1:
             embed = discord.Embed(
                 title=random.choice(NEGATIVE_REPLIES),
                 description="There cannot be more than one `/` in the repository.",
-                colour=Colours.soft_red
+                colour=Colours.soft_red,
             )
             await ctx.send(embed=embed)
             return
@@ -401,11 +572,10 @@ class GithubInfo(commands.Cog):
                 is_pydis = True
             else:
                 fetch_most_starred = True
-
         async with ctx.typing():
             # Case 1: PyDis repo
             if is_pydis:
-                repo_data = repo_query # repo_query already contains the matched repo
+                repo_data = repo_query  # repo_query already contains the matched repo
 
             # Case 2: Not stored or PyDis, fetch most-starred matching repo
             elif fetch_most_starred:
@@ -415,7 +585,7 @@ class GithubInfo(commands.Cog):
                     embed = discord.Embed(
                         title=random.choice(NEGATIVE_REPLIES),
                         description=f"No repositories found matching `{repo_query}`.",
-                        colour=Colours.soft_red
+                        colour=Colours.soft_red,
                     )
                     await ctx.send(embed=embed)
                     return
@@ -428,11 +598,10 @@ class GithubInfo(commands.Cog):
                     embed = discord.Embed(
                         title=random.choice(NEGATIVE_REPLIES),
                         description=f"No repositories found matching `{repo_query}`.",
-                        colour=Colours.soft_red
+                        colour=Colours.soft_red,
                     )
                     await ctx.send(embed=embed)
                     return
-
 
             # Case 3: Regular GitHub repo
             else:
@@ -442,13 +611,14 @@ class GithubInfo(commands.Cog):
                     embed = discord.Embed(
                         title=random.choice(NEGATIVE_REPLIES),
                         description="The requested repository was not found.",
-                        colour=Colours.soft_red
+                        colour=Colours.soft_red,
                     )
                     await ctx.send(embed=embed)
                     return
 
             embed = self.build_embed(repo_data)
             await ctx.send(embed=embed)
+
 
 async def setup(bot: Bot) -> None:
     """Load the GithubInfo cog."""
