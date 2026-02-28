@@ -106,6 +106,32 @@ The bot shall notify the user that no hints are available if all cells in the bo
 
 Optional (point 3): trace tests to requirements.
 
+## Test Cases Traceability Matrix
+
+| Test Case | File | Requirements |
+|---|---|---|
+| `test_load_valid_5x5_grid` | test_mathdoku_parser.py | FR-08, FR-09, FR-10 |
+| `test_load_invalid_5x5_grid` | test_mathdoku_parser.py | FR-09 |
+| `test_load_valid_5x5_grid_and_check_singletons_have_blocks` | test_mathdoku_parser.py | FR-08, FR-10 |
+| `test_load_valid_5x5_grid_and_check_singleton_blocks_have_cells` | test_mathdoku_parser.py | FR-10 |
+| `test_grid` | test_grid_class.py | FR-07, FR-08 |
+| `test_latin_square_check` | test_grid_class.py | FR-15 |
+| `test_addguess` | test_valid_guess.py | FR-13, FR-15 |
+| `test_hint_find_first_empty_cell` | test_mathdoku_hint.py | FR-19 |
+| `test_hint_find_empty_cell_after_some_filled` | test_mathdoku_hint.py | FR-19 |
+| `test_hint_cooldown` | test_mathdoku_hint.py | FR-06, FR-20 |
+| `test_hint_available_again_at_180_seconds` | test_mathdoku_hint.py | FR-06 |
+| `test_hint_all_cells_filled` | test_mathdoku_hint.py | FR-21 |
+| `test_victory_check_won` | test_victory_check.py | FR-15 |
+| `test_victory_check_lost` | test_victory_check.py | FR-15, FR-16 |
+| `test_victory_check_won_with_division` | test_victory_check.py | FR-15 |
+| `test_victory_check_lost_with_division` | test_victory_check.py | FR-15, FR-16 |
+| `test_block_with_id_gets_color` | test_mathdoku.py | FR-10, FR-17 |
+| `test_block_with_unexpected_id_gets_color` | test_mathdoku.py | FR-10, FR-17 |
+| `test_image_generation` | test_mathdoku_image_generation.py | FR-17 |
+| `test_board_filled_handler` | test_board_filled_handler.py | FR-15, FR-16 |
+| `test_recolor_blocks` | test_recolor_blocks.py | FR-16, FR-17 |
+
 ## Code changes
 
 ### Patch (copy your changes or the add git command to show them) git diff ...
