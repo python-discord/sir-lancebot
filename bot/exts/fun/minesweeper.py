@@ -66,7 +66,7 @@ class Minesweeper(commands.Cog):
             return 17
         if bomb_chance <= 0.25:
             return 20
-        return 15     
+        return 15
 
     @commands.group(name="minesweeper", aliases=("ms",), invoke_without_command=True)
     async def minesweeper_group(self, ctx: commands.Context) -> None:

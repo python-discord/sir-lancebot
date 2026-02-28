@@ -302,7 +302,7 @@ class DuckGamesDirector(commands.Cog):
             key=lambda item: item[1],
             reverse=True,
         )
-        
+
         # Award leaderboard points to top 3 players
         point_awards = [
             DUCK_GAME_FIRST_PLACE_POINTS,
@@ -312,7 +312,7 @@ class DuckGamesDirector(commands.Cog):
         for rank, (member, score) in enumerate(scores[:3]):
             if score > 0:
                 await add_points(self.bot, member.id, point_awards[rank], "duck_game")
-        
+
         scoreboard = "Final scores:\n\n"
         for rank, (member, score) in enumerate(scores):
             if rank < 3 and score > 0:

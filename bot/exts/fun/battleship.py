@@ -287,7 +287,7 @@ class Game:
                 self.gameover = True
                 await add_points(self.bot, self.turn.user.id, BATTLESHIP_WIN_POINTS, "battleship")
                 await self.game_over(winner=self.turn.user, loser=self.next.user)
-                
+
 
     async def start_game(self) -> None:
         """Begins the game."""
