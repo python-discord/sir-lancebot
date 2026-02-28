@@ -58,3 +58,49 @@ I 2-
     assert grid._blocks_fufilled_check()[1].id == "H"
 
     grid._generate_image(outfile=filepath, saveToFile=False)
+
+
+def _test_board_filled_handler3x3(tmp_path: Path) -> None:
+    """
+    Contract: The board filled should color in the right and wrong blocks
+    and save the board to testdokuboardfilled3.png.
+    """
+    filepath = "testdokuboardfilled3.png"
+
+    content = """\
+3x3:d3 (easy)
+AAB
+CDB
+CEE
+
+A 3+
+B 4+
+C 6x
+D 3 
+E 1-
+
+1 2 3 
+2 3 1
+3 1 2 
+"""
+    grids_file = tmp_path / "grids.txt"
+    grids_file.write_text(content, encoding="utf-8")
+
+    grids = create_grids(file_path=grids_file)
+
+    grid = grids[3]["easy"][0]
+
+    # Set guess to possible solution
+    for row in grid.cells:
+        for cell in row:
+            cell.guess = cell.correct
+
+    # Comment out the line below to see different colors for singletons
+    assert grid._latin_square_check() is False
+    assert grid.check_victory() is False
+    assert grid.board_filled_handler() is False
+
+    assert grid._blocks_fufilled_check()[0].id == "F"
+    assert grid._blocks_fufilled_check()[1].id == "H"
+
+    grid._generate_image(outfile=filepath, saveToFile=False)
