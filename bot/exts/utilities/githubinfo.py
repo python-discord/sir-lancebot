@@ -487,6 +487,26 @@ class GithubInfo(commands.Cog):
 
         return right - left + 1
 
+    def parse_date(self, date_str: str) -> datetime | None:
+        """Parse a YYYY-MM-DD date string into a UTC datetime."""
+        try:
+            return datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=UTC)
+        except ValueError:
+            return None
+
+    def validate_date_format(self, date_str: str) -> bool:
+        """Validates that the date string is formatted correctly."""
+        return self.parse_date(date_str) is not None
+
+    def validate_date_range(self, start_date: str, end_date: str) -> bool:
+        """Validate a date range for correctness and logical ordering."""
+        start = self.parse_date(start_date)
+        end = self.parse_date(end_date)
+
+        if start and end:
+            return start <= end
+        return False
+
     @github_group.command(name="stats")
     async def github_stats(self, ctx: commands.Context, start: str, end: str, repo: str) -> None:
         """
@@ -495,6 +515,35 @@ class GithubInfo(commands.Cog):
         Usage: !github_stats 2023-01-01 2023-12-31 python-discord/bot.
         """
         async with ctx.typing():
+            # Validate the date first to spare API calls
+            if not self.validate_date_format(start):
+                embed = discord.Embed(
+                    title=random.choice(NEGATIVE_REPLIES),
+                    description="Start date must be in YYYY-MM-DD format.",
+                    colour=Colours.soft_red,
+                )
+                await ctx.send(embed=embed)
+
+                return
+
+            if not self.validate_date_format(end):
+                embed = discord.Embed(
+                    title=random.choice(NEGATIVE_REPLIES),
+                    description="End date must be in YYYY-MM-DD format.",
+                    colour=Colours.soft_red,
+                )
+                await ctx.send(embed=embed)
+                return
+
+            if not self.validate_date_range(start, end):
+                embed = discord.Embed(
+                    title=random.choice(NEGATIVE_REPLIES),
+                    description="Invalid date range.",
+                    colour=Colours.soft_red,
+                )
+                await ctx.send(embed=embed)
+                return
+
             url = f"{GITHUB_API_URL}/repos/{repo}"
             repo_data, response = await self.fetch_data(url)
 
