@@ -18,7 +18,9 @@ log = get_logger(__name__)
 
 GITHUB_API_URL = "https://api.github.com"
 
-REQUEST_HEADERS = {"Accept": "application/vnd.github.v3+json"}
+REQUEST_HEADERS = {
+    "Accept": "application/vnd.github.v3+json"
+}
 
 REPOSITORY_ENDPOINT = "https://api.github.com/orgs/{org}/repos?per_page=100&type=public"
 MOST_STARRED_ENDPOINT = "https://api.github.com/search/repositories?q={name}&sort=stars&order=desc&per_page=100"
@@ -32,9 +34,9 @@ if Tokens.github:
     REQUEST_HEADERS["Authorization"] = f"token {Tokens.github.get_secret_value()}"
 
 CODE_BLOCK_RE = re.compile(
-    r"`([^`\n]+)`"  # Inline codeblock
+    r"`([^`\n]+)`"    # Inline codeblock
     r"|```(.+?)```",  # Multiline codeblock
-    re.DOTALL | re.MULTILINE,
+    re.DOTALL | re.MULTILINE
 )
 
 # Maximum number of issues in one message
@@ -102,12 +104,18 @@ class GithubInfo(commands.Cog):
         """
         self.refresh_repos.cancel()
 
+
     @staticmethod
     def remove_codeblocks(message: str) -> str:
         """Remove any codeblock in a message."""
         return CODE_BLOCK_RE.sub("", message)
 
-    async def fetch_issue(self, number: int, repository: str, user: str) -> IssueState | FetchError:
+    async def fetch_issue(
+        self,
+        number: int,
+        repository: str,
+        user: str
+    ) -> IssueState | FetchError:
         """
         Retrieve an issue from a GitHub repository.
 
@@ -159,7 +167,9 @@ class GithubInfo(commands.Cog):
         return IssueState(repository, number, issue_url, json_data.get("title", ""), emoji)
 
     @staticmethod
-    def format_embed(results: list[IssueState | FetchError]) -> discord.Embed:
+    def format_embed(
+        results: list[IssueState | FetchError]
+    ) -> discord.Embed:
         """Take a list of IssueState or FetchError and format a Discord embed for them."""
         description_list = []
 
@@ -171,7 +181,10 @@ class GithubInfo(commands.Cog):
             elif isinstance(result, FetchError):
                 description_list.append(f":x: [{result.return_code}] {result.message}")
 
-        resp = discord.Embed(colour=Colours.bright_green, description="\n".join(description_list))
+        resp = discord.Embed(
+            colour=Colours.bright_green,
+            description="\n".join(description_list)
+        )
 
         resp.set_author(name="GitHub")
         return resp
@@ -213,14 +226,16 @@ class GithubInfo(commands.Cog):
                 embed = discord.Embed(
                     title=random.choice(ERROR_REPLIES),
                     color=Colours.soft_red,
-                    description=f"Too many issues/PRs! (maximum of {MAXIMUM_ISSUES})",
+                    description=f"Too many issues/PRs! (maximum of {MAXIMUM_ISSUES})"
                 )
                 await message.channel.send(embed=embed, delete_after=5)
                 return
 
             for repo_issue in issues:
                 result = await self.fetch_issue(
-                    int(repo_issue.number), repo_issue.repository, repo_issue.organisation or "python-discord"
+                    int(repo_issue.number),
+                    repo_issue.repository,
+                    repo_issue.organisation or "python-discord"
                 )
                 if isinstance(result, IssueState):
                     links.append(result)
@@ -248,7 +263,7 @@ class GithubInfo(commands.Cog):
                 embed = discord.Embed(
                     title=random.choice(NEGATIVE_REPLIES),
                     description=f"The profile for `{username}` was not found.",
-                    colour=Colours.soft_red,
+                    colour=Colours.soft_red
                 )
 
                 await ctx.send(embed=embed)
@@ -273,21 +288,25 @@ class GithubInfo(commands.Cog):
                 description=f"```\n{user_data['bio']}\n```\n" if user_data["bio"] else "",
                 colour=discord.Colour.og_blurple(),
                 url=user_data["html_url"],
-                timestamp=datetime.strptime(user_data["created_at"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=UTC),
+                timestamp=datetime.strptime(user_data["created_at"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=UTC)
             )
             embed.set_thumbnail(url=user_data["avatar_url"])
             embed.set_footer(text="Account created at")
 
             if user_data["type"] == "User":
+
                 embed.add_field(
-                    name="Followers", value=f"[{user_data['followers']}]({user_data['html_url']}?tab=followers)"
+                    name="Followers",
+                    value=f"[{user_data['followers']}]({user_data['html_url']}?tab=followers)"
                 )
                 embed.add_field(
-                    name="Following", value=f"[{user_data['following']}]({user_data['html_url']}?tab=following)"
+                    name="Following",
+                    value=f"[{user_data['following']}]({user_data['html_url']}?tab=following)"
                 )
 
             embed.add_field(
-                name="Public repos", value=f"[{user_data['public_repos']}]({user_data['html_url']}?tab=repositories)"
+                name="Public repos",
+                value=f"[{user_data['public_repos']}]({user_data['html_url']}?tab=repositories)"
             )
 
             if user_data["type"] == "User":
@@ -295,7 +314,7 @@ class GithubInfo(commands.Cog):
 
                 embed.add_field(
                     name=f"Organization{'s' if len(orgs) != 1 else ''}",
-                    value=orgs_to_add if orgs else "No organizations.",
+                    value=orgs_to_add if orgs else "No organizations."
                 )
             embed.add_field(name="Website", value=blog)
 
@@ -314,7 +333,7 @@ class GithubInfo(commands.Cog):
             title=repo_data["name"],
             description=repo_data["description"],
             colour=discord.Colour.og_blurple(),
-            url=repo_data["html_url"],
+            url=repo_data["html_url"]
         )
         # if its a fork it will have a parent key
         try:
@@ -324,16 +343,18 @@ class GithubInfo(commands.Cog):
             log.debug("Repository is not a fork.")
 
         repo_owner = repo_data["owner"]
-        embed.set_author(name=repo_owner["login"], url=repo_owner["html_url"], icon_url=repo_owner["avatar_url"])
+        embed.set_author(
+            name=repo_owner["login"],
+            url=repo_owner["html_url"],
+            icon_url=repo_owner["avatar_url"]
+        )
 
-        repo_created_at = (
-            datetime.strptime(repo_data["created_at"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=UTC).strftime("%d/%m/%Y")
-        )
-        last_pushed = (
-            datetime.strptime(repo_data["pushed_at"], "%Y-%m-%dT%H:%M:%SZ")
-            .replace(tzinfo=UTC)
-            .strftime("%d/%m/%Y at %H:%M")
-        )
+        repo_created_at = datetime.strptime(
+            repo_data["created_at"], "%Y-%m-%dT%H:%M:%SZ"
+        ).replace(tzinfo=UTC).strftime("%d/%m/%Y")
+        last_pushed = datetime.strptime(
+            repo_data["pushed_at"], "%Y-%m-%dT%H:%M:%SZ"
+        ).replace(tzinfo=UTC).strftime("%d/%m/%Y at %H:%M")
 
         embed.set_footer(
             text=(
@@ -603,11 +624,12 @@ class GithubInfo(commands.Cog):
         repo_query = "/".join(repo)
         repo_query_casefold = repo_query.casefold()
 
+
         if repo_query.count("/") > 1:
             embed = discord.Embed(
                 title=random.choice(NEGATIVE_REPLIES),
                 description="There cannot be more than one `/` in the repository.",
-                colour=Colours.soft_red,
+                colour=Colours.soft_red
             )
             await ctx.send(embed=embed)
             return
@@ -621,10 +643,11 @@ class GithubInfo(commands.Cog):
                 is_pydis = True
             else:
                 fetch_most_starred = True
+
         async with ctx.typing():
             # Case 1: PyDis repo
             if is_pydis:
-                repo_data = repo_query  # repo_query already contains the matched repo
+                repo_data = repo_query # repo_query already contains the matched repo
 
             # Case 2: Not stored or PyDis, fetch most-starred matching repo
             elif fetch_most_starred:
@@ -634,7 +657,7 @@ class GithubInfo(commands.Cog):
                     embed = discord.Embed(
                         title=random.choice(NEGATIVE_REPLIES),
                         description=f"No repositories found matching `{repo_query}`.",
-                        colour=Colours.soft_red,
+                        colour=Colours.soft_red
                     )
                     await ctx.send(embed=embed)
                     return
@@ -647,10 +670,11 @@ class GithubInfo(commands.Cog):
                     embed = discord.Embed(
                         title=random.choice(NEGATIVE_REPLIES),
                         description=f"No repositories found matching `{repo_query}`.",
-                        colour=Colours.soft_red,
+                        colour=Colours.soft_red
                     )
                     await ctx.send(embed=embed)
                     return
+
 
             # Case 3: Regular GitHub repo
             else:
@@ -660,14 +684,13 @@ class GithubInfo(commands.Cog):
                     embed = discord.Embed(
                         title=random.choice(NEGATIVE_REPLIES),
                         description="The requested repository was not found.",
-                        colour=Colours.soft_red,
+                        colour=Colours.soft_red
                     )
                     await ctx.send(embed=embed)
                     return
 
             embed = self.build_embed(repo_data)
             await ctx.send(embed=embed)
-
 
 async def setup(bot: Bot) -> None:
     """Load the GithubInfo cog."""
