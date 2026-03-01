@@ -196,7 +196,7 @@ This module connects the game to Discord and manages the full interaction flow w
 This module contains no game rules. It receives player input messages,
 delegates to the game logic, and sends the result back to Discord.
 
-Optional (point 2): relation to design pattern(s).
+Optional (point 2): relation to refactoring pattern(s).
 
 ## Refactoring Patterns
 We have implemented two refactoring patterns from Martin Fowler's catalogue that align with the overall architecture of `Sir Lancebot`.
@@ -216,7 +216,7 @@ own unit.
 #### Extract Method
 Within `mathdoku_parser.py`, we decided to divide the parsing logic into smaller functions rather than a single large function.
 
-- `_search_for_grids_in_file()` reads the board file and applies a regex to locate and extract all board definitions.
+- `_search_for_grids_in_file()` reads the board file and applies a regex to extract all board definitions.
 - `_create_cells_and_blocks()` iterates over the board layout,
   creates `Block` objects, and assigns each cell to its corresponding block.
 - `_read_block_operations()` assigns the arithmetic operator and target number to the corresponding block.
