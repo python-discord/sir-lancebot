@@ -147,6 +147,9 @@ class Mathdoku(commands.Cog):
                 await self.rules_msg.delete()
                 self.rules_msg_exists = False
                 self.rules_msg = None
+                if emoji == RULE_EMOJI:
+                    await self.board.remove_reaction(emoji, user)
+                    return
             if emoji == MAGNIFYING_EMOJI:
                 await self.magnifying_handler(ctx=ctx, user=user)
             elif emoji == HINT_EMOJI:
