@@ -1,8 +1,7 @@
 from datetime import datetime
 from io import BytesIO
-
-from PIL import Image, ImageDraw, ImageFont
 from random import randint
+from PIL import Image, ImageDraw, ImageFont
 
 COLORS = [
     (255, 50, 50), (255, 66, 50), (255, 81, 50), (255, 96, 50), (255, 111, 50),
@@ -25,7 +24,7 @@ COLORS = [
 ]
 
 class Cell:
-    """Represents a single cell in the grid."""
+    """Represent a single cell in the grid."""
 
     def __init__(self, column: int, row: int) -> None:
         self.column = column
@@ -43,12 +42,14 @@ class Cell:
     def guess(self, new_guess) -> None:
         self._guess = new_guess
 
-    def reset_color(self):
+    def reset_color(self) -> None:
+        """Reset a cells color attribute to its block color"""
         self.color = self.block.color
 
 
 class Block:
-    """Represents a block in the puzzle, with its cells, operation and colour."""
+    """Represent a block in the puzzle, with its cells, operation, label and color."""
+
     def __init__(self, id: str, operation: str, number: int, label_cell: Cell, grid: "Grid") -> None:
         self.id = id
         self.cells = []
@@ -62,26 +63,25 @@ class Block:
         
 
     def compute_color(self) -> tuple[int, int, int]:
-        """Computes the block's color."""
+        """Compute the block's color."""
         return COLORS[(self.color_id * (len(COLORS) // (self.grid.current_color_id)) + self.grid.color_offset) % len(COLORS)]
 
 
 class Grid:
-    """Represents the full game board, with all blocks and player guesses."""
+    """Represent the full game board, with all blocks, cells, and difficulty."""
 
     HINT_COOLDOWN_SECONDS = 180  # 3 minutes of hint cooldown.
 
     def __init__(self, size: int, difficulty: str | None = None) -> None:
         self.size = size
         self.blocks = []
-        self._cells = tuple(
-            tuple(Cell(col, row) for col in range(size)) for row in range(size)
-        )  # 2D tupple for cells [row][col]
-
         self._last_hint_timestamp = None
         self.difficulty = difficulty
         self.color_offset = randint(0, 80)
         self.current_color_id = 0
+        self._cells = tuple(
+            tuple(Cell(col, row) for col in range(size)) for row in range(size)
+        )  # 2D tupple for cells [row][col]
 
     @property
     def cells(self):
@@ -98,7 +98,8 @@ class Grid:
 
     def _latin_square_check(self) -> list[set[int], set[int]]:
         """
-        Checks if the grid is filled correctly in terms of a latin square.\n
+        Check if the grid is filled correctly in terms of a latin square.\n
+        
         I.e all numbers in the range per colum and row exist.
         """
         check_row_structure = [[False for col in range(self.size)] for row in range(self.size)]
@@ -128,10 +129,10 @@ class Grid:
 
     def _blocks_fufilled_check(self) -> list[Block]:
         """
-        Checks if all the blocks are filled correctly and meets the requirements. \n
-        Returns the blocks that are wrong or True if all blocks meet the requirements. \n
-        Will return False if the input is invalid.
-        Will return False if the input is invalid.
+        Check if all the blocks are filled correctly and meet the requirements. \n
+
+        Return the blocks that are wrong or True if all blocks meet the requirements. \n
+        Return False if the input is invalid.
         """
         wrong_blocks = []
         for block in self.blocks:
@@ -167,10 +168,7 @@ class Grid:
         return wrong_blocks
 
     def check_victory(self) -> bool:
-        """
-        Checks if the board is in a state where the player has won and will
-        return True or False.
-        """
+        """Check if the board is in a state where the player has won and return True or False."""
         result_latin = self._latin_square_check()
         result_blocks = self._blocks_fufilled_check()
         return len(result_latin[0]) + len(result_latin[1]) + len(result_blocks) == 0
@@ -178,9 +176,10 @@ class Grid:
     def board_filled_handler(self) -> bool:
         """
         Handler for when board is filled.\n
-        The method calls the latin_square_check and blocks_fufilled_check an colors in\n
+
+        Calls the latin_square_check and blocks_fufilled_check and colors in\n
         the wrong rows, cols and blocks in red. The rest in green. \n
-        It returns True or False if the board is solved or not.
+        Return True or False if the board is solved or not.
         """
         # First make the entire board green
         for row in self.cells:
@@ -216,7 +215,7 @@ class Grid:
         return len(wrong_blocks) == 0
 
     def check_full_grid(self) -> bool:
-        """Helper that checks if a grid is completely filled."""
+        """Check if a grid is completely filled."""
         for i in range(self.size):
             for cell in self.cells[i]:
                 if cell.guess <= 0:
@@ -224,7 +223,7 @@ class Grid:
         return True
 
     def recolor_blocks(self) -> None:
-        """Method to recolor all blocks in their original color."""
+        """Recolor all blocks in their original color."""
         for block in self.blocks:
             block.color = block.compute_color()
 
@@ -234,14 +233,20 @@ class Grid:
 
     def __getitem__(self, i: int) -> list[Cell]:
         """
-        Defines the indexing operator for the Grid class.
+        Define the indexing operator for the Grid class.
 
         Grid[i] will return the i:th row.
         """
         return self.cells[i]
 
-    def _generate_image(self, cellSize=80, margin=30, outfile="mathdoku.png", saveToFile=False) -> None:
-        """Print the Grid to."""
+    def _generate_image(
+            self, 
+            cellSize:int =80,
+            margin:int = 30,
+            outfile:str = "mathdoku.png",
+            saveToFile:bool = False
+    ) -> BytesIO:
+        """Generate an image from the Grid, return a buffer holding the image"""
         fontLable = ImageFont.load_default(15)
         fontGuess = ImageFont.load_default(30)
         img = Image.new(
@@ -326,7 +331,7 @@ class Grid:
         buffer.seek(0)
         return buffer
 
-    def _find_first_empty_cell(self):
+    def _find_first_empty_cell(self) -> Cell | None:
         """Return the first empty cell (`guess == 0`) in row-major order, or `None` if all cells are filled."""
         for row in self.cells:
             for cell in row:
@@ -335,7 +340,7 @@ class Grid:
 
         return None
 
-    def hint(self, now: datetime | None = None):
+    def hint(self, now: datetime | None = None) -> dict:
         """Return a hint for the first empty cell, or cooldown/all-filled info if a hint cannot be given."""
         current_time = datetime.now() if now is None else now
 
@@ -363,7 +368,8 @@ class Grid:
 
     def add_guess(self, guess) -> bool:
         """
-        Takes the user guess and checks if its valid, if it is -> add to cell
+        Take the user guess and check if its valid, if it is -> add to cell
+
         A guess is in format A5 4, where A = column, 5 = row and 4 = guessed value.
         """
         guess = guess.split()

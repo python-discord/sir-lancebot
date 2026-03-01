@@ -61,16 +61,11 @@ class Mathdoku(commands.Cog):
     @commands.group(name="Mathdoku", aliases=("md",), invoke_without_command=True)
     async def mathdoku_group(self, ctx: commands.Context) -> None:
         """Commands for Playing Mathdoku."""
-        await ctx.send("The Mathdoku API is working!")
         await self.bot.invoke_help_command(ctx)
 
     @mathdoku_group.command(name="start")
-    async def start_command(self, ctx: commands.Context, size: int = 5, difficulty = "medium") -> None:
-        """Start a game of Mathdoku
-        size = the board size. Pick from 3-9
-        difficulty = easy, medium or hard
-        """
-
+    async def start_command(self, ctx: commands.Context, size: int = 5, difficulty:str = "medium") -> None:
+        """Start a game of Mathdoku. Size = the board size (3-9). Difficulty = easy, medium or hard"""
         size = int(size)
         difficulty = str(difficulty).lower()
 
@@ -212,7 +207,8 @@ class Mathdoku(commands.Cog):
             return True
         return None
 
-    async def magnifying_handler(self, ctx, user) -> None:
+    async def magnifying_handler(self, ctx:commands.Context, user:discord.User) -> None:
+        """Handle the magnifiyng glass emoji. Handle board check and Win action"""
         if self.grid.check_full_grid():
             await self.board.remove_reaction(MAGNIFYING_EMOJI, user)
 
@@ -227,7 +223,7 @@ class Mathdoku(commands.Cog):
             return
         await self.board.remove_reaction(MAGNIFYING_EMOJI, user)
 
-    async def hint_handler(self, ctx, user) -> None:
+    async def hint_handler(self, ctx: commands.Context, user: discord.User) -> None:
         """Handle hint request via 💡 reaction."""
         await self.board.remove_reaction(HINT_EMOJI, user)
         result = self.grid.hint()
@@ -239,13 +235,14 @@ class Mathdoku(commands.Cog):
         else:
             await ctx.send(f"Hint: {result['guess']}")
 
-    async def rules_handler(self, ctx, user) -> None:
+    async def rules_handler(self, ctx:commands.Context, user:discord.User) -> None:
         """Handle rules request via 📕 reaction."""
         await self.board.remove_reaction(RULE_EMOJI, user)
         self.rules_msg = await ctx.send(mathdoku_rules)
         self.rules_msg_exists = True
 
-    async def resent_message(self, ctx):
+    async def resent_message(self, ctx:commands.Context) -> None:
+        """Delete the board message and send again"""
         await self.board.delete()
         self.grid.recolor_blocks()
         file = discord.File(self.grid._generate_image(), filename="mathdoku.png")
