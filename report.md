@@ -33,6 +33,8 @@ Jannis was responsible for the `generate image` function, which generates an ima
 
 Arnau was responsible for the `hint` feature, including the hint logic and cooldown mecanism in the `Grid` class, its integration into the Discord game flow, and the corresponding unit tests. He also contributed in the design of the UML class diagram, the Component Diagram, the identification of functional requirements and the project documentation.
 
+### [Jonatan Bölenius] - GitHub: [@djonte]
+Jonatan was responsible for the generation of `Mathdoku` boards, using a third party library. Furthermore he implemented the parsing and loading of `Mathdoku` boards into memory in a structured manner together with appropriate unit tests. He also made a first draft of the coloring logic, and contributed to the design and implementation of the `Grid` class.
 
 ## Overview of issue(s) and work done.
 
