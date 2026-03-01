@@ -18,8 +18,6 @@ We decided to select a new project because the remaining open issues in the mock
 
 The experience of selecting an issue in this new project was more satisfactory and straightforward. We chose one that the whole team found particularly interesting. The issue was clearly described, and provide to us more flexibility in terms of implementation and decision-making.
 
-
-
 ## Effort spent For each team member, how much time was spent in
 1. plenary discussions/meetings;
 2. discussions within parts of the group;
@@ -142,7 +140,9 @@ Optional (point 5): considered for acceptance (passes all automated checks).
 
 ## Test results Overall results with link to a copy or excerpt of the logs (before/after refactoring).
 
-## UML class diagram and its description ### Key changes/classes affected
+## UML class diagram
+
+![Mathdoku Class Diagram](reportImages/mathdokuClassDiagram.png)
 
 Optional (point 1): Architectural overview.
 
@@ -160,7 +160,7 @@ Our `Mathdoku` implementation follows the same philosophy: board logic is separa
 
 ### Component Diagram
 
-![alt text]()
+![Sir Lancebot Component Diagram](reportImages/componentDiagramMathdoku.png)
 
 The system architecture is organized in layers around a modular bot core.
 `Users` interact through Discord, and the `Discord API` sends events and commands to the `Sir Lancebot Core`, which is responsible for runtime setup and dispatching functionality to the corresponding extension. Each `extension (Cog)` is independent, so features can be added, removed or modified independently without modifying the core logic. Our `Mathdoku` game implementation is included inside the `fun` feature group, but there are other fun features groups as `utilites`, `holidays`, `events`.
