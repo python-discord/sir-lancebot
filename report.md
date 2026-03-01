@@ -19,16 +19,13 @@ We decided to select a new project because the remaining open issues in the mock
 The experience of selecting an issue in this new project was more satisfactory and straightforward. We chose one that the whole team found particularly interesting. The issue was clearly described, and provide to us more flexibility in terms of implementation and decision-making.
 
 ## Effort spent For each team member, how much time was spent in
-1. plenary discussions/meetings;
-2. discussions within parts of the group;
-3. reading documentation;
-4. configuration and setup;
-5. analyzing code/output;
-6. writing documentation;
-7. writing code;
-8. running code?
+We tracked the time we used on in this sheet: https://docs.google.com/spreadsheets/d/16DlTOOYmCEq0yRz4r5hQJV9sXRtIiayvQccEs5ZUgww/edit?gid=0#gid=0
 
-For setting up tools and libraries (step 4), enumerate all dependencies you took care of and where you spent your time, if that time exceeds 30 minutes.
+## Statement of contribution
+
+### [Elias Richard Næss] — GitHub: [@daDevBoat]
+Elias was responsible for setting up the basic structure of the Cell, Block and Grid classes. He was also responsible for adding victory check logic and the coloring of wrong columns, rows and blocks. Elias had also a decent amount of involvement in the color picking and distribution for blocks. Furthermore, he was also responsible for making the boarders around the blocks thick. 
+
 
 ## Overview of issue(s) and work done.
 
