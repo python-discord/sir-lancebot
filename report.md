@@ -225,4 +225,5 @@ into well-named methods, each with a single, clear purpose.
 
 Optional (point 6): How would you put your work in context with best software engineering practice?
 
-Optional (point 7): Is there something special you want to mention here?
+### Optional (point 7): Is there something special you want to mention here?
+We are proud of our implementation of the Mathdoku game. We created a nice interface with the board picture that has both thick lines per block and a nice gradient of colors. Furthermore, we only store the picture purly in memory to avoid creating unneccessary local files. The overall design is very good and modular which made it easy to parallellise the work and integrate it all togheter. Essentially we believe it is a very well developed and properly implemented feature that goes above the expectations of the issue. 
