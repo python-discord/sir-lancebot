@@ -52,32 +52,32 @@ The command `.md start`shall start a new valid **mathdoku** game session.
 - **FR-03 - Grid Size:**
 The `.md start` command shall accept an optional grid size parameter.
 
-- **FR-04 - Independent Game Sessions:**
-Each game session shall maintain an independent board state.
+- **FR-04 - Single Active Game Session:**
+The bot shall allow only one active Mathdoku game session at a time.
 
-- **FR-05 - Hint Message Publication:**
-After starting a game, the bot publish a hint message and automatically attach a lightbulb emoji reaction to that message.
+- **FR-05 - Hint Reaction Availability:**
+After starting a game, the bot shall attach a lightbulb emoji reaction to allow hint requests.
 
 - **FR-06 - Hint Cooldown Mechanism:**
 There shall be a cooldown period of 180 seconds between consecutive hint requests.
 
-- **FR-07 - Board Representation:**
-The board shall be internally represented as an indexable matrix structure, accessible by row and column coordinates.
+- **FR-07 - Start Parameter Validation:**
+The `.md start` command shall validate the requested grid size and only accept values between 3 and 9.
 
-- **FR-08 - Cell Data Model:**
-Each cell in the board shall store its row and column coordinates, associated block, current guessed value, and correct solution value.
+- **FR-08 - Difficulty Selection:**
+The `.md start` command shall accept a difficulty parameter with the values `easy`, `medium` and `hard`.
 
-- **FR-09 - Board Parsing Validation:**
-The board parser shall ignore any invalid configuration that violates the mathdoku rules.
+- **FR-09 - Board Parsing Robustness:**
+The board parser shall skip board definitions with invalid structure.
 
-- **FR-10 - Block Data Model:**
-Each block shall store a unique id, a mathematical operation, and a target result number.
+- **FR-10 - Board Availability Check:**
+The game shall only start if at least one board exists for the selected size and difficulty.
 
 - **FR-11 - Input Request Handling:**
 The game shall prompt the player to provide input moves during gameplay. The bot must clearly indicate when user input is expected.
 
-- **FR-12 - Leave command:**
-The game shall provide a command allowing users to leave an active game session.
+- **FR-12 - Session End by Player Input:**
+The game shall allow the active player to end the current session by sending `end`.
 
 - **FR-13 - Invalid Input Notification:**
 The bot shall notify the user whenever an invalid input is detected.
@@ -95,10 +95,10 @@ The game shall identify incorrect cells or blocks.
 The board shall be visually represented as an image showing grid structure and blocking coloring.
 
 - **FR-18 - Hint Reaction Trigger:**
-The bot shall trigger the hint logic when a user reacts with the lightbulb emoji on the hint message.
+The bot shall trigger the hint logic when a user reacts with the lightbulb emoji on the board message.
 
-- **FR-19 - Hint Contect Logic:**
-A hint shall return the first empty cell in teh board and reveal its correct value.
+- **FR-19 - Hint Content Logic:**
+A hint shall return the first empty cell in the board and reveal its correct value.
 
 - **FR-20 - Cooldown Feedback:**
 The bot shall notify the user of the remaining cooldown time in seconds.
@@ -106,19 +106,26 @@ The bot shall notify the user of the remaining cooldown time in seconds.
 - **FR-21 - No Available Hint Notification:**
 The bot shall notify the user that no hints are available if all cells in the board are filled.
 
+- **FR-22 - Board Check Reaction on Full Grid:**
+The bot shall add the magnifying glass reaction to the board message when the grid becomes fully filled, enabling the user to trigger board validation.
+
+- **FR-23 - Rules Reaction Availability:**
+The bot shall provide a rules reaction that publishes the Mathdoku rules during an active game session.
+
 Optional (point 3): trace tests to requirements.
 
-## Test Cases Traceability Matrix
+## Test Cases Traceability Matrix
 
 | Test Case | File | Requirements |
 |---|---|---|
-| `test_load_valid_5x5_grid` | test_mathdoku_parser.py | FR-08, FR-09, FR-10 |
+| `test_load_valid_5x5_grid` | test_mathdoku_parser.py | FR-09 |
 | `test_load_invalid_5x5_grid` | test_mathdoku_parser.py | FR-09 |
-| `test_load_valid_5x5_grid_and_check_singletons_have_blocks` | test_mathdoku_parser.py | FR-08, FR-10 |
-| `test_load_valid_5x5_grid_and_check_singleton_blocks_have_cells` | test_mathdoku_parser.py | FR-10 |
-| `test_grid` | test_grid_class.py | FR-07, FR-08 |
+| `test_load_valid_5x5_grid_and_check_singletons_have_blocks` | test_mathdoku_parser.py | FR-09 |
+| `test_load_valid_5x5_grid_and_check_singleton_blocks_have_cells` | test_mathdoku_parser.py | FR-09 |
+| `test_load_valid_5x5_with_double_digit_difficulty` | test_mathdoku_parser.py | FR-09 |
+| `test_load_valid_9x9` | test_mathdoku_parser.py | FR-09 |
 | `test_latin_square_check` | test_grid_class.py | FR-15 |
-| `test_addguess` | test_valid_guess.py | FR-13, FR-15 |
+| `test_addguess` | test_valid_guess.py | FR-11 |
 | `test_hint_find_first_empty_cell` | test_mathdoku_hint.py | FR-19 |
 | `test_hint_find_empty_cell_after_some_filled` | test_mathdoku_hint.py | FR-19 |
 | `test_hint_cooldown` | test_mathdoku_hint.py | FR-06, FR-20 |
@@ -128,11 +135,11 @@ Optional (point 3): trace tests to requirements.
 | `test_victory_check_lost` | test_victory_check.py | FR-15, FR-16 |
 | `test_victory_check_won_with_division` | test_victory_check.py | FR-15 |
 | `test_victory_check_lost_with_division` | test_victory_check.py | FR-15, FR-16 |
-| `test_block_with_id_gets_color` | test_mathdoku.py | FR-10, FR-17 |
-| `test_block_with_unexpected_id_gets_color` | test_mathdoku.py | FR-10, FR-17 |
+| `test_block_with_id_gets_color` | test_mathdoku.py | FR-17 |
+| `test_block_with_unexpected_id_gets_color` | test_mathdoku.py | FR-17 |
 | `test_image_generation` | test_mathdoku_image_generation.py | FR-17 |
-| `test_board_filled_handler` | test_board_filled_handler.py | FR-15, FR-16 |
-| `test_recolor_blocks` | test_recolor_blocks.py | FR-16, FR-17 |
+| `test_board_filled_handler` | test_board_filled_handler.py | FR-15, FR-16, FR-17 |
+| `test_board_filled_handler` | test_recolor_blocks.py | FR-17 |
 
 ## Code changes
 Since our project does not make changes to the existing code, but instead adds only new code the diff is essentially all the code found in `mathdoku.py`, `mathdoku_parser.py` and the `mathdoku_integration.py`. The `Sir Lancebot` repo does not have a test suit in place. Therefore, the test logs we have are generated when we run pytest for our own test suit.
