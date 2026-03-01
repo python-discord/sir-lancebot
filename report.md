@@ -128,14 +128,7 @@ Optional (point 3): trace tests to requirements.
 | `test_recolor_blocks` | test_recolor_blocks.py | FR-16, FR-17 |
 
 ## Code changes
-
-### Patch (copy your changes or the add git command to show them) git diff ...
-
-Optional (point 4): the patch is clean.
-
-Optional (point 5): considered for acceptance (passes all automated checks).
-
-## Test results Overall results with link to a copy or excerpt of the logs (before/after refactoring).
+Since our project does not make changes to the existing code, but instead adds only new code the diff is essentially all the code found in `mathdoku.py`, `mathdoku_parser.py` and the `mathdoku_integration.py`. The `Sir Lancebot` repo does not have a test suit in place. Therefore, the test logs we have are generated when we run pytest for our own test suit.
 
 ## UML class diagram
 
