@@ -225,8 +225,12 @@ class Game:
 
                 # Only award points to real users (not the AI/bot)
                 if isinstance(self.current, Player):
-                    _, earned = await add_points(self.ctx.bot, self.current.user.id, TIC_TAC_TOE_WIN_POINTS, "tic_tac_toe")
-                    await self.ctx.send(f":tada: {self.current} won this game! :tada: (+{earned} pts)")
+                    _, earned = await add_points(
+                        self.ctx.bot, self.current.user.id, TIC_TAC_TOE_WIN_POINTS, "tic_tac_toe"
+                    )
+                    await self.ctx.send(
+                        f":tada: {self.current} won this game! :tada: (+{earned} pts)"
+                    )
                 else:
                     await self.ctx.send(
                         f":tada: {self.current} won this game! :tada:"

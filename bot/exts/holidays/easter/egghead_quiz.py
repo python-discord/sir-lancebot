@@ -115,7 +115,7 @@ class EggheadQuiz(commands.Cog):
         mentions = " ".join(u.mention for u in winners)
 
         if winners and len(set(points_earned.values())) == 1:
-            pts = list(points_earned.values())[0]
+            pts = next(iter(points_earned.values()))
             content = f"Well done {mentions} for getting it correct! (+{pts} pts)"
         elif winners:
             content = f"Well done {mentions} for getting it correct!"

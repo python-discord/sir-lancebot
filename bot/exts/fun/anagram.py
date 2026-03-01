@@ -86,7 +86,6 @@ class Anagram(commands.Cog):
             for winner_id in game.winner_ids:
                 _, earned = await add_points(self.bot, winner_id, ANAGRAM_WIN_POINTS, "anagram")
                 points_earned.add(earned)
-                
             if len(points_earned) == 1:
                 pts = points_earned.pop()
                 content = f"Well done {win_list} for getting it right! (+{pts} pts)"
