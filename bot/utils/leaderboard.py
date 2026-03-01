@@ -146,12 +146,30 @@ async def get_daily_leaderboard(bot: Bot) -> list[tuple[int, int]]:
     )
 
 
-async def get_user_rank(bot: Bot, user_id: int) -> int | None:
-    """Get a user's rank on the global leaderboard, or None if unranked."""
-    leaderboard = await get_leaderboard(bot)
-    for rank, (uid, _score) in enumerate(leaderboard, start=1):
+async def get_user_rank(
+    bot: Bot,
+    user_id: int,
+    leaderboard: list[tuple[int, int]] | None = None,
+) -> int | None:
+    """
+    Get a user's rank on the global leaderboard, or None if unranked.
+
+    Users with the same score share a rank.
+    """
+    if leaderboard is None:
+        leaderboard = await get_leaderboard(bot)
+
+    prev_score = None
+    rank = 0
+
+    for position, (uid, score) in enumerate(leaderboard, start=1):
+        if score != prev_score:
+            rank = position
+            prev_score = score
+
         if uid == user_id:
             return rank
+
     return None
 
 

@@ -23,11 +23,17 @@ MEDALS = (
 def _format_leaderboard_lines(records: list[tuple[int, int]]) -> list[str]:
     """Format leaderboard records into display lines."""
     lines = []
-    for rank, (user_id, score) in enumerate(records):
-        if rank < len(MEDALS):
-            prefix = MEDALS[rank]
+    prev_score = None
+    rank = 0
+
+    for position, (user_id, score) in enumerate(records, start=1):
+        if score != prev_score:
+            rank = position
+            prev_score = score
+        if rank <= len(MEDALS):
+            prefix = MEDALS[rank - 1]
         else:
-            prefix = f"**#{rank + 1}**"
+            prefix = f"**#{rank}**"
         lines.append(f"{prefix} <@{user_id}>: **{score}** pts")
     return lines
 
@@ -92,7 +98,7 @@ class Leaderboard(commands.Cog):
         embed.set_thumbnail(url=DUCK_COIN_THUMBNAIL)
 
         user_score = await get_user_points(self.bot, ctx.author.id)
-        rank = await get_user_rank(self.bot, ctx.author.id)
+        rank = await get_user_rank(self.bot, ctx.author.id, leaderboard=records)
         if rank:
             footer = f"Your rank: #{rank} | Your total: {user_score} pts"
         else:
