@@ -26,6 +26,9 @@ We tracked the time we used on in this sheet: https://docs.google.com/spreadshee
 ### [Elias Richard Næss] — GitHub: [@daDevBoat]
 Elias was responsible for setting up the basic structure of the Cell, Block and Grid classes. He was also responsible for adding victory check logic and the coloring of wrong columns, rows and blocks. Elias had also a decent amount of involvement in the color picking and distribution for blocks. Furthermore, he was also responsible for making the boarders around the blocks thick. 
 
+### [Jannis Häffner] — GitHub: [@dJannisHaeffner]
+Jannis was responsible for the `generate image` function, which generates an image of a given Grid. He was also responsible for displaying and updating the board correctly in Discord and setting up the system to handle reactions. He was furthermore responsible for creating several small helper functions to check if a board is full, verify user guesses, and recolor cells, as well as several small bug fixes along the way.
+
 
 ## Overview of issue(s) and work done.
 
