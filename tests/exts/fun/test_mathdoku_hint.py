@@ -39,6 +39,7 @@ I 2-
     return grid
 
 def test_hint_find_first_empty_cell(tmp_path: Path) -> None:
+    """Contract: Checks that the hint method returns the first available empty cell."""
     grid = _load_5x5_grid(tmp_path)
 
     result = grid.hint(now=datetime(2026, 2, 25, 14, 0, 0))
@@ -47,6 +48,7 @@ def test_hint_find_first_empty_cell(tmp_path: Path) -> None:
     assert result["guess"] == "A1 4"
 
 def test_hint_find_empty_cell_after_some_filled(tmp_path: Path) -> None:
+    """Contract: Checks that hint skips already filled cells and finds the next empty one."""
     grid = _load_5x5_grid(tmp_path)
 
     grid.cells[0][0].guess = 4
@@ -60,6 +62,7 @@ def test_hint_find_empty_cell_after_some_filled(tmp_path: Path) -> None:
 
 
 def test_hint_cooldown(tmp_path: Path) -> None:
+    """Contract: Checks that hint cooldown is active when fewer than 180 seconds have passed."""
     grid = _load_5x5_grid(tmp_path)
     t0 = datetime(2026, 2, 25, 14, 0, 0)
     grid.hint(now=t0)
@@ -71,6 +74,7 @@ def test_hint_cooldown(tmp_path: Path) -> None:
 
 
 def test_hint_available_again_at_180_seconds(tmp_path: Path) -> None:
+    """Contract: Checks that the cooldown expires exactly at 180 seconds."""
     grid = _load_5x5_grid(tmp_path)
     t0 = datetime(2026, 2, 25, 14, 0, 0)
 
@@ -82,6 +86,7 @@ def test_hint_available_again_at_180_seconds(tmp_path: Path) -> None:
 
 
 def test_hint_all_cells_filled(tmp_path: Path) -> None:
+    """Contract: Checks that no available hint is returned  when the board is fully filled."""
     grid = _load_5x5_grid(tmp_path)
 
     for row in grid.cells:
