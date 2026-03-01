@@ -82,7 +82,8 @@ G 3-
 
     assert grid.check_victory() is False
 
-    assert grid._latin_square_check() is False
+    w_rows, w_cols = grid._latin_square_check()
+    assert len(w_rows) + len(w_cols) > 0
 
     assert grid._blocks_fufilled_check()[0].id == "A"
 
@@ -170,6 +171,7 @@ I 2-
 
     assert grid.check_victory() is False
 
-    assert grid._latin_square_check() is False
+    w_rows, w_cols = grid._latin_square_check()
+    assert len(w_rows) + len(w_cols) > 0
 
     assert grid._blocks_fufilled_check()[0].id == "H"

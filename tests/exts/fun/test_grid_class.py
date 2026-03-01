@@ -24,8 +24,10 @@ def test_latin_square_check():
     
     print(grid)
     
-    assert grid._latin_square_check() 
+    w_rows, w_cols = grid._latin_square_check()
+    assert len(w_rows) + len(w_cols) == 0
     
     grid.cells[3][3].guess = 1
 
-    assert grid._latin_square_check() is False
+    w_rows, w_cols = grid._latin_square_check()
+    assert len(w_rows) + len(w_cols) > 0

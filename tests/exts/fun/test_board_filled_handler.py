@@ -50,7 +50,8 @@ I 2-
     grid.cells[0][0].guess = 1
 
     # Comment out the line below to see different colors for singletons
-    assert grid._latin_square_check() is False
+    w_rows, w_cols = grid._latin_square_check()
+    assert len(w_rows) + len(w_cols) > 0
     assert grid.check_victory() is False
     assert grid.board_filled_handler() is False
 
@@ -96,7 +97,8 @@ E 1-
             cell.guess = cell.correct
 
     # Comment out the line below to see different colors for singletons
-    assert grid._latin_square_check() is False
+    w_rows, w_cols = grid._latin_square_check()
+    assert len(w_rows) + len(w_cols) > 0
     assert grid.check_victory() is False
     assert grid.board_filled_handler() is False
 

@@ -161,7 +161,7 @@ class Grid:
             print_str += str(self.cells[row][col + 1].guess) + "]\n"
         return print_str
 
-    def _latin_square_check(self) -> bool:
+    def _latin_square_check(self) -> list[set[int], set[int]]:
         """
         Checks if the grid is filled correctly in terms of a latin square.\n
         I.e all numbers in the range per colum and row exist.
@@ -183,15 +183,20 @@ class Grid:
         #print(check_col_structure)
         #print("------------------\n")
 
+        wrong_rows = set()
+        wrong_cols = set()
+
         # Checks that the entire structure is True
         for row in range(self.size):
             for col in range(self.size):
-                if check_row_structure[row][col] is False or check_col_structure[row][col] is False:
-                    return False
+                if check_row_structure[row][col] is False:
+                    wrong_rows.add(row)
+                if check_col_structure[row][col] is False:
+                    wrong_cols.add(col)
 
-        return True
+        return [wrong_rows, wrong_cols]
 
-    def _blocks_fufilled_check(self) -> list[Block] | bool:
+    def _blocks_fufilled_check(self) -> list[Block]:
         """
         Checks if all the blocks are filled correctly and meets the requirements. \n
         Returns the blocks that are wrong or True if all blocks meet the requirements. \n
@@ -229,8 +234,6 @@ class Grid:
             if abs(result) != block.number:
                 wrong_blocks.append(block)
 
-        if len(wrong_blocks) == 0:
-            return True
         return wrong_blocks
 
     def check_victory(self) -> bool:
@@ -238,37 +241,49 @@ class Grid:
         Checks if the board is in a state where the player has won and will
         return True or False.
         """
-        return bool(
-            self._latin_square_check()
-            and isinstance(self._blocks_fufilled_check(), bool)
-            and self._blocks_fufilled_check()
-        )
+        result_latin = self._latin_square_check()
+        result_blocks = self._blocks_fufilled_check()
+        return len(result_latin[0]) + len(result_latin[1]) + len(result_blocks) == 0
 
     def board_filled_handler(self) -> bool:
         """
         Handler for when board is filled.\n
-        The method calls the victory check and colors in the blocks that are not fufilled if any,\n
-        and returns True or False if the board is solved.
+        The method calls the latin_square_check and blocks_fufilled_check an colors in\n
+        the wrong rows, cols and blocks in red. The rest in green. \n
+        It returns True or False if the board is solved or not.
         """
-        wrong_blocks = self._blocks_fufilled_check()
-        if isinstance(wrong_blocks, bool):
-            wrong_blocks = []
+        # First make the entire board green
+        for row in self.cells:
+            for cell in row:
+                cell.color = (100, 255, 100)
+        
+        # Find the wrong rows and cols in terms of latin square
+        wrong_rows, wrong_cols = self._latin_square_check()
 
+        # Color in the wrong rows
+        for row in wrong_rows:
+            for cell in self.cells[row]:
+                cell.color = (255, 0, 0)
+
+        # Color in the wrong columns
+        for row in self.cells:
+            for col, cell in enumerate(row):
+                if col in wrong_cols:
+                    cell.color = (255, 0, 0)
+
+        if len(wrong_rows) + len(wrong_cols) > 0:
+            return False
+
+        # Find the wrong blocks only if now wrong latin rows or cols
+        wrong_blocks = self._blocks_fufilled_check()
+        
+        # Color in the wrong blocks
         for block in self.blocks:
             if block in wrong_blocks:
-                block.color = (255, 0, 0)
-            else:
-                block.color = (100, 255, 100)
+                for cell in block.cells:
+                    cell.color = (255, 0, 0)
 
-        # TODO this currently would overwrite any color changes in the roman lines checker
-        # We should first recolor the blocks based on if they match the block sum criteria, and then overwrite their
-        # color with the colors from the roman lines check - where only rows/column that break the grid are colored
-        # -- maybe in another red so its easy to tell apart?
-        for row in range(self.size):
-            for cell in self.cells[row]:
-                cell.reset_color()
-
-        return self.check_victory()
+        return len(wrong_blocks) == 0
 
     def check_full_grid(self) -> bool:
         """Helper that checks if a grid is completely filled."""
