@@ -30,20 +30,22 @@ async def _get_points_cache() -> RedisCache:
     return Leaderboard.points_cache
 
 
-async def add_points(bot: Bot, user_id: int, points: int, game_name: str) -> int:
+async def add_points(bot: Bot, user_id: int, points: int, game_name: str) -> tuple[int, int]:
     """
     Add points to a user's global leaderboard score.
 
     Points are clamped by the daily cap per game ("DAILY_POINT_CAP").
     Daily entries expire automatically at UTC midnight via Redis TTL.
 
-    Returns the user's new total score, or 0 if the cog is not loaded.
+    Returns a tuple of (new_total_score, points_actually_earned).
+    Returns (0, 0) if the cog is not loaded.
     """
     if points <= 0:
-        return await get_user_points(bot, user_id)
+        total = await get_user_points(bot, user_id)
+        return (total, 0)
 
     if bot.get_cog("Leaderboard") is None:
-        return 0
+        return (0, 0)
 
     redis = bot.redis_session.client
     daily_key = _daily_key(user_id, game_name)
@@ -55,22 +57,24 @@ async def add_points(bot: Bot, user_id: int, points: int, game_name: str) -> int
     remaining = DAILY_POINT_CAP - earned_today
     if remaining <= 0:
         log.trace(f"User {user_id} hit daily cap for {game_name}, skipping.")
-        return await get_user_points(bot, user_id)
+        total = await get_user_points(bot, user_id)
+        return (total, 0)
 
     # clamp to remaining daily allowance
-    points = min(points, remaining)
+    points_earned = min(points, remaining)
 
     ttl = seconds_until_midnight_utc()
-    await redis.set(daily_key, earned_today + points, ex=ttl)
+    await redis.set(daily_key, earned_today + points_earned, ex=ttl)
 
     # update persistent global total
     points_cache = await _get_points_cache()
     if await points_cache.contains(user_id):
-        await points_cache.increment(user_id, points)
+        await points_cache.increment(user_id, points_earned)
     else:
-        await points_cache.set(user_id, points)
+        await points_cache.set(user_id, points_earned)
 
-    return int(await points_cache.get(user_id))
+    new_total = int(await points_cache.get(user_id))
+    return (new_total, points_earned)
 
 
 async def remove_points(bot: Bot, user_id: int, points: int) -> int:

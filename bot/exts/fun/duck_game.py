@@ -309,14 +309,16 @@ class DuckGamesDirector(commands.Cog):
             DUCK_GAME_SECOND_PLACE_POINTS,
             DUCK_GAME_THIRD_PLACE_POINTS
         ]
+        earned_points = {}
         for rank, (member, score) in enumerate(scores[:3]):
             if score > 0:
-                await add_points(self.bot, member.id, point_awards[rank], "duck_game")
+                _, earned = await add_points(self.bot, member.id, point_awards[rank], "duck_game")
+                earned_points[member.id] = earned
 
         scoreboard = "Final scores:\n\n"
         for rank, (member, score) in enumerate(scores):
-            if rank < 3 and score > 0:
-                scoreboard += f"{member.display_name}: {score} (+{point_awards[rank]} global pts)\n"
+            if rank < 3 and score > 0 and member.id in earned_points:
+                scoreboard += f"{member.display_name}: {score} (+{earned_points[member.id]} global pts)\n"
             else:
                 scoreboard += f"{member.display_name}: {score}\n"
         scoreboard_embed.description = scoreboard

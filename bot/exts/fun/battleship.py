@@ -154,13 +154,13 @@ class Game:
         loser: discord.Member
     ) -> None:
         """Removes games from list of current games and announces to public chat."""
-        await self.public_channel.send(
-            f"Game Over! {winner.mention} won against {loser.mention} (+{BATTLESHIP_WIN_POINTS} pts)"
-        )
+        _, earned = await add_points(self.bot, winner.id, BATTLESHIP_WIN_POINTS, "battleship")
+        header = f"Game Over! {winner.mention} won against {loser.mention} (+{earned} pts)"
 
-        for player in (self.p1, self.p2):
+        for i, player in enumerate((self.p1, self.p2)):
             grid = self.format_grid(player, SHIP_EMOJIS)
-            await self.public_channel.send(f"{player.user}'s Board:\n{grid}")
+            content = f"{header}\n{player.user}'s Board:\n{grid}" if i == 0 else f"{player.user}'s Board:\n{grid}"
+            await self.public_channel.send(content)
 
     @staticmethod
     def check_sink(grid: Grid, boat: str) -> bool:
@@ -251,21 +251,21 @@ class Game:
             except TimeoutError:
                 await self.turn.user.send("You took too long. Game over!")
                 await self.next.user.send(f"{self.turn.user} took too long. Game over!")
+                _, earned = await add_points(self.bot, self.next.user.id, BATTLESHIP_WIN_POINTS, "battleship")
                 await self.public_channel.send(
                     f"Game over! {self.turn.user.mention} timed out so {self.next.user.mention} wins! "
-                    f"(+{BATTLESHIP_WIN_POINTS} pts)"
+                    f"(+{earned} pts)"
                 )
-                await add_points(self.bot, self.next.user.id, BATTLESHIP_WIN_POINTS, "battleship")
                 self.gameover = True
                 break
             else:
                 if self.surrender:
                     await self.next.user.send(f"{self.turn.user} surrendered. Game over!")
+                    _, earned = await add_points(self.bot, self.next.user.id, BATTLESHIP_WIN_POINTS, "battleship")
                     await self.public_channel.send(
                         f"Game over! {self.turn.user.mention} surrendered to {self.next.user.mention}! "
-                        f"(+{BATTLESHIP_WIN_POINTS} pts)"
+                        f"(+{earned} pts)"
                     )
-                    await add_points(self.bot, self.next.user.id, BATTLESHIP_WIN_POINTS, "battleship")
                     self.gameover = True
                     break
                 square = self.get_square(self.next.grid, self.match.string)
@@ -284,10 +284,10 @@ class Game:
             await self.turn.user.send(f"You've sunk their {square.boat} ship!", delete_after=3.0)
             alert_messages.append(await self.next.user.send(f"Oh no! Your {square.boat} ship sunk!"))
             if self.check_gameover(self.next.grid):
-                await self.turn.user.send(f"You win! (+{BATTLESHIP_WIN_POINTS} pts)")
+                _, earned = await add_points(self.bot, self.turn.user.id, BATTLESHIP_WIN_POINTS, "battleship")
+                await self.turn.user.send(f"You win! (+{earned} pts)")
                 await self.next.user.send("You lose!")
                 self.gameover = True
-                await add_points(self.bot, self.turn.user.id, BATTLESHIP_WIN_POINTS, "battleship")
                 await self.game_over(winner=self.turn.user, loser=self.next.user)
 
 

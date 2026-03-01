@@ -199,8 +199,8 @@ class Minesweeper(commands.Cog):
         """The player won the game."""
         game = self.games[ctx.author.id]
         points = self.points_by_user.get(ctx.author.id, 6)
-        await add_points(self.bot, ctx.author.id, points, "minesweeper")
-        await ctx.author.send(f":tada: You won! :tada: (+{points} pts)")
+        _, earned = await add_points(self.bot, ctx.author.id, points, "minesweeper")
+        await ctx.author.send(f":tada: You won! :tada: (+{earned} pts)")
         if game.activated_on_server:
             await game.chat_msg.channel.send(
                 f":tada: {ctx.author.mention} just won Minesweeper! :tada: (+{points} pts)"

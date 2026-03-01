@@ -687,10 +687,10 @@ class SnakeAndLaddersGame:
             return
 
         # announce winner and exit
-        await add_points(self.ctx.bot, winner.id, SNAKES_AND_LADDERS_WIN_POINTS, "snakes_and_ladders")
+        _, earned = await add_points(self.ctx.bot, winner.id, SNAKES_AND_LADDERS_WIN_POINTS, "snakes_and_ladders")
         await self.channel.send(
             f"**Snakes and Ladders**: {winner.mention} has won the game! :tada: "
-            f"(+{SNAKES_AND_LADDERS_WIN_POINTS} pts)"
+            f"(+{earned} pts)"
         )
         self._destruct()
 

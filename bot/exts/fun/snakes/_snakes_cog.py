@@ -441,10 +441,10 @@ class Snakes(Cog):
 
         if str(reaction.emoji) == ANSWERS_EMOJI[answer]:
             if award_points is not None:
-                await add_points(self.bot, ctx.author.id, award_points, game)
+                _, earned = await add_points(self.bot, ctx.author.id, award_points, game)
                 await ctx.send(
                 f"{random.choice(CORRECT_GUESS)} The correct answer was **{options[answer]}**. "
-                f"(+{award_points} pts)"
+                f"(+{earned} pts)"
                 )
             else:
                 await ctx.send(f"{random.choice(CORRECT_GUESS)} The correct answer was **{options[answer]}**.")

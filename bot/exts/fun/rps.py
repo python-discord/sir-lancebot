@@ -53,8 +53,8 @@ class RPS(commands.Cog):
             message_string = f"{player_mention} You and Sir Lancebot played {bot_move}, it's a tie."
             await ctx.send(message_string)
         elif player_result == 1:
-            await add_points(self.bot, ctx.author.id, RPS_WIN_POINTS, "rps")
-            await ctx.send(f"Sir Lancebot played {bot_move}! {player_mention} won! (+{RPS_WIN_POINTS} pts)")
+            _, earned = await add_points(self.bot, ctx.author.id, RPS_WIN_POINTS, "rps")
+            await ctx.send(f"Sir Lancebot played {bot_move}! {player_mention} won! (+{earned} pts)")
         else:
             await ctx.send(f"Sir Lancebot played {bot_move}! {player_mention} lost!")
 

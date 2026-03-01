@@ -170,10 +170,10 @@ class Hangman(commands.Cog):
 
         # The loop exited meaning that the user has guessed the word
         await original_message.edit(embed=self.create_embed(tries, user_guess))
-        await add_points(self.bot, ctx.author.id, HANGMAN_WIN_POINTS, "hangman")
+        _, earned = await add_points(self.bot, ctx.author.id, HANGMAN_WIN_POINTS, "hangman")
         win_embed = Embed(
             title="You won!",
-            description=f"The word was `{word}`. (+{HANGMAN_WIN_POINTS} pts)",
+            description=f"The word was `{word}`. (+{earned} pts)",
             color=Colours.grass_green
         )
         await ctx.send(embed=win_embed)

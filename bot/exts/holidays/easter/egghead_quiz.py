@@ -107,16 +107,20 @@ class EggheadQuiz(commands.Cog):
 
         winners = [u for u in users if not u.bot]
 
+        points_earned = {}
         for u in winners:
-            await add_points(ctx.bot, u.id, EGGQUIZ_WIN_POINTS, "eggquiz")
+            _, earned = await add_points(ctx.bot, u.id, EGGQUIZ_WIN_POINTS, "eggquiz")
+            points_earned[u.id] = earned
 
         mentions = " ".join(u.mention for u in winners)
 
-        content = (
-            f"Well done {mentions} for getting it correct! (+{EGGQUIZ_WIN_POINTS} pts)"
-            if mentions
-            else "Nobody got it right..."
-        )
+        if winners and len(set(points_earned.values())) == 1:
+            pts = list(points_earned.values())[0]
+            content = f"Well done {mentions} for getting it correct! (+{pts} pts)"
+        elif winners:
+            content = f"Well done {mentions} for getting it correct!"
+        else:
+            content = "Nobody got it right..."
 
         a_embed = discord.Embed(
             title=f"The correct answer was {correct}!",

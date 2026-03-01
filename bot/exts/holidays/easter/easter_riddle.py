@@ -88,8 +88,8 @@ class EasterRiddle(commands.Cog):
                 await ctx.send(embed=hint_embed)
 
         if winner_id is not None:
-            await add_points(self.bot, winner_id, EASTER_RIDDLE_WIN_POINTS, "easter_riddle")
-            content = f"Well done {winner} for getting it right! (+{EASTER_RIDDLE_WIN_POINTS} pts)"
+            new_total, earned = await add_points(self.bot, winner_id, EASTER_RIDDLE_WIN_POINTS, "easter_riddle")
+            content = f"Well done {winner} for getting it right! (+{earned} pts)"
         else:
             content = "Nobody got it right..."
 
