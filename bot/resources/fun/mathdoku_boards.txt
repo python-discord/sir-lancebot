@@ -17641,3 +17641,2202 @@ h 3-
 7 9 4 3 1 6 2 5 8
 3 5 9 8 6 2 7 1 4
 1 3 7 6 4 9 5 8 2
+
+9x9:d5 (easy)
+AE7aUTTPP
+AEKaUbbb8
+NNK6RMMGG
+NKKRRCMWD
+VVKRCC3WD
+YVIIHZZ5F
+Y9QcHZLLF
+YSQcJJJdB
+SSSOOXXdB
+
+A 5-
+B 24x
+C 72x
+D 45x
+E 6+
+F 5-
+G 3-
+H 24x
+I 42x
+J 14+
+K 23+
+L 4-
+M 392x
+N 216x
+O 14+
+P 2/
+Q 3+
+R 9+
+S 1152x
+T 10+
+U 5-
+V 112x
+W 11+
+X 3+
+Y 30x
+Z 288x
+a 4-
+b 60x
+c 6x
+d 2-
+
+2 5 7 8 4 9 1 6 3
+7 1 3 4 9 5 6 2 8
+9 3 5 6 2 7 8 4 1
+8 2 4 5 1 6 7 3 9
+4 7 9 1 6 2 3 8 5
+1 4 6 7 3 8 9 5 2
+6 9 2 3 8 4 5 1 7
+5 8 1 2 7 3 4 9 6
+3 6 8 9 5 1 2 7 4
+
+9x9:d7 (easy)
+BFFEE2eeR
+BHaaYYRRR
+cHVgPUULL
+c8VgPCDDL
+NNAAPC3ZZ
+bIIKKKMZW
+bbO9ddMMW
+GGOXSTTff
+QQ2XSTJJJ
+
+A 13+
+B 7+
+C 2-
+D 4+
+E 2-
+F 6-
+G 42x
+H 7-
+I 11+
+J 19+
+K 10+
+L 17+
+M 432x
+N 3+
+O 2-
+P 9+
+Q 1-
+R 20+
+S 17+
+T 17+
+U 4/
+V 1-
+W 3-
+X 3+
+Y 6+
+Z 80x
+a 1-
+b 17+
+c 10+
+d 4-
+e 2-
+f 5+
+g 1-
+
+4 3 9 8 6 2 5 7 1
+3 2 8 7 5 1 4 6 9
+1 9 6 5 3 8 2 4 7
+9 8 5 4 2 7 1 3 6
+2 1 7 6 4 9 3 5 8
+8 7 4 3 1 6 9 2 5
+5 4 1 9 7 3 6 8 2
+7 6 3 2 9 5 8 1 4
+6 5 2 1 8 4 7 9 3
+
+9x9:d7 (easy)
+bbbGNNcTT
+BVVGHXcAa
+BBCKHXcAa
+dLCKRRJAa
+dL4QEEJPP
+MYYQQZZFP
+MDOSSSZFW
+eDOOffIWW
+e2ggUUIhh
+
+A 14+
+B 32x
+C 6-
+D 17+
+E 1-
+F 5-
+G 3-
+H 7-
+I 3-
+J 5+
+K 18x
+L 8+
+M 4-
+N 1-
+O 12+
+P 192x
+Q 25+
+R 1-
+S 40x
+T 2/
+U 1-
+V 18x
+W 24+
+X 7-
+Y 10x
+Z 12+
+a 17+
+b 27x
+c 22+
+d 40x
+e 54x
+f 12x
+g 4-
+h 4+
+
+1 3 9 5 7 8 6 4 2
+4 6 3 8 1 2 9 7 5
+2 4 1 6 8 9 7 5 3
+8 1 7 3 5 6 4 2 9
+5 7 4 9 2 3 1 8 6
+3 5 2 7 9 1 8 6 4
+7 9 6 2 4 5 3 1 8
+6 8 5 1 3 4 2 9 7
+9 2 8 4 6 7 5 3 1
+
+9x9:d6 (easy)
+bOdSSHHH9
+bOdIS9CFF
+PPDIYYCFN
+TTDIWeeNN
+GT9UWRRRN
+GGQUBBMMM
+cQQQEAaaa
+cJZ7EALXV
+6JZKKLLXV
+
+A 4-
+B 21x
+C 7+
+D 15x
+E 5-
+F 42x
+G 24+
+H 21+
+I 192x
+J 12+
+K 4-
+L 18x
+M 15+
+N 23+
+O 2/
+P 1-
+Q 6x
+R 9+
+S 20x
+T 96x
+U 1-
+V 2-
+W 3/
+X 2-
+Y 45x
+Z 2-
+a 18+
+b 7+
+c 5-
+d 28x
+e 56x
+
+2 3 4 5 1 6 7 8 9
+5 6 7 8 4 9 1 2 3
+1 2 3 4 9 5 6 7 8
+3 4 5 6 2 7 8 9 1
+7 8 9 1 6 2 3 4 5
+8 9 1 2 7 3 4 5 6
+9 1 2 3 8 4 5 6 7
+4 5 6 7 3 8 9 1 2
+6 7 8 9 5 1 2 3 4
+
+9x9:d6 (easy)
+YYAddBNJJ
+FFAKXBNNc
+aFQKXBSSc
+aFQK9BLWW
+T2QDDZLWH
+TCRRGZPPH
+9CRVGMMPU
+EEVVGMIUU
+OO7VGIIbb
+
+A 36x
+B 448x
+C 28x
+D 30x
+E 5-
+F 26+
+G 16+
+H 45x
+I 120x
+J 10+
+K 13+
+L 3-
+M 18+
+N 11+
+O 8+
+P 14+
+Q 10+
+R 40x
+S 3/
+T 4-
+U 112x
+V 22+
+W 48x
+X 12x
+Y 5-
+Z 5-
+a 6+
+b 1-
+c 13+
+d 1-
+
+8 3 4 6 7 2 5 9 1
+4 8 9 2 3 7 1 5 6
+5 9 1 3 4 8 2 6 7
+1 5 6 8 9 4 7 2 3
+7 2 3 5 6 1 4 8 9
+3 7 8 1 2 6 9 4 5
+9 4 5 7 8 3 6 1 2
+6 1 2 4 5 9 3 7 8
+2 6 7 9 1 5 8 3 4
+
+9x9:d6 (easy)
+AABPPSSDD
+ABBHPSeD9
+LLBHCFe4G
+bbMHCFFUG
+TTMMKK3UG
+QcXXEEaaW
+QcNN2EJJW
+RVVYYOIZZ
+RRVYOOIdd
+
+A 21x
+B 18+
+C 4-
+D 48x
+E 140x
+F 11+
+G 60x
+H 70x
+I 11+
+J 5-
+K 3-
+L 3-
+M 10+
+N 3-
+O 48x
+P 15+
+Q 24x
+R 8x
+S 64x
+T 4/
+U 1-
+V 18+
+W 4+
+X 4/
+Y 108x
+Z 7-
+a 6+
+b 27x
+c 2-
+d 2-
+e 16+
+
+7 1 3 9 5 8 2 6 4
+3 6 8 5 1 4 7 2 9
+5 8 1 7 3 6 9 4 2
+9 3 5 2 7 1 4 8 6
+8 2 4 1 6 9 3 7 5
+6 9 2 8 4 7 1 5 3
+4 7 9 6 2 5 8 3 1
+2 5 7 4 9 3 6 1 8
+1 4 6 3 8 2 5 9 7
+
+9x9:d5 (easy)
+fWTTEEIIG
+fW6QQHIIG
+XXXSSHaaN
+AAFbbHCCN
+UcFJJMeeN
+UcD7YMRVd
+UUDPYRRVd
+ZKKPYR8VO
+Z2BBBBLLO
+
+A 1-
+B 26+
+C 6+
+D 6x
+E 54x
+F 1-
+G 4-
+H 105x
+I 294x
+J 8-
+K 2-
+L 5-
+M 8x
+N 36x
+O 12+
+P 4-
+Q 1-
+R 14+
+S 1-
+T 4-
+U 960x
+V 288x
+W 5-
+X 16x
+Y 18+
+Z 2-
+a 14+
+b 72x
+c 35x
+d 8-
+e 4-
+f 5-
+
+4 3 1 5 6 9 2 7 8
+9 8 6 1 2 5 7 3 4
+2 1 8 3 4 7 9 5 6
+7 6 4 8 9 3 5 1 2
+8 7 5 9 1 4 6 2 3
+6 5 3 7 8 2 4 9 1
+5 4 2 6 7 1 3 8 9
+1 9 7 2 3 6 8 4 5
+3 2 9 4 5 8 1 6 7
+
+9x9:d4 (easy)
+ddLEEccRR
+1HLEbTMNN
+eHQQbTMN3
+eOOCCC9WW
+DD5BCaaKK
+SSFBX1GUU
+ffFBXXG6Z
+VAAJIIYPZ
+VVAJJYYPP
+
+A 18+
+B 504x
+C 504x
+D 9+
+E 90x
+F 1-
+G 9+
+H 1-
+I 10+
+J 192x
+K 9+
+L 8+
+M 56x
+N 21+
+O 12+
+P 12+
+Q 5-
+R 4-
+S 48x
+T 20x
+U 4-
+V 75x
+W 6+
+X 12x
+Y 11+
+Z 7-
+a 18x
+b 30x
+c 4/
+d 2-
+e 7-
+f 16+
+
+4 6 1 5 9 8 2 3 7
+1 3 7 2 6 5 8 9 4
+9 2 6 1 5 4 7 8 3
+2 4 8 3 7 6 9 1 5
+8 1 5 9 4 3 6 7 2
+6 8 3 7 2 1 4 5 9
+7 9 4 8 3 2 5 6 1
+5 7 2 6 1 9 3 4 8
+3 5 9 4 8 7 1 2 6
+
+9x9:d7 (easy)
+DKKMFFbHH
+DSSMWbbPP
+YYggWAAPJ
+aaUUU9ReJ
+QhTfBORe6
+QhTfBOGLd
+IINNZOGLd
+I3XXZcGVC
+1XXEEccVC
+
+A 15+
+B 4-
+C 13+
+D 2/
+E 5-
+F 3-
+G 16+
+H 15+
+I 315x
+J 7+
+K 6-
+L 3-
+M 8+
+N 7-
+O 36x
+P 144x
+Q 11+
+R 7-
+S 3/
+T 9+
+U 105x
+V 3-
+W 1-
+X 29+
+Y 6+
+Z 2-
+a 3/
+b 168x
+c 8+
+d 6-
+e 2-
+f 5-
+g 2-
+h 4-
+
+2 7 1 3 8 5 4 6 9
+4 9 3 5 1 7 6 8 2
+5 1 4 6 2 8 7 9 3
+6 2 5 7 3 9 8 1 4
+8 4 7 9 5 2 1 3 6
+3 8 2 4 9 6 5 7 1
+9 5 8 1 6 3 2 4 7
+7 3 6 8 4 1 9 2 5
+1 6 9 2 7 4 3 5 8
+
+9x9:d6 (easy)
+P3UNNJJbb
+PZULNFHHH
+OZZLNFYRR
+OQQ8gKYRG
+ccAAgK8GG
+CC7XDDMWW
+VVBXTTMee
+VdBfIIEES
+7dBfIaaES
+
+A 4-
+B 12+
+C 4/
+D 9+
+E 21+
+F 7-
+G 30x
+H 10+
+I 9+
+J 35x
+K 15+
+L 2-
+M 3-
+N 432x
+O 1-
+P 27x
+Q 10+
+R 252x
+S 1-
+T 56x
+U 10+
+V 13+
+W 8-
+X 2/
+Y 1-
+Z 18+
+a 8+
+b 1-
+c 3-
+d 10+
+e 12x
+f 3+
+g 6-
+
+9 3 8 4 6 5 7 2 1
+3 6 2 7 9 8 1 5 4
+5 8 4 9 2 1 3 7 6
+4 7 3 8 1 9 2 6 5
+1 4 9 5 7 6 8 3 2
+8 2 7 3 5 4 6 1 9
+2 5 1 6 8 7 9 4 3
+6 9 5 1 3 2 4 8 7
+7 1 6 2 4 3 5 9 8
+
+9x9:d6 (easy)
+II9AZNJJe
+ddMAZNPRe
+GMMZZNPRQ
+GffEEBY4Q
+HaaE8BYCC
+HKUVV4YDc
+8KUWWSSDc
+hLTbWOODF
+hLTbggXXF
+
+A 45x
+B 15+
+C 3/
+D 15+
+E 18x
+F 2-
+G 2-
+H 2/
+I 9+
+J 1-
+K 7+
+L 11+
+M 19+
+N 12x
+O 45x
+P 6+
+Q 2-
+R 8+
+S 36x
+T 2-
+U 14x
+V 12+
+W 18x
+X 56x
+Y 48x
+Z 16+
+a 1-
+b 14+
+c 8+
+d 2-
+e 32x
+f 1-
+g 1-
+h 2-
+
+1 8 9 5 3 2 6 7 4
+5 3 4 9 7 6 1 2 8
+9 7 8 4 2 1 5 6 3
+7 5 6 2 9 8 3 4 1
+6 4 5 1 8 7 2 3 9
+3 1 2 7 5 4 8 9 6
+8 6 7 3 1 9 4 5 2
+4 2 3 8 6 5 9 1 7
+2 9 1 6 4 3 7 8 5
+
+9x9:d6 (easy)
+KKEIAAGGG
+OOEI2CCGa
+UUcYY7Faa
+U6cYDDFMM
+JQQQLLTMR
+JJbbLZTMR
+8WbBBZXXR
+NWHPdd8VV
+NWHPPSSVV
+
+A 2-
+B 7+
+C 1-
+D 11+
+E 1-
+F 5-
+G 17+
+H 16x
+I 15+
+J 15+
+K 10+
+L 384x
+M 22+
+N 3-
+O 1-
+P 16+
+Q 6x
+R 315x
+S 30x
+T 16+
+U 42x
+V 126x
+W 28x
+X 2-
+Y 11+
+Z 4+
+a 32x
+b 12+
+c 36x
+d 2-
+
+1 9 7 8 3 5 4 6 2
+9 8 6 7 2 4 3 5 1
+3 2 9 1 5 7 6 8 4
+7 6 4 5 9 2 1 3 8
+4 3 1 2 6 8 7 9 5
+6 5 3 4 8 1 9 2 7
+8 7 5 6 1 3 2 4 9
+5 4 2 3 7 9 8 1 6
+2 1 8 9 4 6 5 7 3
+
+9x9:d5 (easy)
+3UUZZfCCP
+DUKZVfXIP
+DcKVVAXIP
+YcKLbANNd
+Y6QLbSNRd
+WWQLbSSRH
+BB8FTeeGH
+BJJFTOMG8
+EEJJOOMaa
+
+A 4+
+B 28x
+C 1-
+D 4-
+E 9+
+F 6-
+G 7+
+H 2-
+I 24x
+J 72x
+K 135x
+L 30x
+M 30x
+N 21+
+O 19+
+P 48x
+Q 24x
+R 2-
+S 8x
+T 27x
+U 126x
+V 24x
+W 4/
+X 5-
+Y 1-
+Z 22+
+a 28x
+b 16+
+c 2-
+d 8-
+e 9+
+f 12+
+
+3 9 7 6 8 5 2 1 4
+5 2 9 8 1 7 4 3 6
+1 7 5 4 6 3 9 8 2
+8 5 3 2 4 1 7 6 9
+9 6 4 3 5 2 8 7 1
+2 8 6 5 7 4 1 9 3
+4 1 8 7 9 6 3 2 5
+7 4 2 1 3 9 6 5 8
+6 3 1 9 2 8 5 4 7
+
+9x9:d10 (medium)
+ddPTTQQGG
+JJPT9QQaa
+cORYYYQaE
+cORYWWAIE
+7RRYNNAIX
+DDfBCCAbX
+M8fBKKVbb
+MFFeeSVHU
+ZZZLLS3HU
+
+A 16+
+B 12x
+C 11+
+D 10+
+E 1-
+F 5-
+G 13+
+H 4+
+I 14+
+J 4+
+K 4-
+L 1-
+M 3-
+N 5-
+O 42x
+P 48x
+Q 7560x
+R 11+
+S 24x
+T 16x
+U 2-
+V 3-
+W 8+
+X 3+
+Y 18+
+Z 16+
+a 16+
+b 19+
+c 1-
+d 2-
+e 8-
+f 36x
+
+5 3 8 1 2 7 6 4 9
+3 1 6 8 9 5 4 2 7
+8 6 2 4 5 1 9 7 3
+9 7 3 5 6 2 1 8 4
+7 5 1 3 4 9 8 6 2
+6 4 9 2 3 8 7 5 1
+1 8 4 6 7 3 2 9 5
+4 2 7 9 1 6 5 3 8
+2 9 5 7 8 4 3 1 6
+
+9x9:d11 (medium)
+UKKXXdTbP
+UKBBBdTbP
+ccHZAARLL
+VSHZARRRW
+VSSZAGOIW
+5CQQQGOIW
+FCDQMMMI2
+F6DNNNIIE
+FYYJJJaaE
+
+A 21+
+B 21+
+C 4-
+D 1-
+E 6+
+F 216x
+G 3+
+H 4+
+I 756x
+J 504x
+K 240x
+L 1-
+M 90x
+N 12+
+O 1-
+P 3/
+Q 288x
+R 22+
+S 180x
+T 3-
+U 8+
+V 3/
+W 19+
+X 2/
+Y 3+
+Z 15+
+a 10+
+b 4/
+c 6+
+d 2/
+
+7 5 6 2 4 3 1 8 9
+1 8 9 5 7 6 4 2 3
+4 2 3 8 1 9 7 5 6
+2 9 1 6 8 7 5 3 4
+6 4 5 1 3 2 9 7 8
+5 3 4 9 2 1 8 6 7
+9 7 8 4 6 5 3 1 2
+8 6 7 3 5 4 2 9 1
+3 1 2 7 9 8 6 4 5
+
+9x9:d12 (medium)
+GGNN1QQPP
+cJ2KeOIMM
+cJYKeOIfM
+FFY9VVIfX
+ZRTaUU8XX
+ZRTaWWLLL
+bSSSW9AdL
+bHBBECAdD
+bHBEECDDD
+
+A 10x
+B 252x
+C 2-
+D 18+
+E 13+
+F 1-
+G 11+
+H 2-
+I 63x
+J 9+
+K 48x
+L 24+
+M 15x
+N 11+
+O 35x
+P 16+
+Q 2/
+R 16+
+S 10+
+T 2-
+U 1-
+V 56x
+W 96x
+X 48x
+Y 9+
+Z 7-
+a 2-
+b 16+
+c 7-
+d 3-
+e 2-
+f 1-
+
+6 5 8 3 1 2 4 7 9
+9 8 2 6 4 5 7 1 3
+2 1 4 8 6 7 9 3 5
+3 2 5 9 7 8 1 4 6
+1 9 3 7 5 6 8 2 4
+8 7 1 5 3 4 6 9 2
+4 3 6 1 8 9 2 5 7
+7 6 9 4 2 3 5 8 1
+5 4 7 2 9 1 3 6 8
+
+9x9:d10 (medium)
+ddWWU8VVa
+AAW7UcMaa
+eeBNNcMII
+YSBD2OOOO
+YS2DbbEEO
+F8TTXbKKG
+FJJJXQQGG
+HCCRRPP7Z
+HHHHLLLZZ
+
+A 1-
+B 1-
+C 7-
+D 3-
+E 6+
+F 6-
+G 80x
+H 35+
+I 6-
+J 72x
+K 14+
+L 20x
+M 1-
+N 7-
+O 672x
+P 8+
+Q 4-
+R 2-
+S 28x
+T 7+
+U 2-
+V 13+
+W 9+
+X 18x
+Y 2/
+Z 72x
+a 16+
+b 288x
+c 1-
+d 6x
+e 1-
+
+2 3 1 5 7 8 4 9 6
+4 5 3 7 9 1 6 2 8
+5 6 4 8 1 2 7 3 9
+6 7 5 9 2 3 8 4 1
+3 4 2 6 8 9 5 1 7
+7 8 6 1 3 4 9 5 2
+1 2 9 4 6 7 3 8 5
+9 1 8 3 5 6 2 7 4
+8 9 7 2 4 5 1 6 3
+
+9x9:d10 (medium)
+DW6ZHbbNN
+DWZZHbJTT
+UEEEY8Jcc
+Uhh4YgKKc
+XaBBYgKVV
+XaBdLSSSf
+FIMdLRRRf
+FIMOCCeGQ
+AAAOPPeGQ
+
+A 28x
+B 42x
+C 3-
+D 1-
+E 14x
+F 1-
+G 5-
+H 10+
+I 1-
+J 13+
+K 11+
+L 2/
+M 1-
+N 4/
+O 4-
+P 4/
+Q 7+
+R 20+
+S 14+
+T 6-
+U 24x
+V 11+
+W 1-
+X 6+
+Y 210x
+Z 210x
+a 32x
+b 60x
+c 90x
+d 9+
+e 10+
+f 11+
+g 8-
+h 3/
+
+9 3 6 7 1 4 5 2 8
+8 2 5 6 9 3 4 1 7
+4 7 1 2 5 8 9 6 3
+6 9 3 4 7 1 2 8 5
+5 8 2 3 6 9 1 7 4
+1 4 7 8 2 5 6 3 9
+3 6 9 1 4 7 8 5 2
+2 5 8 9 3 6 7 4 1
+7 1 4 5 8 2 3 9 6
+
+9x9:d11 (medium)
+SSUNNAAXX
+c8UNNNMMX
+cPP3KZZFF
+BB7WKCCYQ
+BBBWEE3YQ
+bVVDGGG2Q
+bJLDTGRRR
+IJLDTOOR3
+IILTTaaHH
+
+A 2-
+B 1890x
+C 2-
+D 56x
+E 5-
+F 11+
+G 23+
+H 2/
+I 16+
+J 3+
+K 3-
+L 20+
+M 2-
+N 3360x
+O 2-
+P 7+
+Q 17+
+R 864x
+S 7-
+T 16+
+U 1-
+V 32x
+W 5-
+X 17+
+Y 6+
+Z 7-
+a 9+
+b 3-
+c 7-
+
+2 9 4 6 8 3 5 7 1
+1 8 3 5 7 2 4 6 9
+8 6 1 3 5 9 2 4 7
+5 3 7 9 2 6 8 1 4
+9 7 2 4 6 1 3 5 8
+6 4 8 1 3 7 9 2 5
+3 1 5 7 9 4 6 8 2
+4 2 6 8 1 5 7 9 3
+7 5 9 2 4 8 1 3 6
+
+9x9:d12 (medium)
+BWWaa7Gee
+BPPggGGYA
+fZZ9SSLYA
+fHHIISLL7
+C5HcEEXXb
+CJJcFRUUb
+CJMMFRQQT
+DDNNNOOKT
+2VVVddOKT
+
+A 9+
+B 2-
+C 63x
+D 13+
+E 10+
+F 28x
+G 21+
+H 36x
+I 10x
+J 17+
+K 18x
+L 48x
+M 2/
+N 13+
+O 18+
+P 5-
+Q 5-
+R 7+
+S 7+
+T 27x
+U 14+
+V 105x
+W 2/
+X 5-
+Y 1-
+Z 9+
+a 3-
+b 2-
+c 4+
+d 2-
+e 1-
+f 2-
+g 4/
+
+3 8 4 6 9 7 5 1 2
+5 1 6 8 2 9 7 3 4
+6 2 7 9 3 1 8 4 5
+8 4 9 2 5 3 1 6 7
+9 5 1 3 6 4 2 7 8
+7 3 8 1 4 2 9 5 6
+1 6 2 4 7 5 3 8 9
+4 9 5 7 1 8 6 2 3
+2 7 3 5 8 6 4 9 1
+
+9x9:d10 (medium)
+aQ6NNHHZZ
+aQSNNPY6L
+OSSbbPYYL
+OJeFFPKMM
+OJeWWEKDM
+AAAIIEED8
+CVddIfBBB
+CVVG9fRRc
+TTTGXXUUc
+
+A 90x
+B 21+
+C 21x
+D 4-
+E 35x
+F 15x
+G 2/
+H 3-
+I 15+
+J 5-
+K 4-
+L 1-
+M 12+
+N 20+
+O 11+
+P 108x
+Q 4/
+R 5-
+S 12+
+T 19+
+U 6+
+V 30x
+W 7-
+X 4/
+Y 45x
+Z 14+
+a 3-
+b 2-
+c 24x
+d 8+
+e 2/
+f 3/
+
+8 2 6 3 1 7 4 9 5
+5 8 3 9 7 4 1 6 2
+4 7 2 8 6 3 9 5 1
+1 4 8 5 3 9 6 2 7
+6 9 4 1 8 5 2 7 3
+2 5 9 6 4 1 7 3 8
+3 6 1 7 5 2 8 4 9
+7 1 5 2 9 6 3 8 4
+9 3 7 4 2 8 5 1 6
+
+9x9:d11 (medium)
+ITWccOOXN
+ITWW9KXXN
+DD5MMKXCC
+RRG7LKEaa
+RYGGLHE9P
+RYYFLHUUP
+BBYFFddAA
+VVFFZZSSQ
+VbbJJJJJQ
+
+A 1-
+B 4-
+C 1-
+D 36x
+E 9+
+F 22+
+G 48x
+H 1-
+I 2-
+J 864x
+K 15+
+L 12+
+M 5-
+N 24x
+O 1-
+P 3+
+Q 40x
+R 36x
+S 10+
+T 2-
+U 7+
+V 20+
+W 18+
+X 105x
+Y 28+
+Z 2-
+a 1-
+b 5-
+c 14x
+d 1-
+
+5 1 6 2 7 9 8 3 4
+7 3 8 4 9 2 1 5 6
+4 9 5 1 6 8 7 2 3
+1 6 2 7 3 5 4 8 9
+2 7 3 8 4 6 5 9 1
+3 8 4 9 5 7 6 1 2
+8 4 9 5 1 3 2 6 7
+9 5 1 6 2 4 3 7 8
+6 2 7 3 8 1 9 4 5
+
+9x9:d12 (medium)
+bbFPP6Vdd
+MHFPccVGG
+MHUUURVaa
+ZAAUJRIaN
+ZZTTJKINN
+QSS7fKDDL
+QOeEfYWLL
+XOeE7YWBB
+XXXEEYCCC
+
+A 10+
+B 1-
+C 15+
+D 4-
+E 12+
+F 21x
+G 1-
+H 6-
+I 3/
+J 11+
+K 12+
+L 54x
+M 10x
+N 14x
+O 3-
+P 13+
+Q 3-
+R 7+
+S 6x
+T 36x
+U 21+
+V 17+
+W 6-
+X 126x
+Y 19+
+Z 17+
+a 336x
+b 3-
+c 5-
+d 8-
+e 40x
+f 3-
+
+7 4 3 8 2 6 5 9 1
+2 8 7 3 6 1 9 4 5
+5 2 1 6 9 4 3 7 8
+4 1 9 5 8 3 2 6 7
+8 5 4 9 3 7 6 1 2
+6 3 2 7 1 5 4 8 9
+9 6 5 1 4 8 7 2 3
+3 9 8 4 7 2 1 5 6
+1 7 6 2 5 9 8 3 4
+
+9x9:d11 (medium)
+H1VWWWWTT
+HHVDDcRRT
+bGGYDcBRJ
+bUYY6FBBJ
+PULLLFdXX
+PSS7AAdOO
+PSCQQZZ9O
+NNCCKKIEE
+NaaMMKIE4
+
+A 8-
+B 13+
+C 7+
+D 90x
+E 15+
+F 5-
+G 32x
+H 18+
+I 5-
+J 3+
+K 18+
+L 18+
+M 2-
+N 14+
+O 240x
+P 10+
+Q 4+
+R 96x
+S 144x
+T 14+
+U 5-
+V 7+
+W 22+
+X 13+
+Y 60x
+Z 11+
+a 14x
+b 15+
+c 3-
+d 1-
+
+9 1 6 5 7 8 2 4 3
+4 5 1 9 2 3 6 8 7
+7 8 4 3 5 6 9 2 1
+8 9 5 4 6 7 1 3 2
+3 4 9 8 1 2 5 7 6
+2 3 8 7 9 1 4 6 5
+5 6 2 1 3 4 7 9 8
+6 7 3 2 4 5 8 1 9
+1 2 7 6 8 9 3 5 4
+
+9x9:d11 (medium)
+NNaMF7YYY
+NLaMFDDUe
+NLccFIUUe
+fOOcEIAAB
+fXPPETTZB
+2XXVCCWZZ
+RRXVJCWbb
+dRQKJSSS1
+d9QKJHHGG
+
+A 5-
+B 2-
+C 14+
+D 3-
+E 7-
+F 17+
+G 14x
+H 2/
+I 4/
+J 140x
+K 4/
+L 4/
+M 4+
+N 1008x
+O 11+
+P 2-
+Q 5+
+R 10+
+S 20+
+T 3-
+U 10+
+V 45x
+W 4-
+X 588x
+Y 9+
+Z 288x
+a 2-
+b 5-
+c 252x
+d 3-
+e 3-
+f 2-
+
+9 4 5 3 8 7 1 6 2
+7 2 3 1 6 5 8 4 9
+4 8 9 7 3 2 5 1 6
+1 5 6 4 9 8 2 7 3
+3 7 8 6 2 1 4 9 5
+2 6 7 5 1 9 3 8 4
+6 1 2 9 5 4 7 3 8
+8 3 4 2 7 6 9 5 1
+5 9 1 8 4 3 6 2 7
+
+9x9:d11 (medium)
+SBB8iiWWW
+SBBMM5FFT
+dNNCZZffT
+dACCJJJOD
+UAAAYYeOD
+UXGKLLeHH
+bXGKccIVg
+bhhEEEIVg
+RRQQPPIaa
+
+A 1134x
+B 21+
+C 8+
+D 14x
+E 17+
+F 5-
+G 9+
+H 5+
+I 14+
+J 192x
+K 2-
+L 5-
+M 3/
+N 2-
+O 6+
+P 5-
+Q 3-
+R 7+
+S 5-
+T 14+
+U 1-
+V 48x
+W 14+
+X 2-
+Y 5-
+Z 21x
+a 3/
+b 2-
+c 5-
+d 1-
+e 8-
+f 14+
+g 2-
+h 4+
+i 6+
+
+6 9 2 8 5 1 3 7 4
+1 4 6 3 9 5 7 2 8
+8 2 4 1 7 3 5 9 6
+9 3 5 2 8 4 6 1 7
+4 7 9 6 3 8 1 5 2
+3 6 8 5 2 7 9 4 1
+5 8 1 7 4 9 2 6 3
+7 1 3 9 6 2 4 8 5
+2 5 7 4 1 6 8 3 9
+
+9x9:d10 (medium)
+2EEGGRRRZ
+EEW7MPXRZ
+bLWTMPXHZ
+bLaTJccHH
+VIaaJJJSS
+VIIOOdU7Q
+VIYB3dUAQ
+KYYBFC5AQ
+KDDBFCNNN
+
+A 72x
+B 13+
+C 3-
+D 4-
+E 360x
+F 3-
+G 1-
+H 30x
+I 17+
+J 1008x
+K 3-
+L 8+
+M 2-
+N 16x
+O 1-
+P 2-
+Q 21+
+R 72x
+S 1-
+T 6+
+U 2-
+V 105x
+W 2-
+X 16+
+Y 36x
+Z 14+
+a 22+
+b 2/
+c 24x
+d 11+
+
+2 9 5 8 7 6 1 4 3
+1 8 4 7 6 5 9 3 2
+8 6 2 5 4 3 7 1 9
+4 2 7 1 9 8 3 6 5
+3 1 6 9 8 7 2 5 4
+5 3 8 2 1 9 4 7 6
+7 5 1 4 3 2 6 9 8
+6 4 9 3 2 1 5 8 7
+9 7 3 6 5 4 8 2 1
+
+9x9:d11 (medium)
+ccJLLLLII
+EEJJMNWTT
+KKJ9MNWbC
+KZJYPPQbC
+ZZ5YRPQbA
+SSSGRRR4A
+9VVGOOFdU
+aDDGG8FdU
+aBBGXXHH1
+
+A 14+
+B 7-
+C 1-
+D 2-
+E 11+
+F 11+
+G 21+
+H 30x
+I 4-
+J 15+
+K 13+
+L 20+
+M 1-
+N 1-
+O 4-
+P 23+
+Q 7+
+R 15+
+S 63x
+T 5-
+U 2-
+V 14+
+W 15+
+X 4-
+Y 11+
+Z 168x
+a 4-
+b 112x
+c 3+
+d 4+
+
+2 1 8 6 7 3 4 5 9
+6 5 3 1 2 7 8 9 4
+5 4 2 9 1 6 7 8 3
+4 3 1 8 9 5 6 7 2
+8 7 5 3 4 9 1 2 6
+1 9 7 5 6 2 3 4 8
+9 8 6 4 5 1 2 3 7
+7 6 4 2 3 8 9 1 5
+3 2 9 7 8 4 5 6 1
+
+9x9:d10 (medium)
+SaQDDDXX7
+SaQJDee7Z
+STQJ6KKAZ
+bTIIGNNAA
+b8HFGYYBA
+PVHFGOYBc
+PVRRWOCCc
+PVVEWOMMU
+LLLEdd7UU
+
+A 26+
+B 15+
+C 10+
+D 240x
+E 3-
+F 10x
+G 84x
+H 8+
+I 7+
+J 1-
+K 3-
+L 14+
+M 3-
+N 4/
+O 315x
+P 18+
+Q 21+
+R 21x
+S 15+
+T 3-
+U 14+
+V 14+
+W 18x
+X 3/
+Y 12+
+Z 1-
+a 3/
+b 14x
+c 5-
+d 4-
+e 5+
+
+5 2 4 8 1 6 9 3 7
+9 6 8 3 5 1 4 7 2
+1 7 9 4 6 2 5 8 3
+7 4 6 1 3 8 2 5 9
+2 8 1 5 7 3 6 9 4
+8 5 7 2 4 9 3 6 1
+4 1 3 7 9 5 8 2 6
+6 3 5 9 2 7 1 4 8
+3 9 2 6 8 4 7 1 5
+
+9x9:d10 (medium)
+3YYYPPKHa
+RRUUUUKHa
+TTdd8DVVV
+TGGFEDCZZ
+OMGFEDCZL
+OMbWWJJZL
+OMbWSQBBL
+cII1SQNNN
+cXXSS8AAA
+
+A 30x
+B 17+
+C 1-
+D 9+
+E 12x
+F 1-
+G 81x
+H 7+
+I 1-
+J 2/
+K 9+
+L 10+
+M 13+
+N 72x
+O 16+
+P 63x
+Q 4-
+R 9+
+S 19+
+T 13+
+U 14+
+V 27x
+W 17+
+X 1-
+Y 19+
+Z 24+
+a 36x
+b 1-
+c 20x
+d 35x
+
+3 5 6 8 9 7 2 1 4
+8 1 2 4 5 3 7 6 9
+2 4 5 7 8 6 1 9 3
+7 9 1 3 4 2 6 5 8
+6 8 9 2 3 1 5 4 7
+9 2 3 5 6 4 8 7 1
+1 3 4 6 7 5 9 8 2
+5 7 8 1 2 9 4 3 6
+4 6 7 9 1 8 3 2 5
+
+9x9:d10 (medium)
+FFZ9ffDDb
+SSZZINNNb
+RRZIIQYEE
+JVVddQYYW
+JccUKXXYW
+PPLUKKeMM
+PHLUTOeM2
+GHCCTOBBA
+GaaCCBBBA
+
+A 63x
+B 17+
+C 19+
+D 4/
+E 15+
+F 13+
+G 9+
+H 2/
+I 10x
+J 4-
+K 162x
+L 1-
+M 10+
+N 23+
+O 12+
+P 18x
+Q 2-
+R 1-
+S 1-
+T 9+
+U 19+
+V 7+
+W 2/
+X 8-
+Y 210x
+Z 15+
+a 4-
+b 15x
+c 12x
+d 4-
+e 1-
+f 3-
+
+6 7 3 9 4 1 2 8 5
+4 5 1 7 2 8 9 6 3
+7 8 4 1 5 2 3 9 6
+9 1 6 3 7 4 5 2 8
+5 6 2 8 3 9 1 7 4
+2 3 8 5 9 6 7 4 1
+3 4 9 6 1 7 8 5 2
+1 2 7 4 8 5 6 3 9
+8 9 5 2 6 3 4 1 7
+
+9x9:d10 (medium)
+WWeeNNNbb
+USHCCXXRR
+USHHOXQcc
+MAHOOIQLL
+MAKVVIQBZ
+M1KVVDGBZ
+5EKJJDGGG
+EEFaPdTTf
+YYFaPdT4f
+
+A 4/
+B 2-
+C 4-
+D 15+
+E 36x
+F 2-
+G 17+
+H 1440x
+I 3-
+J 5-
+K 13+
+L 2/
+M 14+
+N 56x
+O 54x
+P 6+
+Q 162x
+R 5-
+S 30x
+T 210x
+U 1-
+V 945x
+W 1-
+X 8x
+Y 1-
+Z 2-
+a 14+
+b 14+
+c 9+
+d 2-
+e 4-
+f 18x
+
+4 3 6 2 7 8 1 9 5
+7 6 9 5 1 2 4 3 8
+6 5 8 4 9 1 3 2 7
+3 2 5 1 6 7 9 8 4
+9 8 2 7 3 4 6 5 1
+2 1 4 9 5 6 8 7 3
+5 4 7 3 8 9 2 1 6
+1 9 3 8 4 5 7 6 2
+8 7 1 6 2 3 5 4 9
+
+9x9:d11 (medium)
+cIIaaMMWW
+cIKKEbb6e
+OOOKEBBLe
+YYGXTTRLU
+9YGXTTRRU
+VVS9THFQU
+NNSSdHFQ7
+ASSPdJZCD
+AA9PPJZCD
+
+A 15+
+B 7+
+C 2-
+D 9+
+E 15+
+F 13+
+G 1-
+H 4-
+I 10+
+J 24x
+K 28x
+L 12+
+M 3-
+N 3/
+O 32x
+P 240x
+Q 4-
+R 23+
+S 27+
+T 16+
+U 60x
+V 5-
+W 3-
+X 7+
+Y 10+
+Z 2-
+a 3+
+b 3-
+c 56x
+d 3-
+e 12+
+
+8 3 5 2 1 9 6 7 4
+7 2 4 1 9 8 5 6 3
+4 8 1 7 6 5 2 3 9
+1 5 7 4 3 2 8 9 6
+9 4 6 3 2 1 7 8 5
+6 1 3 9 8 7 4 5 2
+2 6 8 5 4 3 9 1 7
+5 9 2 8 7 6 3 4 1
+3 7 9 6 5 4 1 2 8
+
+9x9:d10 (medium)
+aaAAJJfNN
+IIbMeJfYN
+cIbMeQQY4
+cRRVXBBBT
+FFRVXXTTT
+HF2DDGEEW
+H2UZZGCWW
+LPUZKKCCd
+LPOOKKSSd
+
+A 2-
+B 108x
+C 18+
+D 1-
+E 21x
+F 19+
+G 2-
+H 7-
+I 126x
+J 13+
+K 18x
+L 7+
+M 5-
+N 144x
+O 2-
+P 20x
+Q 8-
+R 144x
+S 24x
+T 21+
+U 2-
+V 4-
+W 9+
+X 15+
+Y 7+
+Z 336x
+a 1-
+b 14+
+c 10x
+d 11+
+e 5-
+f 11+
+
+7 8 1 3 4 5 6 2 9
+6 7 9 2 3 4 5 1 8
+2 3 5 7 8 9 1 6 4
+5 6 8 1 2 3 4 9 7
+9 1 3 5 6 7 8 4 2
+8 9 2 4 5 6 7 3 1
+1 2 4 6 7 8 9 5 3
+3 4 6 8 9 1 2 7 5
+4 5 7 9 1 2 3 8 6
+
+9x9:d11 (medium)
+NNZZ1PPRR
+BBDDSSffR
+bb2DIIIYY
+TTaaEE5JJ
+ccAHVVGGQ
+M1AHHVVQQ
+MKLLH1FFQ
+XKUUCOWFd
+XXeeCOWWd
+
+A 5+
+B 7-
+C 1-
+D 14+
+E 5-
+F 432x
+G 2-
+H 18+
+I 20+
+J 5-
+K 6-
+L 7+
+M 56x
+N 2-
+O 9+
+P 10+
+Q 378x
+R 13+
+S 4-
+T 24x
+U 13+
+V 22+
+W 6+
+X 8x
+Y 6+
+Z 1-
+a 8-
+b 2-
+c 2-
+d 11+
+e 15+
+f 7-
+
+3 5 8 9 1 6 4 2 7
+9 2 5 6 7 3 1 8 4
+6 8 2 3 4 9 7 5 1
+4 6 9 1 2 7 5 3 8
+5 7 1 2 3 8 6 4 9
+8 1 4 5 6 2 9 7 3
+7 9 3 4 5 1 8 6 2
+1 3 6 7 8 4 2 9 5
+2 4 7 8 9 5 3 1 6
+
+9x9:d10 (medium)
+bbWDDcccF
+ObWNCII6F
+O6NNCIgZE
+aPP1LTgZE
+aHHULTGBe
+hVRU3TGBe
+hVRUMSSJJ
+KX3dMSAYY
+KXddQQAff
+
+A 3/
+B 6+
+C 3-
+D 3/
+E 3-
+F 5-
+G 7+
+H 5-
+I 54x
+J 11+
+K 3-
+L 1-
+M 3/
+N 56x
+O 40x
+P 5-
+Q 9+
+R 11+
+S 20x
+T 15+
+U 17+
+V 4/
+W 6+
+X 6-
+Y 2/
+Z 6-
+a 5+
+b 180x
+c 112x
+d 240x
+e 4-
+f 5-
+g 40x
+h 8+
+
+4 5 1 3 9 8 7 2 6
+8 9 5 7 4 3 2 6 1
+5 6 2 4 1 9 8 3 7
+2 3 8 1 7 6 5 9 4
+3 4 9 2 8 7 6 1 5
+7 8 4 6 3 2 1 5 9
+1 2 7 9 6 5 4 8 3
+6 7 3 5 2 1 9 4 8
+9 1 6 8 5 4 3 7 2
+
+9x9:d10 (medium)
+9WWIIaaXX
+cc5RIaBBB
+UUUR1GGee
+SSQOOOGDV
+JJQHHNNDV
+LLLYYNNDZ
+LKCPbFFZZ
+AKCPbTF1E
+A8MMbTddE
+
+A 1-
+B 17+
+C 2/
+D 14+
+E 1-
+F 23+
+G 11+
+H 1-
+I 96x
+J 3-
+K 16+
+L 14+
+M 15x
+N 14+
+O 42x
+P 10+
+Q 17+
+R 2-
+S 13+
+T 1-
+U 126x
+V 10+
+W 5-
+X 5-
+Y 1-
+Z 18+
+a 120x
+b 210x
+c 3-
+d 2-
+e 2/
+
+9 6 1 3 4 8 5 7 2
+4 1 5 7 8 3 9 2 6
+6 3 7 9 1 5 2 4 8
+8 5 9 2 3 7 4 6 1
+7 4 8 1 2 6 3 5 9
+5 2 6 8 9 4 1 3 7
+1 7 2 4 5 9 6 8 3
+3 9 4 6 7 2 8 1 5
+2 8 3 5 6 1 7 9 4
+
+9x9:d11 (medium)
+CCAPPLLbM
+OcAAaSSbM
+OcTTaR5JY
+OHWWaRRJY
+UHH9GGdEY
+UXXQQDdE7
+XXFFFDVEE
+3IKBBBVZZ
+IIKKKNNNZ
+
+A 72x
+B 240x
+C 35x
+D 24x
+E 18+
+F 84x
+G 6-
+H 36x
+I 18x
+J 1-
+K 1440x
+L 5-
+M 2-
+N 126x
+O 180x
+P 10+
+Q 1-
+R 16+
+S 6+
+T 8+
+U 2-
+V 8x
+W 6-
+X 20+
+Y 60x
+Z 14x
+a 15+
+b 2/
+c 5-
+d 2-
+
+7 5 4 1 9 3 8 2 6
+9 7 6 3 2 5 1 4 8
+4 2 1 7 6 9 5 8 3
+5 3 2 8 7 1 6 9 4
+6 4 3 9 8 2 7 1 5
+8 6 5 2 1 4 9 3 7
+1 8 7 4 3 6 2 5 9
+3 1 9 6 5 8 4 7 2
+2 9 8 5 4 7 3 6 1
+
+9x9:d10 (medium)
+DD5YYYBBf
+VeFLL2BBf
+VeFZZHHTX
+CCNNZKKTX
+G1aaIIWJJ
+GGQQQIWW6
+PccEAbOOO
+PRREAb3OM
+PddSSUUMM
+
+A 2-
+B 120x
+C 5-
+D 2/
+E 2-
+F 1-
+G 180x
+H 2-
+I 120x
+J 2-
+K 2-
+L 1-
+M 16x
+N 10+
+O 16+
+P 378x
+Q 6+
+R 1-
+S 1-
+T 1-
+U 2-
+V 1-
+W 448x
+X 20x
+Y 378x
+Z 18x
+a 1-
+b 7-
+c 1-
+d 6x
+e 1-
+f 2-
+
+8 4 5 6 7 9 2 3 1
+1 6 7 8 9 2 4 5 3
+2 7 8 9 1 3 5 6 4
+3 8 9 1 2 4 6 7 5
+5 1 2 3 4 6 8 9 7
+4 9 1 2 3 5 7 8 6
+7 3 4 5 6 8 1 2 9
+9 5 6 7 8 1 3 4 2
+6 2 3 4 5 7 9 1 8
+
+9x9:d15 (hard)
+4RRRMMaaQ
+bbTTWWaQQ
+O7HSSYYYP
+OHHLLJ2IP
+NVHDDJIIP
+NVUGDEBBZ
+ccUG9ECZZ
+XAAKKECee
+XXddKFFFF
+
+A 2-
+B 2-
+C 4+
+D 168x
+E 20+
+F 22+
+G 6-
+H 20+
+I 72x
+J 10+
+K 9+
+L 10+
+M 4-
+N 14+
+O 5-
+P 17+
+Q 70x
+R 17+
+S 20x
+T 11+
+U 3-
+V 4-
+W 36x
+X 19+
+Y 48x
+Z 21x
+a 14+
+b 5-
+c 4-
+d 6+
+e 4-
+
+4 9 2 6 7 3 8 1 5
+1 6 8 3 4 9 5 7 2
+2 7 9 4 5 1 6 8 3
+7 3 5 9 1 6 2 4 8
+5 1 3 7 8 4 9 2 6
+9 5 7 2 3 8 4 6 1
+6 2 4 8 9 5 1 3 7
+8 4 6 1 2 7 3 5 9
+3 8 1 5 6 2 7 9 4
+
+9x9:d10 (hard)
+ZJUUUDDII
+ZJbbDDG7I
+8OOPPMGGI
+EEQQ8MeeI
+LLTTSSKXF
+VVVSS2KXF
+NNcHHH5CY
+RRc2ddACY
+aaBBWWAAY
+
+A 17+
+B 11+
+C 1-
+D 27+
+E 6+
+F 2-
+G 21+
+H 36x
+I 252x
+J 11+
+K 2-
+L 5-
+M 2/
+N 3/
+O 5-
+P 1-
+Q 15+
+R 4-
+S 2520x
+T 9+
+U 8+
+V 18+
+W 7+
+X 9+
+Y 360x
+Z 10+
+a 5-
+b 3-
+c 15+
+d 4-
+e 2/
+
+9 5 1 4 3 7 8 6 2
+1 6 2 5 4 8 9 7 3
+8 4 9 3 2 6 7 5 1
+5 1 6 9 8 3 4 2 7
+2 7 3 6 5 9 1 8 4
+4 9 5 8 7 2 3 1 6
+6 2 7 1 9 4 5 3 8
+7 3 8 2 1 5 6 4 9
+3 8 4 7 6 1 2 9 5
