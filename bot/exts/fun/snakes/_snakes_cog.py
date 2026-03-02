@@ -443,8 +443,8 @@ class Snakes(Cog):
             if award_points is not None:
                 _, earned = await add_points(self.bot, ctx.author.id, award_points, game)
                 await ctx.send(
-                f"{random.choice(CORRECT_GUESS)} The correct answer was **{options[answer]}**. "
-                f"(+{earned} pts)"
+                    f"{random.choice(CORRECT_GUESS)} The correct answer was **{options[answer]}**. "
+                    f"(+{earned} pts)"
                 )
             else:
                 await ctx.send(f"{random.choice(CORRECT_GUESS)} The correct answer was **{options[answer]}**.")
