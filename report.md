@@ -36,6 +36,9 @@ Arnau was responsible for the `hint` feature, including the hint logic and coold
 ### [Jonatan Bölenius] - GitHub: [@djonte]
 Jonatan was responsible for the generation of `Mathdoku` boards, using a third party library. Furthermore he implemented the parsing and loading of `Mathdoku` boards into memory in a structured manner together with appropriate unit tests. He also made a first draft of the coloring logic, and contributed to the design and implementation of the `Grid` class.
 
+### [Alexander Mannertorn] — GitHub: [knasssss]
+Alexander was responsible for creating the first version of the Mathdoku Discord cog, which included implementing the `start` command, and functionality for inputting a number on the board and checking if it is a valid input. He also implemented the `rules` feature, and wrote the "Overview of issue(s) and work done" section of the report.
+
 ## Overview of issue(s) and work done.
 
 ### Title: Kenken command #989
