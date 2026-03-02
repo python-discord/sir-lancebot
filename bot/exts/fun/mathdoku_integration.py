@@ -1,13 +1,11 @@
 import asyncio
 import re
+from copy import deepcopy
 from random import choice
-
 
 import discord
 from discord.ext import commands
 from pydis_core.utils.logging import get_logger
-
-from copy import deepcopy
 
 from bot.bot import Bot
 
@@ -15,14 +13,14 @@ CROSS_EMOJI = "\u274c"  # "\u274e"
 MAGNIFYING_EMOJI = "🔍"
 PARTY_EMOJI = "🎉"
 HINT_EMOJI = "💡"
-RULE_EMOJI = '📕'
+RULE_EMOJI = "📕"
 mathdoku_rules = """Rules for Playing Mathdoku
 
-The numbers you can enter on the board depend on the size of the board you selected. If you choose an n × n
-board, you may use the numbers 1, 2, …, n. For example, on a 3 × 3 board you can use the numbers 1, 2, and 3.
+The numbers you can enter on the board depend on the size of the board you selected. If you choose an n x n
+board, you may use the numbers 1, 2, …, n. For example, on a 3 x 3 board you can use the numbers 1, 2, and 3.
 
 The board is divided into cages, which are groups of squares outlined with a thick border. In the top-left
-corner of each cage, a target number and a mathematical operation (+, −, ×, ÷) are shown. The numbers you
+corner of each cage, a target number and a mathematical operation (+, -, x, ÷) are shown. The numbers you
 place in that cage must combine (using the indicated operation) to produce the target number. The operation
 may be applied in any order.
 
@@ -34,7 +32,9 @@ Also note the following rules:
 
 The emojis attached to the board have different functions as well:
 
-🔍 Check: This emoji only appears when the board is full. When pressed, it checks whether the board's conditions are fulfilled. If they are, the board turns green and a victory message is shown. If not, the cages that are not fulfilled turn red.
+🔍 Check: This emoji only appears when the board is full. When pressed, it checks whether the board's conditions are
+fulfilled. If they are, the board turns green and a victory message is shown. If not, the cages that are not fulfilled
+turn red.
 
 💡 Hint: This emoji provides a helpful hint to assist the player in solving the puzzle. It has a cooldown of 3 minutes.
 
@@ -64,8 +64,8 @@ class Mathdoku(commands.Cog):
         await self.bot.invoke_help_command(ctx)
 
     @mathdoku_group.command(name="start")
-    async def start_command(self, ctx: commands.Context, size: int = 5, difficulty:str = "medium") -> None:
-        """Start a game of Mathdoku. Size = the board size (3-9). Difficulty = easy, medium or hard"""
+    async def start_command(self, ctx: commands.Context, size: int = 5, difficulty: str = "medium") -> None:
+        """Start a game of Mathdoku. Size = the board size (3-9). Difficulty = easy, medium or hard."""
         size = int(size)
         difficulty = str(difficulty).lower()
 
@@ -73,27 +73,32 @@ class Mathdoku(commands.Cog):
             await ctx.send("Someone else is playing right now. Please wait your turn.")
             return
 
-        if size not in [3,4,5,6,7,8,9]:
+        if size not in [3, 4, 5, 6, 7, 8, 9]:
             await ctx.send("Please give a valid size between 3 and 9")
             return
-        
+
         if difficulty not in ["easy", "medium", "hard"]:
             await ctx.send("Please give a valid difficulty: easy, medium or hard")
             return
-    
+
         grids_available = self.grids[size][difficulty]
         if len(grids_available) < 1:
-            await ctx.send("Couldn't find any boards for size: " + size + " and difficulty: " + difficulty  + ". Sorry :/")
+            await ctx.send(
+                "Couldn't find any boards for size: " + size + " and difficulty: " + difficulty + ". Sorry :/"
+            )
             return
-        
+
         self.playing = True
         self.player_id = ctx.author.id
-        self.grid = deepcopy(choice(grids_available))  # get a random grid from the available ones for this size / difficulty
+        self.grid = deepcopy(
+            choice(grids_available)
+        )  # get a random grid from the available ones for this size / difficulty
         await ctx.send("Game of Mathdoku has been started!")
         await ctx.send(
-            "Press 🔍 to check if the board's conditions are met (only appears when the board is full)\n" 
+            "Press 🔍 to check if the board's conditions are met (only appears when the board is full)\n"
             "Press 💡 to get a helpful hint on how to solve the puzzle\n"
-            "Press 📕 to get the rules of the Mathdoku game")
+            "Press 📕 to get the rules of the Mathdoku game"
+        )
 
         file = discord.File(self.grid._generate_image(), filename="mathdoku.png")
         self.board = await ctx.send(file=file)
@@ -130,7 +135,7 @@ class Mathdoku(commands.Cog):
             await ctx.send("You took too long. Game over!")
             self.playing = False
             return
-        
+
         except Exception:
             return
 
@@ -210,8 +215,8 @@ class Mathdoku(commands.Cog):
             return True
         return None
 
-    async def magnifying_handler(self, ctx:commands.Context, user:discord.User) -> None:
-        """Handle the magnifiyng glass emoji. Handle board check and Win action"""
+    async def magnifying_handler(self, ctx: commands.Context, user: discord.User) -> None:
+        """Handle the magnifiyng glass emoji. Handle board check and Win action."""
         if self.grid.check_full_grid():
             await self.board.remove_reaction(MAGNIFYING_EMOJI, user)
 
@@ -219,7 +224,7 @@ class Mathdoku(commands.Cog):
             file = discord.File(self.grid._generate_image(), filename="mathdoku.png")
             await self.board.edit(content=None, attachments=[file])
 
-            if result: # WIN
+            if result:  # WIN
                 await self.board.add_reaction(PARTY_EMOJI)
                 await ctx.send(PARTY_EMOJI + " Congrats! You WON " + PARTY_EMOJI)
                 self.playing = False
@@ -238,23 +243,23 @@ class Mathdoku(commands.Cog):
         else:
             await ctx.send(f"Hint: {result['guess']}")
 
-    async def rules_handler(self, ctx:commands.Context, user:discord.User) -> None:
+    async def rules_handler(self, ctx: commands.Context, user: discord.User) -> None:
         """Handle rules request via 📕 reaction."""
         await self.board.remove_reaction(RULE_EMOJI, user)
         self.rules_msg = await ctx.send(mathdoku_rules)
         self.rules_msg_exists = True
 
-    async def resent_message(self, ctx:commands.Context) -> None:
-        """Delete the board message and send again"""
+    async def resent_message(self, ctx: commands.Context) -> None:
+        """Delete the board message and send again."""
         await self.board.delete()
         self.grid.recolor_blocks()
         file = discord.File(self.grid._generate_image(), filename="mathdoku.png")
         self.board = await ctx.send(file=file)
         await self.board.add_reaction(HINT_EMOJI)
         await ctx.send(
-            "Type the square and what number you want to input. Format it like this: A1 3\n"
-            "Type `end` to end game."
+            "Type the square and what number you want to input. Format it like this: A1 3\n" + "Type `end` to end game."
         )
+
 
 async def setup(bot: Bot) -> None:
     """Load the Mathdoku cog."""

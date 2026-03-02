@@ -5,6 +5,7 @@ from bot.bot import Bot
 
 from .mathdoku import Block, Grid
 
+# The boards/grids were generated using this repo: https://github.com/ghfbsd/kenken-maker
 FILE_PATH = Path("bot/resources/fun/mathdoku_boards.txt")
 
 

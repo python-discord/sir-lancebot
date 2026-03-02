@@ -1,32 +1,101 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from io import BytesIO
 from random import randint
+
 from PIL import Image, ImageDraw, ImageFont
+
 from bot.bot import Bot
+
 
 async def setup(bot: Bot) -> None:
     """Setup function to avoid erros."""
     return
 
+
 COLORS = [
-    (255, 50, 50), (255, 66, 50), (255, 81, 50), (255, 96, 50), (255, 111, 50),
-    (255, 126, 50), (255, 141, 50), (255, 156, 50), (255, 171, 50), (255, 187, 50),
-    (255, 202, 50), (255, 217, 50), (255, 232, 50), (255, 247, 50), (247, 255, 50),
-    (232, 255, 50), (217, 255, 50), (202, 255, 50), (187, 255, 50), (171, 255, 50),
-    (156, 255, 50), (141, 255, 50), (126, 255, 50), (111, 255, 50), (96, 255, 50),
-    (81, 255, 50), (66, 255, 50), (50, 255, 50), (50, 255, 66), (50, 255, 81),
-    (50, 255, 96), (50, 255, 111), (50, 255, 126), (50, 255, 141), (50, 255, 156),
-    (50, 255, 171), (50, 255, 186), (50, 255, 202), (50, 255, 217), (50, 255, 232),
-    (50, 255, 247), (50, 247, 255), (50, 232, 255), (50, 217, 255), (50, 202, 255),
-    (50, 186, 255), (50, 171, 255), (50, 156, 255), (50, 141, 255), (50, 126, 255),
-    (50, 111, 255), (50, 96, 255), (50, 81, 255), (50, 66, 255), (50, 50, 255),
-    (66, 50, 255), (81, 50, 255), (96, 50, 255), (111, 50, 255), (126, 50, 255),
-    (141, 50, 255), (156, 50, 255), (171, 50, 255), (187, 50, 255), (202, 50, 255),
-    (217, 50, 255), (232, 50, 255), (247, 50, 255), (255, 50, 247), (255, 50, 232),
-    (255, 50, 217), (255, 50, 202), (255, 50, 187), (255, 50, 171), (255, 50, 156),
-    (255, 50, 141), (255, 50, 126), (255, 50, 111), (255, 50, 96), (255, 50, 81),
+    (255, 50, 50),
+    (255, 66, 50),
+    (255, 81, 50),
+    (255, 96, 50),
+    (255, 111, 50),
+    (255, 126, 50),
+    (255, 141, 50),
+    (255, 156, 50),
+    (255, 171, 50),
+    (255, 187, 50),
+    (255, 202, 50),
+    (255, 217, 50),
+    (255, 232, 50),
+    (255, 247, 50),
+    (247, 255, 50),
+    (232, 255, 50),
+    (217, 255, 50),
+    (202, 255, 50),
+    (187, 255, 50),
+    (171, 255, 50),
+    (156, 255, 50),
+    (141, 255, 50),
+    (126, 255, 50),
+    (111, 255, 50),
+    (96, 255, 50),
+    (81, 255, 50),
+    (66, 255, 50),
+    (50, 255, 50),
+    (50, 255, 66),
+    (50, 255, 81),
+    (50, 255, 96),
+    (50, 255, 111),
+    (50, 255, 126),
+    (50, 255, 141),
+    (50, 255, 156),
+    (50, 255, 171),
+    (50, 255, 186),
+    (50, 255, 202),
+    (50, 255, 217),
+    (50, 255, 232),
+    (50, 255, 247),
+    (50, 247, 255),
+    (50, 232, 255),
+    (50, 217, 255),
+    (50, 202, 255),
+    (50, 186, 255),
+    (50, 171, 255),
+    (50, 156, 255),
+    (50, 141, 255),
+    (50, 126, 255),
+    (50, 111, 255),
+    (50, 96, 255),
+    (50, 81, 255),
+    (50, 66, 255),
+    (50, 50, 255),
+    (66, 50, 255),
+    (81, 50, 255),
+    (96, 50, 255),
+    (111, 50, 255),
+    (126, 50, 255),
+    (141, 50, 255),
+    (156, 50, 255),
+    (171, 50, 255),
+    (187, 50, 255),
+    (202, 50, 255),
+    (217, 50, 255),
+    (232, 50, 255),
+    (247, 50, 255),
+    (255, 50, 247),
+    (255, 50, 232),
+    (255, 50, 217),
+    (255, 50, 202),
+    (255, 50, 187),
+    (255, 50, 171),
+    (255, 50, 156),
+    (255, 50, 141),
+    (255, 50, 126),
+    (255, 50, 111),
+    (255, 50, 96),
+    (255, 50, 81),
     (255, 50, 66),
 ]
+
 
 class Cell:
     """Represent a single cell in the grid."""
@@ -40,15 +109,17 @@ class Cell:
         self.color = None
 
     @property
-    def guess(self):
+    def guess(self) -> int:
+        """Returns the current guess of the cell."""
         return self._guess
 
     @guess.setter
-    def guess(self, new_guess) -> None:
+    def guess(self, new_guess: int) -> None:
+        """Sets the current guess of the cell."""
         self._guess = new_guess
 
     def reset_color(self) -> None:
-        """Reset a cells color attribute to its block color"""
+        """Reset a cells color attribute to its block color."""
         self.color = self.block.color
 
 
@@ -65,11 +136,12 @@ class Block:
         self.color_id = grid.current_color_id
         grid.current_color_id += 1
         self.color = self.compute_color()
-        
 
     def compute_color(self) -> tuple[int, int, int]:
         """Compute the block's color."""
-        return COLORS[(self.color_id * (len(COLORS) // (self.grid.current_color_id)) + self.grid.color_offset) % len(COLORS)]
+        return COLORS[
+            (self.color_id * (len(COLORS) // (self.grid.current_color_id)) + self.grid.color_offset) % len(COLORS)
+        ]
 
 
 class Grid:
@@ -89,7 +161,8 @@ class Grid:
         )  # 2D tupple for cells [row][col]
 
     @property
-    def cells(self):
+    def cells(self) -> tuple[tuple[Cell]]:
+        """Returns the 2d array containing the cells of the grid."""
         return self._cells
 
     def __str__(self) -> str:
@@ -103,8 +176,8 @@ class Grid:
 
     def _latin_square_check(self) -> list[set[int], set[int]]:
         """
-        Check if the grid is filled correctly in terms of a latin square.\n
-        
+        Check if the grid is filled correctly in terms of a latin square.\n.
+
         I.e all numbers in the range per colum and row exist.
         """
         check_row_structure = [[False for col in range(self.size)] for row in range(self.size)]
@@ -134,7 +207,7 @@ class Grid:
 
     def _blocks_fufilled_check(self) -> list[Block]:
         """
-        Check if all the blocks are filled correctly and meet the requirements. \n
+        Check if all the blocks are filled correctly and meet the requirements. \n.
 
         Return the blocks that are wrong or True if all blocks meet the requirements. \n
         Return False if the input is invalid.
@@ -180,7 +253,7 @@ class Grid:
 
     def board_filled_handler(self) -> bool:
         """
-        Handler for when board is filled.\n
+        Handler for when board is filled.\n.
 
         Calls the latin_square_check and blocks_fufilled_check and colors in\n
         the wrong rows, cols and blocks in red. The rest in green. \n
@@ -190,7 +263,7 @@ class Grid:
         for row in self.cells:
             for cell in row:
                 cell.color = (100, 255, 100)
-        
+
         # Find the wrong rows and cols in terms of latin square
         wrong_rows, wrong_cols = self._latin_square_check()
 
@@ -210,7 +283,7 @@ class Grid:
 
         # Find the wrong blocks only if now wrong latin rows or cols
         wrong_blocks = self._blocks_fufilled_check()
-        
+
         # Color in the wrong blocks
         for block in self.blocks:
             if block in wrong_blocks:
@@ -245,40 +318,36 @@ class Grid:
         return self.cells[i]
 
     def _generate_image(
-            self, 
-            cellSize:int =80,
-            margin:int = 30,
-            outfile:str = "mathdoku.png",
-            saveToFile:bool = False
+        self, cell_size: int = 80, margin: int = 30, outfile: str = "mathdoku.png", save_to_file: bool = False
     ) -> BytesIO:
-        """Generate an image from the Grid, return a buffer holding the image"""
-        fontLable = ImageFont.load_default(15)
-        fontGuess = ImageFont.load_default(30)
+        """Generate an image from the Grid, return a buffer holding the image."""
+        font_label = ImageFont.load_default(15)
+        font_guess = ImageFont.load_default(30)
         img = Image.new(
-            "RGB", (cellSize * len(self.cells) + 2 * margin, cellSize * len(self.cells) + 2 * margin), "white"
+            "RGB", (cell_size * len(self.cells) + 2 * margin, cell_size * len(self.cells) + 2 * margin), "white"
         )
         draw = ImageDraw.Draw(img)
 
         for i, row in enumerate(self.cells):
             for j, cell in enumerate(row):
                 # 1) The block color
-                x_start = (cell.column) * cellSize + margin + margin // 2
-                y_start = (cell.row) * cellSize + margin + margin // 2
-                x_end = (cell.column) * cellSize + cellSize + margin + margin // 2
-                y_end = (cell.row) * cellSize + cellSize + margin + margin // 2
+                x_start = (cell.column) * cell_size + margin + margin // 2
+                y_start = (cell.row) * cell_size + margin + margin // 2
+                x_end = (cell.column) * cell_size + cell_size + margin + margin // 2
+                y_end = (cell.row) * cell_size + cell_size + margin + margin // 2
                 color = cell.color
                 draw.rectangle((x_start, y_start, x_end, y_end), fill=color)
 
                 # 2) the guess
                 guess = cell.guess
                 if guess != 0:
-                    draw.text((x_start + 30, y_start + 22), str(guess), fill="black", font=fontGuess)
+                    draw.text((x_start + 30, y_start + 22), str(guess), fill="black", font=font_guess)
 
                 # 3) the lines between the cells
                 thin_line_width = 2
-                draw.line((x_start, y_start, x_start + cellSize, y_start), fill="black", width=thin_line_width)
+                draw.line((x_start, y_start, x_start + cell_size, y_start), fill="black", width=thin_line_width)
                 draw.line((x_end, y_start, x_end, y_end), fill="black", width=thin_line_width)
-                draw.line((x_start, y_start, x_start, y_start + cellSize), fill="black", width=thin_line_width)
+                draw.line((x_start, y_start, x_start, y_start + cell_size), fill="black", width=thin_line_width)
                 draw.line((x_start, y_end, x_end, y_end), fill="black", width=thin_line_width)
 
                 n_over = 1
@@ -313,22 +382,22 @@ class Grid:
             # 4) the lable of the block - in the top left corner of the lable cell
             label_cell = block.label_cell
             label = str(block.number) + " " + str(block.operation)
-            x_start = (label_cell.column) * cellSize + margin + margin // 2
-            y_start = (label_cell.row) * cellSize + margin + margin // 2
+            x_start = (label_cell.column) * cell_size + margin + margin // 2
+            y_start = (label_cell.row) * cell_size + margin + margin // 2
             # print("Label:" + label )
-            draw.text((x_start + 4, y_start + 2), str(label), fill="black", font=fontLable)
+            draw.text((x_start + 4, y_start + 2), str(label), fill="black", font=font_label)
 
         # 5) the x axis description A-...
         for i in range(self.size):
             text = chr(ord("A") + i)
-            draw.text((margin + 30 + i * cellSize + margin // 2, 4), str(text), fill="black", font=fontGuess)
+            draw.text((margin + 30 + i * cell_size + margin // 2, 4), str(text), fill="black", font=font_guess)
 
         # 6) the y axis description 1-...
         for j in range(self.size):
             text = str(j + 1)
-            draw.text((13, margin + 22 + j * cellSize + margin // 2), str(text), fill="black", font=fontGuess)
+            draw.text((13, margin + 22 + j * cell_size + margin // 2), str(text), fill="black", font=font_guess)
 
-        if saveToFile:
+        if save_to_file:
             img.save(outfile)
 
         buffer = BytesIO()
@@ -347,7 +416,7 @@ class Grid:
 
     def hint(self, now: datetime | None = None) -> dict:
         """Return a hint for the first empty cell, or cooldown/all-filled info if a hint cannot be given."""
-        current_time = datetime.now() if now is None else now
+        current_time = datetime.now(UTC) if now is None else now
 
         if self._last_hint_timestamp is not None:
             elapsed = (current_time - self._last_hint_timestamp).total_seconds()
@@ -371,9 +440,9 @@ class Grid:
             "guess": f"{coord} {cell.correct}",
         }
 
-    def add_guess(self, guess) -> bool:
+    def add_guess(self, guess: str) -> bool:
         """
-        Take the user guess and check if its valid, if it is -> add to cell
+        Take the user guess and check if its valid, if it is -> add to cell.
 
         A guess is in format A5 4, where A = column, 5 = row and 4 = guessed value.
         """
