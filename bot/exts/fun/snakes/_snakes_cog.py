@@ -417,7 +417,7 @@ class Snakes(Cog):
         answer: str,
         options: dict[str, str],
         *,
-        award_points: int | None = None,
+        award_points: int,
     ) -> None:
         """Validate the answer using a reaction event loop."""
         def predicate(reaction: Reaction, user: Member) -> bool:
@@ -440,14 +440,11 @@ class Snakes(Cog):
             return
 
         if str(reaction.emoji) == ANSWERS_EMOJI[answer]:
-            if award_points is not None:
-                _, earned = await add_points(self.bot, ctx.author.id, award_points, SNAKE_QUIZ_GAME_NAME)
-                await ctx.send(
-                    f"{random.choice(CORRECT_GUESS)} The correct answer was **{options[answer]}**. "
-                    f"(+{earned} pts)"
-                )
-            else:
-                await ctx.send(f"{random.choice(CORRECT_GUESS)} The correct answer was **{options[answer]}**.")
+            _, earned = await add_points(self.bot, ctx.author.id, award_points, SNAKE_QUIZ_GAME_NAME)
+            await ctx.send(
+                f"{random.choice(CORRECT_GUESS)} The correct answer was **{options[answer]}**. "
+                f"(+{earned} pts)"
+            )
         else:
             await ctx.send(
                 f"{random.choice(INCORRECT_GUESS)} The correct answer was **{options[answer]}**."
