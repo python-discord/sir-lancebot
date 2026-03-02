@@ -150,19 +150,16 @@ class Game:
             try:
                 reaction, user = await self.bot.wait_for("reaction_add", check=self.predicate, timeout=30.0)
             except TimeoutError:
+                message = (
+                        f"{self.player_active.mention}, you took too long. Game over! "
+                        f"{self.player_inactive.mention} wins!"
+                )
                 if isinstance(self.player_inactive, Member):
                     _, earned = await add_points(
                         self.bot, self.player_inactive.id, CONNECT_FOUR_WIN_POINTS, "connect_four"
                     )
-                    await self.channel.send(
-                        f"{self.player_active.mention}, you took too long. Game over! "
-                        f"{self.player_inactive.mention} wins! (+{earned} pts)"
-                    )
-                else:
-                    await self.channel.send(
-                        f"{self.player_active.mention}, you took too long. Game over! "
-                        f"{self.player_inactive.mention} wins!"
-                    )
+                    message += f" (+{earned} pts)"
+                await self.channel.send(message)
                 return None
             else:
                 await message.delete()
