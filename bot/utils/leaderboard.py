@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import operator
 from typing import TYPE_CHECKING
 
 from async_rediscache import RedisCache
