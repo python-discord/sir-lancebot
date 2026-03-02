@@ -18,6 +18,11 @@ from bot.utils.leaderboard import add_points
 DUCK_GAME_FIRST_PLACE_POINTS = 30
 DUCK_GAME_SECOND_PLACE_POINTS = 20
 DUCK_GAME_THIRD_PLACE_POINTS = 10
+DUCK_GAME_POINT_AWARDS = (
+    DUCK_GAME_FIRST_PLACE_POINTS,
+    DUCK_GAME_SECOND_PLACE_POINTS,
+    DUCK_GAME_THIRD_PLACE_POINTS,
+)
 DUCK_GAME_NAME = "duck_game"
 
 DECK = list(product(*[(0, 1, 2)]*4))
@@ -304,21 +309,18 @@ class DuckGamesDirector(commands.Cog):
             reverse=True,
         )
 
-        # Award leaderboard points to top 3 players
-        point_awards = [
-            DUCK_GAME_FIRST_PLACE_POINTS,
-            DUCK_GAME_SECOND_PLACE_POINTS,
-            DUCK_GAME_THIRD_PLACE_POINTS
-        ]
+        # Award leaderboard points to top finishers (number of places from DUCK_GAME_POINT_AWARDS)
         earned_points = {}
-        for rank, (member, score) in enumerate(scores[:3]):
+        for rank, (member, score) in enumerate(scores[:len(DUCK_GAME_POINT_AWARDS)]):
             if score > 0:
-                _, earned = await add_points(self.bot, member.id, point_awards[rank], DUCK_GAME_NAME)
+                _, earned = await add_points(
+                    self.bot, member.id, DUCK_GAME_POINT_AWARDS[rank], DUCK_GAME_NAME
+                )
                 earned_points[member.id] = earned
 
         scoreboard = "Final scores:\n\n"
         for rank, (member, score) in enumerate(scores):
-            if rank < 3 and score > 0 and member.id in earned_points:
+            if rank < len(DUCK_GAME_POINT_AWARDS) and score > 0 and member.id in earned_points:
                 scoreboard += f"{member.display_name}: {score} (+{earned_points[member.id]} global pts)\n"
             else:
                 scoreboard += f"{member.display_name}: {score}\n"
