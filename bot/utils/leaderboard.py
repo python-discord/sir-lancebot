@@ -114,7 +114,7 @@ async def get_leaderboard(bot: Bot) -> list[tuple[int, int]]:
 
     return sorted(
         ((int(user_id), int(score)) for user_id, score in records if int(score) > 0),
-        key=lambda x: x[1],
+        key=operator.itemgetter(1),
         reverse=True,
     )
 
