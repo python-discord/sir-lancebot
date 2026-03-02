@@ -69,10 +69,7 @@ async def add_points(bot: Bot, user_id: int, points: int, game_name: str) -> tup
 
     # update persistent global total
     points_cache = await _get_points_cache()
-    if await points_cache.contains(user_id):
-        await points_cache.increment(user_id, points_earned)
-    else:
-        await points_cache.set(user_id, points_earned)
+    await points_cache.increment(user_id, points_earned)
 
     new_total = int(await points_cache.get(user_id))
     return (new_total, points_earned)
