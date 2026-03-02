@@ -12,6 +12,7 @@ from bot.constants import Colours
 from bot.utils.leaderboard import add_points
 
 EGGQUIZ_WIN_POINTS = 10
+EGGQUIZ_GAME_NAME = "eggquiz"
 log = get_logger(__name__)
 
 EGGHEAD_QUESTIONS = loads(Path("bot/resources/holidays/easter/egghead_questions.json").read_text("utf8"))
@@ -109,7 +110,7 @@ class EggheadQuiz(commands.Cog):
 
         points_earned = {}
         for u in winners:
-            _, earned = await add_points(ctx.bot, u.id, EGGQUIZ_WIN_POINTS, "eggquiz")
+            _, earned = await add_points(ctx.bot, u.id, EGGQUIZ_WIN_POINTS, EGGQUIZ_GAME_NAME)
             points_earned[u.id] = earned
 
         mentions = " ".join(u.mention for u in winners)

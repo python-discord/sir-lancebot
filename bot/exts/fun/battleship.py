@@ -12,6 +12,7 @@ from bot.constants import Colours, Emojis
 from bot.utils.leaderboard import add_points
 
 BATTLESHIP_WIN_POINTS = 30
+BATTLESHIP_GAME_NAME = "battleship"
 
 
 log = get_logger(__name__)
@@ -154,7 +155,7 @@ class Game:
         loser: discord.Member
     ) -> None:
         """Removes games from list of current games and announces to public chat."""
-        _, earned = await add_points(self.bot, winner.id, BATTLESHIP_WIN_POINTS, "battleship")
+        _, earned = await add_points(self.bot, winner.id, BATTLESHIP_WIN_POINTS, BATTLESHIP_GAME_NAME)
         header = f"Game Over! {winner.mention} won against {loser.mention} (+{earned} pts)"
 
         for i, player in enumerate((self.p1, self.p2)):
@@ -251,7 +252,7 @@ class Game:
             except TimeoutError:
                 await self.turn.user.send("You took too long. Game over!")
                 await self.next.user.send(f"{self.turn.user} took too long. Game over!")
-                _, earned = await add_points(self.bot, self.next.user.id, BATTLESHIP_WIN_POINTS, "battleship")
+                _, earned = await add_points(self.bot, self.next.user.id, BATTLESHIP_WIN_POINTS, BATTLESHIP_GAME_NAME)
                 await self.public_channel.send(
                     f"Game over! {self.turn.user.mention} timed out so {self.next.user.mention} wins! "
                     f"(+{earned} pts)"
@@ -261,7 +262,9 @@ class Game:
             else:
                 if self.surrender:
                     await self.next.user.send(f"{self.turn.user} surrendered. Game over!")
-                    _, earned = await add_points(self.bot, self.next.user.id, BATTLESHIP_WIN_POINTS, "battleship")
+                    _, earned = await add_points(
+                        self.bot, self.next.user.id, BATTLESHIP_WIN_POINTS, BATTLESHIP_GAME_NAME
+                    )
                     await self.public_channel.send(
                         f"Game over! {self.turn.user.mention} surrendered to {self.next.user.mention}! "
                         f"(+{earned} pts)"
@@ -284,7 +287,7 @@ class Game:
             await self.turn.user.send(f"You've sunk their {square.boat} ship!", delete_after=3.0)
             alert_messages.append(await self.next.user.send(f"Oh no! Your {square.boat} ship sunk!"))
             if self.check_gameover(self.next.grid):
-                _, earned = await add_points(self.bot, self.turn.user.id, BATTLESHIP_WIN_POINTS, "battleship")
+                _, earned = await add_points(self.bot, self.turn.user.id, BATTLESHIP_WIN_POINTS, BATTLESHIP_GAME_NAME)
                 await self.turn.user.send(f"You win! (+{earned} pts)")
                 await self.next.user.send("You lose!")
                 self.gameover = True

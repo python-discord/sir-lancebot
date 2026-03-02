@@ -10,6 +10,7 @@ from bot.utils.leaderboard import add_points
 from bot.utils.pagination import LinePaginator
 
 TIC_TAC_TOE_WIN_POINTS = 10
+TIC_TAC_TOE_GAME_NAME = "tic_tac_toe"
 
 CONFIRMATION_MESSAGE = (
     "{opponent}, {requester} wants to play Tic-Tac-Toe against you."
@@ -226,7 +227,7 @@ class Game:
                 # Only award points to real users (not the AI/bot)
                 if isinstance(self.current, Player):
                     _, earned = await add_points(
-                        self.ctx.bot, self.current.user.id, TIC_TAC_TOE_WIN_POINTS, "tic_tac_toe"
+                        self.ctx.bot, self.current.user.id, TIC_TAC_TOE_WIN_POINTS, TIC_TAC_TOE_GAME_NAME
                     )
                     await self.ctx.send(
                         f":tada: {self.current} won this game! :tada: (+{earned} pts)"

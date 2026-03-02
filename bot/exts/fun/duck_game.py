@@ -18,6 +18,7 @@ from bot.utils.leaderboard import add_points
 DUCK_GAME_FIRST_PLACE_POINTS = 30
 DUCK_GAME_SECOND_PLACE_POINTS = 20
 DUCK_GAME_THIRD_PLACE_POINTS = 10
+DUCK_GAME_NAME = "duck_game"
 
 DECK = list(product(*[(0, 1, 2)]*4))
 
@@ -312,7 +313,7 @@ class DuckGamesDirector(commands.Cog):
         earned_points = {}
         for rank, (member, score) in enumerate(scores[:3]):
             if score > 0:
-                _, earned = await add_points(self.bot, member.id, point_awards[rank], "duck_game")
+                _, earned = await add_points(self.bot, member.id, point_awards[rank], DUCK_GAME_NAME)
                 earned_points[member.id] = earned
 
         scoreboard = "Final scores:\n\n"

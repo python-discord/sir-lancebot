@@ -13,6 +13,7 @@ from bot.utils.exceptions import UserNotPlayingError
 from bot.utils.leaderboard import add_points
 
 MINESWEEPER_WIN_POINTS = 15
+MINESWEEPER_GAME_NAME = "minesweeper"
 
 MESSAGE_MAPPING = {
     0: ":stop_button:",
@@ -199,7 +200,7 @@ class Minesweeper(commands.Cog):
         """The player won the game."""
         game = self.games[ctx.author.id]
         points = self.points_by_user.get(ctx.author.id, 6)
-        _, earned = await add_points(self.bot, ctx.author.id, points, "minesweeper")
+        _, earned = await add_points(self.bot, ctx.author.id, points, MINESWEEPER_GAME_NAME)
         await ctx.author.send(f":tada: You won! :tada: (+{earned} pts)")
         if game.activated_on_server:
             await game.chat_msg.channel.send(

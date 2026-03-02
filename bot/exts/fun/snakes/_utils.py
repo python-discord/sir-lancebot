@@ -15,6 +15,7 @@ from bot.constants import Emojis, MODERATION_ROLES
 from bot.utils.leaderboard import add_points
 
 SNAKES_AND_LADDERS_WIN_POINTS = 15
+SNAKES_AND_LADDERS_GAME_NAME = "snakes_and_ladders"
 
 SNAKE_RESOURCES = Path("bot/resources/fun/snakes").absolute()
 
@@ -687,7 +688,9 @@ class SnakeAndLaddersGame:
             return
 
         # announce winner and exit
-        _, earned = await add_points(self.ctx.bot, winner.id, SNAKES_AND_LADDERS_WIN_POINTS, "snakes_and_ladders")
+        _, earned = await add_points(
+            self.ctx.bot, winner.id, SNAKES_AND_LADDERS_WIN_POINTS, SNAKES_AND_LADDERS_GAME_NAME
+        )
         await self.channel.send(
             f"**Snakes and Ladders**: {winner.mention} has won the game! :tada: "
             f"(+{earned} pts)"

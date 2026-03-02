@@ -25,6 +25,7 @@ from bot.utils.decorators import locked
 from bot.utils.leaderboard import add_points
 
 SNAKE_QUIZ_WIN_POINTS = 10
+SNAKE_QUIZ_GAME_NAME = "snakes_quiz"
 
 log = get_logger(__name__)
 
@@ -417,7 +418,6 @@ class Snakes(Cog):
         options: dict[str, str],
         *,
         award_points: int | None = None,
-        game: str = "snakes_quiz",
     ) -> None:
         """Validate the answer using a reaction event loop."""
         def predicate(reaction: Reaction, user: Member) -> bool:
@@ -441,7 +441,7 @@ class Snakes(Cog):
 
         if str(reaction.emoji) == ANSWERS_EMOJI[answer]:
             if award_points is not None:
-                _, earned = await add_points(self.bot, ctx.author.id, award_points, game)
+                _, earned = await add_points(self.bot, ctx.author.id, award_points, SNAKE_QUIZ_GAME_NAME)
                 await ctx.send(
                     f"{random.choice(CORRECT_GUESS)} The correct answer was **{options[answer]}**. "
                     f"(+{earned} pts)"
@@ -864,7 +864,7 @@ class Snakes(Cog):
         )
 
         quiz = await ctx.send(embed=embed)
-        await self._validate_answer(ctx, quiz, answer, options, award_points=SNAKE_QUIZ_WIN_POINTS, game="snakes_quiz")
+        await self._validate_answer(ctx, quiz, answer, options, award_points=SNAKE_QUIZ_WIN_POINTS)
 
     @snakes_group.command(name="name", aliases=("name_gen",))
     async def name_command(self, ctx: Context, *, name: str | None = None) -> None:

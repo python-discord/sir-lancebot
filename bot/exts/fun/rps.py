@@ -6,6 +6,7 @@ from bot.bot import Bot
 from bot.utils.leaderboard import add_points
 
 RPS_WIN_POINTS = 2
+RPS_GAME_NAME = "rps"
 
 CHOICES = ["rock", "paper", "scissors"]
 SHORT_CHOICES = ["r", "p", "s"]
@@ -53,7 +54,7 @@ class RPS(commands.Cog):
             message_string = f"{player_mention} You and Sir Lancebot played {bot_move}, it's a tie."
             await ctx.send(message_string)
         elif player_result == 1:
-            _, earned = await add_points(self.bot, ctx.author.id, RPS_WIN_POINTS, "rps")
+            _, earned = await add_points(self.bot, ctx.author.id, RPS_WIN_POINTS, RPS_GAME_NAME)
             await ctx.send(f"Sir Lancebot played {bot_move}! {player_mention} won! (+{earned} pts)")
         else:
             await ctx.send(f"Sir Lancebot played {bot_move}! {player_mention} lost!")

@@ -22,6 +22,7 @@ from bot.utils.leaderboard import add_points
 logger = get_logger(__name__)
 
 DEFAULT_QUESTION_LIMIT = 7
+TRIVIA_QUIZ_GAME_NAME = "quiz"
 STANDARD_VARIATION_TOLERANCE = 88
 DYNAMICALLY_GEN_VARIATION_TOLERANCE = 97
 
@@ -493,7 +494,7 @@ class TriviaQuiz(commands.Cog):
                     self.player_scores[msg.author] = points
 
                 hint_no = 0
-                _, earned = await add_points(self.bot, msg.author.id, leaderboard_points, "quiz")
+                _, earned = await add_points(self.bot, msg.author.id, leaderboard_points, TRIVIA_QUIZ_GAME_NAME)
                 await ctx.send(
                     f"{msg.author.mention} got the correct answer :tada: "
                     f"{points} points! (+{earned} global pts)"

@@ -12,6 +12,7 @@ from bot.constants import Colours
 from bot.utils.leaderboard import add_points
 
 ANAGRAM_WIN_POINTS = 10
+ANAGRAM_GAME_NAME = "anagram"
 
 log = get_logger(__name__)
 
@@ -84,7 +85,7 @@ class Anagram(commands.Cog):
             win_list = ", ".join(game.winners)
             points_earned = set()
             for winner_id in game.winner_ids:
-                _, earned = await add_points(self.bot, winner_id, ANAGRAM_WIN_POINTS, "anagram")
+                _, earned = await add_points(self.bot, winner_id, ANAGRAM_WIN_POINTS, ANAGRAM_GAME_NAME)
                 points_earned.add(earned)
             if len(points_earned) == 1:
                 pts = points_earned.pop()

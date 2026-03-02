@@ -7,6 +7,7 @@ from bot.constants import Emojis
 from bot.utils.leaderboard import add_points
 
 COINFLIP_WIN_POINTS = 2
+COINFLIP_GAME_NAME = "coinflip"
 
 
 class CoinSide(commands.Converter):
@@ -48,7 +49,7 @@ class CoinFlip(commands.Cog):
             return
 
         if side == flipped_side:
-            _, earned = await add_points(self.bot, ctx.author.id, COINFLIP_WIN_POINTS, "coinflip")
+            _, earned = await add_points(self.bot, ctx.author.id, COINFLIP_WIN_POINTS, COINFLIP_GAME_NAME)
             message += f"You guessed correctly! {Emojis.lemon_hyperpleased} (+{earned} pts)"
         else:
             message += f"You guessed incorrectly. {Emojis.lemon_pensive}"

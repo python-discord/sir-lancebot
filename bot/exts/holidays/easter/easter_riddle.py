@@ -11,6 +11,7 @@ from bot.constants import Colours, NEGATIVE_REPLIES
 from bot.utils.leaderboard import add_points
 
 EASTER_RIDDLE_WIN_POINTS = 10
+EASTER_RIDDLE_GAME_NAME = "easter_riddle"
 
 log = get_logger(__name__)
 
@@ -88,7 +89,7 @@ class EasterRiddle(commands.Cog):
                 await ctx.send(embed=hint_embed)
 
         if winner_id is not None:
-            new_total, earned = await add_points(self.bot, winner_id, EASTER_RIDDLE_WIN_POINTS, "easter_riddle")
+            new_total, earned = await add_points(self.bot, winner_id, EASTER_RIDDLE_WIN_POINTS, EASTER_RIDDLE_GAME_NAME)
             content = f"Well done {winner} for getting it right! (+{earned} pts)"
         else:
             content = "Nobody got it right..."

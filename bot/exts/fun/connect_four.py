@@ -11,6 +11,7 @@ from bot.constants import Emojis
 from bot.utils.leaderboard import add_points
 
 CONNECT_FOUR_WIN_POINTS = 15
+CONNECT_FOUR_GAME_NAME = "connect_four"
 
 NUMBERS = list(Emojis.number_emojis.values())
 CROSS_EMOJI = Emojis.incident_unactioned
@@ -79,7 +80,7 @@ class Game:
         """Announces to public chat."""
         if action == "win":
             if isinstance(player1, Member):
-                _, earned = await add_points(self.bot, player1.id, CONNECT_FOUR_WIN_POINTS, "connect_four")
+                _, earned = await add_points(self.bot, player1.id, CONNECT_FOUR_WIN_POINTS, CONNECT_FOUR_GAME_NAME)
                 await self.channel.send(
                     f"Game Over! {player1.mention} won against {player2.mention} (+{earned} pts)"
                 )
@@ -91,7 +92,7 @@ class Game:
             await self.channel.send(f"Game Over! {player1.mention} {player2.mention} It's A Draw :tada:")
         elif action == "quit":
             if isinstance(player2, Member):
-                _, earned = await add_points(self.bot, player2.id, CONNECT_FOUR_WIN_POINTS, "connect_four")
+                _, earned = await add_points(self.bot, player2.id, CONNECT_FOUR_WIN_POINTS, CONNECT_FOUR_GAME_NAME)
                 await self.channel.send(
                     f"{player1.mention} surrendered. {player2.mention} wins! Game over! (+{earned} pts)"
                 )
