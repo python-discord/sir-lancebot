@@ -2,6 +2,11 @@ from datetime import datetime
 from io import BytesIO
 from random import randint
 from PIL import Image, ImageDraw, ImageFont
+from bot.bot import Bot
+
+async def setup(bot: Bot) -> None:
+    """Setup function to avoid erros."""
+    return
 
 COLORS = [
     (255, 50, 50), (255, 66, 50), (255, 81, 50), (255, 96, 50), (255, 111, 50),
