@@ -63,7 +63,6 @@ class EasterRiddle(commands.Cog):
         await ctx.send(embed=riddle_embed)
         hint_number = 0
         winner = None
-        winner_id = None
         while hint_number < 3:
             try:
                 response = await self.bot.wait_for(
@@ -73,8 +72,7 @@ class EasterRiddle(commands.Cog):
                     and m.content.lower() == correct.lower(),
                     timeout=TIMELIMIT,
                 )
-                winner = response.author.mention
-                winner_id = response.author.id
+                winner = response.author
                 break
             except TimeoutError:
                 hint_number += 1
@@ -88,9 +86,9 @@ class EasterRiddle(commands.Cog):
                     break
                 await ctx.send(embed=hint_embed)
 
-        if winner_id is not None:
-            new_total, earned = await add_points(self.bot, winner_id, EASTER_RIDDLE_WIN_POINTS, EASTER_RIDDLE_GAME_NAME)
-            content = f"Well done {winner} for getting it right! (+{earned} pts)"
+        if winner.id is not None:
+            new_total, earned = await add_points(self.bot, winner.id, EASTER_RIDDLE_WIN_POINTS, EASTER_RIDDLE_GAME_NAME)
+            content = f"Well done {winner.mention} for getting it right! (+{earned} pts)"
         else:
             content = "Nobody got it right..."
 
