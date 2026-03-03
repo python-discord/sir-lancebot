@@ -106,7 +106,7 @@ class EggheadQuiz(commands.Cog):
             # with the correct answer, so stop looping over reactions.
             break
 
-        winners = [u for u in users if not u.bot]
+        winners = tuple(u for u in users if not u.bot)
 
         points_earned = {}
         for u in winners:

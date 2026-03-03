@@ -6,7 +6,7 @@ from discord.ext import commands
 from bot.bot import Bot
 from bot.constants import Colours, MODERATION_ROLES
 from bot.utils.decorators import with_role
-from bot.utils.leaderboard import get_daily_leaderboard, get_leaderboard, get_user_points, get_user_rank
+from bot.utils.leaderboard import POINTS_CACHE, get_daily_leaderboard, get_leaderboard, get_user_points, get_user_rank
 from bot.utils.pagination import LinePaginator
 
 DUCK_COIN_THUMBNAIL = (
@@ -58,10 +58,12 @@ class ConfirmClear(ui.View):
     @ui.button(label="Confirm", style=ButtonStyle.danger)
     async def confirm(self, interaction: Interaction, _button: ui.Button) -> None:
         """Clear the leaderboard on confirmation."""
-        from bot.utils.leaderboard import _get_points_cache
+        if POINTS_CACHE is None:
+            await interaction.response.send_message("Leaderboard cache is not initialized.")
+            self.stop()
+            return
 
-        points_cache = await _get_points_cache()
-        await points_cache.clear()
+        await POINTS_CACHE.clear()
         await interaction.response.send_message("Leaderboard has been cleared.")
         self.stop()
 
@@ -79,6 +81,11 @@ class Leaderboard(commands.Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
+
+    async def cog_load(self) -> None:
+        """Register the global cache when the cog loads."""
+        from bot.utils import leaderboard
+        leaderboard.POINTS_CACHE = self.points_cache
 
     @commands.group(name="leaderboard", aliases=("lb", "points"), invoke_without_command=True)
     async def leaderboard_command(self, ctx: commands.Context) -> None:

@@ -19,16 +19,13 @@ DAILY_POINT_CAP = 100
 # Prefix for daily cap keys stored directly in Redis (not via RedisCache).
 _DAILY_KEY_PREFIX = "leaderboard:daily"
 
+#Global points cache, set by the Leaderboard cog on load.
+POINTS_CACHE: RedisCache | None = None
+
 
 def _daily_key(user_id: int, game_name: str) -> str:
     """Build a namespaced Redis key for daily point tracking."""
     return f"{_DAILY_KEY_PREFIX}:{user_id}:{game_name}"
-
-
-async def _get_points_cache() -> RedisCache:
-    """Get the persistent points cache from the Leaderboard cog."""
-    from bot.exts.fun.leaderboard import Leaderboard
-    return Leaderboard.points_cache
 
 
 async def add_points(bot: Bot, user_id: int, points: int, game_name: str) -> tuple[int, int]:
@@ -68,13 +65,9 @@ async def add_points(bot: Bot, user_id: int, points: int, game_name: str) -> tup
     await redis.set(daily_key, earned_today + points_earned, ex=ttl)
 
     # update persistent global total
-    points_cache = await _get_points_cache()
-    if await points_cache.contains(user_id):
-        await points_cache.increment(user_id, points_earned)
-    else:
-        await points_cache.set(user_id, points_earned)
+    await POINTS_CACHE.increment(user_id, points_earned)
 
-    new_total = int(await points_cache.get(user_id))
+    new_total = int(await POINTS_CACHE.get(user_id))
     return (new_total, points_earned)
 
 
@@ -85,18 +78,16 @@ async def remove_points(bot: Bot, user_id: int, points: int) -> int:
     Score will not go below 0. Returns the user's new total score,
     or 0 if the cog is not loaded.
     """
-    if points <= 0 or bot.get_cog("Leaderboard") is None:
+    if points <= 0 or bot.get_cog("Leaderboard") is None or POINTS_CACHE is None:
         return await get_user_points(bot, user_id)
 
-    points_cache = await _get_points_cache()
-
-    current = await points_cache.get(user_id)
+    current = await POINTS_CACHE.get(user_id)
     if not current:
         return 0
 
     current = int(current)
     to_remove = min(points, current)
-    await points_cache.decrement(user_id, to_remove)
+    await POINTS_CACHE.decrement(user_id, to_remove)
 
     return current - to_remove
 
@@ -107,11 +98,10 @@ async def get_leaderboard(bot: Bot) -> list[tuple[int, int]]:
 
     Returns a list of (user_id, score) tuples sorted by score descending.
     """
-    if bot.get_cog("Leaderboard") is None:
+    if bot.get_cog("Leaderboard") is None or POINTS_CACHE is None:
         return []
 
-    points_cache = await _get_points_cache()
-    records = await points_cache.items()
+    records = await POINTS_CACHE.items()
 
     return sorted(
         ((int(user_id), int(score)) for user_id, score in records if int(score) > 0),
@@ -176,9 +166,8 @@ async def get_user_rank(
 
 async def get_user_points(bot: Bot, user_id: int) -> int:
     """Get a specific user's total points."""
-    if bot.get_cog("Leaderboard") is None:
+    if bot.get_cog("Leaderboard") is None or POINTS_CACHE is None:
         return 0
 
-    points_cache = await _get_points_cache()
-    score = await points_cache.get(user_id)
+    score = await POINTS_CACHE.get(user_id)
     return int(score) if score else 0
