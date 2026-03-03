@@ -199,7 +199,7 @@ class Minesweeper(commands.Cog):
     async def won(self, ctx: commands.Context) -> None:
         """The player won the game."""
         game = self.games[ctx.author.id]
-        points = self.points_by_user.get(ctx.author.id, 6)
+        points = self.points_by_user.get(ctx.author.id, MINESWEEPER_WIN_POINTS)
         _, earned = await add_points(self.bot, ctx.author.id, points, MINESWEEPER_GAME_NAME)
         await ctx.author.send(f":tada: You won! :tada: (+{earned} pts)")
         if game.activated_on_server:
