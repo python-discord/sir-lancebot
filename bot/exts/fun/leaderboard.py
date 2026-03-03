@@ -154,19 +154,7 @@ class Leaderboard(commands.Cog):
     @leaderboard_command.command(name="me")
     async def leaderboard_me(self, ctx: commands.Context) -> None:
         """Show your own global points."""
-        score = await get_user_points(self.bot, ctx.author.id)
-        rank = await get_user_rank(self.bot, ctx.author.id)
-
-        description = f"{ctx.author.mention}: **{score}** pts"
-        if rank:
-            description += f" (Rank #{rank})"
-
-        embed = discord.Embed(
-            colour=Colours.blue,
-            title="Your Global Points",
-            description=description,
-        )
-        await ctx.send(embed=embed)
+        await self.leaderboard_user(ctx, ctx.author)
 
     @leaderboard_command.command(name="user")
     async def leaderboard_user(self, ctx: commands.Context, user: discord.User) -> None:

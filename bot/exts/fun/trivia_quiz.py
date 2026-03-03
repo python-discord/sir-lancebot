@@ -497,7 +497,7 @@ class TriviaQuiz(commands.Cog):
                 _, earned = await add_points(self.bot, msg.author.id, leaderboard_points, TRIVIA_QUIZ_GAME_NAME)
                 await ctx.send(
                     f"{msg.author.mention} got the correct answer :tada: "
-                    f"{points} points! (+{earned} global pts)"
+                    f"{points} points! (+{earned} pts)"
                 )
 
                 await self.send_answer(

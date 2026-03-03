@@ -321,7 +321,7 @@ class DuckGamesDirector(commands.Cog):
         scoreboard = "Final scores:\n\n"
         for rank, (member, score) in enumerate(scores):
             if rank < len(DUCK_GAME_POINT_AWARDS) and score > 0 and member.id in earned_points:
-                scoreboard += f"{member.display_name}: {score} (+{earned_points[member.id]} global pts)\n"
+                scoreboard += f"{member.display_name}: {score} (+{earned_points[member.id]} pts)\n"
             else:
                 scoreboard += f"{member.display_name}: {score}\n"
         scoreboard_embed.description = scoreboard
