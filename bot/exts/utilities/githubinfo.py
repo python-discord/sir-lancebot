@@ -48,6 +48,17 @@ AUTOMATIC_REGEX = re.compile(
     r"((?P<org>[a-zA-Z0-9][a-zA-Z0-9\-]{1,39})\/)?(?P<repo>[\w\-\.]{1,100})#(?P<number>[0-9]+)"
 )
 
+class GithubAPIError(Exception):
+    """Raised when GitHub API returns a non 200 status code."""
+
+    def __init__(self, status: int, message: str = "GitHub API error"):
+        self.status = status
+        self.message = message
+        super().__init__(f"{message} (Status: {status})")
+
+class StargazersLimitError(Exception):
+    """Raised when a repository exceeds the searchable stargazer limit."""
+
 
 @dataclass(eq=True, frozen=True)
 class FoundIssue:
@@ -374,7 +385,7 @@ class GithubInfo(commands.Cog):
 
         async with self.bot.http_session.get(url, headers=REQUEST_HEADERS, params=params) as response:
             if response.status != 200:
-                return -1
+                raise GithubAPIError(response.status)
             data = await response.json()
             return data.get("total_count", 0)
 
@@ -396,7 +407,7 @@ class GithubInfo(commands.Cog):
 
         async with self.bot.http_session.get(url, headers=REQUEST_HEADERS, params=params) as response:
             if response.status != 200:
-                return -1
+                raise GithubAPIError(response.status)
 
             data = await response.json()
             return data.get("total_count", 0)
@@ -411,7 +422,7 @@ class GithubInfo(commands.Cog):
 
         async with self.bot.http_session.get(url, headers=REQUEST_HEADERS, params=params) as response:
             if response.status != 200:
-                return -1
+                raise GithubAPIError(response.status)
 
             commits_json = await response.json()
             # No commits
@@ -437,7 +448,7 @@ class GithubInfo(commands.Cog):
             params = {"per_page": 100, "page": page}
             async with self.bot.http_session.get(url, headers=headers, params=params) as response:
                 if response.status != 200:
-                    return []
+                    raise GithubAPIError(response.status)
                 cache[page] = await response.json()
         return cache[page]
 
@@ -462,7 +473,7 @@ class GithubInfo(commands.Cog):
 
         repo_data, response = await self.fetch_data(f"{GITHUB_API_URL}/repos/{repo}")
         if response.status != 200:
-            return -1
+            raise GithubAPIError(response.status)
 
         max_stars = repo_data.get("stargazers_count", 0)
 
@@ -473,7 +484,7 @@ class GithubInfo(commands.Cog):
         # Because of this the output is not consistent for projects with more than 40 000 stars so we default to -2
         github_stargazer_limit = 40000
         if max_stars > github_stargazer_limit:
-            return -2
+            raise StargazersLimitError("Repository exceeds the 40,000 star limit.")
         searchable_stars = max_stars
 
         # We use a cache and binary search to limit the number of requests to the GitHub API
@@ -566,7 +577,7 @@ class GithubInfo(commands.Cog):
                 return
 
             url = f"{GITHUB_API_URL}/repos/{repo}"
-            repo_data, response = await self.fetch_data(url)
+            repo_data, _ = await self.fetch_data(url)
 
             if "message" in repo_data:
                 embed = discord.Embed(
@@ -577,22 +588,28 @@ class GithubInfo(commands.Cog):
                 await ctx.send(embed=embed)
                 return
 
-            open_issues = await self.get_issue_count(repo, start, end, state="created")
-            closed_issues = await self.get_issue_count(repo, start, end, state="closed")
-            prs_opened = await self.get_pr_count(repo, start, end, "opened")
-            prs_closed = await self.get_pr_count(repo, start, end, "closed")
-            prs_merged = await self.get_pr_count(repo, start, end, "merged")
-            commits = await self.get_commit_count(repo, start, end)
-            stars_gained = await self.get_stars_gained(repo, start, end)
+            try:
+                open_issues = await self.get_issue_count(repo, start, end, state="created")
+                closed_issues = await self.get_issue_count(repo, start, end, state="closed")
+                prs_opened = await self.get_pr_count(repo, start, end, "opened")
+                prs_closed = await self.get_pr_count(repo, start, end, "closed")
+                prs_merged = await self.get_pr_count(repo, start, end, "merged")
+                commits = await self.get_commit_count(repo, start, end)
 
-            if stars_gained == -2:
-                stars = "N/A (repo exceeds API limit)"
-            elif stars_gained > 0:
-                stars = f"+{stars_gained}"
-            elif stars_gained == 0:
-                stars = "0"
-            else:
-                stars = "unavailable"
+                try:
+                    stars_gained = await self.get_stars_gained(repo, start, end)
+                    stars = f"+{stars_gained}" if stars_gained > 0 else "0"
+                except StargazersLimitError:
+                    stars = "N/A (repo exceeded API limit)"
+
+            except GithubAPIError as e:
+                embed = discord.Embed(
+                    title=random.choice(NEGATIVE_REPLIES),
+                    description=f"Failed to fetch data from GitHub API. (Status Code: {e.status})",
+                    colour=Colours.soft_red,
+                    )
+                await ctx.send(embed=embed)
+                return
 
             stats_text = (
                 f"Issues opened: {open_issues}\n"
