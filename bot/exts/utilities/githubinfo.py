@@ -2,13 +2,15 @@ import json
 import random
 import re
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from typing import Annotated, Literal
 from urllib.parse import quote
 
 import discord
 from aiohttp import ClientResponse
 from discord.ext import commands, tasks
+from pydis_core.utils.converters import ISODateTime
 from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
@@ -34,7 +36,7 @@ if Tokens.github:
     REQUEST_HEADERS["Authorization"] = f"token {Tokens.github.get_secret_value()}"
 
 CODE_BLOCK_RE = re.compile(
-    r"^`([^`\n]+)`"   # Inline codeblock
+    r"`([^`\n]+)`"    # Inline codeblock
     r"|```(.+?)```",  # Multiline codeblock
     re.DOTALL | re.MULTILINE
 )
@@ -47,6 +49,17 @@ MAXIMUM_ISSUES = 5
 AUTOMATIC_REGEX = re.compile(
     r"((?P<org>[a-zA-Z0-9][a-zA-Z0-9\-]{1,39})\/)?(?P<repo>[\w\-\.]{1,100})#(?P<number>[0-9]+)"
 )
+
+class GithubAPIError(Exception):
+    """Raised when GitHub API returns a non 200 status code."""
+
+    def __init__(self, status: int, message: str = "GitHub API error"):
+        self.status = status
+        self.message = message
+        super().__init__(f"{message} (Status: {status})")
+
+class StargazersLimitError(Exception):
+    """Raised when a repository exceeds the searchable stargazer limit."""
 
 
 @dataclass(eq=True, frozen=True)
@@ -366,6 +379,235 @@ class GithubInfo(commands.Cog):
         )
         return embed
 
+    async def get_issue_count(
+            self,
+            repo: str,
+            start: datetime,
+            end: datetime,
+            action:
+            Literal["created", "closed"]
+        ) -> int:
+        """Gets the number of issues opened or closed (based on state) in a given timeframe."""
+        start_str = start.strftime("%Y-%m-%d")
+        end_str = end.strftime("%Y-%m-%d")
+        url = f"{GITHUB_API_URL}/search/issues"
+        query = f"repo:{repo} is:issue {action}:{start_str}..{end_str}"
+        params = {"q": query}
+
+        async with self.bot.http_session.get(url, headers=REQUEST_HEADERS, params=params) as response:
+            if response.status != 200:
+                raise GithubAPIError(response.status)
+            data = await response.json()
+            return data.get("total_count", 0)
+
+    async def get_pr_count(
+            self,
+            repo: str,
+            start: datetime,
+            end: datetime,
+            action:
+            Literal["opened", "merged", "closed"]
+        ) -> int:
+        """Gets the number of PRs opened, closed, or merged in a given timeframe."""
+        start_str = start.strftime("%Y-%m-%d")
+        end_str = end.strftime("%Y-%m-%d")
+        url = f"{GITHUB_API_URL}/search/issues"
+
+        state_query = {
+            "opened": f"created:{start_str}..{end_str}",
+            "merged": f"is:merged merged:{start_str}..{end_str}",
+            "closed": f"is:unmerged closed:{start_str}..{end_str}"
+        }
+
+        query = f"repo:{repo} is:pr {state_query[action]}"
+        params = {"q": query}
+
+        async with self.bot.http_session.get(url, headers=REQUEST_HEADERS, params=params) as response:
+            if response.status != 200:
+                raise GithubAPIError(response.status)
+
+            data = await response.json()
+            return data.get("total_count", 0)
+
+    async def get_commit_count(self, repo: str, start: datetime, end: datetime) -> int:
+        """Returns the number of commits done to the given repo between the start and end date."""
+        end_next_day = end + timedelta(days=1)
+        start_iso = start.strftime("%Y-%m-%dT%H:%M:%SZ")
+        end_iso = end_next_day.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+        url = f"https://api.github.com/repos/{repo}/commits"
+        params = {"since": start_iso, "until": end_iso, "per_page": 1, "page": 1}
+
+        async with self.bot.http_session.get(url, headers=REQUEST_HEADERS, params=params) as response:
+            if response.status != 200:
+                raise GithubAPIError(response.status)
+
+            commits_json = await response.json()
+            # No commits
+            if not commits_json:
+                return 0
+
+            link_header = response.headers.get("Link")
+            # No link header means only one page
+            if not link_header:
+                return 1
+
+            # Grabbing the number of pages from the Link header
+            match = re.search(r'page=(\d+)>; rel="last"', link_header)
+            if match:
+                return int(match.group(1))
+
+            # If we reach here, GitHub sent a Link header but our regex couldn't parse it.
+            # This is an unexpected API failure, so we raise an exception!
+            raise GithubAPIError(500, "Failed to parse pagination Link header for commits.")
+
+    async def _fetch_page(self, url: str, page: int) -> list:
+        """Fetch a single page of stargazers from the API."""
+        params = {"per_page": 100, "page": page}
+        headers = REQUEST_HEADERS | {"Accept": "application/vnd.github.star+json"}
+
+        async with self.bot.http_session.get(url, headers=headers, params=params) as response:
+            if response.status != 200:
+                raise GithubAPIError(response.status)
+            return await response.json()
+
+    async def get_stars_gained(self, repo: str, start: datetime, end: datetime) -> int:
+        """Gets the number of stars gained for a given repository in a timeframe."""
+        start_str = start.strftime("%Y-%m-%d")
+        end_str = end.strftime("%Y-%m-%d")
+        url = f"{GITHUB_API_URL}/repos/{repo}/stargazers"
+        cache = {}
+
+        async def get_date_with_cache(index: int) -> str:
+            """Helper to check the cache before calling the API."""
+            page_num = (index // 100) + 1
+            pos = index % 100
+
+            if page_num not in cache:
+                cache[page_num] = await self._fetch_page(url, page_num)
+
+            page_data = cache[page_num]
+            if page_data and pos < len(page_data):
+                return page_data[pos].get("starred_at", "")[:10]
+            return ""
+
+        repo_data, response = await self.fetch_data(f"{GITHUB_API_URL}/repos/{repo}")
+        if response.status != 200:
+            raise GithubAPIError(response.status)
+
+        max_stars = repo_data.get("stargazers_count", 0)
+        if max_stars == 0:
+            return 0
+
+        # GitHub API limits stargazers pagination to 40 000 entries (page 400 max)
+        # Because of this the output is not consistent for projects with more than 40 000 stars so we raise and error
+        github_stargazer_limit = 40000
+        if max_stars > github_stargazer_limit:
+            raise StargazersLimitError("Repository exceeds the 40,000 star limit.")
+
+        searchable_stars = max_stars
+
+        # We use a cache and binary search to limit the number of requests to the GitHub API
+        low, high = 0, searchable_stars - 1
+        while low < high:
+            mid = (low + high) // 2
+            lowdate = await get_date_with_cache(mid)
+            if lowdate == "":
+                raise GithubAPIError(500, "Failed to fetch stargazer date during binary search")
+            if lowdate < start_str:
+                low = mid + 1
+            else:
+                high = mid
+        left = low
+
+        date_left = await get_date_with_cache(left)
+        if date_left < start_str or date_left > end_str:
+            return 0
+
+        low, high = left, searchable_stars - 1
+        while low < high:
+            mid = (low + high + 1) // 2
+            highdate = await get_date_with_cache(mid)
+            if highdate == "":
+                raise GithubAPIError(500, "Failed to fetch stargazer date during binary search")
+            if highdate > end_str:
+                high = mid - 1
+            else:
+                low = mid
+        right = low
+
+        return right - left + 1
+
+    @github_group.command(name="stats")
+    async def github_stats(
+            self,
+            ctx: commands.Context,
+            start: Annotated[datetime, ISODateTime],
+            end: Annotated[datetime, ISODateTime],
+            repo_query: str
+        ) -> None:
+        """
+        Fetches stats for a GitHub repo.
+
+        Usage: !github_stats 2023-01-01 2023-12-31 python-discord/bot.
+        """
+        async with ctx.typing():
+            try:
+                # Check date
+                now = datetime.now(UTC)
+                if end > now:
+                    end = now # cap future dates to today
+                if start > end:
+                    raise commands.BadArgument("The start date must be before, or equal to the end date.")
+
+                # Protect against directory traversal
+                if repo_query.count("/") != 1 or ".." in repo_query:
+                    raise commands.BadArgument("Repository must be in the format `owner/repo`.")
+                repo = quote(repo_query)
+
+                # Check if repo exists
+                url = f"{GITHUB_API_URL}/repos/{repo}"
+                repo_data, _ = await self.fetch_data(url)
+                if "message" in repo_data:
+                    raise commands.BadArgument(f"Could not find repository: `{repo_query}`")
+
+                # Get stats
+                open_issues = await self.get_issue_count(repo, start, end, action="created")
+                closed_issues = await self.get_issue_count(repo, start, end, action="closed")
+                prs_opened = await self.get_pr_count(repo, start, end, "opened")
+                prs_closed = await self.get_pr_count(repo, start, end, "closed")
+                prs_merged = await self.get_pr_count(repo, start, end, "merged")
+                commits = await self.get_commit_count(repo, start, end)
+
+                try:
+                    stars_gained = await self.get_stars_gained(repo, start, end)
+                    stars = f"+{stars_gained}" if stars_gained > 0 else "0"
+                except StargazersLimitError:
+                    stars = "N/A (repo exceeded API limit)"
+
+            except (commands.BadArgument, GithubAPIError) as e:
+                embed = discord.Embed(
+                    title=random.choice(NEGATIVE_REPLIES),
+                    description=str(e),
+                    colour=Colours.soft_red,
+                )
+                await ctx.send(embed=embed)
+                return
+
+            text = (
+                f"Issues opened: {open_issues}\n"
+                f"Issues closed: {closed_issues}\n"
+                f"Pull Requests opened: {prs_opened}\n"
+                f"Pull Requests closed: {prs_closed}\n"
+                f"Pull Requests merged: {prs_merged}\n"
+                f"Stars gained: {stars}\n"
+                f"Commits: {commits}"
+            )
+
+            stats_embed = discord.Embed(
+                title=f"Stats for {repo}", description=text, colour=discord.Colour.og_blurple()
+            )
+            await ctx.send(embed=stats_embed)
 
     @github_group.command(name="repository", aliases=("repo",))
     async def github_repo_info(self, ctx: commands.Context, *repo: str) -> None:
