@@ -79,7 +79,7 @@ async def remove_points(bot: Bot, user_id: int, points: int) -> int:
     or 0 if the cog is not loaded.
     """
     if points <= 0 or bot.get_cog("Leaderboard") is None or POINTS_CACHE is None:
-        return await get_user_points(bot, user_id)
+        return 0
 
     current = await POINTS_CACHE.get(user_id)
     if not current:
