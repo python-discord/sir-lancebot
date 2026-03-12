@@ -87,6 +87,11 @@ class Leaderboard(commands.Cog):
         from bot.utils import leaderboard
         leaderboard.POINTS_CACHE = self.points_cache
 
+    async def cog_unload(self) -> None:
+        """Reset the global cache when the cog unloads."""
+        from bot.utils import leaderboard
+        leaderboard.POINTS_CACHE = None
+
     @commands.group(name="leaderboard", aliases=("lb", "points"), invoke_without_command=True)
     async def leaderboard_command(self, ctx: commands.Context) -> None:
         """Show the global game points leaderboard."""
