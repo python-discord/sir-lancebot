@@ -157,7 +157,7 @@ class Game:
                 )
                 if isinstance(self.player_inactive, Member):
                     _, earned = await add_points(
-                        self.bot, self.player_inactive.id, CONNECT_FOUR_WIN_POINTS, "connect_four"
+                        self.bot, self.player_inactive.id, CONNECT_FOUR_WIN_POINTS, CONNECT_FOUR_GAME_NAME
                     )
                     message += f" (+{earned} pts)"
                 await self.channel.send(message)
