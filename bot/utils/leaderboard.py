@@ -114,7 +114,7 @@ async def get_daily_leaderboard(bot: Bot) -> list[tuple[int, int]]:
     """
     Get today's leaderboard by scanning daily Redis TTL keys.
 
-    Returns a list of (user_id, total_daily_score) tuples sorted descending.
+    Returns a list of (user_id, total_daily_score) tuples sorted in descending order.
     """
     if bot.get_cog("Leaderboard") is None:
         return []
