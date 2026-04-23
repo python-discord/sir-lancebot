@@ -3,6 +3,10 @@ from random import choice
 from discord.ext import commands
 
 from bot.bot import Bot
+from bot.utils.leaderboard import add_points
+
+RPS_WIN_POINTS = 2
+RPS_GAME_NAME = "rps"
 
 CHOICES = ["rock", "paper", "scissors"]
 SHORT_CHOICES = ["r", "p", "s"]
@@ -30,6 +34,9 @@ WINNER_DICT = {
 class RPS(commands.Cog):
     """Rock Paper Scissors. The Classic Game!"""
 
+    def __init__(self, bot: Bot):
+        self.bot = bot
+
     @commands.command(case_insensitive=True)
     async def rps(self, ctx: commands.Context, move: str) -> None:
         """Play the classic game of Rock Paper Scissors with your own sir-lancebot!"""
@@ -47,7 +54,8 @@ class RPS(commands.Cog):
             message_string = f"{player_mention} You and Sir Lancebot played {bot_move}, it's a tie."
             await ctx.send(message_string)
         elif player_result == 1:
-            await ctx.send(f"Sir Lancebot played {bot_move}! {player_mention} won!")
+            _, earned = await add_points(self.bot, ctx.author.id, RPS_WIN_POINTS, RPS_GAME_NAME)
+            await ctx.send(f"Sir Lancebot played {bot_move}! {player_mention} won! (+{earned} pts)")
         else:
             await ctx.send(f"Sir Lancebot played {bot_move}! {player_mention} lost!")
 
