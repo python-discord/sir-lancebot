@@ -65,7 +65,7 @@ EarthDay = Holiday([Month.APRIL], {
 )
 Pride = Holiday([Month.JUNE], {
     "pride": Trigger(r"\bpride\b", [
-        "\N{WAVING WHITE FLAG}\N{ZWJ}\N{RAINBOW}",
+        "\N{WAVING WHITE FLAG}\N{VARIATION SELECTOR-16}\N{ZWJ}\N{RAINBOW}",
         "\N{WAVING WHITE FLAG}\N{VARIATION SELECTOR-16}\N{ZERO WIDTH JOINER}"      # Trans flag
         "\N{MALE WITH STROKE AND MALE AND FEMALE SIGN}\N{VARIATION SELECTOR-16}",  # Trans flag
         "\\<:flag_asexual:585954608929570836>",
@@ -73,7 +73,6 @@ Pride = Holiday([Month.JUNE], {
         "\\<:flag_intersex:585954609902911508>",
         "\\<:flag_lesbian:719210341657215036>",
         "\\<:flag_pansexual:585954608904405012>",
-        "\\<:flag_transgender:585954608808067072>",
                                     ]),
     }
 )
