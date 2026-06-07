@@ -13,6 +13,17 @@ from discord.ext import commands
 from bot.bot import Bot
 from bot.constants import MODERATION_ROLES
 from bot.utils.decorators import with_role
+from bot.utils.leaderboard import add_points
+
+DUCK_GAME_FIRST_PLACE_POINTS = 30
+DUCK_GAME_SECOND_PLACE_POINTS = 20
+DUCK_GAME_THIRD_PLACE_POINTS = 10
+DUCK_GAME_POINT_AWARDS = (
+    DUCK_GAME_FIRST_PLACE_POINTS,
+    DUCK_GAME_SECOND_PLACE_POINTS,
+    DUCK_GAME_THIRD_PLACE_POINTS,
+)
+DUCK_GAME_NAME = "duck_game"
 
 DECK = list(product(*[(0, 1, 2)]*4))
 
@@ -297,8 +308,22 @@ class DuckGamesDirector(commands.Cog):
             key=lambda item: item[1],
             reverse=True,
         )
+
+        # Award leaderboard points to top finishers (number of places from DUCK_GAME_POINT_AWARDS)
+        earned_points = {}
+        for rank, (member, score) in enumerate(scores[:len(DUCK_GAME_POINT_AWARDS)]):
+            if score > 0:
+                _, earned = await add_points(
+                    self.bot, member.id, DUCK_GAME_POINT_AWARDS[rank], DUCK_GAME_NAME
+                )
+                earned_points[member.id] = earned
+
         scoreboard = "Final scores:\n\n"
-        scoreboard += "\n".join(f"{member.display_name}: {score}" for member, score in scores)
+        for rank, (member, score) in enumerate(scores):
+            if rank < len(DUCK_GAME_POINT_AWARDS) and score > 0 and member.id in earned_points:
+                scoreboard += f"{member.display_name}: {score} (+{earned_points[member.id]} pts)\n"
+            else:
+                scoreboard += f"{member.display_name}: {score}\n"
         scoreboard_embed.description = scoreboard
         await channel.send(embed=scoreboard_embed)
 

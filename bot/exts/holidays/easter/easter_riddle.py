@@ -8,6 +8,10 @@ from pydis_core.utils.logging import get_logger
 
 from bot.bot import Bot
 from bot.constants import Colours, NEGATIVE_REPLIES
+from bot.utils.leaderboard import add_points
+
+EASTER_RIDDLE_WIN_POINTS = 10
+EASTER_RIDDLE_GAME_NAME = "easter_riddle"
 
 log = get_logger(__name__)
 
@@ -68,7 +72,7 @@ class EasterRiddle(commands.Cog):
                     and m.content.lower() == correct.lower(),
                     timeout=TIMELIMIT,
                 )
-                winner = response.author.mention
+                winner = response.author
                 break
             except TimeoutError:
                 hint_number += 1
@@ -82,8 +86,9 @@ class EasterRiddle(commands.Cog):
                     break
                 await ctx.send(embed=hint_embed)
 
-        if winner:
-            content = f"Well done {winner} for getting it right!"
+        if winner is not None:
+            new_total, earned = await add_points(self.bot, winner.id, EASTER_RIDDLE_WIN_POINTS, EASTER_RIDDLE_GAME_NAME)
+            content = f"Well done {winner.mention} for getting it right! (+{earned} pts)"
         else:
             content = "Nobody got it right..."
 

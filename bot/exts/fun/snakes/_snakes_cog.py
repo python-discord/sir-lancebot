@@ -22,6 +22,10 @@ from bot.constants import ERROR_REPLIES, Tokens
 from bot.exts.fun.snakes import _utils as utils
 from bot.exts.fun.snakes._converter import Snake
 from bot.utils.decorators import locked
+from bot.utils.leaderboard import add_points
+
+SNAKE_QUIZ_WIN_POINTS = 10
+SNAKE_QUIZ_GAME_NAME = "snakes_quiz"
 
 log = get_logger(__name__)
 
@@ -406,7 +410,15 @@ class Snakes(Cog):
         """Gets a random snake name."""
         return random.choice(self.snake_names)
 
-    async def _validate_answer(self, ctx: Context, message: Message, answer: str, options: dict[str, str]) -> None:
+    async def _validate_answer(
+        self,
+        ctx: Context,
+        message: Message,
+        answer: str,
+        options: dict[str, str],
+        *,
+        award_points: int,
+    ) -> None:
         """Validate the answer using a reaction event loop."""
         def predicate(reaction: Reaction, user: Member) -> bool:
             """Test if the the answer is valid and can be evaluated."""
@@ -428,7 +440,11 @@ class Snakes(Cog):
             return
 
         if str(reaction.emoji) == ANSWERS_EMOJI[answer]:
-            await ctx.send(f"{random.choice(CORRECT_GUESS)} The correct answer was **{options[answer]}**.")
+            _, earned = await add_points(self.bot, ctx.author.id, award_points, SNAKE_QUIZ_GAME_NAME)
+            await ctx.send(
+                f"{random.choice(CORRECT_GUESS)} The correct answer was **{options[answer]}**. "
+                f"(+{earned} pts)"
+            )
         else:
             await ctx.send(
                 f"{random.choice(INCORRECT_GUESS)} The correct answer was **{options[answer]}**."
@@ -845,7 +861,7 @@ class Snakes(Cog):
         )
 
         quiz = await ctx.send(embed=embed)
-        await self._validate_answer(ctx, quiz, answer, options)
+        await self._validate_answer(ctx, quiz, answer, options, award_points=SNAKE_QUIZ_WIN_POINTS)
 
     @snakes_group.command(name="name", aliases=("name_gen",))
     async def name_command(self, ctx: Context, *, name: str | None = None) -> None:
