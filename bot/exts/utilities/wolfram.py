@@ -120,7 +120,7 @@ async def get_pod_pages(ctx: Context, bot: Bot, query: str) -> list[tuple[str, s
         request_url = QUERY.format(request="query")
 
         async with bot.http_session.get(url=request_url, params=params) as response:
-            json = await response.json(content_type="text/plain")
+            json = await response.json()
 
         result = json["queryresult"]
         log_full_url = f"{request_url}?{urlencode(params)}"
