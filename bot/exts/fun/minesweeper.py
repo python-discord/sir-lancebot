@@ -10,6 +10,10 @@ from bot.bot import Bot
 from bot.constants import Client
 from bot.utils.converters import CoordinateConverter
 from bot.utils.exceptions import UserNotPlayingError
+from bot.utils.leaderboard import add_points
+
+MINESWEEPER_WIN_POINTS = 15
+MINESWEEPER_GAME_NAME = "minesweeper"
 
 MESSAGE_MAPPING = {
     0: ":stop_button:",
@@ -52,6 +56,18 @@ class Minesweeper(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.games: dict[int, Game] = {}
+        self.points_by_user: dict[int, int] = {}
+
+    @staticmethod
+    def points_for_bomb_chance(bomb_chance: float) -> int:
+        """Calculate points awarded based on the bomb density of the board."""
+        if bomb_chance <= 0.15:
+            return 15
+        if bomb_chance <= 0.20:
+            return 17
+        if bomb_chance <= 0.25:
+            return 20
+        return 15
 
     @commands.group(name="minesweeper", aliases=("ms",), invoke_without_command=True)
     async def minesweeper_group(self, ctx: commands.Context) -> None:
@@ -123,7 +139,7 @@ class Minesweeper(commands.Cog):
             log.debug(f"{ctx.author.name} ({ctx.author.id}) has disabled DMs from server members.")
             await ctx.send(f":x: {ctx.author.mention}, please enable DMs to play minesweeper.")
             return
-
+        self.points_by_user[ctx.author.id] = self.points_for_bomb_chance(bomb_chance)
         # Add game to list
         board: GameBoard = self.generate_board(bomb_chance)
         revealed_board: GameBoard = [["hidden"] * 10 for _ in range(10)]
@@ -183,10 +199,13 @@ class Minesweeper(commands.Cog):
     async def won(self, ctx: commands.Context) -> None:
         """The player won the game."""
         game = self.games[ctx.author.id]
-        await ctx.author.send(":tada: You won! :tada:")
+        points = self.points_by_user.get(ctx.author.id, MINESWEEPER_WIN_POINTS)
+        _, earned = await add_points(self.bot, ctx.author.id, points, MINESWEEPER_GAME_NAME)
+        await ctx.author.send(f":tada: You won! :tada: (+{earned} pts)")
         if game.activated_on_server:
-            await game.chat_msg.channel.send(f":tada: {ctx.author.mention} just won Minesweeper! :tada:")
-
+            await game.chat_msg.channel.send(
+                f":tada: {ctx.author.mention} just won Minesweeper! :tada: (+{points} pts)"
+            )
     def reveal_zeros(self, revealed: GameBoard, board: GameBoard, x: int, y: int) -> None:
         """Recursively reveal adjacent cells when a 0 cell is encountered."""
         for x_, y_ in self.get_neighbours(x, y):
@@ -245,6 +264,7 @@ class Minesweeper(commands.Cog):
             if await self.reveal_one(ctx, revealed, board, x, y):
                 await self.update_boards(ctx)
                 del self.games[ctx.author.id]
+                self.points_by_user.pop(ctx.author.id, None)
                 break
         else:
             await self.update_boards(ctx)
@@ -262,6 +282,7 @@ class Minesweeper(commands.Cog):
         if game.activated_on_server:
             await game.chat_msg.edit(content=new_msg)
         del self.games[ctx.author.id]
+        self.points_by_user.pop(ctx.author.id, None)
 
 
 async def setup(bot: Bot) -> None:
