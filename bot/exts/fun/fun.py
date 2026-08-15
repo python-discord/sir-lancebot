@@ -155,10 +155,26 @@ class Fun(Cog):
         await self._caesar_cipher(ctx, offset, msg, left_shift=True)
 
     @commands.command()
-    async def joke(self, ctx: commands.Context, category: Literal["neutral", "chuck", "all"] = "all") -> None:
-        """Retrieves a joke of the specified `category` from the pyjokes api."""
-        joke = pyjokes.get_joke(category=category)
-        await ctx.send(joke)
+    async def joke(self, ctx: commands.Context, category: Literal["dad", "neutral", "chuck", "all"] = "all") -> None:
+        """
+        Retrieves a joke of the specified `category` from the pyjokes api.
+
+        - dad uses icanhazdadjoke.
+        - others use pyjokes.
+        """
+        if category == "dad":
+            async with self.bot.http_session.get(
+                "https://icanhazdadjoke.com",
+                headers={
+                    "Accept":"application/json",
+                    "User-Agent": "Sir-lancebot (https://github.com/python-discord/sir-lancebot)"
+                }) as res:
+                res.raise_for_status()
+                data = await res.json()
+                await ctx.send(data["joke"])
+        else:
+            joke = pyjokes.get_joke(category=category)
+            await ctx.send(joke)
 
     @commands.group(name="quote")
     async def quote(self, ctx: Context) -> None:

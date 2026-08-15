@@ -1,7 +1,8 @@
 import re
 from random import randint
 
-from discord import Embed
+import discord
+from discord import Embed, ui
 from discord.ext import tasks
 from discord.ext.commands import Cog, Context, command
 from pydis_core.utils.logging import get_logger
@@ -67,22 +68,35 @@ class XKCD(Cog):
                     await ctx.send(embed=embed)
                     return
 
-        embed.title = f"XKCD comic #{info['num']}"
-        embed.description = info["alt"]
-        embed.url = f"{BASE_URL}/{info['num']}"
+        date = f"{info['year']}/{info['month']}/{info['day']}"
+        view = self._build_comic_view(info["num"], info["safe_title"], info["img"], info["alt"], date)
 
-        if info["img"][-3:] in ("jpg", "png", "gif"):
-            embed.set_image(url=info["img"])
-            date = f"{info['year']}/{info['month']}/{info['day']}"
-            embed.set_footer(text=f"{date} - #{info['num']}, '{info['safe_title']}'")
-            embed.colour = Colours.soft_green
+        await ctx.send(view=view)
+
+    @staticmethod
+    def _build_comic_view(num: int, title: str, image_url: str, alt_text: str, date: str) -> ui.LayoutView:
+        """Build a layout view to display the comic, if possible."""
+        view = ui.LayoutView(timeout=0)
+
+        url = f"{BASE_URL}/{num}"
+        if image_url[-3:] in ("jpg", "png", "gif"):
+            image_display = ui.MediaGallery(discord.MediaGalleryItem(media=image_url))
         else:
-            embed.description = (
-                "The selected comic is interactive, and cannot be displayed within an embed.\n"
-                f"Comic can be viewed [here](https://xkcd.com/{info['num']})."
+            image_display = ui.TextDisplay(
+                "The selected comic is interactive, and cannot be displayed within a discord message.\n"
+                f"Comic can be viewed [here]({url})."
             )
 
-        await ctx.send(embed=embed)
+        container = ui.Container(
+            ui.TextDisplay(f"### [XKCD comic #{num} — {title}]({url})"),
+            image_display,
+        )
+        if alt_text:
+            container.add_item(ui.TextDisplay(alt_text))
+        container.add_item(ui.TextDisplay(f"-# {date}"))
+        view.add_item(container)
+
+        return view
 
 
 async def setup(bot: Bot) -> None:

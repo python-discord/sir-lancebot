@@ -4,7 +4,7 @@ import itertools
 from contextlib import suppress
 from typing import NamedTuple
 
-from discord import Colour, Embed, HTTPException, Message, Reaction, User
+from discord import ChannelType, Colour, Embed, HTTPException, Message, NotFound, Object, RawReactionActionEvent
 from discord.ext import commands
 from discord.ext.commands import CheckFailure, Cog as DiscordCog, Command, Context
 from pydis_core.utils.logging import get_logger
@@ -182,32 +182,42 @@ class HelpSession:
         # recreate the timeout task
         self._timeout_task = self._bot.loop.create_task(self.timeout())
 
-    async def on_reaction_add(self, reaction: Reaction, user: User) -> None:
-        """Event handler for when reactions are added on the help message."""
-        # ensure it was the relevant session message
-        if reaction.message.id != self.message.id:
+
+    async def on_raw_reaction_add(self, payload: RawReactionActionEvent) -> None:
+        """Handle raw reaction events for DM compatibility."""
+        # Ignore if not our message
+        if payload.message_id != self.message.id:
             return
 
-        # ensure it was the session author who reacted
-        if user.id != self.author.id:
+        # Ignore if not the session author
+        if payload.user_id != self.author.id:
             return
 
-        emoji = str(reaction.emoji)
+        # Get the emoji string
+        emoji = str(payload.emoji)
 
-        # check if valid action
+        # Check if valid action
         if emoji not in REACTIONS:
             return
 
         self.reset_timeout()
 
+        # Remove the reaction to prep for re-use
+        try:
+            # We need to get the actual message and user objects for remove_reaction
+            channel = self._bot.get_channel(payload.channel_id)
+            if channel and channel.type != ChannelType.private:
+                # channel is None in DMs, this condition skips reaction removal in DMs to prevent exceptions
+                message = channel.get_partial_message(payload.message_id)
+                await message.remove_reaction(payload.emoji, Object(id=payload.user_id))
+        except (HTTPException, NotFound):
+            # Ignore errors when removing reactions
+            pass
+
         # Run relevant action method
         action = getattr(self, f"do_{REACTIONS[emoji]}", None)
         if action:
             await action()
-
-        # remove the added reaction to prep for re-use
-        with suppress(HTTPException):
-            await self.message.remove_reaction(reaction, user)
 
     async def on_message_delete(self, message: Message) -> None:
         """Closes the help session when the help message is deleted."""
@@ -219,7 +229,7 @@ class HelpSession:
         await self.build_pages()
         await self.update_page()
 
-        self._bot.add_listener(self.on_reaction_add)
+        self._bot.add_listener(self.on_raw_reaction_add)
         self._bot.add_listener(self.on_message_delete)
 
         self.add_reactions()
@@ -459,7 +469,7 @@ class HelpSession:
 
     async def stop(self) -> None:
         """Stops the help session, removes event listeners and attempts to delete the help message."""
-        self._bot.remove_listener(self.on_reaction_add)
+        self._bot.remove_listener(self.on_raw_reaction_add)
         self._bot.remove_listener(self.on_message_delete)
 
         # ignore if permission issue, or the message doesn't exist

@@ -830,6 +830,73 @@
       "id": 444,
       "question": "On Linux systems, the `fork` system call returns what value in the parent process?",
       "answer": ["PID", "child PID"]
+    },
+    {
+      "id": 445,
+      "question": "What lemma is commonly used to prove non-regularity of languages?",
+      "answer": ["pumping lemma", "pumping"]
+    },
+    {
+      "id": 446,
+      "question": "TCP congestion and flow control throttle the sender by adjusting the _________",
+      "answer": "window size"
+    },
+    {
+      "id": 447,
+      "question": "What algorithm was famously created at a cafe in 20 minutes?",
+      "answer": ["Dijkstra's", "Dijkstra", "Dijkstra's algorithm"],
+      "info": "Dijkstra's algorithm is an algorithm to find the shortest path between two nodes in a weighted graph."
+    },
+    {
+      "id": 448,
+      "question": "What is the minimal time complexity for a comparison-based sorting algorithm?",
+      "answer": ["O(n log n)", "O(nlogn)", "nlogn", "n log n"]
+    },
+    {
+      "id": 450,
+      "question": "The family of algorithms for choosing a simple random sample without replacement from a stream of unknown size in a single pass is called?",
+      "answer": "reservoir sample"
+    },
+    {
+      "id": 451,
+      "question": "A hash function with no hash collisions is known as?",
+      "answer": ["perfect", "perfect hash function"]
+    },
+    {
+      "id": 452,
+      "question": "What is it called when an attacker gains unauthorized privilages on a machine?",
+      "answer": "privilege escalation"
+    },
+    {
+      "id": 453,
+      "question": "An attacker using an SQL query to access private or confidential information within a web form which passes unsanitized input is known as a(n):",
+      "answer": ["SQL injection", "sql injection"]
+    },
+    {
+      "id": 454,
+      "question": "A _____ is the term used to describe the part of a virus that actually delivers or executes malicious code",
+      "answer": "payload"
+    },
+    {
+      "id": 455,
+      "question": "_______ movement is when an attacker moves within a network after compromising a single machine.",
+      "answer": "lateral"
+    },
+    {
+      "id": 456,
+      "question": "Which protocol does HTTPS use to secure traffic?",
+      "answer": "TLS",
+      "info": "SSL used to be used for HTTPS, but was deprecated in favor for TLS. Libraries such as OpenSSL, despite having SSL in the name, are primarily used as an implementation of TLS."
+    },
+    {
+      "id": 457,
+      "question": "In contrast to block ciphers, ______ ciphers are symmetric-key algorithms where plaintext is combined with a keystream",
+      "answer": "stream"
+    },
+    {
+      "id": 458,
+      "question": "The block cipher used within the AES standard was originally known as:",
+      "answer": "Rijndael"
     }
   ],
   "python": [
@@ -1077,6 +1144,22 @@
       "id": 549,
       "question": "What cache replacement policy is used by the `re` module for up to 256 compiled patterns?",
       "answer": "FIFO"
+    },
+    {
+      "id": 550,
+      "question": "What builtin function does this function implement?\n```py\nmystery = lambda *args: map(lambda *x: x, *args)\n```",
+      "answer": "zip"
+    },
+    {
+      "id": 551,
+      "question": "What algorithm does this function implement?\n```py\nmystery = lambda xs: xs and [*mystery([x for x in xs[1:] if x <= xs[0]]), xs[0], *mystery([x for x in xs[1:] if x > xs[0]])]\n```",
+      "answer": "quicksort",
+      "info": "Quicksort is a divide-and-conquer algorithm used to sort collections of data."
+    },
+    {
+      "id": 552,
+      "question": "In what year did Python 2 reach EOL (End of Life)?",
+      "answer": "2020"
     }
   ]
 }
