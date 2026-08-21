@@ -221,6 +221,13 @@ class TriviaQuiz(commands.Cog):
         self.player_scores = defaultdict(int)  # A variable to store all player's scores for a bot session.
         self.game_player_scores = {}  # A variable to store temporary game player's scores.
 
+        # Buffers every non-bot message per channel while a question is active, so answers are
+        # evaluated strictly in Discord's delivery order. This closes the gap `bot.wait_for` had
+        # between consecutive waits (no listener registered while sending hints/embeds), which
+        # could let a correct answer go completely unseen if it arrived at the wrong moment.
+        # See #1766.
+        self.message_queues: dict[int, asyncio.Queue[discord.Message]] = {}
+
         self.categories = {
             "general": "Test your general knowledge.",
             "retro": "Questions related to retro gaming.",
@@ -236,6 +243,50 @@ class TriviaQuiz(commands.Cog):
     def cog_unload(self) -> None:
         """Cancel `get_wiki_questions` task when Cog will unload."""
         self.get_wiki_questions.cancel()
+
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message) -> None:
+        """
+        Buffer messages for any channel with an active quiz question.
+
+        This listener is always registered (unlike `bot.wait_for`, which only listens while
+        actively awaited), so no message can slip through unseen between questions/hints.
+        """
+        if message.author.bot:
+            return
+
+        queue = self.message_queues.get(message.channel.id)
+        if queue is not None:
+            queue.put_nowait(message)
+
+    async def _wait_for_answer(
+        self,
+        channel_id: int,
+        check: Callable[[discord.Message], bool],
+        timeout: float,
+    ) -> discord.Message:
+        """
+        Return the first buffered message in `channel_id` for which `check` returns True.
+
+        Messages are drained strictly in the order Discord delivered them (FIFO), guaranteeing
+        the earliest-arriving correct answer wins, regardless of how busy the bot was when it
+        arrived. Raises `TimeoutError` if no matching message arrives within `timeout` seconds.
+        """
+        queue = self.message_queues[channel_id]
+        loop = asyncio.get_running_loop()
+        deadline = loop.time() + timeout
+
+        while True:
+            remaining = deadline - loop.time()
+            if remaining <= 0:
+                raise TimeoutError
+
+            # Only the wait for the *next* item is time-bounded; already-queued messages are
+            # returned instantly by queue.get() without consuming extra wall-clock time.
+            message = await asyncio.wait_for(queue.get(), timeout=remaining)
+            if check(message):
+                return message
+            # Not a match for this question - discard and keep draining in arrival order.
 
     @tasks.loop(hours=24.0)
     async def get_wiki_questions(self) -> None:
@@ -389,11 +440,16 @@ class TriviaQuiz(commands.Cog):
                 self.game_status[ctx.channel.id] = False
                 del self.game_owners[ctx.channel.id]
                 self.game_player_scores[ctx.channel.id] = {}
+                self.message_queues.pop(ctx.channel.id, None)
 
                 break
 
             # If no hint has been sent or any time alert. Basically if hint_no = 0  means it is a new question.
             if hint_no == 0:
+                # Fresh queue per question: any stray messages left over from the previous
+                # question's answer/score/sleep window are irrelevant to this one and dropped.
+                self.message_queues[ctx.channel.id] = asyncio.Queue()
+
                 # Select a random question which has not been used yet.
                 while True:
                     question_dict = random.choice(topic)
@@ -435,7 +491,7 @@ class TriviaQuiz(commands.Cog):
                 return contains_correct_answer
 
             try:
-                msg = await self.bot.wait_for("message", check=check_func(quiz_entry.var_tol), timeout=10)
+                msg = await self._wait_for_answer(ctx.channel.id, check_func(quiz_entry.var_tol), timeout=10)
             except TimeoutError:
                 # In case of TimeoutError and the game has been stopped, then do nothing.
                 if not self.game_status[ctx.channel.id]:
@@ -549,6 +605,7 @@ class TriviaQuiz(commands.Cog):
                     self.game_status[ctx.channel.id] = False
                     del self.game_owners[ctx.channel.id]
                     self.game_player_scores[ctx.channel.id] = {}
+                    self.message_queues.pop(ctx.channel.id, None)
 
                     await ctx.send("Quiz stopped.")
                     await self.declare_winner(ctx.channel, self.game_player_scores[ctx.channel.id])
