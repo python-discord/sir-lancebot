@@ -1,0 +1,193 @@
+{
+  "start": {
+    "text": "You are Gurfelt, a curious purple dog, standing outside a creepy haunted mansion. The wind howls, and the front door creaks ominously. What will you do?",
+    "options": [
+      {
+        "text": "Walk around the mansion",
+        "leads_to": "grave",
+        "emoji": "🐾"
+      },
+      {
+        "text": "Enter the mansion",
+        "leads_to": "lobby",
+        "emoji": "🏚️"
+      }
+    ]
+  },
+  "other_rooms": {
+    "grave": {
+      "text": "You circle around the mansion and come across an old, neglected grave. Something glimmers in the moonlight. Gurfelt pricks up his ears, unsure if he should investigate.",
+      "options": [
+        {
+          "text": "Dig up the grave",
+          "leads_to": "digged_grave",
+          "emoji": "⛏️",
+          "effect_restricts": "rusty_key"
+        },
+        {
+          "text": "Leave the grave and go inside the mansion",
+          "leads_to": "lobby",
+          "emoji": "🏃"
+        }
+      ]
+    },
+    "digged_grave": {
+      "text": "You dig up the grave and find a rusty key! Gurfelt picks it up, should he take it with him?.",
+      "options": [
+        {
+          "text": "Take the key",
+          "leads_to": "lobby",
+          "emoji": "🔑",
+          "effect": "rusty_key"
+        },
+        {
+          "text": "Leave the grave and go inside the mansion",
+          "leads_to": "lobby",
+          "emoji": "🏃"
+        }
+      ]
+    },
+    "lobby": {
+      "text": "Stepping through the door, Gurfelt is immediately greeted by flickering lights and a sudden BANG—something just slammed shut behind him! Gurfelt has the feeling that he is not alone here...",
+      "options": [
+        {
+          "text": "Go upstairs",
+          "leads_to": "upstairs",
+          "emoji": "🚪"
+        },
+        {
+          "text": "Explore the living room",
+          "leads_to": "living_room",
+          "emoji": "🛋️"
+        }
+      ]
+    },
+    "living_room": {
+      "text": "The living room is dimly lit. Old portraits line the walls, and a faint shimmer appears near the fireplace. Suddenly, a ghost emerges from the shadows!",
+      "options": [
+        {
+          "text": "Talk to the ghost",
+          "leads_to": "ghost_info",
+          "emoji": "👻"
+        },
+        {
+          "text": "Proceed to the kitchen",
+          "leads_to": "kitchen",
+          "emoji": "🍽️"
+        },
+        {
+          "text": "Return to the lobby",
+          "leads_to": "lobby",
+          "emoji": "🏚️"
+        }
+      ]
+    },
+    "ghost_info": {
+      "text": "The ghost tells you a disturbing secret: 'the mansion once belonged to a reclusive inventor who vanished under mysterious circumstances. The inventor tried to create a potato which could feed thousands of people but something went wrong' Chills run down Gurfelt’s spine.",
+      "options": [
+        {
+          "text": "Check out the kitchen",
+          "leads_to": "kitchen",
+          "emoji": "🍽️"
+        },
+        {
+          "text": "Head back to the lobby",
+          "leads_to": "lobby",
+          "emoji": "🏚️"
+        }
+      ]
+    },
+    "kitchen": {
+      "text": "You enter a dusty kitchen filled with rusty utensils and scattered knives. There is also a single potato masher on the counter...",
+      "options": [
+        {
+          "text": "Take a knife and go to the lobby",
+          "leads_to": "lobby",
+          "emoji": "🔪",
+          "effect": "knife",
+          "effect_restricts": "knife"
+        },
+        {
+          "text": "Take the potato masher and go to the lobby",
+          "leads_to": "lobby",
+          "emoji": "🥔",
+          "effect": "potato_masher",
+          "effect_restricts": "potato_masher"
+        },
+        {
+          "text": "Return to the lobby empty-handed",
+          "leads_to": "lobby",
+          "emoji": "🚪"
+        }
+      ]
+    },
+    "upstairs": {
+      "text": "You carefully climb the creaky stairs. A dusty corridor extends ahead with two doors: one leads to the attic, and another looks locked, possibly requiring a key.",
+      "options": [
+        {
+          "text": "Go to the attic",
+          "leads_to": "attic",
+          "emoji": "🔦"
+        },
+        {
+          "text": "Open the secret room",
+          "leads_to": "secret_room",
+          "emoji": "🗝️",
+          "requires_effect": "rusty_key"
+        }
+      ]
+    },
+    "secret_room": {
+      "text": "You unlock the door with the rusty key, revealing a trove of gold coins and... a copy of GTA 6?! Overjoyed, Gurfelt decides this is enough excitement (and wealth) for one day!",
+      "type": "end",
+      "emoji": "🎉"
+    },
+    "attic": {
+      "text": "The attic is dark and cluttered with old boxes. Suddenly, a giant potato monster lumbers out of the shadows, roaring at Gurfelt!",
+      "options": [
+        {
+          "text": "Eat the monster",
+          "leads_to": "end_eat_monster",
+          "emoji": "😖"
+        },
+        {
+          "text": "Use the knife",
+          "leads_to": "end_knife_monster",
+          "emoji": "🔪",
+          "requires_effect": "knife"
+        },
+        {
+          "text": "Try to charm the monster",
+          "leads_to": "end_charm_monster",
+          "emoji": "🪄"
+        },
+        {
+          "text": "Mash the monster",
+          "leads_to": "end_mash_monster",
+          "emoji": "🥔",
+          "requires_effect": "potato_masher"
+        }
+      ]
+    },
+    "end_eat_monster": {
+      "text": "Gurfelt tries to eat the potato monster. It tastes terrible! Horrified by the awful taste, Gurfelt bolts away in disgust. The adventure ends here.",
+      "type": "end",
+      "emoji": "🤢"
+    },
+    "end_knife_monster": {
+      "text": "Gurfelt raises the knife, ready to strike, but hesitates. A question grips him—does his life hold more value than the monster's? Doubt consumes him. He sinks to his knees, lost in uncertainty. The adventure ends here.",
+      "type": "end",
+      "emoji": "🗿"
+    },
+    "end_charm_monster": {
+      "text": "Gurfelt tries to charm the potato monster with a blown kiss and a wagging tail, but it only angers the beast. Gurfelt flees, defeated and spooked. The adventure ends here.",
+      "type": "end",
+      "emoji": "😱"
+    },
+    "end_mash_monster": {
+      "text": "Armed with the potato masher, Gurfelt reduces the monstrous spud to harmless mash! Victorious, Gurfelt claims the haunted attic as conquered. The adventure ends in triumph!",
+      "type": "end",
+      "emoji": "🏆"
+    }
+  }
+}
