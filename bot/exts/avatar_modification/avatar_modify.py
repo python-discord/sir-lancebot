@@ -9,8 +9,12 @@ from pathlib import Path
 from typing import TypeVar
 
 import discord
+from discord import Interaction, app_commands
+from discord.app_commands import Group
 from discord.ext import commands
+from discord.ext.commands import Greedy
 from pydis_core.utils.logging import get_logger
+from rapidfuzz import process
 
 from bot.bot import Bot
 from bot.constants import Colours, Emojis
@@ -368,6 +372,236 @@ class AvatarModify(commands.Cog):
             await ctx.send(file=file, embed=embed)
 
 
+class AvatarModifyAppCommand(commands.Cog):
+    """Various commands for users to apply affects to their own avatars."""
+
+    def __init__(self, bot: Bot):
+        self.bot = bot
+
+    avatar_modify = Group(name="avatar_modify", description="Groups all of the pfp modifying commands to allow a single concurrency limit.")
+
+    @avatar_modify.command(name="8bitify")
+    async def eightbit_command(self, ctx: Interaction) -> None:
+        """Pixelates your avatar and changes the palette to an 8bit one."""
+        await ctx.response.defer()
+
+        image_bytes = await ctx.user.display_avatar.replace(size=1024).read()
+        file_name = file_safe_name("eightbit_avatar", ctx.user.display_name)
+
+        file = await in_executor(
+            PfpEffects.apply_effect,
+            image_bytes,
+            PfpEffects.eight_bitify_effect,
+            file_name
+        )
+
+        embed = discord.Embed(
+            title="Your 8-bit avatar",
+            description="Here is your avatar. I think it looks all cool and 'retro'."
+        )
+
+        embed.set_image(url=f"attachment://{file_name}")
+        embed.set_footer(text=f"Made by {ctx.user.display_name}.", icon_url=ctx.user.display_avatar.url)
+
+        await ctx.edit_original_response(embed=embed, attachments=(file,))
+
+    @avatar_modify.command(name="reverse")
+    async def reverse(self, ctx: Interaction) -> None:
+        """Reverses the user's profile picture."""
+
+        await ctx.response.defer()
+
+        image_bytes = await ctx.user.display_avatar.replace(size=1024).read()
+        filename = file_safe_name("reverse_avatar", ctx.user.display_name)
+
+        file = await in_executor(
+            PfpEffects.apply_effect,
+            image_bytes,
+            PfpEffects.flip_effect,
+            filename
+        )
+
+        embed = discord.Embed(
+            title="Your reversed avatar.",
+            description="Here is your reversed avatar. I think it is a spitting image of you."
+        )
+
+        embed.set_image(url=f"attachment://{filename}")
+        embed.set_footer(text=f"Made by {ctx.user.display_name}.", icon_url=ctx.user.display_avatar.url)
+
+        await ctx.edit_original_response(embed=embed, attachments=(file,))
+
+    @avatar_modify.command(name="easterify", description="Easterify the user's avatar.")
+    @app_commands.describe(colours="Discord colour names, HTML colour names, XKCD colour names and hex values are accepted.")
+    async def avatareasterify(self, ctx: Interaction, colours: str = "") -> None:
+        """
+        Easterify the user's avatar.
+
+        Given colours will produce a personalised egg in the corner, similar to the egg_decorate command.
+        If colours are not given, a nice little chocolate bunny will sit in the corner.
+        Colours are split by spaces, unless you wrap the colour name in double quotes.
+        Discord colour names, HTML colour names, XKCD colour names and hex values are accepted.
+        """
+
+        await ctx.response.defer()
+
+        egg = None
+        if colours:
+            sep_colours = []
+            for i in colours.split(" "):
+                try:
+                    sep_colours.append(discord.Colour.from_str(i))
+                except ValueError:
+                    sep_colours.append(i)
+            result = self.bot.get_cog("EggDecorating").render_egg(*sep_colours)
+            if isinstance(result, str):
+                await ctx.edit_original_response(content=result)
+                return
+            else:
+                egg = result
+
+        image_bytes = await ctx.user.display_avatar.replace(size=256).read()
+        file_name = file_safe_name("easterified_avatar", ctx.user.display_name)
+
+        file = await in_executor(
+            PfpEffects.apply_effect,
+            image_bytes,
+            PfpEffects.easterify_effect,
+            file_name,
+            egg
+        )
+
+        embed = discord.Embed(
+            title="Your Lovely Easterified Avatar!",
+            description="Here is your lovely avatar, all bright and colourful\nwith Easter pastel colours. Enjoy :D"
+        )
+        embed.set_image(url=f"attachment://{file_name}")
+        embed.set_footer(text=f"Made by {ctx.user.display_name}.", icon_url=ctx.user.display_avatar.url)
+
+        await ctx.edit_original_response(embed=embed, attachments=(file,))
+
+    @avatar_modify.command(name="pride")
+    @app_commands.describe(gender="The pride flag to use as the border.", pixels="The thickness of the flag border.")
+    async def prideavatar(self, ctx: Interaction, gender: str = "lgbt",
+                          pixels: app_commands.Range[int, 0, 512] = 64) -> None:
+        """
+        Surround an avatar with a border of a specified LGBT flag.
+
+        Default to the LGBT rainbow flag if none is given.
+        The amount of pixels can be given which determines the thickness of the flag border.
+        A maximum of 512px is enforced, defaults to a 64px border.
+        The full image is 1024x1024.
+        """
+        gender = gender.lower()
+        pixels = max(0, min(512, pixels))
+        gender = GENDER_OPTIONS.get(gender)
+        if gender is None:
+            await ctx.response.send_message("I don't have that flag!")
+            return
+
+        await ctx.response.defer()
+        image_bytes = await ctx.user.display_avatar.replace(size=1024).read()
+        file_name = file_safe_name("pride_avatar", ctx.user.display_name)
+
+        file = await in_executor(
+            PfpEffects.apply_effect,
+            image_bytes,
+            PfpEffects.pridify_effect,
+            file_name,
+            pixels,
+            gender
+        )
+
+        embed = discord.Embed(
+            title="Your Lovely Pride Avatar!",
+            description=f"Here is your lovely avatar, surrounded by\n a beautiful {gender} flag. Enjoy :D"
+        )
+        embed.set_image(url=f"attachment://{file_name}")
+        embed.set_footer(text=f"Made by {ctx.user.display_name}.", icon_url=ctx.user.display_avatar.url)
+        await ctx.edit_original_response(embed=embed, attachments=(file,))
+
+    @prideavatar.autocomplete("gender")
+    async def gender_autocomplete(self, interaction: Interaction, query: str) -> list[app_commands.Choice[str]]:
+        """Returns a list of pride flags that matches `query`."""
+        if query == "":
+            return [app_commands.Choice[str](name=x, value=x) for x in GENDER_OPTIONS.keys()][:25]
+        result = process.extract(query=query, choices=GENDER_OPTIONS.keys(), limit=25, score_cutoff=61)
+        return [app_commands.Choice[str](name=x[0], value=x[0]) for x in result]
+
+    @avatar_modify.command(name="spooky")
+    async def spookyavatar(self, ctx: Interaction) -> None:
+        """Spookify the user's avatar, with a random *spooky* effect."""
+
+        await ctx.response.defer()
+        image_bytes = await ctx.user.display_avatar.replace(size=1024).read()
+
+        file_name = file_safe_name("spooky_avatar", ctx.user.display_name)
+
+        file = await in_executor(
+            PfpEffects.apply_effect,
+            image_bytes,
+            spookifications.get_random_effect,
+            file_name
+        )
+
+        embed = discord.Embed(
+            title="Is this you or am I just really paranoid?",
+            colour=Colours.soft_red
+        )
+        embed.set_image(url=f"attachment://{file_name}")
+        embed.set_footer(text=f"Made by {ctx.user.display_name}.", icon_url=ctx.user.display_avatar.url)
+
+        await ctx.edit_original_response(embed=embed, attachments=(file,))
+
+    @avatar_modify.command(name="mosaic")
+    async def mosaic_command(self, ctx: Interaction, squares: app_commands.Range[int, 1, MAX_SQUARES] = 16) -> None:
+        """Splits your avatar into x squares, randomizes them and stitches them back into a new image!"""
+        await ctx.response.defer()
+
+        if not 1 <= squares <= MAX_SQUARES:
+            await ctx.edit_original_response(content=f"Squares must be a positive number less than or equal to {MAX_SQUARES:,}.")
+            return
+
+        sqrt = math.sqrt(squares)
+
+        if not sqrt.is_integer():
+            squares = math.ceil(sqrt) ** 2  # Get the next perfect square
+
+        file_name = file_safe_name("mosaic_avatar", ctx.user.display_name)
+
+        img_bytes = await ctx.user.display_avatar.replace(size=1024).read()
+
+        file = await in_executor(
+            PfpEffects.apply_effect,
+            img_bytes,
+            PfpEffects.mosaic_effect,
+            file_name,
+            squares,
+        )
+
+        if squares == 1:
+            title = "Hooh... that was a lot of work"
+            description = "I present to you... Yourself!"
+        elif squares == MAX_SQUARES:
+            title = "Testing the limits I see..."
+            description = "What a masterpiece. :star:"
+        else:
+            title = "Your mosaic avatar"
+            description = f"Here is your avatar. I think it looks a bit *puzzling*\nMade with {squares} squares."
+
+        embed = discord.Embed(
+            title=title,
+            description=description,
+            colour=Colours.blue
+        )
+
+        embed.set_image(url=f"attachment://{file_name}")
+        embed.set_footer(text=f"Made by {ctx.user.display_name}", icon_url=ctx.user.display_avatar.url)
+
+        await ctx.edit_original_response(embed=embed, attachments=(file,))
+
+
 async def setup(bot: Bot) -> None:
     """Load the AvatarModify cog."""
     await bot.add_cog(AvatarModify(bot))
+    await bot.add_cog(AvatarModifyAppCommand(bot))

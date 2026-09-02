@@ -40,6 +40,60 @@ class EggDecorating(commands.Cog):
             return int(XKCD_COLOURS[colour], 16)
         return None
 
+    @staticmethod
+    def render_egg(*colours: discord.Colour | str) -> str | Image:
+        """
+        Picks a random egg design and decorates it using the given colours.
+
+        Colours are split by spaces, unless you wrap the colour name in double quotes.
+        Discord colour names, HTML colour names, XKCD colour names and hex values are accepted.
+
+        Returns a response string that should be sent to the user if the input is invalid.
+        Otherwise, returns a completed discord.File object.
+        """
+        if len(colours) < 2:
+            return "You must include at least 2 colours!"
+
+        invalid = []
+        colours = list(colours)
+        for idx, colour in enumerate(colours):
+            if isinstance(colour, discord.Colour):
+                continue
+            value = EggDecorating.replace_invalid(colour)
+            if value:
+                colours[idx] = discord.Colour(value)
+            else:
+                invalid.append(helpers.suppress_links(colour))
+
+        if len(invalid) > 1:
+            return f"Sorry, I don't know these colours: {' '.join(invalid)}"
+        if len(invalid) == 1:
+            return f"Sorry, I don't know the colour {invalid[0]}!"
+
+        # Expand list to 8 colours
+        colours_n = len(colours)
+        if colours_n < 8:
+            q, r = divmod(8, colours_n)
+            colours = colours * q + colours[:r]
+        num = random.randint(1, 6)
+        im = Image.open(Path(f"bot/resources/holidays/easter/easter_eggs/design{num}.png"))
+        data = list(im.getdata())
+
+        replaceable = {x for x in data if x not in IRREPLACEABLE}
+        replaceable = sorted(replaceable, key=COLOURS.index)
+
+        replacing_colours = {colour: colours[i] for i, colour in enumerate(replaceable)}
+        new_data = []
+        for x in data:
+            if x in replacing_colours:
+                new_data.append((*replacing_colours[x].to_rgb(), 255))
+                # Also ensures that the alpha channel has a value
+            else:
+                new_data.append(x)
+        new_im = Image.new(im.mode, im.size)
+        new_im.putdata(new_data)
+        return new_im
+
     @commands.command(aliases=("decorateegg",))
     async def eggdecorate(
         self, ctx: commands.Context, *colours: discord.Colour | str
@@ -50,58 +104,20 @@ class EggDecorating(commands.Cog):
         Colours are split by spaces, unless you wrap the colour name in double quotes.
         Discord colour names, HTML colour names, XKCD colour names and hex values are accepted.
         """
-        if len(colours) < 2:
-            await ctx.send("You must include at least 2 colours!")
-            return None
-
-        invalid = []
-        colours = list(colours)
-        for idx, colour in enumerate(colours):
-            if isinstance(colour, discord.Colour):
-                continue
-            value = self.replace_invalid(colour)
-            if value:
-                colours[idx] = discord.Colour(value)
-            else:
-                invalid.append(helpers.suppress_links(colour))
-
-        if len(invalid) > 1:
-            await ctx.send(f"Sorry, I don't know these colours: {' '.join(invalid)}")
-            return None
-        if len(invalid) == 1:
-            await ctx.send(f"Sorry, I don't know the colour {invalid[0]}!")
-            return None
 
         async with ctx.typing():
-            # Expand list to 8 colours
-            colours_n = len(colours)
-            if colours_n < 8:
-                q, r = divmod(8, colours_n)
-                colours = colours * q + colours[:r]
-            num = random.randint(1, 6)
-            im = Image.open(Path(f"bot/resources/holidays/easter/easter_eggs/design{num}.png"))
-            data = list(im.getdata())
-
-            replaceable = {x for x in data if x not in IRREPLACEABLE}
-            replaceable = sorted(replaceable, key=COLOURS.index)
-
-            replacing_colours = {colour: colours[i] for i, colour in enumerate(replaceable)}
-            new_data = []
-            for x in data:
-                if x in replacing_colours:
-                    new_data.append((*replacing_colours[x].to_rgb(), 255))
-                    # Also ensures that the alpha channel has a value
-                else:
-                    new_data.append(x)
-            new_im = Image.new(im.mode, im.size)
-            new_im.putdata(new_data)
-
+            result = self.render_egg(*colours)
+            if isinstance(result, str):
+                await ctx.send(result)
+                return
+            else:
+                new_im = result
             bufferedio = BytesIO()
             new_im.save(bufferedio, format="PNG")
 
             bufferedio.seek(0)
 
-            file = discord.File(bufferedio, filename="egg.png")  # Creates file to be used in embed
+            file = discord.File(bufferedio, filename="egg.png")
             embed = discord.Embed(
                 title="Your Colourful Easter Egg",
                 description="Here is your pretty little egg. Hope you like it!"
