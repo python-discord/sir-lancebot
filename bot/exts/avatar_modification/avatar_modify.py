@@ -12,7 +12,6 @@ import discord
 from discord import Interaction, app_commands
 from discord.app_commands import Group
 from discord.ext import commands
-from discord.ext.commands import Greedy
 from pydis_core.utils.logging import get_logger
 from rapidfuzz import process
 
@@ -34,7 +33,7 @@ T = TypeVar("T")
 GENDER_OPTIONS = json.loads(Path("bot/resources/holidays/pride/gender_options.json").read_text("utf8"))
 
 
-async def in_executor(func: Callable[..., T], *args) -> T:
+async def in_executor[T](func: Callable[..., T], *args) -> T:
     """
     Runs the given synchronous function `func` in an executor.
 
@@ -378,7 +377,10 @@ class AvatarModifyAppCommand(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    avatar_modify = Group(name="avatar_modify", description="Groups all of the pfp modifying commands to allow a single concurrency limit.")
+    avatar_modify = Group(
+        name="avatar_modify",
+        description="Groups all of the pfp modifying commands to allow a single concurrency limit."
+    )
 
     @avatar_modify.command(name="8bitify")
     async def eightbit_command(self, ctx: Interaction) -> None:
@@ -408,7 +410,6 @@ class AvatarModifyAppCommand(commands.Cog):
     @avatar_modify.command(name="reverse")
     async def reverse(self, ctx: Interaction) -> None:
         """Reverses the user's profile picture."""
-
         await ctx.response.defer()
 
         image_bytes = await ctx.user.display_avatar.replace(size=1024).read()
@@ -432,7 +433,9 @@ class AvatarModifyAppCommand(commands.Cog):
         await ctx.edit_original_response(embed=embed, attachments=(file,))
 
     @avatar_modify.command(name="easterify", description="Easterify the user's avatar.")
-    @app_commands.describe(colours="Discord colour names, HTML colour names, XKCD colour names and hex values are accepted.")
+    @app_commands.describe(
+        colours="Discord colour names, HTML colour names, XKCD colour names and hex values are accepted."
+    )
     async def avatareasterify(self, ctx: Interaction, colours: str = "") -> None:
         """
         Easterify the user's avatar.
@@ -442,7 +445,6 @@ class AvatarModifyAppCommand(commands.Cog):
         Colours are split by spaces, unless you wrap the colour name in double quotes.
         Discord colour names, HTML colour names, XKCD colour names and hex values are accepted.
         """
-
         await ctx.response.defer()
 
         egg = None
@@ -457,8 +459,7 @@ class AvatarModifyAppCommand(commands.Cog):
             if isinstance(result, str):
                 await ctx.edit_original_response(content=result)
                 return
-            else:
-                egg = result
+            egg = result
 
         image_bytes = await ctx.user.display_avatar.replace(size=256).read()
         file_name = file_safe_name("easterified_avatar", ctx.user.display_name)
@@ -524,14 +525,13 @@ class AvatarModifyAppCommand(commands.Cog):
     async def gender_autocomplete(self, interaction: Interaction, query: str) -> list[app_commands.Choice[str]]:
         """Returns a list of pride flags that matches `query`."""
         if query == "":
-            return [app_commands.Choice[str](name=x, value=x) for x in GENDER_OPTIONS.keys()][:25]
+            return [app_commands.Choice[str](name=x, value=x) for x in GENDER_OPTIONS][:25]
         result = process.extract(query=query, choices=GENDER_OPTIONS.keys(), limit=25, score_cutoff=61)
         return [app_commands.Choice[str](name=x[0], value=x[0]) for x in result]
 
     @avatar_modify.command(name="spooky")
     async def spookyavatar(self, ctx: Interaction) -> None:
         """Spookify the user's avatar, with a random *spooky* effect."""
-
         await ctx.response.defer()
         image_bytes = await ctx.user.display_avatar.replace(size=1024).read()
 
@@ -559,7 +559,9 @@ class AvatarModifyAppCommand(commands.Cog):
         await ctx.response.defer()
 
         if not 1 <= squares <= MAX_SQUARES:
-            await ctx.edit_original_response(content=f"Squares must be a positive number less than or equal to {MAX_SQUARES:,}.")
+            await ctx.edit_original_response(
+                content=f"Squares must be a positive number less than or equal to {MAX_SQUARES:,}."
+            )
             return
 
         sqrt = math.sqrt(squares)

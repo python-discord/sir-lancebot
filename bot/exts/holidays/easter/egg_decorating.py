@@ -104,14 +104,12 @@ class EggDecorating(commands.Cog):
         Colours are split by spaces, unless you wrap the colour name in double quotes.
         Discord colour names, HTML colour names, XKCD colour names and hex values are accepted.
         """
-
         async with ctx.typing():
             result = self.render_egg(*colours)
             if isinstance(result, str):
                 await ctx.send(result)
-                return
-            else:
-                new_im = result
+                return None
+            new_im = result
             bufferedio = BytesIO()
             new_im.save(bufferedio, format="PNG")
 
