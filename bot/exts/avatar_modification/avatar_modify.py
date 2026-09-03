@@ -9,8 +9,11 @@ from pathlib import Path
 from typing import TypeVar
 
 import discord
+from discord import Interaction, app_commands
 from discord.ext import commands
+from discord.ext.commands import Greedy
 from pydis_core.utils.logging import get_logger
+from rapidfuzz import process
 
 from bot.bot import Bot
 from bot.constants import Colours, Emojis
@@ -30,7 +33,7 @@ T = TypeVar("T")
 GENDER_OPTIONS = json.loads(Path("bot/resources/holidays/pride/gender_options.json").read_text("utf8"))
 
 
-async def in_executor(func: Callable[..., T], *args) -> T:
+async def in_executor[T](func: Callable[..., T], *args) -> T:
     """
     Runs the given synchronous function `func` in an executor.
 
@@ -85,7 +88,7 @@ class AvatarModify(commands.Cog):
 
         return user
 
-    @commands.group(aliases=("avatar_mod", "pfp_mod", "avatarmod", "pfpmod"))
+    @commands.hybrid_group(aliases=("avatar_mod", "pfp_mod", "avatarmod", "pfpmod"))
     async def avatar_modify(self, ctx: commands.Context) -> None:
         """Groups all of the pfp modifying commands to allow a single concurrency limit."""
         if not ctx.invoked_subcommand:
@@ -94,34 +97,35 @@ class AvatarModify(commands.Cog):
     @avatar_modify.command(name="8bitify", root_aliases=("8bitify",))
     async def eightbit_command(self, ctx: commands.Context) -> None:
         """Pixelates your avatar and changes the palette to an 8bit one."""
-        async with ctx.typing():
-            user = await self._fetch_user(ctx.author.id)
-            if not user:
-                await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
-                return
+        await ctx.defer()
+        user = await self._fetch_user(ctx.author.id)
+        if not user:
+            await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
+            return
 
-            image_bytes = await user.display_avatar.replace(size=1024).read()
-            file_name = file_safe_name("eightbit_avatar", ctx.author.display_name)
+        image_bytes = await user.display_avatar.replace(size=1024).read()
+        file_name = file_safe_name("eightbit_avatar", ctx.author.display_name)
 
-            file = await in_executor(
-                PfpEffects.apply_effect,
-                image_bytes,
-                PfpEffects.eight_bitify_effect,
-                file_name
-            )
+        file = await in_executor(
+            PfpEffects.apply_effect,
+            image_bytes,
+            PfpEffects.eight_bitify_effect,
+            file_name
+        )
 
-            embed = discord.Embed(
-                title="Your 8-bit avatar",
-                description="Here is your avatar. I think it looks all cool and 'retro'."
-            )
+        embed = discord.Embed(
+            title="Your 8-bit avatar",
+            description="Here is your avatar. I think it looks all cool and 'retro'."
+        )
 
-            embed.set_image(url=f"attachment://{file_name}")
-            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=user.display_avatar.url)
+        embed.set_image(url=f"attachment://{file_name}")
+        embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=user.display_avatar.url)
 
         await ctx.send(embed=embed, file=file)
 
     @avatar_modify.command(name="reverse", root_aliases=("reverse",))
-    async def reverse(self, ctx: commands.Context, *, text: str | None) -> None:
+    @app_commands.describe(text="The text to reverse")
+    async def reverse(self, ctx: commands.Context, *, text: str | None = None) -> None:
         """
         Reverses the sent text.
 
@@ -131,34 +135,37 @@ class AvatarModify(commands.Cog):
             await ctx.send(f"> {text[::-1]}", allowed_mentions=discord.AllowedMentions.none())
             return
 
-        async with ctx.typing():
-            user = await self._fetch_user(ctx.author.id)
-            if not user:
-                await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
-                return
+        await ctx.defer()
+        user = await self._fetch_user(ctx.author.id)
+        if not user:
+            await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
+            return
 
-            image_bytes = await user.display_avatar.replace(size=1024).read()
-            filename = file_safe_name("reverse_avatar", ctx.author.display_name)
+        image_bytes = await user.display_avatar.replace(size=1024).read()
+        filename = file_safe_name("reverse_avatar", ctx.author.display_name)
 
-            file = await in_executor(
-                PfpEffects.apply_effect,
-                image_bytes,
-                PfpEffects.flip_effect,
-                filename
-            )
+        file = await in_executor(
+            PfpEffects.apply_effect,
+            image_bytes,
+            PfpEffects.flip_effect,
+            filename
+        )
 
-            embed = discord.Embed(
-                title="Your reversed avatar.",
-                description="Here is your reversed avatar. I think it is a spitting image of you."
-            )
+        embed = discord.Embed(
+            title="Your reversed avatar.",
+            description="Here is your reversed avatar. I think it is a spitting image of you."
+        )
 
-            embed.set_image(url=f"attachment://{filename}")
-            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=user.display_avatar.url)
+        embed.set_image(url=f"attachment://{filename}")
+        embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=user.display_avatar.url)
 
-            await ctx.send(embed=embed, file=file)
+        await ctx.send(embed=embed, file=file)
 
     @avatar_modify.command(aliases=("easterify",), root_aliases=("easterify", "avatareasterify"))
-    async def avatareasterify(self, ctx: commands.Context, *colours: discord.Colour | str) -> None:
+    @app_commands.describe(
+        colours="Discord colour names, HTML colour names, XKCD colour names and hex values are accepted."
+    )
+    async def avatareasterify(self, ctx: commands.Context, colours: Greedy[discord.Colour | str]) -> None:
         """
         Easterify the user's avatar.
 
@@ -178,39 +185,42 @@ class AvatarModify(commands.Cog):
                 return args[0]
             return None
 
-        async with ctx.typing():
-            user = await self._fetch_user(ctx.author.id)
-            if not user:
-                await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
+        await ctx.defer()
+        user = await self._fetch_user(ctx.author.id)
+        if not user:
+            await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
+            return
+
+        egg = None
+        if colours:
+            send_message = ctx.send
+            ctx.send = send  # Assigns ctx.send to a fake send
+            if (cog := self.bot.get_cog("EggDecorating")) is not None:
+                egg = cog.render_egg(*colours)
+            else:
+                egg = None
+            if isinstance(egg, str):  # When an error message occurs in eggdecorate.
+                await send_message(egg)
                 return
+            ctx.send = send_message  # Reassigns ctx.send
 
-            egg = None
-            if colours:
-                send_message = ctx.send
-                ctx.send = send  # Assigns ctx.send to a fake send
-                egg = await ctx.invoke(self.bot.get_command("eggdecorate"), *colours)
-                if isinstance(egg, str):  # When an error message occurs in eggdecorate.
-                    await send_message(egg)
-                    return
-                ctx.send = send_message  # Reassigns ctx.send
+        image_bytes = await user.display_avatar.replace(size=256).read()
+        file_name = file_safe_name("easterified_avatar", ctx.author.display_name)
 
-            image_bytes = await user.display_avatar.replace(size=256).read()
-            file_name = file_safe_name("easterified_avatar", ctx.author.display_name)
+        file = await in_executor(
+            PfpEffects.apply_effect,
+            image_bytes,
+            PfpEffects.easterify_effect,
+            file_name,
+            egg
+        )
 
-            file = await in_executor(
-                PfpEffects.apply_effect,
-                image_bytes,
-                PfpEffects.easterify_effect,
-                file_name,
-                egg
-            )
-
-            embed = discord.Embed(
-                title="Your Lovely Easterified Avatar!",
-                description="Here is your lovely avatar, all bright and colourful\nwith Easter pastel colours. Enjoy :D"
-            )
-            embed.set_image(url=f"attachment://{file_name}")
-            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=user.display_avatar.url)
+        embed = discord.Embed(
+            title="Your Lovely Easterified Avatar!",
+            description="Here is your lovely avatar, all bright and colourful\nwith Easter pastel colours. Enjoy :D"
+        )
+        embed.set_image(url=f"attachment://{file_name}")
+        embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=user.display_avatar.url)
 
         await ctx.send(file=file, embed=embed)
 
@@ -246,9 +256,14 @@ class AvatarModify(commands.Cog):
     @avatar_modify.group(
         aliases=("avatarpride", "pridepfp", "prideprofile"),
         root_aliases=("prideavatar", "avatarpride", "pridepfp", "prideprofile"),
-        invoke_without_command=True
+        invoke_without_command=True,
+        fallback="pride",
     )
-    async def prideavatar(self, ctx: commands.Context, option: str = "lgbt", pixels: int = 64) -> None:
+    @app_commands.describe(option="The pride flag to use as the border.", pixels="The thickness of the flag border.")
+    async def prideavatar(
+            self, ctx: commands.Context, option: str = "lgbt",
+            pixels: app_commands.Range[int, 0, 512] = 64
+    ) -> None:
         """
         Surround an avatar with a border of a specified LGBT flag.
 
@@ -264,13 +279,21 @@ class AvatarModify(commands.Cog):
             await ctx.send("I don't have that flag!")
             return
 
-        async with ctx.typing():
-            user = await self._fetch_user(ctx.author.id)
-            if not user:
-                await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
-                return
-            image_bytes = await user.display_avatar.replace(size=1024).read()
-            await self.send_pride_image(ctx, image_bytes, pixels, flag, option)
+        await ctx.defer()
+        user = await self._fetch_user(ctx.author.id)
+        if not user:
+            await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
+            return
+        image_bytes = await user.display_avatar.replace(size=1024).read()
+        await self.send_pride_image(ctx, image_bytes, pixels, flag, option)
+
+    @prideavatar.autocomplete("option")
+    async def gender_autocomplete(self, interaction: Interaction, query: str) -> list[app_commands.Choice[str]]:
+        """Returns a list of pride flags that matches `query`."""
+        if query == "":
+            return [app_commands.Choice[str](name=x, value=x) for x in GENDER_OPTIONS][:25]
+        result = process.extract(query=query, choices=GENDER_OPTIONS.keys(), limit=25, score_cutoff=61)
+        return [app_commands.Choice[str](name=x[0], value=x[0]) for x in result]
 
     @prideavatar.command()
     async def flags(self, ctx: commands.Context) -> None:
@@ -296,76 +319,81 @@ class AvatarModify(commands.Cog):
             await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
             return
 
-        async with ctx.typing():
-            image_bytes = await user.display_avatar.replace(size=1024).read()
+        await ctx.defer()
+        image_bytes = await user.display_avatar.replace(size=1024).read()
 
-            file_name = file_safe_name("spooky_avatar", ctx.author.display_name)
+        file_name = file_safe_name("spooky_avatar", ctx.author.display_name)
 
-            file = await in_executor(
-                PfpEffects.apply_effect,
-                image_bytes,
-                spookifications.get_random_effect,
-                file_name
-            )
+        file = await in_executor(
+            PfpEffects.apply_effect,
+            image_bytes,
+            spookifications.get_random_effect,
+            file_name
+        )
 
-            embed = discord.Embed(
-                title="Is this you or am I just really paranoid?",
-                colour=Colours.soft_red
-            )
-            embed.set_image(url=f"attachment://{file_name}")
-            embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=ctx.author.display_avatar.url)
+        embed = discord.Embed(
+            title="Is this you or am I just really paranoid?",
+            colour=Colours.soft_red
+        )
+        embed.set_image(url=f"attachment://{file_name}")
+        embed.set_footer(text=f"Made by {ctx.author.display_name}.", icon_url=ctx.author.display_avatar.url)
 
-            await ctx.send(file=file, embed=embed)
+        await ctx.send(file=file, embed=embed)
 
     @avatar_modify.command(name="mosaic", root_aliases=("mosaic",))
-    async def mosaic_command(self, ctx: commands.Context, squares: int = 16) -> None:
+    @app_commands.describe(squares="Amount of squares to use. Will be converted to next perfect square.")
+    async def mosaic_command(
+            self,
+            ctx: commands.Context,
+            squares: app_commands.Range[int, 1, MAX_SQUARES] = 16
+    ) -> None:
         """Splits your avatar into x squares, randomizes them and stitches them back into a new image!"""
-        async with ctx.typing():
-            user = await self._fetch_user(ctx.author.id)
-            if not user:
-                await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
-                return
+        await ctx.defer()
+        user = await self._fetch_user(ctx.author.id)
+        if not user:
+            await ctx.send(f"{Emojis.cross_mark} Could not get user info.")
+            return
 
-            if not 1 <= squares <= MAX_SQUARES:
-                raise commands.BadArgument(f"Squares must be a positive number less than or equal to {MAX_SQUARES:,}.")
+        if not 1 <= squares <= MAX_SQUARES:
+            raise commands.BadArgument(f"Squares must be a positive number less than or equal to {MAX_SQUARES:,}.")
 
-            sqrt = math.sqrt(squares)
+        sqrt = math.sqrt(squares)
 
-            if not sqrt.is_integer():
-                squares = math.ceil(sqrt) ** 2  # Get the next perfect square
+        if not sqrt.is_integer():
+            squares = math.ceil(sqrt) ** 2  # Get the next perfect square
 
-            file_name = file_safe_name("mosaic_avatar", ctx.author.display_name)
+        file_name = file_safe_name("mosaic_avatar", ctx.author.display_name)
 
-            img_bytes = await user.display_avatar.replace(size=1024).read()
+        img_bytes = await user.display_avatar.replace(size=1024).read()
 
-            file = await in_executor(
-                PfpEffects.apply_effect,
-                img_bytes,
-                PfpEffects.mosaic_effect,
-                file_name,
-                squares,
-            )
+        file = await in_executor(
+            PfpEffects.apply_effect,
+            img_bytes,
+            PfpEffects.mosaic_effect,
+            file_name,
+            squares,
+        )
 
-            if squares == 1:
-                title = "Hooh... that was a lot of work"
-                description = "I present to you... Yourself!"
-            elif squares == MAX_SQUARES:
-                title = "Testing the limits I see..."
-                description = "What a masterpiece. :star:"
-            else:
-                title = "Your mosaic avatar"
-                description = f"Here is your avatar. I think it looks a bit *puzzling*\nMade with {squares} squares."
+        if squares == 1:
+            title = "Hooh... that was a lot of work"
+            description = "I present to you... Yourself!"
+        elif squares == MAX_SQUARES:
+            title = "Testing the limits I see..."
+            description = "What a masterpiece. :star:"
+        else:
+            title = "Your mosaic avatar"
+            description = f"Here is your avatar. I think it looks a bit *puzzling*\nMade with {squares} squares."
 
-            embed = discord.Embed(
-                title=title,
-                description=description,
-                colour=Colours.blue
-            )
+        embed = discord.Embed(
+            title=title,
+            description=description,
+            colour=Colours.blue
+        )
 
-            embed.set_image(url=f"attachment://{file_name}")
-            embed.set_footer(text=f"Made by {ctx.author.display_name}", icon_url=user.display_avatar.url)
+        embed.set_image(url=f"attachment://{file_name}")
+        embed.set_footer(text=f"Made by {ctx.author.display_name}", icon_url=user.display_avatar.url)
 
-            await ctx.send(file=file, embed=embed)
+        await ctx.send(file=file, embed=embed)
 
 
 async def setup(bot: Bot) -> None:
