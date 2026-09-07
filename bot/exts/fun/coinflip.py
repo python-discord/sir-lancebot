@@ -4,6 +4,10 @@ from discord.ext import commands
 
 from bot.bot import Bot
 from bot.constants import Emojis
+from bot.utils.leaderboard import add_points
+
+COINFLIP_WIN_POINTS = 2
+COINFLIP_GAME_NAME = "coinflip"
 
 
 class CoinSide(commands.Converter):
@@ -27,6 +31,9 @@ class CoinSide(commands.Converter):
 class CoinFlip(commands.Cog):
     """Cog for the CoinFlip command."""
 
+    def __init__(self, bot: Bot):
+        self.bot = bot
+
     @commands.command(name="coinflip", aliases=("flip", "coin", "cf"))
     async def coinflip_command(self, ctx: commands.Context, side: CoinSide = None) -> None:
         """
@@ -42,7 +49,8 @@ class CoinFlip(commands.Cog):
             return
 
         if side == flipped_side:
-            message += f"You guessed correctly! {Emojis.lemon_hyperpleased}"
+            _, earned = await add_points(self.bot, ctx.author.id, COINFLIP_WIN_POINTS, COINFLIP_GAME_NAME)
+            message += f"You guessed correctly! {Emojis.lemon_hyperpleased} (+{earned} pts)"
         else:
             message += f"You guessed incorrectly. {Emojis.lemon_pensive}"
         await ctx.send(message)
@@ -50,4 +58,4 @@ class CoinFlip(commands.Cog):
 
 async def setup(bot: Bot) -> None:
     """Loads the coinflip cog."""
-    await bot.add_cog(CoinFlip())
+    await bot.add_cog(CoinFlip(bot))
