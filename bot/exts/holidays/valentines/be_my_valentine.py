@@ -81,19 +81,19 @@ class BeMyValentine(commands.Cog):
         await channel.send(user.mention, embed=embed)
 
     @commands.cooldown(1, 1800, commands.BucketType.user)
-    @send_valentine.command(name="secret")
-    async def anonymous(
+    @send_valentine.command(name="private")
+    async def private_love_dm(
         self, ctx: commands.Context, user: discord.Member, *, valentine_type: str | None = None
     ) -> None:
         """
-        Send an anonymous Valentine via DM to to a specified user with the lovefest role.
+        Send a private Valentine via DM to a specified user with the lovefest role.
 
-        syntax : .bemyvalentine secret [user] [p/poem/c/compliment/or you can type your own valentine message]
+        syntax : .bemyvalentine private [user] [p/poem/c/compliment/or you can type your own valentine message]
         (optional)
 
-        example : .bemyvalentine secret Iceman#6508 p (sends a poem to Iceman in DM making you anonymous)
-        example : .bemyvalentine secret Iceman#6508 Hey I love you, wanna hang around ? (sends the custom message to
-        Iceman in DM making you anonymous)
+        example : .bemyvalentine private Iceman#6508 p (sends a poem to Iceman in DM)
+        example : .bemyvalentine private Iceman#6508 Hey I love you, wanna hang around ? (sends the custom message to
+        Iceman in DM but he knows your identity)
         """
         if Roles.lovefest not in [role.id for role in user.roles]:
             await ctx.message.delete()
@@ -110,7 +110,7 @@ class BeMyValentine(commands.Cog):
 
         embed = discord.Embed(
             title=f"{emoji_1}{title} {user.display_name}{emoji_2}",
-            description=f"{valentine} \n **{emoji_2}From anonymous{emoji_1}**",
+            description=f"{valentine} \n **{emoji_2}From {ctx.author}{emoji_1}**",
             color=Colours.pink
         )
         await ctx.message.delete()
